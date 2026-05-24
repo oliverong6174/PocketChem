@@ -1,11 +1,21 @@
 import { useState } from "react";
 import MoleculeDrawer from "./components/MoleculeDrawer";
+import {
+  analyzeFunctionalGroupHierarchy,
+  type FunctionalGroupResult,
+} from "./utils/analyzeSmiles";
 import "./App.css";
+
 
 function App() {
   const [smiles, setSmiles] = useState("Not analyzed yet");
   const [status, setStatus] = useState("Draw a molecule first");
-
+  
+  const [mainGroup, setMainGroup] = useState<FunctionalGroupResult | null>(null);
+  const [functionalGroups, setFunctionalGroups] = useState<FunctionalGroupResult[]>([]);
+  const additionalFunctionalGroups = mainGroup
+  ? functionalGroups.filter((group) => group.name !== mainGroup.name)
+  : functionalGroups;
 //ANALYZE MOLECULE
 
  const analyzeMolecule = async () => {
@@ -29,7 +39,12 @@ function App() {
     }
 
     setSmiles(result);
+    const hierarchy = await analyzeFunctionalGroupHierarchy(result);
+
+    setMainGroup(hierarchy.mainGroup);
+    setFunctionalGroups(hierarchy.primaryGroups);
     setStatus("Molecule analyzed successfully.");
+
   } catch (error) {
     console.error("Analyze error:", error);
     setStatus("Something went wrong while analyzing the molecule.");
@@ -61,7 +76,6 @@ function App() {
             <span className="status">Draw Mode</span>
           </div>
 
-//MoleculeDrawer
           <div className="drawer-placeholder">
             <MoleculeDrawer />
           </div>
@@ -75,6 +89,9 @@ function App() {
               onClick={() => {
                 setSmiles("Not analyzed yet");
                 setStatus("Draw a molecule first");
+                   setMainGroup(null);
+                    setFunctionalGroups([]);
+                setFunctionalGroups([]);
               }}
             >
               Clear Analysis
@@ -94,12 +111,66 @@ function App() {
             <p className="label">SMILES</p>
             <p className="smiles-output">{smiles}</p>
           </div>
-
+          
           <div className="analysis-section">
-            <p className="label">Functional Groups</p>
-            <p className="empty">Coming next</p>
+            <p className="label">Main Functional Group</p>
+
+            {mainGroup ? (
+              <div className="group-card">
+                <div className="group-card-header">
+                  <h3>
+                    {mainGroup.name}
+                    {mainGroup.count > 1 ? ` (×${mainGroup.count})` : ""}
+                  </h3>
+                  <span>{mainGroup.confidence} confidence</span>
+                </div>
+                <p>
+                  <strong>Suffix:</strong> {mainGroup.suffix}
+                </p>
+                <p>
+                  <strong>Prefix if substituent:</strong> {mainGroup.prefix}
+                </p>
+                <p>{mainGroup.mcatNote}</p>
+              </div>
+            ) : (
+              <p className="empty">Draw and analyze a molecule first</p>
+            )}
           </div>
 
+          <div className="analysis-section">
+          <p className="label">Additional Functional Groups</p>
+
+          {functionalGroups.length === 0 ? (
+              <p className="empty">Draw and analyze a molecule first</p>
+            ) : additionalFunctionalGroups.length === 0 ? (
+              <p className="empty">No additional functional groups</p>
+            ) : (
+              <div className="group-list">
+                {additionalFunctionalGroups.map((group) => (
+                  <div className="group-card" key={group.name}>
+                    <div className="group-card-header">
+                      <h3>
+                        {group.name}
+                        {group.count > 1 ? ` (×${group.count})` : ""}
+                      </h3>
+                      <span>{group.confidence} confidence</span>
+                    </div>
+
+                    <p>
+                      <strong>Suffix:</strong> {group.suffix}
+                    </p>
+                    <p>
+                      <strong>Prefix if substituent:</strong> {group.prefix}
+                    </p>
+                    <p>{group.mcatNote}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+        </div>
+
+
+      
           <div className="analysis-section">
             <p className="label">MCAT Notes</p>
             <p>

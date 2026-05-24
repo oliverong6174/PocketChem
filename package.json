@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@rdkit/rdkit": "^2025.3.4-1.0.0",
     "ketcher-core": "^3.12.0",
     "ketcher-react": "^3.12.0",
     "ketcher-standalone": "^3.12.0",
