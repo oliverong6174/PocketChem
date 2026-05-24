@@ -712,6 +712,100 @@ function getMainGroup(groups: FunctionalGroupResult[]): FunctionalGroupResult | 
   )[0];
 }
 
+// TODO: Add all simple molecules: H2O2, PCl5, and others 
+
+function detectSimpleMolecule(smiles: string): FunctionalGroupResult | null {
+  const s = smiles.replace(/\s+/g, "").trim();
+
+  const simpleMolecules: Record<string, FunctionalGroupResult> = {
+    O: {
+      name: "Water",
+      priority: 900,
+      nomenclaturePriority: 900,
+      confidence: "High",
+      suffix: "N/A",
+      prefix: "N/A",
+      count: 1,
+      mcatNote:
+        "Water is not an organic functional group, but it is biologically essential as a solvent, reactant, and product in hydrolysis and condensation reactions.",
+    },
+
+    "O=C=O": {
+      name: "Carbon dioxide",
+      priority: 900,
+      nomenclaturePriority: 900,
+      confidence: "High",
+      suffix: "N/A",
+      prefix: "N/A",
+      count: 1,
+      mcatNote:
+        "Carbon dioxide is not an organic functional group. In biochemistry, it appears in decarboxylation reactions, respiration, and bicarbonate buffering.",
+    },
+
+    N: {
+      name: "Ammonia",
+      priority: 900,
+      nomenclaturePriority: 900,
+      confidence: "High",
+      suffix: "N/A",
+      prefix: "N/A",
+      count: 1,
+      mcatNote:
+        "Ammonia is not an organic functional group, but it is related to amines and nitrogen metabolism.",
+    },
+
+    "[NH4+]": {
+      name: "Ammonium",
+      priority: 900,
+      nomenclaturePriority: 900,
+      confidence: "High",
+      suffix: "N/A",
+      prefix: "N/A",
+      count: 1,
+      mcatNote:
+        "Ammonium is the protonated form of ammonia. It is positively charged and relevant to acid-base chemistry and nitrogen metabolism.",
+    },
+
+    Cl: {
+      name: "Chlorine / chloride-like species",
+      priority: 900,
+      nomenclaturePriority: 900,
+      confidence: "Medium",
+      suffix: "N/A",
+      prefix: "N/A",
+      count: 1,
+      mcatNote:
+        "This is not an organic functional group. Chloride ions and chlorine-containing species are important in electrolyte balance and substitution chemistry.",
+    },
+
+    "[Na+]": {
+      name: "Sodium ion",
+      priority: 900,
+      nomenclaturePriority: 900,
+      confidence: "High",
+      suffix: "N/A",
+      prefix: "N/A",
+      count: 1,
+      mcatNote:
+        "Sodium ion is not an organic functional group. It is an important electrolyte in physiology and membrane potentials.",
+    },
+
+    "[K+]": {
+      name: "Potassium ion",
+      priority: 900,
+      nomenclaturePriority: 900,
+      confidence: "High",
+      suffix: "N/A",
+      prefix: "N/A",
+      count: 1,
+      mcatNote:
+        "Potassium ion is not an organic functional group. It is important in membrane potentials and action potentials.",
+    },
+  };
+
+  return simpleMolecules[s] ?? null;
+}
+
 export async function analyzeFunctionalGroups(
   smiles: string
 ): Promise<FunctionalGroupResult[]> {
@@ -725,6 +819,14 @@ export async function analyzeFunctionalGroupHierarchy(
   try {
     const RDKit = await getRDKit();
     const cleanSmiles = smiles.replace(/\s+/g, "").trim();
+    const simpleMolecule = detectSimpleMolecule(cleanSmiles);
+
+    if (simpleMolecule) {
+    return {
+        mainGroup: simpleMolecule,
+        primaryGroups: [simpleMolecule],
+    };
+    }
 
     console.log("Raw SMILES:", smiles);
     console.log("Normalized SMILES:", cleanSmiles);
@@ -765,7 +867,7 @@ export async function analyzeFunctionalGroupHierarchy(
 
     if (rawPrimaryGroups.length === 0) {
       const noGroupResult: FunctionalGroupResult = {
-        name: "No simple group detected yet",
+        name: "No supported organic functional group detected",
         priority: 999,
         nomenclaturePriority: 999,
         confidence: "Low",
@@ -773,7 +875,7 @@ export async function analyzeFunctionalGroupHierarchy(
         prefix: "N/A",
         count: 0,
         mcatNote:
-          "RDKit parsed the molecule, but no supported functional group pattern matched yet.",
+           "RDKit parsed the molecule, but no supported organic functional group matched. This may be an inorganic molecule, an elemental species, or a structure outside the current MVP detector.",
       };
 
       return {
@@ -797,6 +899,7 @@ export async function analyzeFunctionalGroupHierarchy(
       mainGroup,
       primaryGroups,
     };
+
   } catch (error) {
     console.error("RDKit analysis error:", error);
 
