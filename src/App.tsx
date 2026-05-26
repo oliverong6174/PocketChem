@@ -2,10 +2,24 @@ import { useState } from "react";
 import MoleculeDrawer from "./components/MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
+  getMoleculeSvg,
   type FunctionalGroupResult,
 } from "./utils/analyzeSmiles";
-import { analyzeArio, type ArioResult } from "./utils/analyzeArio";
+import { analyzeAcidity, type AcidityResult } from "./utils/analyzeAcidity";
+import { analyzeBasicity, type BasicityResult } from "./utils/analyzeBasicity";
 import "./App.css";
+
+type RankingMode = "acidity" | "basicity";
+
+type ComparisonMolecule = {
+  id: number;
+  label: string;
+  smiles: string;
+  structureSvg: string | null;
+  functionalGroups: FunctionalGroupResult[];
+  acidityResults: AcidityResult[];
+  basicityResults: BasicityResult[];
+};
 
 function App() {
   const [smiles, setSmiles] = useState("Not analyzed yet");
@@ -17,7 +31,12 @@ function App() {
   const [functionalGroups, setFunctionalGroups] = useState<
     FunctionalGroupResult[]
   >([]);
-  const [arioResults, setArioResults] = useState<ArioResult[]>([]);
+  const [acidityResults, setAcidityResults] = useState<AcidityResult[]>([]);
+  const [basicityResults, setBasicityResults] = useState<BasicityResult[]>([]);
+const [comparisonMolecules, setComparisonMolecules] = useState<
+  ComparisonMolecule[]
+>([]);
+const [rankingMode, setRankingMode] = useState<RankingMode>("acidity");
 
   const additionalFunctionalGroups = mainGroup
     ? functionalGroups.filter((group) => group.name !== mainGroup.name)
@@ -49,8 +68,10 @@ function App() {
       setMainGroup(hierarchy.mainGroup);
       setFunctionalGroups(hierarchy.primaryGroups);
 
-      const ario = analyzeArio(hierarchy.primaryGroups);
-      setArioResults(ario);
+      const acidity = await analyzeAcidity(result, hierarchy.primaryGroups);
+      setAcidityResults(acidity);
+      const basicity = analyzeBasicity(hierarchy.primaryGroups);
+      setBasicityResults(basicity);
 
       setStatus("Molecule analyzed successfully.");
     } catch (error) {
@@ -58,6 +79,97 @@ function App() {
       setStatus("Something went wrong while analyzing the molecule.");
     }
   };
+ 
+const addCurrentMoleculeToComparison = async () => {
+  if (!window.ketcher) {
+    setStatus("Molecule editor is still loading. Try again in a second.");
+    return;
+  }
+
+  if (comparisonMolecules.length >= 5) {
+    setStatus("Comparison list is full. You can compare up to 5 molecules.");
+    return;
+  }
+
+  try {
+    const currentSmiles = await window.ketcher.getSmiles();
+
+    if (!currentSmiles || currentSmiles.trim() === "") {
+      setStatus("Draw a molecule before adding it to comparison.");
+      return;
+    }
+
+    const hierarchy = await analyzeFunctionalGroupHierarchy(currentSmiles);
+    const acidity = await analyzeAcidity(currentSmiles, hierarchy.primaryGroups);
+    const basicity = analyzeBasicity(hierarchy.primaryGroups);
+    const structureSvg = await getMoleculeSvg(currentSmiles);
+
+    const nextLabel = `Molecule ${String.fromCharCode(
+      65 + comparisonMolecules.length
+    )}`;
+
+    const newMolecule: ComparisonMolecule = {
+      id: Date.now(),
+      label: nextLabel,
+      smiles: currentSmiles,
+      structureSvg,
+      functionalGroups: hierarchy.primaryGroups,
+      acidityResults: acidity,
+      basicityResults: basicity,
+    };
+
+    setComparisonMolecules((prev) => [...prev, newMolecule]);
+
+    // Also update the main analysis panel to match the molecule just added
+    setSmiles(currentSmiles);
+    setMainGroup(hierarchy.mainGroup);
+    setFunctionalGroups(hierarchy.primaryGroups);
+    setAcidityResults(acidity);
+    setBasicityResults(basicity);
+
+    setStatus(`${nextLabel} added to comparison.`);
+  } catch (error) {
+    console.error("Add to comparison error:", error);
+    setStatus("Something went wrong while adding the molecule to comparison.");
+  }
+};
+
+const deleteComparisonMolecule = (id: number) => {
+  setComparisonMolecules((prev) =>
+    prev.filter((molecule) => molecule.id !== id)
+  );
+
+  setStatus("Molecule removed from comparison.");
+};
+
+const getRankedComparison = () => {
+  return [...comparisonMolecules]
+    .filter((molecule) =>
+      rankingMode === "acidity"
+        ? molecule.acidityResults.length > 0
+        : molecule.basicityResults.length > 0
+    )
+    .sort((a, b) => {
+      if (rankingMode === "acidity") {
+        return (
+          a.acidityResults[0].estimatedPkaNumber -
+          b.acidityResults[0].estimatedPkaNumber
+        );
+      }
+
+      return (
+        b.basicityResults[0].conjugateAcidPkaNumber -
+        a.basicityResults[0].conjugateAcidPkaNumber
+      );
+    });
+};
+
+const rankedComparison = getRankedComparison();
+
+const clearComparison = () => {
+  setComparisonMolecules([]);
+  setStatus("Comparison list cleared.");
+};
 
   return (
     <main className="app">
@@ -100,10 +212,19 @@ function App() {
                 setStatus("Draw a molecule first");
                 setMainGroup(null);
                 setFunctionalGroups([]);
-                setArioResults([]);
+                setAcidityResults([]);
+                setBasicityResults([]);
               }}
             >
               Clear Analysis
+            </button>
+
+            <button className="secondary-button" onClick={addCurrentMoleculeToComparison}>
+              Add to Comparison
+            </button>
+
+            <button className="secondary-button" onClick={clearComparison}>
+              Clear Comparison
             </button>
           </div>
         </div>
@@ -180,39 +301,44 @@ function App() {
   </div>
 
       <div className="analysis-section">
-        <p className="label">ARIO / Acidity Estimate</p>
+        <p className="label">Acidity Estimate</p>
 
-        {arioResults.length === 0 ? (
+        {acidityResults.length === 0 ? (
           <p className="empty">No acidic sites estimated yet</p>
         ) : (
           <>
             <div className="group-card">
               <div className="group-card-header">
-                <h3>Strongest acidic site: {arioResults[0].acidicSite}</h3>
-                <span>pKa {arioResults[0].estimatedPka}</span>
+                <h3>Strongest acidic site: {acidityResults[0].acidicSite}</h3>
+                <span>pKa {acidityResults[0].estimatedPka}</span>
               </div>
 
               <p>
-                <strong>Related group:</strong> {arioResults[0].relatedGroup}
+                <strong>Related group:</strong> {acidityResults[0].relatedGroup}
               </p>
               <p>
-                <strong>A — Atom:</strong> {arioResults[0].atom}
+                <strong>A — Atom:</strong> {acidityResults[0].atom}
               </p>
               <p>
-                <strong>R — Resonance:</strong> {arioResults[0].resonance}
+                <strong>R — Resonance:</strong> {acidityResults[0].resonance}
               </p>
               <p>
-                <strong>I — Induction:</strong> {arioResults[0].induction}
+                <strong>I — Induction:</strong> {acidityResults[0].induction}
               </p>
               <p>
-                <strong>O — Orbital:</strong> {arioResults[0].orbital}
+                <strong>O — Orbital:</strong> {acidityResults[0].orbital}
               </p>
-              <p>{arioResults[0].explanation}</p>
+              <p>{acidityResults[0].explanation}</p>
+              {acidityResults[0].modifiers.length > 0 && (
+                <p>
+                  <strong>pKa modifier:</strong> {acidityResults[0].modifiers.join(" ")}
+                </p>
+              )}
             </div>
 
-            {arioResults.length > 1 && (
+            {acidityResults.length > 1 && (
               <div className="group-list">
-                {arioResults.slice(1).map((result) => (
+                {acidityResults.slice(1).map((result) => (
                   <div className="group-card" key={result.relatedGroup}>
                     <div className="group-card-header">
                       <h3>Weaker acidic site: {result.acidicSite}</h3>
@@ -231,6 +357,129 @@ function App() {
         )}
       </div>
     </div>
+
+    <div className="analysis-section">
+  <p className="label">Basicity Estimate</p>
+
+  {basicityResults.length === 0 ? (
+    <p className="empty">No basic sites estimated yet</p>
+  ) : (
+    <div className="group-list">
+      {basicityResults.map((result) => (
+        <div className="group-card" key={result.relatedGroup}>
+          <div className="group-card-header">
+            <h3>{result.basicSite}</h3>
+            <span>conj. acid pKa {result.conjugateAcidPka}</span>
+          </div>
+
+          <p>
+            <strong>Related group:</strong> {result.relatedGroup}
+          </p>
+          <p>{result.explanation}</p>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+  <div className="analysis-section">
+  <p className="label">Compare Molecules</p>
+
+  <div className="button-row">
+    <label>
+      <input
+        type="radio"
+        name="rankingMode"
+        value="acidity"
+        checked={rankingMode === "acidity"}
+        onChange={() => setRankingMode("acidity")}
+      />
+      Rank by acidity
+    </label>
+
+    <label>
+      <input
+        type="radio"
+        name="rankingMode"
+        value="basicity"
+        checked={rankingMode === "basicity"}
+        onChange={() => setRankingMode("basicity")}
+      />
+      Rank by basicity
+    </label>
+  </div>
+
+  {comparisonMolecules.length === 0 ? (
+    <p className="empty">Analyze molecules and add them to comparison.</p>
+  ) : rankedComparison.length === 0 ? (
+    <p className="empty">
+      No comparable {rankingMode === "acidity" ? "acidic" : "basic"} sites
+      detected yet.
+    </p>
+  ) : (
+    <div className="group-list">
+      {rankedComparison.map((molecule, index) => {
+        const bestAcid = molecule.acidityResults[0];
+        const bestBase = molecule.basicityResults[0];
+
+        return (
+          <div className="group-card" key={molecule.id}>
+            <div className="group-card-header">
+              <h3>
+                #{index + 1}: {molecule.label}
+              </h3>
+
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={() => deleteComparisonMolecule(molecule.id)}
+              >
+                Delete
+              </button>
+            </div>
+
+            {molecule.structureSvg && (
+              <div
+                className="molecule-preview"
+                dangerouslySetInnerHTML={{ __html: molecule.structureSvg }}
+              />
+            )}
+
+            <p>
+              <strong>
+                {rankingMode === "acidity" ? "Estimated pKa:" : "Conjugate acid pKa:"}
+              </strong>{" "}
+              {rankingMode === "acidity"
+                ? bestAcid.estimatedPka
+                : bestBase.conjugateAcidPka}
+            </p>
+
+            <p>
+              <strong>SMILES:</strong> {molecule.smiles}
+            </p>
+
+            {rankingMode === "acidity" ? (
+              <>
+                <p>
+                  <strong>Strongest acidic site:</strong>{" "}
+                  {bestAcid.acidicSite}
+                </p>
+                <p>{bestAcid.explanation}</p>
+              </>
+            ) : (
+              <>
+                <p>
+                  <strong>Strongest basic site:</strong> {bestBase.basicSite}
+                </p>
+                <p>{bestBase.explanation}</p>
+              </>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  )}
+</div>
       </section>
     </main>
   );

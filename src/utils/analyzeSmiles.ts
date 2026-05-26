@@ -28,7 +28,7 @@ declare global {
 
 let rdkitPromise: Promise<any> | null = null;
 
-function getRDKit() {
+export function getRDKit() {
     console.log("window.initRDKitModule:", window.initRDKitModule);
 
   if (!window.initRDKitModule) {
@@ -919,5 +919,28 @@ export async function analyzeFunctionalGroupHierarchy(
       mainGroup: errorResult,
       primaryGroups: [errorResult],
     };
+  }
+
+  
+}
+
+export async function getMoleculeSvg(smiles: string): Promise<string | null> {
+  try {
+    const RDKit = await getRDKit();
+    const cleanSmiles = smiles.replace(/\s+/g, "").trim();
+
+    const mol = RDKit.get_mol(cleanSmiles);
+
+    if (!mol) {
+      return null;
+    }
+
+    const svg = mol.get_svg();
+    mol.delete();
+
+    return svg;
+  } catch (error) {
+    console.error("Molecule SVG error:", error);
+    return null;
   }
 }

@@ -259,3 +259,21 @@ button {
   font-weight: 700;
   white-space: nowrap;
 }
+
+.molecule-preview {
+  width: 140px;
+  height: 100px;
+  background: white;
+  border-radius: 12px;
+  padding: 8px;
+  margin: 8px 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.molecule-preview svg {
+  max-width: 100%;
+  max-height: 100%;
+}
