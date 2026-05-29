@@ -70,7 +70,7 @@ const [rankingMode, setRankingMode] = useState<RankingMode>("acidity");
 
       const acidity = await analyzeAcidity(result, hierarchy.primaryGroups);
       setAcidityResults(acidity);
-      const basicity = analyzeBasicity(hierarchy.primaryGroups);
+      const basicity = await analyzeBasicity(result, hierarchy.primaryGroups);
       setBasicityResults(basicity);
 
       setStatus("Molecule analyzed successfully.");
@@ -101,7 +101,7 @@ const addCurrentMoleculeToComparison = async () => {
 
     const hierarchy = await analyzeFunctionalGroupHierarchy(currentSmiles);
     const acidity = await analyzeAcidity(currentSmiles, hierarchy.primaryGroups);
-    const basicity = analyzeBasicity(hierarchy.primaryGroups);
+    const basicity = await analyzeBasicity(currentSmiles, hierarchy.primaryGroups);
     const structureSvg = await getMoleculeSvg(currentSmiles);
 
     const nextLabel = `Molecule ${String.fromCharCode(
@@ -356,31 +356,31 @@ const clearComparison = () => {
           </>
         )}
       </div>
-    </div>
 
-    <div className="analysis-section">
-  <p className="label">Basicity Estimate</p>
+              <div className="analysis-section">
+          <p className="label">Basicity Estimate</p>
 
-  {basicityResults.length === 0 ? (
-    <p className="empty">No basic sites estimated yet</p>
-  ) : (
-    <div className="group-list">
-      {basicityResults.map((result) => (
-        <div className="group-card" key={result.relatedGroup}>
-          <div className="group-card-header">
-            <h3>{result.basicSite}</h3>
-            <span>conj. acid pKa {result.conjugateAcidPka}</span>
-          </div>
+          {basicityResults.length === 0 ? (
+            <p className="empty">No basic sites estimated yet</p>
+          ) : (
+            <div className="group-list">
+              {basicityResults.map((result) => (
+                <div className="group-card" key={result.relatedGroup}>
+                  <div className="group-card-header">
+                    <h3>{result.basicSite}</h3>
+                    <span>conj. acid pKa {result.conjugateAcidPka}</span>
+                  </div>
 
-          <p>
-            <strong>Related group:</strong> {result.relatedGroup}
-          </p>
-          <p>{result.explanation}</p>
+                  <p>
+                    <strong>Related group:</strong> {result.relatedGroup}
+                  </p>
+                  <p>{result.explanation}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ))}
     </div>
-  )}
-</div>
 
   <div className="analysis-section">
   <p className="label">Compare Molecules</p>

@@ -1,17 +1,23 @@
 import type { FunctionalGroupResult } from "./analyzeSmiles";
+import { getInductiveModifiersForSite } from "./inductionUtils";
 
 export type BasicityResult = {
   relatedGroup: string;
   basicSite: string;
   conjugateAcidPka: string;
   conjugateAcidPkaNumber: number;
+  baseConjugateAcidPkaNumber: number;
   strengthRank: number;
+  modifiers: string[];
   explanation: string;
 };
 
 type BasicityRule = {
   groupName: string;
   basicSite: string;
+  siteSmarts: string;
+  anchorAtomIndexInMatch: number;
+  inductionSensitivity: number;
   conjugateAcidPka: string;
   conjugateAcidPkaNumber: number;
   strengthRank: number;
@@ -22,15 +28,23 @@ const BASICITY_RULES: BasicityRule[] = [
   {
     groupName: "Amine",
     basicSite: "amine nitrogen lone pair",
+    siteSmarts:
+      "[NX3;!$([NX3][CX3](=[OX1]));!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    anchorAtomIndexInMatch: 0,
+    inductionSensitivity: 0.8,
     conjugateAcidPka: "~9–11",
     conjugateAcidPkaNumber: 10,
     strengthRank: 1,
     explanation:
-      "Amines are relatively basic because the nitrogen lone pair can accept a proton. Alkyl groups can donate electron density and increase basicity.",
+      "Amines are relatively basic because the nitrogen lone pair can accept a proton. Electron-donating groups increase basicity, while electron-withdrawing groups decrease it.",
   },
   {
     groupName: "Aniline",
     basicSite: "aniline nitrogen lone pair",
+    siteSmarts:
+      "[a][NX3;!$([NX3][CX3](=[OX1]));!$(N=C);!$([N+](=O)[O-])]",
+    anchorAtomIndexInMatch: 1,
+    inductionSensitivity: 0.7,
     conjugateAcidPka: "~4–5",
     conjugateAcidPkaNumber: 4.6,
     strengthRank: 2,
@@ -40,15 +54,21 @@ const BASICITY_RULES: BasicityRule[] = [
   {
     groupName: "Alcohol",
     basicSite: "alcohol oxygen lone pair",
+    siteSmarts: "[CX4][OX2H]",
+    anchorAtomIndexInMatch: 1,
+    inductionSensitivity: 0.4,
     conjugateAcidPka: "~ -2",
     conjugateAcidPkaNumber: -2,
     strengthRank: 3,
     explanation:
-      "Alcohol oxygen can accept a proton, but alcohols are weak bases compared with amines because protonated alcohols are strongly acidic.",
+      "Alcohol oxygen can accept a proton, but alcohols are weak bases compared with amines.",
   },
   {
     groupName: "Ether",
     basicSite: "ether oxygen lone pair",
+    siteSmarts: "[#6][OX2][#6]",
+    anchorAtomIndexInMatch: 1,
+    inductionSensitivity: 0.4,
     conjugateAcidPka: "~ -3",
     conjugateAcidPkaNumber: -3,
     strengthRank: 4,
@@ -58,6 +78,9 @@ const BASICITY_RULES: BasicityRule[] = [
   {
     groupName: "Aryl ether",
     basicSite: "aryl ether oxygen lone pair",
+    siteSmarts: "[a][OX2][#6]",
+    anchorAtomIndexInMatch: 1,
+    inductionSensitivity: 0.35,
     conjugateAcidPka: "~ -3",
     conjugateAcidPkaNumber: -3,
     strengthRank: 4,
@@ -67,6 +90,9 @@ const BASICITY_RULES: BasicityRule[] = [
   {
     groupName: "Phenol",
     basicSite: "phenol oxygen lone pair",
+    siteSmarts: "[a][OX2H]",
+    anchorAtomIndexInMatch: 1,
+    inductionSensitivity: 0.35,
     conjugateAcidPka: "~ -6",
     conjugateAcidPkaNumber: -6,
     strengthRank: 5,
@@ -76,15 +102,21 @@ const BASICITY_RULES: BasicityRule[] = [
   {
     groupName: "Carboxylic acid",
     basicSite: "carbonyl oxygen",
+    siteSmarts: "[CX3](=[OX1])[OX2H1]",
+    anchorAtomIndexInMatch: 1,
+    inductionSensitivity: 0.3,
     conjugateAcidPka: "~ -6",
     conjugateAcidPkaNumber: -6,
     strengthRank: 6,
     explanation:
-      "Carboxylic acids are much more important as acids than bases. Protonation can occur at oxygen, but they are weak bases.",
+      "Carboxylic acids are mainly acids, not bases. Protonation can occur at oxygen, but they are weak bases overall.",
   },
   {
     groupName: "Benzoic acid derivative",
     basicSite: "carbonyl oxygen",
+    siteSmarts: "[a][CX3](=[OX1])[OX2H1]",
+    anchorAtomIndexInMatch: 2,
+    inductionSensitivity: 0.3,
     conjugateAcidPka: "~ -6",
     conjugateAcidPkaNumber: -6,
     strengthRank: 6,
@@ -94,6 +126,9 @@ const BASICITY_RULES: BasicityRule[] = [
   {
     groupName: "Amide",
     basicSite: "amide oxygen, not usually nitrogen",
+    siteSmarts: "[CX3](=[OX1])[NX3]",
+    anchorAtomIndexInMatch: 1,
+    inductionSensitivity: 0.35,
     conjugateAcidPka: "~ -1",
     conjugateAcidPkaNumber: -1,
     strengthRank: 7,
@@ -103,6 +138,9 @@ const BASICITY_RULES: BasicityRule[] = [
   {
     groupName: "Ketone",
     basicSite: "carbonyl oxygen",
+    siteSmarts: "[#6][CX3](=[OX1])[#6]",
+    anchorAtomIndexInMatch: 2,
+    inductionSensitivity: 0.5,
     conjugateAcidPka: "~ -7",
     conjugateAcidPkaNumber: -7,
     strengthRank: 8,
@@ -112,6 +150,9 @@ const BASICITY_RULES: BasicityRule[] = [
   {
     groupName: "Aldehyde",
     basicSite: "carbonyl oxygen",
+    siteSmarts: "[CX3H1](=[OX1])[#6,H]",
+    anchorAtomIndexInMatch: 1,
+    inductionSensitivity: 0.5,
     conjugateAcidPka: "~ -7",
     conjugateAcidPkaNumber: -7,
     strengthRank: 8,
@@ -119,19 +160,23 @@ const BASICITY_RULES: BasicityRule[] = [
       "Aldehydes can be protonated at the carbonyl oxygen, but they are weak bases compared with amines.",
   },
   {
-    groupName: "Alkyne",
-    basicSite: "alkynyl/acetylide site if deprotonated",
-    conjugateAcidPka: "~25 for terminal alkyne",
-    conjugateAcidPkaNumber: 25,
-    strengthRank: 0,
+    groupName: "Nitrile",
+    basicSite: "nitrile nitrogen",
+    siteSmarts: "[CX2]#N",
+    anchorAtomIndexInMatch: 1,
+    inductionSensitivity: 0.3,
+    conjugateAcidPka: "~ -10",
+    conjugateAcidPkaNumber: -10,
+    strengthRank: 9,
     explanation:
-      "If the molecule is an acetylide/conjugate base form, it is a strong base. A neutral terminal alkyne is not itself basic, but its conjugate base is strong.",
+      "Nitriles are weak bases. The nitrogen lone pair is held tightly in an sp orbital, making it less available for protonation.",
   },
 ];
 
-export function analyzeBasicity(
+export async function analyzeBasicity(
+  smiles: string,
   functionalGroups: FunctionalGroupResult[]
-): BasicityResult[] {
+): Promise<BasicityResult[]> {
   const results: BasicityResult[] = [];
 
   for (const group of functionalGroups) {
@@ -139,17 +184,42 @@ export function analyzeBasicity(
 
     if (!rule) continue;
 
+    const inductiveModifiers = await getInductiveModifiersForSite(
+      smiles,
+      rule.siteSmarts,
+      rule.anchorAtomIndexInMatch,
+      rule.inductionSensitivity,
+      "basicity"
+    );
+
+    const totalPkaShift = inductiveModifiers.reduce(
+      (sum, modifier) => sum + modifier.pkaShift,
+      0
+    );
+
+    const adjustedConjugateAcidPka =
+      rule.conjugateAcidPkaNumber + totalPkaShift;
+
     results.push({
       relatedGroup: rule.groupName,
       basicSite: rule.basicSite,
-      conjugateAcidPka: rule.conjugateAcidPka,
-      conjugateAcidPkaNumber: rule.conjugateAcidPkaNumber,
+      conjugateAcidPka:
+        inductiveModifiers.length > 0
+          ? `~${adjustedConjugateAcidPka.toFixed(2)}`
+          : rule.conjugateAcidPka,
+      conjugateAcidPkaNumber: adjustedConjugateAcidPka,
+      baseConjugateAcidPkaNumber: rule.conjugateAcidPkaNumber,
       strengthRank: rule.strengthRank,
-      explanation: rule.explanation,
+      modifiers: inductiveModifiers.map((modifier) => modifier.explanation),
+      explanation:
+        inductiveModifiers.length > 0
+          ? `${rule.explanation} ${inductiveModifiers
+              .map((modifier) => modifier.explanation)
+              .join(" ")}`
+          : rule.explanation,
     });
   }
 
-  // Higher conjugate-acid pKa = stronger base
   return results.sort(
     (a, b) => b.conjugateAcidPkaNumber - a.conjugateAcidPkaNumber
   );

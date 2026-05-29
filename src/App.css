@@ -260,13 +260,32 @@ button {
   white-space: nowrap;
 }
 
+.comparison-card {
+  width: 100%;
+}
+
+.comparison-content {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 16px;
+  align-items: start;
+  margin-top: 12px;
+}
+
+.comparison-details {
+  min-width: 0;
+}
+
+.comparison-details p {
+  margin: 0 0 8px;
+}
+
 .molecule-preview {
   width: 140px;
-  height: 100px;
+  height: 120px;
   background: white;
   border-radius: 12px;
   padding: 8px;
-  margin: 8px 0;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -276,4 +295,15 @@ button {
 .molecule-preview svg {
   max-width: 100%;
   max-height: 100%;
+}
+
+@media (max-width: 700px) {
+  .comparison-content {
+    grid-template-columns: 1fr;
+  }
+
+  .molecule-preview {
+    width: 100%;
+    max-width: 220px;
+  }
 }
