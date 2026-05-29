@@ -38,8 +38,9 @@
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr);
   gap: 24px;
+  align-items: start;
 }
 
 .card {
@@ -48,6 +49,16 @@
   border-radius: 22px;
   padding: 24px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.molecule-card,
+.analysis-card {
+  align-self: start;
+}
+
+.analysis-card {
+  display: flex;
+  flex-direction: column;
 }
 
 .card-header {
@@ -88,6 +99,7 @@
 
 .button-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 16px;
 }
@@ -174,6 +186,14 @@ button {
 
   .app {
     padding: 20px;
+  }
+
+  .drawer-placeholder {
+    height: 440px;
+  }
+
+  .button-row button {
+    flex: 1 1 180px;
   }
 }
 
@@ -306,4 +326,14 @@ button {
     width: 100%;
     max-width: 220px;
   }
+}
+
+.comparison-smiles {
+  word-break: break-word;
+}
+
+.comparison-smiles code {
+  color: #93c5fd;
+  font-family: "Courier New", monospace;
+  overflow-wrap: anywhere;
 }

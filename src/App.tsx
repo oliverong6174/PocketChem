@@ -143,25 +143,30 @@ const deleteComparisonMolecule = (id: number) => {
 };
 
 const getRankedComparison = () => {
-  return [...comparisonMolecules]
-    .filter((molecule) =>
+  return [...comparisonMolecules].sort((a, b) => {
+    const aScore =
       rankingMode === "acidity"
-        ? molecule.acidityResults.length > 0
-        : molecule.basicityResults.length > 0
-    )
-    .sort((a, b) => {
-      if (rankingMode === "acidity") {
-        return (
-          a.acidityResults[0].estimatedPkaNumber -
-          b.acidityResults[0].estimatedPkaNumber
-        );
-      }
+        ? a.acidityResults[0]?.estimatedPkaNumber
+        : a.basicityResults[0]?.conjugateAcidPkaNumber;
 
-      return (
-        b.basicityResults[0].conjugateAcidPkaNumber -
-        a.basicityResults[0].conjugateAcidPkaNumber
-      );
-    });
+    const bScore =
+      rankingMode === "acidity"
+        ? b.acidityResults[0]?.estimatedPkaNumber
+        : b.basicityResults[0]?.conjugateAcidPkaNumber;
+
+    // Molecules with no rankable site go to the bottom
+    if (aScore === undefined && bScore === undefined) return 0;
+    if (aScore === undefined) return 1;
+    if (bScore === undefined) return -1;
+
+    // Lower pKa = stronger acid
+    if (rankingMode === "acidity") {
+      return aScore - bScore;
+    }
+
+    // Higher conjugate acid pKa = stronger base
+    return bScore - aScore;
+  });
 };
 
 const rankedComparison = getRankedComparison();
@@ -380,9 +385,8 @@ const clearComparison = () => {
             </div>
           )}
         </div>
-    </div>
 
-  <div className="analysis-section">
+        <div className="analysis-section">
   <p className="label">Compare Molecules</p>
 
   <div className="button-row">
@@ -411,23 +415,21 @@ const clearComparison = () => {
 
   {comparisonMolecules.length === 0 ? (
     <p className="empty">Analyze molecules and add them to comparison.</p>
-  ) : rankedComparison.length === 0 ? (
-    <p className="empty">
-      No comparable {rankingMode === "acidity" ? "acidic" : "basic"} sites
-      detected yet.
-    </p>
   ) : (
     <div className="group-list">
       {rankedComparison.map((molecule, index) => {
-        const bestAcid = molecule.acidityResults[0];
-        const bestBase = molecule.basicityResults[0];
+  const bestAcid = molecule.acidityResults[0];
+  const bestBase = molecule.basicityResults[0];
 
-        return (
+  const hasRankableSite =
+    rankingMode === "acidity" ? Boolean(bestAcid) : Boolean(bestBase);
+
+  return (
           <div className="group-card" key={molecule.id}>
             <div className="group-card-header">
-              <h3>
-                #{index + 1}: {molecule.label}
-              </h3>
+             <h3>
+              {hasRankableSite ? `#${index + 1}: ${molecule.label}` : `Unranked: ${molecule.label}`}
+            </h3>
 
               <button
                 className="secondary-button"
@@ -445,6 +447,7 @@ const clearComparison = () => {
               />
             )}
 
+          {hasRankableSite ? (
             <p>
               <strong>
                 {rankingMode === "acidity" ? "Estimated pKa:" : "Conjugate acid pKa:"}
@@ -453,33 +456,41 @@ const clearComparison = () => {
                 ? bestAcid.estimatedPka
                 : bestBase.conjugateAcidPka}
             </p>
+          ) : (
+            <p className="empty">
+              No {rankingMode === "acidity" ? "acidic" : "basic"} site detected for ranking.
+            </p>
+          )}
 
             <p>
               <strong>SMILES:</strong> {molecule.smiles}
             </p>
 
-            {rankingMode === "acidity" ? (
-              <>
-                <p>
-                  <strong>Strongest acidic site:</strong>{" "}
-                  {bestAcid.acidicSite}
-                </p>
-                <p>{bestAcid.explanation}</p>
-              </>
-            ) : (
-              <>
-                <p>
-                  <strong>Strongest basic site:</strong> {bestBase.basicSite}
-                </p>
-                <p>{bestBase.explanation}</p>
-              </>
-            )}
+                        {hasRankableSite &&
+              (rankingMode === "acidity" ? (
+                <>
+                  <p>
+                    <strong>Strongest acidic site:</strong> {bestAcid.acidicSite}
+                  </p>
+                  <p>{bestAcid.explanation}</p>
+                </>
+              ) : (
+                <>
+                  <p>
+                    <strong>Strongest basic site:</strong> {bestBase.basicSite}
+                  </p>
+                  <p>{bestBase.explanation}</p>
+                </>
+              ))}
           </div>
         );
       })}
     </div>
   )}
 </div>
+    </div>
+
+  
       </section>
     </main>
   );

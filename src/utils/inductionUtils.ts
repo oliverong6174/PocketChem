@@ -215,7 +215,7 @@ export async function getInductiveModifiersForSite(
         if (substituentAnchorIndex === undefined) continue;
 
         // Do not count the acidic/basic site itself as its own modifier.
-        if (siteMatch.includes(substituentAnchorIndex)) continue;
+        if (substituentAnchorIndex === siteAnchorIndex) continue;
 
         const distance = getShortestBondDistance(
           adjacency,

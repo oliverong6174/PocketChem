@@ -123,7 +123,7 @@ const ACIDITY_RULES: AcidityRule[] = [
   acidicSite: "phenolic O-H proton",
   siteSmarts: "[a][OX2H]",
   anchorAtomIndexInMatch: 0,
-  inductionSensitivity: 0.75,
+  inductionSensitivity: 0.25,
   estimatedPka: "~10",
   estimatedPkaNumber: 10,
   strengthRank: 3,
@@ -243,6 +243,69 @@ const ACIDITY_RULES: AcidityRule[] = [
   explanation:
     "Neutral amines are much more important as bases than as acids. Their N-H protons are weakly acidic.",
 },
+{
+  groupName: "Alkane",
+  acidicSite: "alkane C-H proton",
+  siteSmarts: "[CX4;!H0]",
+  anchorAtomIndexInMatch: 0,
+  inductionSensitivity: 0.75,
+  estimatedPka: "~50",
+  estimatedPkaNumber: 50,
+  strengthRank: 99,
+  atom:
+    "The acidic proton is attached to sp3 carbon, which is poor at stabilizing negative charge.",
+  resonance:
+    "The conjugate base usually has no resonance stabilization.",
+  induction:
+    "Alkyl groups do not strongly stabilize the conjugate base.",
+  orbital:
+    "The conjugate base places negative charge in an sp3 orbital, making it much less stable than sp or resonance-stabilized anions.",
+  explanation:
+    "Alkanes are extremely weak acids. Deprotonation would form an unstable alkyl carbanion, so their pKa is around 50.",
+},
+
+//CHARGED GROUPS
+
+  {
+    groupName: "Oxonium ion",
+    acidicSite: "oxonium O-H proton",
+    siteSmarts: "[O+]",
+    anchorAtomIndexInMatch: 0,
+    inductionSensitivity: 0.2,
+    estimatedPka: "~ -2 to 0",
+    estimatedPkaNumber: -1,
+    strengthRank: 0,
+    atom:
+      "The acidic proton is attached to a positively charged oxygen.",
+    resonance:
+      "Usually limited unless the oxonium ion is next to a π system.",
+    induction:
+      "The positive charge strongly withdraws electron density and makes the O-H bond very acidic.",
+    orbital:
+      "Deprotonation neutralizes the oxygen.",
+    explanation:
+      "Oxonium ions are strongly acidic because losing H+ gives a neutral oxygen species.",
+  },
+  {
+    groupName: "Ammonium ion",
+    acidicSite: "ammonium N-H proton",
+    siteSmarts: "[N+;H1,H2,H3,H4]",
+    anchorAtomIndexInMatch: 0,
+    inductionSensitivity: 0.4,
+    estimatedPka: "~9–11",
+    estimatedPkaNumber: 10,
+    strengthRank: 4,
+    atom:
+      "The acidic proton is attached to positively charged nitrogen.",
+    resonance:
+      "Usually limited unless the ammonium group is attached to an aromatic or carbonyl system.",
+    induction:
+      "The positive charge makes the N-H bond more acidic than a neutral amine N-H bond.",
+    orbital:
+      "Deprotonation gives a neutral amine.",
+    explanation:
+      "Ammonium ions are the conjugate acids of amines. They can donate H+ to reform the neutral amine.",
+  },
 
 ];
 
@@ -252,10 +315,22 @@ export async function analyzeAcidity(
 ): Promise<AcidityResult[]> {
   const results: AcidityResult[] = [];
 
-  for (const group of functionalGroups) {
-    const rule = ACIDITY_RULES.find((rule) => rule.groupName === group.name);
 
-    if (!rule) continue;
+    for (const group of functionalGroups) {
+    const rule = ACIDITY_RULES.find((rule) => {
+      if (
+        rule.groupName === "Alkane" &&
+        (group.name === "Alkane" ||
+          group.name === "Alkyl halide" ||
+          group.name === "Haloalkane")
+      ) {
+        return true;
+      }
+
+      return rule.groupName === group.name;
+    });
+
+  if (!rule) continue;
 
     const inductiveModifiers = await getInductiveModifiersForSite(
       smiles,
@@ -264,6 +339,14 @@ export async function analyzeAcidity(
       rule.inductionSensitivity,
       "acidity"
     );
+
+    console.log("ACIDITY DEBUG");
+    console.log("Rule:", rule.groupName);
+    console.log("SMILES:", smiles);
+    console.log("siteSmarts:", rule.siteSmarts);
+    console.log("anchorAtomIndexInMatch:", rule.anchorAtomIndexInMatch);
+    console.log("inductionSensitivity:", rule.inductionSensitivity);
+    console.log("inductiveModifiers:", inductiveModifiers);
 
     const totalPkaShift = inductiveModifiers.reduce(
       (sum, modifier) => sum + modifier.pkaShift,

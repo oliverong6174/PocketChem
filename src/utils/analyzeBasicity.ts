@@ -171,6 +171,105 @@ const BASICITY_RULES: BasicityRule[] = [
     explanation:
       "Nitriles are weak bases. The nitrogen lone pair is held tightly in an sp orbital, making it less available for protonation.",
   },
+
+  //CHARGED GROUPS
+
+  {
+    groupName: "Carboxylate",
+    basicSite: "carboxylate oxygen",
+    siteSmarts: "[CX3](=[OX1])[O-]",
+    anchorAtomIndexInMatch: 2,
+    inductionSensitivity: 0.8,
+    conjugateAcidPka: "~4–5",
+    conjugateAcidPkaNumber: 4.5,
+    strengthRank: 0,
+    explanation:
+      "Carboxylates are basic at oxygen, but resonance delocalization makes them weaker bases than alkoxides.",
+  },
+  {
+    groupName: "Alkoxide",
+    basicSite: "alkoxide oxygen",
+    siteSmarts: "[O-][CX4]",
+    anchorAtomIndexInMatch: 0,
+    inductionSensitivity: 0.6,
+    conjugateAcidPka: "~16–18",
+    conjugateAcidPkaNumber: 16.5,
+    strengthRank: 1,
+    explanation:
+      "Alkoxides are strong bases because protonation gives an alcohol with a relatively high pKa.",
+  },
+  {
+    groupName: "Thiolate",
+    basicSite: "thiolate sulfur",
+    siteSmarts: "[S-]",
+    anchorAtomIndexInMatch: 0,
+    inductionSensitivity: 0.5,
+    conjugateAcidPka: "~10–11",
+    conjugateAcidPkaNumber: 10.5,
+    strengthRank: 2,
+    explanation:
+      "Thiolates are basic and very nucleophilic. They are less basic than alkoxides because sulfur is larger and stabilizes negative charge better.",
+  },
+  {
+    groupName: "Carbanion",
+    basicSite: "negatively charged carbon",
+    siteSmarts: "[C-]",
+    anchorAtomIndexInMatch: 0,
+    inductionSensitivity: 1.0,
+    conjugateAcidPka: "~25–50",
+    conjugateAcidPkaNumber: 35,
+    strengthRank: 0,
+    explanation:
+      "Carbanions are usually very strong bases. Their exact basicity depends on resonance, nearby carbonyls, nitriles, or other electron-withdrawing groups.",
+  },
+{
+  groupName: "Acetylide anion",
+  basicSite: "acetylide carbon",
+  siteSmarts: "[C-]#[C]",
+  anchorAtomIndexInMatch: 0,
+  inductionSensitivity: 0.8,
+  conjugateAcidPka: "~25",
+  conjugateAcidPkaNumber: 25,
+  strengthRank: 0,
+  explanation:
+    "Acetylide anions are strong bases and strong nucleophiles. Protonation gives a terminal alkyne, whose pKa is about 25.",
+},
+{
+  groupName: "Deprotonated carboxamide",
+  basicSite: "amide anion nitrogen",
+  siteSmarts: "[#6](=[#8])-[#7-]",
+  anchorAtomIndexInMatch: 2,
+  inductionSensitivity: 0.8,
+  conjugateAcidPka: "~15–17",
+  conjugateAcidPkaNumber: 15.5,
+  strengthRank: 2,
+  explanation:
+    "This nitrogen is negatively charged, so it is basic. However, resonance with the adjacent carbonyl stabilizes the anion, making it less basic than a simple amide anion.",
+},
+{
+  groupName: "Amide anion",
+  basicSite: "negatively charged nitrogen",
+  siteSmarts: "[N-]",
+  anchorAtomIndexInMatch: 0,
+  inductionSensitivity: 0.7,
+  conjugateAcidPka: "~35–40",
+  conjugateAcidPkaNumber: 38,
+  strengthRank: 0,
+  explanation:
+    "A negatively charged nitrogen is a very strong base. Protonation gives a neutral amine, whose N-H bond is much less acidic.",
+},
+{
+  groupName: "Methyl carbanion",
+  basicSite: "CH2− carbon",
+  siteSmarts: "[CH2-]",
+  anchorAtomIndexInMatch: 0,
+  inductionSensitivity: 1.0,
+  conjugateAcidPka: "~45–50",
+  conjugateAcidPkaNumber: 48,
+  strengthRank: 0,
+  explanation:
+    "A CH2− carbanion is extremely basic because protonation gives an alkane-like C-H bond with a very high pKa.",
+},
 ];
 
 export async function analyzeBasicity(
@@ -220,7 +319,21 @@ export async function analyzeBasicity(
     });
   }
 
-  return results.sort(
+    const hasDeprotonatedCarboxamide = results.some(
+    (result) => result.relatedGroup === "Deprotonated carboxamide"
+  );
+
+  const filteredResults = hasDeprotonatedCarboxamide
+    ? results.filter(
+        (result) =>
+          !(
+            result.relatedGroup === "Amide anion" &&
+            result.basicSite === "negatively charged nitrogen"
+          )
+      )
+    : results;
+
+  return filteredResults.sort(
     (a, b) => b.conjugateAcidPkaNumber - a.conjugateAcidPkaNumber
   );
 }
