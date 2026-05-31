@@ -7,9 +7,10 @@ import {
 } from "./utils/analyzeSmiles";
 import { analyzeAcidity, type AcidityResult } from "./utils/analyzeAcidity";
 import { analyzeBasicity, type BasicityResult } from "./utils/analyzeBasicity";
+import { analyzeResonance } from "./utils/resonanceUtils";
 import "./App.css";
 
-type RankingMode = "acidity" | "basicity";
+type RankingMode = "acidity" | "basicity" | "anionStability";
 
 type ComparisonMolecule = {
   id: number;
@@ -65,6 +66,8 @@ const [rankingMode, setRankingMode] = useState<RankingMode>("acidity");
       setSmiles(result);
 
       const hierarchy = await analyzeFunctionalGroupHierarchy(result);
+      const resonance = await analyzeResonance(result);
+      console.log("Resonance results:", resonance);
       setMainGroup(hierarchy.mainGroup);
       setFunctionalGroups(hierarchy.primaryGroups);
 
@@ -142,6 +145,35 @@ const deleteComparisonMolecule = (id: number) => {
   setStatus("Molecule removed from comparison.");
 };
 
+const getAnionStabilityScore = (molecule: ComparisonMolecule) => {
+  const bestBase = molecule.basicityResults[0];
+
+  if (!bestBase) return 999;
+
+  const group = bestBase.relatedGroup.toLowerCase();
+  const site = bestBase.basicSite.toLowerCase();
+  const explanation = bestBase.explanation.toLowerCase();
+
+  if (group.includes("carboxylate")) return 0;
+
+  if (
+    group.includes("alpha resonance-stabilized") ||
+    site.includes("alpha resonance-stabilized") ||
+    explanation.includes("resonance-stabilized")
+  ) {
+    return 1;
+  }
+
+  if (group.includes("methyl localized carbanion")) return 2;
+  if (group.includes("primary localized carbanion")) return 3;
+  if (group.includes("secondary localized carbanion")) return 4;
+  if (group.includes("tertiary localized carbanion")) return 5;
+
+  if (group.includes("carbanion")) return 6;
+
+  return 999;
+};
+
 const getRankedComparison = () => {
   return [...comparisonMolecules].sort((a, b) => {
     const aScore =
@@ -165,7 +197,36 @@ const getRankedComparison = () => {
     }
 
     // Higher conjugate acid pKa = stronger base
-    return bScore - aScore;
+    if (rankingMode === "basicity") {
+      return bScore - aScore;
+    }
+
+    // Custom stability order:
+    // carboxylate > alpha resonance-stabilized > methyl > primary > secondary > tertiary
+    if (rankingMode === "anionStability") {
+      console.log("ANION STABILITY SORT:", {
+        a: a.label,
+        aGroup: a.basicityResults[0]?.relatedGroup,
+        aSite: a.basicityResults[0]?.basicSite,
+        aScore: getAnionStabilityScore(a),
+        b: b.label,
+        bGroup: b.basicityResults[0]?.relatedGroup,
+        bSite: b.basicityResults[0]?.basicSite,
+        bScore: getAnionStabilityScore(b),
+      }); 
+
+      const aStabilityScore = getAnionStabilityScore(a);
+      const bStabilityScore = getAnionStabilityScore(b);
+
+      if (aStabilityScore !== bStabilityScore) {
+        return aStabilityScore - bStabilityScore;
+      }
+
+      // tie-breaker: lower conjugate acid pKa = more stable anion
+      return aScore - bScore;
+    }
+
+    return 0;
   });
 };
 
@@ -369,8 +430,11 @@ const clearComparison = () => {
             <p className="empty">No basic sites estimated yet</p>
           ) : (
             <div className="group-list">
-              {basicityResults.map((result) => (
-                <div className="group-card" key={result.relatedGroup}>
+              {basicityResults.map((result, index) => (
+                <div
+                  className="group-card"
+                  key={`${result.relatedGroup}-${result.basicSite}-${index}`}
+                >
                   <div className="group-card-header">
                     <h3>{result.basicSite}</h3>
                     <span>conj. acid pKa {result.conjugateAcidPka}</span>
@@ -411,6 +475,17 @@ const clearComparison = () => {
       />
       Rank by basicity
     </label>
+
+    <label>
+      <input
+        type="radio"
+        name="rankingMode"
+        value="anionStability"
+        checked={rankingMode === "anionStability"}
+        onChange={() => setRankingMode("anionStability")}
+      />
+      Rank by anion stability
+    </label>
   </div>
 
   {comparisonMolecules.length === 0 ? (
@@ -448,17 +523,32 @@ const clearComparison = () => {
             )}
 
           {hasRankableSite ? (
-            <p>
-              <strong>
-                {rankingMode === "acidity" ? "Estimated pKa:" : "Conjugate acid pKa:"}
-              </strong>{" "}
-              {rankingMode === "acidity"
-                ? bestAcid.estimatedPka
-                : bestBase.conjugateAcidPka}
-            </p>
+            rankingMode === "anionStability" ? (
+              <p>
+                <strong>Stability basis:</strong>{" "}
+                {bestBase.relatedGroup}
+              </p>
+            ) : (
+              <p>
+                <strong>
+                  {rankingMode === "acidity"
+                    ? "Estimated pKa:"
+                    : "Conjugate acid pKa:"}
+                </strong>{" "}
+                {rankingMode === "acidity"
+                  ? bestAcid.estimatedPka
+                  : bestBase.conjugateAcidPka}
+              </p>
+            )
           ) : (
             <p className="empty">
-              No {rankingMode === "acidity" ? "acidic" : "basic"} site detected for ranking.
+              No{" "}
+              {rankingMode === "acidity"
+                ? "acidic"
+                : rankingMode === "basicity"
+                ? "basic"
+                : "anion stability"}{" "}
+              site detected for ranking.
             </p>
           )}
 
@@ -466,8 +556,8 @@ const clearComparison = () => {
               <strong>SMILES:</strong> {molecule.smiles}
             </p>
 
-                        {hasRankableSite &&
-              (rankingMode === "acidity" ? (
+            {hasRankableSite ? (
+              rankingMode === "acidity" ? (
                 <>
                   <p>
                     <strong>Strongest acidic site:</strong> {bestAcid.acidicSite}
@@ -481,7 +571,8 @@ const clearComparison = () => {
                   </p>
                   <p>{bestBase.explanation}</p>
                 </>
-              ))}
+              )
+            ) : null}
           </div>
         );
       })}

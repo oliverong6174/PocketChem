@@ -1,5 +1,10 @@
-import type { FunctionalGroupResult } from "./analyzeSmiles";
+import { getRDKit, type FunctionalGroupResult } from "./analyzeSmiles";
 import { getInductiveModifiersForSite } from "./inductionUtils";
+import {
+  analyzeCarbanionStability,
+  getBestCarbanionStabilityResult,
+} from "./anionStability";
+
 
 export type BasicityResult = {
   relatedGroup: string;
@@ -270,7 +275,61 @@ const BASICITY_RULES: BasicityRule[] = [
   explanation:
     "A CH2− carbanion is extremely basic because protonation gives an alkane-like C-H bond with a very high pKa.",
 },
+
 ];
+
+
+function isRuleAllowedForFunctionalGroups(
+  rule: BasicityRule,
+  functionalGroups: FunctionalGroupResult[]
+) {
+  return functionalGroups.some((group) => group.name === rule.groupName);
+}
+
+
+function extractAtomMatches(matchesJson: string): number[][] {
+  try {
+    const parsed = JSON.parse(matchesJson);
+
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map((match) => {
+          if (Array.isArray(match)) return match;
+          if (Array.isArray(match.atoms)) return match.atoms;
+          return [];
+        })
+        .filter((atoms) => atoms.length > 0);
+    }
+
+    if (parsed && Array.isArray(parsed.atoms)) {
+      return [parsed.atoms];
+    }
+
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+async function ruleActuallyMatchesSmiles(
+  smiles: string,
+  siteSmarts: string
+): Promise<boolean> {
+  const RDKit = await getRDKit();
+  const mol = RDKit.get_mol(smiles);
+
+  if (!mol) return false;
+
+  try {
+    const query = RDKit.get_qmol(siteSmarts);
+    const matches = extractAtomMatches(mol.get_substruct_matches(query));
+
+    return matches.length > 0;
+  } catch (error) {
+    console.log("SMARTS match failed:", siteSmarts, error);
+    return false;
+  }
+}
 
 export async function analyzeBasicity(
   smiles: string,
@@ -278,10 +337,22 @@ export async function analyzeBasicity(
 ): Promise<BasicityResult[]> {
   const results: BasicityResult[] = [];
 
-  for (const group of functionalGroups) {
-    const rule = BASICITY_RULES.find((rule) => rule.groupName === group.name);
+  //Carbanion support
+  const carbanionStabilityResults = await analyzeCarbanionStability(smiles);
+  const bestCarbanionStability = getBestCarbanionStabilityResult(
+    carbanionStabilityResults
+  );
 
-    if (!rule) continue;
+    console.log("BASICITY SMILES:", smiles);
+    console.log("CARBANION STABILITY RESULTS:", carbanionStabilityResults);
+    console.log("BEST CARBANION STABILITY:", bestCarbanionStability);
+
+for (const rule of BASICITY_RULES) {
+  if (!isRuleAllowedForFunctionalGroups(rule, functionalGroups)) continue;
+
+  const ruleMatches = await ruleActuallyMatchesSmiles(smiles, rule.siteSmarts);
+
+  if (!ruleMatches) continue;
 
     const inductiveModifiers = await getInductiveModifiersForSite(
       smiles,
@@ -299,14 +370,52 @@ export async function analyzeBasicity(
     const adjustedConjugateAcidPka =
       rule.conjugateAcidPkaNumber + totalPkaShift;
 
+    let finalConjugateAcidPkaNumber = adjustedConjugateAcidPka;
+    let finalConjugateAcidPka =
+      inductiveModifiers.length > 0
+        ? `~${adjustedConjugateAcidPka.toFixed(2)}`
+        : rule.conjugateAcidPka;
+
+    let finalRelatedGroup = rule.groupName;
+    let finalBasicSite = rule.basicSite;
+    let extraExplanation = "";
+
+    const isCarbanionRule =
+    rule.groupName.toLowerCase().includes("carbanion") ||
+    rule.basicSite.toLowerCase().includes("carbon");
+
+
+
+    if (isCarbanionRule && bestCarbanionStability) {
+      console.log("CARBANION RULE BEING MODIFIED:", rule.groupName);
+      console.log("ORIGINAL BASIC SITE:", rule.basicSite);
+      console.log("BEST STABILITY USED:", bestCarbanionStability);
+
+
+      finalConjugateAcidPkaNumber =
+        rule.conjugateAcidPkaNumber + bestCarbanionStability.pkaShift;
+
+      finalConjugateAcidPka = `~${finalConjugateAcidPkaNumber.toFixed(2)}`;
+
+      if (
+        bestCarbanionStability.resonanceStabilized &&
+        bestCarbanionStability.nearestStabilizer
+      ) {
+        finalRelatedGroup = `${bestCarbanionStability.positionLabel} resonance-stabilized carbanion near ${bestCarbanionStability.nearestStabilizer}`;
+        finalBasicSite = `${bestCarbanionStability.positionLabel} resonance-stabilized carbanion`;
+      } else {
+        finalRelatedGroup = `${bestCarbanionStability.substitution} localized carbanion`;
+        finalBasicSite = `${bestCarbanionStability.substitution} localized carbanion`;
+      }
+
+      extraExplanation = ` ${bestCarbanionStability.explanation}`;
+    }
+
     results.push({
-      relatedGroup: rule.groupName,
-      basicSite: rule.basicSite,
-      conjugateAcidPka:
-        inductiveModifiers.length > 0
-          ? `~${adjustedConjugateAcidPka.toFixed(2)}`
-          : rule.conjugateAcidPka,
-      conjugateAcidPkaNumber: adjustedConjugateAcidPka,
+      relatedGroup: finalRelatedGroup,
+      basicSite: finalBasicSite,
+      conjugateAcidPka: finalConjugateAcidPka,
+      conjugateAcidPkaNumber: finalConjugateAcidPkaNumber,
       baseConjugateAcidPkaNumber: rule.conjugateAcidPkaNumber,
       strengthRank: rule.strengthRank,
       modifiers: inductiveModifiers.map((modifier) => modifier.explanation),
@@ -314,26 +423,29 @@ export async function analyzeBasicity(
         inductiveModifiers.length > 0
           ? `${rule.explanation} ${inductiveModifiers
               .map((modifier) => modifier.explanation)
-              .join(" ")}`
-          : rule.explanation,
+              .join(" ")}${extraExplanation}`
+          : `${rule.explanation}${extraExplanation}`,
     });
   }
 
-    const hasDeprotonatedCarboxamide = results.some(
-    (result) => result.relatedGroup === "Deprotonated carboxamide"
-  );
+const hasDeprotonatedCarboxamide = results.some(
+  (result) => result.relatedGroup === "Deprotonated carboxamide"
+);
 
-  const filteredResults = hasDeprotonatedCarboxamide
-    ? results.filter(
-        (result) =>
-          !(
-            result.relatedGroup === "Amide anion" &&
-            result.basicSite === "negatively charged nitrogen"
-          )
-      )
-    : results;
+const filteredResults = results.filter((result) => {
+  if (
+    hasDeprotonatedCarboxamide &&
+    result.relatedGroup === "Amide anion" &&
+    result.basicSite === "negatively charged nitrogen"
+  ) {
+    return false;
+  }
 
-  return filteredResults.sort(
-    (a, b) => b.conjugateAcidPkaNumber - a.conjugateAcidPkaNumber
-  );
+  return true;
+});
+
+return filteredResults.sort(
+  (a, b) => b.conjugateAcidPkaNumber - a.conjugateAcidPkaNumber
+);
+
 }
