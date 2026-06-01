@@ -1,4 +1,10 @@
-import { useState } from "react";
+import {
+  getMoleculeAnnotation,
+  getHighlightedMoleculeSvg,
+  type AnnotationConcept,
+  type MoleculeAnnotation,
+} from "./utils/moleculeAnnotation";
+import { useEffect, useState } from "react";
 import MoleculeDrawer from "./components/MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
@@ -23,9 +29,9 @@ type ComparisonMolecule = {
 };
 
 function App() {
+  //useState calls
   const [smiles, setSmiles] = useState("Not analyzed yet");
   const [status, setStatus] = useState("Draw a molecule first");
-
   const [mainGroup, setMainGroup] = useState<FunctionalGroupResult | null>(
     null
   );
@@ -34,19 +40,30 @@ function App() {
   >([]);
   const [acidityResults, setAcidityResults] = useState<AcidityResult[]>([]);
   const [basicityResults, setBasicityResults] = useState<BasicityResult[]>([]);
-const [comparisonMolecules, setComparisonMolecules] = useState<
+  const [comparisonMolecules, setComparisonMolecules] = useState<
   ComparisonMolecule[]
->([]);
-const [rankingMode, setRankingMode] = useState<RankingMode>("acidity");
+  >([]);
+  const [rankingMode, setRankingMode] = useState<RankingMode>("acidity");
+  const [moleculeAnnotation, setMoleculeAnnotation] =
+    useState<MoleculeAnnotation | null>(null);
+
+  const [selectedConcept, setSelectedConcept] =
+    useState<AnnotationConcept>("hybridization");
+  const [selectedHybridization, setSelectedHybridization] =
+  useState<"all" | "sp" | "sp2" | "sp3">("all");
+  const [selectedBondType, setSelectedBondType] =
+  useState<"all" | "single" | "double" | "triple" | "aromatic">("all");
+
+  const [selectedAtomIndex, setSelectedAtomIndex] = useState<number | null>(null);
+  const [selectedBondIndex, setSelectedBondIndex] = useState<number | null>(null);
+  const [highlightedMoleculeSvg, setHighlightedMoleculeSvg] =
+  useState<string | null>(null);
 
   const additionalFunctionalGroups = mainGroup
     ? functionalGroups.filter((group) => group.name !== mainGroup.name)
     : functionalGroups;
 
   const analyzeMolecule = async () => {
-    console.log("Analyze button clicked");
-    console.log("Window Ketcher object:", window.ketcher);
-
     if (!window.ketcher) {
       setStatus("Molecule editor is still loading. Try again in a second.");
       return;
@@ -66,15 +83,21 @@ const [rankingMode, setRankingMode] = useState<RankingMode>("acidity");
       setSmiles(result);
 
       const hierarchy = await analyzeFunctionalGroupHierarchy(result);
-      const resonance = await analyzeResonance(result);
-      console.log("Resonance results:", resonance);
       setMainGroup(hierarchy.mainGroup);
       setFunctionalGroups(hierarchy.primaryGroups);
+
+      const annotation = await getMoleculeAnnotation(result);
+      setMoleculeAnnotation(annotation);
+
+      const resonance = await analyzeResonance(result);
+      console.log("Resonance results:", resonance);
 
       const acidity = await analyzeAcidity(result, hierarchy.primaryGroups);
       setAcidityResults(acidity);
       const basicity = await analyzeBasicity(result, hierarchy.primaryGroups);
       setBasicityResults(basicity);
+
+      
 
       setStatus("Molecule analyzed successfully.");
     } catch (error) {
@@ -204,17 +227,6 @@ const getRankedComparison = () => {
     // Custom stability order:
     // carboxylate > alpha resonance-stabilized > methyl > primary > secondary > tertiary
     if (rankingMode === "anionStability") {
-      console.log("ANION STABILITY SORT:", {
-        a: a.label,
-        aGroup: a.basicityResults[0]?.relatedGroup,
-        aSite: a.basicityResults[0]?.basicSite,
-        aScore: getAnionStabilityScore(a),
-        b: b.label,
-        bGroup: b.basicityResults[0]?.relatedGroup,
-        bSite: b.basicityResults[0]?.basicSite,
-        bScore: getAnionStabilityScore(b),
-      }); 
-
       const aStabilityScore = getAnionStabilityScore(a);
       const bStabilityScore = getAnionStabilityScore(b);
 
@@ -234,9 +246,184 @@ const rankedComparison = getRankedComparison();
 
 const clearComparison = () => {
   setComparisonMolecules([]);
+  setSmiles("Not analyzed yet");
+  setMainGroup(null);
+  setFunctionalGroups([]);                            
   setStatus("Comparison list cleared.");
 };
 
+const getAtomCardClassName = (atom: MoleculeAnnotation["atoms"][number]) => {
+  const classes = ["annotation-card"];
+
+  if (selectedConcept === "hybridization") {
+    classes.push(`hybridization-${atom.hybridization}`);
+
+    if (
+      selectedHybridization !== "all" &&
+      atom.hybridization === selectedHybridization
+    ) {
+      classes.push("annotation-card-highlighted");
+    }
+  }
+
+  if (selectedConcept === "lonePairs" && atom.lonePairInfo.count > 0) {
+    classes.push("annotation-card-highlighted");
+  }
+
+  if (selectedAtomIndex === atom.atomIndex) {
+    classes.push("annotation-card-selected");
+  }
+
+  return classes.join(" ");
+};
+
+const getBondCardClassName = (bond: MoleculeAnnotation["bonds"][number]) => {
+  const classes = ["annotation-card"];
+
+  if (selectedConcept === "bondOrbitals") {
+    classes.push(`bond-${bond.bondType}`);
+
+    if (selectedBondType !== "all" && bond.bondType === selectedBondType) {
+      classes.push("annotation-card-highlighted");
+    }
+  }
+
+  if (selectedBondIndex === bond.bondIndex) {
+    classes.push("annotation-card-selected");
+  }
+
+  return classes.join(" ");
+};
+
+const getVisibleAtomAnnotations = () => {
+
+  
+  if (!moleculeAnnotation) return [];
+
+  if (selectedConcept === "hybridization") {
+    return moleculeAnnotation.atoms.filter((atom) => {
+      if (atom.hybridization === "unknown") return false;
+
+      if (selectedHybridization === "all") {
+        return true;
+      }
+
+      return atom.hybridization === selectedHybridization;
+    });
+  }
+
+  if (selectedConcept === "lonePairs") {
+    return moleculeAnnotation.atoms.filter(
+      (atom) => atom.lonePairInfo.count > 0
+    );
+  }
+
+  if (selectedConcept === "acidBaseSites") {
+    return moleculeAnnotation.atoms.filter((atom) =>
+      atom.siteTypes.some(
+        (site) =>
+          site.includes("basic") ||
+          site.includes("acid") ||
+          site.includes("lone-pair")
+      )
+    );
+  }
+
+  if (selectedConcept === "reactiveSites") {
+    return moleculeAnnotation.atoms.filter((atom) =>
+      atom.siteTypes.some(
+        (site) =>
+          site.includes("electrophilic") ||
+          site.includes("basic") ||
+          site.includes("lone-pair")
+      )
+    );
+  }
+
+  return [];
+};
+
+const getVisibleBondAnnotations = () => {
+  if (!moleculeAnnotation) return [];
+
+  if (selectedConcept === "bondOrbitals") {
+    return moleculeAnnotation.bonds.filter((bond) => {
+      if (selectedBondType === "all") return true;
+      return bond.bondType === selectedBondType;
+    });
+  }
+
+  return [];
+};
+
+const getHighlightedAtomIndices = () => {
+  const visibleAtomIndices = getVisibleAtomAnnotations().map(
+    (atom) => atom.atomIndex
+  );
+
+  if (selectedAtomIndex !== null) {
+    visibleAtomIndices.push(selectedAtomIndex);
+  }
+
+  if (selectedBondIndex !== null && moleculeAnnotation) {
+    const selectedBond = moleculeAnnotation.bonds.find(
+      (bond) => bond.bondIndex === selectedBondIndex
+    );
+
+    if (selectedBond) {
+      visibleAtomIndices.push(...selectedBond.atomIndices);
+    }
+  }
+
+  return Array.from(new Set(visibleAtomIndices));
+};
+
+const getHighlightedBondIndices = () => {
+  const visibleBondIndices = getVisibleBondAnnotations().map(
+    (bond) => bond.bondIndex
+  );
+
+  if (selectedBondIndex !== null) {
+    visibleBondIndices.push(selectedBondIndex);
+  }
+
+  return Array.from(new Set(visibleBondIndices));
+};
+
+useEffect(() => {
+  const updateHighlightedSvg = async () => {
+    if (!moleculeAnnotation || smiles === "Not analyzed yet") {
+      setHighlightedMoleculeSvg(null);
+      return;
+    }
+
+    const atomIndices = getHighlightedAtomIndices();
+    const bondIndices = getHighlightedBondIndices();
+
+    const svg = await getHighlightedMoleculeSvg(
+      smiles,
+      atomIndices,
+      bondIndices,
+      selectedAtomIndex,
+      selectedBondIndex
+    );
+
+    setHighlightedMoleculeSvg(svg);
+  };
+
+  updateHighlightedSvg();
+    }, [
+      moleculeAnnotation,
+      smiles,
+      selectedConcept,
+      selectedHybridization,
+      selectedBondType,
+      selectedAtomIndex,
+      selectedBondIndex,
+    ]);
+
+
+//RETURN STATEMENT 
   return (
     <main className="app">
       <section className="hero">
@@ -280,6 +467,9 @@ const clearComparison = () => {
                 setFunctionalGroups([]);
                 setAcidityResults([]);
                 setBasicityResults([]);
+                setMoleculeAnnotation(null);
+                setSelectedAtomIndex(null);
+                setSelectedBondIndex(null);
               }}
             >
               Clear Analysis
@@ -307,6 +497,268 @@ const clearComparison = () => {
     <p className="label">SMILES</p>
     <p className="smiles-output">{smiles}</p>
   </div>
+
+<div className="analysis-section">
+  <p className="label">Concept View</p>
+
+  <div className="concept-button-row">
+    <button
+      className={
+        selectedConcept === "hybridization"
+          ? "concept-button active"
+          : "concept-button"
+      }
+      onClick={() => {
+        setSelectedConcept("hybridization");
+        setSelectedAtomIndex(null);
+        setSelectedBondIndex(null);
+      }}
+      type="button"
+    >
+      Hybridization
+    </button>
+
+    <button
+      className={
+        selectedConcept === "bondOrbitals"
+          ? "concept-button active"
+          : "concept-button"
+      }
+      onClick={() => {
+  setSelectedConcept("bondOrbitals");
+  setSelectedAtomIndex(null);
+  setSelectedBondIndex(null);
+}}
+      type="button"
+    >
+      Bond Orbitals
+    </button>
+
+    <button
+      className={
+        selectedConcept === "lonePairs"
+          ? "concept-button active"
+          : "concept-button"
+      }
+      onClick={() => {
+  setSelectedConcept("lonePairs");
+  setSelectedAtomIndex(null);
+  setSelectedBondIndex(null);
+}}
+      type="button"
+    >
+      Lone Pairs
+    </button>
+
+    <button
+      className={
+        selectedConcept === "acidBaseSites"
+          ? "concept-button active"
+          : "concept-button"
+      }
+      onClick={() => {
+  setSelectedConcept("acidBaseSites");
+  setSelectedAtomIndex(null);
+  setSelectedBondIndex(null);
+}}
+      type="button"
+    >
+      Acid/Base Sites
+    </button>
+
+    <button
+      className={
+        selectedConcept === "reactiveSites"
+          ? "concept-button active"
+          : "concept-button"
+      }
+      onClick={() => {
+  setSelectedConcept("reactiveSites");
+  setSelectedAtomIndex(null);
+  setSelectedBondIndex(null);
+}}
+      type="button"
+    >
+      Reactive Sites
+    </button>
+  </div>
+
+  {selectedConcept === "hybridization" && (
+    <div className="concept-subfilter-row">
+      {(["all", "sp", "sp2", "sp3"] as const).map((hybridization) => (
+        <button
+          key={hybridization}
+          className={
+            selectedHybridization === hybridization
+              ? "concept-subfilter-button active"
+              : "concept-subfilter-button"
+          }
+          onClick={() => setSelectedHybridization(hybridization)}
+          type="button"
+        >
+          {hybridization === "all" ? "All" : hybridization}
+        </button>
+      ))}
+    </div>
+  )}
+
+  {selectedConcept === "bondOrbitals" && (
+    <div className="concept-subfilter-row">
+      {(["all", "single", "double", "triple", "aromatic"] as const).map(
+        (bondType) => (
+          <button
+            key={bondType}
+            className={
+              selectedBondType === bondType
+                ? "concept-subfilter-button active"
+                : "concept-subfilter-button"
+            }
+            onClick={() => setSelectedBondType(bondType)}
+            type="button"
+          >
+            {bondType === "all" ? "All" : bondType}
+          </button>
+        )
+      )}
+    </div>
+  )}
+
+  {highlightedMoleculeSvg && (
+
+  <div className="highlight-preview">
+
+    <p className="annotation-summary">Highlighted molecule preview</p>
+
+    <div
+
+      className="highlighted-molecule-svg"
+
+      dangerouslySetInnerHTML={{ __html: highlightedMoleculeSvg }}
+
+    />
+
+  </div>
+
+)}
+
+  {!moleculeAnnotation ? (
+    <p className="empty">Analyze a molecule to see concept annotations.</p>
+  ) : (
+    <div className="annotation-list">
+      {selectedConcept === "hybridization" && (
+        <p className="annotation-summary">
+          Showing{" "}
+          {selectedHybridization === "all"
+            ? "all hybridized atoms"
+            : `${selectedHybridization} atoms`}
+          .
+        </p>
+      )}
+
+      {selectedConcept === "bondOrbitals" && (
+        <p className="annotation-summary">
+          Showing{" "}
+          {selectedBondType === "all"
+            ? "all bond orbital overlaps"
+            : `${selectedBondType} bond orbital overlaps`}
+          .
+        </p>
+      )}
+
+      {getVisibleAtomAnnotations().map((atom) => (
+        <div
+        className={getAtomCardClassName(atom)}
+        key={`atom-${atom.atomIndex}`}
+        onClick={() => {
+          setSelectedAtomIndex(atom.atomIndex);
+          setSelectedBondIndex(null);
+        }}
+        role="button"
+        tabIndex={0}
+      >
+          <h3>
+            Atom {atom.atomIndex}: {atom.element}
+          </h3>
+          
+            {selectedAtomIndex === atom.atomIndex && (
+              <p className="selected-note">Selected atom</p>
+            )}
+
+          <p>
+            <strong>Hybridization:</strong> {atom.hybridization}
+          </p>
+
+          {selectedConcept === "lonePairs" && (
+            <>
+              <p>
+                <strong>Lone pairs:</strong> {atom.lonePairInfo.count}
+              </p>
+              <p>
+                <strong>Lone pair orbital:</strong> {atom.lonePairInfo.orbital}
+              </p>
+              <p>
+                <strong>Resonance participation:</strong>{" "}
+                {atom.lonePairInfo.participatesInResonance ? "Yes" : "No"}
+              </p>
+              <p>{atom.lonePairInfo.explanation}</p>
+            </>
+          )}
+
+          {atom.siteTypes.length > 0 && selectedConcept !== "lonePairs" && (
+            <p>
+              <strong>Site type:</strong> {atom.siteTypes.join(", ")}
+            </p>
+          )}
+
+          {selectedConcept !== "lonePairs" && <p>{atom.explanation}</p>}
+        </div>
+      ))}
+
+      {getVisibleBondAnnotations().map((bond) => (
+        <div
+          className={getBondCardClassName(bond)}
+          key={`bond-${bond.bondIndex}`}
+          onClick={() => {
+            setSelectedBondIndex(bond.bondIndex);
+            setSelectedAtomIndex(null);
+          }}
+          role="button"
+          tabIndex={0}
+        >
+          <h3>
+            {bond.bondType} bond: Atom {bond.atomIndices[0]}–Atom{" "}
+            {bond.atomIndices[1]}
+          </h3>
+
+          {selectedBondIndex === bond.bondIndex && (
+            <p className="selected-note">Selected bond</p>
+          )}
+
+          <p>
+            <strong>Sigma overlap:</strong> {bond.sigmaOverlap}
+          </p>
+
+          {bond.piOverlap && (
+            <p>
+              <strong>Pi overlap:</strong> {bond.piOverlap}
+            </p>
+          )}
+
+          <p>
+            <strong>Orbital info:</strong> {bond.orbitalInfo.join(", ")}
+          </p>
+
+          <p>{bond.explanation}</p>
+        </div>
+      ))}
+
+      {getVisibleAtomAnnotations().length === 0 &&
+        getVisibleBondAnnotations().length === 0 && (
+          <p className="empty">No annotations found for this concept yet.</p>
+        )}
+    </div>
+  )}
+</div>
 
   <div className="analysis-section">
     <p className="label">Main Functional Group</p>

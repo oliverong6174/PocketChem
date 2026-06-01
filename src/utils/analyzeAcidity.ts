@@ -244,6 +244,26 @@ const ACIDITY_RULES: AcidityRule[] = [
     "Neutral amines are much more important as bases than as acids. Their N-H protons are weakly acidic.",
 },
 {
+  groupName: "Ether",
+  acidicSite: "alpha C-H next to ether oxygen",
+  siteSmarts: "[CX4;!H0][OX2][#6]",
+  anchorAtomIndexInMatch: 0,
+  inductionSensitivity: 0.45,
+  estimatedPka: "~40–45",
+  estimatedPkaNumber: 43,
+  strengthRank: 90,
+  atom:
+    "The acidic proton is on an sp3 carbon next to oxygen.",
+  resonance:
+    "The conjugate base is usually not strongly resonance-stabilized.",
+  induction:
+    "The nearby oxygen withdraws electron density by induction, slightly stabilizing the carbanion compared with a plain alkane.",
+  orbital:
+    "The conjugate base still places negative charge mostly in an sp3 carbon orbital, so this remains a very weak acid.",
+  explanation:
+    "Ethers have weakly acidic alpha C-H bonds next to oxygen. They are more acidic than simple alkanes but much less acidic than alcohols, carbonyl alpha hydrogens, or terminal alkynes.",
+},
+{
   groupName: "Alkane",
   acidicSite: "alkane C-H proton",
   siteSmarts: "[CX4;!H0]",

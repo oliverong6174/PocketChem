@@ -342,11 +342,7 @@ export async function analyzeBasicity(
   const bestCarbanionStability = getBestCarbanionStabilityResult(
     carbanionStabilityResults
   );
-
-    console.log("BASICITY SMILES:", smiles);
-    console.log("CARBANION STABILITY RESULTS:", carbanionStabilityResults);
-    console.log("BEST CARBANION STABILITY:", bestCarbanionStability);
-
+  
 for (const rule of BASICITY_RULES) {
   if (!isRuleAllowedForFunctionalGroups(rule, functionalGroups)) continue;
 
@@ -387,11 +383,6 @@ for (const rule of BASICITY_RULES) {
 
 
     if (isCarbanionRule && bestCarbanionStability) {
-      console.log("CARBANION RULE BEING MODIFIED:", rule.groupName);
-      console.log("ORIGINAL BASIC SITE:", rule.basicSite);
-      console.log("BEST STABILITY USED:", bestCarbanionStability);
-
-
       finalConjugateAcidPkaNumber =
         rule.conjugateAcidPkaNumber + bestCarbanionStability.pkaShift;
 
