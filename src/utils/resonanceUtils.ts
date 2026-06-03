@@ -8,6 +8,9 @@ export type ResonanceType =
   | "phenoxide"
   | "deprotonated carboxamide"
   | "nitro"
+  | "allylic radical"
+  | "conjugated radical"
+  | "benzylic radical"
   | "none";
 
 export type ResonanceStrength = "none" | "weak" | "moderate" | "strong";
@@ -29,6 +32,10 @@ export type ResonanceResult = {
   pkaShiftHint: number;
   explanation: string;
   forms: ResonanceForm[];
+
+  // optional fields for radicals / future resonance drawing
+  possibleRadicalSites?: number[];
+  resonanceBondIndices?: number[];
 };
 
 type ResonanceRule = {
@@ -63,6 +70,213 @@ function extractAtomMatches(matchesJson: string): number[][] {
   } catch {
     return [];
   }
+}
+
+type ParsedAtom = {
+  atomIndex: number;
+  element: string;
+};
+
+type ParsedBond = {
+  bondIndex: number;
+  atomA: number;
+  atomB: number;
+  bondOrder: number;
+};
+
+type ParsedMolBlock = {
+  atoms: ParsedAtom[];
+  bonds: ParsedBond[];
+};
+
+function parseMolBlock(molblock: string): ParsedMolBlock {
+  const lines = molblock.split(/\r?\n/);
+  const countsLine = lines[3];
+
+  if (!countsLine) {
+    return { atoms: [], bonds: [] };
+  }
+
+  const atomCount = Number.parseInt(countsLine.slice(0, 3).trim(), 10);
+  const bondCount = Number.parseInt(countsLine.slice(3, 6).trim(), 10);
+
+  if (!Number.isFinite(atomCount) || !Number.isFinite(bondCount)) {
+    return { atoms: [], bonds: [] };
+  }
+
+  const atomLines = lines.slice(4, 4 + atomCount);
+  const bondLines = lines.slice(4 + atomCount, 4 + atomCount + bondCount);
+
+  const atoms: ParsedAtom[] = atomLines.map((line, index) => {
+    const parts = line.trim().split(/\s+/);
+
+    return {
+      atomIndex: index,
+      element: parts[3] ?? "unknown",
+    };
+  });
+
+  const bonds: ParsedBond[] = bondLines
+    .map((line, index) => {
+      const parts = line.trim().split(/\s+/);
+
+      const atomA = Number.parseInt(parts[0], 10) - 1;
+      const atomB = Number.parseInt(parts[1], 10) - 1;
+      const bondOrder = Number.parseInt(parts[2], 10);
+
+      if (
+        !Number.isFinite(atomA) ||
+        !Number.isFinite(atomB) ||
+        !Number.isFinite(bondOrder)
+      ) {
+        return null;
+      }
+
+      return {
+        bondIndex: index,
+        atomA,
+        atomB,
+        bondOrder,
+      };
+    })
+    .filter((bond): bond is ParsedBond => bond !== null);
+
+  return { atoms, bonds };
+}
+
+function getBondsForAtom(parsedMol: ParsedMolBlock, atomIndex: number) {
+  return parsedMol.bonds.filter(
+    (bond) => bond.atomA === atomIndex || bond.atomB === atomIndex
+  );
+}
+
+function getNeighborAtomIndex(bond: ParsedBond, atomIndex: number) {
+  return bond.atomA === atomIndex ? bond.atomB : bond.atomA;
+}
+
+function uniqueNumbers(values: number[]) {
+  return Array.from(new Set(values)).sort((a, b) => a - b);
+}
+
+function getRadicalAtomIndicesFromMolBlock(molblock: string): number[] {
+  const lines = molblock.split(/\r?\n/);
+  const radicalAtoms: number[] = [];
+
+  for (const line of lines) {
+    // V2000 radical line example:
+    // M  RAD  1   5   2
+    if (!line.startsWith("M  RAD")) continue;
+
+    const parts = line.trim().split(/\s+/);
+    const count = Number.parseInt(parts[2], 10);
+
+    if (!Number.isFinite(count)) continue;
+
+    for (let i = 0; i < count; i += 1) {
+      const atomNumber = Number.parseInt(parts[3 + i * 2], 10);
+
+      if (Number.isFinite(atomNumber)) {
+        radicalAtoms.push(atomNumber - 1);
+      }
+    }
+  }
+
+  return uniqueNumbers(radicalAtoms);
+}
+
+function getDoubleBondedCarbonNeighbors(
+  parsedMol: ParsedMolBlock,
+  atomIndex: number
+) {
+  return getBondsForAtom(parsedMol, atomIndex)
+    .filter((bond) => bond.bondOrder === 2)
+    .map((bond) => getNeighborAtomIndex(bond, atomIndex))
+    .filter((neighborIndex) => parsedMol.atoms[neighborIndex]?.element === "C");
+}
+
+function findAllylicRadicalResults(
+  parsedMol: ParsedMolBlock,
+  radicalAtomIndices: number[]
+): ResonanceResult[] {
+  const results: ResonanceResult[] = [];
+
+  for (const radicalAtomIndex of radicalAtomIndices) {
+    const radicalAtom = parsedMol.atoms[radicalAtomIndex];
+
+    if (!radicalAtom || radicalAtom.element !== "C") continue;
+
+    const singleBonds = getBondsForAtom(parsedMol, radicalAtomIndex).filter(
+      (bond) => bond.bondOrder === 1
+    );
+
+    for (const singleBond of singleBonds) {
+      const adjacentAtomIndex = getNeighborAtomIndex(
+        singleBond,
+        radicalAtomIndex
+      );
+
+      const doubleBondedCarbonNeighbors = getDoubleBondedCarbonNeighbors(
+        parsedMol,
+        adjacentAtomIndex
+      );
+
+      for (const terminalPiAtomIndex of doubleBondedCarbonNeighbors) {
+        if (terminalPiAtomIndex === radicalAtomIndex) continue;
+
+        const piBond = parsedMol.bonds.find(
+          (bond) =>
+            bond.bondOrder === 2 &&
+            ((bond.atomA === adjacentAtomIndex &&
+              bond.atomB === terminalPiAtomIndex) ||
+              (bond.atomB === adjacentAtomIndex &&
+                bond.atomA === terminalPiAtomIndex))
+        );
+
+        if (!piBond) continue;
+
+        results.push({
+          type: "allylic radical",
+          siteLabel: "allylic radical",
+          siteSmarts: "molblock radical + adjacent C=C",
+          matchedAtoms: uniqueNumbers([
+            radicalAtomIndex,
+            adjacentAtomIndex,
+            terminalPiAtomIndex,
+          ]),
+          isResonanceStabilized: true,
+          stabilizationStrength: "moderate",
+          pkaShiftHint: 0,
+          explanation:
+            "This is an allylic radical. The unpaired electron is next to a π bond, so radical character can delocalize between the two terminal carbons of the allylic system.",
+          forms: [
+            {
+              label: "Radical form 1",
+              smiles: null,
+              description: "Radical character starts on one end of the allylic system.",
+              majorContributor: true,
+            },
+            {
+              label: "Radical form 2",
+              smiles: null,
+              description:
+                "The π bond shifts and radical character moves to the other end of the allylic system.",
+              majorContributor: true,
+            },
+          ],
+          possibleRadicalSites: uniqueNumbers([
+            radicalAtomIndex,
+            terminalPiAtomIndex,
+          ]),
+          resonanceBondIndices: uniqueNumbers([
+            singleBond.bondIndex,
+            piBond.bondIndex,
+          ]),
+        });
+      }
+    }
+  }
+
+  return results;
 }
 
 const RESONANCE_RULES: ResonanceRule[] = [
@@ -147,21 +361,23 @@ const RESONANCE_RULES: ResonanceRule[] = [
     stabilizationStrength: "moderate",
     pkaShiftHint: -8,
     explanation:
-      "An allylic carbanion is resonance-stabilized because the negative charge can delocalize across the adjacent π bond.",
+    "This is an allylic carbanion. The three highlighted atoms form one conjugated resonance system. The negative charge can move between the two terminal carbons while the middle carbon helps connect the π system.",
     forms: [
-      {
-        label: "Form 1",
-        smiles: null,
-        description: "Negative charge on one end of the allylic system.",
-        majorContributor: true,
-      },
-      {
-        label: "Form 2",
-        smiles: null,
-        description: "Negative charge shifted to the other end of the allylic system.",
-        majorContributor: true,
-      },
-    ],
+    {
+      label: "Form 1",
+      smiles: null,
+      description:
+        "Negative charge is on one terminal carbon of the allylic system.",
+      majorContributor: true,
+    },
+    {
+      label: "Form 2",
+      smiles: null,
+      description:
+        "The π bond shifts, and the negative charge moves to the other terminal carbon.",
+      majorContributor: true,
+    },
+  ],
   },
 
   {
@@ -289,7 +505,8 @@ const RESONANCE_RULES: ResonanceRule[] = [
 ];
 
 function makeResultKey(type: ResonanceType, matchedAtoms: number[]) {
-  return `${type}:${matchedAtoms.join("-")}`;
+  const normalizedAtoms = [...matchedAtoms].sort((a, b) => a - b);
+  return `${type}:${normalizedAtoms.join("-")}`;
 }
 
 export async function analyzeResonance(
@@ -302,6 +519,23 @@ export async function analyzeResonance(
 
   const results: ResonanceResult[] = [];
   const seen = new Set<string>();
+  const molblock = mol.get_molblock();
+  const parsedMol = parseMolBlock(molblock);
+  const radicalAtomIndices = getRadicalAtomIndicesFromMolBlock(molblock);
+
+  const radicalResults = findAllylicRadicalResults(
+    parsedMol,
+    radicalAtomIndices
+  );
+
+for (const radicalResult of radicalResults) {
+  const key = makeResultKey(radicalResult.type, radicalResult.matchedAtoms);
+
+  if (seen.has(key)) continue;
+  seen.add(key);
+
+  results.push(radicalResult);
+}
 
   for (const rule of RESONANCE_RULES) {
     const query = RDKit.get_qmol(rule.siteSmarts);
@@ -323,6 +557,7 @@ export async function analyzeResonance(
         pkaShiftHint: rule.pkaShiftHint,
         explanation: rule.explanation,
         forms: rule.forms,
+        resonanceBondIndices: getBondIndicesAmongAtoms(parsedMol, matchedAtoms),
       });
     }
   }
@@ -354,6 +589,17 @@ export function getStrongestResonance(
       strengthScore[b.stabilizationStrength] -
       strengthScore[a.stabilizationStrength]
   )[0];
+}
+
+function getBondIndicesAmongAtoms(
+  parsedMol: ParsedMolBlock,
+  atomIndices: number[]
+): number[] {
+  const atomSet = new Set(atomIndices);
+
+  return parsedMol.bonds
+    .filter((bond) => atomSet.has(bond.atomA) && atomSet.has(bond.atomB))
+    .map((bond) => bond.bondIndex);
 }
 
 export function getResonanceExplanationSummary(

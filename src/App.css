@@ -375,6 +375,11 @@ button {
   border: 1px solid #334155;
   border-radius: 12px;
   padding: 10px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
 }
 
 .annotation-card h3 {
@@ -412,16 +417,6 @@ button {
   background: #0ea5e9;
   color: white;
   border-color: #7dd3fc;
-}
-
-
-
-.annotation-card {
-  cursor: pointer;
-  transition:
-    border-color 0.15s ease,
-    background 0.15s ease,
-    transform 0.15s ease;
 }
 
 .annotation-card:hover {
@@ -477,7 +472,7 @@ button {
   border-left: 4px solid #c084fc;
 }
 
-highlight-preview {
+.highlight-preview {
   margin: 12px 0;
   background: white;
   border-radius: 14px;
@@ -495,4 +490,56 @@ highlight-preview {
 .highlighted-molecule-svg svg {
   max-width: 100%;
   height: auto;
+}
+
+.annotation-carousel {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.annotation-carousel-card {
+  min-width: 0;
+}
+
+.carousel-arrow {
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+  border-radius: 14px;
+  font-size: 32px;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-arrow:hover:not(:disabled) {
+  background: #334155;
+  color: white;
+}
+
+.carousel-arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.annotation-counter {
+  color: #93c5fd !important;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.svg-clickable-site {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.highlighted-molecule-svg svg .bond-0,
+.highlighted-molecule-svg svg [class*="bond-"] {
+  pointer-events: stroke;
 }

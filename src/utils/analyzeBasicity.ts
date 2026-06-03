@@ -435,7 +435,31 @@ const filteredResults = results.filter((result) => {
   return true;
 });
 
-return filteredResults.sort(
+const dedupedResults = filteredResults.reduce<BasicityResult[]>((acc, result) => {
+  const key = `${result.relatedGroup}-${result.basicSite}`;
+
+  const existingIndex = acc.findIndex(
+    (item) => `${item.relatedGroup}-${item.basicSite}` === key
+  );
+
+  if (existingIndex === -1) {
+    acc.push(result);
+    return acc;
+  }
+
+  // For duplicate same-site basicity results, keep the stronger base:
+  // higher conjugate acid pKa = stronger base.
+  if (
+    result.conjugateAcidPkaNumber >
+    acc[existingIndex].conjugateAcidPkaNumber
+  ) {
+    acc[existingIndex] = result;
+  }
+
+  return acc;
+}, []);
+
+return dedupedResults.sort(
   (a, b) => b.conjugateAcidPkaNumber - a.conjugateAcidPkaNumber
 );
 

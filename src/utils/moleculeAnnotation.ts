@@ -18,7 +18,8 @@ export type AnnotationConcept =
   | "bondOrbitals"
   | "lonePairs"
   | "acidBaseSites"
-  | "reactiveSites";
+  | "reactiveSites"
+  | "resonance";
 
 export type AtomAnnotation = {
   atomIndex: number;
@@ -499,7 +500,9 @@ export async function getHighlightedMoleculeSvg(
   atomIndices: number[],
   bondIndices: number[],
   selectedAtomIndex: number | null,
-  selectedBondIndex: number | null
+  selectedBondIndex: number | null,
+  selectedSystemAtomIndices: number[] = [],
+  selectedSystemBondIndices: number[] = []
 ): Promise<string | null> {
   const RDKit = await getRDKit();
   const mol = RDKit.get_mol(smiles);
@@ -512,31 +515,43 @@ export async function getHighlightedMoleculeSvg(
   const selectedBonds =
     selectedBondIndex !== null ? [selectedBondIndex] : [];
 
+  const strongAtomIndices = Array.from(
+    new Set([...selectedAtoms, ...selectedSystemAtomIndices])
+  );
+
+  const strongBondIndices = Array.from(
+    new Set([...selectedBonds, ...selectedSystemBondIndices])
+  );
+
   const allHighlightedAtoms = Array.from(
-    new Set([...atomIndices, ...selectedAtoms])
+    new Set([...atomIndices, ...strongAtomIndices])
   );
 
   const allHighlightedBonds = Array.from(
-    new Set([...bondIndices, ...selectedBonds])
+    new Set([...bondIndices, ...strongBondIndices])
   );
 
   const softAtomColor: [number, number, number] = [0.65, 0.82, 1.0];
-  const selectedAtomColor: [number, number, number] = [1.0, 0.82, 0.15];
+  const selectedAtomColor: [number, number, number] = [1.0, 0.65, 0.05];
 
-  const softBondColor: [number, number, number] = [0.75, 0.75, 0.75];
+  const softBondColor: [number, number, number] = [0.72, 0.84, 1.0];
   const selectedBondColor: [number, number, number] = [1.0, 0.55, 0.05];
 
   const highlightAtomColors = Object.fromEntries(
     allHighlightedAtoms.map((atomIndex) => [
       atomIndex,
-      atomIndex === selectedAtomIndex ? selectedAtomColor : softAtomColor,
+      strongAtomIndices.includes(atomIndex)
+        ? selectedAtomColor
+        : softAtomColor,
     ])
   );
 
   const highlightBondColors = Object.fromEntries(
     allHighlightedBonds.map((bondIndex) => [
       bondIndex,
-      bondIndex === selectedBondIndex ? selectedBondColor : softBondColor,
+      strongBondIndices.includes(bondIndex)
+        ? selectedBondColor
+        : softBondColor,
     ])
   );
 
@@ -550,10 +565,10 @@ export async function getHighlightedMoleculeSvg(
     highlightAtomRadii: Object.fromEntries(
       allHighlightedAtoms.map((atomIndex) => [
         atomIndex,
-        atomIndex === selectedAtomIndex ? 0.45 : 0.25,
+        strongAtomIndices.includes(atomIndex) ? 0.45 : 0.28,
       ])
     ),
-    highlightBondWidthMultiplier: 12,
+    highlightBondWidthMultiplier: 6,
   };
 
   try {

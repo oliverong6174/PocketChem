@@ -4,7 +4,7 @@ import {
   type AnnotationConcept,
   type MoleculeAnnotation,
 } from "./utils/moleculeAnnotation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import MoleculeDrawer from "./components/MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
@@ -13,7 +13,10 @@ import {
 } from "./utils/analyzeSmiles";
 import { analyzeAcidity, type AcidityResult } from "./utils/analyzeAcidity";
 import { analyzeBasicity, type BasicityResult } from "./utils/analyzeBasicity";
-import { analyzeResonance } from "./utils/resonanceUtils";
+import {
+  analyzeResonance,
+  type ResonanceResult,
+} from "./utils/resonanceUtils";
 import "./App.css";
 
 type RankingMode = "acidity" | "basicity" | "anionStability";
@@ -28,6 +31,22 @@ type ComparisonMolecule = {
   basicityResults: BasicityResult[];
 };
 
+type AnnotationCarouselItem =
+  | {
+      kind: "atom";
+      atom: MoleculeAnnotation["atoms"][number];
+    }
+  | {
+      kind: "bond";
+      bond: MoleculeAnnotation["bonds"][number];
+    }
+  | {
+      kind: "resonance";
+      resonance: ResonanceResult;
+    };
+
+
+
 function App() {
   //useState calls
   const [smiles, setSmiles] = useState("Not analyzed yet");
@@ -40,6 +59,7 @@ function App() {
   >([]);
   const [acidityResults, setAcidityResults] = useState<AcidityResult[]>([]);
   const [basicityResults, setBasicityResults] = useState<BasicityResult[]>([]);
+  const [resonanceResults, setResonanceResults] = useState<ResonanceResult[]>([]);
   const [comparisonMolecules, setComparisonMolecules] = useState<
   ComparisonMolecule[]
   >([]);
@@ -52,12 +72,14 @@ function App() {
   const [selectedHybridization, setSelectedHybridization] =
   useState<"all" | "sp" | "sp2" | "sp3">("all");
   const [selectedBondType, setSelectedBondType] =
-  useState<"all" | "single" | "double" | "triple" | "aromatic">("all");
+  useState<"all" | "single" | "double" | "triple">("all");
 
   const [selectedAtomIndex, setSelectedAtomIndex] = useState<number | null>(null);
   const [selectedBondIndex, setSelectedBondIndex] = useState<number | null>(null);
+  const [annotationCardIndex, setAnnotationCardIndex] = useState(0);
   const [highlightedMoleculeSvg, setHighlightedMoleculeSvg] =
   useState<string | null>(null);
+  const highlightedSvgRef = useRef<HTMLDivElement | null>(null);
 
   const additionalFunctionalGroups = mainGroup
     ? functionalGroups.filter((group) => group.name !== mainGroup.name)
@@ -90,6 +112,7 @@ function App() {
       setMoleculeAnnotation(annotation);
 
       const resonance = await analyzeResonance(result);
+      setResonanceResults(resonance);
       console.log("Resonance results:", resonance);
 
       const acidity = await analyzeAcidity(result, hierarchy.primaryGroups);
@@ -361,6 +384,15 @@ const getHighlightedAtomIndices = () => {
     (atom) => atom.atomIndex
   );
 
+  if (selectedConcept === "resonance") {
+    const allResonanceAtomIndices = resonanceResults.flatMap((result) => [
+      ...result.matchedAtoms,
+      ...(result.possibleRadicalSites ?? []),
+    ]);
+
+    return Array.from(new Set(allResonanceAtomIndices));
+  }
+
   if (selectedAtomIndex !== null) {
     visibleAtomIndices.push(selectedAtomIndex);
   }
@@ -379,15 +411,56 @@ const getHighlightedAtomIndices = () => {
 };
 
 const getHighlightedBondIndices = () => {
-  const visibleBondIndices = getVisibleBondAnnotations().map(
-    (bond) => bond.bondIndex
-  );
+  const visibleBondIndices: number[] = [];
+
+  if (selectedConcept === "resonance") {
+    const allResonanceBondIndices = resonanceResults.flatMap(
+      (result) => result.resonanceBondIndices ?? []
+    );
+
+    return Array.from(new Set(allResonanceBondIndices));
+  }
+
+  if (selectedConcept === "bondOrbitals") {
+    visibleBondIndices.push(
+      ...getVisibleBondAnnotations().map((bond) => bond.bondIndex)
+    );
+  }
 
   if (selectedBondIndex !== null) {
     visibleBondIndices.push(selectedBondIndex);
   }
 
   return Array.from(new Set(visibleBondIndices));
+};
+
+const getSelectedResonanceAtomIndices = () => {
+  if (
+    selectedConcept !== "resonance" ||
+    currentAnnotationItem?.kind !== "resonance"
+  ) {
+    return [];
+  }
+
+  return Array.from(
+    new Set([
+      ...currentAnnotationItem.resonance.matchedAtoms,
+      ...(currentAnnotationItem.resonance.possibleRadicalSites ?? []),
+    ])
+  );
+};
+
+const getSelectedResonanceBondIndices = () => {
+  if (
+    selectedConcept !== "resonance" ||
+    currentAnnotationItem?.kind !== "resonance"
+  ) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(currentAnnotationItem.resonance.resonanceBondIndices ?? [])
+  );
 };
 
 useEffect(() => {
@@ -404,26 +477,232 @@ useEffect(() => {
       smiles,
       atomIndices,
       bondIndices,
-      selectedAtomIndex,
-      selectedBondIndex
+      selectedConcept === "resonance" ? null : selectedAtomIndex,
+      selectedConcept === "resonance" ? null : selectedBondIndex,
+      getSelectedResonanceAtomIndices(),
+      getSelectedResonanceBondIndices()
     );
 
     setHighlightedMoleculeSvg(svg);
   };
 
   updateHighlightedSvg();
-    }, [
-      moleculeAnnotation,
-      smiles,
-      selectedConcept,
-      selectedHybridization,
-      selectedBondType,
-      selectedAtomIndex,
-      selectedBondIndex,
-    ]);
+}, [
+  moleculeAnnotation,
+  smiles,
+  selectedConcept,
+  selectedHybridization,
+  selectedBondType,
+  selectedAtomIndex,
+  selectedBondIndex,
+  resonanceResults,
+  annotationCardIndex,
+]);
+
+const annotationCarouselItems = useMemo<AnnotationCarouselItem[]>(() => {
+  if (selectedConcept === "resonance") {
+    return resonanceResults.map((resonance) => ({
+      kind: "resonance" as const,
+      resonance,
+    }));
+  }
+
+  const atomItems = getVisibleAtomAnnotations().map((atom) => ({
+    kind: "atom" as const,
+    atom,
+  }));
+
+  const bondItems = getVisibleBondAnnotations().map((bond) => ({
+    kind: "bond" as const,
+    bond,
+  }));
+
+  return [...atomItems, ...bondItems];
+}, [
+  moleculeAnnotation,
+  selectedConcept,
+  selectedHybridization,
+  selectedBondType,
+  resonanceResults,
+]);
+
+const currentAnnotationItem =
+  annotationCarouselItems[annotationCardIndex] ?? null;
+
+  useEffect(() => {
+  if (!currentAnnotationItem) {
+    setSelectedAtomIndex(null);
+    setSelectedBondIndex(null);
+    return;
+  }
+
+  if (currentAnnotationItem.kind === "atom") {
+    setSelectedAtomIndex(currentAnnotationItem.atom.atomIndex);
+    setSelectedBondIndex(null);
+  }
+
+  if (currentAnnotationItem.kind === "bond") {
+    setSelectedBondIndex(currentAnnotationItem.bond.bondIndex);
+    setSelectedAtomIndex(null);
+  }
+
+  if (currentAnnotationItem.kind === "resonance") {
+    setSelectedAtomIndex(null);
+    setSelectedBondIndex(null);
+  }
+
+}, [currentAnnotationItem]);
+
+const goToPreviousAnnotationCard = () => {
+  if (annotationCarouselItems.length === 0) return;
+
+  setAnnotationCardIndex((currentIndex) =>
+    currentIndex === 0 ? annotationCarouselItems.length - 1 : currentIndex - 1
+  );
+};
+
+const goToNextAnnotationCard = () => {
+  if (annotationCarouselItems.length === 0) return;
+
+  setAnnotationCardIndex((currentIndex) =>
+    currentIndex === annotationCarouselItems.length - 1 ? 0 : currentIndex + 1
+  );
+};
+
+const jumpToAnnotationItem = (kind: "atom" | "bond", index: number) => {
+  // Special behavior for Resonance mode:
+  // clicking any atom/bond in a resonance system jumps to that resonance card.
+  if (selectedConcept === "resonance") {
+    const targetIndex = annotationCarouselItems.findIndex((item) => {
+      if (item.kind !== "resonance") return false;
+
+      const resonance = item.resonance;
+
+      if (kind === "atom") {
+        return [
+          ...resonance.matchedAtoms,
+          ...(resonance.possibleRadicalSites ?? []),
+        ].includes(index);
+      }
+
+      if (kind === "bond") {
+        return (resonance.resonanceBondIndices ?? []).includes(index);
+      }
+
+      return false;
+    });
+
+    if (targetIndex !== -1) {
+      setAnnotationCardIndex(targetIndex);
+      setSelectedAtomIndex(null);
+      setSelectedBondIndex(null);
+    }
+
+    return;
+  }
+
+  // Normal atom/bond behavior for non-resonance modes
+  const targetIndex = annotationCarouselItems.findIndex((item) => {
+    if (kind === "atom" && item.kind === "atom") {
+      return item.atom.atomIndex === index;
+    }
+
+    if (kind === "bond" && item.kind === "bond") {
+      return item.bond.bondIndex === index;
+    }
+
+    return false;
+  });
+
+  if (targetIndex === -1) return;
+
+  setAnnotationCardIndex(targetIndex);
+
+  if (kind === "atom") {
+    setSelectedAtomIndex(index);
+    setSelectedBondIndex(null);
+  } else {
+    setSelectedBondIndex(index);
+    setSelectedAtomIndex(null);
+  }
+};
+
+useEffect(() => {
+  setAnnotationCardIndex(0);
+}, [selectedConcept, selectedHybridization, selectedBondType, moleculeAnnotation]);
+
+useEffect(() => {
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (annotationCarouselItems.length <= 1) return;
+
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goToPreviousAnnotationCard();
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goToNextAnnotationCard();
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+}, [annotationCarouselItems.length]);
+
+{/* CLICKER FUNCTION */}
+useEffect(() => {
+  const container = highlightedSvgRef.current;
+  if (!container) return;
+
+  const svg = container.querySelector("svg");
+  if (!svg) return;
+
+  const clickableElements = svg.querySelectorAll(
+    "[class*='atom-'], [class*='bond-']"
+  );
+
+  const cleanupFunctions: Array<() => void> = [];
+
+  clickableElements.forEach((element) => {
+    element.classList.add("svg-clickable-site");
+
+    const handleClick = (event: Event) => {
+      event.stopPropagation();
+
+      const className = element.getAttribute("class") ?? "";
+
+      const bondMatch = className.match(/bond-(\d+)/);
+      const atomMatch = className.match(/atom-(\d+)/);
+
+      if (bondMatch) {
+        jumpToAnnotationItem("bond", Number(bondMatch[1]));
+        return;
+      }
+
+      if (atomMatch) {
+        jumpToAnnotationItem("atom", Number(atomMatch[1]));
+      }
+    };
+
+    element.addEventListener("click", handleClick);
+
+    cleanupFunctions.push(() => {
+      element.removeEventListener("click", handleClick);
+    });
+  });
+
+  return () => {
+    cleanupFunctions.forEach((cleanup) => cleanup());
+  };
+}, [highlightedMoleculeSvg, annotationCarouselItems]);
+
+{/*RETURN STATEMENT*/}
 
 
-//RETURN STATEMENT 
   return (
     <main className="app">
       <section className="hero">
@@ -467,6 +746,7 @@ useEffect(() => {
                 setFunctionalGroups([]);
                 setAcidityResults([]);
                 setBasicityResults([]);
+                setResonanceResults([]);
                 setMoleculeAnnotation(null);
                 setSelectedAtomIndex(null);
                 setSelectedBondIndex(null);
@@ -497,6 +777,8 @@ useEffect(() => {
     <p className="label">SMILES</p>
     <p className="smiles-output">{smiles}</p>
   </div>
+
+{/* ORBITAL SECTION */}
 
 <div className="analysis-section">
   <p className="label">Concept View</p>
@@ -583,6 +865,22 @@ useEffect(() => {
     </button>
   </div>
 
+  <button
+  className={
+    selectedConcept === "resonance"
+      ? "concept-button active"
+      : "concept-button"
+  }
+  onClick={() => {
+    setSelectedConcept("resonance");
+    setSelectedAtomIndex(null);
+    setSelectedBondIndex(null);
+  }}
+  type="button"
+>
+  Resonance Sites
+</button>
+
   {selectedConcept === "hybridization" && (
     <div className="concept-subfilter-row">
       {(["all", "sp", "sp2", "sp3"] as const).map((hybridization) => (
@@ -604,7 +902,7 @@ useEffect(() => {
 
   {selectedConcept === "bondOrbitals" && (
     <div className="concept-subfilter-row">
-      {(["all", "single", "double", "triple", "aromatic"] as const).map(
+      {(["all", "single", "double", "triple"] as const).map(
         (bondType) => (
           <button
             key={bondType}
@@ -623,22 +921,19 @@ useEffect(() => {
     </div>
   )}
 
-  {highlightedMoleculeSvg && (
 
-  <div className="highlight-preview">
+{highlightedMoleculeSvg && (
+  <div className="highlight-preview-wrapper">
+    <p className="annotation-summary">Highlighted molecule preview:</p>
 
-    <p className="annotation-summary">Highlighted molecule preview</p>
-
-    <div
-
-      className="highlighted-molecule-svg"
-
-      dangerouslySetInnerHTML={{ __html: highlightedMoleculeSvg }}
-
-    />
-
+    <div className="highlight-preview">
+      <div
+          ref={highlightedSvgRef}
+          className="highlighted-molecule-svg"
+          dangerouslySetInnerHTML={{ __html: highlightedMoleculeSvg }}
+        />
+    </div>
   </div>
-
 )}
 
   {!moleculeAnnotation ? (
@@ -663,102 +958,215 @@ useEffect(() => {
             : `${selectedBondType} bond orbital overlaps`}
           .
         </p>
+
+      
       )}
 
-      {getVisibleAtomAnnotations().map((atom) => (
-        <div
-        className={getAtomCardClassName(atom)}
-        key={`atom-${atom.atomIndex}`}
-        onClick={() => {
-          setSelectedAtomIndex(atom.atomIndex);
-          setSelectedBondIndex(null);
-        }}
-        role="button"
-        tabIndex={0}
-      >
-          <h3>
-            Atom {atom.atomIndex}: {atom.element}
-          </h3>
-          
-            {selectedAtomIndex === atom.atomIndex && (
-              <p className="selected-note">Selected atom</p>
+      {selectedConcept === "resonance" && (
+        <p className="annotation-summary">
+          Showing resonance-stabilized systems and possible delocalization sites.
+        </p>
+      )}
+
+        {annotationCarouselItems.length === 0 ? (
+          <p className="empty">No annotations found for this concept yet.</p>
+        ) : (
+          <div className="annotation-carousel">
+            <button
+              className="carousel-arrow"
+              type="button"
+              onClick={goToPreviousAnnotationCard}
+              disabled={annotationCarouselItems.length <= 1}
+              aria-label="Previous annotation"
+            >
+              ‹
+            </button>
+
+            <div className="annotation-carousel-card">
+              <p className="annotation-counter">
+                Card {annotationCardIndex + 1} of {annotationCarouselItems.length}
+              </p>
+
+              {currentAnnotationItem?.kind === "atom" && (
+                <div
+                  className={getAtomCardClassName(currentAnnotationItem.atom)}
+                  onClick={() => {
+                    setSelectedAtomIndex(currentAnnotationItem.atom.atomIndex);
+                    setSelectedBondIndex(null);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <h3>
+                    Atom {currentAnnotationItem.atom.atomIndex + 1}:{" "}
+                    {currentAnnotationItem.atom.element}
+                  </h3>
+
+                  {selectedAtomIndex === currentAnnotationItem.atom.atomIndex && (
+                    <p className="selected-note">Selected atom</p>
+                  )}
+
+                  <p>
+                    <strong>Hybridization:</strong>{" "}
+                    {currentAnnotationItem.atom.hybridization}
+                  </p>
+
+                  {selectedConcept === "lonePairs" && (
+                    <>
+                      <p>
+                        <strong>Lone pairs:</strong>{" "}
+                        {currentAnnotationItem.atom.lonePairInfo.count}
+                      </p>
+                      <p>
+                        <strong>Lone pair orbital:</strong>{" "}
+                        {currentAnnotationItem.atom.lonePairInfo.orbital}
+                      </p>
+                      <p>
+                        <strong>Resonance participation:</strong>{" "}
+                        {currentAnnotationItem.atom.lonePairInfo.participatesInResonance
+                          ? "Yes"
+                          : "No"}
+                      </p>
+                      <p>{currentAnnotationItem.atom.lonePairInfo.explanation}</p>
+                    </>
+                  )}
+
+                  {currentAnnotationItem.atom.siteTypes.length > 0 &&
+                    selectedConcept !== "lonePairs" && (
+                      <p>
+                        <strong>Site type:</strong>{" "}
+                        {currentAnnotationItem.atom.siteTypes.join(", ")}
+                      </p>
+                    )}
+
+                  {selectedConcept !== "lonePairs" && (
+                    <p>{currentAnnotationItem.atom.explanation}</p>
+                  )}
+                </div>
+              )}
+
+              {currentAnnotationItem?.kind === "bond" && (
+                <div
+                  className={getBondCardClassName(currentAnnotationItem.bond)}
+                  onClick={() => {
+                    setSelectedBondIndex(currentAnnotationItem.bond.bondIndex);
+                    setSelectedAtomIndex(null);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <h3>
+                    {currentAnnotationItem.bond.bondType} bond: Atom{" "}
+                    {currentAnnotationItem.bond.atomIndices[0] + 1}–Atom{" "}
+                    {currentAnnotationItem.bond.atomIndices[1] + 1}
+                  </h3>
+
+                  {selectedBondIndex === currentAnnotationItem.bond.bondIndex && (
+                    <p className="selected-note">Selected bond</p>
+                  )}
+
+                  <p>
+                    <strong>Sigma overlap:</strong>{" "}
+                    {currentAnnotationItem.bond.sigmaOverlap}
+                  </p>
+
+                  {currentAnnotationItem.bond.piOverlap && (
+                    <p>
+                      <strong>Pi overlap:</strong>{" "}
+                      {currentAnnotationItem.bond.piOverlap}
+                    </p>
+                  )}
+
+                  <p>
+                    <strong>Orbital info:</strong>{" "}
+                    {currentAnnotationItem.bond.orbitalInfo.join(", ")}
+                  </p>
+
+                  <p>{currentAnnotationItem.bond.explanation}</p>
+                </div>
+              )}
+
+            {currentAnnotationItem?.kind === "resonance" && (
+            <div className="annotation-card annotation-card-selected">
+            <h3>{currentAnnotationItem.resonance.siteLabel}</h3>
+            <p className="selected-note">Selected resonance system</p>
+
+            <p>
+              <strong>Type:</strong> {currentAnnotationItem.resonance.type}
+            </p>
+
+            <p>
+              <strong>Strength:</strong>{" "}
+              {currentAnnotationItem.resonance.stabilizationStrength}
+            </p>
+
+            <p>
+              <strong>Highlighted resonance system:</strong>{" "}
+              {[...currentAnnotationItem.resonance.matchedAtoms]
+                .sort((a, b) => a - b)
+                .map((atomIndex) => atomIndex + 1)
+                .join(", ")}
+            </p>
+
+            {currentAnnotationItem.resonance.possibleRadicalSites && (
+              <p>
+                <strong>Possible charged/radical sites:</strong>{" "}
+                {[...currentAnnotationItem.resonance.possibleRadicalSites]
+                  .sort((a, b) => a - b)
+                  .map((atomIndex) => atomIndex + 1)
+                  .join(", ")}
+              </p>
             )}
 
-          <p>
-            <strong>Hybridization:</strong> {atom.hybridization}
-          </p>
-
-          {selectedConcept === "lonePairs" && (
-            <>
+            {currentAnnotationItem.resonance.resonanceBondIndices && (
               <p>
-                <strong>Lone pairs:</strong> {atom.lonePairInfo.count}
+                <strong>Resonance bonds:</strong>{" "}
+                {[...currentAnnotationItem.resonance.resonanceBondIndices]
+                  .sort((a, b) => a - b)
+                  .map((bondIndex) => bondIndex + 1)
+                  .join(", ")}
               </p>
-              <p>
-                <strong>Lone pair orbital:</strong> {atom.lonePairInfo.orbital}
-              </p>
-              <p>
-                <strong>Resonance participation:</strong>{" "}
-                {atom.lonePairInfo.participatesInResonance ? "Yes" : "No"}
-              </p>
-              <p>{atom.lonePairInfo.explanation}</p>
-            </>
-          )}
+            )}
 
-          {atom.siteTypes.length > 0 && selectedConcept !== "lonePairs" && (
-            <p>
-              <strong>Site type:</strong> {atom.siteTypes.join(", ")}
-            </p>
-          )}
+            <p>{currentAnnotationItem.resonance.explanation}</p>
 
-          {selectedConcept !== "lonePairs" && <p>{atom.explanation}</p>}
-        </div>
-      ))}
+            {currentAnnotationItem.resonance.forms.length > 0 && (
+              <div>
+                <p>
+                  <strong>Possible forms:</strong>
+                </p>
 
-      {getVisibleBondAnnotations().map((bond) => (
-        <div
-          className={getBondCardClassName(bond)}
-          key={`bond-${bond.bondIndex}`}
-          onClick={() => {
-            setSelectedBondIndex(bond.bondIndex);
-            setSelectedAtomIndex(null);
-          }}
-          role="button"
-          tabIndex={0}
-        >
-          <h3>
-            {bond.bondType} bond: Atom {bond.atomIndices[0]}–Atom{" "}
-            {bond.atomIndices[1]}
-          </h3>
-
-          {selectedBondIndex === bond.bondIndex && (
-            <p className="selected-note">Selected bond</p>
-          )}
-
-          <p>
-            <strong>Sigma overlap:</strong> {bond.sigmaOverlap}
-          </p>
-
-          {bond.piOverlap && (
-            <p>
-              <strong>Pi overlap:</strong> {bond.piOverlap}
-            </p>
-          )}
-
-          <p>
-            <strong>Orbital info:</strong> {bond.orbitalInfo.join(", ")}
-          </p>
-
-          <p>{bond.explanation}</p>
-        </div>
-      ))}
-
-      {getVisibleAtomAnnotations().length === 0 &&
-        getVisibleBondAnnotations().length === 0 && (
-          <p className="empty">No annotations found for this concept yet.</p>
+                {currentAnnotationItem.resonance.forms.map((form) => (
+                  <p key={form.label}>
+                    <strong>{form.label}:</strong> {form.description}
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
         )}
+            </div>
+
+    
+
+            
+
+            <button
+              className="carousel-arrow"
+              type="button"
+              onClick={goToNextAnnotationCard}
+              disabled={annotationCarouselItems.length <= 1}
+              aria-label="Next annotation"
+            >
+              ›
+            </button>
+          </div>
+        )}  
     </div>
   )}
 </div>
+
+{/* FUNCTIONAL GROUP SECTION */}
 
   <div className="analysis-section">
     <p className="label">Main Functional Group</p>
@@ -817,6 +1225,55 @@ useEffect(() => {
       </div>
     )}
   </div>
+
+{/* RESONANCE SECTION */}
+
+<div className="analysis-section">
+  <p className="label">Resonance</p>
+
+  {resonanceResults.length === 0 ? (
+    <p className="empty">No major resonance pattern detected yet.</p>
+  ) : (
+    <div className="group-list">
+      {resonanceResults.map((result, index) => (
+        <div
+          className="group-card"
+          key={`${result.type}-${result.siteLabel}-${index}`}
+        >
+          <div className="group-card-header">
+            <h3>{result.siteLabel}</h3>
+            <span>{result.stabilizationStrength} resonance</span>
+          </div>
+
+          <p>
+            <strong>Type:</strong> {result.type}
+          </p>
+
+          <p>
+            <strong>Matched atoms:</strong>{" "}
+            {[...result.matchedAtoms]
+            .sort((a, b) => a - b)
+            .map((atomIndex) => atomIndex + 1)
+            .join(", ")}
+          </p>
+
+          {result.possibleRadicalSites && (
+            <p>
+              <strong>Possible radical sites:</strong>{" "}
+              {result.possibleRadicalSites
+                .map((atomIndex) => atomIndex + 1)
+                .join(", ")}
+            </p>
+          )}
+
+          <p>{result.explanation}</p>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+{/* ACIDITY AND BASICITY SECTION */}
 
       <div className="analysis-section">
         <p className="label">Acidity Estimate</p>
