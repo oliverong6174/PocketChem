@@ -7,6 +7,7 @@ const structServiceProvider = new StandaloneStructServiceProvider();
 
 type KetcherApi = {
   getSmiles: () => Promise<string>;
+  getMolfile: () => Promise<string>;
 };
 
 declare global {
@@ -33,9 +34,11 @@ function MoleculeDrawer() {
 
   return (
     <div className="ketcher-shell">
-      <div className={ready ? "ketcher-badge ready" : "ketcher-badge loading"}>
-        {ready ? "Ketcher Ready" : "Ketcher Loading"}
+      {!ready && (
+      <div className="ketcher-badge loading">
+        Ketcher Loading
       </div>
+    )}
 
       {mounted ? (
         <Editor

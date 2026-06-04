@@ -339,9 +339,8 @@ button {
 }
 
 .concept-button-row {
-  display: flex;
+  display: grid;
   flex-wrap: wrap;
-  gap: 10px;
   margin: 12px 0;
 }
 
@@ -352,6 +351,8 @@ button {
   border-radius: 999px;
   padding: 8px 12px;
   font-size: 13px;
+  margin: 0 14px 12px 0;
+  flex: 0 0 auto;
 }
 
 .concept-button:hover {

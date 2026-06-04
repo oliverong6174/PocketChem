@@ -19,7 +19,8 @@ export type AnnotationConcept =
   | "lonePairs"
   | "acidBaseSites"
   | "reactiveSites"
-  | "resonance";
+  | "resonance"
+  | "chirality";
 
 export type AtomAnnotation = {
   atomIndex: number;

@@ -18,6 +18,10 @@ import {
   type ResonanceResult,
 } from "./utils/resonanceUtils";
 import "./App.css";
+import {
+  analyzeChirality,
+  type ChiralityResult,
+} from "./utils/chiralityUtils";
 
 type RankingMode = "acidity" | "basicity" | "anionStability";
 
@@ -43,7 +47,11 @@ type AnnotationCarouselItem =
   | {
       kind: "resonance";
       resonance: ResonanceResult;
-    };
+    }
+  | {
+      kind: "chirality";
+      chirality: ChiralityResult;
+    }; 
 
 
 
@@ -73,6 +81,7 @@ function App() {
   useState<"all" | "sp" | "sp2" | "sp3">("all");
   const [selectedBondType, setSelectedBondType] =
   useState<"all" | "single" | "double" | "triple">("all");
+  
 
   const [selectedAtomIndex, setSelectedAtomIndex] = useState<number | null>(null);
   const [selectedBondIndex, setSelectedBondIndex] = useState<number | null>(null);
@@ -81,6 +90,9 @@ function App() {
   useState<string | null>(null);
   const highlightedSvgRef = useRef<HTMLDivElement | null>(null);
 
+  const [chiralityResults, setChiralityResults] = useState<ChiralityResult[]>([]);
+  const [molfile, setMolfile] = useState<string | null>(null);
+  
   const additionalFunctionalGroups = mainGroup
     ? functionalGroups.filter((group) => group.name !== mainGroup.name)
     : functionalGroups;
@@ -93,8 +105,12 @@ function App() {
 
     try {
       const result = await window.ketcher.getSmiles();
+      const currentMolfile = await window.ketcher.getMolfile();
+
+      setMolfile(currentMolfile);
 
       console.log("SMILES result:", result);
+      console.log("MOLFILE result:", currentMolfile);
 
       if (!result || result.trim() === "") {
         setSmiles("No molecule detected");
@@ -104,22 +120,31 @@ function App() {
 
       setSmiles(result);
 
-      const hierarchy = await analyzeFunctionalGroupHierarchy(result);
-      setMainGroup(hierarchy.mainGroup);
-      setFunctionalGroups(hierarchy.primaryGroups);
+      const moleculeSource = currentMolfile || result;
 
-      const annotation = await getMoleculeAnnotation(result);
+      const annotation = await getMoleculeAnnotation(moleculeSource);
       setMoleculeAnnotation(annotation);
 
-      const resonance = await analyzeResonance(result);
+      const resonance = await analyzeResonance(moleculeSource);
       setResonanceResults(resonance);
       console.log("Resonance results:", resonance);
 
+      
+      const chirality = await analyzeChirality(result, currentMolfile);
+      setChiralityResults(chirality);
+      console.log("Chirality results:", chirality);
+      
+      const hierarchy = await analyzeFunctionalGroupHierarchy(result);
+      setMainGroup(hierarchy.mainGroup);
+      setFunctionalGroups(hierarchy.primaryGroups);
+      
       const acidity = await analyzeAcidity(result, hierarchy.primaryGroups);
       setAcidityResults(acidity);
+      
       const basicity = await analyzeBasicity(result, hierarchy.primaryGroups);
       setBasicityResults(basicity);
 
+      
       
 
       setStatus("Molecule analyzed successfully.");
@@ -393,6 +418,12 @@ const getHighlightedAtomIndices = () => {
     return Array.from(new Set(allResonanceAtomIndices));
   }
 
+  if (selectedConcept === "chirality") {
+  return Array.from(
+    new Set(chiralityResults.map((result) => result.atomIndex))
+  );
+  }
+
   if (selectedAtomIndex !== null) {
     visibleAtomIndices.push(selectedAtomIndex);
   }
@@ -463,6 +494,19 @@ const getSelectedResonanceBondIndices = () => {
   );
 };
 
+const getSelectedChiralityAtomIndices = () => {
+  if (
+    selectedConcept !== "chirality" ||
+    currentAnnotationItem?.kind !== "chirality"
+  ) {
+    return [];
+  }
+
+  return [currentAnnotationItem.chirality.atomIndex];
+};
+
+
+
 useEffect(() => {
   const updateHighlightedSvg = async () => {
     if (!moleculeAnnotation || smiles === "Not analyzed yet") {
@@ -473,15 +517,25 @@ useEffect(() => {
     const atomIndices = getHighlightedAtomIndices();
     const bondIndices = getHighlightedBondIndices();
 
-    const svg = await getHighlightedMoleculeSvg(
-      smiles,
-      atomIndices,
-      bondIndices,
-      selectedConcept === "resonance" ? null : selectedAtomIndex,
-      selectedConcept === "resonance" ? null : selectedBondIndex,
-      getSelectedResonanceAtomIndices(),
-      getSelectedResonanceBondIndices()
-    );
+const moleculeSourceForHighlight = molfile || smiles;
+
+  
+const svg = await getHighlightedMoleculeSvg(
+  moleculeSourceForHighlight,
+  atomIndices,
+  bondIndices,
+  selectedConcept === "resonance" || selectedConcept === "chirality"
+    ? null
+    : selectedAtomIndex,
+  selectedConcept === "resonance" || selectedConcept === "chirality"
+    ? null
+    : selectedBondIndex,
+  [
+    ...getSelectedResonanceAtomIndices(),
+    ...getSelectedChiralityAtomIndices(),
+  ],
+  getSelectedResonanceBondIndices()
+);
 
     setHighlightedMoleculeSvg(svg);
   };
@@ -490,6 +544,7 @@ useEffect(() => {
 }, [
   moleculeAnnotation,
   smiles,
+  molfile,
   selectedConcept,
   selectedHybridization,
   selectedBondType,
@@ -506,6 +561,13 @@ const annotationCarouselItems = useMemo<AnnotationCarouselItem[]>(() => {
       resonance,
     }));
   }
+
+  if (selectedConcept === "chirality") {
+  return chiralityResults.map((chirality) => ({
+    kind: "chirality" as const,
+    chirality,
+  }));
+}
 
   const atomItems = getVisibleAtomAnnotations().map((atom) => ({
     kind: "atom" as const,
@@ -550,6 +612,12 @@ const currentAnnotationItem =
     setSelectedAtomIndex(null);
     setSelectedBondIndex(null);
   }
+
+  if (currentAnnotationItem.kind === "chirality") {
+  setSelectedAtomIndex(null);
+  setSelectedBondIndex(null);
+  return;
+}
 
 }, [currentAnnotationItem]);
 
@@ -600,6 +668,21 @@ const jumpToAnnotationItem = (kind: "atom" | "bond", index: number) => {
 
     return;
   }
+
+  if (selectedConcept === "chirality" && kind === "atom") {
+  const targetIndex = annotationCarouselItems.findIndex(
+    (item) =>
+      item.kind === "chirality" && item.chirality.atomIndex === index
+  );
+
+  if (targetIndex !== -1) {
+    setAnnotationCardIndex(targetIndex);
+    setSelectedAtomIndex(null);
+    setSelectedBondIndex(null);
+  }
+
+  return;
+}
 
   // Normal atom/bond behavior for non-resonance modes
   const targetIndex = annotationCarouselItems.findIndex((item) => {
@@ -747,9 +830,11 @@ useEffect(() => {
                 setAcidityResults([]);
                 setBasicityResults([]);
                 setResonanceResults([]);
+                setChiralityResults([]);
                 setMoleculeAnnotation(null);
                 setSelectedAtomIndex(null);
                 setSelectedBondIndex(null);
+                setMolfile(null);
               }}
             >
               Clear Analysis
@@ -863,9 +948,8 @@ useEffect(() => {
     >
       Reactive Sites
     </button>
-  </div>
 
-  <button
+      <button
   className={
     selectedConcept === "resonance"
       ? "concept-button active"
@@ -880,6 +964,26 @@ useEffect(() => {
 >
   Resonance Sites
 </button>
+
+<button
+  className={
+    selectedConcept === "chirality"
+      ? "concept-button active"
+      : "concept-button"
+  }
+  onClick={() => {
+    setSelectedConcept("chirality");
+    setSelectedAtomIndex(null);
+    setSelectedBondIndex(null);
+  }}
+  type="button"
+>
+  Chirality
+</button>
+
+  </div>
+
+
 
   {selectedConcept === "hybridization" && (
     <div className="concept-subfilter-row">
@@ -965,6 +1069,12 @@ useEffect(() => {
       {selectedConcept === "resonance" && (
         <p className="annotation-summary">
           Showing resonance-stabilized systems and possible delocalization sites.
+        </p>
+      )}
+
+      {selectedConcept === "chirality" && (
+        <p className="annotation-summary">
+          Showing possible chiral centers. Specific R/S assignment requires wedge/dash stereochemistry.
         </p>
       )}
 
@@ -1145,11 +1255,56 @@ useEffect(() => {
             )}
           </div>
         )}
+
+        {currentAnnotationItem?.kind === "chirality" && (
+          <div className="annotation-card annotation-card-selected">
+            <h3>
+              Atom {currentAnnotationItem.chirality.atomIndex + 1}:{" "}
+              {currentAnnotationItem.chirality.element}
+            </h3>
+
+            <p className="selected-note">Selected chiral center</p>
+
+            <p>
+              <strong>Configuration:</strong>{" "}
+              {currentAnnotationItem.chirality.configuration === "unknown"
+                ? "Not assigned"
+                : currentAnnotationItem.chirality.configuration}
+            </p>
+
+            <p>
+              <strong>Assignment source:</strong>{" "}
+              {currentAnnotationItem.chirality.assignmentSource === "rdkit"
+                ? "Automatic Analysis"
+                : currentAnnotationItem.chirality.assignmentSource === "pocketchem-fallback"
+                ? "Manual Analysis"
+                : "Unassigned"}
+            </p>
+
+            {currentAnnotationItem.chirality.configuration === "unknown" && (
+              <p className="empty">
+                Add wedge/dash bonds in Ketcher to specify stereochemistry for R/S assignment.
+              </p>
+            )}
+
+            <p>
+              <strong>Type:</strong> {currentAnnotationItem.chirality.label}
+            </p>
+
+            <p>{currentAnnotationItem.chirality.explanation}</p>
+
+            <p>
+            <strong>Why this is chiral:</strong>{" "}
+            {currentAnnotationItem.chirality.whyChiralExplanation}
+          </p>
+
+          <p>
+            <strong>How the configuration was assigned:</strong>{" "}
+            {currentAnnotationItem.chirality.configurationExplanation}
+          </p>
+          </div>
+        )}
             </div>
-
-    
-
-            
 
             <button
               className="carousel-arrow"
