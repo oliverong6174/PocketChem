@@ -22,6 +22,10 @@ import {
   analyzeChirality,
   type ChiralityResult,
 } from "./utils/chiralityUtils";
+import {
+  analyzeNomenclatureAndProperties,
+  type MoleculeIdentityResult,
+} from "./utils/nomenclatureUtils";
 
 type RankingMode = "acidity" | "basicity" | "anionStability";
 
@@ -53,7 +57,32 @@ type AnnotationCarouselItem =
       chirality: ChiralityResult;
     }; 
 
+type PropertyTileProps = {
+  label: string;
+  value: string | number;
+  info: string;
+};
 
+function PropertyTile({ label, value, info }: PropertyTileProps) {
+  return (
+    <div className="property-tile">
+      <div className="property-tile-header">
+        <span>{label}</span>
+
+        <button
+          type="button"
+          className="info-button"
+          aria-label={`What is ${label}?`}
+          title={info}
+        >
+          ?
+        </button>
+      </div>
+
+      <strong>{value}</strong>
+    </div>
+  );
+}
 
 function App() {
   //useState calls
@@ -92,6 +121,60 @@ function App() {
 
   const [chiralityResults, setChiralityResults] = useState<ChiralityResult[]>([]);
   const [molfile, setMolfile] = useState<string | null>(null);
+
+  const [moleculeIdentity, setMoleculeIdentity] =
+  useState<MoleculeIdentityResult | null>(null);
+
+  const PROPERTY_INFO: Record<string, string> = {
+  formula:
+    "Molecular formula shows the number and type of atoms in the molecule, such as C2H4O2.",
+
+  dbe:
+    "DBE means degrees of unsaturation. It estimates how many rings and/or pi bonds are present. A double bond counts as 1 DBE, a ring counts as 1 DBE, and a triple bond counts as 2 DBE.",
+
+  molecularWeight:
+    "Molecular weight is the average mass of one mole of the molecule, usually shown in g/mol. It helps estimate molecule size.",
+
+  exactMass:
+    "Exact mass is calculated using the exact masses of specific isotopes, usually the most common isotope of each atom.",
+
+  formalCharge:
+    "Formal charge is the overall charge assigned from the Lewis structure. Neutral molecules have formal charge 0.",
+
+  heavyAtoms:
+    "Heavy atom count is the number of non-hydrogen atoms. It helps estimate molecule size and complexity.",
+
+  hbd:
+    "H-bond donors are atoms/groups that can donate a hydrogen bond, usually O-H or N-H groups.",
+
+  hba:
+    "H-bond acceptors are atoms with lone pairs that can accept a hydrogen bond, usually oxygen or nitrogen. Some atoms, like the OH oxygen in carboxylic acids, may not count as effective acceptors.",
+
+  rotatableBonds:
+    "Rotatable bonds are single bonds that can freely rotate. More rotatable bonds usually means a molecule is more flexible.",
+
+  tpsa:
+  "TPSA means topological polar surface area. It estimates how much of the molecule's surface is polar. Low TPSA, about 0–40 Å², means less polar and often better membrane crossing. Medium TPSA, about 40–90 Å², means moderate polarity. High TPSA, above 90–140 Å², means more polar and more hydrogen bonding. Very high TPSA, above 140 Å², often lowers intestinal absorption.",
+
+  logP:
+  "logP estimates whether a neutral molecule prefers oil/fat or water. Negative logP means very water-loving. logP around 0–1 is fairly hydrophilic. logP around 1–3 is often a good balance for drug-like molecules. logP around 3–5 is more lipophilic. logP above 5 may be too greasy, poorly water-soluble, and more likely to accumulate in fat.",
+  
+  rings:
+    "Ring count is the number of ring systems detected in the molecule. Rings affect shape, rigidity, and chemical behavior.",
+
+  boilingPoint:
+  "Boiling point tendency estimates whether a molecule should have a low, medium, or high boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching. This is not an exact experimental boiling point.",
+    
+    waterSolubility:
+    "Water solubility tendency estimates how well a molecule dissolves in water. Very low means mostly nonpolar or greasy. Low means limited water solubility. Medium means some polar groups but not extremely water-loving. High means polar or hydrogen-bonding groups. Very high usually means charged, very polar, or many hydrogen-bonding groups.",
+
+  membranePermeability:
+    "Membrane permeability tendency estimates passive crossing through lipid membranes. Very low usually means charged, very large, or very polar. Low means crossing may be difficult. Medium means possible but structure-dependent. High means a good balance of lipid solubility and size. Very high means small, neutral, and lipid-compatible, but extremely greasy molecules may still have poor useful absorption.",
+
+  volatility:
+    "Volatility tendency estimates how easily a molecule evaporates. Very low means it is not very volatile, often because it is large, charged, or strongly hydrogen-bonding. Low means it evaporates slowly. Medium means moderate evaporation. High means fairly volatile. Very high means small molecules with weak intermolecular forces that evaporate easily.",
+    
+  };
   
   const additionalFunctionalGroups = mainGroup
     ? functionalGroups.filter((group) => group.name !== mainGroup.name)
@@ -144,7 +227,13 @@ function App() {
       const basicity = await analyzeBasicity(result, hierarchy.primaryGroups);
       setBasicityResults(basicity);
 
-      
+      const identity = await analyzeNomenclatureAndProperties(
+        result,
+        hierarchy.primaryGroups,
+        hierarchy.mainGroup
+      );
+
+      setMoleculeIdentity(identity);
       
 
       setStatus("Molecule analyzed successfully.");
@@ -835,6 +924,7 @@ useEffect(() => {
                 setSelectedAtomIndex(null);
                 setSelectedBondIndex(null);
                 setMolfile(null);
+                setMoleculeIdentity(null);
               }}
             >
               Clear Analysis
@@ -862,6 +952,163 @@ useEffect(() => {
     <p className="label">SMILES</p>
     <p className="smiles-output">{smiles}</p>
   </div>
+
+{/* NOMENCLATURE SECTION */}
+
+<div className="analysis-section">
+  <p className="label">Nomenclature & Core Properties</p>
+
+  {!moleculeIdentity ? (
+    <p className="empty">
+      Analyze a molecule to estimate its name, formula, DBE, and basic molecular properties.
+    </p>
+  ) : (
+    <div className="group-list">
+      <div className="group-card">
+          <div className="group-card-header">
+            <h3>
+              {moleculeIdentity.nomenclature.displayName ||
+                moleculeIdentity.nomenclature.estimatedName}
+            </h3>
+
+            <span>{moleculeIdentity.nomenclature.namingConfidence} confidence</span>
+          </div>
+  
+     
+
+        {moleculeIdentity.nomenclature.commonName && (
+          <p>
+            <strong>Common name:</strong>{" "}
+            {moleculeIdentity.nomenclature.commonName}
+          </p>
+        )}
+        <p>
+          <strong>Parent chain:</strong>{" "}
+          {moleculeIdentity.nomenclature.parentChain ?? "Not assigned"}
+          {moleculeIdentity.nomenclature.parentChainLength > 0
+            ? ` (${moleculeIdentity.nomenclature.parentChainLength} C)`
+            : ""}
+        </p>
+
+        <p>
+          <strong>Main suffix:</strong>{" "}
+          {moleculeIdentity.nomenclature.mainSuffix ??
+            "Hydrocarbon / no suffix group detected"}
+        </p>
+
+        {moleculeIdentity.nomenclature.prefixes.length > 0 && (
+          <p>
+            <strong>Detected prefixes:</strong>{" "}
+            {moleculeIdentity.nomenclature.prefixes.join(", ")}
+          </p>
+        )}
+
+        <p>{moleculeIdentity.nomenclature.explanation}</p>
+
+        <div className="limitation-list">
+          {moleculeIdentity.nomenclature.limitations.map((limitation) => (
+            <p className="empty" key={limitation}>
+              {limitation}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <div className="property-grid">
+        <PropertyTile
+          label="Formula"
+          value={moleculeIdentity.properties.molecularFormula}
+          info={PROPERTY_INFO.formula}
+        />
+
+        <PropertyTile
+          label="DBE / unsaturation"
+          value={moleculeIdentity.properties.degreesOfUnsaturation ?? "N/A"}
+          info={PROPERTY_INFO.dbe}
+        />
+
+        <PropertyTile
+          label="Molecular weight"
+          value={
+            moleculeIdentity.properties.molecularWeight
+              ? `${moleculeIdentity.properties.molecularWeight} g/mol`
+              : "N/A"
+          }
+          info={PROPERTY_INFO.molecularWeight}
+        />
+
+        <PropertyTile
+          label="Exact mass"
+          value={moleculeIdentity.properties.exactMass ?? "N/A"}
+          info={PROPERTY_INFO.exactMass}
+        />
+
+        <PropertyTile
+          label="Formal charge"
+          value={moleculeIdentity.properties.formalCharge}
+          info={PROPERTY_INFO.formalCharge}
+        />
+
+        <PropertyTile
+          label="Heavy atoms"
+          value={moleculeIdentity.properties.heavyAtomCount}
+          info={PROPERTY_INFO.heavyAtoms}
+        />
+
+        <PropertyTile
+          label="Water solubility"
+          value={moleculeIdentity.properties.waterSolubilityTendency.level}
+          info={PROPERTY_INFO.waterSolubility}
+        />
+
+        <PropertyTile
+          label="Membrane permeability"
+          value={moleculeIdentity.properties.membranePermeabilityTendency.level}
+          info={PROPERTY_INFO.membranePermeability}
+        />
+
+        <PropertyTile
+        label="Boiling point tendency"
+        value={moleculeIdentity.properties.boilingPointTendency.level}
+        info={PROPERTY_INFO.boilingPoint}
+        />
+
+        
+        <PropertyTile
+          label="Volatility"
+          value={moleculeIdentity.properties.volatilityTendency.level}
+          info={PROPERTY_INFO.volatility}
+        />
+
+  
+
+        <PropertyTile
+          label="H-bond donors"
+          value={moleculeIdentity.properties.hydrogenBondDonors ?? "N/A"}
+          info={PROPERTY_INFO.hbd}
+        />
+
+        <PropertyTile
+          label="H-bond acceptors"
+          value={moleculeIdentity.properties.hydrogenBondAcceptors ?? "N/A"}
+          info={PROPERTY_INFO.hba}
+        />
+
+        <PropertyTile
+          label="Rotatable bonds"
+          value={moleculeIdentity.properties.rotatableBonds ?? "N/A"}
+          info={PROPERTY_INFO.rotatableBonds}
+        />
+
+        <PropertyTile
+          label="Rings"
+          value={moleculeIdentity.properties.ringCount ?? "N/A"}
+          info={PROPERTY_INFO.rings}
+        />
+      </div>
+    </div>
+  )}
+</div>
 
 {/* ORBITAL SECTION */}
 
