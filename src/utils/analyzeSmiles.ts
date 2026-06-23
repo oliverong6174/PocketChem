@@ -184,7 +184,7 @@ const FUNCTIONAL_GROUPS: FunctionalGroupPattern[] = [
     priority: 13,
     nomenclaturePriority: 12.5,
     confidence: "Medium",
-    suffix: "Rare",
+    suffix: "hydrazone (appended)",
     prefix: "hydrazono",
     smarts: "[CX3]=[NX2][NX3]",
     mcatNote:
@@ -195,7 +195,7 @@ const FUNCTIONAL_GROUPS: FunctionalGroupPattern[] = [
     priority: 14,
     nomenclaturePriority: 12.6,
     confidence: "Medium",
-    suffix: "Rare",
+    suffix: "-oxime",
     prefix: "hydroxyimino",
     smarts: "[CX3]=[NX2][OX2H]",
     mcatNote:
@@ -217,8 +217,8 @@ const FUNCTIONAL_GROUPS: FunctionalGroupPattern[] = [
     priority: 16,
     nomenclaturePriority: 13.5,
     confidence: "Medium",
-    suffix: "Rare",
-    prefix: "phosphino",
+    suffix: "-phosphane",
+    prefix: "phosphanyl",
     smarts: "[PX3]",
     mcatNote:
       "Phosphines contain trivalent phosphorus. They are more common in organophosphorus chemistry than in basic MCAT organic chemistry.",
