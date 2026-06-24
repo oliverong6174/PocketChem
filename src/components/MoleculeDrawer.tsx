@@ -5,7 +5,7 @@ import "ketcher-react/dist/index.css";
 
 const structServiceProvider = new StandaloneStructServiceProvider();
 
-type KetcherApi = {
+export type KetcherApi = {
   getSmiles: () => Promise<string>;
   getMolfile: () => Promise<string>;
 };
@@ -13,10 +13,19 @@ type KetcherApi = {
 declare global {
   interface Window {
     ketcher?: KetcherApi;
+    reactionKetcher?: KetcherApi;
   }
 }
 
-function MoleculeDrawer() {
+type MoleculeDrawerProps = {
+  onReady?: (ketcher: KetcherApi) => void;
+  globalKey?: "ketcher" | "reactionKetcher";
+};
+
+function MoleculeDrawer({
+  onReady,
+  globalKey = "ketcher",
+}: MoleculeDrawerProps) {
   const [mounted, setMounted] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -34,11 +43,7 @@ function MoleculeDrawer() {
 
   return (
     <div className="ketcher-shell">
-      {!ready && (
-      <div className="ketcher-badge loading">
-        Ketcher Loading
-      </div>
-    )}
+      {!ready && <div className="ketcher-badge loading">Ketcher Loading</div>}
 
       {mounted ? (
         <Editor
@@ -46,8 +51,11 @@ function MoleculeDrawer() {
           structServiceProvider={structServiceProvider}
           errorHandler={handleError}
           onInit={(ketcher) => {
-            console.log("KETCHER INIT FIRED:", ketcher);
-            window.ketcher = ketcher as KetcherApi;
+            const api = ketcher as KetcherApi;
+
+            window[globalKey] = api;
+            onReady?.(api);
+
             setReady(true);
           }}
         />

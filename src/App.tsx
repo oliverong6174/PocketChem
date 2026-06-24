@@ -27,6 +27,12 @@ import {
   type MoleculeIdentityResult,
 } from "./utils/nomenclatureUtils";
 
+import ReactionsPage from "./components/ReactionsPage";
+import {
+  predictReactionPathways,
+  type ReactionPathway,
+} from "./utils/reactionUtils";
+
 type RankingMode = "acidity" | "basicity" | "anionStability";
 
 type ComparisonMolecule = {
@@ -110,7 +116,6 @@ function App() {
   useState<"all" | "sp" | "sp2" | "sp3">("all");
   const [selectedBondType, setSelectedBondType] =
   useState<"all" | "single" | "double" | "triple">("all");
-  
 
   const [selectedAtomIndex, setSelectedAtomIndex] = useState<number | null>(null);
   const [selectedBondIndex, setSelectedBondIndex] = useState<number | null>(null);
@@ -124,6 +129,9 @@ function App() {
 
   const [moleculeIdentity, setMoleculeIdentity] =
   useState<MoleculeIdentityResult | null>(null);
+
+  const [activePage, setActivePage] = useState<"analysis" | "reactions">("analysis");
+  const [reactionPathways, setReactionPathways] = useState<ReactionPathway[]>([]);
 
   const PROPERTY_INFO: Record<string, string> = {
   formula:
@@ -220,6 +228,9 @@ function App() {
       const hierarchy = await analyzeFunctionalGroupHierarchy(result);
       setMainGroup(hierarchy.mainGroup);
       setFunctionalGroups(hierarchy.primaryGroups);
+      setReactionPathways(
+        predictReactionPathways(result, hierarchy.primaryGroups)
+      );
       
       const acidity = await analyzeAcidity(result, hierarchy.primaryGroups);
       setAcidityResults(acidity);
@@ -232,7 +243,6 @@ function App() {
         hierarchy.primaryGroups,
         hierarchy.mainGroup
       );
-
       setMoleculeIdentity(identity);
       
 
@@ -879,7 +889,7 @@ useEffect(() => {
     <main className="app">
       <section className="hero">
         <div>
-          <p className="eyebrow">Premed Organic Chemistry Helper</p>
+          <p className="eyebrow">Multipurpose Organic Chemistry Tool</p>
           <h1>PocketChem</h1>
           <p className="subtitle">
             Draw molecules, identify functional groups, understand mechanisms,
@@ -888,7 +898,24 @@ useEffect(() => {
         </div>
       </section>
 
-      <section className="workspace">
+      <div className="page-tabs">
+        <button
+          className={activePage === "analysis" ? "page-tab active" : "page-tab"}
+          onClick={() => setActivePage("analysis")}
+        >
+          Analysis
+        </button>
+
+        <button
+          className={activePage === "reactions" ? "page-tab active" : "page-tab"}
+          onClick={() => setActivePage("reactions")}
+        >
+          Reactions
+        </button>
+      </div>
+
+      {activePage === "analysis" ? (
+    <section className="workspace">
         <div className="card molecule-card">
           <div className="card-header">
             <div>
@@ -920,6 +947,8 @@ useEffect(() => {
                 setBasicityResults([]);
                 setResonanceResults([]);
                 setChiralityResults([]);
+                setReactionPathways([]);
+                setActivePage("analysis");
                 setMoleculeAnnotation(null);
                 setSelectedAtomIndex(null);
                 setSelectedBondIndex(null);
@@ -1734,6 +1763,8 @@ useEffect(() => {
         )}
       </div>
 
+{/* BASICITY SECTION*/}
+
               <div className="analysis-section">
           <p className="label">Basicity Estimate</p>
 
@@ -1760,6 +1791,8 @@ useEffect(() => {
             </div>
           )}
         </div>
+
+{/* COMPARISON SECTION */}
 
         <div className="analysis-section">
   <p className="label">Compare Molecules</p>
@@ -1885,15 +1918,21 @@ useEffect(() => {
               )
             ) : null}
           </div>
+
+
         );
       })}
     </div>
   )}
 </div>
-    </div>
+
+</div>
 
   
-      </section>
+      </section> ) : (
+  <ReactionsPage initialPathways={reactionPathways} />
+)}
+
     </main>
   );
 }
