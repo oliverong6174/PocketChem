@@ -781,3 +781,10 @@ button {
 .reaction-ketcher-box .ketcher-shell {
   height: 100%;
 }
+
+.reaction-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 18px;
+  margin-bottom: 18px;
+}

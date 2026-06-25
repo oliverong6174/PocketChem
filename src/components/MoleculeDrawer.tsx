@@ -8,6 +8,7 @@ const structServiceProvider = new StandaloneStructServiceProvider();
 export type KetcherApi = {
   getSmiles: () => Promise<string>;
   getMolfile: () => Promise<string>;
+  setMolecule: (structure: string) => Promise<void>;
 };
 
 declare global {

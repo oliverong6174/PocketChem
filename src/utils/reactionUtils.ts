@@ -1,9 +1,14 @@
+import { getRDKit } from "./analyzeSmiles";
+import { analyzeFunctionalGroupHierarchy } from "./analyzeSmiles";
+import { analyzeNomenclatureAndProperties } from "./nomenclatureUtils";
 import type { FunctionalGroupResult } from "./analyzeSmiles";
+
 
 export type ReactionPathway = {
   id: string;
   title: string;
   reactantSmiles: string;
+  reactantLabel: string;
   reagentLabel: string;
   reagentNote: string;
   productSmiles: string | null;
@@ -29,6 +34,68 @@ type ReactionRule = {
   shortExplanation: string;
   transformType: TransformType;
 };
+
+async function runReactionSmarts(
+  reactantSmiles: string,
+  reactionSmarts: string
+): Promise<string | null> {
+  const RDKit = await getRDKit();
+
+  try {
+    const reaction = RDKit.get_rxn(reactionSmarts);
+    const reactant = RDKit.get_mol(reactantSmiles);
+
+    const molList = new RDKit.MolList();
+    molList.append(reactant);
+
+    const products = reaction.run_reactants(molList);
+
+    console.log("Products size:", products.size?.());
+
+    console.log("Reaction products object:", products);
+    console.log(
+      "Reaction products methods:",
+      Object.getOwnPropertyNames(Object.getPrototypeOf(products))
+    );
+
+    let productSmiles: string | null = null;
+    let firstSet: any = null;
+    let productMol: any = null;
+
+    if (
+      products &&
+      typeof products.size === "function" &&
+      products.size() > 0 &&
+      typeof products.get === "function"
+    ) {
+      firstSet = products.get(0);
+
+      if (
+        firstSet &&
+        typeof firstSet.size === "function" &&
+        firstSet.size() > 0 &&
+        typeof firstSet.at === "function"
+      ) {
+        productMol = firstSet.at(0);
+        productSmiles = productMol?.get_smiles?.() ?? null;
+      }
+    }
+
+    productMol?.delete?.();
+    firstSet?.delete?.();
+    products?.delete?.();
+    molList.delete?.();
+    reactant.delete?.();
+    reaction.delete?.();
+
+    console.log("Product SMILES:", productSmiles);
+
+    return productSmiles || null;
+  } catch (error) {
+    console.error("Reaction SMARTS failed:", reactionSmarts, error);
+    return null;
+  }
+}
 
 const REACTION_RULES: ReactionRule[] = [
   {
@@ -87,101 +154,107 @@ function normalizeName(name: string) {
   return name.trim().toLowerCase();
 }
 
-function replaceFirst(smiles: string, patterns: Array<[RegExp, string]>): string | null {
-  for (const [pattern, replacement] of patterns) {
-    if (pattern.test(smiles)) {
-      return smiles.replace(pattern, replacement);
-    }
-  }
-
-  return null;
-}
-
-function hydrogenateAlkene(smiles: string): string | null {
-  return replaceFirst(smiles, [
-    [/C=C/, "CC"],
-    [/C=([A-Z])/, "C$1"],
-  ]);
-}
-
-function reduceCarboxylicAcid(smiles: string): string | null {
-  return replaceFirst(smiles, [
-    [/C\(=O\)O/, "CO"],
-    [/C\(=O\)\[OH\]/, "CO"],
-    [/C\(=O\)O\[H\]/, "CO"],
-  ]);
-}
-
-function reduceCarbonyl(smiles: string): string | null {
-  return replaceFirst(smiles, [
-    [/C\(=O\)/, "C(O)"],
-    [/C=O/, "CO"],
-  ]);
-}
-
-function hydrolyzeEster(smiles: string): string | null {
-  return replaceFirst(smiles, [
-    [/C\(=O\)O[A-Za-z0-9@+\-\[\]\(\)=#$\\/]+/, "C(=O)O"],
-  ]);
-}
-
-function hydrolyzeAmide(smiles: string): string | null {
-  return replaceFirst(smiles, [
-    [/C\(=O\)N[A-Za-z0-9@+\-\[\]\(\)=#$\\/]*?/, "C(=O)O"],
-  ]);
-}
-
-function applyTransform(type: TransformType, smiles: string): string | null {
+async function applyTransform(
+  type: TransformType,
+  smiles: string
+): Promise<string | null> {
   switch (type) {
     case "alkene-hydrogenation":
-      return hydrogenateAlkene(smiles);
-
-    case "carboxylic-acid-reduction":
-      return reduceCarboxylicAcid(smiles);
+      return runReactionSmarts(
+            
+        smiles,
+        "[C:1]=[C:2]>>[C:1][C:2]"
+      );
 
     case "carbonyl-reduction":
-      return reduceCarbonyl(smiles);
+      return runReactionSmarts(
+        smiles,
+        "[C:1]=[O:2]>>[C:1]-[O:2]"
+      );
+
+    case "carboxylic-acid-reduction":
+      return runReactionSmarts(
+        smiles,
+        "[C:1](=[O:2])[O:3]>>[C:1][O:3]"
+      );
 
     case "ester-hydrolysis":
-      return hydrolyzeEster(smiles);
+      return runReactionSmarts(
+        smiles,
+        "[C:1](=[O:2])[O:3][C:4]>>[C:1](=[O:2])[O:3]"
+      );
 
     case "amide-hydrolysis":
-      return hydrolyzeAmide(smiles);
-
-    case "no-transform":
-      return null;
+      return runReactionSmarts(
+        smiles,
+        "[C:1](=[O:2])[N:3]>>[C:1](=[O:2])O"
+      );
 
     default:
       return null;
   }
 }
 
-export function predictReactionPathways(
+export async function predictReactionPathways(
   reactantSmiles: string,
   functionalGroups: FunctionalGroupResult[]
-): ReactionPathway[] {
+): Promise<ReactionPathway[]> {
+
   const detectedNames = new Set(
     functionalGroups.map((group) => normalizeName(group.name))
   );
 
-  return REACTION_RULES.filter((rule) =>
+  const matchingRules = REACTION_RULES.filter((rule) =>
     rule.groupNames.some((name) => detectedNames.has(normalizeName(name)))
-  )
-    .map((rule) => {
-      const productSmiles = applyTransform(rule.transformType, reactantSmiles);
+  );
 
-      return {
-        id: rule.id,
-        title: rule.title,
-        reactantSmiles,
-        reagentLabel: rule.reagentLabel,
-        reagentNote: rule.reagentNote,
-        productSmiles,
-        productLabel: productSmiles ? rule.productLabel : "Product not generated yet",
-        shortExplanation: productSmiles
-          ? rule.shortExplanation
-          : "This reaction was detected, but the dynamic product transform is not implemented for this molecule yet.",
-      };
-    })
-    .filter((pathway) => pathway.productSmiles !== null);
+  const pathways: ReactionPathway[] = [];
+
+    console.log("Reactant SMILES:", reactantSmiles);
+    console.log("Detected groups:", functionalGroups.map((g) => g.name));
+    console.log("Matching rules:", matchingRules.map((r) => r.id));
+
+  const reactantIdentity = await analyzeNomenclatureAndProperties(
+  reactantSmiles,
+  functionalGroups,
+  functionalGroups[0] ?? null
+);
+
+  const reactantName =
+  reactantIdentity.nomenclature.displayName ||
+  reactantIdentity.nomenclature.estimatedName ||
+  "Reactant";
+
+  for (const rule of matchingRules) {
+    const productSmiles = await applyTransform(rule.transformType, reactantSmiles);
+
+    if (!productSmiles) continue;
+
+    const productHierarchy = await analyzeFunctionalGroupHierarchy(productSmiles);
+
+    const productIdentity = await analyzeNomenclatureAndProperties(
+      productSmiles,
+      productHierarchy.primaryGroups,
+      productHierarchy.mainGroup
+    );
+
+    const productName =
+      productIdentity.nomenclature.displayName ||
+      productIdentity.nomenclature.estimatedName ||
+      rule.productLabel;
+
+    pathways.push({
+      id: rule.id,
+      title: rule.title,
+      reactantSmiles,
+      reactantLabel: reactantName,
+      reagentLabel: rule.reagentLabel,
+      reagentNote: rule.reagentNote,
+      productSmiles,
+      productLabel: productName,
+      shortExplanation: rule.shortExplanation,
+    });
+  }
+
+  return pathways;
 }

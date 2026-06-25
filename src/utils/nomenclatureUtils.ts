@@ -35,9 +35,9 @@ export type MoleculePropertyResult = {
   ringCount: number | null;
   notes: string[];
   boilingPointTendency: PropertyTendencyResult;
-waterSolubilityTendency: PropertyTendencyResult;
-membranePermeabilityTendency: PropertyTendencyResult;
-volatilityTendency: PropertyTendencyResult;
+  waterSolubilityTendency: PropertyTendencyResult;
+  membranePermeabilityTendency: PropertyTendencyResult;
+  volatilityTendency: PropertyTendencyResult;
 };
 
 export type NomenclatureResult = {
@@ -58,6 +58,36 @@ export type MoleculeIdentityResult = {
   nomenclature: NomenclatureResult;
   properties: MoleculePropertyResult;
 };
+
+export async function analyzeNomenclatureAndProperties(
+  smiles: string,
+  functionalGroups: FunctionalGroupResult[],
+  mainGroup: FunctionalGroupResult | null
+): Promise<MoleculeIdentityResult> {
+  const RDKit = await getRDKit();
+  const mol = RDKit.get_mol(smiles);
+
+  if (!mol) {
+    throw new Error("Could not create molecule for nomenclature/property analysis.");
+  }
+
+  try {
+    const parsedMol = parseMolBlock(mol.get_molblock());
+
+    const molWithDescriptors = mol as {
+      get_descriptors?: () => unknown;
+    };
+
+    const descriptors = safeParseDescriptors(molWithDescriptors.get_descriptors?.());
+
+    return {
+      nomenclature: estimateNomenclature(parsedMol, functionalGroups, mainGroup),
+      properties: buildProperties(parsedMol, descriptors, functionalGroups),
+    };
+  } finally {
+    mol.delete?.();
+  }
+}
 
 type ParsedAtom = {
   atomIndex: number;
@@ -2922,32 +2952,3 @@ function countCarboxylicAcidGroups(parsedMol: ParsedMol) {
   return count;
 }
 
-export async function analyzeNomenclatureAndProperties(
-  smiles: string,
-  functionalGroups: FunctionalGroupResult[],
-  mainGroup: FunctionalGroupResult | null
-): Promise<MoleculeIdentityResult> {
-  const RDKit = await getRDKit();
-  const mol = RDKit.get_mol(smiles);
-
-  if (!mol) {
-    throw new Error("Could not create molecule for nomenclature/property analysis.");
-  }
-
-  try {
-    const parsedMol = parseMolBlock(mol.get_molblock());
-
-    const molWithDescriptors = mol as {
-      get_descriptors?: () => unknown;
-    };
-
-    const descriptors = safeParseDescriptors(molWithDescriptors.get_descriptors?.());
-
-    return {
-      nomenclature: estimateNomenclature(parsedMol, functionalGroups, mainGroup),
-      properties: buildProperties(parsedMol, descriptors, functionalGroups),
-    };
-  } finally {
-    mol.delete?.();
-  }
-}

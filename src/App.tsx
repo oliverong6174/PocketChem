@@ -228,9 +228,13 @@ function App() {
       const hierarchy = await analyzeFunctionalGroupHierarchy(result);
       setMainGroup(hierarchy.mainGroup);
       setFunctionalGroups(hierarchy.primaryGroups);
-      setReactionPathways(
-        predictReactionPathways(result, hierarchy.primaryGroups)
+      
+      const pathways = await predictReactionPathways(
+        result,
+        hierarchy.primaryGroups
       );
+
+setReactionPathways(pathways);
       
       const acidity = await analyzeAcidity(result, hierarchy.primaryGroups);
       setAcidityResults(acidity);

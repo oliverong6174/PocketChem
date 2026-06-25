@@ -62,13 +62,23 @@ export default function ReactionsPage({ initialPathways }: Props) {
             return;
         }
 
+        if (smiles.includes(".")) {
+          setReactionSmiles(smiles);
+          setPathways([]);
+          alert("Please draw only one molecule at a time for reaction prediction.");
+          return;
+        }
+
         setReactionSmiles(smiles);
 
         const hierarchy = await analyzeFunctionalGroupHierarchy(smiles);
 
-        setPathways(
-            predictReactionPathways(smiles, hierarchy.primaryGroups)
-        );
+        const pathways = await predictReactionPathways(
+            smiles,
+            hierarchy.primaryGroups
+            );
+
+            setPathways(pathways);
     }
 
   return (
@@ -90,9 +100,30 @@ export default function ReactionsPage({ initialPathways }: Props) {
             </div>
         </div>
 
-        <button className="primary" onClick={analyzeReactionMolecule}>
-          Analyze for Reactions
-        </button>
+          <div className="reaction-actions">
+
+{/*MAIN ANALYSIS BUTTON*/}
+
+          <button
+            className="primary-button"
+            onClick={analyzeReactionMolecule}
+          >
+            Predict Reactions
+          </button>
+
+{/*CLEAR ANALYSIS BUTTON*/}
+
+          <button
+            className="secondary-button"
+            onClick={async () => {
+              await ketcher?.setMolecule("");
+              setReactionSmiles("");
+              setPathways([]);
+            }}
+          >
+            Clear Analysis
+          </button>
+        </div>
 
         {reactionSmiles && (
           <p className="empty">
@@ -102,8 +133,12 @@ export default function ReactionsPage({ initialPathways }: Props) {
       </div>
 
       {pathways.length === 0 ? (
-        <p className="empty">Draw and analyze a molecule first.</p>
-      ) : (
+        <p className="empty">
+          {reactionSmiles
+            ? "No supported reactions found yet for this molecule."
+            : "Draw and analyze a molecule first."}
+        </p>
+        ) : (
         <>
           <p className="empty">
             These are starter predicted reaction pathways. Product structures are representative and will become more exact as the reaction engine develops.
@@ -122,7 +157,7 @@ export default function ReactionsPage({ initialPathways }: Props) {
                         __html: reactantSvgs[pathway.id] ?? "",
                       }}
                     />
-                    <p>Original molecule</p>
+                    <p>{pathway.reactantLabel}</p>
                   </div>
 
                   <div className="reaction-column reagent-column">
