@@ -247,6 +247,9 @@ setReactionPathways(pathways);
         hierarchy.primaryGroups,
         hierarchy.mainGroup
       );
+
+      console.log("SMILES leaving App.tsx:", JSON.stringify(smiles));
+      
       setMoleculeIdentity(identity);
       
 

@@ -65,9 +65,15 @@ export async function analyzeNomenclatureAndProperties(
   mainGroup: FunctionalGroupResult | null
 ): Promise<MoleculeIdentityResult> {
   const RDKit = await getRDKit();
+  const cleanSmiles = smiles.replace(/\s+/g, "").trim();
+  console.log("SMILES received by nomenclature:", JSON.stringify(smiles));
   const mol = RDKit.get_mol(smiles);
-
   if (!mol) {
+    console.error("Nomenclature RDKit failed for SMILES:", {
+      raw: smiles,
+      cleaned: cleanSmiles,
+    });
+
     throw new Error("Could not create molecule for nomenclature/property analysis.");
   }
 
@@ -428,6 +434,26 @@ function getAlcoholBearingCarbons(parsedMol: ParsedMol) {
   return Array.from(new Set(alcoholCarbons));
 }
 
+function getPathUnsaturationCount(parsedMol: ParsedMol, path: number[]) {
+  let count = 0;
+
+  for (let i = 0; i < path.length - 1; i++) {
+    const bond = parsedMol.bonds.find(
+      (candidate) =>
+        (candidate.atomA === path[i] && candidate.atomB === path[i + 1]) ||
+        (candidate.atomB === path[i] && candidate.atomA === path[i + 1])
+    );
+
+    if (!bond) continue;
+
+    if (bond.bondOrder === 2 || bond.bondOrder === 3) {
+      count++;
+    }
+  }
+
+  return count;
+}
+
 function getBestNomenclatureCarbonPath(parsedMol: ParsedMol) {
   const carbonAtoms = parsedMol.atoms
     .filter((atom) => atom.element === "C")
@@ -436,20 +462,26 @@ function getBestNomenclatureCarbonPath(parsedMol: ParsedMol) {
   const alcoholCarbons = new Set(getAlcoholBearingCarbons(parsedMol));
 
   let bestPath: number[] = [];
-  let bestAlcoholScore = -1;
 
-  const scorePath = (path: number[]) => {
-    return path.filter((atomIndex) => alcoholCarbons.has(atomIndex)).length;
-  };
+  const scoreAlcohols = (path: number[]) =>
+    path.filter((atomIndex) => alcoholCarbons.has(atomIndex)).length;
 
   const isBetterPath = (path: number[]) => {
-    const alcoholScore = scorePath(path);
+    if (bestPath.length === 0) return true;
+
+    const pathUnsaturation = getPathUnsaturationCount(parsedMol, path);
+    const bestUnsaturation = getPathUnsaturationCount(parsedMol, bestPath);
+
+    if (pathUnsaturation > bestUnsaturation) return true;
+    if (pathUnsaturation < bestUnsaturation) return false;
 
     if (path.length > bestPath.length) return true;
+    if (path.length < bestPath.length) return false;
 
-    if (path.length === bestPath.length && alcoholScore > bestAlcoholScore) {
-      return true;
-    }
+    const pathAlcohols = scoreAlcohols(path);
+    const bestAlcohols = scoreAlcohols(bestPath);
+
+    if (pathAlcohols > bestAlcohols) return true;
 
     return false;
   };
@@ -457,7 +489,6 @@ function getBestNomenclatureCarbonPath(parsedMol: ParsedMol) {
   const dfs = (current: number, visited: Set<number>, path: number[]) => {
     if (isBetterPath(path)) {
       bestPath = [...path];
-      bestAlcoholScore = scorePath(path);
     }
 
     for (const bond of parsedMol.adjacency.get(current) ?? []) {
@@ -910,6 +941,10 @@ const commonNames: Record<string, string> = {
   "2-amino-3-(1h-indol-3-yl)propanoic acid": "tryptophan",
   "2-amino-3-carbamoylpropanoic acid": "asparagine",
   "2-amino-4-carbamoylbutanoic acid": "glutamine",
+
+  //Alkenes
+  "2-methylprop-1-ene": "isobutylene",
+  "2-methylpropene": "isobutylene",
 };
 
   return commonNames[normalizedName] ?? null;
