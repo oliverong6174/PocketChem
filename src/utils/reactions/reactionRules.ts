@@ -19,30 +19,6 @@ export const legacyReactionRules: ReactionRule[] = [
   },
 
   {
-    id: "carbonyl-reduction",
-    family: "legacy-carbonyls",
-    title: "Carbonyl Reduction",
-    reagents: "NaBH₄",
-    reagentNote: "Hydride donor",
-    productHint: "Alcohol",
-    explanation:
-      "The aldehyde or ketone carbonyl is reduced to an alcohol.",
-    trigger: {
-      functionalGroups: [
-        "Aldehyde",
-        "Ketone",
-        "Aryl ketone",
-        "Benzaldehyde derivative",
-      ],
-    },
-    transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1]=[O:2]>>[C:1]-[O:2]",
-    },
-    priority: 1010,
-  },
-
-  {
     id: "ester-hydrolysis",
     family: "legacy-carboxylic-acid-derivatives",
     title: "Ester Hydrolysis",

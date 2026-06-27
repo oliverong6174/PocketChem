@@ -2,6 +2,7 @@ import { getRDKit, analyzeFunctionalGroupHierarchy } from "../../analyzeSmiles";
 import { analyzeNomenclatureAndProperties } from "../../nomenclatureUtils";
 import type { FunctionalGroupResult } from "../../analyzeSmiles";
 import type { ReactionPathway, ReactionRule } from "../reactionTypes";
+import { runEngineHandler } from "./handlers";
 
 function normalizeName(name: string) {
   return name.trim().toLowerCase();
@@ -114,6 +115,14 @@ async function applyRule(rule: ReactionRule, reactantSmiles: string) {
   switch (rule.transform.type) {
     case "rdkitReactionSmarts":
       return runReactionSmarts(reactantSmiles, rule.transform.smarts);
+
+    case "engineHandler":
+      return runEngineHandler(
+        rule.transform.handler,
+        reactantSmiles,
+        rule.transform.options
+      );
+
     default:
       return null;
   }

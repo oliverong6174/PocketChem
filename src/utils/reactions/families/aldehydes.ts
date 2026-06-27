@@ -8,53 +8,44 @@ const aldehydeTrigger = {
 };
 
 export const aldehydeReactionRules: ReactionRule[] = [
-  {
-    id: "aldehyde-nabh4-reduction",
+    {
+    id: "aldehyde-reduction",
     family: "aldehydes",
     title: "Aldehyde Reduction",
     reagents: "NaBH₄ or LiAlH₄, then H₃O⁺",
     reagentNote: "Hydride reduction",
     productHint: "Primary alcohol",
     explanation:
-      "Aldehydes are reduced by hydride reagents to primary alcohols.",
+      "Hydride reagents reduce aldehydes to primary alcohols.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH2:1][OH:2]",
+      type: "engineHandler",
+      handler: "oneTwoAddition",
+      options: {
+        nucleophile: "hydride",
+      },
     },
     priority: 900,
   },
   {
-    id: "aldehyde-grignard-addition",
+    id: "aldehyde-organometallic-addition",
     family: "aldehydes",
-    title: "Grignard Addition",
-    reagents: "1) RMgBr  2) H₃O⁺",
-    reagentNote: "C-C bond formation",
+    title: "Organometallic Addition",
+    reagents: "1) RMgBr, RMgCl, or RLi  2) H₃O⁺",
+    reagentNote: "Grignard and organolithium addition",
     productHint: "Secondary alcohol",
     explanation:
-      "Grignard reagents add to aldehydes to form secondary alcohols after acidic workup. Formaldehyde gives primary alcohols.",
+      "Grignard and organolithium reagents add to aldehydes to form secondary alcohols after acidic workup. Formaldehyde gives primary alcohols.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH:1]([OH:2])C",
+      type: "engineHandler",
+      handler: "addition",
+      options: {
+        mode: "oneTwoAddition",
+        nucleophile: "organometallic",
+      },
     },
     priority: 910,
-  },
-  {
-    id: "aldehyde-organolithium-addition",
-    family: "aldehydes",
-    title: "Organolithium Addition",
-    reagents: "1) RLi  2) H₃O⁺",
-    reagentNote: "Strong organometallic nucleophile",
-    productHint: "Secondary alcohol",
-    explanation:
-      "Organolithium reagents add to aldehydes similarly to Grignard reagents, forming alcohols after acidic workup.",
-    trigger: aldehydeTrigger,
-    transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH:1]([OH:2])C",
-    },
-    priority: 920,
   },
   {
     id: "aldehyde-oxidation",
@@ -67,8 +58,11 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Aldehydes are easily oxidized to carboxylic acids.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[C:1](=[O:2])O",
+      type: "engineHandler",
+      handler: "oxidation",
+      options: {
+        mode: "aldehydeOxidation",
+      },
     },
     priority: 930,
   },
@@ -83,8 +77,12 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Water adds reversibly to aldehydes to form geminal diols.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH:1]([OH:2])O",
+      type: "engineHandler",
+      handler: "addition",
+      options: {
+        mode: "oneTwoAddition",
+        nucleophile: "water",
+      },
     },
     priority: 940,
   },
@@ -99,9 +97,13 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Cyanide adds to aldehydes followed by protonation to form cyanohydrins.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH:1]([OH:2])C#N",
+    type: "engineHandler",
+    handler: "addition",
+    options: {
+      mode: "oneTwoAddition",
+      nucleophile: "cyanide",
     },
+  },
     priority: 950,
   },
   {
@@ -115,8 +117,11 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Aldehydes react with alcohols under acidic conditions to form acetals through hemiacetal intermediates.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH:1](OC)(OC)",
+      type: "engineHandler",
+      handler: "condensation",
+      options: {
+        mode: "acetalFormation",
+      },
     },
     priority: 960,
   },
@@ -131,9 +136,12 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Aldehydes react with primary amines to form imines through dehydration.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH:1]=NC",
+    type: "engineHandler",
+    handler: "condensation",
+    options: {
+      mode: "imineFormation",
     },
+  },
     priority: 970,
   },
   {
@@ -162,10 +170,13 @@ export const aldehydeReactionRules: ReactionRule[] = [
     explanation:
       "Aldehydes react with hydroxylamine to form oximes.",
     trigger: aldehydeTrigger,
-    transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH:1]=NO",
+      transform: {
+    type: "engineHandler",
+    handler: "condensation",
+    options: {
+      mode: "oximeFormation",
     },
+  },
     priority: 990,
   },
   {
@@ -179,9 +190,12 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Aldehydes react with hydrazines to form hydrazones.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH:1]=NN",
+    type: "engineHandler",
+    handler: "condensation",
+    options: {
+      mode: "hydrazoneFormation",
     },
+  },
     priority: 1000,
   },
   {
@@ -195,8 +209,11 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Wolff-Kishner reduction converts aldehydes to alkanes under strongly basic conditions.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH3:1]",
+      type: "engineHandler",
+      handler: "reduction",
+      options: {
+        mode: "carbonylToAlkane",
+      },
     },
     priority: 1010,
   },
@@ -211,8 +228,11 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Clemmensen reduction converts aldehydes to alkanes under acidic conditions.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH3:1]",
+      type: "engineHandler",
+      handler: "reduction",
+      options: {
+        mode: "carbonylToAlkane",
+      },
     },
     priority: 1020,
   },
@@ -227,8 +247,11 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Wittig reagents convert aldehydes into alkenes.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH:1]=C",
+      type: "engineHandler",
+      handler: "addition",
+      options: {
+        mode: "wittigReaction",
+      },
     },
     priority: 1030,
   },
@@ -243,8 +266,11 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Aldehydes with alpha hydrogens can form enolates that add to another aldehyde, producing beta-hydroxy aldehydes.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH:1]([OH:2])CC=O",
+      type: "engineHandler",
+      handler: "addition",
+      options: {
+        mode: "aldolAddition",
+      },
     },
     priority: 1040,
   },
@@ -259,8 +285,11 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Under stronger or heated conditions, aldol products dehydrate to alpha,beta-unsaturated aldehydes.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH:1]=CC=O",
+      type: "engineHandler",
+      handler: "condensation",
+      options: {
+        mode: "aldolCondensation",
+      },
     },
     priority: 1050,
   },

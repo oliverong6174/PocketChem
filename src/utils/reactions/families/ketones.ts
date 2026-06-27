@@ -9,52 +9,43 @@ const ketoneTrigger = {
 
 export const ketoneReactionRules: ReactionRule[] = [
   {
-    id: "ketone-nabh4-reduction",
+    id: "ketone-reduction",
     family: "ketones",
     title: "Ketone Reduction",
     reagents: "NaBH₄ or LiAlH₄, then H₃O⁺",
     reagentNote: "Hydride reduction",
     productHint: "Secondary alcohol",
     explanation:
-      "Ketones are reduced by hydride reagents to secondary alcohols.",
+      "Hydride reagents reduce ketones to secondary alcohols.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1]([OH:2])([C:3])[C:4]",
+      type: "engineHandler",
+      handler: "oneTwoAddition",
+      options: {
+        nucleophile: "hydride",
+      },
     },
     priority: 1100,
   },
-  {
-    id: "ketone-grignard-addition",
+    {
+    id: "ketone-organometallic-addition",
     family: "ketones",
-    title: "Grignard Addition",
-    reagents: "1) RMgBr  2) H₃O⁺",
-    reagentNote: "C-C bond formation",
+    title: "Organometallic Addition",
+    reagents: "1) RMgBr, RMgCl, or RLi  2) H₃O⁺",
+    reagentNote: "Grignard and organolithium addition",
     productHint: "Tertiary alcohol",
     explanation:
-      "Grignard reagents add to ketones to form tertiary alcohols after acidic workup.",
+      "Grignard reagents and organolithium reagents add to ketones to form tertiary alcohols after acidic workup.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1]([OH:2])(C)([C:3])[C:4]",
+      type: "engineHandler",
+      handler: "oneTwoAddition",
+      options: {
+        nucleophile: "organometallic",
+        reagents: ["Grignard", "Organolithium"],
+      },
     },
     priority: 1110,
-  },
-  {
-    id: "ketone-organolithium-addition",
-    family: "ketones",
-    title: "Organolithium Addition",
-    reagents: "1) RLi  2) H₃O⁺",
-    reagentNote: "Strong organometallic nucleophile",
-    productHint: "Tertiary alcohol",
-    explanation:
-      "Organolithium reagents add to ketones similarly to Grignard reagents, forming tertiary alcohols after acidic workup.",
-    trigger: ketoneTrigger,
-    transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1]([OH:2])(C)([C:3])[C:4]",
-    },
-    priority: 1120,
   },
   {
     id: "ketone-hydration",
@@ -67,9 +58,13 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Water can add reversibly to ketones to form geminal diols, although ketones are usually less hydrated than aldehydes.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1]([OH:2])(O)([C:3])[C:4]",
+    type: "engineHandler",
+    handler: "addition",
+    options: {
+      mode: "oneTwoAddition",
+      nucleophile: "water",
     },
+  },
     priority: 1130,
   },
   {
@@ -83,9 +78,13 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Cyanide adds to ketones followed by protonation to form cyanohydrins.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1]([OH:2])(C#N)([C:3])[C:4]",
+    type: "engineHandler",
+    handler: "addition",
+    options: {
+      mode: "oneTwoAddition",
+      nucleophile: "cyanide",
     },
+  },
     priority: 1140,
   },
   {
@@ -99,8 +98,11 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Ketones react with alcohols under acidic conditions to form ketals through hemiketal intermediates.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](OC)(OC)([C:3])[C:4]",
+      type: "engineHandler",
+      handler: "condensation",
+      options: {
+        mode: "acetalFormation",
+      },
     },
     priority: 1150,
   },
@@ -115,8 +117,11 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Ketones react with primary amines to form imines through dehydration.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](=NC)([C:3])[C:4]",
+      type: "engineHandler",
+      handler: "condensation",
+      options: {
+        mode: "imineFormation",
+      },
     },
     priority: 1160,
   },
@@ -147,8 +152,11 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Ketones react with hydroxylamine to form oximes.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](=NO)([C:3])[C:4]",
+      type: "engineHandler",
+      handler: "condensation",
+      options: {
+        mode: "oximeFormation",
+      },
     },
     priority: 1180,
   },
@@ -163,8 +171,11 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Ketones react with hydrazines to form hydrazones.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](=NN)([C:3])[C:4]",
+      type: "engineHandler",
+      handler: "condensation",
+      options: {
+        mode: "hydrazoneFormation",
+      },
     },
     priority: 1190,
   },
@@ -179,8 +190,11 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Wolff-Kishner reduction converts ketones to alkanes under strongly basic conditions.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[CH2:1]([C:3])[C:4]",
+      type: "engineHandler",
+      handler: "reduction",
+      options: {
+        mode: "carbonylToAlkane",
+      },
     },
     priority: 1200,
   },
@@ -195,8 +209,11 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Clemmensen reduction converts ketones to alkanes under acidic conditions.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[CH2:1]([C:3])[C:4]",
+      type: "engineHandler",
+      handler: "reduction",
+      options: {
+        mode: "carbonylToAlkane",
+      },
     },
     priority: 1210,
   },
@@ -211,9 +228,12 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Wittig reagents convert ketones into substituted alkenes.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](=C)([C:3])[C:4]",
+    type: "engineHandler",
+    handler: "addition",
+    options: {
+      mode: "wittigReaction",
     },
+  },
     priority: 1220,
   },
   {
@@ -227,8 +247,11 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Ketones with alpha hydrogens can form enolates that add to another carbonyl compound, producing beta-hydroxy ketones.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](=[O:2])[C:3]C(O)C",
+      type: "engineHandler",
+      handler: "addition",
+      options: {
+        mode: "aldolAddition",
+      },
     },
     priority: 1230,
   },
@@ -243,8 +266,11 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Under heated basic conditions, aldol products dehydrate to alpha,beta-unsaturated ketones.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](=[O:2])[C:3]=CC",
+      type: "engineHandler",
+      handler: "condensation",
+      options: {
+        mode: "aldolCondensation",
+      },
     },
     priority: 1240,
   },
@@ -259,8 +285,11 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Baeyer-Villiger oxidation inserts oxygen next to the carbonyl carbon of a ketone, forming an ester.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](=[O:2])O[C:3]",
+      type: "engineHandler",
+      handler: "oxidation",
+      options: {
+        mode: "baeyerVilliger",
+      },
     },
     priority: 1250,
   },

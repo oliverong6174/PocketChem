@@ -117,8 +117,12 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Mild oxidants convert primary alcohols into aldehydes.",
     trigger: alcoholTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1][CH2:2][OH:3]>>[C:1][C:2]=[O:3]",
+      type: "engineHandler",
+      handler: "oxidation",
+      options: {
+        mode: "alcoholOxidation",
+        level: "mild",
+      },
     },
     priority: 560,
   },
@@ -133,8 +137,12 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Strong oxidants convert primary alcohols into carboxylic acids.",
     trigger: alcoholTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1][CH2:2][OH:3]>>[C:1][C:2](=O)O",
+      type: "engineHandler",
+      handler: "oxidation",
+      options: {
+        mode: "alcoholOxidation",
+        level: "strong",
+      },
     },
     priority: 570,
   },

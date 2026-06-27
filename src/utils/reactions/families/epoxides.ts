@@ -19,8 +19,12 @@ export const epoxideReactionRules: ReactionRule[] = [
       "Under acidic conditions, water opens protonated epoxides to form trans diols. Nucleophilic attack favors the more substituted carbon.",
     trigger: epoxideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1]1[O:2][C:3]1>>[C:1]([OH])[O:2].[C:3][OH]",
+      type: "engineHandler",
+      handler: "addition",
+      options: {
+        mode: "epoxideOpening",
+        nucleophile: "water",
+      },
     },
     priority: 800,
   },
@@ -35,8 +39,12 @@ export const epoxideReactionRules: ReactionRule[] = [
       "Under basic conditions, hydroxide opens epoxides by attacking the less substituted carbon, followed by protonation.",
     trigger: epoxideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1]1[O:2][C:3]1>>[C:1]([OH])[C:3][OH]",
+      type: "engineHandler",
+      handler: "addition",
+      options: {
+        mode: "epoxideOpening",
+        nucleophile: "hydroxide",
+      },
     },
     priority: 810,
   },
@@ -51,8 +59,12 @@ export const epoxideReactionRules: ReactionRule[] = [
       "Alcohols open protonated epoxides under acidic conditions to form alkoxy alcohols.",
     trigger: epoxideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1]1[O:2][C:3]1>>[C:1]([OC])[C:3][OH]",
+      type: "engineHandler",
+      handler: "addition",
+      options: {
+        mode: "epoxideOpening",
+        nucleophile: "hydroxide",
+      },
     },
     priority: 820,
   },
@@ -67,8 +79,12 @@ export const epoxideReactionRules: ReactionRule[] = [
       "Alkoxides open epoxides under basic conditions, usually attacking the less substituted carbon.",
     trigger: epoxideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1]1[O:2][C:3]1>>[C:1]([OC])[C:3][OH]",
+      type: "engineHandler",
+      handler: "addition",
+      options: {
+        mode: "epoxideOpening",
+        nucleophile: "hydroxide",
+      },
     },
     priority: 830,
   },

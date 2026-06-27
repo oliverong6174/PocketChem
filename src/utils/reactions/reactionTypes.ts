@@ -1,9 +1,15 @@
 import type { FunctionalGroupResult } from "../analyzeSmiles";
 
-export type ReactionTransform = {
-  type: "rdkitReactionSmarts";
-  smarts: string;
-};
+export type ReactionTransform =
+  | {
+      type: "rdkitReactionSmarts";
+      smarts: string;
+    }
+  | {
+      type: "engineHandler";
+      handler: string;
+      options?: Record<string, unknown>;
+    };
 
 export type ReactionTrigger = {
   functionalGroups: string[];
