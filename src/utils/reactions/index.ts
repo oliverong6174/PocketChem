@@ -1,4 +1,4 @@
-import type { FunctionalGroupResult } from "../analyzeSmiles";
+import type { FunctionalGroupResult } from "../analyzeGroups";
 import { predictReactionPathwaysFromRules } from "./engine/reactionEngine";
 import { reactionRegistry } from "./reactionRegistry";
 

@@ -5,6 +5,6 @@ export type {
   MoleculePropertyResult,
   NomenclatureResult,
   MoleculeIdentityResult,
-} from "./nomenclature";
+} from "./types";
 
-export { analyzeNomenclatureAndProperties } from "./nomenclature";
+export { analyzeNomenclatureAndProperties } from "./nomenclatureEngine";

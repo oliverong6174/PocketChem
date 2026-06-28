@@ -10,7 +10,7 @@ import {
   analyzeFunctionalGroupHierarchy,
   getMoleculeSvg,
   type FunctionalGroupResult,
-} from "./utils/analyzeSmiles";
+} from "./utils/analyzeGroups";
 import { analyzeAcidity, type AcidityResult } from "./utils/analyzeAcidity";
 import { analyzeBasicity, type BasicityResult } from "./utils/analyzeBasicity";
 import {

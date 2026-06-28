@@ -1,4 +1,4 @@
-import { getRDKit, type FunctionalGroupResult } from "./analyzeSmiles";
+import { getRDKit, type FunctionalGroupResult } from "./analyzeGroups";
 import { getInductiveModifiersForSite } from "./inductionUtils";
 import {
   analyzeCarbanionStability,

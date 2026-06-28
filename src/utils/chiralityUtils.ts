@@ -1,4 +1,4 @@
-import { getRDKit } from "./analyzeSmiles";
+import { getRDKit } from "./analyzeGroups";
 
 export type ChiralityConfiguration = "R" | "S" | "unknown";
 

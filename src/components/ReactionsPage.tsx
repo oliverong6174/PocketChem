@@ -3,7 +3,7 @@ import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
   getMoleculeSvg,
-} from "../utils/analyzeSmiles";
+} from "../utils/analyzeGroups";
 
 import {
   predictReactionPathways,

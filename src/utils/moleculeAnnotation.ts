@@ -1,4 +1,4 @@
-import { getRDKit } from "./analyzeSmiles";
+import { getRDKit } from "./analyzeGroups";
 
 export type Hybridization = "sp" | "sp2" | "sp3" | "unknown";
 
