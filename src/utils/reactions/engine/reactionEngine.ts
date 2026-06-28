@@ -10,7 +10,7 @@ function normalizeName(name: string) {
 
 function ruleMatchesFunctionalGroups(
   rule: ReactionRule,
-  functionalGroups: FunctionalGroupResult[]
+  functionalGroups: FunctionalGroupResult[] = []
 ) {
   const detectedNames = functionalGroups.map((group) =>
     normalizeName(group.name)
@@ -130,7 +130,7 @@ async function applyRule(rule: ReactionRule, reactantSmiles: string) {
 
 export async function predictReactionPathwaysFromRules(
   reactantSmiles: string,
-  functionalGroups: FunctionalGroupResult[],
+  functionalGroups: FunctionalGroupResult[] = [],
   rules: ReactionRule[]
 ): Promise<ReactionPathway[]> {
   const matchingRules = rules

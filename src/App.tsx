@@ -226,12 +226,15 @@ function App() {
       console.log("Chirality results:", chirality);
       
       const hierarchy = await analyzeFunctionalGroupHierarchy(result);
-      setMainGroup(hierarchy.mainGroup);
-      setFunctionalGroups(hierarchy.primaryGroups);
-      
+      const detectedFunctionalGroups =
+        hierarchy.primaryGroups ?? hierarchy.functionalGroups ?? [];
+
+      setMainGroup(hierarchy.mainGroup ?? detectedFunctionalGroups[0] ?? null);
+      setFunctionalGroups(detectedFunctionalGroups);
+
       const pathways = await predictReactionPathways(
         result,
-        hierarchy.primaryGroups
+        detectedFunctionalGroups
       );
 
 setReactionPathways(pathways);

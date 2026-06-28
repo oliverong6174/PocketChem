@@ -1,7 +1,7 @@
 // ADD POTENTIAL DISCLAIMER: pKa values are approximate MCAT-level estimates.
 // Substituents, solvent, and resonance effects can shift actual values.
 
-import type { FunctionalGroupResult } from "./analyzeGroups";
+import type { FunctionalGroupResult } from "./functionalGroups/types";
 import { getInductiveModifiersForSite } from "./inductionUtils";
 
 export type AcidityResult = {

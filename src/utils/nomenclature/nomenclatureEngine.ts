@@ -1,4 +1,5 @@
-import { getRDKit, type FunctionalGroupResult } from "../analyzeGroups";
+import { getRDKit } from "../functionalGroups/rdkit";
+import type { FunctionalGroupResult } from "../functionalGroups/types";
 
 import type {
   MoleculeIdentityResult,
