@@ -2,6 +2,8 @@ import { getRDKit } from "./rdkit";
 import { FUNCTIONAL_GROUPS } from "./groupPatterns";
 import { detectSimpleMolecule } from "./simpleMolecules";
 import { removeOverlappingGroups } from "./overlapRules";
+import { deduplicateAromaticMatches } from "./aromaticUtils";
+import { parseRDKitSubstructureMatches } from "./matchUtils";
 
 import type {
   FunctionalGroupHierarchy,
@@ -45,38 +47,14 @@ export async function analyzeFunctionalGroupHierarchy(
       query = RDKit.get_qmol(group.smarts);
       const matchesRaw = mol.get_substruct_matches(query);
 
-      console.log(group.name);
-      console.log(matchesRaw);
+       const matchedAtoms = parseRDKitSubstructureMatches(matchesRaw);
 
-        let matchedAtoms: number[][] = [];
+        const finalMatches = deduplicateAromaticMatches(
+          group.name,
+          matchedAtoms
+        );
 
-        try {
-          const parsedMatches = JSON.parse(matchesRaw);
-
-          if (Array.isArray(parsedMatches)) {
-            matchedAtoms = parsedMatches
-              .map((match) => {
-                if (
-                  match &&
-                  typeof match === "object" &&
-                  Array.isArray(match.atoms)
-                ) {
-                  return match.atoms as number[];
-                }
-
-                if (Array.isArray(match)) {
-                  return match as number[];
-                }
-
-                return [];
-              })
-              .filter((atoms) => atoms.length > 0);
-          }
-        } catch {
-          matchedAtoms = [];
-        }
-
-      if (matchedAtoms.length > 0) {
+      if (finalMatches.length > 0) {
         detectedGroups.push({
           name: group.name,
           priority: group.priority,
@@ -85,12 +63,9 @@ export async function analyzeFunctionalGroupHierarchy(
           suffix: group.suffix,
           prefix: group.prefix,
           equivalentNames: group.equivalentNames,
-          count:
-            group.name === "Arene" || group.name === "Benzene"
-              ? 1
-              : matchedAtoms.length,
+          count: finalMatches.length,
           mcatNote: group.mcatNote,
-          matches: matchedAtoms,
+          matches: finalMatches,
         });
       }
     } catch (error) {
