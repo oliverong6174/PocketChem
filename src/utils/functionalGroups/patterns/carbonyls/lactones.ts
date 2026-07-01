@@ -12,7 +12,9 @@ export const lactoneGroups: FunctionalGroupPattern[] = [
     smarts: "[OX2;R]1[CX3;R](=O)[CX4;R]1",
     mcatNote:
       "Alpha lactones are three-membered cyclic esters. They are highly strained and usually very unstable/reactive.",
-  },
+    displaySmarts: "[OX2;R]1[CX3;R](=O)[CX4;R]1",
+    category: "functionalGroup",
+    },
   {
     name: "Beta lactone",
     priority: 4.11,
@@ -24,7 +26,9 @@ export const lactoneGroups: FunctionalGroupPattern[] = [
     smarts: "[OX2;R]1[CX4;R][CX4;R][CX3;R](=O)1",
     mcatNote:
       "Beta lactones are four-membered cyclic esters. Their ring strain makes them more reactive than larger lactones.",
-  },
+    displaySmarts: "[OX2;R]1[CX4;R][CX4;R][CX3;R](=O)1",
+    category: "functionalGroup", 
+    },
   {
     name: "Gamma lactone",
     priority: 4.12,
@@ -36,6 +40,8 @@ export const lactoneGroups: FunctionalGroupPattern[] = [
     smarts: "[OX2;R]1[CX4;R][CX4;R][CX4;R][CX3;R](=O)1",
     mcatNote:
       "Gamma lactones are five-membered cyclic esters. They commonly form from gamma-hydroxy acids.",
+    displaySmarts: "[OX2;R]1[CX4;R][CX4;R][CX4;R][CX3;R](=O)1",
+    category: "functionalGroup",
   },
   {
     name: "Delta lactone",
@@ -48,6 +54,8 @@ export const lactoneGroups: FunctionalGroupPattern[] = [
     smarts: "[OX2;R]1[CX4;R][CX4;R][CX4;R][CX4;R][CX3;R](=O)1",
     mcatNote:
       "Delta lactones are six-membered cyclic esters. They commonly form from delta-hydroxy acids.",
+    displaySmarts: "[OX2;R]1[CX4;R][CX4;R][CX4;R][CX4;R][CX3;R](=O)1",
+    category: "functionalGroup",
   },
   {
     name: "Epsilon lactone",
@@ -61,7 +69,9 @@ export const lactoneGroups: FunctionalGroupPattern[] = [
       "[OX2;R]1[CX4;R][CX4;R][CX4;R][CX4;R][CX4;R][CX3;R](=O)1",
     mcatNote:
       "Epsilon lactones are seven-membered cyclic esters. They are larger-ring lactones and are less strained than beta lactones.",
-  },
+    displaySmarts: "[OX2;R]1[CX4;R][CX4;R][CX4;R][CX4;R][CX4;R][CX3;R](=O)1",
+    category: "functionalGroup",
+    },
   {
     name: "Lactone",
     priority: 4.19,
@@ -73,5 +83,7 @@ export const lactoneGroups: FunctionalGroupPattern[] = [
     smarts: "[OX2;R][CX3;R](=O)",
     mcatNote:
       "Lactones are cyclic esters. They are classified by ring size into α-, β-, γ-, δ-, and ε-lactones.",
+    displaySmarts: "[OX2;R][CX3;R](=O)",
+    category: "functionalGroup",
   },
 ];

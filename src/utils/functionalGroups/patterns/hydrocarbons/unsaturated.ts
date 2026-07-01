@@ -11,6 +11,8 @@ export const unsaturatedHydrocarbons: FunctionalGroupPattern[] = [
     smarts: "C=C",
     mcatNote:
       "Alkenes contain a carbon-carbon double bond. They undergo electrophilic addition reactions and contribute one degree of unsaturation.",
+    displaySmarts: "[CX3]=[CX3]",  
+    category: "functionalGroup",
   },
   {
     name: "Diene",
@@ -23,7 +25,9 @@ export const unsaturatedHydrocarbons: FunctionalGroupPattern[] = [
     smarts: "C=C-C=C",
     mcatNote:
       "Dienes contain two carbon-carbon double bonds. Conjugated dienes participate in Diels-Alder reactions.",
-  },
+      displaySmarts: "[CX3]=[CX3]-[CX3]=[CX3]",
+      category: "functionalGroup",
+    },
   {
     name: "Triene",
     priority: 24.2,
@@ -35,7 +39,9 @@ export const unsaturatedHydrocarbons: FunctionalGroupPattern[] = [
     smarts: "C=C-C=C-C=C",
     mcatNote:
       "Trienes contain three carbon-carbon double bonds and often exhibit extended conjugation.",
-  },
+    displaySmarts: "[CX3]=[CX3]-[CX3]=[CX3]-[CX3]=[CX3]",
+    category: "functionalGroup",
+    },
   {
     name: "Conjugated diene",
     priority: 24.15,
@@ -47,7 +53,9 @@ export const unsaturatedHydrocarbons: FunctionalGroupPattern[] = [
     smarts: "C=CC=C",
     mcatNote:
       "Conjugated dienes have alternating double and single bonds, allowing resonance stabilization and Diels-Alder reactivity.",
-  },
+      displaySmarts: "[CX3]=[CX3]-[CX3]=[CX3]",
+      category: "functionalGroup",
+    },
   {
     name: "Cumulated diene",
     priority: 24.16,
@@ -59,7 +67,9 @@ export const unsaturatedHydrocarbons: FunctionalGroupPattern[] = [
     smarts: "C=C=C",
     mcatNote:
       "Cumulated dienes contain adjacent double bonds sharing one carbon. The simplest example is allene.",
-  },
+      displaySmarts: "[CX2]=[CX2]=[CX2]",
+      category: "functionalGroup",
+    },
   {
     name: "Allene",
     priority: 24.17,
@@ -71,7 +81,9 @@ export const unsaturatedHydrocarbons: FunctionalGroupPattern[] = [
     smarts: "C=C=C",
     mcatNote:
       "Allenes are cumulated dienes whose central carbon is sp-hybridized. Their terminal π bonds are perpendicular.",
-  },
+      displaySmarts: "[CX2]=[CX2]=[CX2]",
+      category: "functionalGroup",
+    },
   {
     name: "Enyne",
     priority: 24.3,
@@ -83,7 +95,9 @@ export const unsaturatedHydrocarbons: FunctionalGroupPattern[] = [
     smarts: "C=CC#C",
     mcatNote:
       "Enynes contain both an alkene and an alkyne, creating unique conjugated π systems.",
-  },
+    displaySmarts: "[CX3]=[CX3]-[CX2]#[CX2]",
+    category: "functionalGroup",
+    },
   {
     name: "Alkyne",
     priority: 25,
@@ -94,7 +108,9 @@ export const unsaturatedHydrocarbons: FunctionalGroupPattern[] = [
     smarts: "C#C",
     mcatNote:
       "Alkynes contain a carbon-carbon triple bond. They contribute two degrees of unsaturation and undergo addition reactions.",
-  },
+    displaySmarts: "[CX2]#[CX2]",
+    category: "functionalGroup",
+    },
   {
     name: "Terminal alkyne",
     priority: 25.1,
@@ -106,7 +122,9 @@ export const unsaturatedHydrocarbons: FunctionalGroupPattern[] = [
     smarts: "[CX2]#[CX2H]",
     mcatNote:
       "Terminal alkynes possess an acidic hydrogen (pKa ≈25) and can be deprotonated to form acetylide anions.",
-  },
+    displaySmarts: "[CX2]#[CH]",
+    category: "functionalGroup",
+    },
   {
     name: "Internal alkyne",
     priority: 25.2,
@@ -118,5 +136,7 @@ export const unsaturatedHydrocarbons: FunctionalGroupPattern[] = [
     smarts: "[#6][CX2]#[CX2][#6]",
     mcatNote:
       "Internal alkynes lack an acidic terminal hydrogen and therefore cannot form acetylide anions directly.",
-  },
+      displaySmarts: "[CX2]#[CX2]",
+      category: "functionalGroup",
+    },
 ];

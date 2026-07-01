@@ -12,7 +12,9 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3](=O)[OX2][OX2H]",
     mcatNote:
       "Peroxyacids contain a carbonyl attached to an O-OH group. They are powerful oxidizing agents commonly used for alkene epoxidation and Baeyer-Villiger oxidation.",
-  },
+    displaySmarts: "[CX3](=O)[OX2][OX2H]",
+    category: "functionalGroup",
+    },
   {
     name: "Carboxylic acid",
     priority: 1,
@@ -23,6 +25,8 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3](=O)[OX2H1]",
     mcatNote:
       "Carboxylic acids are acidic because their conjugate base is resonance-stabilized. At physiological pH, they are often negatively charged carboxylates.",
+    displaySmarts: "[CX3](=O)[OX2H1]",
+    category: "functionalGroup",
   },
   {
     name: "Acid anhydride",
@@ -34,6 +38,8 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3](=[OX1])[OX2][CX3](=[OX1])",
     mcatNote:
       "Anhydrides are reactive carboxylic acid derivatives. They undergo nucleophilic acyl substitution to form acids, esters, or amides.",
+    displaySmarts: "[CX3](=O)[OX2][CX3](=O)",
+    category: "functionalGroup",
   },
   {
     name: "Ester",
@@ -45,6 +51,8 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3](=[OX1])[OX2][CX4,c]",
     mcatNote:
       "Esters are carboxylic acid derivatives. They are common in lipids and can undergo hydrolysis.",
+    displaySmarts: "[CX3](=[OX1])[OX2]",
+    category: "functionalGroup",
   },
   {
     name: "Acyl halide",
@@ -56,7 +64,9 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3](=O)[F,Cl,Br,I]",
     mcatNote:
       "Acyl halides are highly reactive carboxylic acid derivatives and readily undergo nucleophilic acyl substitution.",
-  },
+    displaySmarts: "[CX3](=O)[F,Cl,Br,I]",
+    category: "functionalGroup",
+    },
   {
     name: "Amide",
     priority: 6,
@@ -67,7 +77,9 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3](=[OX1])[NX3]",
     mcatNote:
       "Amides are resonance-stabilized and less basic than amines. Peptide bonds in proteins are amide bonds.",
-  },
+    displaySmarts: "[CX3](=[OX1])[NX3]", 
+    category: "functionalGroup",
+    },
   {
     name: "Primary amide",
     priority: 5.90,
@@ -79,7 +91,9 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3](=[OX1])[NX3H2]",
     mcatNote:
       "Primary amides have a carbonyl attached to NH2. Their nitrogen lone pair is resonance-delocalized into the carbonyl, making them much less basic than amines.",
-  },
+    displaySmarts: "[CX3](=O)[NX3H2]",
+    category: "functionalGroup",
+      },
   {
     name: "Secondary amide",
     priority: 5.91,
@@ -91,7 +105,9 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3](=[OX1])[NX3H1][#6]",
     mcatNote:
       "Secondary amides have a carbonyl attached to NHR. Peptide bonds are usually secondary amides.",
-  },
+    displaySmarts: "[CX3](=O)[NX3H1]",
+    category: "functionalGroup",
+    },
   {
     name: "Tertiary amide",
     priority: 5.92,
@@ -103,5 +119,33 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3](=[OX1])[NX3H0]([#6])[#6]",
     mcatNote:
       "Tertiary amides have a carbonyl attached to NR2. They are resonance-stabilized and cannot donate N-H hydrogen bonds.",
+    displaySmarts: "[CX3](=O)[NX3H0]",
+    category: "functionalGroup",
+    },
+    {
+  name: "Urea",
+  priority: 6.15,
+  nomenclaturePriority: 6.15,
+  confidence: "High",
+  suffix: "urea",
+  prefix: "ureido",
+  smarts: "[NX3][CX3](=O)[NX3]",
+  displaySmarts: "[NX3][CX3](=O)[NX3]",
+  mcatNote:
+    "Ureas contain a carbonyl bonded to two nitrogens. They are common in biochemistry, medicinal chemistry, and protein denaturation chemistry.",
+  category: "functionalGroup",
+},
+{
+  name: "Hydroxamic acid",
+  priority: 6.25,
+  nomenclaturePriority: 6.25,
+  confidence: "High",
+  suffix: "hydroxamic acid",
+  prefix: "hydroxycarbamoyl",
+  smarts: "[CX3](=O)[NX3][OX2H]",
+  displaySmarts: "[CX3](=O)[NX3][OX2H]",
+  mcatNote:
+    "Hydroxamic acids contain C(=O)-NHOH and strongly chelate metals. They appear in enzyme inhibitors.",
+  category: "functionalGroup",
   },
 ];

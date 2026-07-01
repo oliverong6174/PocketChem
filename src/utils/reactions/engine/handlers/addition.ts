@@ -1,4 +1,4 @@
-import { getRDKit } from "../../../analyzeGroups";
+import { getRDKit } from "../../../rdkit";
 
 export type OneTwoAdditionNucleophile =
   | "hydride"

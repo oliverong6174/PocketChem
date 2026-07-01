@@ -1,10 +1,12 @@
-export function parseRDKitSubstructureMatches(matchesRaw: string): number[][] {
+import type { FunctionalGroupMatch } from "./types";
+
+export function parseRDKitSubstructureMatches(
+  matchesRaw: string
+): FunctionalGroupMatch[] {
   try {
     const parsedMatches = JSON.parse(matchesRaw);
 
-    if (!Array.isArray(parsedMatches)) {
-      return [];
-    }
+    if (!Array.isArray(parsedMatches)) return [];
 
     return parsedMatches
       .map((match) => {
@@ -13,16 +15,22 @@ export function parseRDKitSubstructureMatches(matchesRaw: string): number[][] {
           typeof match === "object" &&
           Array.isArray(match.atoms)
         ) {
-          return match.atoms as number[];
+          return {
+            atoms: match.atoms as number[],
+            bonds: Array.isArray(match.bonds) ? (match.bonds as number[]) : [],
+          };
         }
 
         if (Array.isArray(match)) {
-          return match as number[];
+          return {
+            atoms: match as number[],
+            bonds: [],
+          };
         }
 
-        return [];
+        return { atoms: [], bonds: [] };
       })
-      .filter((atoms) => atoms.length > 0);
+      .filter((match) => match.atoms.length > 0);
   } catch {
     return [];
   }
@@ -36,6 +44,9 @@ export function hasAtomOverlap(a: number[], b: number[]) {
   return a.some((atomIndex) => b.includes(atomIndex));
 }
 
+export function getAtomOverlapCount(a: number[], b: number[]) {
+  return a.filter((atomIndex) => b.includes(atomIndex)).length;
+}
 export function isAtomSubset(childAtoms: number[], parentAtoms: number[]) {
   return childAtoms.every((atomIndex) => parentAtoms.includes(atomIndex));
 }

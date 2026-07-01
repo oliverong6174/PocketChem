@@ -1,6 +1,10 @@
 export { analyzeFunctionalGroupHierarchy } from "./analyzer";
-export { getRDKit } from "./rdkit";
+export { getRDKit } from "../rdkit";
 export { getMoleculeSvg } from "./svg";
+export { getDisplayMatchesForGroup } from "./displayMatches";
+export { flattenFunctionalGroupOccurrences } from "./occurrences";
+export type { FunctionalGroupOccurrence } from "./occurrences";
+
 
 export type {
   FunctionalGroupResult,

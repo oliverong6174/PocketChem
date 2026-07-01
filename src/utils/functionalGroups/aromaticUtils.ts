@@ -1,8 +1,8 @@
 import { deduplicateAtomMatches } from "./matchUtils";
+import type { FunctionalGroupMatch } from "./types";
 
 const AROMATIC_RING_GROUPS = new Set([
   "Benzene",
-  "Arene",
   "Phenol",
   "Aryl ether",
   "Anisole",
@@ -12,6 +12,15 @@ const AROMATIC_RING_GROUPS = new Set([
   "Nitrobenzene",
   "Alkylbenzene",
   "Toluene",
+  "Naphthalene",
+  "Anthracene",
+  "Phenanthrene",
+  "Indane",
+  "Pyridine",
+  "Pyrrole",
+  "Furan",
+  "Thiophene",
+  "Indole",
 ]);
 
 export function isAromaticRingGroup(groupName: string) {
@@ -20,11 +29,23 @@ export function isAromaticRingGroup(groupName: string) {
 
 export function deduplicateAromaticMatches(
   groupName: string,
-  matches: number[][]
-): number[][] {
+  matches: FunctionalGroupMatch[]
+): FunctionalGroupMatch[] {
   if (!isAromaticRingGroup(groupName)) {
     return matches;
   }
 
-  return deduplicateAtomMatches(matches);
+  const uniqueAtomMatches = deduplicateAtomMatches(
+    matches.map((match) => match.atoms)
+  );
+
+  return uniqueAtomMatches.map((atoms) => {
+    const original = matches.find(
+      (match) =>
+        [...match.atoms].sort((a, b) => a - b).join("-") ===
+        [...atoms].sort((a, b) => a - b).join("-")
+    );
+
+    return original ?? { atoms, bonds: [] };
+  });
 }

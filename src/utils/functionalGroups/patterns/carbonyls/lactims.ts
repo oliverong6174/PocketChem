@@ -12,6 +12,8 @@ export const lactimGroups: FunctionalGroupPattern[] = [
     smarts: "[NX2;R]1=[CX3;R]([OX2H])[CX4;R]1",
     mcatNote:
       "Alpha lactims are the imidic acid tautomers of alpha lactams.",
+    displaySmarts: "[NX2;R]1=[CX3;R]([OX2H])[CX4;R]1",
+    category: "functionalGroup",
   },
   {
     name: "Beta lactim",
@@ -24,6 +26,8 @@ export const lactimGroups: FunctionalGroupPattern[] = [
     smarts: "[NX2;R]1=[CX3;R]([OX2H])[CX4;R][CX4;R]1",
     mcatNote:
       "Beta lactims are the imidic acid tautomers of beta lactams.",
+    displaySmarts: "[NX2;R]1=[CX3;R]([OX2H])[CX4;R][CX4;R]1",
+    category: "functionalGroup",
   },
   {
     name: "Gamma lactim",
@@ -36,6 +40,8 @@ export const lactimGroups: FunctionalGroupPattern[] = [
     smarts: "[NX2;R]1=[CX3;R]([OX2H])[CX4;R][CX4;R][CX4;R]1",
     mcatNote:
       "Gamma lactims are the imidic acid tautomers of gamma lactams.",
+    displaySmarts: "[NX2;R]1=[CX3;R]([OX2H])[CX4;R][CX4;R][CX4;R]1",
+    category: "functionalGroup",
   },
   {
     name: "Delta lactim",
@@ -49,6 +55,9 @@ export const lactimGroups: FunctionalGroupPattern[] = [
       "[NX2;R]1=[CX3;R]([OX2H])[CX4;R][CX4;R][CX4;R][CX4;R]1",
     mcatNote:
       "Delta lactims are the imidic acid tautomers of delta lactams.",
+      displaySmarts:
+  "[NX2;R]1=[CX3;R]([OX2H])[CX4;R][CX4;R][CX4;R][CX4;R]1",
+  category: "functionalGroup",
   },
   {
     name: "Epsilon lactim",
@@ -62,6 +71,9 @@ export const lactimGroups: FunctionalGroupPattern[] = [
       "[NX2;R]1=[CX3;R]([OX2H])[CX4;R][CX4;R][CX4;R][CX4;R][CX4;R]1",
     mcatNote:
       "Epsilon lactims are the imidic acid tautomers of epsilon lactams.",
+    displaySmarts:
+  "[NX2;R]1=[CX3;R]([OX2H])[CX4;R][CX4;R][CX4;R][CX4;R][CX4;R]1",
+  category: "functionalGroup",
   },
   {
     name: "Lactim",
@@ -74,5 +86,7 @@ export const lactimGroups: FunctionalGroupPattern[] = [
     smarts: "[NX2;R]=[CX3;R][OX2H]",
     mcatNote:
       "Lactims are the imidic acid tautomers of lactams. They participate in lactam-lactim tautomerism.",
+    displaySmarts: "[NX2;R]=[CX3;R][OX2H]",
+    category: "functionalGroup",
   },
 ];

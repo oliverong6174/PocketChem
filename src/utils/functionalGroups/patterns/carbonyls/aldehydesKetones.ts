@@ -1,3 +1,4 @@
+//Aldol, Benzoin 
 import type { FunctionalGroupPattern } from "../../types";
 
 export const aldehydeKetoneGroups: FunctionalGroupPattern[] = [
@@ -11,6 +12,8 @@ export const aldehydeKetoneGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3H1](=[OX1])[#6,H]",
     mcatNote:
       "Aldehydes contain a terminal carbonyl. They are electrophilic and readily oxidized to carboxylic acids.",
+    displaySmarts: "[CX3H1](=[OX1])",
+    category: "functionalGroup",
   },
   {
     name: "Ketone",
@@ -22,6 +25,8 @@ export const aldehydeKetoneGroups: FunctionalGroupPattern[] = [
     smarts: "[#6][CX3](=[OX1])[#6]",
     mcatNote:
       "Ketones contain an internal carbonyl. They undergo nucleophilic addition reactions and are less easily oxidized than aldehydes.",
+    displaySmarts: "[CX3]=[OX1]",
+    category: "functionalGroup",
   },
   {
     name: "Enol",
@@ -34,6 +39,8 @@ export const aldehydeKetoneGroups: FunctionalGroupPattern[] = [
     smarts: "[OX2H][C]=[C]",
     mcatNote:
       "Enols contain an OH group attached to an alkene carbon. They are the tautomeric forms of aldehydes and ketones and readily interconvert through keto-enol tautomerism.",
+    displaySmarts: "[OX2H][C]=[C]",
+    category: "functionalGroup",
   },
   {
     name: "Aldol",
@@ -46,6 +53,8 @@ export const aldehydeKetoneGroups: FunctionalGroupPattern[] = [
     smarts: "[OX2H][CX4][CX3](=O)",
     mcatNote:
       "Aldols are β-hydroxy aldehydes or ketones formed by aldol addition reactions.",
+    displaySmarts: "[OX2H][CX4][CX3](=O)",
+    category: "motif",
   },
   {
     name: "Benzoin",
@@ -58,6 +67,8 @@ export const aldehydeKetoneGroups: FunctionalGroupPattern[] = [
     smarts: "[a][CX3](=O)[CX4]([OX2H])[a]",
     mcatNote:
       "Benzoin is an α-hydroxy ketone connecting two aromatic rings. It is produced in the benzoin condensation.",
+    displaySmarts: "[CX3](=O)[CX4]([OX2H])",
+    category: "motif",
   },
   {
     name: "Imine",
@@ -69,7 +80,9 @@ export const aldehydeKetoneGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3]=[NX2]",
     mcatNote:
       "Imines are carbonyl analogs in which oxygen has been replaced by nitrogen. They are formed from aldehydes or ketones reacting with primary amines.",
-  },
+    displaySmarts: "[CX3]=[NX2]",
+    category: "functionalGroup",
+    },
   {
     name: "Hydrazone",
     priority: 13,
@@ -80,7 +93,9 @@ export const aldehydeKetoneGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3]=[NX2][NX3]",
     mcatNote:
       "Hydrazones are condensation products of aldehydes or ketones with hydrazine derivatives.",
-  },
+    displaySmarts: "[CX3]=[NX2][NX3]",
+    category: "functionalGroup",
+    },
   {
     name: "Oxime",
     priority: 14,
@@ -91,5 +106,20 @@ export const aldehydeKetoneGroups: FunctionalGroupPattern[] = [
     smarts: "[CX3]=[NX2][OX2H]",
     mcatNote:
       "Oximes are formed when aldehydes or ketones react with hydroxylamine. They are useful synthetic intermediates.",
+    displaySmarts: "[CX3]=[NX2][OX2H]",
+    category: "functionalGroup",
+    },
+    {
+  name: "Ketene",
+  priority: 8.7,
+  nomenclaturePriority: 8.7,
+  confidence: "High",
+  suffix: "ketene",
+  prefix: "ketenyl",
+  smarts: "[CX2]=[CX2]=[OX1]",
+  displaySmarts: "[CX2]=[CX2]=[OX1]",
+  mcatNote:
+    "Ketenes contain C=C=O and are highly reactive carbonyl-like electrophiles.",
+  category: "functionalGroup",
   },
 ];

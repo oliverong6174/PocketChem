@@ -1,6 +1,6 @@
-import { getRDKit, analyzeFunctionalGroupHierarchy } from "../../analyzeGroups";
+import { getRDKit, analyzeFunctionalGroupHierarchy, } from "../../functionalGroups";
 import { analyzeNomenclatureAndProperties } from "../../nomenclatureUtils";
-import type { FunctionalGroupResult } from "../../analyzeGroups";
+import type { FunctionalGroupResult } from "../../functionalGroups";
 import type { ReactionPathway, ReactionRule } from "../reactionTypes";
 import { runEngineHandler } from "./handlers";
 

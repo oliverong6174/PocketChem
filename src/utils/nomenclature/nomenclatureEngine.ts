@@ -1,4 +1,4 @@
-import { getRDKit } from "../functionalGroups/rdkit";
+import { getRDKit } from "../rdkit";
 import type { FunctionalGroupResult } from "../functionalGroups/types";
 
 import type {

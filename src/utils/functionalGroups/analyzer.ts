@@ -1,9 +1,10 @@
-import { getRDKit } from "./rdkit";
+import { getRDKit } from "../rdkit";
 import { FUNCTIONAL_GROUPS } from "./groupPatterns";
 import { detectSimpleMolecule } from "./simpleMolecules";
 import { removeOverlappingGroups } from "./overlapRules";
 import { deduplicateAromaticMatches } from "./aromaticUtils";
 import { parseRDKitSubstructureMatches } from "./matchUtils";
+import { getDisplayMatchesForGroup } from "./displayMatches";
 
 import type {
   FunctionalGroupHierarchy,
@@ -47,12 +48,28 @@ export async function analyzeFunctionalGroupHierarchy(
       query = RDKit.get_qmol(group.smarts);
       const matchesRaw = mol.get_substruct_matches(query);
 
-       const matchedAtoms = parseRDKitSubstructureMatches(matchesRaw);
+       const detectedMatches = parseRDKitSubstructureMatches(matchesRaw);
 
-        const finalMatches = deduplicateAromaticMatches(
+       const finalMatches = deduplicateAromaticMatches(
           group.name,
-          matchedAtoms
+          detectedMatches
         );
+
+        const displayMatches = getDisplayMatchesForGroup(
+          RDKit,
+          mol,
+          group,
+          finalMatches
+        );
+
+        if (group.name === "Ketone") {
+          console.log("KETONE MATCH DEBUG", {
+            smarts: group.smarts,
+            displaySmarts: group.displaySmarts,
+            finalMatches,
+            displayMatches,
+          });
+        }
 
       if (finalMatches.length > 0) {
         detectedGroups.push({
@@ -66,6 +83,9 @@ export async function analyzeFunctionalGroupHierarchy(
           count: finalMatches.length,
           mcatNote: group.mcatNote,
           matches: finalMatches,
+          displayMatches,
+          displaySmarts: group.displaySmarts,
+          category: group.category ?? "functionalGroup",
         });
       }
     } catch (error) {

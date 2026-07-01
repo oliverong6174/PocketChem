@@ -1,4 +1,4 @@
-import { getRDKit } from "./functionalGroups/rdkit";
+import { getRDKit } from "./rdkit";
 
 
 export type CarbanionSubstitution =
@@ -19,9 +19,6 @@ export type CarbanionStabilityResult = {
   stabilityScore: number;
   explanation: string;
 };
-
-
-
 
 type StabilizerRule = {
   label: string;

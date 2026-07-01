@@ -11,7 +11,9 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "a1aaaaa1",
     mcatNote:
       "A benzene ring is a six-membered aromatic ring with six delocalized π electrons. It is the most common aromatic system in organic chemistry.",
-  },
+    displaySmarts: "c1ccccc1",
+    category: "functionalGroup",
+    },
   {
     name: "Phenol",
     priority: 10.5,
@@ -23,6 +25,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "[a][OX2H]",
     mcatNote:
       "Phenols contain an -OH group directly attached to an aromatic ring. They are more acidic than ordinary alcohols because the phenoxide conjugate base is resonance-stabilized.",
+    category: "substituent",
   },
   {
     name: "Aryl ether",
@@ -35,7 +38,8 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "[a][OX2][#6]",
     mcatNote:
       "Aryl ethers contain an oxygen directly attached to an aromatic ring. Anisole is the simplest example.",
-  },
+    category: "substituent",
+    },
   {
     name: "Anisole",
     priority: 19.4,
@@ -47,7 +51,8 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "c1ccccc1OC",
     mcatNote:
       "Anisole is methoxybenzene, containing a methoxy group directly attached to a benzene ring.",
-  },
+    category: "substituent",
+    },
   {
     name: "Alkylbenzene",
     priority: 31.2,
@@ -64,7 +69,8 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "[a][CX4;!R]",
     mcatNote:
       "Alkylbenzenes contain an alkyl substituent attached directly to a benzene ring. Toluene is the simplest member of this family.",
-  },
+    category: "substituent",
+    },
   {
     name: "Toluene",
     priority: 31.1,
@@ -76,7 +82,8 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "[a][CH3;!R]",
     mcatNote:
       "Toluene is methylbenzene, containing a single methyl group directly attached to a benzene ring. It is the simplest alkylbenzene.",
-  },
+    category: "substituent",
+    },
   {
     name: "Aryl amine",
     priority: 14.3,
@@ -88,7 +95,8 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "[a][NX3;!$(NC=O);!$(N=C);!$([N+](=O)[O-])]",
     mcatNote:
       "Aryl amines contain a nitrogen directly attached to an aromatic ring. Their lone pair interacts with the aromatic π system, reducing basicity compared with alkyl amines.",
-  },
+    category: "substituent",
+    },
   {
     name: "Aniline",
     priority: 14.2,
@@ -100,7 +108,8 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "c1ccccc1N",
     mcatNote:
       "Aniline is aminobenzene, containing an NH₂ group directly attached to a benzene ring. It is the parent aromatic amine.",
-  },
+    category: "substituent",
+    },
   {
     name: "Aryl halide",
     priority: 27.5,
@@ -111,6 +120,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     equivalentNames: ["halobenzene"],
     smarts: "[a][F,Cl,Br,I]",
     mcatNote: "Aryl halides have a halogen directly attached to an aromatic ring.",
+    category: "substituent",
   },
   {
     name: "Nitrobenzene",
@@ -123,7 +133,8 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "[a][NX3+](=O)[O-]",
     mcatNote:
       "Nitrobenzenes contain a nitro group attached to an aromatic ring. Nitro groups are strongly electron-withdrawing.",
-  },
+    category: "substituent",
+    },
 
   {
     name: "Naphthalene",
@@ -136,6 +147,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "c1ccc2ccccc2c1",
     mcatNote:
       "Naphthalene is a fused bicyclic aromatic hydrocarbon with two fused benzene rings.",
+    category: "scaffold",
   },
   {
     name: "Anthracene",
@@ -148,6 +160,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "c1ccc2cc3ccccc3cc2c1",
     mcatNote:
       "Anthracene is a linear tricyclic aromatic hydrocarbon with three fused benzene rings.",
+    category: "scaffold",
   },
   {
     name: "Phenanthrene",
@@ -160,6 +173,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "c1ccc2c(c1)ccc3ccccc23",
     mcatNote:
       "Phenanthrene is an angular tricyclic aromatic hydrocarbon with three fused benzene rings.",
+    category: "scaffold",
   },
   {
     name: "Indane",
@@ -172,6 +186,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "c1ccc2CCCCc2c1",
     mcatNote:
       "Indane contains a benzene ring fused to a saturated five-membered ring. It is not the same as an alkylbenzene.",
+    category: "scaffold",
   },
   {
     name: "Pyridine",
@@ -184,6 +199,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "n1ccccc1",
     mcatNote:
       "Pyridine is a six-membered aromatic heterocycle with a nitrogen whose lone pair is not part of the aromatic sextet.",
+    category: "scaffold",
   },
   {
     name: "Pyrrole",
@@ -195,6 +211,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "[nH]1cccc1",
     mcatNote:
       "Pyrrole is a five-membered aromatic heterocycle whose nitrogen lone pair contributes to aromaticity.",
+    category: "scaffold",
   },
   {
     name: "Furan",
@@ -206,6 +223,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "o1cccc1",
     mcatNote:
       "Furan is a five-membered aromatic heterocycle containing oxygen.",
+    category: "scaffold",
   },
   {
     name: "Thiophene",
@@ -217,6 +235,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "s1cccc1",
     mcatNote:
       "Thiophene is a five-membered aromatic heterocycle containing sulfur.",
+    category: "scaffold",
   },
   {
     name: "Indole",
@@ -229,5 +248,186 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "c1ccc2[nH]ccc2c1",
     mcatNote:
       "Indole is a fused aromatic heterocycle made from benzene fused to pyrrole. It appears in tryptophan and many bioactive molecules.",
+    category: "scaffold",
   },
+  {
+  name: "Imidazole",
+  priority: 30.4,
+  nomenclaturePriority: 21.4,
+  confidence: "High",
+  suffix: "imidazole",
+  prefix: "imidazolyl",
+  smarts: "n1cc[nH]c1",
+  mcatNote:
+    "Imidazole is a five-membered aromatic heterocycle containing two nitrogens. It is the functional ring of histidine.",
+  category: "scaffold",
+},
+{
+  name: "Pyrazole",
+  priority: 30.4,
+  nomenclaturePriority: 21.4,
+  confidence: "High",
+  suffix: "pyrazole",
+  prefix: "pyrazolyl",
+  smarts: "[nH]1nccc1",
+  mcatNote:
+    "Pyrazole is a five-membered aromatic heterocycle containing two adjacent nitrogen atoms.",
+  category: "scaffold",
+},
+{
+  name: "Oxazole",
+  priority: 30.4,
+  nomenclaturePriority: 21.4,
+  confidence: "High",
+  suffix: "oxazole",
+  prefix: "oxazolyl",
+  smarts: "o1cncc1",
+  mcatNote:
+    "Oxazole is an aromatic five-membered heterocycle containing oxygen and nitrogen.",
+  category: "scaffold",
+},
+{
+  name: "Isoxazole",
+  priority: 30.4,
+  nomenclaturePriority: 21.4,
+  confidence: "Medium",
+  suffix: "isoxazole",
+  prefix: "isoxazolyl",
+  smarts: "o1nccc1",
+  mcatNote:
+    "Isoxazole is an aromatic heterocycle containing adjacent oxygen and nitrogen atoms.",
+  category: "scaffold",
+},
+{
+  name: "Thiazole",
+  priority: 30.4,
+  nomenclaturePriority: 21.4,
+  confidence: "High",
+  suffix: "thiazole",
+  prefix: "thiazolyl",
+  smarts: "s1cncc1",
+  mcatNote:
+    "Thiazole is a sulfur- and nitrogen-containing aromatic heterocycle found in vitamin B1 and many pharmaceuticals.",
+  category: "scaffold",
+},
+{
+  name: "Isothiazole",
+  priority: 30.4,
+  nomenclaturePriority: 21.4,
+  confidence: "Medium",
+  suffix: "isothiazole",
+  prefix: "isothiazolyl",
+  smarts: "s1nccc1",
+  mcatNote:
+    "Isothiazole is an aromatic sulfur-nitrogen heterocycle frequently encountered in medicinal chemistry.",
+  category: "scaffold",
+},
+{
+  name: "Quinoline",
+  priority: 30.3,
+  nomenclaturePriority: 21.3,
+  confidence: "High",
+  suffix: "quinoline",
+  prefix: "quinolinyl",
+  smarts: "c1ccc2ncccc2c1",
+  mcatNote:
+    "Quinoline consists of a benzene ring fused to pyridine and is a common medicinal chemistry scaffold.",
+  category: "scaffold",
+},
+{
+  name: "Isoquinoline",
+  priority: 30.3,
+  nomenclaturePriority: 21.3,
+  confidence: "High",
+  suffix: "isoquinoline",
+  prefix: "isoquinolinyl",
+  smarts: "c1ccc2ccnc2c1",
+  mcatNote:
+    "Isoquinoline is an isomer of quinoline and forms the core of numerous natural alkaloids.",
+  category: "scaffold",
+},
+{
+  name: "Pyrimidine",
+  priority: 30.2,
+  nomenclaturePriority: 21.2,
+  confidence: "High",
+  suffix: "pyrimidine",
+  prefix: "pyrimidinyl",
+  smarts: "n1ccnc(c)1",
+  mcatNote:
+    "Pyrimidine is the heterocyclic scaffold found in cytosine, thymine, and uracil.",
+  category: "scaffold",
+},
+{
+  name: "Purine",
+  priority: 30.1,
+  nomenclaturePriority: 21.1,
+  confidence: "High",
+  suffix: "purine",
+  prefix: "purinyl",
+  smarts: "c1ncnc2ncnc12",
+  mcatNote:
+    "Purine is the fused bicyclic scaffold found in adenine and guanine.",
+  category: "scaffold",
+},
+{
+  name: "Benzimidazole",
+  priority: 30.0,
+  nomenclaturePriority: 21.0,
+  confidence: "High",
+  suffix: "benzimidazole",
+  prefix: "benzimidazolyl",
+  smarts: "c1ccc2[nH]cnc2c1",
+  mcatNote:
+    "Benzimidazole is a fused benzene-imidazole scaffold commonly found in pharmaceuticals and antiparasitic drugs.",
+  category: "scaffold",
+},
+{
+  name: "Benzoxazole",
+  priority: 30.0,
+  nomenclaturePriority: 21.0,
+  confidence: "Medium",
+  suffix: "benzoxazole",
+  prefix: "benzoxazolyl",
+  smarts: "c1ccc2ocnc2c1",
+  mcatNote:
+    "Benzoxazole is a fused aromatic heterocycle containing oxygen and nitrogen.",
+  category: "scaffold",
+},
+{
+  name: "Benzothiazole",
+  priority: 30.0,
+  nomenclaturePriority: 21.0,
+  confidence: "Medium",
+  suffix: "benzothiazole",
+  prefix: "benzothiazolyl",
+  smarts: "c1ccc2scnc2c1",
+  mcatNote:
+    "Benzothiazole is a fused aromatic sulfur-nitrogen scaffold found in dyes and medicinal chemistry.",
+  category: "scaffold",
+},
+{
+  name: "Tetrazole",
+  priority: 29.9,
+  nomenclaturePriority: 20.9,
+  confidence: "High",
+  suffix: "tetrazole",
+  prefix: "tetrazolyl",
+  smarts: "n1nnnc1",
+  mcatNote:
+    "Tetrazoles are aromatic four-nitrogen heterocycles frequently used as bioisosteres for carboxylic acids.",
+  category: "scaffold",
+},
+{
+  name: "Triazole",
+  priority: 29.9,
+  nomenclaturePriority: 20.9,
+  confidence: "High",
+  suffix: "triazole",
+  prefix: "triazolyl",
+  smarts: "n1nccn1",
+  mcatNote:
+    "Triazoles are aromatic three-nitrogen heterocycles commonly formed by click chemistry.",
+  category: "scaffold",
+},
 ];

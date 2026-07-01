@@ -1,4 +1,4 @@
-import type { FunctionalGroupResult } from "../analyzeGroups";
+import type { FunctionalGroupResult } from "../functionalGroups";
 
 export type ReactionTransform =
   | {

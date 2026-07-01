@@ -9,8 +9,10 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     suffix: "-nitrile",
     prefix: "cyano",
     smarts: "[CX2]#N",
+    displaySmarts: "[CX2]#N",
     mcatNote:
       "Nitriles contain a carbon-nitrogen triple bond. The nitrile carbon is electrophilic and can be hydrolyzed to carboxylic acid derivatives.",
+    category: "functionalGroup",
   },
   {
     name: "Imine",
@@ -20,9 +22,11 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     suffix: "-imine",
     prefix: "imino",
     smarts: "[CX3]=[NX2]",
+    displaySmarts: "[CX3]=[NX2]",
     mcatNote:
       "Imines contain a carbon-nitrogen double bond. They are related to carbonyl chemistry and can form from aldehydes or ketones with amines.",
-  },
+    category: "functionalGroup",
+    },
   {
     name: "Hydrazone",
     priority: 13,
@@ -31,9 +35,11 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     suffix: "hydrazone (appended)",
     prefix: "hydrazono",
     smarts: "[CX3]=[NX2][NX3]",
+    displaySmarts: "[CX3]=[NX2][NX3]",
     mcatNote:
       "Hydrazones contain a C=N-N group and are commonly formed from aldehydes or ketones reacting with hydrazine derivatives.",
-  },
+    category: "functionalGroup",
+    },
   {
     name: "Oxime",
     priority: 14,
@@ -42,10 +48,12 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     suffix: "-oxime",
     prefix: "hydroxyimino",
     smarts: "[CX3]=[NX2][OX2H]",
+    displaySmarts: "[CX3]=[NX2][OX2H]",
     mcatNote:
       "Oximes contain a C=N-OH group and are commonly formed from aldehydes or ketones reacting with hydroxylamine.",
-  },
-    {
+    category: "functionalGroup",
+    },
+  {
     name: "Primary amine",
     priority: 14.8,
     nomenclaturePriority: 14.8,
@@ -53,11 +61,14 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     suffix: "-amine",
     prefix: "amino",
     equivalentNames: ["1° amine"],
-    smarts: "[NX3H2;!$([NX3][CX3](=[OX1]));!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    smarts:
+      "[NX3H2;!$([NX3][CX3](=[OX1]));!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    displaySmarts: "[NX3H2]",
     mcatNote:
-        "Primary amines have nitrogen bonded to one carbon and two hydrogens. They are basic and can act as nucleophiles.",
+      "Primary amines have nitrogen bonded to one carbon and two hydrogens. They are basic and can act as nucleophiles.",
+    category: "functionalGroup",
     },
-    {
+  {
     name: "Secondary amine",
     priority: 14.9,
     nomenclaturePriority: 14.9,
@@ -65,11 +76,14 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     suffix: "-amine",
     prefix: "amino",
     equivalentNames: ["2° amine"],
-    smarts: "[NX3H1;!$([NX3][CX3](=[OX1]));!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    smarts:
+      "[NX3H1;!$([NX3][CX3](=[OX1]));!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    displaySmarts: "[NX3H1]",
     mcatNote:
-        "Secondary amines have nitrogen bonded to two carbons and one hydrogen. They are generally basic and nucleophilic.",
+      "Secondary amines have nitrogen bonded to two carbons and one hydrogen. They are generally basic and nucleophilic.",
+    category: "functionalGroup",
     },
-    {
+  {
     name: "Tertiary amine",
     priority: 15.0,
     nomenclaturePriority: 15.0,
@@ -77,9 +91,12 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     suffix: "-amine",
     prefix: "amino",
     equivalentNames: ["3° amine"],
-    smarts: "[NX3H0;!$([NX3][CX3](=[OX1]));!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    smarts:
+      "[NX3H0;!$([NX3][CX3](=[OX1]));!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    displaySmarts: "[NX3H0]",
     mcatNote:
-        "Tertiary amines have nitrogen bonded to three carbons and no N-H bond. They are basic but cannot donate hydrogen bonds.",
+      "Tertiary amines have nitrogen bonded to three carbons and no N-H bond. They are basic but cannot donate hydrogen bonds.",
+    category: "functionalGroup",
     },
   {
     name: "Amine",
@@ -88,12 +105,16 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     confidence: "Medium",
     suffix: "-amine",
     prefix: "amino",
-    smarts: "[NX3;!$([NX3][CX3](=[OX1]));!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    smarts:
+      "[NX3;!$([NX3][CX3](=[OX1]));!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    displaySmarts: "[NX3]",
     mcatNote:
       "Amines are basic and often positively charged at physiological pH. Amino groups are common in amino acids and neurotransmitters.",
-  },
+    category: "functionalGroup",
+    },
   {
-    name: "Azo compound",
+    name: "Azo",
+    category: "functionalGroup",
     priority: 17,
     nomenclaturePriority: 14,
     confidence: "High",
@@ -102,9 +123,11 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     smarts: "[#6][NX2]=[NX2][#6]",
     mcatNote:
       "Azo compounds contain an N=N linkage between carbon groups. They are often highly conjugated and can appear in dyes.",
-  },
+    
+    },
   {
-    name: "Diazo compound",
+    name: "Diazo",
+    category: "functionalGroup",
     priority: 18,
     nomenclaturePriority: 14.5,
     confidence: "Medium",
@@ -116,17 +139,20 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
   },
   {
     name: "Nitro",
+    category: "functionalGroup",
     priority: 26,
     nomenclaturePriority: 20,
     confidence: "High",
     suffix: "Never suffix",
     prefix: "nitro",
     smarts: "[NX3+](=O)[O-]",
+    displaySmarts: "[NX3+](=O)[O-]",
     mcatNote:
       "Nitro groups contain nitrogen bonded to oxygens and are strongly electron-withdrawing.",
   },
   {
     name: "Isocyanide",
+    category: "functionalGroup",
     priority: 29,
     nomenclaturePriority: 13.2,
     confidence: "Medium",
@@ -137,17 +163,6 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
       "Isocyanides contain the R-NC connectivity. They are structural isomers of nitriles but have different connectivity.",
   },
   {
-    name: "Isocyanate",
-    priority: 30,
-    nomenclaturePriority: 18.5,
-    confidence: "High",
-    suffix: "Rare",
-    prefix: "isocyanato",
-    smarts: "[NX2]=[CX2]=[OX1]",
-    mcatNote:
-      "Isocyanates contain the N=C=O group. They are electrophilic and can react with nucleophiles such as alcohols or amines.",
-  },
-  {
     name: "Azide",
     priority: 29.5,
     nomenclaturePriority: 20.5,
@@ -156,7 +171,72 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     prefix: "azido",
     equivalentNames: ["organic azide"],
     smarts: "[NX3-][NX2+]#N",
+    displaySmarts: "[NX3-][NX2+]#N",
     mcatNote:
       "Azides contain an N3 group. Organic azides are useful in click chemistry and can be reduced to amines.",
   },
+  {
+    name: "Isocyanate",
+    priority: 30,
+    nomenclaturePriority: 18.5,
+    confidence: "High",
+    suffix: "Rare",
+    prefix: "isocyanato",
+    smarts: "[NX2]=[CX2]=[OX1]",
+    displaySmarts: "[NX2]=[CX2]=[OX1]",
+    mcatNote:
+      "Isocyanates contain the N=C=O group. They are electrophilic and can react with nucleophiles such as alcohols or amines.",
+  },
+  {
+  name: "Aziridine",
+  priority: 15.7,
+  nomenclaturePriority: 15.7,
+  confidence: "High",
+  suffix: "aziridine",
+  prefix: "aziridinyl",
+  smarts: "[NX3r3]1[#6r3][#6r3]1",
+  displaySmarts: "[NX3r3]1[#6r3][#6r3]1",
+  mcatNote:
+    "Aziridines are three-membered nitrogen heterocycles. Ring strain makes them reactive toward nucleophilic ring opening.",
+  category: "functionalGroup",
+},
+{
+  name: "N-oxide",
+  priority: 15.8,
+  nomenclaturePriority: 15.8,
+  confidence: "High",
+  suffix: "N-oxide",
+  prefix: "oxido",
+  smarts: "[NX3+][O-]",
+  displaySmarts: "[NX3+][O-]",
+  mcatNote:
+    "N-oxides contain an N→O bond representation with formal N+ and O−. They commonly form from tertiary amines or heteroaromatic nitrogens.",
+  category: "functionalGroup",
+},
+{
+  name: "Amidine",
+  priority: 16.1,
+  nomenclaturePriority: 16.1,
+  confidence: "High",
+  suffix: "amidine",
+  prefix: "amidino",
+  smarts: "[CX3](=[NX2])[NX3]",
+  displaySmarts: "[CX3](=[NX2])[NX3]",
+  mcatNote:
+    "Amidines contain C(=N)-N and are strongly basic because the conjugate acid is resonance-stabilized.",
+  category: "functionalGroup",
+},
+{
+  name: "Guanidine",
+  priority: 16.2,
+  nomenclaturePriority: 16.2,
+  confidence: "High",
+  suffix: "guanidine",
+  prefix: "guanidino",
+  smarts: "[NX3][CX3](=[NX2])[NX3]",
+  displaySmarts: "[NX3][CX3](=[NX2])[NX3]",
+  mcatNote:
+    "Guanidines are very basic nitrogen functional groups. Arginine contains a guanidinium group.",
+  category: "functionalGroup",
+},
 ];

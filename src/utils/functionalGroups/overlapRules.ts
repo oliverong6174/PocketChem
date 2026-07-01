@@ -1,4 +1,7 @@
-import type { FunctionalGroupResult } from "./types";
+import type {
+  FunctionalGroupMatch,
+  FunctionalGroupResult,
+} from "./types";
 import { hasAtomOverlap } from "./matchUtils";
 
 const SUPPRESSION_RULES: Record<string, string[]> = {
@@ -11,6 +14,8 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   // Acid derivatives
   Peroxyacid: ["Carboxylic acid", "Peroxide"],
   "Acid anhydride": ["Ester", "Ether"],
+  "Carbonate ester": ["Ester", "Ether"],
+"Carbamate": ["Amide", "Ester", "Ether"],
   Ester: ["Ether"],
   "Acyl halide": ["Halogen", "Haloalkane"],
   Amide: ["Amine"],
@@ -178,6 +183,19 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   "Benzylic chloride": ["Benzylic halide", "Haloalkane", "Halogen"],
   "Benzylic bromide": ["Benzylic halide", "Haloalkane", "Halogen"],
   
+  //Advanced Groups
+  Hydroperoxide: ["Peroxide"],
+Oxetane: ["Ether"],
+Aziridine: ["Amine"],
+"N-oxide": ["Amine"],
+Guanidine: ["Amidine", "Amine"],
+Urea: ["Amide"],
+"Hydroxamic acid": ["Amide"],
+Thioester: ["Ester"],
+Thioamide: ["Amide"],
+Thioketone: ["Ketone"],
+Thioaldehyde: ["Aldehyde"],
+"Phosphodiester": ["Phosphate"],
 
  
 };
@@ -192,7 +210,7 @@ function namesMatch(a: string, b: string) {
 
 function shouldSuppressMatch(
   childGroup: FunctionalGroupResult,
-  childMatch: number[],
+  childMatch: FunctionalGroupMatch,
   allGroups: FunctionalGroupResult[]
 ) {
   for (const [parentName, suppressedNames] of Object.entries(SUPPRESSION_RULES)) {
@@ -208,7 +226,7 @@ function shouldSuppressMatch(
 
     for (const parentGroup of parentGroups) {
       for (const parentMatch of parentGroup.matches ?? []) {
-        if (hasAtomOverlap(childMatch, parentMatch)) {
+        if (hasAtomOverlap(childMatch.atoms, parentMatch.atoms)) {
           return true;
         }
       }
@@ -223,14 +241,18 @@ export function removeOverlappingGroups(
 ): FunctionalGroupResult[] {
   const filteredGroups = groups
     .map((group) => {
-      const remainingMatches = (group.matches ?? []).filter(
-        (match) => !shouldSuppressMatch(group, match, groups)
-      );
+      const remainingMatchIndexes = (group.matches ?? [])
+        .map((match, index) => ({ match, index }))
+        .filter(({ match }) => !shouldSuppressMatch(group, match, groups))
+        .map(({ index }) => index);
 
       return {
         ...group,
-        matches: remainingMatches,
-        count: remainingMatches.length,
+        matches: remainingMatchIndexes.map((index) => group.matches[index]),
+        displayMatches: group.displayMatches
+          ? remainingMatchIndexes.map((index) => group.displayMatches![index])
+          : undefined,
+        count: remainingMatchIndexes.length,
       };
     })
     .filter((group) => group.count > 0);

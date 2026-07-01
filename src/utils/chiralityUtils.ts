@@ -1,4 +1,4 @@
-import { getRDKit } from "./functionalGroups/rdkit";
+import { getRDKit } from "./rdkit";
 
 export type ChiralityConfiguration = "R" | "S" | "unknown";
 

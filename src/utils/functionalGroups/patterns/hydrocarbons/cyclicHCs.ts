@@ -12,6 +12,7 @@ export const cyclicHydrocarbonGroups: FunctionalGroupPattern[] = [
     smarts: "[CX4;R]1[CX4;R][CX4;R]1",
     mcatNote:
       "Cyclopropanes are three-membered saturated rings. Their high ring strain makes them more reactive than ordinary alkanes.",
+    category: "scaffold",
   },
   {
     name: "Cyclobutane",
@@ -24,7 +25,8 @@ export const cyclicHydrocarbonGroups: FunctionalGroupPattern[] = [
     smarts: "[CX4;R]1[CX4;R][CX4;R][CX4;R]1",
     mcatNote:
       "Cyclobutanes are four-membered saturated rings. They are strained, but less strained than cyclopropanes.",
-  },
+    category: "scaffold",
+    },
   {
     name: "Cyclopentane",
     priority: 32.3,
@@ -36,7 +38,8 @@ export const cyclicHydrocarbonGroups: FunctionalGroupPattern[] = [
     smarts: "[CX4;R]1[CX4;R][CX4;R][CX4;R][CX4;R]1",
     mcatNote:
       "Cyclopentanes are five-membered saturated rings with relatively low ring strain.",
-  },
+    category: "scaffold",
+    },
   {
     name: "Cyclohexane",
     priority: 32.4,
@@ -48,7 +51,8 @@ export const cyclicHydrocarbonGroups: FunctionalGroupPattern[] = [
     smarts: "[CX4;R]1[CX4;R][CX4;R][CX4;R][CX4;R][CX4;R]1",
     mcatNote:
       "Cyclohexanes are six-membered saturated rings. Chair conformations minimize ring strain and are central in stereochemistry.",
-  },
+    category: "scaffold",
+    },
   {
     name: "Cycloalkane",
     priority: 32.9,
@@ -60,7 +64,8 @@ export const cyclicHydrocarbonGroups: FunctionalGroupPattern[] = [
     smarts: "[CX4;R]",
     mcatNote:
       "Cycloalkanes are saturated carbon rings. Ring size strongly affects strain and conformation.",
-  },
+    category: "scaffold",
+    },
   {
     name: "Cycloalkene",
     priority: 24.2,
@@ -72,7 +77,8 @@ export const cyclicHydrocarbonGroups: FunctionalGroupPattern[] = [
     smarts: "[C;R]=[C;R]",
     mcatNote:
       "Cycloalkenes contain a carbon-carbon double bond within a ring. Smaller cycloalkenes can be strained.",
-  },
+    category: "scaffold",
+    },
   {
     name: "Cycloalkyne",
     priority: 25.2,
@@ -84,5 +90,6 @@ export const cyclicHydrocarbonGroups: FunctionalGroupPattern[] = [
     smarts: "[C;R]#[C;R]",
     mcatNote:
       "Cycloalkynes contain a carbon-carbon triple bond within a ring. Small cycloalkynes are highly strained; cyclooctyne is more commonly encountered.",
-  },
+    category: "scaffold",
+    },
 ];

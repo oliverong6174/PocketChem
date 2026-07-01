@@ -23,7 +23,8 @@ export const halogenGroups: FunctionalGroupPattern[] = [
     smarts: "[CX4][F,Cl,Br,I]",
     mcatNote:
       "Haloalkanes contain a halogen attached to an sp3 carbon. They readily undergo SN1, SN2, E1, and E2 reactions.",
-  },
+    category: "substituent",
+    },
   {
     name: "Allylic halide",
     priority: 27.2,
@@ -35,7 +36,8 @@ export const halogenGroups: FunctionalGroupPattern[] = [
     smarts: "C=C[CX4][F,Cl,Br,I]",
     mcatNote:
       "Allylic halides have a halogen adjacent to an alkene. Their intermediates are resonance-stabilized, making substitution reactions faster.",
-  },
+    category: "substituent",
+    },
   {
     name: "Benzylic halide",
     priority: 27.3,
@@ -47,7 +49,8 @@ export const halogenGroups: FunctionalGroupPattern[] = [
     smarts: "[a][CH2][F,Cl,Br,I]",
     mcatNote:
       "Benzylic halides contain a halogen on the carbon next to a benzene ring. Benzylic carbocations and radicals are resonance-stabilized.",
-  },
+    category: "substituent",
+    },
   {
     name: "Geminal dihalide",
     priority: 27.4,
@@ -59,7 +62,8 @@ export const halogenGroups: FunctionalGroupPattern[] = [
     smarts: "[CX4]([F,Cl,Br,I])([F,Cl,Br,I])",
     mcatNote:
       "Geminal dihalides contain two halogens on the same carbon atom. They are useful synthetic intermediates.",
-  },
+    category: "substituent",
+    },
   {
     name: "Vicinal dihalide",
     priority: 27.5,
@@ -71,7 +75,8 @@ export const halogenGroups: FunctionalGroupPattern[] = [
     smarts: "[CX4]([F,Cl,Br,I])[CX4]([F,Cl,Br,I])",
     mcatNote:
       "Vicinal dihalides contain halogens on adjacent carbons. They are commonly formed by halogen addition to alkenes.",
-  },
+    category: "substituent",
+    },
   {
     name: "Allylic fluoride",
     priority: 27.21,

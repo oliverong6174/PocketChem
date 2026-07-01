@@ -1,4 +1,4 @@
-import { getRDKit } from "./rdkit";
+import { getRDKit } from "../rdkit";
 
 export async function getMoleculeSvg(smiles: string): Promise<string | null> {
   try {

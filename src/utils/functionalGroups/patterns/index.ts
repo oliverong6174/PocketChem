@@ -1,11 +1,11 @@
-import { chargedGroups } from "./charged";
+import { chargedGroups } from "./ions";
 import { carbonylGroups } from "./carbonyls/index";
 import { oxygenGroups } from "./oxygen";
 import { nitrogenGroups } from "./nitrogen";
 import { sulfurPhosphorusGroups } from "./sulfurPhosphorus";
 import { aromaticGroups } from "./aromatics";
-import { advancedGroups } from "./advanced";
 import { hydrocarbonGroups } from "./hydrocarbons/index";
+import { validateFunctionalGroupPatterns } from "../validator";
 
 export const functionalGroupRegistry = {
   charged: chargedGroups,
@@ -15,9 +15,12 @@ export const functionalGroupRegistry = {
   sulfurPhosphorus: sulfurPhosphorusGroups,
   aromatics: aromaticGroups,
   hydrocarbons: hydrocarbonGroups,
-  advanced: advancedGroups,
 };
 
 export const FUNCTIONAL_GROUPS = Object.values(
   functionalGroupRegistry
 ).flat();
+
+if (import.meta.env.DEV) {
+  validateFunctionalGroupPatterns(FUNCTIONAL_GROUPS);
+}

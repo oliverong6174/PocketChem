@@ -11,5 +11,7 @@ export const saturatedHydrocarbons: FunctionalGroupPattern[] = [
     smarts: "[CX4;H3,H2,H1,H0]",
     mcatNote:
       "Alkanes are saturated hydrocarbons with only single bonds. They are nonpolar and relatively unreactive.",
-  },
+    displaySmarts: "[CX4]-[CX4]",
+    category: "functionalGroup",
+    },
 ];

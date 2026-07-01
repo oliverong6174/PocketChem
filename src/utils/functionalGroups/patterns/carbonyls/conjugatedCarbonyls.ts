@@ -1,3 +1,5 @@
+//Acrylic acid, Crotonic acid, Crotonaldehyde, Cinnamic acid, Cinnamaldehyde, Chalcone
+
 import type { FunctionalGroupPattern } from "../../types";
 
 export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
@@ -12,7 +14,9 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "[#6]=[#6][CX3H1](=O)",
     mcatNote:
       "Enals are α,β-unsaturated aldehydes. They are conjugated electrophiles and commonly undergo Michael addition.",
-  },
+    displaySmarts: "[#6]=[#6][CX3H1]=[OX1]",
+    category: "motif",
+    },
   {
     name: "Enone",
     priority: 8.3,
@@ -24,7 +28,9 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "[#6]=[#6][CX3](=O)[#6]",
     mcatNote:
       "Enones are α,β-unsaturated ketones. They can undergo both 1,2-addition and 1,4-conjugate addition.",
-  },
+    displaySmarts: "[#6]=[#6][CX3]=[OX1]",
+    category: "motif",
+    },
   {
     name: "Acrolein",
     priority: 8.15,
@@ -36,9 +42,11 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "C=CC=O",
     mcatNote:
       "Acrolein is propenal, the simplest α,β-unsaturated aldehyde. It is a highly reactive Michael acceptor.",
-  },
+    displaySmarts: "C=CC=O",
+    category: "motif",
+    },
   {
-    name: "Acryloyl group",
+    name: "Acryloyl",
     priority: 8.5,
     nomenclaturePriority: 8.5,
     confidence: "High",
@@ -48,7 +56,9 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "C=CC(=O)",
     mcatNote:
       "Acryloyl groups contain a conjugated alkene-carbonyl system and are common electrophilic Michael acceptors.",
-  },
+    displaySmarts: "C=CC(=O)",
+    category: "motif",
+    },
   {
     name: "Acrylic acid",
     priority: 1.5,
@@ -60,7 +70,9 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "C=CC(=O)[OX2H]",
     mcatNote:
       "Acrylic acid is propenoic acid, the simplest α,β-unsaturated carboxylic acid.",
-  },
+    displaySmarts: "C=CC(=O)[OX2H]",
+    category: "motif",
+    },
   {
     name: "Enoic acid",
     priority: 1.6,
@@ -72,7 +84,9 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "[#6]=[#6][CX3](=O)[OX2H]",
     mcatNote:
       "Enoic acids are α,β-unsaturated carboxylic acids. They combine carboxylic acid acidity with conjugated alkene reactivity.",
-  },
+    displaySmarts: "[#6]=[#6][CX3](=O)[OX2H]",
+    category: "motif",
+    },
   {
     name: "Crotonic acid",
     priority: 1.55,
@@ -84,7 +98,9 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "CC=CC(=O)[OX2H]",
     mcatNote:
       "Crotonic acid is but-2-enoic acid, a methyl-substituted α,β-unsaturated carboxylic acid.",
-  },
+    displaySmarts: "CC=CC(=O)[OX2H]",
+    category: "motif",
+    },
   {
     name: "Crotonaldehyde",
     priority: 8.16,
@@ -96,7 +112,9 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "CC=CC=O",
     mcatNote:
       "Crotonaldehyde is but-2-enal, a methyl-substituted α,β-unsaturated aldehyde.",
-  },
+    displaySmarts: "CC=CC=O",
+    category: "motif",
+    },
   {
     name: "Cinnamic acid",
     priority: 1.54,
@@ -108,7 +126,9 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "c1ccccc1C=CC(=O)[OX2H]",
     mcatNote:
       "Cinnamic acid contains a phenyl-substituted α,β-unsaturated carboxylic acid system.",
-  },
+    displaySmarts: "c1ccccc1C=CC(=O)[OX2H]",
+    category: "motif",
+    },
   {
     name: "Cinnamaldehyde",
     priority: 8.14,
@@ -120,7 +140,9 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "c1ccccc1C=CC=O",
     mcatNote:
       "Cinnamaldehyde contains a phenyl-substituted α,β-unsaturated aldehyde system and is the main flavor compound in cinnamon.",
-  },
+    displaySmarts: "c1ccccc1C=CC=O",
+    category: "motif",
+    },
   {
     name: "Chalcone",
     priority: 8.13,
@@ -132,7 +154,9 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "c1ccccc1C=CC(=O)c1ccccc1",
     mcatNote:
       "Chalcones are diaryl enones. They contain an α,β-unsaturated ketone between two aromatic rings.",
-  },
+    displaySmarts: "c1ccccc1C=CC(=O)c1ccccc1",
+    category: "motif",
+    },
   {
     name: "Enamide",
     priority: 6.5,
@@ -144,7 +168,9 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "[#6]=[#6][CX3](=O)[NX3]",
     mcatNote:
       "Enamides are α,β-unsaturated amides. They combine amide resonance with conjugated alkene reactivity.",
-  },
+    displaySmarts: "[#6]=[#6][CX3](=O)[NX3]",
+    category: "motif",
+    },
   {
     name: "Enoate",
     priority: 4.5,
@@ -156,5 +182,7 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     smarts: "[#6]=[#6][CX3](=O)[OX2][#6]",
     mcatNote:
       "Enoates are α,β-unsaturated esters. They are Michael acceptors and are common in conjugate addition chemistry.",
-  },
+    displaySmarts: "[#6]=[#6][CX3](=O)[OX2][#6]",
+    category: "motif",
+    },
 ];

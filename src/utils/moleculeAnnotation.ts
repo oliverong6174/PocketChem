@@ -1,4 +1,4 @@
-import { getRDKit } from "./functionalGroups/rdkit";
+import { getRDKit } from "./rdkit";
 
 export type Hybridization = "sp" | "sp2" | "sp3" | "unknown";
 
@@ -20,7 +20,8 @@ export type AnnotationConcept =
   | "acidBaseSites"
   | "reactiveSites"
   | "resonance"
-  | "chirality";
+  | "chirality"
+  | "functionalGroups";
 
 export type AtomAnnotation = {
   atomIndex: number;
