@@ -1,4 +1,4 @@
-import { chargedGroups } from "./ions";
+import { chargedGroups } from "./charged";
 import { carbonylGroups } from "./carbonyls/index";
 import { oxygenGroups } from "./oxygen";
 import { nitrogenGroups } from "./nitrogen";

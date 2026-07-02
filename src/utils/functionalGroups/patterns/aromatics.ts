@@ -25,7 +25,8 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "[a][OX2H]",
     mcatNote:
       "Phenols contain an -OH group directly attached to an aromatic ring. They are more acidic than ordinary alcohols because the phenoxide conjugate base is resonance-stabilized.",
-    category: "substituent",
+    displaySmarts: "c[OX2H]",
+      category: "functionalGroup",
   },
   {
     name: "Aryl ether",
@@ -95,7 +96,9 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "[a][NX3;!$(NC=O);!$(N=C);!$([N+](=O)[O-])]",
     mcatNote:
       "Aryl amines contain a nitrogen directly attached to an aromatic ring. Their lone pair interacts with the aromatic π system, reducing basicity compared with alkyl amines.",
-    category: "substituent",
+    
+  displaySmarts: "c[NX3]",
+      category: "functionalGroup",
     },
   {
     name: "Aniline",
@@ -108,7 +111,8 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "c1ccccc1N",
     mcatNote:
       "Aniline is aminobenzene, containing an NH₂ group directly attached to a benzene ring. It is the parent aromatic amine.",
-    category: "substituent",
+    displaySmarts: "c[NX3H2]",
+      category: "functionalGroup",
     },
   {
     name: "Aryl halide",

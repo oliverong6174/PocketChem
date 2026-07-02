@@ -233,6 +233,8 @@ export function getChainUnsaturation(parsedMol: ParsedMol, path: number[]) {
   return { doubleLocants, tripleLocants };
 }
 
+
+
 function getLowestLocantList(values: number[]) {
   return [...values].sort((a, b) => a - b);
 }
@@ -532,7 +534,62 @@ export function isBenzeneLikeRing(
   return aromaticBondCount >= 6 || doubleBondCount === 3;
 }
 
-export function getParentDescriptor(parsedMol: ParsedMol): ParentDescriptor {
+function isCarbonylCarbon(parsedMol: ParsedMol, atomIndex: number) {
+  const atom = parsedMol.atoms[atomIndex];
+  if (!atom || atom.element !== "C") return false;
+
+  return (parsedMol.adjacency.get(atomIndex) ?? []).some((bond) => {
+    const other = parsedMol.atoms[getOtherAtom(bond, atomIndex)];
+    return other?.element === "O" && bond.bondOrder === 2;
+  });
+}
+
+export function getBestAcylParentDescriptor(parsedMol: ParsedMol): ParentDescriptor | null {
+  const carbonylCarbons = parsedMol.atoms
+    .filter((atom) => atom.element === "C")
+    .map((atom) => atom.atomIndex)
+    .filter((atomIndex) => isCarbonylCarbon(parsedMol, atomIndex));
+
+  let bestPath: number[] = [];
+
+  const dfs = (current: number, visited: Set<number>, path: number[]) => {
+    if (path.length > bestPath.length) {
+      bestPath = [...path];
+    }
+
+    for (const bond of parsedMol.adjacency.get(current) ?? []) {
+      const next = getOtherAtom(bond, current);
+      const nextAtom = parsedMol.atoms[next];
+
+      if (!nextAtom || nextAtom.element !== "C") continue;
+      if (visited.has(next)) continue;
+
+      visited.add(next);
+      dfs(next, visited, [...path, next]);
+      visited.delete(next);
+    }
+  };
+
+  for (const carbonylCarbon of carbonylCarbons) {
+    dfs(carbonylCarbon, new Set([carbonylCarbon]), [carbonylCarbon]);
+  }
+
+  if (bestPath.length === 0) return null;
+
+  const prefix = CHAIN_PREFIXES[bestPath.length];
+
+  return {
+    kind: "chain",
+    path: bestPath,
+    carbonCount: bestPath.length,
+    parentHydrocarbon: getHydrocarbonBaseName(parsedMol, bestPath),
+    parentStem: prefix ? `${prefix}an` : null,
+  };
+}
+
+export function getParentDescriptor(
+  parsedMol: ParsedMol,
+): ParentDescriptor {
   const ring = getSimpleCarbonRing(parsedMol);
 
   if (ring) {

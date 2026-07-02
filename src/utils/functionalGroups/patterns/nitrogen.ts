@@ -207,10 +207,23 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
   confidence: "High",
   suffix: "N-oxide",
   prefix: "oxido",
-  smarts: "[NX3+][O-]",
-  displaySmarts: "[NX3+][O-]",
+  smarts: "[NX4+][O-]",
+  displaySmarts: "[NX4+][O-]",
   mcatNote:
     "N-oxides contain an N→O bond representation with formal N+ and O−. They commonly form from tertiary amines or heteroaromatic nitrogens.",
+  category: "functionalGroup",
+},
+{
+  name: "Nitrone",
+  priority: 15.85,
+  nomenclaturePriority: 15.85,
+  confidence: "High",
+  suffix: "nitrone",
+  prefix: "nitrone",
+  smarts: "[NX3+]([O-])=[#6]",
+  displaySmarts: "[NX3+]([O-])=[#6]",
+  mcatNote:
+    "Nitrones are imine N-oxides with the general structure R2C=N+(O−)R. They are distinct from simple amine N-oxides and are useful 1,3-dipoles in cycloaddition chemistry.",
   category: "functionalGroup",
 },
 {

@@ -5,10 +5,14 @@ import type {
   Substituent,
 } from "./types";
 
+import type { FunctionalGroupResult } from "../functionalGroups/types";
+
 import { formatLocants } from "./formatUtils";
 import { getSimpleBenzeneDerivativeName } from "./aromaticNames";
-import { getParentDescriptor, getParentStemWithUnsaturation } from "./parentSelection";
+import { getParentDescriptor, getParentStemWithUnsaturation, getBestAcylParentDescriptor } from "./parentSelection";
 import { detectNamingFeatures, getCarboxylicAcidCarbons } from "./featureDetection";
+
+
 
 import {
   detectSubstituents,
@@ -24,13 +28,51 @@ export type EstimatedIupacResult = {
   substituents: Substituent[];
 };
 
+function getPrimaryFunctionalGroup(
+  functionalGroups: FunctionalGroupResult[] = [],
+  mainGroup: FunctionalGroupResult | null = null
+) {
+  return (
+    mainGroup ??
+    [...functionalGroups]
+      .filter((group) => typeof group.nomenclaturePriority === "number")
+      .sort((a, b) => a.nomenclaturePriority - b.nomenclaturePriority)[0] ??
+    null
+  );
+}
+
+function getParentStrategy(group: FunctionalGroupResult | null) {
+  const suffix = group?.suffix?.toLowerCase() ?? "";
+
+  if (
+    suffix.includes("oic acid") ||
+    suffix.includes("oic anhydride") ||
+    suffix.includes("oate") ||
+    suffix.includes("amide") ||
+    suffix.includes("oyl") ||
+    suffix.includes("carbonitrile")
+  ) {
+    return "acyl";
+  }
+
+  return "hydrocarbon";
+}
+
 export function buildEstimatedIupacName(
-  parsedMol: ParsedMol
+  parsedMol: ParsedMol,
+  functionalGroups: FunctionalGroupResult[] = [],
+  mainGroup: FunctionalGroupResult | null = null
 ): EstimatedIupacResult | null {
-  const parent = getParentDescriptor(parsedMol);
+  const defaultParent = getParentDescriptor(parsedMol);
+  const primaryGroup = getPrimaryFunctionalGroup(functionalGroups, mainGroup);
+
+  const parent =
+    getParentStrategy(primaryGroup) === "acyl"
+      ? getBestAcylParentDescriptor(parsedMol) ?? defaultParent
+      : defaultParent;
+
   const features = detectNamingFeatures(parsedMol, parent);
   const primaryFeature = features[0] ?? null;
-  const suffixName = buildSuffixName(parsedMol, parent, primaryFeature);
 
   const aromaticAcidOverride = getAromaticAcidOverride(
     parsedMol,
@@ -39,9 +81,18 @@ export function buildEstimatedIupacName(
   );
 
   if (aromaticAcidOverride) return aromaticAcidOverride;
+
+  const suffixName =
+    buildFunctionalGroupSuffixName(parsedMol, parent, primaryGroup) ??
+    buildSuffixName(parsedMol, parent, primaryFeature);
+
   if (!suffixName) return null;
 
-  const prefixString = buildPrefixString(features, primaryFeature);
+  const prefixString = buildPrefixString(
+    features,
+    primaryFeature,
+  );
+
   const substituents = detectSubstituents(parsedMol, parent);
   const branchString = buildSubstituentPrefix(substituents, parent);
 
@@ -130,6 +181,31 @@ function getAromaticCommonName(
   }
 
   return null;
+}
+
+function buildFunctionalGroupSuffixName(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor,
+  primaryGroup: FunctionalGroupResult | null
+) {
+  if (!primaryGroup) return null;
+  if (!parent.parentStem || !parent.parentHydrocarbon) return null;
+
+  const suffix = primaryGroup.suffix;
+  if (!suffix || suffix.toLowerCase().includes("never suffix")) return null;
+
+  const parentStem = getParentStemWithUnsaturation(parsedMol, parent);
+  if (!parentStem) return null;
+
+  const cleanSuffix = suffix.replace(/^-/, "");
+
+  if (cleanSuffix === "oic anhydride") return `${parentStem}oic anhydride`;
+  if (cleanSuffix === "oic acid") return `${parentStem}oic acid`;
+  if (cleanSuffix === "oate") return `${parentStem}oate`;
+  if (cleanSuffix === "amide") return `${parentStem}amide`;
+  if (cleanSuffix === "nitrile") return `${parent.parentHydrocarbon}nitrile`;
+
+  return `${parentStem}${cleanSuffix}`;
 }
 
 export function buildSuffixName(
@@ -230,13 +306,46 @@ export function buildPrimarySuffixName(
 
 export function buildPrefixString(
   features: NamingFeature[],
-  primaryFeature: NamingFeature | null
+  primaryFeature: NamingFeature | null,
+  primaryGroup: FunctionalGroupResult | null = null
 ) {
   return features
-    .filter((feature) => feature !== primaryFeature)
+    .filter((feature) => {
+      if (feature === primaryFeature) return false;
+
+      if (shouldSuppressFeaturePrefixForPrimaryGroup(feature, primaryGroup)) {
+        return false;
+      }
+
+      return true;
+    })
     .map(formatPrefix)
     .sort()
     .join("-");
+}
+
+function shouldSuppressFeaturePrefixForPrimaryGroup(
+  feature: NamingFeature,
+  primaryGroup: FunctionalGroupResult | null
+) {
+  if (!primaryGroup) return false;
+
+  const primaryName = primaryGroup.name.toLowerCase();
+
+  if (primaryName.includes("anhydride")) {
+    return [
+      "ester",
+      "ketone",
+      "aldehyde",
+      "acidChloride",
+      "carboxylicAcid",
+      "alkoxycarbonyl",
+      "carbonyl",
+      "alkoxy",
+    ].includes(feature.type);
+  }
+
+  return false;
 }
 
 export function formatPrefix(feature: NamingFeature) {

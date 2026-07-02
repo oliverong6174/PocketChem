@@ -16,6 +16,8 @@ export type {
   MoleculeIdentityResult,
 } from "./types";
 
+
+
 import { parseMolBlock } from "./molParser";
 
 import {
@@ -102,7 +104,11 @@ function estimateNomenclature(
   functionalGroups: FunctionalGroupResult[],
   mainGroup: FunctionalGroupResult | null
 ): NomenclatureResult {
-  const namingResult = buildEstimatedIupacName(parsedMol);
+  const namingResult = buildEstimatedIupacName(
+  parsedMol,
+  functionalGroups,
+  mainGroup
+);
   const prefixes = getPrefixes(functionalGroups, mainGroup);
 
   if (!namingResult) {

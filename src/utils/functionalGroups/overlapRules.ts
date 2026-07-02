@@ -65,6 +65,10 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Aniline: ["Benzene", "Aryl amine", "Primary amine", "Amine"],
   "Aryl amine": ["Benzene", "Primary amine", "Amine"],
 
+  //Nitrogens
+  "N-oxide": ["Amine"],
+  "Nitro": ["N-oxide", "Amine"],
+
   // Oxygen/ether motifs
   Hemiacetal: ["Alcohol", "Ether"],
   Acetal: ["Ether"],
@@ -185,17 +189,16 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   
   //Advanced Groups
   Hydroperoxide: ["Peroxide"],
-Oxetane: ["Ether"],
-Aziridine: ["Amine"],
-"N-oxide": ["Amine"],
-Guanidine: ["Amidine", "Amine"],
-Urea: ["Amide"],
-"Hydroxamic acid": ["Amide"],
-Thioester: ["Ester"],
-Thioamide: ["Amide"],
-Thioketone: ["Ketone"],
-Thioaldehyde: ["Aldehyde"],
-"Phosphodiester": ["Phosphate"],
+  Oxetane: ["Ether"],
+  Aziridine: ["Amine"], 
+  Guanidine: ["Amidine", "Amine"],
+  Urea: ["Amide"],
+  "Hydroxamic acid": ["Amide"],
+  Thioester: ["Ester"],
+  Thioamide: ["Amide"],
+  Thioketone: ["Ketone"],
+  Thioaldehyde: ["Aldehyde"],
+  "Phosphodiester": ["Phosphate"],
 
  
 };
