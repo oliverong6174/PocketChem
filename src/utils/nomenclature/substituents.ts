@@ -222,6 +222,9 @@ export function detectSubstituents(
     for (const bond of parsedMol.adjacency.get(parentAtom) ?? []) {
       const other = getOtherAtom(bond, parentAtom);
       if (parentSet.has(other)) continue;
+      if (shouldSkipSubstituentForParent(parsedMol, parentAtom, other)) {
+  continue;
+}
 
       const atom = parsedMol.atoms[other];
       if (!atom) continue;
@@ -310,6 +313,42 @@ export function detectSubstituents(
   }
 
   return substituents;
+}
+
+function shouldSkipSubstituentForParent(
+  parsedMol: ParsedMol,
+  parentAtom: number,
+  otherAtom: number
+) {
+  const other = parsedMol.atoms[otherAtom];
+  if (!other) return false;
+
+  // Do not treat the anhydride bridge oxygen as alkoxy.
+  if (other.element === "O") {
+    const oxygenBonds = parsedMol.adjacency.get(otherAtom) ?? [];
+
+    const attachedCarbonylCarbons = oxygenBonds
+      .filter((bond) => bond.bondOrder === 1)
+      .map((bond) => getOtherAtom(bond, otherAtom))
+      .filter((atomIndex) => {
+        const atom = parsedMol.atoms[atomIndex];
+        if (atom?.element !== "C") return false;
+
+        return (parsedMol.adjacency.get(atomIndex) ?? []).some((bond) => {
+          const attached = parsedMol.atoms[getOtherAtom(bond, atomIndex)];
+          return attached?.element === "O" && bond.bondOrder === 2;
+        });
+      });
+
+    if (
+      attachedCarbonylCarbons.length >= 2 &&
+      attachedCarbonylCarbons.includes(parentAtom)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function formatSubstituents(substituents: Substituent[]) {

@@ -7,18 +7,31 @@ import type {
 
 import type { FunctionalGroupResult } from "../functionalGroups/types";
 
-import { formatLocants } from "./formatUtils";
-import { getSimpleBenzeneDerivativeName } from "./aromaticNames";
-import { getParentDescriptor, getParentStemWithUnsaturation, getBestAcylParentDescriptor } from "./parentSelection";
-import { detectNamingFeatures, getCarboxylicAcidCarbons } from "./featureDetection";
+import {
+  getParentDescriptor,
+  getBestAcylParentDescriptor,
+} from "./parentSelection";
 
-
+import {
+  detectNamingFeatures,
+  getCarboxylicAcidCarbons,
+} from "./featureDetection";
 
 import {
   detectSubstituents,
   formatSubstituents,
   omitUnnecessaryRingLocant,
 } from "./substituents";
+
+import {
+  buildFunctionalGroupSuffixName,
+  buildSuffixName,
+} from "./nameBuilder/suffixBuilder";
+
+import { buildPrefixString } from "./nameBuilder/prefixBuilder";
+import { constructName } from "./nameBuilder/nameConstructor";
+
+import { orientParentForPrimaryGroup } from "./parentOrientation";
 
 export type EstimatedIupacResult = {
   estimatedName: string;
@@ -66,13 +79,21 @@ export function buildEstimatedIupacName(
   const defaultParent = getParentDescriptor(parsedMol);
   const primaryGroup = getPrimaryFunctionalGroup(functionalGroups, mainGroup);
 
-  const parent =
+  const unorientedParent =
     getParentStrategy(primaryGroup) === "acyl"
       ? getBestAcylParentDescriptor(parsedMol) ?? defaultParent
       : defaultParent;
 
+  const parent = orientParentForPrimaryGroup(
+    parsedMol,
+    unorientedParent,
+    primaryGroup
+  );
+
   const features = detectNamingFeatures(parsedMol, parent);
   const primaryFeature = features[0] ?? null;
+
+  const substituents = detectSubstituents(parsedMol, parent);
 
   const aromaticAcidOverride = getAromaticAcidOverride(
     parsedMol,
@@ -91,9 +112,9 @@ export function buildEstimatedIupacName(
   const prefixString = buildPrefixString(
     features,
     primaryFeature,
+    primaryGroup
   );
 
-  const substituents = detectSubstituents(parsedMol, parent);
   const branchString = buildSubstituentPrefix(substituents, parent);
 
   const aromaticCommonName = getAromaticCommonName(
@@ -104,7 +125,7 @@ export function buildEstimatedIupacName(
 
   const estimatedName =
     aromaticCommonName ??
-    [branchString, prefixString, suffixName].filter(Boolean).join("");
+    constructName([branchString, prefixString, suffixName]);
 
   return {
     estimatedName,
@@ -124,9 +145,7 @@ function getAromaticAcidOverride(
     ? getCarboxylicAcidCarbons(parsedMol).length
     : 0;
 
-  if (!parent.aromaticRing || aromaticAcidCarbonCount === 0) {
-    return null;
-  }
+  if (!parent.aromaticRing || aromaticAcidCarbonCount === 0) return null;
 
   const benzoicAcidFeature: NamingFeature = {
     type: "carboxylicAcid",
@@ -181,203 +200,4 @@ function getAromaticCommonName(
   }
 
   return null;
-}
-
-function buildFunctionalGroupSuffixName(
-  parsedMol: ParsedMol,
-  parent: ParentDescriptor,
-  primaryGroup: FunctionalGroupResult | null
-) {
-  if (!primaryGroup) return null;
-  if (!parent.parentStem || !parent.parentHydrocarbon) return null;
-
-  const suffix = primaryGroup.suffix;
-  if (!suffix || suffix.toLowerCase().includes("never suffix")) return null;
-
-  const parentStem = getParentStemWithUnsaturation(parsedMol, parent);
-  if (!parentStem) return null;
-
-  const cleanSuffix = suffix.replace(/^-/, "");
-
-  if (cleanSuffix === "oic anhydride") return `${parentStem}oic anhydride`;
-  if (cleanSuffix === "oic acid") return `${parentStem}oic acid`;
-  if (cleanSuffix === "oate") return `${parentStem}oate`;
-  if (cleanSuffix === "amide") return `${parentStem}amide`;
-  if (cleanSuffix === "nitrile") return `${parent.parentHydrocarbon}nitrile`;
-
-  return `${parentStem}${cleanSuffix}`;
-}
-
-export function buildSuffixName(
-  parsedMol: ParsedMol,
-  parent: ParentDescriptor,
-  primaryFeature: NamingFeature | null
-) {
-  if (!parent.parentStem || !parent.parentHydrocarbon) return null;
-  if (!primaryFeature) return parent.parentHydrocarbon;
-
-  const parentStem = getParentStemWithUnsaturation(parsedMol, parent);
-  if (!parentStem) return null;
-
-  if (parent.kind === "ring") {
-    if (parent.aromaticRing) {
-      return getSimpleBenzeneDerivativeName(primaryFeature);
-    }
-
-    if (primaryFeature.type === "ketone") {
-      return `${parent.parentStem}one`;
-    }
-
-    if (primaryFeature.type === "alcohol") {
-      return `${parent.parentStem}ol`;
-    }
-
-    if (primaryFeature.type === "amine") {
-      return `${parent.parentStem}amine`;
-    }
-
-    if (primaryFeature.type === "thiol") {
-      return `${parent.parentStem}ethiol`;
-    }
-
-    return `${parent.parentHydrocarbon} with ${primaryFeature.suffix}`;
-  }
-
-  return buildPrimarySuffixName(parentStem, parent, primaryFeature);
-}
-
-export function buildPrimarySuffixName(
-  parentStem: string,
-  parent: ParentDescriptor,
-  feature: NamingFeature
-) {
-  const locants = feature.locants;
-  const count = locants.length;
-  const multiplier = getMultiplier(count);
-
-  if (feature.type === "ester") {
-    return `${feature.alkylName ?? "alkyl"} ${parentStem}oate`;
-  }
-
-  if (feature.type === "acidChloride") {
-    return `${parentStem}${feature.suffix}`;
-  }
-
-  if (feature.type === "carboxylicAcid") {
-    return count > 1 ? `${parentStem}edioic acid` : `${parentStem}oic acid`;
-  }
-
-  if (feature.type === "aldehyde") {
-    return count > 1 ? `${parentStem}${multiplier}al` : `${parentStem}al`;
-  }
-
-  if (feature.type === "amine") {
-    if (count > 1) {
-      return `${parentStem}-${locants.join(",")}-${multiplier}amine`;
-    }
-
-    if (parent.carbonCount <= 2) {
-      return `${parentStem}amine`;
-    }
-
-    return `${parentStem}-${locants[0]}-amine`;
-  }
-
-  if (feature.type === "nitrile") {
-    const alkaneName = parent.parentHydrocarbon ?? parentStem;
-
-    if (count > 1) {
-      return `${alkaneName}dinitrile`;
-    }
-
-    return `${alkaneName}nitrile`;
-  }
-
-  if (count > 1) {
-    return `${parentStem}-${locants.join(",")}-${multiplier}${feature.suffix}`;
-  }
-
-  if (shouldOmitSingleLocant(parent, feature)) {
-    return `${parentStem}${feature.suffix}`;
-  }
-
-  return `${parentStem}-${locants[0]}-${feature.suffix}`;
-}
-
-export function buildPrefixString(
-  features: NamingFeature[],
-  primaryFeature: NamingFeature | null,
-  primaryGroup: FunctionalGroupResult | null = null
-) {
-  return features
-    .filter((feature) => {
-      if (feature === primaryFeature) return false;
-
-      if (shouldSuppressFeaturePrefixForPrimaryGroup(feature, primaryGroup)) {
-        return false;
-      }
-
-      return true;
-    })
-    .map(formatPrefix)
-    .sort()
-    .join("-");
-}
-
-function shouldSuppressFeaturePrefixForPrimaryGroup(
-  feature: NamingFeature,
-  primaryGroup: FunctionalGroupResult | null
-) {
-  if (!primaryGroup) return false;
-
-  const primaryName = primaryGroup.name.toLowerCase();
-
-  if (primaryName.includes("anhydride")) {
-    return [
-      "ester",
-      "ketone",
-      "aldehyde",
-      "acidChloride",
-      "carboxylicAcid",
-      "alkoxycarbonyl",
-      "carbonyl",
-      "alkoxy",
-    ].includes(feature.type);
-  }
-
-  return false;
-}
-
-export function formatPrefix(feature: NamingFeature) {
-  if (feature.locants.length === 0) return feature.prefix;
-
-  const multiplier = getMultiplier(feature.locants.length);
-  return `${formatLocants(feature.locants)}-${multiplier}${feature.prefix}`;
-}
-
-export function shouldOmitSingleLocant(
-  parent: ParentDescriptor,
-  feature: NamingFeature
-) {
-  return (
-    feature.locants.length === 1 &&
-    ((feature.type === "alcohol" && parent.carbonCount <= 2) ||
-      (feature.type === "ketone" && parent.carbonCount <= 3))
-  );
-}
-
-export function formatDisplayName(
-  iupacName: string,
-  commonName: string | null
-) {
-  return commonName ? `${iupacName} (${commonName})` : iupacName;
-}
-
-export function getMultiplier(count: number) {
-  if (count === 2) return "di";
-  if (count === 3) return "tri";
-  if (count === 4) return "tetra";
-  if (count === 5) return "penta";
-  if (count === 6) return "hexa";
-  return "";
 }

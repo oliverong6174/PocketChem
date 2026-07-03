@@ -252,4 +252,17 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     "Guanidines are very basic nitrogen functional groups. Arginine contains a guanidinium group.",
   category: "functionalGroup",
 },
+{
+  name: "Nitroso",
+  priority: 25.5,
+  nomenclaturePriority: 19.5,
+  confidence: "High",
+  suffix: "Never suffix",
+  prefix: "nitroso",
+  smarts: "[#6][N]=O",
+  displaySmarts: "[N]=O",
+  mcatNote:
+    "Nitroso compounds contain an N=O group bonded to carbon (R–N=O). They are distinct from nitro compounds and are important intermediates in oxidation, reduction, and diazotization chemistry.",
+  category: "functionalGroup",
+},
 ];

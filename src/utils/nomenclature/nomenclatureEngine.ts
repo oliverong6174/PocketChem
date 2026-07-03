@@ -21,10 +21,13 @@ export type {
 import { parseMolBlock } from "./molParser";
 
 import {
-  formatDisplayName,
   buildEstimatedIupacName,
 
 } from "./nameBuilder";
+
+import {
+   formatDisplayName,
+} from "./displayName";
 
 import { getCommonName } from "./commonNames";
 
@@ -179,7 +182,7 @@ function estimateNomenclature(
     namingConfidence,
     parentChain: parent.parentHydrocarbon,
     parentChainLength: parent.carbonCount,
-    mainSuffix: primaryFeature ? `-${primaryFeature.suffix}` : null,
+    mainSuffix: mainGroup?.suffix ?? (primaryFeature ? `-${primaryFeature.suffix}` : null),
     prefixes,
     motifs,
     explanation: explanationLines.join(" "),

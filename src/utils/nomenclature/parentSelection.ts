@@ -6,6 +6,7 @@ import type {
   RingDescriptor,
 } from "./types";
 
+
 import { CHAIN_PREFIXES, COMMON_VALENCES } from "./constants";
 import { getOtherAtom } from "./molParser";
 

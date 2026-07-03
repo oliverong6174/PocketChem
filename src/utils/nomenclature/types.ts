@@ -94,6 +94,7 @@ export type NamingFeatureType =
   | "carboxylicAcid"
   | "ester"
   | "acidChloride"
+  | "anhydride"
   | "aldehyde"
   | "ketone"
   | "alcohol"

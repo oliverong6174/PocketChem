@@ -13,7 +13,7 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
 
   // Acid derivatives
   Peroxyacid: ["Carboxylic acid", "Peroxide"],
-  "Acid anhydride": ["Ester", "Ether"],
+  "Acid anhydride": ["Ester", "Ether", "Ketone", "Carbonyl"],
   "Carbonate ester": ["Ester", "Ether"],
 "Carbamate": ["Amide", "Ester", "Ether"],
   Ester: ["Ether"],
