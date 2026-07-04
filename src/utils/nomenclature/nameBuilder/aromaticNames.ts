@@ -1,4 +1,4 @@
-import type { NamingFeature } from "./types";
+import type { NamingFeature } from "../types";
 
 export function getSimpleBenzeneDerivativeName(
   primaryFeature: NamingFeature | null

@@ -29,20 +29,6 @@ export const aldehydeKetoneGroups: FunctionalGroupPattern[] = [
     category: "functionalGroup",
   },
   {
-    name: "Enol",
-    priority: 10.8,
-    nomenclaturePriority: 10.8,
-    confidence: "Medium",
-    suffix: "-enol",
-    prefix: "hydroxy",
-    equivalentNames: ["alkenol"],
-    smarts: "[OX2H][C]=[C]",
-    mcatNote:
-      "Enols contain an OH group attached to an alkene carbon. They are the tautomeric forms of aldehydes and ketones and readily interconvert through keto-enol tautomerism.",
-    displaySmarts: "[OX2H][C]=[C]",
-    category: "functionalGroup",
-  },
-  {
     name: "Aldol",
     priority: 10.7,
     nomenclaturePriority: 10.7,

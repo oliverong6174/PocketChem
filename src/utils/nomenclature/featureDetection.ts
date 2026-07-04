@@ -13,7 +13,7 @@ import {
   getLocantMap,
   isAldehydeCarbon,
   isKetoneCarbon,
-} from "./parentSelection";
+} from "./graph/parentSelection";
 
 function getExpectedValence(atom: ParsedAtom) {
   if (atom.element === "N" && atom.charge > 0) return 4;

@@ -386,4 +386,17 @@ export const chargedGroups: FunctionalGroupPattern[] = [
     mcatNote:
       "Azide is a resonance-stabilized nucleophile commonly used in synthesis.",
   },
+      {
+    name: "Acylammonium ion",
+    priority: 5.8,
+    nomenclaturePriority: 5.8,
+    confidence: "Medium",
+    suffix: "Rare",
+    prefix: "acylammonio",
+    smarts: "[CX3](=[OX1])[NX4+]",
+    displaySmarts: "[CX3](=[OX1])[NX4+]",
+    mcatNote:
+      "Acylammonium ions are positively charged amide derivatives formed as reactive intermediates in acyl transfer chemistry.",
+    category: "ion",
+    },
 ];

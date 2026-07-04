@@ -1,4 +1,5 @@
 import type { FunctionalGroupResult } from "../../functionalGroups/types";
+import { groupHasUsableSuffix } from "./nomenclatureRules";
 
 export function getPrimaryFunctionalGroup(
   functionalGroups: FunctionalGroupResult[] = [],
@@ -7,7 +8,7 @@ export function getPrimaryFunctionalGroup(
   return (
     mainGroup ??
     [...functionalGroups]
-      .filter((group) => typeof group.nomenclaturePriority === "number")
+      .filter(groupHasUsableSuffix)
       .sort((a, b) => a.nomenclaturePriority - b.nomenclaturePriority)[0] ??
     null
   );

@@ -12,7 +12,7 @@ import type {
 
 import { COMMON_VALENCES, ELEMENT_ORDER } from "./constants";
 import { getOtherAtom } from "./molParser";
-import { getLongestCarbonPath } from "./parentSelection";
+import { getLongestCarbonPath } from "./graph/parentSelection";
 
 function getExpectedValence(atom: ParsedAtom) {
   if (atom.element === "N" && atom.charge > 0) return 4;

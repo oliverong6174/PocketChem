@@ -23,7 +23,8 @@ export const halogenGroups: FunctionalGroupPattern[] = [
     smarts: "[CX4][F,Cl,Br,I]",
     mcatNote:
       "Haloalkanes contain a halogen attached to an sp3 carbon. They readily undergo SN1, SN2, E1, and E2 reactions.",
-    category: "substituent",
+    displaySmarts: "[CX4][F,Cl,Br,I]",
+    category: "functionalGroup",
     },
   {
     name: "Allylic halide",

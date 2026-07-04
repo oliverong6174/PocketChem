@@ -148,4 +148,18 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     "Hydroxamic acids contain C(=O)-NHOH and strongly chelate metals. They appear in enzyme inhibitors.",
   category: "functionalGroup",
   },
+  {
+  name: "Carbamate",
+  priority: 6.5,
+  nomenclaturePriority: 6.5,
+  confidence: "High",
+  suffix: "carbamate",
+  prefix: "carbamoyloxy",
+  equivalentNames: ["urethane"],
+  smarts: "[OX2][CX3](=O)[NX3]",
+  displaySmarts: "[OX2][CX3](=O)[NX3]",
+  mcatNote:
+    "Carbamates (urethanes) are carbonic acid derivatives containing both an amide-like nitrogen and an ester-like oxygen attached to the same carbonyl carbon. They are common in protecting groups, pharmaceuticals, and polyurethanes.",
+  category: "functionalGroup",
+},
 ];

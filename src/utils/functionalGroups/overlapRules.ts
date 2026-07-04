@@ -15,10 +15,18 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Peroxyacid: ["Carboxylic acid", "Peroxide"],
   "Acid anhydride": ["Ester", "Ether", "Ketone", "Carbonyl"],
   "Carbonate ester": ["Ester", "Ether"],
-"Carbamate": ["Amide", "Ester", "Ether"],
+  Carbamate: [
+  "Amide",
+  "Primary amide",
+  "Secondary amide",
+  "Tertiary amide",
+  "Ester",
+  "Ether"
+],
   Ester: ["Ether"],
   "Acyl halide": ["Halogen", "Haloalkane"],
   Amide: ["Amine"],
+  
 
   "Primary amide": ["Amide"],
   "Secondary amide": ["Amide"],
@@ -33,13 +41,15 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   "Epsilon lactone": ["Lactone", "Cycloalkane", "Ester"],
 
   // Lactams
-  "Alpha lactam": ["Lactam", "Cycloalkane", "Amide"],
-  "Beta lactam": ["Lactam", "Cycloalkane", "Amide"],
-  "Gamma lactam": ["Lactam", "Cycloalkane", "Amide"],
-  "Delta lactam": ["Lactam", "Cycloalkane", "Amide"],
-  "Epsilon lactam": ["Lactam", "Cycloalkane", "Amide"],
+  "Lactam": ["Cycloalkane", "Amide", "Primary amide", "Secondary amide", "Tertiary amide"],
+  "Alpha lactam": ["Lactam", "Cycloalkane", "Amide", "Primary amide", "Secondary amide", "Tertiary amide"],
+  "Beta lactam": ["Lactam", "Cycloalkane", "Amide", "Primary amide", "Secondary amide", "Tertiary amide"],
+  "Gamma lactam": ["Lactam", "Cycloalkane", "Amide", "Primary amide", "Secondary amide", "Tertiary amide"],
+  "Delta lactam": ["Lactam", "Cycloalkane", "Amide", "Primary amide", "Secondary amide", "Tertiary amide"],
+  "Epsilon lactam": ["Lactam", "Cycloalkane", "Amide", "Primary amide", "Secondary amide", "Tertiary amide"],
 
   // Lactims
+  "Lactim": ["Cycloalkane", "Enol", "Imine"],
   "Alpha lactim": ["Lactim", "Cycloalkane", "Enol", "Imine"],
   "Beta lactim": ["Lactim",  "Cycloalkane", "Enol", "Imine"],
   "Gamma lactim": ["Lactim",  "Cycloalkane", "Enol", "Imine"],

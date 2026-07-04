@@ -15,7 +15,7 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     mcatNote:
       "Enals are α,β-unsaturated aldehydes. They are conjugated electrophiles and commonly undergo Michael addition.",
     displaySmarts: "[#6]=[#6][CX3H1]=[OX1]",
-    category: "motif",
+    category: "functionalGroup",
     },
   {
     name: "Enone",
@@ -29,7 +29,7 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     mcatNote:
       "Enones are α,β-unsaturated ketones. They can undergo both 1,2-addition and 1,4-conjugate addition.",
     displaySmarts: "[#6]=[#6][CX3]=[OX1]",
-    category: "motif",
+    category: "functionalGroup",
     },
   {
     name: "Acrolein",

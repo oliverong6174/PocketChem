@@ -101,7 +101,9 @@ export type NamingFeatureType =
   | "amine"
   | "thiol"
   | "nitrile"
-  | "amide";
+  | "amide"
+  | "alkene"
+  | "alkyne";
 
 export type NamingFeature = {
   type: NamingFeatureType;

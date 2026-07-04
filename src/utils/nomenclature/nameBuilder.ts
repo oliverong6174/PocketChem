@@ -7,10 +7,23 @@ import type {
 
 import type { FunctionalGroupResult } from "../functionalGroups/types";
 
+import { getPrimaryFunctionalGroup } from "./nameBuilder/primaryGroup";
+import { getParentStrategy } from "./nameBuilder/parentStrategy";
+
+import { constructName } from "./nameBuilder/nameConstructor";
+import {
+  buildFunctionalGroupSuffixName,
+  buildSuffixName,
+} from "./nameBuilder/suffixBuilder";
+
+import { buildCombinedPrefixString } from "./nameBuilder/prefixBuilder";
+
+
+
 import {
   getParentDescriptor,
   getBestAcylParentDescriptor,
-} from "./parentSelection";
+} from "./graph/parentSelection";
 
 import {
   detectNamingFeatures,
@@ -19,19 +32,10 @@ import {
 
 import {
   detectSubstituents,
-  formatSubstituents,
-  omitUnnecessaryRingLocant,
 } from "./substituents";
 
-import {
-  buildFunctionalGroupSuffixName,
-  buildSuffixName,
-} from "./nameBuilder/suffixBuilder";
 
-import { buildPrefixString } from "./nameBuilder/prefixBuilder";
-import { constructName } from "./nameBuilder/nameConstructor";
-
-import { orientParentForPrimaryGroup } from "./parentOrientation";
+import { orientParentForPrimaryGroup } from "./graph/parentOrientation";
 
 export type EstimatedIupacResult = {
   estimatedName: string;
@@ -40,36 +44,6 @@ export type EstimatedIupacResult = {
   primaryFeature: NamingFeature | null;
   substituents: Substituent[];
 };
-
-function getPrimaryFunctionalGroup(
-  functionalGroups: FunctionalGroupResult[] = [],
-  mainGroup: FunctionalGroupResult | null = null
-) {
-  return (
-    mainGroup ??
-    [...functionalGroups]
-      .filter((group) => typeof group.nomenclaturePriority === "number")
-      .sort((a, b) => a.nomenclaturePriority - b.nomenclaturePriority)[0] ??
-    null
-  );
-}
-
-function getParentStrategy(group: FunctionalGroupResult | null) {
-  const suffix = group?.suffix?.toLowerCase() ?? "";
-
-  if (
-    suffix.includes("oic acid") ||
-    suffix.includes("oic anhydride") ||
-    suffix.includes("oate") ||
-    suffix.includes("amide") ||
-    suffix.includes("oyl") ||
-    suffix.includes("carbonitrile")
-  ) {
-    return "acyl";
-  }
-
-  return "hydrocarbon";
-}
 
 export function buildEstimatedIupacName(
   parsedMol: ParsedMol,
@@ -92,7 +66,6 @@ export function buildEstimatedIupacName(
 
   const features = detectNamingFeatures(parsedMol, parent);
   const primaryFeature = features[0] ?? null;
-
   const substituents = detectSubstituents(parsedMol, parent);
 
   const aromaticAcidOverride = getAromaticAcidOverride(
@@ -104,18 +77,23 @@ export function buildEstimatedIupacName(
   if (aromaticAcidOverride) return aromaticAcidOverride;
 
   const suffixName =
-    buildFunctionalGroupSuffixName(parsedMol, parent, primaryGroup) ??
-    buildSuffixName(parsedMol, parent, primaryFeature);
+    buildFunctionalGroupSuffixName(
+      parsedMol,
+      parent,
+      primaryGroup,
+      primaryFeature
+    ) ?? buildSuffixName(parsedMol, parent, primaryFeature);
 
   if (!suffixName) return null;
 
-  const prefixString = buildPrefixString(
-    features,
-    primaryFeature,
-    primaryGroup
-  );
 
-  const branchString = buildSubstituentPrefix(substituents, parent);
+  const prefixString = buildCombinedPrefixString(
+    features,
+    primaryGroup ? null : primaryFeature,
+    primaryGroup,
+    substituents,
+  );
+    
 
   const aromaticCommonName = getAromaticCommonName(
     parent,
@@ -123,9 +101,10 @@ export function buildEstimatedIupacName(
     primaryFeature
   );
 
-  const estimatedName =
+    const estimatedName =
     aromaticCommonName ??
-    constructName([branchString, prefixString, suffixName]);
+    constructName([prefixString, suffixName]);
+
 
   return {
     estimatedName,
@@ -162,19 +141,6 @@ function getAromaticAcidOverride(
     primaryFeature: benzoicAcidFeature,
     substituents: [],
   };
-}
-
-function buildSubstituentPrefix(
-  substituents: Substituent[],
-  parent: ParentDescriptor
-) {
-  const branchString = formatSubstituents(substituents);
-
-  return omitUnnecessaryRingLocant(
-    branchString,
-    parent,
-    substituents.length
-  );
 }
 
 function getAromaticCommonName(

@@ -1,39 +1,12 @@
 import type {
   ParentDescriptor,
-  ParsedAtom,
-  ParsedBond,
   ParsedMol,
   RingDescriptor,
-} from "./types";
+} from "../types";
 
 
-import { CHAIN_PREFIXES, COMMON_VALENCES } from "./constants";
-import { getOtherAtom } from "./molParser";
-
-function getExpectedValence(atom: ParsedAtom) {
-  if (atom.element === "N" && atom.charge > 0) return 4;
-  if (atom.element === "O" && atom.charge < 0) return 1;
-  if (atom.element === "C" && atom.charge < 0) return 3;
-
-  return COMMON_VALENCES[atom.element] ?? 0;
-}
-
-function countImplicitHydrogens(
-  atom: ParsedAtom,
-  adjacency: Map<number, ParsedBond[]>
-) {
-  if (atom.element === "H") return 0;
-
-  const expectedValence = getExpectedValence(atom);
-  if (expectedValence === 0) return 0;
-
-  const bondOrderSum = (adjacency.get(atom.atomIndex) ?? []).reduce(
-    (sum, bond) => sum + bond.bondOrder,
-    0
-  );
-
-  return Math.max(0, Math.round(expectedValence - bondOrderSum));
-}
+import { CHAIN_PREFIXES } from "../constants";
+import { getOtherAtom } from "../molParser";
 
 export function isAldehydeCarbon(parsedMol: ParsedMol, carbonIndex: number) {
   const atom = parsedMol.atoms[carbonIndex];
@@ -48,9 +21,12 @@ export function isAldehydeCarbon(parsedMol: ParsedMol, carbonIndex: number) {
 
   if (!hasCarbonylOxygen) return false;
 
-  const implicitHydrogens = countImplicitHydrogens(atom, parsedMol.adjacency);
+  const carbonNeighborCount = bonds.filter((bond) => {
+    const otherAtom = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
+    return otherAtom?.element === "C";
+  }).length;
 
-  return implicitHydrogens >= 1;
+  return carbonNeighborCount <= 1;
 }
 
 export function isKetoneCarbon(parsedMol: ParsedMol, carbonIndex: number) {
@@ -240,7 +216,7 @@ function getLowestLocantList(values: number[]) {
   return [...values].sort((a, b) => a - b);
 }
 
-function compareLocantLists(a: number[], b: number[]) {
+export function compareLocantLists(a: number[], b: number[]) {
   const sortedA = getLowestLocantList(a);
   const sortedB = getLowestLocantList(b);
 

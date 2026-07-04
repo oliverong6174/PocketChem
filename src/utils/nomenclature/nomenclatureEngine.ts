@@ -16,8 +16,6 @@ export type {
   MoleculeIdentityResult,
 } from "./types";
 
-
-
 import { parseMolBlock } from "./molParser";
 
 import {
@@ -29,7 +27,7 @@ import {
    formatDisplayName,
 } from "./displayName";
 
-import { getCommonName } from "./commonNames";
+import { getCommonName } from "./nameBuilder/commonNames";
 
 import {
   buildProperties,
@@ -131,7 +129,6 @@ function estimateNomenclature(
       explanation:
         "PocketChem could not build a parent-based name for this structure yet.",
       limitations: [
-        "Current nomenclature support is strongest for simple chains, simple rings, and common carbonyl/alcohol combinations.",
         "Complex branching, fused rings, stereochemistry, and full IUPAC tie-breaking are still in development.",
       ],
     };

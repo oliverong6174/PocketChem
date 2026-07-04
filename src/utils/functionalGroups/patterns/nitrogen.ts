@@ -98,6 +98,20 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
       "Tertiary amines have nitrogen bonded to three carbons and no N-H bond. They are basic but cannot donate hydrogen bonds.",
     category: "functionalGroup",
     },
+    {
+  name: "Quaternary ammonium",
+  priority: 15.1,
+  nomenclaturePriority: 15.1,
+  confidence: "High",
+  suffix: "ammonium",
+  prefix: "ammonio",
+  equivalentNames: ["quaternary ammonium ion", "quat"],
+  smarts: "[NX4+]",
+  displaySmarts: "[NX4+]",
+  mcatNote:
+    "Quaternary ammonium compounds contain a positively charged nitrogen bonded to four carbon substituents. Unlike amines, they have no lone pair and are permanently positively charged.",
+  category: "functionalGroup",
+},
   {
     name: "Amine",
     priority: 15.5,
@@ -158,7 +172,8 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     confidence: "Medium",
     suffix: "Rare",
     prefix: "isocyano",
-    smarts: "[NX1+]#[CX1-]",
+    smarts: "[#6][N+]#[C-]",
+    displaySmarts: "[N+]#[C-]",
     mcatNote:
       "Isocyanides contain the R-NC connectivity. They are structural isomers of nitriles but have different connectivity.",
   },

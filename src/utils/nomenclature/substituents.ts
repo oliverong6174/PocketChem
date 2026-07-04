@@ -6,8 +6,15 @@ import type {
 
 import { CHAIN_PREFIXES } from "./constants";
 import { getOtherAtom } from "./molParser";
-import { getLocantMap } from "./parentSelection";
+import { getLocantMap } from "./graph/parentSelection";
 import { getAlkylSubtreeInfo } from "./featureDetection";
+
+const HALOGEN_PREFIXES: Record<string, string> = {
+  F: "fluoro",
+  Cl: "chloro",
+  Br: "bromo",
+  I: "iodo",
+};
 
 function getMultiplier(count: number) {
   if (count === 2) return "di";
@@ -16,6 +23,12 @@ function getMultiplier(count: number) {
   if (count === 5) return "penta";
   if (count === 6) return "hexa";
   return "";
+}
+
+function getPrefixSortKey(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/^(di|tri|tetra|penta|hexa|bis|tris)/, "");
 }
 
 export function getAlkylBaseName(
@@ -113,9 +126,130 @@ export function orientBranchPathForAttachment(
   attachmentAtom: number
 ) {
   const forwardLocant = path.indexOf(attachmentAtom) + 1;
-  const reverseLocant = [...path].reverse().indexOf(attachmentAtom) + 1;
+  const reversePath = [...path].reverse();
+  const reverseLocant = reversePath.indexOf(attachmentAtom) + 1;
 
-  return reverseLocant < forwardLocant ? [...path].reverse() : path;
+  return reverseLocant < forwardLocant ? reversePath : path;
+}
+
+function formatMiniSubstituents(substituents: Substituent[]) {
+  if (substituents.length === 0) return "";
+
+  const groups = new Map<string, number[]>();
+
+  for (const sub of substituents) {
+    if (!sub.locant) continue;
+
+    const existing = groups.get(sub.name) ?? [];
+    existing.push(sub.locant);
+    groups.set(sub.name, existing);
+  }
+
+  return Array.from(groups.entries())
+    .map(([name, locants]) => {
+      locants.sort((a, b) => a - b);
+
+      const multiplier = getMultiplier(locants.length);
+      return {
+        text: `${locants.join(",")}-${multiplier}${name}`,
+        sortKey: getPrefixSortKey(name),
+        firstLocant: locants[0] ?? Number.POSITIVE_INFINITY,
+      };
+    })
+    .sort((a, b) => {
+      const alpha = a.sortKey.localeCompare(b.sortKey);
+      if (alpha !== 0) return alpha;
+      return a.firstLocant - b.firstLocant;
+    })
+    .map((entry) => entry.text)
+    .join("-");
+}
+
+function getBranchLocantMap(path: number[]) {
+  const locants = new Map<number, number>();
+
+  path.forEach((atomIndex, index) => {
+    locants.set(atomIndex, index + 1);
+  });
+
+  return locants;
+}
+
+function detectBranchInternalSubstituents(
+  parsedMol: ParsedMol,
+  branchAtoms: Set<number>,
+  branchPath: number[]
+): Substituent[] {
+  const branchPathSet = new Set(branchPath);
+  const locants = getBranchLocantMap(branchPath);
+  const miniSubstituents: Substituent[] = [];
+
+  for (const branchAtom of branchPath) {
+    const locant = locants.get(branchAtom) ?? 0;
+
+    for (const bond of parsedMol.adjacency.get(branchAtom) ?? []) {
+      const other = getOtherAtom(bond, branchAtom);
+      const otherAtom = parsedMol.atoms[other];
+
+      if (!otherAtom) continue;
+
+      const halogenName = HALOGEN_PREFIXES[otherAtom.element];
+
+      if (halogenName) {
+        miniSubstituents.push({
+          name: halogenName,
+          locant,
+        });
+
+        continue;
+      }
+
+      if (otherAtom.element === "C") {
+        if (!branchAtoms.has(other)) continue;
+        if (branchPathSet.has(other)) continue;
+
+        const miniBranchAtoms = collectBranchCarbons(
+          parsedMol,
+          other,
+          branchAtom
+        );
+
+        miniSubstituents.push({
+          name: getAlkylBaseName(miniBranchAtoms.size, 1),
+          locant,
+        });
+
+        continue;
+      }
+
+      if (otherAtom.element === "O") {
+        miniSubstituents.push({
+          name: "hydroxy",
+          locant,
+        });
+
+        continue;
+      }
+
+      if (otherAtom.element === "S") {
+        miniSubstituents.push({
+          name: "sulfanyl",
+          locant,
+        });
+
+        continue;
+      }
+
+      if (otherAtom.element === "N") {
+        miniSubstituents.push({
+          name: "amino",
+          locant,
+        });
+      }
+    }
+  }
+
+  return miniSubstituents;
 }
 
 export function getCarbonBranchInfo(
@@ -133,81 +267,40 @@ export function getCarbonBranchInfo(
 
   branchPath = orientBranchPathForAttachment(branchPath, startAtom);
 
-  const branchPathSet = new Set(branchPath);
   const attachmentLocant = branchPath.indexOf(startAtom) + 1;
-
-  const miniSubstituents: Substituent[] = [];
-
-  branchPath.forEach((branchAtom, index) => {
-    for (const bond of parsedMol.adjacency.get(branchAtom) ?? []) {
-      const other = getOtherAtom(bond, branchAtom);
-
-      if (!branchAtoms.has(other)) continue;
-      if (branchPathSet.has(other)) continue;
-
-      const otherAtom = parsedMol.atoms[other];
-      if (otherAtom?.element !== "C") continue;
-
-      const miniBranchAtoms = collectBranchCarbons(
-        parsedMol,
-        other,
-        branchAtom
-      );
-
-      miniSubstituents.push({
-        name: getAlkylBaseName(miniBranchAtoms.size, 1),
-        locant: index + 1,
-      });
-    }
-  });
-
   const baseName = getAlkylBaseName(branchPath.length, attachmentLocant);
-  const prefixString = formatSubstituents(miniSubstituents);
 
-  const hasHalogenOnBranch = Array.from(branchAtoms).some((branchAtom) => {
-    return (parsedMol.adjacency.get(branchAtom) ?? []).some((bond) => {
-      const other = getOtherAtom(bond, branchAtom);
-      const element = parsedMol.atoms[other]?.element;
-      return ["F", "Cl", "Br", "I"].includes(element ?? "");
-    });
-  });
+  const miniSubstituents = detectBranchInternalSubstituents(
+    parsedMol,
+    branchAtoms,
+    branchPath
+  );
 
-  if (branchAtoms.size === 1 && hasHalogenOnBranch) {
-    const branchAtom = Array.from(branchAtoms)[0];
-
-    const halogenBond = (parsedMol.adjacency.get(branchAtom) ?? []).find(
-      (bond) => {
-        const other = getOtherAtom(bond, branchAtom);
-        const element = parsedMol.atoms[other]?.element;
-        return ["F", "Cl", "Br", "I"].includes(element ?? "");
-      }
-    );
-
-    const halogenElement = halogenBond
-      ? parsedMol.atoms[getOtherAtom(halogenBond, branchAtom)]?.element
-      : null;
-
-    const halogenPrefix =
-      halogenElement === "Br"
-        ? "bromo"
-        : halogenElement === "Cl"
-        ? "chloro"
-        : halogenElement === "F"
-        ? "fluoro"
-        : halogenElement === "I"
-        ? "iodo"
-        : "";
-
-    return {
-      carbonCount: branchAtoms.size,
-      name: `${halogenPrefix}methyl`,
-    };
-  }
+  const prefixString = formatMiniSubstituents(miniSubstituents);
 
   return {
     carbonCount: branchAtoms.size,
     name: prefixString ? `${prefixString}${baseName}` : baseName,
   };
+}
+
+function getAlkoxyName(
+  parsedMol: ParsedMol,
+  alkylCarbon: number,
+  oxygenAtom: number
+) {
+  const alkylInfo = getAlkylSubtreeInfo(
+    parsedMol,
+    alkylCarbon,
+    oxygenAtom
+  );
+
+  if (alkylInfo.carbonCount === 1) return "methoxy";
+  if (alkylInfo.carbonCount === 2) return "ethoxy";
+  if (alkylInfo.carbonCount === 3) return "propoxy";
+  if (alkylInfo.carbonCount === 4) return "butoxy";
+
+  return "alkoxy";
 }
 
 export function detectSubstituents(
@@ -221,10 +314,11 @@ export function detectSubstituents(
   for (const parentAtom of parent.path) {
     for (const bond of parsedMol.adjacency.get(parentAtom) ?? []) {
       const other = getOtherAtom(bond, parentAtom);
+
       if (parentSet.has(other)) continue;
       if (shouldSkipSubstituentForParent(parsedMol, parentAtom, other)) {
-  continue;
-}
+        continue;
+      }
 
       const atom = parsedMol.atoms[other];
       if (!atom) continue;
@@ -238,27 +332,30 @@ export function detectSubstituents(
           name: branch.name,
           locant,
         });
+
+        continue;
       }
 
       if (atom.element === "N") {
         const nBonds = parsedMol.adjacency.get(other) ?? [];
 
-        const oxygenCount = nBonds.filter((bond) => {
-          const attached = getOtherAtom(bond, other);
+        const oxygenCount = nBonds.filter((nBond) => {
+          const attached = getOtherAtom(nBond, other);
           return parsedMol.atoms[attached]?.element === "O";
         }).length;
 
-        if (oxygenCount >= 2) {
-          substituents.push({
-            name: "nitro",
-            locant,
-          });
+        substituents.push({
+          name: oxygenCount >= 2 ? "nitro" : "amino",
+          locant,
+        });
 
-          continue;
-        }
+        continue;
       }
 
       if (atom.element === "O") {
+          if (atom.element === "O" && bond.bondOrder !== 1) {
+            continue;
+      }
         const oxygenBonds = parsedMol.adjacency.get(other) ?? [];
 
         const alkylBond = oxygenBonds.find((oxygenBond) => {
@@ -269,39 +366,26 @@ export function detectSubstituents(
           return parsedMol.atoms[attached]?.element === "C";
         });
 
-        if (alkylBond) {
-          const alkylCarbon = getOtherAtom(alkylBond, other);
+        substituents.push({
+          name: alkylBond
+            ? getAlkoxyName(parsedMol, getOtherAtom(alkylBond, other), other)
+            : "hydroxy",
+          locant,
+        });
 
-          const alkylInfo = getAlkylSubtreeInfo(
-            parsedMol,
-            alkylCarbon,
-            other
-          );
-
-          const alkoxyName =
-            alkylInfo.carbonCount === 1
-              ? "methoxy"
-              : alkylInfo.carbonCount === 2
-              ? "ethoxy"
-              : alkylInfo.carbonCount === 3
-              ? "propoxy"
-              : "alkoxy";
-
-          substituents.push({
-            name: alkoxyName,
-            locant,
-          });
-        }
+        continue;
       }
 
-      const halogenPrefixes: Record<string, string> = {
-        F: "fluoro",
-        Cl: "chloro",
-        Br: "bromo",
-        I: "iodo",
-      };
+      if (atom.element === "S") {
+        substituents.push({
+          name: "sulfanyl",
+          locant,
+        });
 
-      const halogenName = halogenPrefixes[atom.element];
+        continue;
+      }
+
+      const halogenName = HALOGEN_PREFIXES[atom.element];
 
       if (halogenName) {
         substituents.push({
@@ -323,7 +407,6 @@ function shouldSkipSubstituentForParent(
   const other = parsedMol.atoms[otherAtom];
   if (!other) return false;
 
-  // Do not treat the anhydride bridge oxygen as alkoxy.
   if (other.element === "O") {
     const oxygenBonds = parsedMol.adjacency.get(otherAtom) ?? [];
 
@@ -368,19 +451,18 @@ export function formatSubstituents(substituents: Substituent[]) {
 
       const multiplier = getMultiplier(locants.length);
 
-      return `${locants.join(",")}-${multiplier}${name}`;
+      return {
+        text: `${locants.join(",")}-${multiplier}${name}`,
+        sortKey: getPrefixSortKey(name),
+        firstLocant: locants[0] ?? Number.POSITIVE_INFINITY,
+      };
     })
     .sort((a, b) => {
-      const cleanA = a
-        .replace(/^\d+(,\d+)*-/, "")
-        .replace(/^(di|tri|tetra|penta|hexa)/, "");
-
-      const cleanB = b
-        .replace(/^\d+(,\d+)*-/, "")
-        .replace(/^(di|tri|tetra|penta|hexa)/, "");
-
-      return cleanA.localeCompare(cleanB);
+      const alpha = a.sortKey.localeCompare(b.sortKey);
+      if (alpha !== 0) return alpha;
+      return a.firstLocant - b.firstLocant;
     })
+    .map((entry) => entry.text)
     .join("-");
 }
 

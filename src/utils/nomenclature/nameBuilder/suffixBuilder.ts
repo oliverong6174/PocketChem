@@ -6,13 +6,14 @@ import type {
   ParsedMol,
 } from "../types";
 
-import { getSimpleBenzeneDerivativeName } from "../aromaticNames";
-import { getParentStemWithUnsaturation } from "../parentSelection";
+import { getSimpleBenzeneDerivativeName } from "./aromaticNames";
+import { getParentStemWithUnsaturation } from "../graph/parentSelection";
 
 export function buildFunctionalGroupSuffixName(
   parsedMol: ParsedMol,
   parent: ParentDescriptor,
-  primaryGroup: FunctionalGroupResult | null
+  primaryGroup: FunctionalGroupResult | null,
+  primaryFeature: NamingFeature | null
 ) {
   if (!primaryGroup) return null;
   if (!parent.parentStem || !parent.parentHydrocarbon) return null;
@@ -20,22 +21,65 @@ export function buildFunctionalGroupSuffixName(
   const suffix = primaryGroup.suffix;
   if (!suffix || suffix.toLowerCase().includes("never suffix")) return null;
 
-  const parentStem = getParentStemWithUnsaturation(parsedMol, parent);
-  if (!parentStem) return null;
+  const saturatedStem = parent.parentStem;
+  const unsaturatedStem = getParentStemWithUnsaturation(parsedMol, parent);
+
+  if (!saturatedStem || !unsaturatedStem) return null;
 
   const cleanSuffix = suffix.replace(/^-/, "");
 
-  if (cleanSuffix === "oic anhydride") return `${parentStem}oic anhydride`;
-  if (cleanSuffix === "oic acid") return `${parentStem}oic acid`;
-  if (cleanSuffix === "oate") return `${parentStem}oate`;
-  if (cleanSuffix === "amide") return `${parentStem}amide`;
-  if (cleanSuffix === "nitrile") return `${parent.parentHydrocarbon}nitrile`;
-  if (cleanSuffix === "thiol") return `${parentStem}-1-thiol`;
-  if (cleanSuffix === "ol") return `${parentStem}-1-ol`;
-  if (cleanSuffix === "amine") return `${parentStem}-1-amine`;
-
-  return `${parentStem}${cleanSuffix}`;
+if (cleanSuffix === "ane" || cleanSuffix === "ene" || cleanSuffix === "yne") {
+  return parent.parentHydrocarbon;
 }
+
+  if (cleanSuffix === "oic anhydride") return `${unsaturatedStem}oic anhydride`;
+  if (cleanSuffix === "oic acid") return `${unsaturatedStem}oic acid`;
+  if (cleanSuffix === "oate") return `${unsaturatedStem}oate`;
+  if (cleanSuffix === "amide") return `${unsaturatedStem}amide`;
+  if (cleanSuffix === "nitrile") return `${parent.parentHydrocarbon}nitrile`;
+
+  if (
+    primaryFeature &&
+    ["one", "ol", "thiol", "amine"].includes(cleanSuffix)
+  ) {
+    return buildLocantedSuffix(
+      unsaturatedStem,
+      primaryFeature.locants,
+      cleanSuffix
+    );
+  }
+
+  if (
+    primaryFeature &&
+    ["one", "ol", "thiol", "amine"].includes(cleanSuffix)
+  ) {
+    return buildLocantedSuffix(
+      saturatedStem,
+      primaryFeature.locants,
+      cleanSuffix
+    );
+  } 
+
+  return `${unsaturatedStem}${cleanSuffix}`;
+}
+
+function buildLocantedSuffix(
+  parentStem: string,
+  locants: number[],
+  suffix: string
+) {
+  if (locants.length === 0) return `${parentStem}${suffix}`;
+
+  const multiplier = getMultiplier(locants.length);
+
+  if (locants.length === 1) {
+    return `${parentStem}-${locants[0]}-${suffix}`;
+  }
+
+  return `${parentStem}-${locants.join(",")}-${multiplier}${suffix}`;
+}
+  
+
 
 export function buildSuffixName(
   parsedMol: ParsedMol,
@@ -44,6 +88,9 @@ export function buildSuffixName(
 ) {
   if (!parent.parentStem || !parent.parentHydrocarbon) return null;
   if (!primaryFeature) return parent.parentHydrocarbon;
+  if (primaryFeature.type === "alkene" || primaryFeature.type === "alkyne") {
+    return parent.parentHydrocarbon;
+  }
 
   const parentStem = getParentStemWithUnsaturation(parsedMol, parent);
   if (!parentStem) return null;
