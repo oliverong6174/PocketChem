@@ -1,9 +1,12 @@
+import type { FunctionalGroupResult } from "../../functionalGroups/types";
+
 import type {
   ParentDescriptor,
   ParsedMol,
   RingDescriptor,
 } from "../types";
 
+import { getHydroxyBearingCarbon } from "../heteroAtomClassifiers";
 
 import { CHAIN_PREFIXES } from "../constants";
 import { getOtherAtom } from "../molParser";
@@ -14,19 +17,41 @@ export function isAldehydeCarbon(parsedMol: ParsedMol, carbonIndex: number) {
 
   const bonds = parsedMol.adjacency.get(carbonIndex) ?? [];
 
-  const hasCarbonylOxygen = bonds.some((bond) => {
+  const carbonylOxygenBond = bonds.find((bond) => {
     const otherAtom = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
     return otherAtom?.element === "O" && bond.bondOrder === 2;
   });
 
-  if (!hasCarbonylOxygen) return false;
+  if (!carbonylOxygenBond) return false;
 
   const carbonNeighborCount = bonds.filter((bond) => {
     const otherAtom = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
     return otherAtom?.element === "C";
   }).length;
 
-  return carbonNeighborCount <= 1;
+  const hasSingleBondedHeteroAcylSubstituent = bonds.some((bond) => {
+    if (bond === carbonylOxygenBond) return false;
+    if (bond.bondOrder !== 1) return false;
+
+    const otherAtom = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
+
+    return (
+      otherAtom?.element === "O" ||
+      otherAtom?.element === "N" ||
+      otherAtom?.element === "S" ||
+      otherAtom?.element === "F" ||
+      otherAtom?.element === "Cl" ||
+      otherAtom?.element === "Br" ||
+      otherAtom?.element === "I"
+    );
+  });
+
+  if (hasSingleBondedHeteroAcylSubstituent) return false;
+
+  const bondOrderSum = bonds.reduce((sum, bond) => sum + bond.bondOrder, 0);
+  const implicitHydrogenCount = Math.max(0, Math.round(4 - bondOrderSum));
+
+  return carbonNeighborCount <= 1 && implicitHydrogenCount > 0;
 }
 
 export function isKetoneCarbon(parsedMol: ParsedMol, carbonIndex: number) {
@@ -87,29 +112,176 @@ export function getAlcoholBearingCarbons(parsedMol: ParsedMol) {
   const alcoholCarbons: number[] = [];
 
   for (const oxygen of parsedMol.atoms.filter((atom) => atom.element === "O")) {
-    const bonds = parsedMol.adjacency.get(oxygen.atomIndex) ?? [];
+    const carbonIndex = getHydroxyBearingCarbon(
+      parsedMol,
+      oxygen.atomIndex
+    );
 
-    const carbonBond = bonds.find((bond) => {
-      const otherAtom = parsedMol.atoms[getOtherAtom(bond, oxygen.atomIndex)];
-      return otherAtom?.element === "C" && bond.bondOrder === 1;
-    });
-
-    if (!carbonBond) continue;
-
-    const carbonIndex = getOtherAtom(carbonBond, oxygen.atomIndex);
-    const carbonBonds = parsedMol.adjacency.get(carbonIndex) ?? [];
-
-    const isCarboxylicAcidOxygen = carbonBonds.some((bond) => {
-      const otherAtom = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
-      return otherAtom?.element === "O" && bond.bondOrder === 2;
-    });
-
-    if (!isCarboxylicAcidOxygen) {
+    if (carbonIndex !== null) {
       alcoholCarbons.push(carbonIndex);
     }
   }
 
   return Array.from(new Set(alcoholCarbons));
+}
+
+function getHeteroatomAttachedCarbons(
+  parsedMol: ParsedMol,
+  element: "N" | "O" | "S"
+) {
+  const carbons: number[] = [];
+
+  for (const heteroAtom of parsedMol.atoms.filter(
+    (atom) => atom.element === element
+  )) {
+    for (const bond of parsedMol.adjacency.get(heteroAtom.atomIndex) ?? []) {
+      if (bond.bondOrder !== 1) continue;
+
+      const carbonIndex = getOtherAtom(bond, heteroAtom.atomIndex);
+      const carbon = parsedMol.atoms[carbonIndex];
+
+      if (carbon?.element === "C") {
+        carbons.push(carbonIndex);
+      }
+    }
+  }
+
+  return Array.from(new Set(carbons));
+}
+
+export function getThiolBearingCarbons(parsedMol: ParsedMol) {
+  return getHeteroatomAttachedCarbons(parsedMol, "S");
+}
+
+export function getAmineBearingCarbons(parsedMol: ParsedMol) {
+  const carbons: number[] = [];
+
+  for (const nitrogen of parsedMol.atoms.filter(
+    (atom) => atom.element === "N"
+  )) {
+    const bonds = parsedMol.adjacency.get(nitrogen.atomIndex) ?? [];
+
+    // Nitriles, imines, etc. should not be treated as simple amine suffixes.
+    if (bonds.some((bond) => bond.bondOrder > 1)) continue;
+
+    const attachedToCarbonyl = bonds.some((bond) => {
+      const carbonIndex = getOtherAtom(bond, nitrogen.atomIndex);
+      const carbon = parsedMol.atoms[carbonIndex];
+
+      if (carbon?.element !== "C") return false;
+
+      return (parsedMol.adjacency.get(carbonIndex) ?? []).some(
+        (candidate) => {
+          const attached = parsedMol.atoms[
+            getOtherAtom(candidate, carbonIndex)
+          ];
+
+          return attached?.element === "O" && candidate.bondOrder === 2;
+        }
+      );
+    });
+
+    if (attachedToCarbonyl) continue;
+
+    for (const bond of bonds) {
+      if (bond.bondOrder !== 1) continue;
+
+      const carbonIndex = getOtherAtom(bond, nitrogen.atomIndex);
+      const carbon = parsedMol.atoms[carbonIndex];
+
+      if (carbon?.element === "C") {
+        carbons.push(carbonIndex);
+      }
+    }
+  }
+
+  return Array.from(new Set(carbons));
+}
+
+export function getKetoneBearingCarbons(parsedMol: ParsedMol) {
+  return parsedMol.atoms
+    .filter((atom) => atom.element === "C")
+    .map((atom) => atom.atomIndex)
+    .filter((atomIndex) => isKetoneCarbon(parsedMol, atomIndex));
+}
+
+export function getAldehydeBearingCarbons(parsedMol: ParsedMol) {
+  return parsedMol.atoms
+    .filter((atom) => atom.element === "C")
+    .map((atom) => atom.atomIndex)
+    .filter((atomIndex) => isAldehydeCarbon(parsedMol, atomIndex));
+}
+
+export function getNitrileBearingCarbons(parsedMol: ParsedMol) {
+  const carbons: number[] = [];
+
+  for (const bond of parsedMol.bonds) {
+    if (bond.bondOrder !== 3) continue;
+
+    const atomA = parsedMol.atoms[bond.atomA];
+    const atomB = parsedMol.atoms[bond.atomB];
+
+    if (atomA?.element === "C" && atomB?.element === "N") {
+      carbons.push(bond.atomA);
+    }
+
+    if (atomB?.element === "C" && atomA?.element === "N") {
+      carbons.push(bond.atomB);
+    }
+  }
+
+  return Array.from(new Set(carbons));
+}
+
+export function getSuffixBearingCarbonCandidates(parsedMol: ParsedMol) {
+  return Array.from(
+    new Set([
+      ...getAlcoholBearingCarbons(parsedMol),
+      ...getThiolBearingCarbons(parsedMol),
+      ...getAmineBearingCarbons(parsedMol),
+      ...getKetoneBearingCarbons(parsedMol),
+      ...getAldehydeBearingCarbons(parsedMol),
+      ...getNitrileBearingCarbons(parsedMol),
+    ])
+  );
+}
+
+export function getParentCandidateAtomsForPrimaryGroup(
+  parsedMol: ParsedMol,
+  primaryGroup: FunctionalGroupResult | null
+) {
+  const suffix = primaryGroup?.suffix?.toLowerCase().replace(/^-/, "") ?? "";
+  const name = primaryGroup?.name?.toLowerCase() ?? "";
+
+  if (suffix.includes("thiol") || name.includes("thiol")) {
+    return getThiolBearingCarbons(parsedMol);
+  }
+
+  if (
+    suffix === "ol" ||
+    name.includes("alcohol") ||
+    name.includes("phenol")
+  ) {
+    return getAlcoholBearingCarbons(parsedMol);
+  }
+
+  if (suffix.includes("amine") || name.includes("amine")) {
+    return getAmineBearingCarbons(parsedMol);
+  }
+
+  if (suffix === "one" || name.includes("ketone")) {
+    return getKetoneBearingCarbons(parsedMol);
+  }
+
+  if (suffix === "al" || name.includes("aldehyde")) {
+    return getAldehydeBearingCarbons(parsedMol);
+  }
+
+  if (suffix.includes("nitrile") || name.includes("nitrile")) {
+    return getNitrileBearingCarbons(parsedMol);
+  }
+
+  return [];
 }
 
 export function getPathUnsaturationCount(parsedMol: ParsedMol, path: number[]) {
@@ -132,20 +304,35 @@ export function getPathUnsaturationCount(parsedMol: ParsedMol, path: number[]) {
   return count;
 }
 
-export function getBestNomenclatureCarbonPath(parsedMol: ParsedMol) {
+export function getBestNomenclatureCarbonPath(
+  parsedMol: ParsedMol,
+  preferredAtoms: number[] = []
+) {
   const carbonAtoms = parsedMol.atoms
     .filter((atom) => atom.element === "C")
     .map((atom) => atom.atomIndex);
 
-  const alcoholCarbons = new Set(getAlcoholBearingCarbons(parsedMol));
+  const preferredAtomSet = new Set(preferredAtoms);
+  const suffixCandidateAtoms = new Set(
+    getSuffixBearingCarbonCandidates(parsedMol)
+  );
 
   let bestPath: number[] = [];
 
-  const scoreAlcohols = (path: number[]) =>
-    path.filter((atomIndex) => alcoholCarbons.has(atomIndex)).length;
+  const scoreAtoms = (path: number[], atomSet: Set<number>) =>
+    path.filter((atomIndex) => atomSet.has(atomIndex)).length;
 
   const isBetterPath = (path: number[]) => {
     if (bestPath.length === 0) return true;
+
+    const atomsToPrioritize =
+      preferredAtomSet.size > 0 ? preferredAtomSet : suffixCandidateAtoms;
+
+    const pathPreferredAtoms = scoreAtoms(path, atomsToPrioritize);
+    const bestPreferredAtoms = scoreAtoms(bestPath, atomsToPrioritize);
+
+    if (pathPreferredAtoms > bestPreferredAtoms) return true;
+    if (pathPreferredAtoms < bestPreferredAtoms) return false;
 
     const pathUnsaturation = getPathUnsaturationCount(parsedMol, path);
     const bestUnsaturation = getPathUnsaturationCount(parsedMol, bestPath);
@@ -155,11 +342,6 @@ export function getBestNomenclatureCarbonPath(parsedMol: ParsedMol) {
 
     if (path.length > bestPath.length) return true;
     if (path.length < bestPath.length) return false;
-
-    const pathAlcohols = scoreAlcohols(path);
-    const bestAlcohols = scoreAlcohols(bestPath);
-
-    if (pathAlcohols > bestAlcohols) return true;
 
     return false;
   };
@@ -269,6 +451,12 @@ export function getParentStemWithUnsaturation(
   parsedMol: ParsedMol,
   parent: ParentDescriptor
 ) {
+  // Aromatic rings should stay retained aromatic parents.
+  // Do not turn benzene into hexa-1,3,5-triene / hexa-2,4-diene stems.
+  if (parent.kind === "ring" && parent.aromaticRing) {
+    return parent.parentStem;
+  }
+
   const prefix = CHAIN_PREFIXES[parent.carbonCount];
   if (!prefix) return parent.parentStem;
 
@@ -521,7 +709,9 @@ function isCarbonylCarbon(parsedMol: ParsedMol, atomIndex: number) {
   });
 }
 
-export function getBestAcylParentDescriptor(parsedMol: ParsedMol): ParentDescriptor | null {
+export function getBestAcylParentDescriptor(
+  parsedMol: ParsedMol
+): ParentDescriptor | null {
   const carbonylCarbons = parsedMol.atoms
     .filter((atom) => atom.element === "C")
     .map((atom) => atom.atomIndex)
@@ -529,8 +719,29 @@ export function getBestAcylParentDescriptor(parsedMol: ParsedMol): ParentDescrip
 
   let bestPath: number[] = [];
 
-  const dfs = (current: number, visited: Set<number>, path: number[]) => {
-    if (path.length > bestPath.length) {
+  const isBetterAcylPath = (path: number[]) => {
+    if (bestPath.length === 0) return true;
+
+    // Acyl/aldehyde parent chain must start at the carbonyl carbon.
+    // Then choose the longest chain, then the most unsaturation.
+    if (path.length > bestPath.length) return true;
+    if (path.length < bestPath.length) return false;
+
+    const pathUnsaturation = getPathUnsaturationCount(parsedMol, path);
+    const bestUnsaturation = getPathUnsaturationCount(parsedMol, bestPath);
+
+    if (pathUnsaturation > bestUnsaturation) return true;
+    if (pathUnsaturation < bestUnsaturation) return false;
+
+    return false;
+  };
+
+  const dfs = (
+    current: number,
+    visited: Set<number>,
+    path: number[]
+  ) => {
+    if (isBetterAcylPath(path)) {
       bestPath = [...path];
     }
 
@@ -566,6 +777,7 @@ export function getBestAcylParentDescriptor(parsedMol: ParsedMol): ParentDescrip
 
 export function getParentDescriptor(
   parsedMol: ParsedMol,
+  preferredAtoms: number[] = []
 ): ParentDescriptor {
   const ring = getSimpleCarbonRing(parsedMol);
 
@@ -588,7 +800,7 @@ export function getParentDescriptor(
 
   const carbonPath = orientPathForLowestUnsaturationLocants(
     parsedMol,
-    getBestNomenclatureCarbonPath(parsedMol)
+    getBestNomenclatureCarbonPath(parsedMol, preferredAtoms)
   );
 
   const prefix = CHAIN_PREFIXES[carbonPath.length];

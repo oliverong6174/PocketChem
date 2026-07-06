@@ -1,5 +1,4 @@
 import type { ParsedMol } from "../types.ts";
-import type { BranchSubstituent } from "./branchTypes.ts";
 
 import { CHAIN_PREFIXES } from "../constants.ts";
 
@@ -9,11 +8,11 @@ import { formatBranchSubstituents } from "./branchPrefixes";
 import {
   collectBranchCarbons,
   getLongestBranchParentPath,
-  orientBranchPathForAttachment,
 } from "./branchSelection.ts";
 
 import {
   detectBranchInternalSubstituents,
+  getBranchSubstituentBearingAtoms,
   getBranchUnsaturation,
 } from "./branchFeatures.ts";
 
@@ -73,7 +72,21 @@ export function buildBranchName(
     startAtom
   );
 
-  branchPath = orientBranchPathForNaming(parsedMol, branchPath, startAtom);
+  const ignoredAtoms = new Set<number>([blockedAtom]);
+
+  const substituentBearingAtoms = getBranchSubstituentBearingAtoms(
+    parsedMol,
+    branchAtoms,
+    branchPath,
+    ignoredAtoms
+  );
+
+  branchPath = orientBranchPathForNaming(
+    parsedMol,
+    branchPath,
+    startAtom,
+    substituentBearingAtoms
+  );
 
   const attachmentLocant = branchPath.indexOf(startAtom) + 1;
 
@@ -83,16 +96,18 @@ export function buildBranchName(
     attachmentLocant
   );
 
-  const branchSubstituents = detectBranchInternalSubstituents(
+    const branchSubstituents = detectBranchInternalSubstituents(
     parsedMol,
     branchAtoms,
-    branchPath
+    branchPath,
+    ignoredAtoms
   );
-
   const prefixString = formatBranchSubstituents(branchSubstituents);
 
   return {
     carbonCount: branchAtoms.size,
+    path: branchPath,
+    attachmentLocant,
     name: prefixString ? `${prefixString}${baseName}` : baseName,
   };
 }

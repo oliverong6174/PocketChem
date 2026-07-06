@@ -1,6 +1,7 @@
 import type { FunctionalGroupResult } from "../../functionalGroups/types";
 import type { NamingFeature } from "../types";
 
+
 export type ParentStrategy = "hydrocarbon" | "acyl";
 
 export function groupHasUsableSuffix(group: FunctionalGroupResult): boolean {
@@ -103,4 +104,28 @@ export function shouldSuppressFeaturePrefixForPrimaryGroup(
   }
 
   return false;
+}
+
+export function getParentStrategy(
+  primaryGroup: FunctionalGroupResult | null
+): "default" | "acyl" {
+  const suffix = primaryGroup?.suffix?.toLowerCase().replace(/^-/, "") ?? "";
+  const name = primaryGroup?.name?.toLowerCase() ?? "";
+
+  if (
+    suffix === "al" ||
+    suffix === "oic acid" ||
+    suffix === "oate" ||
+    suffix === "amide" ||
+    suffix.includes("nitrile") ||
+    name.includes("aldehyde") ||
+    name.includes("carboxylic acid") ||
+    name.includes("ester") ||
+    name.includes("amide") ||
+    name.includes("nitrile")
+  ) {
+    return "acyl";
+  }
+
+  return "default";
 }

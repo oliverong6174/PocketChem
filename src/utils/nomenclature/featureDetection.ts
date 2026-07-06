@@ -6,8 +6,10 @@ import type {
   ParsedMol,
 } from "./types";
 
-import { CHAIN_PREFIXES, COMMON_VALENCES } from "./constants";
+import { COMMON_VALENCES } from "./constants";
 import { getOtherAtom } from "./molParser";
+import { buildBranchName } from "./branch/branchConstructor";
+import { getHydroxyBearingCarbon } from "./heteroAtomClassifiers";
 
 import {
   getLocantMap,
@@ -83,77 +85,16 @@ export function getFeatureLocantsFromCarbonIndexes(
     .sort((a, b) => a - b);
 }
 
-export function getAlkylSubtreeInfo(
-  parsedMol: ParsedMol,
-  startAtom: number,
-  blockedAtom: number
-) {
-  const visited = new Set<number>();
-  const path: number[] = [];
-
-  const dfs = (atomIndex: number) => {
-    if (visited.has(atomIndex)) return;
-    visited.add(atomIndex);
-
-    const atom = parsedMol.atoms[atomIndex];
-    if (!atom || atom.element !== "C") return;
-
-    path.push(atomIndex);
-
-    for (const bond of parsedMol.adjacency.get(atomIndex) ?? []) {
-      const next = getOtherAtom(bond, atomIndex);
-
-      if (next === blockedAtom) continue;
-
-      const nextAtom = parsedMol.atoms[next];
-
-      if (nextAtom?.element === "C") {
-        dfs(next);
-      }
-    }
-  };
-
-  dfs(startAtom);
-
-  const doubleLocants: number[] = [];
-
-  for (let i = 0; i < path.length - 1; i++) {
-    const bond = parsedMol.bonds.find(
-      (candidate) =>
-        (candidate.atomA === path[i] && candidate.atomB === path[i + 1]) ||
-        (candidate.atomB === path[i] && candidate.atomA === path[i + 1])
-    );
-
-    if (bond?.bondOrder === 2) {
-      doubleLocants.push(i + 1);
-    }
+function getAlkoxyNameFromAlkylName(alkylName: string) {
+  if (/^[a-z]+yl$/.test(alkylName)) {
+    return alkylName.replace(/yl$/, "oxy");
   }
 
-  return {
-    carbonCount: path.length,
-    doubleLocants,
-  };
-}
-
-export function getSimpleAlkylName(
-  carbonCount: number,
-  doubleLocants: number[] = []
-) {
-  const prefix = CHAIN_PREFIXES[carbonCount];
-
-  if (!prefix) return "alkyl";
-
-  if (doubleLocants.length === 1) {
-    const locant = doubleLocants[0];
-    return `${prefix}-${locant}-enyl`;
+  if (alkylName.endsWith("yl")) {
+    return `${alkylName}oxy`;
   }
 
-  if (carbonCount === 1) return "methyl";
-  if (carbonCount === 2) return "ethyl";
-  if (carbonCount === 3) return "propyl";
-  if (carbonCount === 4) return "butyl";
-
-  return `${prefix}yl`;
+  return "alkoxy";
 }
 
 export function getEsterGroups(parsedMol: ParsedMol, parent?: ParentDescriptor) {
@@ -205,11 +146,11 @@ export function getEsterGroups(parsedMol: ParsedMol, parent?: ParentDescriptor) 
 
     const alkylCarbonIndex = getOtherAtom(alkylCarbonBond, oxygenIndex);
 
-    const alkylInfo = getAlkylSubtreeInfo(
+    const alkylName = buildBranchName(
       parsedMol,
       alkylCarbonIndex,
       oxygenIndex
-    );
+    ).name;
 
     const attachmentCarbonBond = bonds.find((bond) => {
       const other = getOtherAtom(bond, carbon.atomIndex);
@@ -222,18 +163,8 @@ export function getEsterGroups(parsedMol: ParsedMol, parent?: ParentDescriptor) 
 
     esters.push({
       carbonIndex: carbon.atomIndex,
-      alkylName: getSimpleAlkylName(
-        alkylInfo.carbonCount,
-        alkylInfo.doubleLocants
-      ),
-      alkoxyName:
-        alkylInfo.carbonCount === 1
-          ? "methoxy"
-          : alkylInfo.carbonCount === 2
-          ? "ethoxy"
-          : alkylInfo.carbonCount === 3
-          ? "propoxy"
-          : "alkoxy",
+      alkylName,
+      alkoxyName: getAlkoxyNameFromAlkylName(alkylName),
       attachmentLocant: locantMap.get(attachmentCarbonIndex) ?? 1,
     });
   }
@@ -241,32 +172,26 @@ export function getEsterGroups(parsedMol: ParsedMol, parent?: ParentDescriptor) 
   return esters;
 }
 
-export function getAlcoholLocants(parsedMol: ParsedMol, parent: ParentDescriptor) {
+export function getAlcoholLocants(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor
+) {
   const locantMap = getLocantMap(parent);
   const locants: number[] = [];
 
   for (const oxygen of parsedMol.atoms.filter((atom) => atom.element === "O")) {
-    const bonds = parsedMol.adjacency.get(oxygen.atomIndex) ?? [];
+    const carbonIndex = getHydroxyBearingCarbon(
+      parsedMol,
+      oxygen.atomIndex
+    );
 
-    const singleCarbonBond = bonds.find((bond) => {
-      const otherAtom = parsedMol.atoms[getOtherAtom(bond, oxygen.atomIndex)];
-      return otherAtom?.element === "C" && bond.bondOrder === 1;
-    });
-
-    if (!singleCarbonBond) continue;
-
-    const carbonIndex = getOtherAtom(singleCarbonBond, oxygen.atomIndex);
-    const carbonBonds = parsedMol.adjacency.get(carbonIndex) ?? [];
-
-    const carbonAlsoHasCarbonylOxygen = carbonBonds.some((bond) => {
-      const otherAtom = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
-      return otherAtom?.element === "O" && bond.bondOrder === 2;
-    });
-
-    if (carbonAlsoHasCarbonylOxygen) continue;
+    if (carbonIndex === null) continue;
 
     const locant = locantMap.get(carbonIndex);
-    if (locant) locants.push(locant);
+
+    if (locant) {
+      locants.push(locant);
+    }
   }
 
   return locants.sort((a, b) => a - b);
@@ -510,12 +435,18 @@ export function detectNamingFeatures(
     });
 
     for (const ester of esterGroups) {
+      const esterLocants = getFeatureLocantsFromCarbonIndexes(parent, [
+        ester.carbonIndex,
+      ]);
+
+      if (esterLocants.length === 0) continue;
+
       features.push({
         type: "ester",
-        locants: [ester.attachmentLocant],
+        locants: esterLocants,
         suffix: "oate",
-        prefix: `${ester.alkoxyName}carbonyl`,
-        priority: 5,
+        prefix: "alkoxycarbonyl",
+        priority: 1,
         alkylName: ester.alkylName,
       });
     }

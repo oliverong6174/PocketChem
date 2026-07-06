@@ -104,7 +104,7 @@
     //useState calls
     const [smiles, setSmiles] = useState("Not analyzed yet");
     const [status, setStatus] = useState("Draw a molecule first");
-    const [mainGroup, setMainGroup] = useState<FunctionalGroupResult | null>(
+    const [, setMainGroup] = useState<FunctionalGroupResult | null>(
       null
     );
     const [functionalGroups, setFunctionalGroups] = useState<

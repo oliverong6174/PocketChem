@@ -72,7 +72,7 @@ export const chargedGroups: FunctionalGroupPattern[] = [
   },
   {
     name: "Carboxylate",
-    category: "ion",
+    category: "functionalGroup",
     priority: 0.3,
     nomenclaturePriority: 0.3,
     confidence: "High",
@@ -82,6 +82,7 @@ export const chargedGroups: FunctionalGroupPattern[] = [
     displaySmarts: "[CX3](=[OX1])[O-]",
     mcatNote:
       "Carboxylates are resonance-stabilized conjugate bases of carboxylic acids.",
+    
   },
 
   // =========================

@@ -85,7 +85,7 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     mcatNote:
       "Enoic acids are α,β-unsaturated carboxylic acids. They combine carboxylic acid acidity with conjugated alkene reactivity.",
     displaySmarts: "[#6]=[#6][CX3](=O)[OX2H]",
-    category: "motif",
+    category: "functionalGroup",
     },
   {
     name: "Crotonic acid",
@@ -169,7 +169,7 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     mcatNote:
       "Enamides are α,β-unsaturated amides. They combine amide resonance with conjugated alkene reactivity.",
     displaySmarts: "[#6]=[#6][CX3](=O)[NX3]",
-    category: "motif",
+    category: "functionalGroup",
     },
   {
     name: "Enoate",
@@ -183,6 +183,19 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     mcatNote:
       "Enoates are α,β-unsaturated esters. They are Michael acceptors and are common in conjugate addition chemistry.",
     displaySmarts: "[#6]=[#6][CX3](=O)[OX2][#6]",
-    category: "motif",
+    category: "functionalGroup",
     },
+    {
+    name: "Enamine",
+    priority: 12.2,
+    nomenclaturePriority: 12.2,
+    confidence: "High",
+    suffix: "enamine",
+    prefix: "amino",
+    smarts: "[NX3][CX3]=[CX3]",
+    displaySmarts: "[NX3][CX3]=[CX3]",
+    mcatNote:
+      "Enamines contain an amine directly attached to an alkene carbon. They are the nitrogen analogs of enols and are important intermediates in enamine and Stork chemistry.",
+    category: "functionalGroup",
+  },
 ];

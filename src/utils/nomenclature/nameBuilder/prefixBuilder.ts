@@ -45,8 +45,11 @@ export function buildFeaturePrefixEntries(
 ): PrefixEntry[] {
   return features
     .filter((feature) => {
-      if (feature === primaryFeature) return false;
       if (!feature.prefix) return false;
+
+      if (isSameFeatureAsPrimary(feature, primaryFeature)) {
+        return false;
+      }
 
       return !shouldSuppressFeaturePrefixForPrimaryGroup(
         feature,
@@ -58,6 +61,28 @@ export function buildFeaturePrefixEntries(
       sortKey: getPrefixSortKey(feature.prefix),
       firstLocant: feature.locants[0] ?? Number.POSITIVE_INFINITY,
     }));
+}
+
+function isSameFeatureAsPrimary(
+  feature: NamingFeature,
+  primaryFeature: NamingFeature | null
+) {
+  if (!primaryFeature) return false;
+
+  if (feature === primaryFeature) return true;
+
+  if (feature.type !== primaryFeature.type) return false;
+
+  return sameLocants(feature.locants, primaryFeature.locants);
+}
+
+function sameLocants(a: number[], b: number[]) {
+  if (a.length !== b.length) return false;
+
+  const sortedA = [...a].sort((x, y) => x - y);
+  const sortedB = [...b].sort((x, y) => x - y);
+
+  return sortedA.every((value, index) => value === sortedB[index]);
 }
 
 export function buildSubstituentPrefixEntries(
@@ -88,8 +113,30 @@ function groupSubstituents(substituents: Substituent[]) {
 }
 
 function formatSubstituentGroup(group: SubstituentGroup) {
-  const multiplier = getMultiplier(group.locants.length);
-  return `${group.locants.join(",")}-${multiplier}${group.name}`;
+  const isComplex = isComplexSubstituentName(group.name);
+  const multiplier = isComplex
+    ? getComplexSubstituentMultiplier(group.locants.length)
+    : getMultiplier(group.locants.length);
+  const name = isComplex ? `(${group.name})` : group.name;
+
+  return `${group.locants.join(",")}-${multiplier}${name}`;
+}
+
+function isComplexSubstituentName(name: string) {
+  // Parenthesize only substituent names that contain their own locants or
+  // punctuation. Do not classify simple prefixes like sulfanyl, hydroxy,
+  // amino, chloro, etc. as complex merely because their spelling contains
+  // the letters "yl".
+  return name.includes("-") || name.includes(",") || name.includes("(");
+}
+
+function getComplexSubstituentMultiplier(count: number) {
+  if (count === 2) return "bis";
+  if (count === 3) return "tris";
+  if (count === 4) return "tetrakis";
+  if (count === 5) return "pentakis";
+  if (count === 6) return "hexakis";
+  return "";
 }
 
 export function formatFeaturePrefix(feature: NamingFeature) {

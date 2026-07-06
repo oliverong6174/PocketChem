@@ -129,6 +129,9 @@ const COMMON_NAME_MAP: Record<string, string> = {
     "benzene-1,3-diol": "resorcinol",
     "benzene-1,4-diol": "hydroquinone",
     "benzene-1,2,3-triol": "pyrogallol",
+    "2-nitrophenol": "o-nitrophenol",
+    "3-nitrophenol": "m-nitrophenol",
+    "4-nitrophenol": "p-nitrophenol",
 
     // ----------------------------
     // Ethers
@@ -139,6 +142,14 @@ const COMMON_NAME_MAP: Record<string, string> = {
     "ethoxyethane": "diethyl ether",
     "methoxyethane": "methyl ethyl ether",
     "2-methoxy-2-methylpropane": "MTBE",
+
+        // Glycol ethers / polyether alcohols
+    "2-(2-hydroxyethoxy)ethan-1-ol": "diethylene glycol",
+    "2-(2-hydroxyethoxy)ethanol": "diethylene glycol",
+    "2,2'-oxydiethanol": "diethylene glycol",
+    "2,2-oxydiethanol": "diethylene glycol",
+    "2,2'-oxybis(ethan-1-ol)": "diethylene glycol",
+    "2,2-oxybis(ethan-1-ol)": "diethylene glycol",
 
     // ----------------------------
     // Amines

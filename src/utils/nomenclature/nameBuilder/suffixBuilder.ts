@@ -28,27 +28,34 @@ export function buildFunctionalGroupSuffixName(
 
   const cleanSuffix = suffix.replace(/^-/, "");
 
+    if (parent.kind === "ring" && parent.aromaticRing) {
+    const aromaticName = buildAromaticFunctionalGroupName(
+      primaryGroup,
+      primaryFeature,
+      cleanSuffix
+    );
+
+    if (aromaticName) return aromaticName;
+  }
+
 if (cleanSuffix === "ane" || cleanSuffix === "ene" || cleanSuffix === "yne") {
   return parent.parentHydrocarbon;
 }
+  
+  if (primaryFeature && shouldUseDetectedFeatureSuffix(primaryFeature)) {
+    return buildPrimarySuffixName(
+      unsaturatedStem,
+      parent,
+      primaryFeature
+    );
+  }
 
   if (cleanSuffix === "oic anhydride") return `${unsaturatedStem}oic anhydride`;
   if (cleanSuffix === "oic acid") return `${unsaturatedStem}oic acid`;
   if (cleanSuffix === "oate") return `${unsaturatedStem}oate`;
   if (cleanSuffix === "amide") return `${unsaturatedStem}amide`;
   if (cleanSuffix === "nitrile") return `${parent.parentHydrocarbon}nitrile`;
-
-  if (
-    primaryFeature &&
-    ["one", "ol", "thiol", "amine"].includes(cleanSuffix)
-  ) {
-    return buildLocantedSuffix(
-      unsaturatedStem,
-      primaryFeature.locants,
-      cleanSuffix
-    );
-  }
-
+  
   if (
     primaryFeature &&
     ["one", "ol", "thiol", "amine"].includes(cleanSuffix)
@@ -61,6 +68,17 @@ if (cleanSuffix === "ane" || cleanSuffix === "ene" || cleanSuffix === "yne") {
   } 
 
   return `${unsaturatedStem}${cleanSuffix}`;
+}
+
+function shouldUseDetectedFeatureSuffix(feature: NamingFeature) {
+  return (
+    feature.type === "ester" ||
+    feature.type === "carboxylicAcid" ||
+    feature.type === "amide" ||
+    feature.type === "acidChloride" ||
+    feature.type === "aldehyde" ||
+    feature.type === "nitrile"
+  );
 }
 
 function buildLocantedSuffix(
@@ -186,3 +204,70 @@ export function getMultiplier(count: number) {
   if (count === 6) return "hexa";
   return "";
 }
+
+function buildAromaticFunctionalGroupName(
+  primaryGroup: FunctionalGroupResult,
+  primaryFeature: NamingFeature | null,
+  cleanSuffix: string
+) {
+  const groupName = primaryGroup.name.toLowerCase();
+
+  if (
+    cleanSuffix === "phenol" ||
+    groupName.includes("phenol") ||
+    (primaryFeature?.type === "alcohol" && cleanSuffix === "ol")
+  ) {
+    return "phenol";
+  }
+
+  if (
+    cleanSuffix === "aniline" ||
+    groupName.includes("aniline") ||
+    (primaryFeature?.type === "amine" && cleanSuffix === "amine")
+  ) {
+    return "aniline";
+  }
+
+  if (
+    cleanSuffix === "thiophenol" ||
+    groupName.includes("thiophenol") ||
+    (primaryFeature?.type === "thiol" && cleanSuffix === "thiol")
+  ) {
+    return "thiophenol";
+  }
+
+  if (
+    cleanSuffix === "benzaldehyde" ||
+    groupName.includes("benzaldehyde") ||
+    primaryFeature?.type === "aldehyde"
+  ) {
+    return "benzaldehyde";
+  }
+
+  if (
+    cleanSuffix === "benzamide" ||
+    groupName.includes("benzamide") ||
+    primaryFeature?.type === "amide"
+  ) {
+    return "benzamide";
+  }
+
+  if (
+    cleanSuffix === "benzonitrile" ||
+    groupName.includes("benzonitrile") ||
+    primaryFeature?.type === "nitrile"
+  ) {
+    return "benzonitrile";
+  }
+
+  if (
+    cleanSuffix === "benzoic acid" ||
+    groupName.includes("benzoic acid") ||
+    primaryFeature?.type === "carboxylicAcid"
+  ) {
+    return "benzoic acid";
+  }
+
+  return null;
+}
+

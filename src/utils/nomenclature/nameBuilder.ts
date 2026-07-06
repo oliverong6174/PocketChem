@@ -21,14 +21,17 @@ import { buildCombinedPrefixString } from "./nameBuilder/prefixBuilder";
 
 
 import {
+  getParentCandidateAtomsForPrimaryGroup,
   getParentDescriptor,
   getBestAcylParentDescriptor,
 } from "./graph/parentSelection";
 
+import { detectNamingFeatures } from "./featureDetection";
+
 import {
-  detectNamingFeatures,
-  getCarboxylicAcidCarbons,
-} from "./featureDetection";
+  getAromaticSuffixContext,
+  orientAromaticParentForSuffix,
+} from "./nameBuilder/ringNomenclature";
 
 import {
   detectSubstituents,
@@ -50,39 +53,69 @@ export function buildEstimatedIupacName(
   functionalGroups: FunctionalGroupResult[] = [],
   mainGroup: FunctionalGroupResult | null = null
 ): EstimatedIupacResult | null {
-  const defaultParent = getParentDescriptor(parsedMol);
-  const primaryGroup = getPrimaryFunctionalGroup(functionalGroups, mainGroup);
+    const primaryGroup = getPrimaryFunctionalGroup(functionalGroups, mainGroup);
 
-  const unorientedParent =
-    getParentStrategy(primaryGroup) === "acyl"
-      ? getBestAcylParentDescriptor(parsedMol) ?? defaultParent
-      : defaultParent;
+    const preferredParentAtoms = getParentCandidateAtomsForPrimaryGroup(
+      parsedMol,
+      primaryGroup
+    );
 
-  const parent = orientParentForPrimaryGroup(
-    parsedMol,
-    unorientedParent,
-    primaryGroup
-  );
+    const defaultParent = getParentDescriptor(
+      parsedMol,
+      preferredParentAtoms
+    );
 
-  const features = detectNamingFeatures(parsedMol, parent);
-  const primaryFeature = features[0] ?? null;
-  const substituents = detectSubstituents(parsedMol, parent);
+    const aromaticSuffixContext = getAromaticSuffixContext(
+      parsedMol,
+      defaultParent,
+      primaryGroup
+    );
 
-  const aromaticAcidOverride = getAromaticAcidOverride(
-    parsedMol,
-    parent,
-    features
-  );
+    const unorientedParent =
+      aromaticSuffixContext
+        ? defaultParent
+        : getParentStrategy(primaryGroup) === "acyl"
+        ? getBestAcylParentDescriptor(parsedMol) ?? defaultParent
+        : defaultParent;
 
-  if (aromaticAcidOverride) return aromaticAcidOverride;
+    const parent = aromaticSuffixContext
+      ? orientAromaticParentForSuffix(
+          parsedMol,
+          unorientedParent,
+          aromaticSuffixContext
+        )
+      : orientParentForPrimaryGroup(
+          parsedMol,
+          unorientedParent,
+          primaryGroup
+        );
 
-  const suffixName =
-    buildFunctionalGroupSuffixName(
+    const finalAromaticSuffixContext = aromaticSuffixContext
+      ? getAromaticSuffixContext(parsedMol, parent, primaryGroup) ??
+        aromaticSuffixContext
+      : null;
+
+    const features = detectNamingFeatures(parsedMol, parent);
+
+    const primaryFeature =
+      finalAromaticSuffixContext?.primaryFeature ?? features[0] ?? null;
+
+    const substituents = detectSubstituents(
       parsedMol,
       parent,
-      primaryGroup,
-      primaryFeature
-    ) ?? buildSuffixName(parsedMol, parent, primaryFeature);
+      features,
+      finalAromaticSuffixContext?.representedExternalAtoms
+);
+
+    const suffixName =
+      finalAromaticSuffixContext?.suffixName ??
+      buildFunctionalGroupSuffixName(
+        parsedMol,
+        parent,
+        primaryGroup,
+        primaryFeature
+      ) ??
+      buildSuffixName(parsedMol, parent, primaryFeature);
 
   if (!suffixName) return null;
 
@@ -102,8 +135,8 @@ export function buildEstimatedIupacName(
   );
 
     const estimatedName =
-    aromaticCommonName ??
-    constructName([prefixString, suffixName]);
+      aromaticCommonName ??
+      constructFinalName(prefixString, suffixName, primaryFeature);
 
 
   return {
@@ -115,55 +148,68 @@ export function buildEstimatedIupacName(
   };
 }
 
-function getAromaticAcidOverride(
-  parsedMol: ParsedMol,
-  parent: ParentDescriptor,
-  features: NamingFeature[]
-): EstimatedIupacResult | null {
-  const aromaticAcidCarbonCount = parent.aromaticRing
-    ? getCarboxylicAcidCarbons(parsedMol).length
-    : 0;
-
-  if (!parent.aromaticRing || aromaticAcidCarbonCount === 0) return null;
-
-  const benzoicAcidFeature: NamingFeature = {
-    type: "carboxylicAcid",
-    locants: [1],
-    suffix: "oic acid",
-    prefix: "carboxy",
-    priority: 1,
-  };
-
-  return {
-    estimatedName: "benzoic acid",
-    parent,
-    features: [benzoicAcidFeature, ...features],
-    primaryFeature: benzoicAcidFeature,
-    substituents: [],
-  };
-}
-
 function getAromaticCommonName(
   parent: ParentDescriptor,
   substituents: Substituent[],
   primaryFeature: NamingFeature | null
 ) {
   if (!parent.aromaticRing) return null;
-  if (primaryFeature) return null;
 
-  if (substituents.length === 0) return "benzene";
+  const baseName = getAromaticBaseName(primaryFeature);
+
+  if (substituents.length === 0) {
+    return baseName;
+  }
 
   if (substituents.length === 1) {
     const sub = substituents[0];
 
-    if (sub.name === "methyl") return "toluene";
-    if (sub.name === "ethyl") return "ethylbenzene";
-    if (sub.name === "methoxy") return "anisole";
-    if (sub.name === "ethenyl" || sub.name === "vinyl") return "styrene";
-    if (sub.name === "propan-2-yl") return "cumene";
+    if (!primaryFeature) {
+      if (sub.name === "methyl") return "toluene";
+      if (sub.name === "ethyl") return "ethylbenzene";
+      if (sub.name === "methoxy") return "anisole";
+      if (sub.name === "ethenyl" || sub.name === "vinyl") return "styrene";
+      if (sub.name === "propan-2-yl") return "cumene";
+    }
 
-    return `${sub.name}benzene`;
+    return `${sub.locant}-${sub.name}${baseName}`;
   }
 
   return null;
+}
+
+function getAromaticBaseName(primaryFeature: NamingFeature | null) {
+  if (!primaryFeature) return "benzene";
+
+  if (primaryFeature.type === "alcohol") return "phenol";
+  if (primaryFeature.type === "amine") return "aniline";
+  if (primaryFeature.type === "thiol") return "thiophenol";
+  if (primaryFeature.type === "aldehyde") return "benzaldehyde";
+  if (primaryFeature.type === "amide") return "benzamide";
+  if (primaryFeature.type === "nitrile") return "benzonitrile";
+  if (primaryFeature.type === "carboxylicAcid") return "benzoic acid";
+
+  return "benzene";
+}
+
+function constructFinalName(
+  prefixString: string,
+  suffixName: string,
+  primaryFeature: NamingFeature | null
+) {
+  if (primaryFeature?.type === "ester" && primaryFeature.alkylName) {
+    const alkylPart = primaryFeature.alkylName;
+    const esterPrefix = `${alkylPart} `;
+
+    if (suffixName.startsWith(esterPrefix)) {
+      const acylPart = suffixName.slice(esterPrefix.length);
+
+      return `${alkylPart} ${constructName([
+        prefixString,
+        acylPart,
+      ])}`;
+    }
+  }
+
+  return constructName([prefixString, suffixName]);
 }

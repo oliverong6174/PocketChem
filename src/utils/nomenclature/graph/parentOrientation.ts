@@ -4,41 +4,9 @@ import type { ParentDescriptor, ParsedMol } from "../types";
 import { getOtherAtom } from "../molParser";
 
 import {
-  getAlcoholBearingCarbons,
   getChainUnsaturation,
+  getParentCandidateAtomsForPrimaryGroup,
 } from "./parentSelection";
-
-function getHeteroatomAttachedCarbons(parsedMol: ParsedMol, element: string) {
-  const carbons: number[] = [];
-
-  for (const atom of parsedMol.atoms) {
-    if (atom.element !== element) continue;
-
-    for (const bond of parsedMol.adjacency.get(atom.atomIndex) ?? []) {
-      const otherIndex = getOtherAtom(bond, atom.atomIndex);
-      const other = parsedMol.atoms[otherIndex];
-
-      if (other?.element === "C" && bond.bondOrder === 1) {
-        carbons.push(otherIndex);
-      }
-    }
-  }
-
-  return Array.from(new Set(carbons));
-}
-
-function getPrimaryGroupBearingAtoms(
-  parsedMol: ParsedMol,
-  primaryGroup: FunctionalGroupResult | null
-) {
-  const suffix = primaryGroup?.suffix?.toLowerCase() ?? "";
-
-  if (suffix.includes("thiol")) return getHeteroatomAttachedCarbons(parsedMol, "S");
-  if (suffix.includes("ol")) return getAlcoholBearingCarbons(parsedMol);
-  if (suffix.includes("amine")) return getHeteroatomAttachedCarbons(parsedMol, "N");
-
-  return [];
-}
 
 function getSubstituentBearingAtoms(parsedMol: ParsedMol, path: number[]) {
   const parentSet = new Set(path);
@@ -87,12 +55,20 @@ export function orientParentForPrimaryGroup(
   parent: ParentDescriptor,
   primaryGroup: FunctionalGroupResult | null
 ): ParentDescriptor {
+  
   if (parent.kind !== "chain") return parent;
+
+  if (isTerminalSuffixGroup(primaryGroup)) {
+  return parent;
+}
 
   const forwardPath = parent.path;
   const reversePath = [...parent.path].reverse();
 
-  const primaryAtoms = getPrimaryGroupBearingAtoms(parsedMol, primaryGroup);
+  const primaryAtoms = getParentCandidateAtomsForPrimaryGroup(
+  parsedMol,
+  primaryGroup
+);
 
   const forwardPrimaryLocants = getLocantsForAtoms(forwardPath, primaryAtoms);
   const reversePrimaryLocants = getLocantsForAtoms(reversePath, primaryAtoms);
@@ -156,4 +132,22 @@ function compareMultipleBondLocants(
 
   // Rule 3: then compare triple bonds
   return compareLocants(reverse.tripleLocants, forward.tripleLocants);
+}
+
+function isTerminalSuffixGroup(primaryGroup: FunctionalGroupResult | null) {
+  const suffix = primaryGroup?.suffix?.toLowerCase().replace(/^-/, "") ?? "";
+  const name = primaryGroup?.name?.toLowerCase() ?? "";
+
+  return (
+    suffix === "al" ||
+    suffix === "oic acid" ||
+    suffix === "oate" ||
+    suffix === "amide" ||
+    suffix.includes("nitrile") ||
+    name.includes("aldehyde") ||
+    name.includes("carboxylic acid") ||
+    name.includes("ester") ||
+    name.includes("amide") ||
+    name.includes("nitrile")
+  );
 }
