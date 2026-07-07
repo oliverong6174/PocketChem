@@ -1,6 +1,7 @@
 import type { FunctionalGroupResult } from "../../functionalGroups/types";
-import { isAcylSuffix } from "./nomenclatureRules";
+
+import { getNamingIntent } from "./namingIntent";
 
 export function getParentStrategy(group: FunctionalGroupResult | null) {
-  return isAcylSuffix(group?.suffix) ? "acyl" : "hydrocarbon";
+  return getNamingIntent(group).parentStrategy;
 }

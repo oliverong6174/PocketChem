@@ -116,7 +116,7 @@ export type NamingFeature = {
 
 export type Substituent = {
   name: string;
-  locant: number;
+  locant: number | string;
 };
 
 export type DescriptorMap = Record<string, unknown>;

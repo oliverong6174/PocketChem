@@ -84,6 +84,8 @@ const COMMON_NAME_MAP: Record<string, string> = {
     "4-hydroxybenzaldehyde": "p-hydroxybenzaldehyde",
     "2-oxopropanedial": "mesoxaldehyde",
 
+    "prop-2-enal": "acrolein",
+
     // ----------------------------
     // Ketones
     // ----------------------------
@@ -200,6 +202,10 @@ const COMMON_NAME_MAP: Record<string, string> = {
     "propanenitrile": "propionitrile",
     "butanenitrile": "butyronitrile",
     "benzenecarbonitrile": "benzonitrile",
+
+    "2-aminoethanenitrile": "aminoacetonitrile",
+    "aminoethanenitrile": "aminoacetonitrile",
+    "2-aminoacetonitrile": "aminoacetonitrile",
 
     // ----------------------------
     // Thiols / sulfur compounds

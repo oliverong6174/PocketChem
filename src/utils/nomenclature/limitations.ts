@@ -1,6 +1,7 @@
 import type {
   NamingFeature,
   ParentDescriptor,
+  Substituent,
 } from "./types";
 
 import { hasComplexSubstituent } from "./substituents";
@@ -8,7 +9,7 @@ import { hasComplexSubstituent } from "./substituents";
 export function buildLimitations(
   parent: ParentDescriptor,
   features: NamingFeature[],
-  substituents: { name: string; locant: number }[]
+  substituents: Substituent[]
 ): string[] {
   const limitations: string[] = [];
 

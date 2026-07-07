@@ -22,7 +22,7 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   "Tertiary amide",
   "Ester",
   "Ether"
-],
+  ],
   Ester: ["Ether"],
   "Acyl halide": ["Halogen", "Haloalkane"],
   Amide: ["Amine"],
@@ -172,6 +172,21 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Sulfoxide: ["Thioether"],
   Sulfone: ["Sulfoxide", "Thioether"],
   "Sulfonic acid": ["Sulfone"],
+    Thioester: ["Ester, Thioether"],
+  Thioamide: [
+    "Primary amide",
+    "Secondary amide",
+    "Tertiary amide",
+    "Amide",
+  ],
+    Sulfonamide: [
+    "Primary amide",
+    "Secondary amide",
+    "Tertiary amide",
+    "Amide",
+  ],
+  Thioketone: ["Ketone"],
+  Thioaldehyde: ["Aldehyde"],
 
   //Cycloalkanes
   Cyclopropane: ["Cycloalkane", "Alkane"],
@@ -204,10 +219,6 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Guanidine: ["Amidine", "Amine"],
   Urea: ["Amide"],
   "Hydroxamic acid": ["Amide"],
-  Thioester: ["Ester"],
-  Thioamide: ["Amide"],
-  Thioketone: ["Ketone"],
-  Thioaldehyde: ["Aldehyde"],
   "Phosphodiester": ["Phosphate"],
 
  

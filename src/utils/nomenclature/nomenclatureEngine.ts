@@ -39,23 +39,46 @@ import { buildLimitations } from "./limitations";
 
 import { detectAromaticMotifs } from "./motifs";
 
+function isMolBlockInput(input: string) {
+  return (
+    input.includes("M  END") ||
+    input.includes("V2000") ||
+    input.includes("V3000")
+  );
+}
+
+function normalizeMoleculeInput(input: string) {
+  const raw = input.trim();
+
+  if (isMolBlockInput(raw)) {
+    return raw;
+  }
+
+  return raw.replace(/\s+/g, "");
+}
 
 export async function analyzeNomenclatureAndProperties(
-  smiles: string,
+  moleculeInput: string,
   functionalGroups: FunctionalGroupResult[],
   mainGroup: FunctionalGroupResult | null
 ): Promise<MoleculeIdentityResult> {
   const RDKit = await getRDKit();
-  const cleanSmiles = smiles.replace(/\s+/g, "").trim();
 
-  console.log("SMILES received by nomenclature:", JSON.stringify(smiles));
+  const cleanInput = normalizeMoleculeInput(moleculeInput);
+  const inputKind = isMolBlockInput(cleanInput) ? "molblock" : "smiles";
 
-  const mol = RDKit.get_mol(cleanSmiles);
+  console.log("Molecule input received by nomenclature:", {
+    inputKind,
+    raw: moleculeInput,
+  });
+
+  const mol = RDKit.get_mol(cleanInput);
 
   if (!mol) {
-    console.error("Nomenclature RDKit failed for SMILES:", {
-      raw: smiles,
-      cleaned: cleanSmiles,
+    console.error("Nomenclature RDKit failed for molecule input:", {
+      inputKind,
+      raw: moleculeInput,
+      cleaned: cleanInput,
     });
 
     throw new Error(
@@ -106,10 +129,11 @@ function estimateNomenclature(
   mainGroup: FunctionalGroupResult | null
 ): NomenclatureResult {
   const namingResult = buildEstimatedIupacName(
-  parsedMol,
-  functionalGroups,
-  mainGroup
-);
+    parsedMol,
+    functionalGroups,
+    mainGroup
+  );
+
   const prefixes = getPrefixes(functionalGroups, mainGroup);
 
   if (!namingResult) {
@@ -134,12 +158,39 @@ function estimateNomenclature(
     };
   }
 
-  const { estimatedName, parent, features, primaryFeature, substituents } =
-    namingResult;
+  const estimatedName = namingResult.estimatedName ?? "Name not estimated yet";
+  const parent = namingResult.parent ?? null;
+  const features = namingResult.features ?? [];
+  const primaryFeature = namingResult.primaryFeature ?? null;
+  const substituents = namingResult.substituents ?? [];
 
   const commonName = getCommonName(estimatedName);
   const displayName = formatDisplayName(estimatedName, commonName);
   const motifs = detectAromaticMotifs(parsedMol);
+
+  if (!parent) {
+    return {
+      estimatedName,
+      commonName,
+      displayName,
+      namingConfidence: namingResult.confidence === "high"
+        ? "High"
+        : namingResult.confidence === "medium"
+        ? "Medium"
+        : "Low",
+      parentChain: null,
+      parentChainLength: 0,
+      mainSuffix: mainGroup?.suffix ?? (primaryFeature ? `-${primaryFeature.suffix}` : null),
+      prefixes,
+      motifs,
+      explanation:
+        namingResult.reason ??
+        "PocketChem estimated a name but could not resolve a parent chain or ring.",
+      limitations: [
+        "Parent-chain/ring resolution is incomplete for this structure.",
+      ],
+    };
+  }
 
   const lowerPriorityFeatures = features.filter(
     (feature) => feature !== primaryFeature
@@ -188,8 +239,6 @@ function estimateNomenclature(
         ? limitations
         : [
             "This is an estimated learning name, not a full IUPAC engine yet.",
-            "Common names are included for high-yield small molecules.",
-            "Next step: add full branch numbering, stereochemistry, and advanced ring naming.",
           ],
   };
 }

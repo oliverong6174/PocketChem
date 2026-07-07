@@ -2,6 +2,7 @@ import type { FunctionalGroupResult } from "../../functionalGroups/types";
 import type { ParentDescriptor, ParsedMol } from "../types";
 
 import { getOtherAtom } from "../molParser";
+import { getNamingIntent } from "../nameBuilder/namingIntent";
 
 import {
   getChainUnsaturation,
@@ -55,20 +56,19 @@ export function orientParentForPrimaryGroup(
   parent: ParentDescriptor,
   primaryGroup: FunctionalGroupResult | null
 ): ParentDescriptor {
-  
   if (parent.kind !== "chain") return parent;
 
-  if (isTerminalSuffixGroup(primaryGroup)) {
-  return parent;
-}
+  if (getNamingIntent(primaryGroup).terminalSuffix) {
+    return parent;
+  }
 
   const forwardPath = parent.path;
   const reversePath = [...parent.path].reverse();
 
   const primaryAtoms = getParentCandidateAtomsForPrimaryGroup(
-  parsedMol,
-  primaryGroup
-);
+    parsedMol,
+    primaryGroup
+  );
 
   const forwardPrimaryLocants = getLocantsForAtoms(forwardPath, primaryAtoms);
   const reversePrimaryLocants = getLocantsForAtoms(reversePath, primaryAtoms);
@@ -86,14 +86,20 @@ export function orientParentForPrimaryGroup(
     forwardPath,
     reversePath
   );
-  
+
   if (unsaturationComparison < 0) return { ...parent, path: reversePath };
   if (unsaturationComparison > 0) return { ...parent, path: forwardPath };
 
   const substituentAtoms = getSubstituentBearingAtoms(parsedMol, parent.path);
 
-  const forwardSubstituentLocants = getLocantsForAtoms(forwardPath, substituentAtoms);
-  const reverseSubstituentLocants = getLocantsForAtoms(reversePath, substituentAtoms);
+  const forwardSubstituentLocants = getLocantsForAtoms(
+    forwardPath,
+    substituentAtoms
+  );
+  const reverseSubstituentLocants = getLocantsForAtoms(
+    reversePath,
+    substituentAtoms
+  );
 
   return compareLocants(reverseSubstituentLocants, forwardSubstituentLocants) < 0
     ? { ...parent, path: reversePath }
@@ -118,11 +124,9 @@ function compareMultipleBondLocants(
   const forward = getMultipleBondLocants(parsedMol, forwardPath);
   const reverse = getMultipleBondLocants(parsedMol, reversePath);
 
-  // Rule 1: lowest set of locants for all multiple bonds
   const allComparison = compareLocants(reverse.all, forward.all);
   if (allComparison !== 0) return allComparison;
 
-  // Rule 2: if tied, double bonds get lower locants than triple bonds
   const doubleComparison = compareLocants(
     reverse.doubleLocants,
     forward.doubleLocants
@@ -130,24 +134,5 @@ function compareMultipleBondLocants(
 
   if (doubleComparison !== 0) return doubleComparison;
 
-  // Rule 3: then compare triple bonds
   return compareLocants(reverse.tripleLocants, forward.tripleLocants);
-}
-
-function isTerminalSuffixGroup(primaryGroup: FunctionalGroupResult | null) {
-  const suffix = primaryGroup?.suffix?.toLowerCase().replace(/^-/, "") ?? "";
-  const name = primaryGroup?.name?.toLowerCase() ?? "";
-
-  return (
-    suffix === "al" ||
-    suffix === "oic acid" ||
-    suffix === "oate" ||
-    suffix === "amide" ||
-    suffix.includes("nitrile") ||
-    name.includes("aldehyde") ||
-    name.includes("carboxylic acid") ||
-    name.includes("ester") ||
-    name.includes("amide") ||
-    name.includes("nitrile")
-  );
 }

@@ -10,6 +10,7 @@ import { COMMON_VALENCES } from "./constants";
 import { getOtherAtom } from "./molParser";
 import { buildBranchName } from "./branch/branchConstructor";
 import { getHydroxyBearingCarbon } from "./heteroAtomClassifiers";
+import { alkylNameToAlkoxyName } from "./alkoxyNames";
 
 import {
   getLocantMap,
@@ -40,6 +41,38 @@ function countImplicitHydrogens(
   );
 
   return Math.max(0, Math.round(expectedValence - bondOrderSum));
+}
+
+function carbonHasCarbonylOxygen(parsedMol: ParsedMol, carbonIndex: number) {
+  return (parsedMol.adjacency.get(carbonIndex) ?? []).some((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
+    return attached?.element === "O" && bond.bondOrder === 2;
+  });
+}
+
+function isAnhydrideBridgeOxygen(
+  parsedMol: ParsedMol,
+  oxygenIndex: number,
+  acylCarbonIndex: number
+) {
+  const carbonylCarbonNeighbors = (
+    parsedMol.adjacency.get(oxygenIndex) ?? []
+  )
+    .filter((bond) => bond.bondOrder === 1)
+    .map((bond) => getOtherAtom(bond, oxygenIndex))
+    .filter((atomIndex) => {
+      const atom = parsedMol.atoms[atomIndex];
+
+      return (
+        atom?.element === "C" &&
+        carbonHasCarbonylOxygen(parsedMol, atomIndex)
+      );
+    });
+
+  return (
+    carbonylCarbonNeighbors.includes(acylCarbonIndex) &&
+    carbonylCarbonNeighbors.length >= 2
+  );
 }
 
 export function getCarboxylicAcidCarbons(parsedMol: ParsedMol) {
@@ -85,18 +118,6 @@ export function getFeatureLocantsFromCarbonIndexes(
     .sort((a, b) => a - b);
 }
 
-function getAlkoxyNameFromAlkylName(alkylName: string) {
-  if (/^[a-z]+yl$/.test(alkylName)) {
-    return alkylName.replace(/yl$/, "oxy");
-  }
-
-  if (alkylName.endsWith("yl")) {
-    return `${alkylName}oxy`;
-  }
-
-  return "alkoxy";
-}
-
 export function getEsterGroups(parsedMol: ParsedMol, parent?: ParentDescriptor) {
   const esters: {
     carbonIndex: number;
@@ -134,6 +155,19 @@ export function getEsterGroups(parsedMol: ParsedMol, parent?: ParentDescriptor) 
 
     if (oxygenHasHydrogen) continue;
 
+    // Do not classify anhydrides as esters.
+    // Ester:      C(=O)-O-C
+    // Anhydride:  C(=O)-O-C(=O)
+    if (
+      isAnhydrideBridgeOxygen(
+        parsedMol,
+        oxygenIndex,
+        carbon.atomIndex
+      )
+    ) {
+      continue;
+    }
+
     const alkylCarbonBond = (parsedMol.adjacency.get(oxygenIndex) ?? []).find(
       (bond) => {
         const other = getOtherAtom(bond, oxygenIndex);
@@ -164,7 +198,7 @@ export function getEsterGroups(parsedMol: ParsedMol, parent?: ParentDescriptor) 
     esters.push({
       carbonIndex: carbon.atomIndex,
       alkylName,
-      alkoxyName: getAlkoxyNameFromAlkylName(alkylName),
+      alkoxyName: alkylNameToAlkoxyName(alkylName),
       attachmentLocant: locantMap.get(attachmentCarbonIndex) ?? 1,
     });
   }
@@ -416,6 +450,8 @@ export function detectNamingFeatures(
       acidHalide.carbonIndex,
     ]);
 
+    if (acidHalideLocants.length === 0) continue;
+
     features.push({
       type: "acidChloride",
       locants: acidHalideLocants,
@@ -455,6 +491,8 @@ export function detectNamingFeatures(
       const esterLocants = getFeatureLocantsFromCarbonIndexes(parent, [
         ester.carbonIndex,
       ]);
+
+      if (esterLocants.length === 0) continue;
 
       features.push({
         type: "ester",

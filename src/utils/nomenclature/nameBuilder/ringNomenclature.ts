@@ -11,6 +11,7 @@ import type {
 import { COMMON_VALENCES } from "../constants";
 import { getOtherAtom } from "../molParser";
 import { buildBranchName } from "../branch/branchConstructor";
+import { getNamingIntent } from "./namingIntent";
 
 export type AromaticSuffixContext = {
   suffixName: string;
@@ -40,10 +41,11 @@ export function getAromaticSuffixContext(
   if (!parent.aromaticRing) return null;
   if (!primaryGroup) return null;
 
-  const suffix = primaryGroup.suffix?.toLowerCase().replace(/^-/, "") ?? "";
-  const groupName = primaryGroup.name.toLowerCase();
+  const intent = getNamingIntent(primaryGroup);
 
-  if (suffix.includes("amide") || groupName.includes("amide")) {
+  if (!intent.aromaticRetainedParentAllowed) return null;
+
+  if (intent.featureType === "amide") {
     const match = findRingAttachedAcylGroup(parsedMol, parent, isAmideCarbon);
 
     if (match) {
@@ -56,10 +58,7 @@ export function getAromaticSuffixContext(
     }
   }
 
-  if (
-    suffix.includes("oic acid") ||
-    groupName.includes("carboxylic acid")
-  ) {
+  if (intent.featureType === "carboxylicAcid") {
     const match = findRingAttachedAcylGroup(
       parsedMol,
       parent,
@@ -76,11 +75,7 @@ export function getAromaticSuffixContext(
     }
   }
 
-  if (
-    suffix.includes("oyl") ||
-    groupName.includes("acid chloride") ||
-    groupName.includes("acyl halide")
-  ) {
+  if (intent.featureType === "acidChloride") {
     const match = findRingAttachedAcylGroup(
       parsedMol,
       parent,
@@ -101,7 +96,7 @@ export function getAromaticSuffixContext(
     }
   }
 
-  if (suffix === "al" || groupName.includes("aldehyde")) {
+  if (intent.featureType === "aldehyde") {
     const match = findRingAttachedAcylGroup(
       parsedMol,
       parent,
@@ -118,11 +113,23 @@ export function getAromaticSuffixContext(
     }
   }
 
-  if (
-    suffix.includes("nitrile") ||
-    suffix.includes("carbonitrile") ||
-    groupName.includes("nitrile")
-  ) {
+  if (intent.featureType === "ketone") {
+    const match = findRingAttachedAcylGroup(parsedMol, parent, isKetoneCarbon);
+    const retainedName = match
+      ? getAromaticKetoneRetainedName(parsedMol, parent, match)
+      : null;
+
+    if (match && retainedName) {
+      return makeContext(match, retainedName, {
+        type: "ketone",
+        suffix: "one",
+        prefix: "oxo",
+        priority: 3,
+      });
+    }
+  }
+
+  if (intent.featureType === "nitrile") {
     const match = findRingAttachedNitrileGroup(parsedMol, parent);
 
     if (match) {
@@ -135,7 +142,7 @@ export function getAromaticSuffixContext(
     }
   }
 
-  if (suffix.includes("oate") || groupName.includes("ester")) {
+  if (intent.featureType === "ester") {
     const match = findRingAttachedAcylGroup(parsedMol, parent, isEsterCarbon);
     const alkylName = match
       ? getEsterAlkylName(parsedMol, match.externalAtom)
@@ -148,6 +155,45 @@ export function getAromaticSuffixContext(
         prefix: "alkoxycarbonyl",
         priority: 1,
         alkylName,
+      });
+    }
+  }
+
+  if (intent.featureType === "alcohol") {
+    const match = findRingAttachedHeteroGroup(parsedMol, parent, "O");
+
+    if (match) {
+      return makeContext(match, "phenol", {
+        type: "alcohol",
+        suffix: "ol",
+        prefix: "hydroxy",
+        priority: 4,
+      });
+    }
+  }
+
+  if (intent.featureType === "amine") {
+    const match = findRingAttachedHeteroGroup(parsedMol, parent, "N");
+
+    if (match) {
+      return makeContext(match, "aniline", {
+        type: "amine",
+        suffix: "amine",
+        prefix: "amino",
+        priority: 6,
+      });
+    }
+  }
+
+  if (intent.featureType === "thiol") {
+    const match = findRingAttachedHeteroGroup(parsedMol, parent, "S");
+
+    if (match) {
+      return makeContext(match, "thiophenol", {
+        type: "thiol",
+        suffix: "thiol",
+        prefix: "sulfanyl",
+        priority: 7,
       });
     }
   }
@@ -221,6 +267,50 @@ function findRingAttachedAcylGroup(
   return null;
 }
 
+function findRingAttachedHeteroGroup(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor,
+  element: "O" | "N" | "S"
+): RingAttachedGroupMatch | null {
+  for (const ringAtom of parent.path) {
+    for (const bond of parsedMol.adjacency.get(ringAtom) ?? []) {
+      if (bond.bondOrder !== 1) continue;
+
+      const other = getOtherAtom(bond, ringAtom);
+      const otherAtom = parsedMol.atoms[other];
+
+      if (!otherAtom) continue;
+      if (otherAtom.element !== element) continue;
+      if (!isSimpleRetainedHeteroGroup(parsedMol, other, element)) continue;
+
+      return {
+        anchorAtom: ringAtom,
+        externalAtom: other,
+        representedExternalAtoms: new Set([other]),
+      };
+    }
+  }
+
+  return null;
+}
+
+function isSimpleRetainedHeteroGroup(
+  parsedMol: ParsedMol,
+  heteroAtom: number,
+  element: "O" | "N" | "S"
+) {
+  const bonds = parsedMol.adjacency.get(heteroAtom) ?? [];
+  const carbonNeighborCount = bonds.filter((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, heteroAtom)];
+    return attached?.element === "C";
+  }).length;
+
+  if (carbonNeighborCount !== 1) return false;
+  if (element === "N") return !bonds.some((bond) => bond.bondOrder > 1);
+
+  return true;
+}
+
 function findRingAttachedNitrileGroup(
   parsedMol: ParsedMol,
   parent: ParentDescriptor
@@ -267,14 +357,26 @@ function collectExternalGroupAtoms(
   rootAtom: number,
   blockedAtoms: Set<number>
 ) {
-  const collected = new Set<number>([rootAtom]);
+  const collected = new Set<number>();
+  const stack = [rootAtom];
 
-  for (const bond of parsedMol.adjacency.get(rootAtom) ?? []) {
-    const other = getOtherAtom(bond, rootAtom);
+  while (stack.length > 0) {
+    const current = stack.pop();
 
-    if (blockedAtoms.has(other)) continue;
+    if (current === undefined) continue;
+    if (collected.has(current)) continue;
+    if (blockedAtoms.has(current)) continue;
 
-    collected.add(other);
+    collected.add(current);
+
+    for (const bond of parsedMol.adjacency.get(current) ?? []) {
+      const other = getOtherAtom(bond, current);
+
+      if (blockedAtoms.has(other)) continue;
+      if (collected.has(other)) continue;
+
+      stack.push(other);
+    }
   }
 
   return collected;
@@ -348,6 +450,19 @@ function isAldehydeCarbon(parsedMol: ParsedMol, carbonIndex: number) {
   );
 }
 
+function isKetoneCarbon(parsedMol: ParsedMol, carbonIndex: number) {
+  if (!hasCarbonylOxygen(parsedMol, carbonIndex)) return false;
+
+  const carbonNeighbors = (parsedMol.adjacency.get(carbonIndex) ?? []).filter(
+    (bond) => {
+      const attached = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
+      return attached?.element === "C";
+    }
+  );
+
+  return carbonNeighbors.length >= 2;
+}
+
 function isEsterCarbon(parsedMol: ParsedMol, carbonIndex: number) {
   if (!hasCarbonylOxygen(parsedMol, carbonIndex)) return false;
 
@@ -390,6 +505,38 @@ function getEsterAlkylName(parsedMol: ParsedMol, carbonIndex: number) {
   return buildBranchName(parsedMol, alkylCarbon, oxygenIndex).name;
 }
 
+function getAromaticKetoneRetainedName(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor,
+  match: RingAttachedGroupMatch
+) {
+  const ringSet = new Set(parent.path);
+
+  const carbonSideBond = (parsedMol.adjacency.get(match.externalAtom) ?? []).find(
+    (bond) => {
+      const attached = getOtherAtom(bond, match.externalAtom);
+      if (ringSet.has(attached)) return false;
+
+      return parsedMol.atoms[attached]?.element === "C";
+    }
+  );
+
+  if (!carbonSideBond) return null;
+
+  const carbonSideAtom = getOtherAtom(carbonSideBond, match.externalAtom);
+
+  const sideName = buildBranchName(
+    parsedMol,
+    carbonSideAtom,
+    match.externalAtom
+  ).name;
+
+  if (sideName === "methyl") return "acetophenone";
+  if (sideName === "ethyl") return "propiophenone";
+
+  return `${sideName} phenyl ketone`;
+}
+
 function orientRingPathFromAnchor(
   parsedMol: ParsedMol,
   ringPath: number[],
@@ -405,10 +552,7 @@ function orientRingPathFromAnchor(
     ...ringPath.slice(0, anchorIndex),
   ];
 
-  const reversed = [
-    rotated[0],
-    ...rotated.slice(1).reverse(),
-  ];
+  const reversed = [rotated[0], ...rotated.slice(1).reverse()];
 
   return compareRingOrientation(
     parsedMol,

@@ -55,6 +55,24 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     category: "functionalGroup",
   },
   {
+  name: "Carbonate ester",
+  priority: 6.7,
+  nomenclaturePriority: 6.7,
+  confidence: "High",
+  suffix: "carbonate",
+  prefix: "alkoxycarbonyloxy",
+  equivalentNames: [
+    "carbonate",
+    "organic carbonate",
+    "carbonic acid diester",
+  ],
+  smarts: "[OX2][CX3](=[OX1])[OX2]",
+  displaySmarts: "[OX2][CX3](=[OX1])[OX2]",
+  mcatNote:
+    "Carbonate esters are carbonic acid derivatives containing a carbonyl carbon bonded to two oxygen atoms. They are found in polycarbonates, cyclic carbonates, and protecting groups.",
+  category: "functionalGroup",
+},
+  {
     name: "Acyl halide",
     priority: 5,
     nomenclaturePriority: 5,

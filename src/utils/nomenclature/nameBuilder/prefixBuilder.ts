@@ -1,9 +1,14 @@
 import type { FunctionalGroupResult } from "../../functionalGroups/types";
-import type { NamingFeature, Substituent } from "../types";
+
+import type {
+  NamingFeature,
+  ParentDescriptor,
+  Substituent,
+} from "../types";
 
 import { formatLocants } from "../formatUtils";
 import { getMultiplier } from "./suffixBuilder";
-import { shouldSuppressFeaturePrefixForPrimaryGroup } from "./nomenclatureRules";
+import { getNamingIntent } from "./namingIntent";
 
 export type PrefixEntry = {
   text: string;
@@ -13,7 +18,7 @@ export type PrefixEntry = {
 
 type SubstituentGroup = {
   name: string;
-  locants: number[];
+  locants: Array<number | string>;
 };
 
 export function buildPrefixString(
@@ -30,11 +35,12 @@ export function buildCombinedPrefixString(
   features: NamingFeature[],
   primaryFeature: NamingFeature | null,
   primaryGroup: FunctionalGroupResult | null,
-  substituents: Substituent[]
+  substituents: Substituent[],
+  parent?: ParentDescriptor
 ) {
   return renderPrefixEntries([
     ...buildFeaturePrefixEntries(features, primaryFeature, primaryGroup),
-    ...buildSubstituentPrefixEntries(substituents),
+    ...buildSubstituentPrefixEntries(substituents, parent, primaryFeature),
   ]);
 }
 
@@ -63,6 +69,18 @@ export function buildFeaturePrefixEntries(
     }));
 }
 
+function shouldSuppressFeaturePrefixForPrimaryGroup(
+  feature: NamingFeature,
+  primaryGroup: FunctionalGroupResult | null
+) {
+  const intent = getNamingIntent(primaryGroup);
+
+  return (
+    Boolean(intent.featureType) &&
+    feature.type === intent.featureType
+  );
+}
+
 function isSameFeatureAsPrimary(
   feature: NamingFeature,
   primaryFeature: NamingFeature | null
@@ -86,20 +104,43 @@ function sameLocants(a: number[], b: number[]) {
 }
 
 export function buildSubstituentPrefixEntries(
-  substituents: Substituent[]
+  substituents: Substituent[],
+  parent?: ParentDescriptor,
+  primaryFeature: NamingFeature | null = null
 ): PrefixEntry[] {
-  return groupSubstituents(substituents).map((group) => ({
-    text: formatSubstituentGroup(group),
-    sortKey: getPrefixSortKey(group.name),
-    firstLocant: group.locants[0] ?? Number.POSITIVE_INFINITY,
-  }));
+  const groups = groupSubstituents(substituents);
+  const totalSubstituentOccurrences = groups.reduce(
+    (sum, group) => sum + group.locants.length,
+    0
+  );
+
+  return groups.map((group) => {
+    const omitLocants = shouldOmitSubstituentLocants(
+      group,
+      parent,
+      primaryFeature,
+      totalSubstituentOccurrences
+    );
+
+    return {
+      text: formatSubstituentGroup(group, omitLocants),
+      sortKey: getPrefixSortKey(group.name),
+      firstLocant: getFirstLocantSortValue(group.locants),
+    };
+  });
 }
 
 function groupSubstituents(substituents: Substituent[]) {
-  const groups = new Map<string, number[]>();
+  const groups = new Map<string, Array<number | string>>();
 
   for (const substituent of substituents) {
-    if (!substituent.locant) continue;
+    if (
+      substituent.locant === null ||
+      substituent.locant === undefined ||
+      substituent.locant === ""
+    ) {
+      continue;
+    }
 
     const existing = groups.get(substituent.name) ?? [];
     existing.push(substituent.locant);
@@ -108,16 +149,96 @@ function groupSubstituents(substituents: Substituent[]) {
 
   return Array.from(groups.entries()).map(([name, locants]) => ({
     name,
-    locants: locants.sort((a, b) => a - b),
+    locants: sortLocants(locants),
   }));
 }
 
-function formatSubstituentGroup(group: SubstituentGroup) {
+function shouldOmitSubstituentLocants(
+  group: SubstituentGroup,
+  parent: ParentDescriptor | undefined,
+  primaryFeature: NamingFeature | null,
+  totalSubstituentOccurrences: number
+) {
+  if (!parent) return false;
+  if (totalSubstituentOccurrences !== 1) return false;
+  if (group.locants.length !== 1) return false;
+
+  const locant = group.locants[0];
+
+  if (typeof locant !== "number") return false;
+
+  // Do not omit locants when there is a true suffix-bearing parent group.
+  // Example: 2-chlorophenol, 3-methylcyclohexan-1-ol.
+  if (
+    primaryFeature &&
+    primaryFeature.type !== "alkene" &&
+    primaryFeature.type !== "alkyne"
+  ) {
+    return false;
+  }
+
+  // Methane/ethane/ethene/ethyne monosubstitution:
+  // 1-chloroethane -> chloroethane
+  if (parent.kind === "chain" && parent.carbonCount <= 2) {
+    return true;
+  }
+
+  // Monosubstituted rings:
+  // 1-chlorobenzene -> chlorobenzene
+  // 1-methylcyclohexane -> methylcyclohexane
+  if (parent.kind === "ring") {
+    return true;
+  }
+
+  return false;
+}
+
+function sortLocants(locants: Array<number | string>) {
+  return [...locants].sort(compareLocants);
+}
+
+function compareLocants(a: number | string, b: number | string) {
+  const valueA = getLocantSortValue(a);
+  const valueB = getLocantSortValue(b);
+
+  if (valueA !== valueB) return valueA - valueB;
+
+  return String(a).localeCompare(String(b));
+}
+
+function getFirstLocantSortValue(locants: Array<number | string>) {
+  return locants.length > 0
+    ? getLocantSortValue(locants[0])
+    : Number.POSITIVE_INFINITY;
+}
+
+function getLocantSortValue(locant: number | string) {
+  if (typeof locant === "number") return locant;
+
+  const normalized = locant.trim().toUpperCase();
+
+  // N-substitution should render as N-methyl, N,N-dimethyl,
+  // N,6-dimethyl, etc.
+  if (normalized === "N") return -1;
+
+  const numeric = Number(normalized);
+  return Number.isFinite(numeric) ? numeric : Number.POSITIVE_INFINITY;
+}
+
+function formatSubstituentGroup(
+  group: SubstituentGroup,
+  omitLocants = false
+) {
   const isComplex = isComplexSubstituentName(group.name);
   const multiplier = isComplex
     ? getComplexSubstituentMultiplier(group.locants.length)
     : getMultiplier(group.locants.length);
+
   const name = isComplex ? `(${group.name})` : group.name;
+
+  if (omitLocants) {
+    return `${multiplier}${name}`;
+  }
 
   return `${group.locants.join(",")}-${multiplier}${name}`;
 }
