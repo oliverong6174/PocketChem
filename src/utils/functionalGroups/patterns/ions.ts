@@ -187,7 +187,7 @@ export const chargedGroups: FunctionalGroupPattern[] = [
 
   {
     name: "Thiolate",
-    category: "ion",
+    category: "functionalGroup",
     priority: 0.5,
     nomenclaturePriority: 0.5,
     confidence: "High",

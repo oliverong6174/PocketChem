@@ -3,6 +3,11 @@ import type { NamingFeature } from "../types";
 
 import { getNamingIntent } from "./namingIntent";
 
+import {
+  isInformationalOrUnsafeSuffix,
+  isUnsafePrimaryGroup,
+} from "./functionalGroupNaming";
+
 const NON_NOMENCLATURE_PRIMARY_GROUPS = new Set([
   "hemiacetal",
   "hemiketal",
@@ -60,30 +65,14 @@ function isHydrocarbonOnlyGroup(group: FunctionalGroupResult) {
   return normalizedSuffix.includes("en") && normalizedSuffix.includes("yn");
 }
 
-function isInformationalSuffix(suffix: string) {
-  const cleanSuffix = suffix.trim().toLowerCase();
-
-  return (
-    cleanSuffix.includes("usually named") ||
-    cleanSuffix.includes("named as") ||
-    cleanSuffix.includes("substituted benzene") ||
-    cleanSuffix.includes("substituted aniline") ||
-    cleanSuffix.includes("use common name") ||
-    cleanSuffix.includes("retained name")
-  );
-}
-
 export function groupHasUsableSuffix(group: FunctionalGroupResult): boolean {
   const name = group.name.trim().toLowerCase();
   const suffix = group.suffix?.trim().toLowerCase() ?? "";
 
   if (!suffix) return false;
-  if (suffix.includes("never suffix")) return false;
-  if (isInformationalSuffix(suffix)) return false;
+  if (isInformationalOrUnsafeSuffix(suffix)) return false;
+  if (isUnsafePrimaryGroup(group)) return false;
   if (NON_NOMENCLATURE_PRIMARY_GROUPS.has(name)) return false;
-
-  // Alkene/alkyne/enyne are parent hydrocarbon descriptors,
-  // not functional-group suffix parents.
   if (isHydrocarbonOnlyGroup(group)) return false;
 
   return true;

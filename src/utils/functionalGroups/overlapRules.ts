@@ -26,9 +26,7 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Ester: ["Ether"],
   "Acyl halide": ["Halogen", "Haloalkane"],
   Amide: ["Amine"],
-  
-
-  "Primary amide": ["Amide"],
+ "Primary amide": ["Amide"],
   "Secondary amide": ["Amide"],
   "Tertiary amide": ["Amide"],
 
@@ -75,9 +73,33 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Aniline: ["Benzene", "Aryl amine", "Primary amine", "Amine"],
   "Aryl amine": ["Benzene", "Primary amine", "Amine"],
 
+  //Anilines
+  "Primary aryl amine": [
+    "Aryl amine",
+    "Primary amine",
+    "Amine",
+  ],
+
+  "Secondary aryl amine": [
+    "Aryl amine",
+    "Secondary amine",
+    "Amine",
+  ],
+
+  "Tertiary aryl amine": [
+    "Aryl amine",
+    "Tertiary amine",
+    "Amine",
+  ],
+
   //Nitrogens
   "N-oxide": ["Amine"],
-  "Nitro": ["N-oxide", "Amine"],
+  "Nitro": ["N-oxide", "Nitroso", "Amine"],
+  Azide: [],
+  Isocyanide: ["Nitrile"],
+  Isocyanate: ["Amine", "Primary amine", "Secondary amine", "Tertiary amine"],
+  Diazo: ["Amine", "Primary amine", "Secondary amine", "Tertiary amine"],
+
 
   // Oxygen/ether motifs
   Hemiacetal: ["Alcohol", "Ether"],
@@ -90,8 +112,8 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Enol: ["Alcohol", "Alkene"],
   Aldol: ["Alcohol"],
   Benzoin: ["Ketone", "Alcohol"],
-  Imine: ["Amine"],
-  Hydrazone: ["Imine"],
+  Imine: ["Amine", "Primary amine", "Secondary amine", "Tertiary amine"],
+  Hydrazone: ["Imine", "Amine", "Primary amine", "Secondary amine", "Tertiary amine"],
   Oxime: ["Imine"],
 
   // Conjugated carbonyls / Michael acceptors
@@ -125,13 +147,11 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
     "Benzene",
 ],
   Chalcone: ["Benzene", "Enone", "Ketone", "Alkene", "Acryloyl group"],
-  Enamide: ["Amide", "Alkene"],
+  Enamide: ["Amide", "Amine", "Primary amine", "Secondary amine", "Tertiary amine", "Alkene"],
+  Enamine: ["Amine", "Primary amine", "Secondary amine", "Tertiary amine", "Alkene"],
   Enoate: ["Ester", "Alkene", "Acryloyl group"],
 
-  // Nitrogen motifs
-  Azide: [],
-  Isocyanide: ["Nitrile"],
-  Isocyanate: ["Amine"],
+
 
   // Aromatics
   Alkylbenzene: ["Benzene"],
@@ -140,9 +160,11 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Nitrobenzene: [
   "Benzene",
   "Nitro",
+  "Nitroso",
   "Halogen",
   "Haloalkane"
 ],
+  "Benzenediazonium": ["Aniline", "Benzene", "Diazo", "Amine", "Primary amine", "Secondary amine", "Tertiary amine"],
 
 
   Naphthalene: ["Benzene"],

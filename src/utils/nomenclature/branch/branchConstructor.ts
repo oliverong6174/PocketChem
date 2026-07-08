@@ -4,6 +4,7 @@ import { CHAIN_PREFIXES } from "../constants.ts";
 
 import { orientBranchPathForNaming } from "./branchOrientation";
 import { formatBranchSubstituents } from "./branchPrefixes";
+import { buildAromaticBranchName } from "./branchAromatics";
 
 import {
   collectBranchCarbons,
@@ -60,6 +61,21 @@ export function buildBranchName(
   startAtom: number,
   blockedAtom: number
 ) {
+  const aromaticBranch = buildAromaticBranchName(
+    parsedMol,
+    startAtom,
+    blockedAtom
+  );
+
+  if (aromaticBranch) {
+    return {
+      carbonCount: aromaticBranch.carbonCount,
+      path: aromaticBranch.ringPath,
+      attachmentLocant: 1,
+      name: aromaticBranch.name,
+    };
+  }
+
   const branchAtoms = collectBranchCarbons(
     parsedMol,
     startAtom,

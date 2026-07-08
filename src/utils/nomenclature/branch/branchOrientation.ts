@@ -61,17 +61,29 @@ function compareMultipleBondLocants(
   return compareLocants(reverse.tripleLocants, forward.tripleLocants);
 }
 
+function getAttachmentLocant(path: number[], attachmentAtom: number) {
+  const locant = path.indexOf(attachmentAtom) + 1;
+  return locant > 0 ? locant : Number.POSITIVE_INFINITY;
+}
+
 export function orientBranchPathForNaming(
   parsedMol: ParsedMol,
   path: number[],
   attachmentAtom: number,
   substituentAtoms: number[] = []
 ) {
+  if (path.length === 0) return path;
+
   const reversePath = [...path].reverse();
 
-  const forwardAttachmentLocant = path.indexOf(attachmentAtom) + 1;
-  const reverseAttachmentLocant = reversePath.indexOf(attachmentAtom) + 1;
+  const forwardAttachmentLocant = getAttachmentLocant(path, attachmentAtom);
+  const reverseAttachmentLocant = getAttachmentLocant(
+    reversePath,
+    attachmentAtom
+  );
 
+  // This must be the first rule for substituent branches.
+  // The free valence / parent attachment atom gets the lowest possible locant.
   if (reverseAttachmentLocant < forwardAttachmentLocant) return reversePath;
   if (reverseAttachmentLocant > forwardAttachmentLocant) return path;
 

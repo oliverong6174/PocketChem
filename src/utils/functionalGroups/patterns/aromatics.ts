@@ -96,8 +96,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "[a][NX3;!$(NC=O);!$(N=C);!$([N+](=O)[O-])]",
     mcatNote:
       "Aryl amines contain a nitrogen directly attached to an aromatic ring. Their lone pair interacts with the aromatic π system, reducing basicity compared with alkyl amines.",
-    
-  displaySmarts: "c[NX3]",
+      displaySmarts: "c[NX3]",
       category: "functionalGroup",
     },
   {
@@ -114,6 +113,54 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     displaySmarts: "c[NX3H2]",
       category: "functionalGroup",
     },
+      {
+    name: "Primary aryl amine",
+    priority: 14.15,
+    nomenclaturePriority: 13.02,
+    confidence: "High",
+    suffix: "Usually named as substituted aniline",
+    prefix: "amino",
+    equivalentNames: ["primary aniline derivative", "aryl primary amine"],
+    smarts:
+      "[a][NX3H2;!$(NC=O);!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    displaySmarts:
+      "[a][NX3H2;!$(NC=O);!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    mcatNote:
+      "Primary aryl amines contain an -NH2 group directly attached to an aromatic ring. The nitrogen lone pair can donate into the ring, making them less basic than alkyl amines and activating the ring toward electrophilic aromatic substitution.",
+    category: "functionalGroup",
+  },
+  {
+    name: "Secondary aryl amine",
+    priority: 14.16,
+    nomenclaturePriority: 13.03,
+    confidence: "High",
+    suffix: "Usually named as N-substituted aniline",
+    prefix: "amino",
+    equivalentNames: ["secondary aniline derivative", "aryl secondary amine"],
+    smarts:
+      "[a][NX3H1;!$(NC=O);!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    displaySmarts:
+      "[a][NX3H1;!$(NC=O);!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    mcatNote:
+      "Secondary aryl amines have an aromatic ring and one additional carbon group attached to nitrogen. N-methylaniline and diphenylamine are examples.",
+    category: "functionalGroup",
+  },
+  {
+    name: "Tertiary aryl amine",
+    priority: 14.17,
+    nomenclaturePriority: 13.04,
+    confidence: "High",
+    suffix: "Usually named as N,N-disubstituted aniline",
+    prefix: "amino",
+    equivalentNames: ["tertiary aniline derivative", "aryl tertiary amine"],
+    smarts:
+      "[a][NX3H0;!$(NC=O);!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    displaySmarts:
+      "[a][NX3H0;!$(NC=O);!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+    mcatNote:
+      "Tertiary aryl amines have an aromatic ring and two additional carbon groups attached to nitrogen. N,N-dimethylaniline and triphenylamine are examples.",
+    category: "functionalGroup",
+  },
   {
     name: "Aryl halide",
     priority: 27.5,
@@ -139,6 +186,28 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
       "Nitrobenzenes contain a nitro group attached to an aromatic ring. Nitro groups are strongly electron-withdrawing.",
     category: "functionalGroup",
     },
+
+    {
+  name: "Benzenediazonium",
+  priority: 18.3,
+  nomenclaturePriority: 14.7,
+  confidence: "High",
+  suffix: "diazonium",
+  prefix: "diazonio",
+  equivalentNames: [
+    "benzene diazonium",
+    "benzenediazonium ion",
+    "aryl diazonium",
+    "arenediazonium",
+  ],
+  smarts: "[a][N+]#N",
+  displaySmarts: "[a][N+]#N",
+  mcatNote:
+    "Benzenediazonium groups contain an aryl-N≡N⁺ unit. Aryl diazonium salts are key intermediates in Sandmeyer reactions, azo coupling, and aromatic substitution chemistry.",
+  category: "functionalGroup",
+},
+
+// MULTI RING or NON HEXAGONAL RINGS
 
   {
     name: "Naphthalene",

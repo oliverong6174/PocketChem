@@ -41,6 +41,12 @@ import {
   getPrimaryFeatureFromIntent,
 } from "./nameBuilder/namingIntent";
 
+import { getExoticParentDescriptor } from "./nameBuilder/exoticParents";
+
+import {
+  getRetainedHeterocycleSpecsFromGroups,
+} from "./nameBuilder/functionalGroupNaming";
+
 type EstimatedIupacResult = {
   estimatedName: string;
   confidence: "low" | "medium" | "high";
@@ -56,7 +62,17 @@ export function buildEstimatedIupacName(
   functionalGroups: FunctionalGroupResult[],
   mainGroup: FunctionalGroupResult | null
 ): EstimatedIupacResult | null {
+
+  console.log("NAME BUILDER ENTERED", {
+  functionalGroups: functionalGroups.map((group) => ({
+    name: group.name,
+    suffix: group.suffix,
+    prefix: group.prefix,
+  })),
+});
   if (!parsedMol || parsedMol.atoms.length === 0) {
+    
+
     return {
       estimatedName: "Name not estimated yet",
       confidence: "low",
@@ -67,42 +83,120 @@ export function buildEstimatedIupacName(
       substituents: [],
     };
   }
-  const primaryGroup = getPrimaryFunctionalGroup(functionalGroups, mainGroup);
-  const namingIntent = getNamingIntent(primaryGroup);
+  const rawPrimaryGroup = getPrimaryFunctionalGroup(functionalGroups, mainGroup);
 
-  const preferredParentAtoms = getParentCandidateAtomsForPrimaryGroup(
+      const retainedHeterocycleSpecs =
+        getRetainedHeterocycleSpecsFromGroups(functionalGroups);
+
+      const exoticParent = getExoticParentDescriptor(
+        parsedMol,
+        retainedHeterocycleSpecs
+      );
+
+      const neutralParent = getParentDescriptor(parsedMol, []);
+      const neutralFeatures = detectNamingFeatures(parsedMol, neutralParent);
+
+  const primaryGroup = validatePrimaryGroupAgainstStructuralFeatures(
     parsedMol,
-    primaryGroup
+    rawPrimaryGroup,
+    neutralFeatures
   );
 
-  const defaultParent = getParentDescriptor(
+const namingIntent = getNamingIntent(primaryGroup);
+
+const preferredParentAtoms = getParentCandidateAtomsForPrimaryGroup(
+  parsedMol,
+  primaryGroup
+);
+
+console.log("PRIMARY GROUP VALIDATION", {
+  rawPrimaryGroup: rawPrimaryGroup?.name,
+  rawPrimaryGroupSuffix: rawPrimaryGroup?.suffix,
+  neutralParent: {
+    kind: neutralParent.kind,
+    hydrocarbon: neutralParent.parentHydrocarbon,
+    stem: neutralParent.parentStem,
+    path: neutralParent.path,
+  },
+  neutralFeatures,
+  effectivePrimaryGroup: primaryGroup?.name,
+  effectivePrimaryGroupSuffix: primaryGroup?.suffix,
+  namingIntent,
+  preferredParentAtoms,
+});
+
+  console.log("PARENT ROUTE DEBUG", {
+  primaryGroup: primaryGroup?.name,
+  primaryGroupSuffix: primaryGroup?.suffix,
+  namingIntent,
+  preferredParentAtoms,
+  parentStrategy: getParentStrategy(primaryGroup),
+});
+
+  const carbonDefaultParent = getParentDescriptor(
     parsedMol,
     preferredParentAtoms
   );
 
-  const initialAromaticSuffixContext =
-    namingIntent.aromaticRetainedParentAllowed
-      ? getAromaticSuffixContext(parsedMol, defaultParent, primaryGroup)
-      : null;
+  const shouldUseExoticParent =
+    exoticParent !== null &&
+    primaryGroup === null &&
+    !neutralFeatures.some(isStructurallyReliableSuffixFeature);
 
-  const unorientedParent =
-    initialAromaticSuffixContext
-      ? defaultParent
-      : getParentStrategy(primaryGroup) === "acyl"
-      ? getBestAcylParentDescriptor(parsedMol) ?? defaultParent
-      : defaultParent;
+  const defaultParent = shouldUseExoticParent
+    ? exoticParent
+    : carbonDefaultParent;
 
-  const parent = initialAromaticSuffixContext
-    ? orientAromaticParentForSuffix(
-        parsedMol,
-        unorientedParent,
-        initialAromaticSuffixContext
-      )
+    console.log("EXOTIC PARENT DEBUG", {
+  rawPrimaryGroup,
+  retainedHeterocycleSpecs,
+  exoticParent,
+  shouldUseExoticParent,
+  defaultParent,
+});
+
+  const initialAromaticSuffixContext = getAromaticSuffixContext(
+  parsedMol,
+  defaultParent,
+  primaryGroup
+);
+
+const shouldUseAcylParent =
+  !shouldUseExoticParent &&
+  getParentStrategy(primaryGroup) === "acyl" &&
+  preferredParentAtoms.length > 0;
+
+const unorientedParent =
+  initialAromaticSuffixContext
+    ? defaultParent
+    : shouldUseAcylParent
+    ? getBestAcylParentDescriptor(parsedMol, preferredParentAtoms) ?? defaultParent
+    : defaultParent;
+
+const parentBeforeAromaticOrientation =
+  shouldUseExoticParent
+    ? unorientedParent
     : orientParentForPrimaryGroup(
         parsedMol,
         unorientedParent,
         primaryGroup
       );
+
+const parent =
+  initialAromaticSuffixContext && !shouldUseExoticParent
+    ? orientAromaticParentForSuffix(
+        parsedMol,
+        parentBeforeAromaticOrientation,
+        initialAromaticSuffixContext
+      )
+    : parentBeforeAromaticOrientation;
+
+  console.log("FINAL PARENT DEBUG", {
+  parentKind: parent.kind,
+  parentPath: parent.path,
+  parentHydrocarbon: parent.parentHydrocarbon,
+  parentStem: parent.parentStem,
+});
 
   const finalAromaticSuffixContext = initialAromaticSuffixContext
     ? getAromaticSuffixContext(parsedMol, parent, primaryGroup) ??
@@ -117,6 +211,11 @@ export function buildEstimatedIupacName(
     finalAromaticSuffixContext,
     primaryGroup
   );
+
+  console.log("FEATURE DEBUG", {
+  features,
+  primaryFeature,
+});
 
   const effectiveAromaticSuffixContext = getEffectiveAromaticSuffixContext(
   finalAromaticSuffixContext,
@@ -282,4 +381,65 @@ function selectPrimaryFeature(
   }
 
   return aromaticContext.primaryFeature;
+}
+
+function validatePrimaryGroupAgainstStructuralFeatures(
+  parsedMol: ParsedMol,
+  primaryGroup: FunctionalGroupResult | null,
+  structuralFeatures: NamingFeature[]
+) {
+  if (!primaryGroup) return null;
+
+  const intent = getNamingIntent(primaryGroup);
+
+  if (!intent.featureType) {
+    return null;
+  }
+
+  // First validate globally, not only against the neutral parent.
+  // This fixes aryl ketones like:
+  // HO-Ph-CH2-CH2-C(=O)-CH3
+  // where the neutral parent may be phenol, but the true principal group
+  // is a side-chain ketone.
+  const candidateAtoms = getParentCandidateAtomsForPrimaryGroup(
+    parsedMol,
+    primaryGroup
+  );
+
+  if (candidateAtoms.length > 0) {
+    return primaryGroup;
+  }
+
+  const hasMatchingStructuralFeature = structuralFeatures.some(
+    (feature) => feature.type === intent.featureType
+  );
+
+  if (hasMatchingStructuralFeature) {
+    return primaryGroup;
+  }
+
+  const hasAnyStructuralSuffixFeature = structuralFeatures.some(
+    isStructurallyReliableSuffixFeature
+  );
+
+  if (hasAnyStructuralSuffixFeature) {
+    return null;
+  }
+
+  return primaryGroup;
+}
+
+function isStructurallyReliableSuffixFeature(feature: NamingFeature) {
+  return (
+    feature.type === "carboxylicAcid" ||
+    feature.type === "ester" ||
+    feature.type === "amide" ||
+    feature.type === "acidChloride" ||
+    feature.type === "aldehyde" ||
+    feature.type === "ketone" ||
+    feature.type === "nitrile" ||
+    feature.type === "alcohol" ||
+    feature.type === "amine" ||
+    feature.type === "thiol"
+  );
 }

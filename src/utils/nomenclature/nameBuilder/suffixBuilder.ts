@@ -224,10 +224,12 @@ export function buildSuffixName(
     return buildPrimarySuffixName(parent.parentStem, parent, primaryFeature);
   }
 
-  const parentStem = getParentStemWithUnsaturation(parsedMol, parent);
-  if (!parentStem) return null;
+    const ringStem =
+      getParentStemWithUnsaturation(parsedMol, parent) ?? parent.parentStem;
 
-  return buildPrimarySuffixName(parentStem, parent, primaryFeature);
+    if (!ringStem) return null;
+
+    return buildPrimarySuffixName(ringStem, parent, primaryFeature);
 }
 
 function isRealSuffixFeature(feature: NamingFeature) {

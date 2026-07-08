@@ -102,6 +102,9 @@
 
   function App() {
     //useState calls
+    const analyzeInFlightRef = useRef(false);
+    const latestAnalyzeRunRef = useRef(0);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [smiles, setSmiles] = useState("Not analyzed yet");
     const [status, setStatus] = useState("Draw a molecule first");
     const [, setMainGroup] = useState<FunctionalGroupResult | null>(
@@ -204,80 +207,125 @@
     [functionalGroups]
   );
 
+  {/*DEBUG MOLFILE SMILES*/}
+      function isMolBlockLike(value: unknown) {
+      if (typeof value !== "string") return false;
+
+      return (
+        value.includes("M  END") ||
+        value.includes("V2000") ||
+        value.includes("V3000") ||
+        value.includes("-INDIGO-") ||
+        /^\s*\n?\s*-INDIGO-/i.test(value)
+      );
+    }
+
+    function sanitizeDisplayedSmiles(value: unknown) {
+      if (typeof value !== "string") return "";
+
+      const trimmed = value.trim();
+
+      if (!trimmed) return "";
+      if (isMolBlockLike(trimmed)) return "";
+
+      return trimmed;
+    }
+
     const analyzeMolecule = async () => {
-      if (!window.ketcher) {
-        setStatus("Molecule editor is still loading. Try again in a second.");
-        return;
-      }
+  if (analyzeInFlightRef.current) {
+    console.warn("Analyze suppressed: analysis already in progress.");
+    return;
+  }
 
-      try {
-        const result = await window.ketcher.getSmiles();
-        const currentMolfile = await window.ketcher.getMolfile();
+  if (!window.ketcher) {
+    setStatus("Molecule editor is still loading. Try again in a second.");
+    return;
+  }
 
-        setMolfile(currentMolfile);
+  analyzeInFlightRef.current = true;
+  setIsAnalyzing(true);
+  setStatus("Analyzing molecule...");
 
-        console.log("SMILES result:", result);
-        console.log("MOLFILE result:", currentMolfile);
+  try {
+    const result = await window.ketcher.getSmiles();
+    const currentMolfile = await window.ketcher.getMolfile();
 
-        if (!result || result.trim() === "") {
-          setSmiles("No molecule detected");
-          setStatus("Draw a molecule before analyzing.");
-          return;
-        }
+    const safeSmiles = sanitizeDisplayedSmiles(result);
 
-        setSmiles(result);
+    console.log("SMILES result:", result);
+    console.log("Safe SMILES:", safeSmiles);
+    console.log("MOLFILE result:", currentMolfile);
 
-        const moleculeSource = currentMolfile || result;
+    if (!safeSmiles) {
+      setSmiles("No molecule detected");
+      setMolfile(null);
+      setStatus("Draw a molecule before analyzing.");
+      return;
+    }
 
-        const annotation = await getMoleculeAnnotation(moleculeSource);
-        setMoleculeAnnotation(annotation);
+    setSmiles(safeSmiles);
+    setMolfile(currentMolfile);
 
-        const resonance = await analyzeResonance(moleculeSource);
-        setResonanceResults(resonance);
-        console.log("Resonance results:", resonance);
+    const moleculeSource = currentMolfile || safeSmiles;
 
-        
-        const chirality = await analyzeChirality(result, currentMolfile);
-        setChiralityResults(chirality);
-        console.log("Chirality results:", chirality);
-        
-        const hierarchy = await analyzeFunctionalGroupHierarchy(moleculeSource);
+    const annotation = await getMoleculeAnnotation(moleculeSource);
+    setMoleculeAnnotation(annotation);
 
-        const detectedFunctionalGroups = hierarchy.functionalGroups ?? [];
+    const resonance = await analyzeResonance(moleculeSource);
+    setResonanceResults(resonance);
+    console.log("Resonance results:", resonance);
 
-        setMainGroup(hierarchy.mainGroup ?? detectedFunctionalGroups[0] ?? null);
-        setFunctionalGroups(detectedFunctionalGroups);
+    const chirality = await analyzeChirality(safeSmiles, currentMolfile);
+    setChiralityResults(chirality);
+    console.log("Chirality results:", chirality);
 
-        const pathways = await predictReactionPathways(
-          result,
-          detectedFunctionalGroups
-        );
+    const hierarchy = await analyzeFunctionalGroupHierarchy(moleculeSource);
 
-  setReactionPathways(pathways);
-        
-        const acidity = await analyzeAcidity(result, hierarchy.primaryGroups);
-        setAcidityResults(acidity);
-        
-        const basicity = await analyzeBasicity(result, hierarchy.primaryGroups);
-        setBasicityResults(basicity);
+    const detectedFunctionalGroups = hierarchy.functionalGroups ?? [];
 
-        const identity = await analyzeNomenclatureAndProperties(
-          result,
-          hierarchy.primaryGroups,
-          hierarchy.mainGroup
-        );
+    setMainGroup(hierarchy.mainGroup ?? detectedFunctionalGroups[0] ?? null);
+    setFunctionalGroups(detectedFunctionalGroups);
 
-        console.log("SMILES leaving App.tsx:", JSON.stringify(smiles));
-        
-        setMoleculeIdentity(identity);
-        
+    const pathways = await predictReactionPathways(
+      safeSmiles,
+      detectedFunctionalGroups
+    );
 
-        setStatus("Molecule analyzed successfully.");
-      } catch (error) {
-        console.error("Analyze error:", error);
-        setStatus("Something went wrong while analyzing the molecule.");
-      }
-    };
+    setReactionPathways(pathways);
+
+    const acidity = await analyzeAcidity(safeSmiles, hierarchy.primaryGroups);
+    setAcidityResults(acidity);
+
+    const basicity = await analyzeBasicity(safeSmiles, hierarchy.primaryGroups);
+    setBasicityResults(basicity);
+
+    let identity: MoleculeIdentityResult | null = null;
+
+    try {
+      identity = await analyzeNomenclatureAndProperties(
+        safeSmiles,
+        hierarchy.primaryGroups,
+        hierarchy.mainGroup
+      );
+    } catch (nomenclatureError) {
+      console.error("Nomenclature/property analysis failed:", nomenclatureError);
+      identity = null;
+    }
+
+    console.log("SMILES leaving App.tsx:", JSON.stringify(safeSmiles));
+
+    setMoleculeIdentity(identity);
+
+    setStatus("Molecule analyzed successfully.");
+  } catch (error) {
+    console.error("Analyze error:", error);
+    setStatus("Something went wrong while analyzing the molecule.");
+  } finally {
+    // Always unlock. Do not condition this on latestAnalyzeRunRef.
+    analyzeInFlightRef.current = false;
+    setIsAnalyzing(false);
+  }
+};
   
     const addCurrentMoleculeToComparison = async () => {
       if (!window.ketcher) {
@@ -1035,8 +1083,12 @@
             </div>
 
             <div className="button-row">
-              <button className="primary-button" onClick={analyzeMolecule}>
-                Analyze Molecule
+              <button
+                className="primary-button"
+                onClick={analyzeMolecule}
+                disabled={isAnalyzing}
+              >
+                {isAnalyzing ? "Analyzing..." : "Analyze Molecule"}
               </button>
 
               {/* CLEAR BUTTON */}
@@ -1044,6 +1096,10 @@
               <button
                 className="secondary-button"
                 onClick={() => {
+                  analyzeInFlightRef.current = false;
+                  latestAnalyzeRunRef.current = 0;
+                  setIsAnalyzing(false);
+                  
                   setSmiles("Not analyzed yet");
                   setStatus("Draw a molecule first");
                   setMainGroup(null);

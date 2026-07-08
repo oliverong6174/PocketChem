@@ -32,7 +32,7 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     priority: 13,
     nomenclaturePriority: 12.5,
     confidence: "Medium",
-    suffix: "hydrazone (appended)",
+    suffix: "hydrazone",
     prefix: "hydrazono",
     smarts: "[CX3]=[NX2][NX3]",
     displaySmarts: "[CX3]=[NX2][NX3]",

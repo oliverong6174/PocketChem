@@ -130,7 +130,7 @@ export const oxygenGroups: FunctionalGroupPattern[] = [
     priority: 23,
     nomenclaturePriority: 17,
     confidence: "High",
-    suffix: "Never suffix",
+    suffix: "oxirane",
     prefix: "epoxy",
     smarts: "[OX2r3]1[#6r3][#6r3]1",
     displaySmarts: "[OX2r3]1[#6r3][#6r3]1",

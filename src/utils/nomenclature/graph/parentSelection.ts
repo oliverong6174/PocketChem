@@ -885,6 +885,8 @@ export function orientRingPathForNaming(
   parsedMol: ParsedMol,
   ringAtoms: number[]
 ) {
+  const ringSet = new Set(ringAtoms);
+
   const scoreAtom = (atomIndex: number) => {
     let score = 0;
 
@@ -895,13 +897,12 @@ export function orientRingPathForNaming(
       const other = getOtherAtom(bond, atomIndex);
       const otherAtom = parsedMol.atoms[other];
 
+      if (ringSet.has(other)) continue;
+
       if (otherAtom?.element === "O") score += 60;
       if (otherAtom?.element === "N") score += 50;
       if (otherAtom?.element === "S") score += 40;
-
-      if (otherAtom?.element === "C" && !ringAtoms.includes(other)) {
-        score += 20;
-      }
+      if (otherAtom?.element === "C") score += 20;
     }
 
     return score;
@@ -909,7 +910,12 @@ export function orientRingPathForNaming(
 
   const rotations = ringAtoms.flatMap((_, index) => {
     const rotated = [...ringAtoms.slice(index), ...ringAtoms.slice(0, index)];
-    const reversed = [...rotated].reverse();
+
+    // Keep the same locant-1 atom while testing the opposite direction.
+    // [...rotated].reverse() moves locant 1 to the end and breaks
+    // cycloalkene/cycloalkanone numbering.
+    const reversed = [rotated[0], ...rotated.slice(1).reverse()];
+
     return [rotated, reversed];
   });
 
@@ -921,8 +927,40 @@ export function orientRingPathForNaming(
       if (bScores[i] !== aScores[i]) return bScores[i] - aScores[i];
     }
 
-    return 0;
+    return compareRingMultipleBondLocants(parsedMol, a, b);
   })[0];
+}
+
+function getRingMultipleBondLocantsForPath(
+  parsedMol: ParsedMol,
+  path: number[]
+) {
+  const locants: number[] = [];
+
+  for (let i = 0; i < path.length; i++) {
+    const current = path[i];
+    const next = path[(i + 1) % path.length];
+    const bond = getBondBetween(parsedMol, current, next);
+
+    if (!bond) continue;
+
+    if (bond.bondOrder === 2 || bond.bondOrder === 3) {
+      locants.push(i + 1);
+    }
+  }
+
+  return locants.sort((a, b) => a - b);
+}
+
+function compareRingMultipleBondLocants(
+  parsedMol: ParsedMol,
+  pathA: number[],
+  pathB: number[]
+) {
+  return compareLocantLists(
+    getRingMultipleBondLocantsForPath(parsedMol, pathA),
+    getRingMultipleBondLocantsForPath(parsedMol, pathB)
+  );
 }
 
 export function isBenzeneLikeRing(
@@ -960,6 +998,72 @@ function isCarbonylCarbon(parsedMol: ParsedMol, atomIndex: number) {
     const other = parsedMol.atoms[getOtherAtom(bond, atomIndex)];
     return other?.element === "O" && bond.bondOrder === 2;
   });
+}
+
+function getBestExternalPreferredCarbonPath(
+  parsedMol: ParsedMol,
+  preferredAtoms: number[],
+  ringAtoms: number[]
+) {
+  const ringSet = new Set(ringAtoms);
+  const preferredSet = new Set(preferredAtoms);
+
+  const externalCarbonAtoms = parsedMol.atoms
+    .filter((atom) => atom.element === "C")
+    .map((atom) => atom.atomIndex)
+    .filter((atomIndex) => !ringSet.has(atomIndex));
+
+  let bestPath: number[] = [];
+
+  const scorePreferredAtoms = (path: number[]) =>
+    path.filter((atomIndex) => preferredSet.has(atomIndex)).length;
+
+  const isBetterPath = (path: number[]) => {
+    if (bestPath.length === 0) return true;
+
+    const pathPreferred = scorePreferredAtoms(path);
+    const bestPreferred = scorePreferredAtoms(bestPath);
+
+    if (pathPreferred > bestPreferred) return true;
+    if (pathPreferred < bestPreferred) return false;
+
+    const pathUnsaturation = getPathUnsaturationCount(parsedMol, path);
+    const bestUnsaturation = getPathUnsaturationCount(parsedMol, bestPath);
+
+    if (pathUnsaturation > bestUnsaturation) return true;
+    if (pathUnsaturation < bestUnsaturation) return false;
+
+    return path.length > bestPath.length;
+  };
+
+  const dfs = (
+    current: number,
+    visited: Set<number>,
+    path: number[]
+  ) => {
+    if (isBetterPath(path)) {
+      bestPath = [...path];
+    }
+
+    for (const bond of parsedMol.adjacency.get(current) ?? []) {
+      const next = getOtherAtom(bond, current);
+      const nextAtom = parsedMol.atoms[next];
+
+      if (!nextAtom || nextAtom.element !== "C") continue;
+      if (ringSet.has(next)) continue;
+      if (visited.has(next)) continue;
+
+      visited.add(next);
+      dfs(next, visited, [...path, next]);
+      visited.delete(next);
+    }
+  };
+
+  for (const atomIndex of externalCarbonAtoms) {
+    dfs(atomIndex, new Set([atomIndex]), [atomIndex]);
+  }
+
+  return bestPath;
 }
 
 export function getBestAcylParentDescriptor(
@@ -1039,6 +1143,56 @@ export function getBestAcylParentDescriptor(
   };
 }
 
+function buildRingParentDescriptor(
+  parsedMol: ParsedMol,
+  ring: RingDescriptor
+): ParentDescriptor | null {
+  const prefix = CHAIN_PREFIXES[ring.ringAtoms.length];
+  if (!prefix) return null;
+
+  const aromaticRing = isBenzeneLikeRing(parsedMol, ring);
+  const orientedPath = orientRingPathForNaming(parsedMol, ring.ringAtoms);
+
+  if (aromaticRing) {
+    return {
+      kind: "ring",
+      path: orientedPath,
+      carbonCount: ring.ringAtoms.length,
+      parentHydrocarbon: "benzene",
+      parentStem: "benzen",
+      aromaticRing: true,
+    };
+  }
+
+  const provisionalParent: ParentDescriptor = {
+    kind: "ring",
+    path: orientedPath,
+    carbonCount: ring.ringAtoms.length,
+    parentHydrocarbon: `cyclo${prefix}ane`,
+    parentStem: `cyclo${prefix}an`,
+    aromaticRing: false,
+  };
+
+  const unsaturatedStem =
+    getParentStemWithUnsaturation(parsedMol, provisionalParent) ??
+    provisionalParent.parentStem;
+
+  return {
+    ...provisionalParent,
+    parentStem: unsaturatedStem,
+    parentHydrocarbon: unsaturatedStem
+      ? `${unsaturatedStem}e`
+      : provisionalParent.parentHydrocarbon,
+  };
+}
+
+function ringContainsAnyAtom(ring: RingDescriptor, atoms: number[]) {
+  if (atoms.length === 0) return false;
+
+  const ringSet = new Set(ring.ringAtoms);
+  return atoms.some((atomIndex) => ringSet.has(atomIndex));
+}
+
 export function getParentDescriptor(
   parsedMol: ParsedMol,
   preferredAtoms: number[] = []
@@ -1046,21 +1200,60 @@ export function getParentDescriptor(
   const ring = getSimpleCarbonRing(parsedMol);
 
   if (ring) {
-    const acyclicPath = getLongestAcyclicCarbonPath(parsedMol, ring.ringAtoms);
-    const prefix = CHAIN_PREFIXES[ring.ringAtoms.length];
-    const aromaticRing = isBenzeneLikeRing(parsedMol, ring);
+  const ringParent = buildRingParentDescriptor(parsedMol, ring);
+  const acyclicPath = getLongestAcyclicCarbonPath(parsedMol, ring.ringAtoms);
 
-    if (prefix && ring.ringAtoms.length >= acyclicPath.length) {
+  const ringOwnsPreferredAtoms =
+    preferredAtoms.length > 0 && ringContainsAnyAtom(ring, preferredAtoms);
+
+  const preferredAtomsAreOutsideRing =
+    preferredAtoms.length > 0 && !ringOwnsPreferredAtoms;
+
+  if (ringParent && ringOwnsPreferredAtoms) {
+    return ringParent;
+  }
+
+  // If the principal suffix group is outside the ring, build an external
+  // acyclic parent instead of letting phenol/benzene win.
+  // Example:
+  // HO-Ph-CH2-CH2-C(=O)-CH3 -> 4-(4-hydroxyphenyl)butan-2-one
+  if (preferredAtomsAreOutsideRing) {
+    const externalPath = getBestExternalPreferredCarbonPath(
+      parsedMol,
+      preferredAtoms,
+      ring.ringAtoms
+    );
+
+    if (externalPath.length > 0) {
+      const orientedPath = orientPathForPreferredAtomsAndUnsaturation(
+        parsedMol,
+        externalPath,
+        preferredAtoms
+      );
+
+      const prefix = CHAIN_PREFIXES[orientedPath.length];
+
       return {
-        kind: "ring",
-        path: orientRingPathForNaming(parsedMol, ring.ringAtoms),
-        carbonCount: ring.ringAtoms.length,
-        parentHydrocarbon: aromaticRing ? "benzene" : `cyclo${prefix}ane`,
-        parentStem: aromaticRing ? "benzen" : `cyclo${prefix}an`,
-        aromaticRing,
+        kind: "chain",
+        path: orientedPath,
+        carbonCount: orientedPath.length,
+        parentHydrocarbon: getHydrocarbonBaseName(parsedMol, orientedPath),
+        parentStem: prefix ? `${prefix}an` : null,
       };
     }
   }
+
+  const suffixBearingAtoms = getSuffixBearingCarbonCandidates(parsedMol);
+  const ringOwnsRelevantSuffix =
+    ringContainsAnyAtom(ring, suffixBearingAtoms);
+
+  if (
+    ringParent &&
+    (ringOwnsRelevantSuffix || ring.ringAtoms.length >= acyclicPath.length)
+  ) {
+    return ringParent;
+  }
+}
 
   const carbonPath = orientPathForPreferredAtomsAndUnsaturation(
     parsedMol,
@@ -1078,7 +1271,6 @@ export function getParentDescriptor(
     parentStem: prefix ? `${prefix}an` : null,
   };
 }
-
 export function getLocantMap(parent: ParentDescriptor) {
   const locants = new Map<number, number>();
 
