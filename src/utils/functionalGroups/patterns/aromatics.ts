@@ -50,6 +50,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     prefix: "methoxy",
     equivalentNames: ["methoxybenzene"],
     smarts: "c1ccccc1OC",
+    displaySmarts: "[cR1][OX2][CH3]",
     mcatNote:
       "Anisole is methoxybenzene, containing a methoxy group directly attached to a benzene ring.",
     category: "functionalGroup",
@@ -83,8 +84,24 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     smarts: "[a][CH3;!R]",
     mcatNote:
       "Toluene is methylbenzene, containing a single methyl group directly attached to a benzene ring. It is the simplest alkylbenzene.",
-    category: "substituent",
+    category: "functionalGroup",
     },
+      {
+    name: "Benzaldehyde",
+    priority: 8.2,
+    nomenclaturePriority: 8.2,
+    confidence: "High",
+    suffix: "benzaldehyde",
+    prefix: "formyl",
+    equivalentNames: ["benzenecarbaldehyde", "phenylmethanal"],
+    smarts:
+      "[cR1]1[cR1][cR1][cR1][cR1][cR1]1[CX3H1](=[OX1])",
+    displaySmarts:
+      "[cR1][CX3H1](=[OX1])",
+    mcatNote:
+      "Benzaldehyde is an aromatic aldehyde with a formyl group directly attached to a benzene ring: Ph-CHO.",
+    category: "functionalGroup",
+  },
   {
     name: "Aryl amine",
     priority: 14.3,
@@ -99,26 +116,28 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
       displaySmarts: "c[NX3]",
       category: "functionalGroup",
     },
-  {
+      {
     name: "Aniline",
-    priority: 14.2,
-    nomenclaturePriority: 13.05,
+    priority: 14.1,
+    nomenclaturePriority: 13.01,
     confidence: "High",
     suffix: "-aniline",
     prefix: "amino",
     equivalentNames: ["aminobenzene", "phenylamine"],
-    smarts: "c1ccccc1N",
+    smarts:
+      "[cR1]1[cR1][cR1][cR1]([NX3H2;!$(NC=O);!$(N=C);!$([N+](=O)[O-]);!$(N=N)])[cR1][cR1]1",
+    displaySmarts:
+      "[cR1][NX3H2;!$(NC=O);!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
     mcatNote:
-      "Aniline is aminobenzene, containing an NH₂ group directly attached to a benzene ring. It is the parent aromatic amine.",
-    displaySmarts: "c[NX3H2]",
-      category: "functionalGroup",
-    },
+      "Aniline is aminobenzene: a primary amino group (-NH₂) directly attached to a non-fused benzene ring. This catches aniline and substituted anilines, while avoiding nitrobenzene, amides, imines, azo/diazo groups, pyridyl amines, and fused aryl amines such as naphthylamine.",
+    category: "functionalGroup",
+  },
       {
     name: "Primary aryl amine",
     priority: 14.15,
     nomenclaturePriority: 13.02,
     confidence: "High",
-    suffix: "Usually named as substituted aniline",
+    suffix: "Never suffix",
     prefix: "amino",
     equivalentNames: ["primary aniline derivative", "aryl primary amine"],
     smarts:
@@ -134,7 +153,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     priority: 14.16,
     nomenclaturePriority: 13.03,
     confidence: "High",
-    suffix: "Usually named as N-substituted aniline",
+    suffix: "Never suffix",
     prefix: "amino",
     equivalentNames: ["secondary aniline derivative", "aryl secondary amine"],
     smarts:
@@ -150,7 +169,7 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     priority: 14.17,
     nomenclaturePriority: 13.04,
     confidence: "High",
-    suffix: "Usually named as N,N-disubstituted aniline",
+    suffix: "Never suffix",
     prefix: "amino",
     equivalentNames: ["tertiary aniline derivative", "aryl tertiary amine"],
     smarts:
@@ -186,7 +205,6 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
       "Nitrobenzenes contain a nitro group attached to an aromatic ring. Nitro groups are strongly electron-withdrawing.",
     category: "functionalGroup",
     },
-
     {
   name: "Benzenediazonium",
   priority: 18.3,
@@ -206,6 +224,91 @@ export const aromaticGroups: FunctionalGroupPattern[] = [
     "Benzenediazonium groups contain an aryl-N≡N⁺ unit. Aryl diazonium salts are key intermediates in Sandmeyer reactions, azo coupling, and aromatic substitution chemistry.",
   category: "functionalGroup",
 },
+{
+  name: "Benzyl azide",
+  priority: 29.45,
+  nomenclaturePriority: 20.45,
+  confidence: "High",
+  suffix: "Never suffix",
+  prefix: "azidomethyl",
+  equivalentNames: ["benzylic azide", "phenylmethyl azide"],
+  smarts:
+    "[cR1]1[cR1][cR1][cR1][cR1][cR1]1[CH2]~[N;D2,N-;D2]~[N+;D2]~[N;D1,N-;D1]",
+  displaySmarts:
+    "[cR1][CH2]~[N;D2,N-;D2]~[N+;D2]~[N;D1,N-;D1]",
+  mcatNote:
+    "Benzyl azides contain an azide group attached to a benzylic CH2 group, Ph-CH2-N3. This is different from an acyl azide, which contains R-C(=O)-N3.",
+  category: "functionalGroup",
+},
+  {
+    name: "Benzyl alcohol",
+    priority: 9.65,
+    nomenclaturePriority: 9.65,
+    confidence: "High",
+    suffix: "benzyl alcohol",
+    prefix: "hydroxymethyl",
+    equivalentNames: ["phenylmethanol"],
+    smarts:
+      "[cR1]1[cR1][cR1][cR1][cR1][cR1]1[CX4H2;!R][OX2H]",
+    displaySmarts:
+      "[cR1][CX4H2;!R][OX2H]",
+    mcatNote:
+      "Benzyl alcohol is Ph-CH2OH. The hydroxyl group is on the benzylic carbon, not directly on the aromatic ring, so it is not a phenol.",
+    category: "functionalGroup",
+  },
+  {
+  name: "Benzyl amine",
+  priority: 14.25,
+  nomenclaturePriority: 13.08,
+  confidence: "High",
+  suffix: "benzylamine",
+  prefix: "aminomethyl",
+  equivalentNames: [
+    "benzylamine",
+    "phenylmethanamine",
+    "benzylic amine",
+    "phenylmethylamine",
+  ],
+  smarts:
+    "[cR1]1[cR1][cR1][cR1][cR1][cR1]1[CX4H2;!R][NX3;!$(NC=O);!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+  displaySmarts:
+    "[cR1][CX4H2;!R][NX3;!$(NC=O);!$(N=C);!$([N+](=O)[O-]);!$(N=N)]",
+  mcatNote:
+    "Benzyl amines contain an amine attached to the benzylic CH2 group, Ph-CH2-N. This is different from aniline, where the nitrogen is directly attached to the aromatic ring.",
+  category: "functionalGroup",
+},
+    {
+    name: "Benzoic acid",
+    priority: 1.2,
+    nomenclaturePriority: 1.2,
+    confidence: "High",
+    suffix: "benzoic acid",
+    prefix: "carboxy",
+    equivalentNames: ["benzenecarboxylic acid"],
+    smarts:
+      "[cR1]1[cR1][cR1][cR1][cR1][cR1]1[CX3](=[OX1])[OX2H1]",
+    displaySmarts:
+      "[cR1][CX3](=[OX1])[OX2H1]",
+    mcatNote:
+      "Benzoic acid is an aromatic carboxylic acid with a carboxyl group directly attached to a benzene ring: Ph-CO2H.",
+    category: "functionalGroup",
+  },
+  {
+    name: "Benzamide",
+    priority: 6.05,
+    nomenclaturePriority: 6.05,
+    confidence: "High",
+    suffix: "benzamide",
+    prefix: "carbamoyl",
+    equivalentNames: ["benzenecarboxamide"],
+    smarts:
+      "[cR1]1[cR1][cR1][cR1][cR1][cR1]1[CX3](=[OX1])[NX3]",
+    displaySmarts:
+      "[cR1][CX3](=[OX1])[NX3]",
+    mcatNote:
+      "Benzamide is an aromatic amide with an amide carbonyl directly attached to a benzene ring: Ph-CONH2. N-substituted benzamides keep the same benzamide core.",
+    category: "functionalGroup",
+  },
 
 // MULTI RING or NON HEXAGONAL RINGS
 

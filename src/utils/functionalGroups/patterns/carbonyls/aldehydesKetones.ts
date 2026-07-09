@@ -28,6 +28,38 @@ export const aldehydeKetoneGroups: FunctionalGroupPattern[] = [
     displaySmarts: "[CX3]=[OX1]",
     category: "functionalGroup",
   },
+  
+  {
+  name: "Acyl azide",
+  priority: 5.5,
+  nomenclaturePriority: 5.5,
+  confidence: "High",
+  suffix: "-oyl azide",
+  prefix: "azidocarbonyl",
+  equivalentNames: ["carbonyl azide", "carboxylic acid azide"],
+  smarts: "[CX3](=[OX1])~[N;D2,N-;D2]~[N+;D2]~[N;D1,N-;D1]",
+  displaySmarts:
+    "[CX3](=[OX1])~[N;D2,N-;D2]~[N+;D2]~[N;D1,N-;D1]",
+  mcatNote:
+    "Acyl azides are carboxylic acid derivatives with the R-C(=O)-N3 motif. They are reactive acylating/azide compounds and can rearrange to isocyanates in the Curtius rearrangement.",
+  category: "functionalGroup",
+},
+{
+  name: "Acyl azide",
+  priority: 5.5,
+  nomenclaturePriority: 5.5,
+  confidence: "High",
+  suffix: "-oyl azide",
+  prefix: "azidocarbonyl",
+  equivalentNames: ["carbonyl azide", "carboxylic acid azide"],
+  smarts:
+    "[CX3](=[OX1])[N;D2,N-;D2]~[N+;D2]~[N;D1,N-;D1]",
+  displaySmarts:
+    "[CX3](=[OX1])[N;D2,N-;D2]~[N+;D2]~[N;D1,N-;D1]",
+  mcatNote:
+    "Acyl azides are carboxylic acid derivatives with the R-C(=O)-N3 motif. This pattern accepts both common azide resonance drawings.",
+  category: "functionalGroup",
+},
   {
     name: "Aldol",
     priority: 10.7,

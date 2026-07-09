@@ -1,6 +1,6 @@
 import type { FunctionalGroupPattern } from "../types";
 
-export const sulfurPhosphorusGroups: FunctionalGroupPattern[] = [
+export const sulfurGroups: FunctionalGroupPattern[] = [
   {
     name: "Sulfonic acid",
     priority: 2,
@@ -53,19 +53,7 @@ export const sulfurPhosphorusGroups: FunctionalGroupPattern[] = [
       "Disulfides contain an S-S bond and commonly link cysteine residues in proteins.",
     category: "functionalGroup",
     },
-  {
-    name: "Phosphine",
-    priority: 16,
-    nomenclaturePriority: 13.5,
-    confidence: "Medium",
-    suffix: "-phosphane",
-    prefix: "phosphanyl",
-    smarts: "[PX3]",
-    displaySmarts: "[PX3]",
-    mcatNote:
-      "Phosphines contain trivalent phosphorus. They are widely used as ligands and in Wittig chemistry.",
-    category: "functionalGroup",
-    },
+
   {
     name: "Thioether",
     priority: 20,
@@ -116,45 +104,6 @@ export const sulfurPhosphorusGroups: FunctionalGroupPattern[] = [
     displaySmarts: "S(=O)(=O)O",
     mcatNote:
       "Sulfonate esters are excellent leaving groups and include tosylates, mesylates, and triflates.",
-    category: "functionalGroup",
-    },
-  {
-    name: "Phosphate",
-    priority: 33,
-    nomenclaturePriority: 24,
-    confidence: "Medium",
-    suffix: "phosphate",
-    prefix: "phospho",
-    smarts: "P(=O)(O)O",
-    displaySmarts: "P(=O)(O)O",
-    mcatNote:
-      "Phosphates are highly charged and important in ATP, DNA/RNA, signaling, and metabolism.",
-    category: "functionalGroup",
-    },
-  {
-    name: "Phosphonate",
-    priority: 33.2,
-    nomenclaturePriority: 24.2,
-    confidence: "Medium",
-    suffix: "phosphonate",
-    prefix: "phosphonato",
-    smarts: "[#6]P(=O)(O)O",
-    displaySmarts: "P(=O)(O)O",
-    mcatNote:
-      "Phosphonates contain a direct carbon-phosphorus bond and are common in medicinal and organophosphorus chemistry.",
-    category: "functionalGroup",
-    },
-  {
-    name: "Phosphine oxide",
-    priority: 33.4,
-    nomenclaturePriority: 24.4,
-    confidence: "Medium",
-    suffix: "phosphine oxide",
-    prefix: "phosphoryl",
-    smarts: "[PX4](=O)",
-    displaySmarts: "[PX4](=O)",
-    mcatNote:
-      "Phosphine oxides contain a polarized P=O bond and are common products of Wittig reactions.",
     category: "functionalGroup",
     },
   {
@@ -259,45 +208,6 @@ export const sulfurPhosphorusGroups: FunctionalGroupPattern[] = [
     displaySmarts: "[SX3](=O)[OX2H]",
     mcatNote:
       "Sulfinic acids are partially oxidized sulfur acids lying between thiols and sulfonic acids.",
-    category: "functionalGroup",
-  },
-  {
-    name: "Phosphinate",
-    priority: 33.3,
-    nomenclaturePriority: 24.3,
-    confidence: "Medium",
-    suffix: "phosphinate",
-    prefix: "phosphinato",
-    smarts: "[#6][PX4](=O)(O)[#6]",
-    displaySmarts: "[PX4](=O)(O)",
-    mcatNote:
-      "Phosphinates contain one P-C bond and one P-O bond and are intermediates between phosphonates and phosphine oxides.",
-    category: "functionalGroup",
-  },
-  {
-    name: "Phosphoramidate",
-    priority: 33.5,
-    nomenclaturePriority: 24.5,
-    confidence: "Medium",
-    suffix: "phosphoramidate",
-    prefix: "phosphoramidato",
-    smarts: "P(=O)(N)O",
-    displaySmarts: "P(=O)(N)O",
-    mcatNote:
-      "Phosphoramidates contain a phosphorus-nitrogen bond and are important in medicinal chemistry and prodrug design.",
-    category: "functionalGroup",
-  },
-  {
-    name: "Phosphodiester",
-    priority: 33.6,
-    nomenclaturePriority: 24.6,
-    confidence: "High",
-    suffix: "phosphodiester",
-    prefix: "phosphodiester",
-    smarts: "P(=O)(O[#6])O[#6]",
-    displaySmarts: "P(=O)(O[#6])O[#6]",
-    mcatNote:
-      "Phosphodiesters connect nucleotides in DNA and RNA and are among the most important biological phosphorus functional groups.",
     category: "functionalGroup",
   },
 ];

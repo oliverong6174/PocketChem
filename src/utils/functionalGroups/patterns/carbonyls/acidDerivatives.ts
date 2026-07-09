@@ -141,18 +141,24 @@ export const acidDerivativeGroups: FunctionalGroupPattern[] = [
     category: "functionalGroup",
     },
     {
-  name: "Urea",
-  priority: 6.15,
-  nomenclaturePriority: 6.15,
-  confidence: "High",
-  suffix: "urea",
-  prefix: "ureido",
-  smarts: "[NX3][CX3](=O)[NX3]",
-  displaySmarts: "[NX3][CX3](=O)[NX3]",
-  mcatNote:
-    "Ureas contain a carbonyl bonded to two nitrogens. They are common in biochemistry, medicinal chemistry, and protein denaturation chemistry.",
-  category: "functionalGroup",
-},
+      name: "Urea",
+      priority: 6.15,
+      nomenclaturePriority: 6.15,
+      confidence: "High",
+      suffix: "urea",
+      prefix: "ureido",
+      equivalentNames: [
+        "carbamide",
+        "ureido group",
+      ],
+      smarts:
+        "[#7;!$([#7+](=O)[O-]);!$([#7]=O)][CX3](=[OX1])[#7;!$([#7+](=O)[O-]);!$([#7]=O)]",
+      displaySmarts:
+        "[#7;!$([#7+](=O)[O-]);!$([#7]=O)][CX3](=[OX1])[#7;!$([#7+](=O)[O-]);!$([#7]=O)]",
+      mcatNote:
+        "Ureas contain a carbonyl bonded directly to two nitrogens: N-C(=O)-N. This includes unsubstituted urea, mono-substituted ureas, secondary/tertiary N-substituted ureas, cyclic ureas, and fully N-substituted ureas.",
+      category: "functionalGroup",
+    },
 {
   name: "Hydroxamic acid",
   priority: 6.25,

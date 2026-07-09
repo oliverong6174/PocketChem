@@ -79,7 +79,6 @@ const COMMON_NAME_MAP: Record<string, string> = {
     "butanal": "butyraldehyde",
     "pentanal": "valeraldehyde",
     "hexanal": "caproaldehyde",
-    "benzaldehyde": "benzaldehyde",
     "2-hydroxybenzaldehyde": "salicylaldehyde",
     "4-hydroxybenzaldehyde": "p-hydroxybenzaldehyde",
     "2-oxopropanedial": "mesoxaldehyde",
@@ -175,11 +174,11 @@ const COMMON_NAME_MAP: Record<string, string> = {
     "ethanamide": "acetamide",
     "propanamide": "propionamide",
     "butanamide": "butyramide",
-    "benzamide": "benzamide",
     "n,n-dimethylmethanamide": "DMF",
     "n,n-dimethylformamide": "DMF",
     "n,n-dimethylethanamide": "DMA",
     "n,n-dimethylacetamide": "DMA",
+    "N-(2-hydroxyethyl)-2-aminoethanol": "DEA",
 
     // ----------------------------
     // Esters

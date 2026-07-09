@@ -70,7 +70,7 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   "Primary amine": ["Amine"],
   "Secondary amine": ["Amine"],
   "Tertiary amine": ["Amine"],
-  Aniline: ["Benzene", "Aryl amine", "Primary amine", "Amine"],
+  Aniline: ["Benzene", "Aryl amine", "Primary aryl amine","Primary amine", "Amine"],
   "Aryl amine": ["Benzene", "Primary amine", "Amine"],
 
   //Anilines
@@ -96,9 +96,60 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   "N-oxide": ["Amine"],
   "Nitro": ["N-oxide", "Nitroso", "Amine"],
   Azide: [],
+
+  "Acyl azide": [
+  "Azide",
+  "Amide",
+  "Primary amide",
+  "Secondary amide",
+  "Tertiary amide",
+  "Amine",
+  "Primary amine",
+  "Secondary amine",
+  "Tertiary amine",
+],
   Isocyanide: ["Nitrile"],
   Isocyanate: ["Amine", "Primary amine", "Secondary amine", "Tertiary amine"],
   Diazo: ["Amine", "Primary amine", "Secondary amine", "Tertiary amine"],
+  Amidine: [
+  "Imine",
+  "Amine",
+  "Primary amine",
+  "Secondary amine",
+  "Tertiary amine",
+],
+
+Guanidine: [
+  "Amidine",
+  "Imine",
+  "Amine",
+  "Primary amine",
+  "Secondary amine",
+  "Tertiary amine",
+],
+
+Aldoxime: ["Imine"],
+Ketoxime: ["Imine"],
+Aminoxime: [
+  "Aldoxime",
+  "Ketoxime",
+  "Imine",
+  "Amine",
+  "Primary amine",
+  "Secondary amine",
+  "Tertiary amine",
+],
+
+  Urea: [
+  "Amide",
+  "Primary amide",
+  "Secondary amide",
+  "Tertiary amide",
+  "Amine",
+  "Primary amine",
+  "Secondary amine",
+  "Tertiary amine",
+],
 
 
   // Oxygen/ether motifs
@@ -114,7 +165,6 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Benzoin: ["Ketone", "Alcohol"],
   Imine: ["Amine", "Primary amine", "Secondary amine", "Tertiary amine"],
   Hydrazone: ["Imine", "Amine", "Primary amine", "Secondary amine", "Tertiary amine"],
-  Oxime: ["Imine"],
 
   // Conjugated carbonyls / Michael acceptors
   Enal: ["Aldehyde", "Alkene", "Acryloyl group"],
@@ -166,6 +216,40 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
 ],
   "Benzenediazonium": ["Aniline", "Benzene", "Diazo", "Amine", "Primary amine", "Secondary amine", "Tertiary amine"],
 
+    Benzaldehyde: [
+    "Benzene",
+    "Aldehyde",
+  ],
+
+  "Benzyl alcohol": [
+    "Benzene",
+    "Alkylbenzene",
+    "Alcohol",
+    "Primary alcohol",
+  ],
+
+  "Benzyl amine": [
+  "Benzene",
+  "Alkylbenzene",
+  "Amine",
+  "Primary amine",
+  "Secondary amine",
+  "Tertiary amine",
+],
+
+  "Benzoic acid": [
+    "Benzene",
+    "Carboxylic acid",
+  ],
+
+  Benzamide: [
+    "Benzene",
+    "Amide",
+    "Primary amide",
+    "Secondary amide",
+    "Tertiary amide",
+    "Amine",
+  ],
 
   Naphthalene: ["Benzene"],
   Anthracene: ["Benzene", "Naphthalene"],
@@ -190,7 +274,7 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   "Terminal alkyne": ["Alkyne"],
   "Internal alkyne": ["Alkyne"],
 
-  // Sulfur/phosphorus
+  // Sulfur
   Sulfoxide: ["Thioether"],
   Sulfone: ["Sulfoxide", "Thioether"],
   "Sulfonic acid": ["Sulfone"],
@@ -210,6 +294,131 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Thioketone: ["Ketone"],
   Thioaldehyde: ["Aldehyde"],
 
+  //Phosphorus
+  "Phosphate ester": ["Phosphate"],
+
+  "Phosphodiester": [
+    "Phosphate ester",
+    "Phosphate",
+  ],
+
+  "Phosphate triester": [
+    "Phosphodiester",
+    "Phosphate ester",
+    "Phosphate",
+  ],
+
+  Phosphonate: [
+  "Primary phosphine oxide",
+  "Secondary phosphine oxide",
+  "Tertiary phosphine oxide",
+],
+
+"Phosphonate ester": [
+  "Phosphonate",
+  "Primary phosphine oxide",
+  "Secondary phosphine oxide",
+  "Tertiary phosphine oxide",
+],
+
+"Phosphonate diester": [
+  "Phosphonate ester",
+  "Phosphonate",
+  "Primary phosphine oxide",
+  "Secondary phosphine oxide",
+  "Tertiary phosphine oxide",
+],
+
+Phosphinate: [
+  "Phosphonate diester",
+  "Phosphonate ester",
+  "Phosphonate",
+  "Primary phosphine oxide",
+  "Secondary phosphine oxide",
+  "Tertiary phosphine oxide",
+],
+
+  "Phosphine oxide": [
+    "Phosphate",
+  ],
+
+  "Primary phosphine oxide": [
+    "Phosphine oxide",
+  ],
+
+  "Secondary phosphine oxide": [
+  "Primary phosphine oxide",
+  "Phosphine oxide",
+],
+
+"Tertiary phosphine oxide": [
+  "Secondary phosphine oxide",
+  "Primary phosphine oxide",
+  "Phosphine oxide",
+],
+
+
+  "Phosphine sulfide": [
+    "Thiophosphate ester",
+    "Dithiophosphate",
+  ],
+
+  "Primary phosphine sulfide": [
+  "Phosphine sulfide",
+],
+
+"Secondary phosphine sulfide": [
+  "Primary phosphine sulfide",
+  "Phosphine sulfide",
+],
+
+"Tertiary phosphine sulfide": [
+  "Secondary phosphine sulfide",
+  "Primary phosphine sulfide",
+  "Phosphine sulfide",
+],
+
+"Thiophosphate ester": [
+  "Phosphine sulfide",
+  "Primary phosphine sulfide",
+  "Secondary phosphine sulfide",
+  "Tertiary phosphine sulfide",
+  "Phosphate ester",
+  "Phosphate",
+],
+
+Dithiophosphate: [
+  "Thiophosphate ester",
+  "Phosphine sulfide",
+  "Primary phosphine sulfide",
+  "Secondary phosphine sulfide",
+  "Tertiary phosphine sulfide",
+  "Phosphate ester",
+  "Phosphate",
+],
+
+
+
+  Phosphoramidate: [
+    "Phosphate",
+    "Phosphine oxide",
+    "Amine",
+    "Primary amine",
+    "Secondary amine",
+    "Tertiary amine",
+    "Primary phosphine oxide",
+  "Secondary phosphine oxide",
+  "Tertiary phosphine oxide",
+  ],
+
+  Phosphoramidite: [
+  "Phosphine",
+  "Amine",
+  "Primary amine",
+  "Secondary amine",
+  "Tertiary amine",
+],
+
   //Cycloalkanes
   Cyclopropane: ["Cycloalkane", "Alkane"],
   Cyclobutane: ["Cycloalkane", "Alkane"],
@@ -218,30 +427,118 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Cycloalkene: ["Alkene"],
   Cycloalkyne: ["Alkyne"],
 
+  //Boron and Silicon
+    // Boron
+  Alkylborane: [
+    "Organoboron",
+  ],
+
+  "Boronic acid": [
+    "Organoboron",
+  ],
+
+  "Boronate monoester": [
+    "Boronic acid",
+    "Organoboron",
+  ],
+
+  "Boronate ester": [
+    "Boronate monoester",
+    "Boronic acid",
+    "Organoboron",
+  ],
+
+  "Borinic acid": [
+    "Organoboron",
+  ],
+
+  "Borinic ester": [
+    "Borinic acid",
+    "Organoboron",
+  ],
+
+  "Borate ester": [
+    "Organoboron",
+  ],
+
+  Organotrifluoroborate: [
+    "Organoboron",
+    "Halogen",
+  ],
+
+  // Silicon
+  Silane: [
+    "Organosilicon",
+  ],
+
+  "Silyl ether": [
+    "Silane",
+    "Organosilicon",
+  ],
+
+  "Silyl enol ether": [
+    "Silyl ether",
+    "Silane",
+    "Organosilicon",
+    "Alkene",
+  ],
+
+  Silanol: [
+    "Silane",
+    "Organosilicon",
+  ],
+
+  Siloxane: [
+    "Silanol",
+    "Silane",
+    "Organosilicon",
+  ],
+
+  "Silyl halide": [
+    "Silane",
+    "Organosilicon",
+    "Halogen",
+  ],
+
+  Disilane: [
+    "Silane",
+    "Organosilicon",
+  ],
+
   //Halogens
-  "Haloalkane": ["Halogen"],
+"Vinyl halide": [
+  "Halogen",
+  "Alkene"
+],
 
-  "Allylic halide": ["Haloalkane", "Halogen"],
-  "Benzylic halide": ["Haloalkane", "Halogen"],
+"Allylic halide": [
+  "Haloalkane",
+  "Halogen",
+  "Alkene",
+],
 
-  "Geminal dihalide": ["Haloalkane", "Halogen"],
-  "Vicinal dihalide": ["Haloalkane", "Halogen"],
+"Benzyl halide": [
+  "Benzene",
+  "Alkylbenzene",
+  "Haloalkane",
+  "Halogen",
+],
 
-  "Allylic fluoride": ["Allylic halide", "Haloalkane", "Halogen"],
-  "Allylic chloride": ["Allylic halide", "Haloalkane", "Halogen"],
-  "Allylic bromide": ["Allylic halide", "Haloalkane", "Halogen"],
+"Geminal dihalide": [
+  "Haloalkane",
+  "Halogen",
+],
 
-  "Benzylic chloride": ["Benzylic halide", "Haloalkane", "Halogen"],
-  "Benzylic bromide": ["Benzylic halide", "Haloalkane", "Halogen"],
+"Vicinal dihalide": [
+  "Haloalkane",
+  "Halogen",
+],
   
   //Advanced Groups
   Hydroperoxide: ["Peroxide"],
   Oxetane: ["Ether"],
   Aziridine: ["Amine"], 
-  Guanidine: ["Amidine", "Amine"],
-  Urea: ["Amide"],
   "Hydroxamic acid": ["Amide"],
-  "Phosphodiester": ["Phosphate"],
 
  
 };

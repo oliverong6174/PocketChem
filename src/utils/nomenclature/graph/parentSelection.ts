@@ -1000,6 +1000,44 @@ function isCarbonylCarbon(parsedMol: ParsedMol, atomIndex: number) {
   });
 }
 
+function isRetainedAromaticAcylCarbon(
+  parsedMol: ParsedMol,
+  carbonIndex: number
+) {
+  return (
+    isAldehydeCarbon(parsedMol, carbonIndex) ||
+    isCarboxylicAcidCarbon(parsedMol, carbonIndex) ||
+    isEsterCarbon(parsedMol, carbonIndex) ||
+    isAmideCarbon(parsedMol, carbonIndex) ||
+    isAcidHalideCarbon(parsedMol, carbonIndex)
+  );
+}
+
+function ringHasAttachedRetainedAromaticAcylGroup(
+  parsedMol: ParsedMol,
+  ring: RingDescriptor,
+  preferredAtoms: number[]
+) {
+  if (preferredAtoms.length === 0) return false;
+
+  const ringSet = new Set(ring.ringAtoms);
+  const preferredSet = new Set(preferredAtoms);
+
+  for (const ringAtom of ring.ringAtoms) {
+    for (const bond of parsedMol.adjacency.get(ringAtom) ?? []) {
+      const outsideAtom = getOtherAtom(bond, ringAtom);
+
+      if (ringSet.has(outsideAtom)) continue;
+      if (!preferredSet.has(outsideAtom)) continue;
+      if (!isRetainedAromaticAcylCarbon(parsedMol, outsideAtom)) continue;
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function getBestExternalPreferredCarbonPath(
   parsedMol: ParsedMol,
   preferredAtoms: number[],
@@ -1085,6 +1123,13 @@ export function getBestAcylParentDescriptor(
       ? preferredCarbonylCarbons
       : allCarbonylCarbons;
 
+
+  const aromaticRing = getSimpleCarbonRing(parsedMol);
+  const aromaticRingSet =
+    aromaticRing && isBenzeneLikeRing(parsedMol, aromaticRing)
+      ? new Set(aromaticRing.ringAtoms)
+      : new Set<number>();
+
   let bestPath: number[] = [];
 
   const isBetterAcylPath = (path: number[]) => {
@@ -1119,6 +1164,7 @@ export function getBestAcylParentDescriptor(
 
       if (!nextAtom || nextAtom.element !== "C") continue;
       if (visited.has(next)) continue;
+      if (aromaticRingSet.has(next)) continue;
 
       visited.add(next);
       dfs(next, visited, [...path, next]);
@@ -1212,6 +1258,17 @@ export function getParentDescriptor(
   if (ringParent && ringOwnsPreferredAtoms) {
     return ringParent;
   }
+
+  if (
+  ringParent?.aromaticRing &&
+  ringHasAttachedRetainedAromaticAcylGroup(
+    parsedMol,
+    ring,
+    preferredAtoms
+  )
+) {
+  return ringParent;
+}
 
   // If the principal suffix group is outside the ring, build an external
   // acyclic parent instead of letting phenol/benzene win.
