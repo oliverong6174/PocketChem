@@ -4,17 +4,14 @@
     type AnnotationConcept,
     type MoleculeAnnotation,
   } from "./utils/moleculeAnnotation";
-  import { useEffect, useMemo, useRef, useState } from "react";
+  import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
   import MoleculeDrawer from "./components/MoleculeDrawer";
   import {
     analyzeFunctionalGroupHierarchy,
-    getMoleculeSvg,
     flattenFunctionalGroupOccurrences,
     type FunctionalGroupResult,
     type FunctionalGroupOccurrence,
   } from "./utils/functionalGroups";
-  import { analyzeAcidity, type AcidityResult } from "./utils/analyzeAcidity";
-  import { analyzeBasicity, type BasicityResult } from "./utils/analyzeBasicity";
   import {
     analyzeResonance,
     type ResonanceResult,
@@ -30,6 +27,7 @@
   } from "./utils/nomenclatureUtils";
 
   import ReactionsPage from "./components/ReactionsPage";
+  import AcidBasePage from "./components/AcidBasePage";
   import {
     predictReactionPathways,
     type ReactionPathway,
@@ -37,18 +35,6 @@
 
   import { initializeFunctionalGroups } from "./utils/functionalGroups/bootstrap";
 
-
-  type RankingMode = "acidity" | "basicity" | "anionStability";
-
-  type ComparisonMolecule = {
-    id: number;
-    label: string;
-    smiles: string;
-    structureSvg: string | null;
-    functionalGroups: FunctionalGroupResult[];
-    acidityResults: AcidityResult[];
-    basicityResults: BasicityResult[];
-  };
 
   type AnnotationCarouselItem =
     | {
@@ -72,6 +58,25 @@
       functionalGroup: FunctionalGroupOccurrence;
       };
     
+
+  type AnalysisPanel = "overview" | "groups" | "concepts" | "properties";
+
+  const ANALYSIS_PANELS: Array<{ id: AnalysisPanel; label: string }> = [
+    { id: "overview", label: "Overview" },
+    { id: "groups", label: "Groups" },
+    { id: "concepts", label: "Concepts" },
+    { id: "properties", label: "Properties" },
+  ];
+
+  const CONCEPT_OPTIONS: Array<{ id: AnnotationConcept; label: string }> = [
+    { id: "functionalGroups", label: "Functional Groups" },
+    { id: "hybridization", label: "Hybridization" },
+    { id: "bondOrbitals", label: "Bond Orbitals" },
+    { id: "lonePairs", label: "Lone Pairs" },
+    { id: "acidBaseSites", label: "Acid/Base Sites" },
+    { id: "reactiveSites", label: "Reactive Sites" },
+    { id: "chirality", label: "Chirality" },
+  ];
 
   type PropertyTileProps = {
     label: string;
@@ -113,13 +118,7 @@
     const [functionalGroups, setFunctionalGroups] = useState<
       FunctionalGroupResult[]
     >([]);
-    const [acidityResults, setAcidityResults] = useState<AcidityResult[]>([]);
-    const [basicityResults, setBasicityResults] = useState<BasicityResult[]>([]);
     const [resonanceResults, setResonanceResults] = useState<ResonanceResult[]>([]);
-    const [comparisonMolecules, setComparisonMolecules] = useState<
-    ComparisonMolecule[]
-    >([]);
-    const [rankingMode, setRankingMode] = useState<RankingMode>("acidity");
     const [moleculeAnnotation, setMoleculeAnnotation] =
       useState<MoleculeAnnotation | null>(null);
 
@@ -143,8 +142,43 @@
     const [moleculeIdentity, setMoleculeIdentity] =
     useState<MoleculeIdentityResult | null>(null);
 
-    const [activePage, setActivePage] = useState<"analysis" | "reactions">("analysis");
+    const [activePage, setActivePage] = useState<"analysis" | "acidBase" | "reactions">("analysis");
+    const [analysisPanel, setAnalysisPanel] = useState<AnalysisPanel>("overview");
     const [reactionPathways, setReactionPathways] = useState<ReactionPathway[]>([]);
+    const appShellRef = useRef<HTMLElement | null>(null);
+
+    const scrollToAppTop = () => {
+      const activeElement = document.activeElement as HTMLElement | null;
+      activeElement?.blur?.();
+
+      appShellRef.current?.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "auto",
+      });
+
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "auto",
+      });
+
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    const switchPage = (page: "analysis" | "acidBase" | "reactions") => {
+      scrollToAppTop();
+      setActivePage(page);
+    };
+
+    useLayoutEffect(() => {
+      scrollToAppTop();
+
+      requestAnimationFrame(() => {
+        scrollToAppTop();
+      });
+    }, [activePage]);
 
     const PROPERTY_INFO: Record<string, string> = {
     formula:
@@ -293,12 +327,6 @@
 
     setReactionPathways(pathways);
 
-    const acidity = await analyzeAcidity(safeSmiles, hierarchy.primaryGroups);
-    setAcidityResults(acidity);
-
-    const basicity = await analyzeBasicity(safeSmiles, hierarchy.primaryGroups);
-    setBasicityResults(basicity);
-
     let identity: MoleculeIdentityResult | null = null;
 
     try {
@@ -316,10 +344,10 @@
 
     setMoleculeIdentity(identity);
 
-    setStatus("Molecule analyzed successfully.");
+    setStatus("Success");
   } catch (error) {
     console.error("Analyze error:", error);
-    setStatus("Something went wrong while analyzing the molecule.");
+    setStatus("Error");
   } finally {
     // Always unlock. Do not condition this on latestAnalyzeRunRef.
     analyzeInFlightRef.current = false;
@@ -327,152 +355,6 @@
   }
 };
   
-    const addCurrentMoleculeToComparison = async () => {
-      if (!window.ketcher) {
-        setStatus("Molecule editor is still loading. Try again in a second.");
-        return;
-      }
-
-      if (comparisonMolecules.length >= 5) {
-        setStatus("Comparison list is full. You can compare up to 5 molecules.");
-        return;
-      }
-
-      try {
-        const currentSmiles = await window.ketcher.getSmiles();
-
-        if (!currentSmiles || currentSmiles.trim() === "") {
-          setStatus("Draw a molecule before adding it to comparison.");
-          return;
-        }
-
-        const hierarchy = await analyzeFunctionalGroupHierarchy(currentSmiles);
-        const acidity = await analyzeAcidity(currentSmiles, hierarchy.primaryGroups);
-        const basicity = await analyzeBasicity(currentSmiles, hierarchy.primaryGroups);
-        const structureSvg = await getMoleculeSvg(currentSmiles);
-
-        const nextLabel = `Molecule ${String.fromCharCode(
-          65 + comparisonMolecules.length
-        )}`;
-
-        const newMolecule: ComparisonMolecule = {
-          id: Date.now(),
-          label: nextLabel,
-          smiles: currentSmiles,
-          structureSvg,
-          functionalGroups: hierarchy.functionalGroups,
-          acidityResults: acidity,
-          basicityResults: basicity,
-        };
-
-        setComparisonMolecules((prev) => [...prev, newMolecule]);
-
-        // Also update the main analysis panel to match the molecule just added
-        setSmiles(currentSmiles);
-        setMainGroup(hierarchy.mainGroup);
-        setFunctionalGroups(hierarchy.functionalGroups);
-        setAcidityResults(acidity);
-        setBasicityResults(basicity);
-
-        setStatus(`${nextLabel} added to comparison.`);
-      } catch (error) {
-        console.error("Add to comparison error:", error);
-        setStatus("Something went wrong while adding the molecule to comparison.");
-      }
-    };
-
-    const deleteComparisonMolecule = (id: number) => {
-      setComparisonMolecules((prev) =>
-        prev.filter((molecule) => molecule.id !== id)
-      );
-
-      setStatus("Molecule removed from comparison.");
-    };
-
-    const getAnionStabilityScore = (molecule: ComparisonMolecule) => {
-      const bestBase = molecule.basicityResults[0];
-
-      if (!bestBase) return 999;
-
-      const group = bestBase.relatedGroup.toLowerCase();
-      const site = bestBase.basicSite.toLowerCase();
-      const explanation = bestBase.explanation.toLowerCase();
-
-      if (group.includes("carboxylate")) return 0;
-
-      if (
-        group.includes("alpha resonance-stabilized") ||
-        site.includes("alpha resonance-stabilized") ||
-        explanation.includes("resonance-stabilized")
-      ) {
-        return 1;
-      }
-
-      if (group.includes("methyl localized carbanion")) return 2;
-      if (group.includes("primary localized carbanion")) return 3;
-      if (group.includes("secondary localized carbanion")) return 4;
-      if (group.includes("tertiary localized carbanion")) return 5;
-
-      if (group.includes("carbanion")) return 6;
-
-      return 999;
-    };
-
-    const getRankedComparison = () => {
-      return [...comparisonMolecules].sort((a, b) => {
-        const aScore =
-          rankingMode === "acidity"
-            ? a.acidityResults[0]?.estimatedPkaNumber
-            : a.basicityResults[0]?.conjugateAcidPkaNumber;
-
-        const bScore =
-          rankingMode === "acidity"
-            ? b.acidityResults[0]?.estimatedPkaNumber
-            : b.basicityResults[0]?.conjugateAcidPkaNumber;
-
-        // Molecules with no rankable site go to the bottom
-        if (aScore === undefined && bScore === undefined) return 0;
-        if (aScore === undefined) return 1;
-        if (bScore === undefined) return -1;
-
-        // Lower pKa = stronger acid
-        if (rankingMode === "acidity") {
-          return aScore - bScore;
-        }
-
-        // Higher conjugate acid pKa = stronger base
-        if (rankingMode === "basicity") {
-          return bScore - aScore;
-        }
-
-        // Custom stability order:
-        // carboxylate > alpha resonance-stabilized > methyl > primary > secondary > tertiary
-        if (rankingMode === "anionStability") {
-          const aStabilityScore = getAnionStabilityScore(a);
-          const bStabilityScore = getAnionStabilityScore(b);
-
-          if (aStabilityScore !== bStabilityScore) {
-            return aStabilityScore - bStabilityScore;
-          }
-
-          // tie-breaker: lower conjugate acid pKa = more stable anion
-          return aScore - bScore;
-        }
-
-        return 0;
-      });
-    };
-
-  const rankedComparison = getRankedComparison();
-
-  const clearComparison = () => {
-    setComparisonMolecules([]);
-    setSmiles("Not analyzed yet");
-    setMainGroup(null);
-    setFunctionalGroups([]);                            
-    setStatus("Comparison list cleared.");
-  };
-
   const getAtomCardClassName = (atom: MoleculeAnnotation["atoms"][number]) => {
     const classes = ["annotation-card"];
 
@@ -1035,41 +917,270 @@
     };
   }, [highlightedMoleculeSvg, annotationCarouselItems]);
 
+  const renderCurrentAnnotationCard = () => {
+    if (!currentAnnotationItem) return null;
+
+    if (currentAnnotationItem.kind === "atom") {
+      return (
+        <div
+          className={getAtomCardClassName(currentAnnotationItem.atom)}
+          onClick={() => {
+            setSelectedAtomIndex(currentAnnotationItem.atom.atomIndex);
+            setSelectedBondIndex(null);
+          }}
+          role="button"
+          tabIndex={0}
+        >
+          <h3>
+            Atom {currentAnnotationItem.atom.atomIndex + 1}: {" "}
+            {currentAnnotationItem.atom.element}
+          </h3>
+
+          {selectedAtomIndex === currentAnnotationItem.atom.atomIndex && (
+            <p className="selected-note">Selected atom</p>
+          )}
+
+          <p>
+            <strong>Hybridization:</strong> {" "}
+            {currentAnnotationItem.atom.hybridization}
+          </p>
+
+          {selectedConcept === "lonePairs" && (
+            <>
+              <p>
+                <strong>Lone pairs:</strong> {" "}
+                {currentAnnotationItem.atom.lonePairInfo.count}
+              </p>
+              <p>
+                <strong>Lone pair orbital:</strong> {" "}
+                {currentAnnotationItem.atom.lonePairInfo.orbital}
+              </p>
+              <p>
+                <strong>Resonance participation:</strong> {" "}
+                {currentAnnotationItem.atom.lonePairInfo.participatesInResonance
+                  ? "Yes"
+                  : "No"}
+              </p>
+              <p>{currentAnnotationItem.atom.lonePairInfo.explanation}</p>
+            </>
+          )}
+
+          {currentAnnotationItem.atom.siteTypes.length > 0 &&
+            selectedConcept !== "lonePairs" && (
+              <p>
+                <strong>Site type:</strong> {" "}
+                {currentAnnotationItem.atom.siteTypes.join(", ")}
+              </p>
+            )}
+
+          {selectedConcept !== "lonePairs" && (
+            <p>{currentAnnotationItem.atom.explanation}</p>
+          )}
+        </div>
+      );
+    }
+
+    if (currentAnnotationItem.kind === "bond") {
+      return (
+        <div
+          className={getBondCardClassName(currentAnnotationItem.bond)}
+          onClick={() => {
+            setSelectedBondIndex(currentAnnotationItem.bond.bondIndex);
+            setSelectedAtomIndex(null);
+          }}
+          role="button"
+          tabIndex={0}
+        >
+          <h3>
+            {currentAnnotationItem.bond.bondType} bond: Atom {" "}
+            {currentAnnotationItem.bond.atomIndices[0] + 1}–Atom {" "}
+            {currentAnnotationItem.bond.atomIndices[1] + 1}
+          </h3>
+
+          {selectedBondIndex === currentAnnotationItem.bond.bondIndex && (
+            <p className="selected-note">Selected bond</p>
+          )}
+
+          <p>
+            <strong>Sigma overlap:</strong> {" "}
+            {currentAnnotationItem.bond.sigmaOverlap}
+          </p>
+
+          {currentAnnotationItem.bond.piOverlap && (
+            <p>
+              <strong>Pi overlap:</strong> {" "}
+              {currentAnnotationItem.bond.piOverlap}
+            </p>
+          )}
+
+          <p>
+            <strong>Orbital info:</strong> {" "}
+            {currentAnnotationItem.bond.orbitalInfo.join(", ")}
+          </p>
+
+          <p>{currentAnnotationItem.bond.explanation}</p>
+        </div>
+      );
+    }
+
+    if (currentAnnotationItem.kind === "chirality") {
+      return (
+        <div className="annotation-card annotation-card-selected">
+          <h3>
+            Atom {currentAnnotationItem.chirality.atomIndex + 1}: {" "}
+            {currentAnnotationItem.chirality.element}
+          </h3>
+
+          <p className="selected-note">Selected chiral center</p>
+
+          <p>
+            <strong>Configuration:</strong> {" "}
+            {currentAnnotationItem.chirality.configuration === "unknown"
+              ? "Not assigned"
+              : currentAnnotationItem.chirality.configuration}
+          </p>
+
+          <p>
+            <strong>Assignment source:</strong> {" "}
+            {currentAnnotationItem.chirality.assignmentSource === "rdkit"
+              ? "Automatic Analysis"
+              : currentAnnotationItem.chirality.assignmentSource ===
+                "pocketchem-fallback"
+              ? "Manual Analysis"
+              : "Unassigned"}
+          </p>
+
+          {currentAnnotationItem.chirality.configuration === "unknown" && (
+            <p className="empty">
+              Add wedge/dash bonds in Ketcher to specify stereochemistry for R/S
+              assignment.
+            </p>
+          )}
+
+          <p>
+            <strong>Type:</strong> {currentAnnotationItem.chirality.label}
+          </p>
+
+          <p>{currentAnnotationItem.chirality.explanation}</p>
+
+          <p>
+            <strong>Why this is chiral:</strong> {" "}
+            {currentAnnotationItem.chirality.whyChiralExplanation}
+          </p>
+
+          <p>
+            <strong>How the configuration was assigned:</strong> {" "}
+            {currentAnnotationItem.chirality.configurationExplanation}
+          </p>
+        </div>
+      );
+    }
+
+    if (currentAnnotationItem.kind === "functionalGroup") {
+      return (
+        <div className="annotation-card annotation-card-selected">
+          <h3>{currentAnnotationItem.functionalGroup.groupName}</h3>
+
+          <p className="selected-note">
+            Occurrence {currentAnnotationItem.functionalGroup.occurrence} / {" "}
+            {currentAnnotationItem.functionalGroup.totalOccurrences}
+          </p>
+
+          <p>
+            <strong>Confidence:</strong> {" "}
+            {currentAnnotationItem.functionalGroup.group.confidence}
+          </p>
+
+          <p>
+            <strong>Suffix:</strong> {" "}
+            {currentAnnotationItem.functionalGroup.group.suffix}
+          </p>
+
+          <p>
+            <strong>Prefix:</strong> {" "}
+            {currentAnnotationItem.functionalGroup.group.prefix}
+          </p>
+
+          <p>
+            <strong>Highlighted atoms:</strong> {" "}
+            {currentAnnotationItem.functionalGroup.atoms
+              .map((atomIndex) => atomIndex + 1)
+              .join(", ")}
+          </p>
+
+          <p>{currentAnnotationItem.functionalGroup.group.mcatNote}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  const clearAnalysis = () => {
+    analyzeInFlightRef.current = false;
+    latestAnalyzeRunRef.current = 0;
+    setIsAnalyzing(false);
+
+    setSmiles("Not analyzed yet");
+    setStatus("Draw a molecule first");
+    setMainGroup(null);
+    setFunctionalGroups([]);
+    setResonanceResults([]);
+    setChiralityResults([]);
+    setReactionPathways([]);
+    setActivePage("analysis");
+    setAnalysisPanel("overview");
+    setMoleculeAnnotation(null);
+    setSelectedAtomIndex(null);
+    setSelectedBondIndex(null);
+    setMolfile(null);
+    setMoleculeIdentity(null);
+  };
+
   {/*RETURN STATEMENT*/}
 
-
-    return (
-      <main className="app">
-        <section className="hero">
-          <div>
-            <p className="eyebrow">Multipurpose Organic Chemistry Tool</p>
-            <h1>PocketChem</h1>
-            <p className="subtitle">
-              Draw molecules, identify functional groups, understand mechanisms,
-              and connect organic chemistry to biochemistry.
-            </p>
-          </div>
-        </section>
-
-        <div className="page-tabs">
-          <button
-            className={activePage === "analysis" ? "page-tab active" : "page-tab"}
-            onClick={() => setActivePage("analysis")}
-          >
-            Analysis
-          </button>
-
-          <button
-            className={activePage === "reactions" ? "page-tab active" : "page-tab"}
-            onClick={() => setActivePage("reactions")}
-          >
-            Reactions
-          </button>
+  return (
+    <main className="app" ref={appShellRef}>
+      <section className="hero">
+        <div>
+          <p className="eyebrow">Multipurpose Organic Chemistry Tool</p>
+          <h1>PocketChem</h1>
+          <p className="subtitle">
+            Draw molecules, identify functional groups, understand mechanisms,
+            and connect organic chemistry to biochemistry.
+          </p>
         </div>
+      </section>
 
-        {activePage === "analysis" ? (
-      <section className="workspace">
-          <div className="card molecule-card">
+      <div className="page-tabs">
+        <button
+          className={activePage === "analysis" ? "page-tab active" : "page-tab"}
+          onClick={() => switchPage("analysis")}
+          type="button"
+        >
+          Analysis
+        </button>
+
+        <button
+          className={activePage === "acidBase" ? "page-tab active" : "page-tab"}
+          onClick={() => switchPage("acidBase")}
+          type="button"
+        >
+          Acid/Base
+        </button>
+
+        <button
+          className={activePage === "reactions" ? "page-tab active" : "page-tab"}
+          onClick={() => switchPage("reactions")}
+          type="button"
+        >
+          Reactions
+        </button>
+      </div>
+
+      {activePage === "analysis" ? (
+        <section className="workspace workspace-compact">
+          <div className="card molecule-card molecule-card-compact">
             <div className="card-header">
               <div>
                 <h2>Molecule Drawer</h2>
@@ -1078,7 +1189,7 @@
               <span className="status">Draw Mode</span>
             </div>
 
-            <div className="drawer-placeholder">
+            <div className="drawer-placeholder drawer-placeholder-compact">
               <MoleculeDrawer />
             </div>
 
@@ -1087,1006 +1198,567 @@
                 className="primary-button"
                 onClick={analyzeMolecule}
                 disabled={isAnalyzing}
+                type="button"
               >
                 {isAnalyzing ? "Analyzing..." : "Analyze Molecule"}
               </button>
 
-              {/* CLEAR BUTTON */}
-              
               <button
                 className="secondary-button"
-                onClick={() => {
-                  analyzeInFlightRef.current = false;
-                  latestAnalyzeRunRef.current = 0;
-                  setIsAnalyzing(false);
-                  
-                  setSmiles("Not analyzed yet");
-                  setStatus("Draw a molecule first");
-                  setMainGroup(null);
-                  setFunctionalGroups([]);
-                  setAcidityResults([]);
-                  setBasicityResults([]);
-                  setResonanceResults([]);
-                  setChiralityResults([]);
-                  setReactionPathways([]);
-                  setActivePage("analysis");
-                  setMoleculeAnnotation(null);
-                  setSelectedAtomIndex(null);
-                  setSelectedBondIndex(null);
-                  setMolfile(null);
-                  setMoleculeIdentity(null);
-                }}
+                onClick={clearAnalysis}
+                type="button"
               >
                 Clear Analysis
               </button>
-
-              <button className="secondary-button" onClick={addCurrentMoleculeToComparison}>
-                Add to Comparison
-              </button>
-
-              <button className="secondary-button" onClick={clearComparison}>
-                Clear Comparison
-              </button>
             </div>
           </div>
 
-        <div className="card analysis-card">
-    <h2>Analysis</h2>
-
-    <div className="analysis-section">
-      <p className="label">Status</p>
-      <p>{status}</p>
-    </div>
-
-    <div className="analysis-section">
-      <p className="label">SMILES</p>
-      <p className="smiles-output">{smiles}</p>
-    </div>
-
-  {/* NOMENCLATURE SECTION */}
-
-  <div className="analysis-section">
-    <p className="label">Nomenclature & Core Properties</p>
-
-    {!moleculeIdentity ? (
-      <p className="empty">
-        Analyze a molecule to estimate its name, formula, DBE, and basic molecular properties.
-      </p>
-    ) : (
-      <div className="group-list">
-        <div className="group-card">
-            <div className="group-card-header">
-              <h3>
-                {moleculeIdentity.nomenclature.displayName ||
-                  moleculeIdentity.nomenclature.estimatedName}
-              </h3>
-
-              <span>{moleculeIdentity.nomenclature.namingConfidence} confidence</span>
-            </div>
-    
-      
-
-          {moleculeIdentity.nomenclature.commonName && (
-            <p>
-              <strong>Common name:</strong>{" "}
-              {moleculeIdentity.nomenclature.commonName}
-            </p>
-          )}
-          <p>
-            <strong>Parent chain:</strong>{" "}
-            {moleculeIdentity.nomenclature.parentChain ?? "Not assigned"}
-            {moleculeIdentity.nomenclature.parentChainLength > 0
-              ? ` (${moleculeIdentity.nomenclature.parentChainLength} C)`
-              : ""}
-          </p>
-
-          <p>
-            <strong>Main suffix:</strong>{" "}
-            {moleculeIdentity.nomenclature.mainSuffix ??
-              "Hydrocarbon / no suffix group detected"}
-          </p>
-
-          {moleculeIdentity.nomenclature.prefixes.length > 0 && (
-            <p>
-              <strong>Detected prefixes:</strong>{" "}
-              {moleculeIdentity.nomenclature.prefixes.join(", ")}
-            </p>
-          )}
-
-          <p>{moleculeIdentity.nomenclature.explanation}</p>
-
-          <div className="limitation-list">
-            {moleculeIdentity.nomenclature.limitations.map((limitation) => (
-              <p className="empty" key={limitation}>
-                {limitation}
-              </p>
-            ))}
-          </div>
-        </div>
-
-  {/*PROPERTY SECTION*/}
-
-        <div className="property-grid">
-          <PropertyTile
-            label="Formula"
-            value={moleculeIdentity.properties.molecularFormula}
-            info={PROPERTY_INFO.formula}
-          />
-
-          <PropertyTile
-            label="DBE / unsaturation"
-            value={moleculeIdentity.properties.degreesOfUnsaturation ?? "N/A"}
-            info={PROPERTY_INFO.dbe}
-          />
-
-          <PropertyTile
-            label="Molecular weight"
-            value={
-              moleculeIdentity.properties.molecularWeight
-                ? `${moleculeIdentity.properties.molecularWeight} g/mol`
-                : "N/A"
-            }
-            info={PROPERTY_INFO.molecularWeight}
-          />
-
-          <PropertyTile
-            label="Exact mass"
-            value={moleculeIdentity.properties.exactMass ?? "N/A"}
-            info={PROPERTY_INFO.exactMass}
-          />
-
-          <PropertyTile
-            label="Formal charge"
-            value={moleculeIdentity.properties.formalCharge}
-            info={PROPERTY_INFO.formalCharge}
-          />
-
-          <PropertyTile
-            label="Heavy atoms"
-            value={moleculeIdentity.properties.heavyAtomCount}
-            info={PROPERTY_INFO.heavyAtoms}
-          />
-
-          <PropertyTile
-            label="Water solubility"
-            value={moleculeIdentity.properties.waterSolubilityTendency.level}
-            info={PROPERTY_INFO.waterSolubility}
-          />
-
-          <PropertyTile
-            label="Membrane permeability"
-            value={moleculeIdentity.properties.membranePermeabilityTendency.level}
-            info={PROPERTY_INFO.membranePermeability}
-          />
-
-          <PropertyTile
-          label="Boiling point tendency"
-          value={moleculeIdentity.properties.boilingPointTendency.level}
-          info={PROPERTY_INFO.boilingPoint}
-          />
-
-          
-          <PropertyTile
-            label="Volatility"
-            value={moleculeIdentity.properties.volatilityTendency.level}
-            info={PROPERTY_INFO.volatility}
-          />
-
-    
-
-          <PropertyTile
-            label="H-bond donors"
-            value={moleculeIdentity.properties.hydrogenBondDonors ?? "N/A"}
-            info={PROPERTY_INFO.hbd}
-          />
-
-          <PropertyTile
-            label="H-bond acceptors"
-            value={moleculeIdentity.properties.hydrogenBondAcceptors ?? "N/A"}
-            info={PROPERTY_INFO.hba}
-          />
-
-          <PropertyTile
-            label="Rotatable bonds"
-            value={moleculeIdentity.properties.rotatableBonds ?? "N/A"}
-            info={PROPERTY_INFO.rotatableBonds}
-          />
-
-          <PropertyTile
-            label="Rings"
-            value={moleculeIdentity.properties.ringCount ?? "N/A"}
-            info={PROPERTY_INFO.rings}
-          />
-        </div>
-      </div>
-    )}
-  </div>
-
-  {/* HIGHLIGHTING SECTION */}
-  <div className="analysis-section">
-    <p className="label">Concept View</p>
-      <div className="concept-button-row">
-
-        <button
-      className={
-        selectedConcept === "functionalGroups"
-          ? "concept-button active"
-          : "concept-button"
-      }
-      onClick={() => {
-        setSelectedConcept("functionalGroups");
-        setSelectedAtomIndex(null);
-        setSelectedBondIndex(null);
-      }}
-      type="button"
-    >
-      Functional Groups
-    </button>
-      <button
-        className={
-          selectedConcept === "hybridization"
-            ? "concept-button active"
-            : "concept-button"
-        }
-        onClick={() => {
-          setSelectedConcept("hybridization");
-          setSelectedAtomIndex(null);
-          setSelectedBondIndex(null);
-        }}
-        type="button"
-      >
-        Hybridization
-      </button>
-
-      <button
-        className={
-          selectedConcept === "bondOrbitals"
-            ? "concept-button active"
-            : "concept-button"
-        }
-        onClick={() => {
-    setSelectedConcept("bondOrbitals");
-    setSelectedAtomIndex(null);
-    setSelectedBondIndex(null);
-  }}
-        type="button"
-      >
-        Bond Orbitals
-      </button>
-
-      <button
-        className={
-          selectedConcept === "lonePairs"
-            ? "concept-button active"
-            : "concept-button"
-        }
-        onClick={() => {
-    setSelectedConcept("lonePairs");
-    setSelectedAtomIndex(null);
-    setSelectedBondIndex(null);
-  }}
-        type="button"
-      >
-        Lone Pairs
-      </button>
-
-      <button
-        className={
-          selectedConcept === "acidBaseSites"
-            ? "concept-button active"
-            : "concept-button"
-        }
-        onClick={() => {
-    setSelectedConcept("acidBaseSites");
-    setSelectedAtomIndex(null);
-    setSelectedBondIndex(null);
-  }}
-        type="button"
-      >
-        Acid/Base Sites
-      </button>
-
-      <button
-        className={
-          selectedConcept === "reactiveSites"
-            ? "concept-button active"
-            : "concept-button"
-        }
-        onClick={() => {
-    setSelectedConcept("reactiveSites");
-    setSelectedAtomIndex(null);
-    setSelectedBondIndex(null);
-  }}
-        type="button"
-      >
-        Reactive Sites
-      </button>
-
-        <button
-    className={
-      selectedConcept === "resonance"
-        ? "concept-button active"
-        : "concept-button"
-    }
-    onClick={() => {
-      setSelectedConcept("resonance");
-      setSelectedAtomIndex(null);
-      setSelectedBondIndex(null);
-    }}
-    type="button"
-  >
-    Resonance Sites
-  </button>
-
-  <button
-    className={
-      selectedConcept === "chirality"
-        ? "concept-button active"
-        : "concept-button"
-    }
-    onClick={() => {
-      setSelectedConcept("chirality");
-      setSelectedAtomIndex(null);
-      setSelectedBondIndex(null);
-    }}
-    type="button"
-  >
-    Chirality
-  </button>
-
-    </div>
-
-
-
-    {selectedConcept === "hybridization" && (
-      <div className="concept-subfilter-row">
-        {(["all", "sp", "sp2", "sp3"] as const).map((hybridization) => (
-          <button
-            key={hybridization}
-            className={
-              selectedHybridization === hybridization
-                ? "concept-subfilter-button active"
-                : "concept-subfilter-button"
-            }
-            onClick={() => setSelectedHybridization(hybridization)}
-            type="button"
-          >
-            {hybridization === "all" ? "All" : hybridization}
-          </button>
-        ))}
-      </div>
-    )}
-
-    {selectedConcept === "bondOrbitals" && (
-      <div className="concept-subfilter-row">
-        {(["all", "single", "double", "triple"] as const).map(
-          (bondType) => (
-            <button
-              key={bondType}
-              className={
-                selectedBondType === bondType
-                  ? "concept-subfilter-button active"
-                  : "concept-subfilter-button"
-              }
-              onClick={() => setSelectedBondType(bondType)}
-              type="button"
-            >
-              {bondType === "all" ? "All" : bondType}
-            </button>
-          )
-        )}
-      </div>
-    )}
-
-
-  {highlightedMoleculeSvg && (
-    <div className="highlight-preview-wrapper">
-      <p className="annotation-summary">Highlighted molecule preview:</p>
-
-      <div className="highlight-preview">
-        <div
-            ref={highlightedSvgRef}
-            className="highlighted-molecule-svg"
-            dangerouslySetInnerHTML={{ __html: highlightedMoleculeSvg }}
-          />
-      </div>
-    </div>
-  )}
-
-    {!moleculeAnnotation ? (
-      <p className="empty">Analyze a molecule to see concept annotations.</p>
-    ) : (
-      <div className="annotation-list">
-        {selectedConcept === "hybridization" && (
-          <p className="annotation-summary">
-            Showing{" "}
-            {selectedHybridization === "all"
-              ? "all hybridized atoms"
-              : `${selectedHybridization} atoms`}
-            .
-          </p>
-        )}
-
-        {selectedConcept === "bondOrbitals" && (
-          <p className="annotation-summary">
-            Showing{" "}
-            {selectedBondType === "all"
-              ? "all bond orbital overlaps"
-              : `${selectedBondType} bond orbital overlaps`}
-            .
-          </p>
-
-        
-        )}
-
-        {selectedConcept === "resonance" && (
-          <p className="annotation-summary">
-            Showing resonance-stabilized systems and possible delocalization sites.
-          </p>
-        )}
-
-        {selectedConcept === "chirality" && (
-          <p className="annotation-summary">
-            Showing possible chiral centers. Specific R/S assignment requires wedge/dash stereochemistry.
-          </p>
-        )}
-
-          {annotationCarouselItems.length === 0 ? (
-            <p className="empty">No annotations found for this concept yet.</p>
-          ) : (
-            <div className="annotation-carousel">
-              <button
-                className="carousel-arrow"
-                type="button"
-                onClick={goToPreviousAnnotationCard}
-                disabled={annotationCarouselItems.length <= 1}
-                aria-label="Previous annotation"
-              >
-                ‹
-              </button>
-
-              <div className="annotation-carousel-card">
-                <p className="annotation-counter">
-                  Card {annotationCardIndex + 1} of {annotationCarouselItems.length}
-                </p>
-
-                {currentAnnotationItem?.kind === "atom" && (
-                  <div
-                    className={getAtomCardClassName(currentAnnotationItem.atom)}
-                    onClick={() => {
-                      setSelectedAtomIndex(currentAnnotationItem.atom.atomIndex);
-                      setSelectedBondIndex(null);
-                    }}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <h3>
-                      Atom {currentAnnotationItem.atom.atomIndex + 1}:{" "}
-                      {currentAnnotationItem.atom.element}
-                    </h3>
-
-                    {selectedAtomIndex === currentAnnotationItem.atom.atomIndex && (
-                      <p className="selected-note">Selected atom</p>
-                    )}
-
-                    <p>
-                      <strong>Hybridization:</strong>{" "}
-                      {currentAnnotationItem.atom.hybridization}
-                    </p>
-
-                    {selectedConcept === "lonePairs" && (
-                      <>
-                        <p>
-                          <strong>Lone pairs:</strong>{" "}
-                          {currentAnnotationItem.atom.lonePairInfo.count}
-                        </p>
-                        <p>
-                          <strong>Lone pair orbital:</strong>{" "}
-                          {currentAnnotationItem.atom.lonePairInfo.orbital}
-                        </p>
-                        <p>
-                          <strong>Resonance participation:</strong>{" "}
-                          {currentAnnotationItem.atom.lonePairInfo.participatesInResonance
-                            ? "Yes"
-                            : "No"}
-                        </p>
-                        <p>{currentAnnotationItem.atom.lonePairInfo.explanation}</p>
-                      </>
-                    )}
-
-                    {currentAnnotationItem.atom.siteTypes.length > 0 &&
-                      selectedConcept !== "lonePairs" && (
-                        <p>
-                          <strong>Site type:</strong>{" "}
-                          {currentAnnotationItem.atom.siteTypes.join(", ")}
-                        </p>
-                      )}
-
-                    {selectedConcept !== "lonePairs" && (
-                      <p>{currentAnnotationItem.atom.explanation}</p>
-                    )}
-                  </div>
-                )}
-
-                {currentAnnotationItem?.kind === "bond" && (
-                  <div
-                    className={getBondCardClassName(currentAnnotationItem.bond)}
-                    onClick={() => {
-                      setSelectedBondIndex(currentAnnotationItem.bond.bondIndex);
-                      setSelectedAtomIndex(null);
-                    }}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <h3>
-                      {currentAnnotationItem.bond.bondType} bond: Atom{" "}
-                      {currentAnnotationItem.bond.atomIndices[0] + 1}–Atom{" "}
-                      {currentAnnotationItem.bond.atomIndices[1] + 1}
-                    </h3>
-
-                    {selectedBondIndex === currentAnnotationItem.bond.bondIndex && (
-                      <p className="selected-note">Selected bond</p>
-                    )}
-
-                    <p>
-                      <strong>Sigma overlap:</strong>{" "}
-                      {currentAnnotationItem.bond.sigmaOverlap}
-                    </p>
-
-                    {currentAnnotationItem.bond.piOverlap && (
-                      <p>
-                        <strong>Pi overlap:</strong>{" "}
-                        {currentAnnotationItem.bond.piOverlap}
-                      </p>
-                    )}
-
-                    <p>
-                      <strong>Orbital info:</strong>{" "}
-                      {currentAnnotationItem.bond.orbitalInfo.join(", ")}
-                    </p>
-
-                    <p>{currentAnnotationItem.bond.explanation}</p>
-                  </div>
-                )}
-
-              {currentAnnotationItem?.kind === "resonance" && (
-              <div className="annotation-card annotation-card-selected">
-              <h3>{currentAnnotationItem.resonance.siteLabel}</h3>
-              <p className="selected-note">Selected resonance system</p>
-
-              <p>
-                <strong>Type:</strong> {currentAnnotationItem.resonance.type}
-              </p>
-
-              <p>
-                <strong>Strength:</strong>{" "}
-                {currentAnnotationItem.resonance.stabilizationStrength}
-              </p>
-
-              <p>
-                <strong>Highlighted resonance system:</strong>{" "}
-                {[...currentAnnotationItem.resonance.matchedAtoms]
-                  .sort((a, b) => a - b)
-                  .map((atomIndex) => atomIndex + 1)
-                  .join(", ")}
-              </p>
-
-              {currentAnnotationItem.resonance.possibleRadicalSites && (
+          <div className="card analysis-card analysis-dashboard-card">
+            <div className="dashboard-header">
+              <div>
+                <h2>Analysis Dashboard</h2>
                 <p>
-                  <strong>Possible charged/radical sites:</strong>{" "}
-                  {[...currentAnnotationItem.resonance.possibleRadicalSites]
-                    .sort((a, b) => a - b)
-                    .map((atomIndex) => atomIndex + 1)
-                    .join(", ")}
+                  {moleculeIdentity
+                    ? moleculeIdentity.nomenclature.displayName ||
+                      moleculeIdentity.nomenclature.estimatedName
+                    : "Analyze a molecule to fill this dashboard."}
                 </p>
-              )}
-
-              {currentAnnotationItem.resonance.resonanceBondIndices && (
-                <p>
-                  <strong>Resonance bonds:</strong>{" "}
-                  {[...currentAnnotationItem.resonance.resonanceBondIndices]
-                    .sort((a, b) => a - b)
-                    .map((bondIndex) => bondIndex + 1)
-                    .join(", ")}
-                </p>
-              )}
-
-              <p>{currentAnnotationItem.resonance.explanation}</p>
-
-              {currentAnnotationItem.resonance.forms.length > 0 && (
-                <div>
-                  <p>
-                    <strong>Possible forms:</strong>
-                  </p>
-
-                  {currentAnnotationItem.resonance.forms.map((form) => (
-                    <p key={form.label}>
-                      <strong>{form.label}:</strong> {form.description}
-                    </p>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {currentAnnotationItem?.kind === "chirality" && (
-            <div className="annotation-card annotation-card-selected">
-              <h3>
-                Atom {currentAnnotationItem.chirality.atomIndex + 1}:{" "}
-                {currentAnnotationItem.chirality.element}
-              </h3>
-
-              <p className="selected-note">Selected chiral center</p>
-
-              <p>
-                <strong>Configuration:</strong>{" "}
-                {currentAnnotationItem.chirality.configuration === "unknown"
-                  ? "Not assigned"
-                  : currentAnnotationItem.chirality.configuration}
-              </p>
-
-              <p>
-                <strong>Assignment source:</strong>{" "}
-                {currentAnnotationItem.chirality.assignmentSource === "rdkit"
-                  ? "Automatic Analysis"
-                  : currentAnnotationItem.chirality.assignmentSource === "pocketchem-fallback"
-                  ? "Manual Analysis"
-                  : "Unassigned"}
-              </p>
-
-              {currentAnnotationItem.chirality.configuration === "unknown" && (
-                <p className="empty">
-                  Add wedge/dash bonds in Ketcher to specify stereochemistry for R/S assignment.
-                </p>
-              )}
-
-              <p>
-                <strong>Type:</strong> {currentAnnotationItem.chirality.label}
-              </p>
-
-              <p>{currentAnnotationItem.chirality.explanation}</p>
-
-              <p>
-              <strong>Why this is chiral:</strong>{" "}
-              {currentAnnotationItem.chirality.whyChiralExplanation}
-            </p>
-
-            <p>
-              <strong>How the configuration was assigned:</strong>{" "}
-              {currentAnnotationItem.chirality.configurationExplanation}
-            </p>
-            </div>
-          )}
-
-          {currentAnnotationItem?.kind === "functionalGroup" && (
-              <div className="annotation-card annotation-card-selected">
-                <h3>{currentAnnotationItem.functionalGroup.groupName}</h3>
-
-                <p className="selected-note">
-                  Occurrence {currentAnnotationItem.functionalGroup.occurrence} /{" "}
-                  {currentAnnotationItem.functionalGroup.totalOccurrences}
-                </p>
-
-                <p>
-                  <strong>Confidence:</strong>{" "}
-                  {currentAnnotationItem.functionalGroup.group.confidence}
-                </p>
-
-                <p>
-                  <strong>Suffix:</strong>{" "}
-                  {currentAnnotationItem.functionalGroup.group.suffix}
-                </p>
-
-                <p>
-                  <strong>Prefix:</strong>{" "}
-                  {currentAnnotationItem.functionalGroup.group.prefix}
-                </p>
-
-                <p>
-                  <strong>Highlighted atoms:</strong>{" "}
-                  {currentAnnotationItem.functionalGroup.atoms.join(", ")}
-                </p>
-
-                <p>{currentAnnotationItem.functionalGroup.group.mcatNote}</p>
-              </div>
-            )}
               </div>
 
-              <button
-                className="carousel-arrow"
-                type="button"
-                onClick={goToNextAnnotationCard}
-                disabled={annotationCarouselItems.length <= 1}
-                aria-label="Next annotation"
-              >
-                ›
-              </button>
-            </div>
-          )}  
-      </div>
-    )}
-  </div>
-
-
-
-  {/* RESONANCE SECTION */}
-
-  <div className="analysis-section">
-    <p className="label">Resonance</p>
-
-    {resonanceResults.length === 0 ? (
-      <p className="empty">No major resonance pattern detected yet.</p>
-    ) : (
-      <div className="group-list">
-        {resonanceResults.map((result, index) => (
-          <div
-            className="group-card"
-            key={`${result.type}-${result.siteLabel}-${index}`}
-          >
-            <div className="group-card-header">
-              <h3>{result.siteLabel}</h3>
-              <span>{result.stabilizationStrength} resonance</span>
+              <span className="status">
+                {functionalGroupOccurrences.length} group
+                {functionalGroupOccurrences.length === 1 ? "" : "s"}
+              </span>
             </div>
 
-            <p>
-              <strong>Type:</strong> {result.type}
-            </p>
-
-            <p>
-              <strong>Matched atoms:</strong>{" "}
-              {[...result.matchedAtoms]
-              .sort((a, b) => a - b)
-              .map((atomIndex) => atomIndex + 1)
-              .join(", ")}
-            </p>
-
-            {result.possibleRadicalSites && (
-              <p>
-                <strong>Possible radical sites:</strong>{" "}
-                {result.possibleRadicalSites
-                  .map((atomIndex) => atomIndex + 1)
-                  .join(", ")}
-              </p>
-            )}
-
-            <p>{result.explanation}</p>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-
-  {/* ACIDITY AND BASICITY SECTION */}
-
-        <div className="analysis-section">
-          <p className="label">Acidity Estimate</p>
-
-          {acidityResults.length === 0 ? (
-            <p className="empty">No acidic sites estimated yet</p>
-          ) : (
-            <>
-              <div className="group-card">
-                <div className="group-card-header">
-                  <h3>Strongest acidic site: {acidityResults[0].acidicSite}</h3>
-                  <span>pKa {acidityResults[0].estimatedPka}</span>
-                </div>
-
-                <p>
-                  <strong>Related group:</strong> {acidityResults[0].relatedGroup}
-                </p>
-                <p>
-                  <strong>A — Atom:</strong> {acidityResults[0].atom}
-                </p>
-                <p>
-                  <strong>R — Resonance:</strong> {acidityResults[0].resonance}
-                </p>
-                <p>
-                  <strong>I — Induction:</strong> {acidityResults[0].induction}
-                </p>
-                <p>
-                  <strong>O — Orbital:</strong> {acidityResults[0].orbital}
-                </p>
-                <p>{acidityResults[0].explanation}</p>
-                {acidityResults[0].modifiers.length > 0 && (
-                  <p>
-                    <strong>pKa modifier:</strong> {acidityResults[0].modifiers.join(" ")}
-                  </p>
-                )}
+            <div className="dashboard-mini-grid">
+              <div>
+                <p className="label">Status</p>
+                <strong>{status}</strong>
               </div>
 
-              {acidityResults.length > 1 && (
-                <div className="group-list">
-                  {acidityResults.slice(1).map((result) => (
-                    <div className="group-card" key={result.relatedGroup}>
-                      <div className="group-card-header">
-                        <h3>Weaker acidic site: {result.acidicSite}</h3>
-                        <span>pKa {result.estimatedPka}</span>
-                      </div>
-
-                      <p>
-                        <strong>Related group:</strong> {result.relatedGroup}
-                      </p>
-                      <p>{result.explanation}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-        </div>
-
-  {/* BASICITY SECTION*/}
-
-                <div className="analysis-section">
-            <p className="label">Basicity Estimate</p>
-
-            {basicityResults.length === 0 ? (
-              <p className="empty">No basic sites estimated yet</p>
-            ) : (
-              <div className="group-list">
-                {basicityResults.map((result, index) => (
-                  <div
-                    className="group-card"
-                    key={`${result.relatedGroup}-${result.basicSite}-${index}`}
-                  >
-                    <div className="group-card-header">
-                      <h3>{result.basicSite}</h3>
-                      <span>conj. acid pKa {result.conjugateAcidPka}</span>
-                    </div>
-
-                    <p>
-                      <strong>Related group:</strong> {result.relatedGroup}
-                    </p>
-                    <p>{result.explanation}</p>
-                  </div>
-                ))}
+              <div>
+                <p className="label">Formula</p>
+                <strong>
+                  {moleculeIdentity?.properties.molecularFormula ?? "—"}
+                </strong>
               </div>
-            )}
-          </div>
 
-  {/* COMPARISON SECTION */}
+              <div>
+                <p className="label">DBE</p>
+                <strong>
+                  {moleculeIdentity?.properties.degreesOfUnsaturation ?? "—"}
+                </strong>
+              </div>
 
-          <div className="analysis-section">
-    <p className="label">Compare Molecules</p>
+              <div>
+                <p className="label">Reactions</p>
+                <strong>{reactionPathways.length}</strong>
+              </div>
+            </div>
 
-    <div className="button-row">
-      <label>
-        <input
-          type="radio"
-          name="rankingMode"
-          value="acidity"
-          checked={rankingMode === "acidity"}
-          onChange={() => setRankingMode("acidity")}
-        />
-        Rank by acidity
-      </label>
-
-      <label>
-        <input
-          type="radio"
-          name="rankingMode"
-          value="basicity"
-          checked={rankingMode === "basicity"}
-          onChange={() => setRankingMode("basicity")}
-        />
-        Rank by basicity
-      </label>
-
-      <label>
-        <input
-          type="radio"
-          name="rankingMode"
-          value="anionStability"
-          checked={rankingMode === "anionStability"}
-          onChange={() => setRankingMode("anionStability")}
-        />
-        Rank by anion stability
-      </label>
-    </div>
-
-    {comparisonMolecules.length === 0 ? (
-      <p className="empty">Analyze molecules and add them to comparison.</p>
-    ) : (
-      <div className="group-list">
-        {rankedComparison.map((molecule, index) => {
-    const bestAcid = molecule.acidityResults[0];
-    const bestBase = molecule.basicityResults[0];
-
-    const hasRankableSite =
-      rankingMode === "acidity" ? Boolean(bestAcid) : Boolean(bestBase);
-
-    return (
-            <div className="group-card" key={molecule.id}>
-              <div className="group-card-header">
-              <h3>
-                {hasRankableSite ? `#${index + 1}: ${molecule.label}` : `Unranked: ${molecule.label}`}
-              </h3>
-
+            <div className="dashboard-tab-row">
+              {ANALYSIS_PANELS.map((panel) => (
                 <button
-                  className="secondary-button"
+                  key={panel.id}
+                  className={
+                    analysisPanel === panel.id
+                      ? "dashboard-tab active"
+                      : "dashboard-tab"
+                  }
+                  onClick={() => setAnalysisPanel(panel.id)}
                   type="button"
-                  onClick={() => deleteComparisonMolecule(molecule.id)}
                 >
-                  Delete
+                  {panel.label}
                 </button>
-              </div>
-
-              {molecule.structureSvg && (
-                <div
-                  className="molecule-preview"
-                  dangerouslySetInnerHTML={{ __html: molecule.structureSvg }}
-                />
-              )}
-
-            {hasRankableSite ? (
-              rankingMode === "anionStability" ? (
-                <p>
-                  <strong>Stability basis:</strong>{" "}
-                  {bestBase.relatedGroup}
-                </p>
-              ) : (
-                <p>
-                  <strong>
-                    {rankingMode === "acidity"
-                      ? "Estimated pKa:"
-                      : "Conjugate acid pKa:"}
-                  </strong>{" "}
-                  {rankingMode === "acidity"
-                    ? bestAcid.estimatedPka
-                    : bestBase.conjugateAcidPka}
-                </p>
-              )
-            ) : (
-              <p className="empty">
-                No{" "}
-                {rankingMode === "acidity"
-                  ? "acidic"
-                  : rankingMode === "basicity"
-                  ? "basic"
-                  : "anion stability"}{" "}
-                site detected for ranking.
-              </p>
-            )}
-
-              <p>
-                <strong>SMILES:</strong> {molecule.smiles}
-              </p>
-
-              {hasRankableSite ? (
-                rankingMode === "acidity" ? (
-                  <>
-                    <p>
-                      <strong>Strongest acidic site:</strong> {bestAcid.acidicSite}
-                    </p>
-                    <p>{bestAcid.explanation}</p>
-                  </>
-                ) : (
-                  <>
-                    <p>
-                      <strong>Strongest basic site:</strong> {bestBase.basicSite}
-                    </p>
-                    <p>{bestBase.explanation}</p>
-                  </>
-                )
-              ) : null}
+              ))}
             </div>
 
+            <div className="dashboard-panel-scroll">
+              {analysisPanel === "overview" && (
+                <div className="dashboard-panel">
+                  <div className="analysis-section compact-section">
+                    <p className="label">SMILES</p>
+                    <p className="smiles-output">{smiles}</p>
+                  </div>
 
-          );
-        })}
-      </div>
-    )}
-  </div>
+                  <div className="analysis-section compact-section">
+                    <p className="label">Identity</p>
 
-  </div>
+                    {!moleculeIdentity ? (
+                      <p className="empty">
+                        Analyze a molecule to estimate its name, formula, DBE,
+                        and molecular properties.
+                      </p>
+                    ) : (
+                      <div className="group-card">
+                        <div className="group-card-header">
+                          <h3>
+                            {moleculeIdentity.nomenclature.displayName ||
+                              moleculeIdentity.nomenclature.estimatedName}
+                          </h3>
+                          <span>
+                            {moleculeIdentity.nomenclature.namingConfidence} {" "}
+                            confidence
+                          </span>
+                        </div>
 
-    
-        </section> ) : (
-    <ReactionsPage initialPathways={reactionPathways} />
-  )}
+                        {moleculeIdentity.nomenclature.commonName && (
+                          <p>
+                            <strong>Common name:</strong> {" "}
+                            {moleculeIdentity.nomenclature.commonName}
+                          </p>
+                        )}
 
-      </main>
-    );
-  }
+                        <p>
+                          <strong>Main suffix:</strong> {" "}
+                          {moleculeIdentity.nomenclature.mainSuffix ??
+                            "Hydrocarbon / no suffix group detected"}
+                        </p>
 
-  export default App;
+                        <p>{moleculeIdentity.nomenclature.explanation}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="analysis-section compact-section">
+                    <p className="label">Quick Counts</p>
+
+                    <div className="property-grid compact-properties">
+                      <PropertyTile
+                        label="Functional groups"
+                        value={functionalGroupOccurrences.length}
+                        info="Number of detected functional-group occurrences."
+                      />
+
+                      <PropertyTile
+                        label="Chiral centers"
+                        value={chiralityResults.length}
+                        info="Possible stereocenters detected from the structure."
+                      />
+
+                      <PropertyTile
+                        label="H-bond donors"
+                        value={
+                          moleculeIdentity?.properties.hydrogenBondDonors ?? "N/A"
+                        }
+                        info={PROPERTY_INFO.hbd}
+                      />
+
+                      <PropertyTile
+                        label="H-bond acceptors"
+                        value={
+                          moleculeIdentity?.properties.hydrogenBondAcceptors ??
+                          "N/A"
+                        }
+                        info={PROPERTY_INFO.hba}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {analysisPanel === "groups" && (
+                <div className="dashboard-panel">
+                  <div className="analysis-section compact-section">
+                    <p className="label">Functional Groups</p>
+
+                    {functionalGroupOccurrences.length === 0 ? (
+                      <p className="empty">
+                        No functional groups detected yet. Analyze a molecule
+                        first.
+                      </p>
+                    ) : (
+                      <div className="group-list compact-group-list">
+                        {functionalGroupOccurrences.map((occurrence) => (
+                          <div
+                            className="group-card"
+                            key={`${occurrence.groupName}-${occurrence.occurrence}`}
+                          >
+                            <div className="group-card-header">
+                              <h3>{occurrence.groupName}</h3>
+                              <span>{occurrence.group.confidence}</span>
+                            </div>
+
+                            <p>
+                              <strong>Occurrence:</strong> {" "}
+                              {occurrence.occurrence} / {" "}
+                              {occurrence.totalOccurrences}
+                            </p>
+
+                            <p>
+                              <strong>Suffix:</strong> {occurrence.group.suffix}
+                            </p>
+
+                            <p>
+                              <strong>Prefix:</strong> {occurrence.group.prefix}
+                            </p>
+
+                            <p>{occurrence.group.mcatNote}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {analysisPanel === "concepts" && (
+                <div className="dashboard-panel">
+                  <div className="analysis-section compact-section">
+                    <p className="label">Concept View</p>
+
+                    <div className="concept-button-row compact-concept-grid">
+                      {CONCEPT_OPTIONS.map((concept) => (
+                        <button
+                          key={concept.id}
+                          className={
+                            selectedConcept === concept.id
+                              ? "concept-button active"
+                              : "concept-button"
+                          }
+                          onClick={() => {
+                            setSelectedConcept(concept.id);
+                            setSelectedAtomIndex(null);
+                            setSelectedBondIndex(null);
+                          }}
+                          type="button"
+                        >
+                          {concept.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {selectedConcept === "hybridization" && (
+                      <div className="concept-subfilter-row">
+                        {(["all", "sp", "sp2", "sp3"] as const).map(
+                          (hybridization) => (
+                            <button
+                              key={hybridization}
+                              className={
+                                selectedHybridization === hybridization
+                                  ? "concept-subfilter-button active"
+                                  : "concept-subfilter-button"
+                              }
+                              onClick={() =>
+                                setSelectedHybridization(hybridization)
+                              }
+                              type="button"
+                            >
+                              {hybridization === "all" ? "All" : hybridization}
+                            </button>
+                          )
+                        )}
+                      </div>
+                    )}
+
+                    {selectedConcept === "bondOrbitals" && (
+                      <div className="concept-subfilter-row">
+                        {(["all", "single", "double", "triple"] as const).map(
+                          (bondType) => (
+                            <button
+                              key={bondType}
+                              className={
+                                selectedBondType === bondType
+                                  ? "concept-subfilter-button active"
+                                  : "concept-subfilter-button"
+                              }
+                              onClick={() => setSelectedBondType(bondType)}
+                              type="button"
+                            >
+                              {bondType === "all" ? "All" : bondType}
+                            </button>
+                          )
+                        )}
+                      </div>
+                    )}
+
+                    {highlightedMoleculeSvg && (
+                      <div className="highlight-preview-wrapper">
+                        <p className="annotation-summary">
+                          Highlighted molecule preview:
+                        </p>
+
+                        <div className="highlight-preview">
+                          <div
+                            ref={highlightedSvgRef}
+                            className="highlighted-molecule-svg"
+                            dangerouslySetInnerHTML={{
+                              __html: highlightedMoleculeSvg,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {!moleculeAnnotation ? (
+                      <p className="empty">
+                        Analyze a molecule to see concept annotations.
+                      </p>
+                    ) : (
+                      <div className="annotation-list">
+                        {selectedConcept === "hybridization" && (
+                          <p className="annotation-summary">
+                            Showing {" "}
+                            {selectedHybridization === "all"
+                              ? "all hybridized atoms"
+                              : `${selectedHybridization} atoms`}
+                            .
+                          </p>
+                        )}
+
+                        {selectedConcept === "bondOrbitals" && (
+                          <p className="annotation-summary">
+                            Showing {" "}
+                            {selectedBondType === "all"
+                              ? "all bond orbital overlaps"
+                              : `${selectedBondType} bond orbital overlaps`}
+                            .
+                          </p>
+                        )}
+
+                        {selectedConcept === "chirality" && (
+                          <p className="annotation-summary">
+                            Showing possible chiral centers. Specific R/S
+                            assignment requires wedge/dash stereochemistry.
+                          </p>
+                        )}
+
+                        {annotationCarouselItems.length === 0 ? (
+                          <p className="empty">
+                            No annotations found for this concept yet.
+                          </p>
+                        ) : (
+                          <div className="annotation-carousel compact-carousel">
+                            <button
+                              className="carousel-arrow"
+                              type="button"
+                              onClick={goToPreviousAnnotationCard}
+                              disabled={annotationCarouselItems.length <= 1}
+                              aria-label="Previous annotation"
+                            >
+                              ‹
+                            </button>
+
+                            <div className="annotation-carousel-card">
+                              <p className="annotation-counter">
+                                Card {annotationCardIndex + 1} of {" "}
+                                {annotationCarouselItems.length}
+                              </p>
+
+                              {renderCurrentAnnotationCard()}
+                            </div>
+
+                            <button
+                              className="carousel-arrow"
+                              type="button"
+                              onClick={goToNextAnnotationCard}
+                              disabled={annotationCarouselItems.length <= 1}
+                              aria-label="Next annotation"
+                            >
+                              ›
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {analysisPanel === "properties" && (
+                <div className="dashboard-panel">
+                  <div className="analysis-section compact-section">
+                    <p className="label">Nomenclature & Core Properties</p>
+
+                    {!moleculeIdentity ? (
+                      <p className="empty">
+                        Analyze a molecule to estimate its name, formula, DBE,
+                        and molecular properties.
+                      </p>
+                    ) : (
+                      <div className="group-list">
+                        <div className="group-card">
+                          <div className="group-card-header">
+                            <h3>
+                              {moleculeIdentity.nomenclature.displayName ||
+                                moleculeIdentity.nomenclature.estimatedName}
+                            </h3>
+
+                            <span>
+                              {moleculeIdentity.nomenclature.namingConfidence} {" "}
+                              confidence
+                            </span>
+                          </div>
+
+                          {moleculeIdentity.nomenclature.commonName && (
+                            <p>
+                              <strong>Common name:</strong> {" "}
+                              {moleculeIdentity.nomenclature.commonName}
+                            </p>
+                          )}
+
+                          <p>
+                            <strong>Parent chain:</strong> {" "}
+                            {moleculeIdentity.nomenclature.parentChain ??
+                              "Not assigned"}
+                            {moleculeIdentity.nomenclature.parentChainLength > 0
+                              ? ` (${moleculeIdentity.nomenclature.parentChainLength} C)`
+                              : ""}
+                          </p>
+
+                          <p>
+                            <strong>Main suffix:</strong> {" "}
+                            {moleculeIdentity.nomenclature.mainSuffix ??
+                              "Hydrocarbon / no suffix group detected"}
+                          </p>
+
+                          {moleculeIdentity.nomenclature.prefixes.length > 0 && (
+                            <p>
+                              <strong>Detected prefixes:</strong> {" "}
+                              {moleculeIdentity.nomenclature.prefixes.join(", ")}
+                            </p>
+                          )}
+
+                          <p>{moleculeIdentity.nomenclature.explanation}</p>
+
+                          <div className="limitation-list">
+                            {moleculeIdentity.nomenclature.limitations.map(
+                              (limitation) => (
+                                <p className="empty" key={limitation}>
+                                  {limitation}
+                                </p>
+                              )
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="property-grid compact-properties">
+                          <PropertyTile
+                            label="Formula"
+                            value={moleculeIdentity.properties.molecularFormula}
+                            info={PROPERTY_INFO.formula}
+                          />
+
+                          <PropertyTile
+                            label="DBE / unsaturation"
+                            value={
+                              moleculeIdentity.properties
+                                .degreesOfUnsaturation ?? "N/A"
+                            }
+                            info={PROPERTY_INFO.dbe}
+                          />
+
+                          <PropertyTile
+                            label="Molecular weight"
+                            value={
+                              moleculeIdentity.properties.molecularWeight
+                                ? `${moleculeIdentity.properties.molecularWeight} g/mol`
+                                : "N/A"
+                            }
+                            info={PROPERTY_INFO.molecularWeight}
+                          />
+
+                          <PropertyTile
+                            label="Exact mass"
+                            value={moleculeIdentity.properties.exactMass ?? "N/A"}
+                            info={PROPERTY_INFO.exactMass}
+                          />
+
+                          <PropertyTile
+                            label="Formal charge"
+                            value={moleculeIdentity.properties.formalCharge}
+                            info={PROPERTY_INFO.formalCharge}
+                          />
+
+                          <PropertyTile
+                            label="Heavy atoms"
+                            value={moleculeIdentity.properties.heavyAtomCount}
+                            info={PROPERTY_INFO.heavyAtoms}
+                          />
+
+                          <PropertyTile
+                            label="Water solubility"
+                            value={
+                              moleculeIdentity.properties.waterSolubilityTendency
+                                .level
+                            }
+                            info={PROPERTY_INFO.waterSolubility}
+                          />
+
+                          <PropertyTile
+                            label="Membrane permeability"
+                            value={
+                              moleculeIdentity.properties
+                                .membranePermeabilityTendency.level
+                            }
+                            info={PROPERTY_INFO.membranePermeability}
+                          />
+
+                          <PropertyTile
+                            label="Boiling point tendency"
+                            value={
+                              moleculeIdentity.properties.boilingPointTendency
+                                .level
+                            }
+                            info={PROPERTY_INFO.boilingPoint}
+                          />
+
+                          <PropertyTile
+                            label="Volatility"
+                            value={
+                              moleculeIdentity.properties.volatilityTendency.level
+                            }
+                            info={PROPERTY_INFO.volatility}
+                          />
+
+                          <PropertyTile
+                            label="H-bond donors"
+                            value={
+                              moleculeIdentity.properties.hydrogenBondDonors ??
+                              "N/A"
+                            }
+                            info={PROPERTY_INFO.hbd}
+                          />
+
+                          <PropertyTile
+                            label="H-bond acceptors"
+                            value={
+                              moleculeIdentity.properties.hydrogenBondAcceptors ??
+                              "N/A"
+                            }
+                            info={PROPERTY_INFO.hba}
+                          />
+
+                          <PropertyTile
+                            label="Rotatable bonds"
+                            value={
+                              moleculeIdentity.properties.rotatableBonds ?? "N/A"
+                            }
+                            info={PROPERTY_INFO.rotatableBonds}
+                          />
+
+                          <PropertyTile
+                            label="Rings"
+                            value={moleculeIdentity.properties.ringCount ?? "N/A"}
+                            info={PROPERTY_INFO.rings}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      ) : activePage === "acidBase" ? (
+        <AcidBasePage />
+      ) : (
+        <ReactionsPage initialPathways={reactionPathways} />
+      )}
+    </main>
+  );
+}
+
+export default App;
