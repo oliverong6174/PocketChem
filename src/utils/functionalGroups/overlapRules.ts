@@ -9,6 +9,8 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   Carboxylate: ["Carboxylic acid"],
   "Acetylide anion": ["Alkyne", "Carbanion"],
   "Methyl carbanion": ["Carbanion"],
+  "Benzylic carbocation": ["Carbocation"],
+  "Allylic carbocation": ["Carbocation"],
   "Deprotonated carboxamide": ["Amide anion"],
 
   // Acid derivatives

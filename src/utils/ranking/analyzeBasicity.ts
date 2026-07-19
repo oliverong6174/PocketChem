@@ -1,5 +1,5 @@
-import { getRDKit } from "./rdkit";
-import type { FunctionalGroupResult } from "./functionalGroups/types";
+import { getRDKit } from "../rdkit";
+import type { FunctionalGroupResult } from "../functionalGroups/types";
 import { getInductiveModifiersForSite } from "./inductionUtils";
 import {
   analyzeCarbanionStability,

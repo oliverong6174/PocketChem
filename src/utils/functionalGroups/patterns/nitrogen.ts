@@ -323,4 +323,38 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
     "Nitroso compounds contain an N=O group bonded to carbon (R–N=O). They are distinct from nitro compounds and are important intermediates in oxidation, reduction, and diazotization chemistry.",
   category: "functionalGroup",
 },
+
+{
+  name: "Cyanohydrin",
+  priority: 17.6,
+  nomenclaturePriority: 17.6,
+  confidence: "High",
+  suffix: "cyanohydrin",
+  prefix: "cyanohydroxy",
+  equivalentNames: ["alpha-hydroxynitrile", "α-hydroxynitrile"],
+  smarts: "[CX4]([OX2H])[CX2]#[NX1]",
+  displaySmarts: "[CX4]([OX2H])[CX2]#[NX1]",
+  mcatNote:
+    "Cyanohydrins contain an alcohol and nitrile on the same carbon: C(OH)-C≡N. They are commonly formed by adding cyanide to aldehydes or ketones.",
+  category: "functionalGroup",
+},
+{
+  name: "Ketone cyanohydrin",
+  priority: 17.65,
+  nomenclaturePriority: 17.65,
+  confidence: "High",
+  suffix: "cyanohydrin",
+  prefix: "cyanohydroxy",
+  equivalentNames: [
+    "ketone-derived cyanohydrin",
+    "tertiary cyanohydrin",
+    "substituted cyanohydrin",
+  ],
+  smarts: "[CX4H0]([#6])([#6])([OX2H])[CX2]#[NX1]",
+  displaySmarts: "[CX4H0]([OX2H])[CX2]#[NX1]",
+  mcatNote:
+    "Ketone cyanohydrins are cyanohydrins where the OH-bearing carbon has two carbon substituents instead of a hydrogen: R2C(OH)-C≡N.",
+  category: "functionalGroup",
+},
+
 ];

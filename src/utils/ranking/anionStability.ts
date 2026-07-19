@@ -1,4 +1,4 @@
-import { getRDKit } from "./rdkit";
+import { getRDKit } from "../rdkit";
 
 
 export type CarbanionSubstitution =

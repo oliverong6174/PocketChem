@@ -282,6 +282,24 @@ export const chargedGroups: FunctionalGroupPattern[] = [
       "Carbanions are generally strong bases and nucleophiles unless resonance stabilized.",
   },
 
+  // ==========================
+  // CATION
+  // ==========================
+
+  {
+    name: "Carbocation",
+    category: "ion",
+    priority: 0.64,
+    nomenclaturePriority: 0.64,
+    confidence: "High",
+    suffix: "carbocation",
+    prefix: "carbocation",
+    smarts: "[#6+]",
+    displaySmarts: "[#6+]",
+    mcatNote:
+      "Carbocations are electron-deficient carbon centers stabilized by resonance, hyperconjugation, and alkyl substitution.",
+  },
+
   // =========================
   // PHOSPHORUS
   // =========================

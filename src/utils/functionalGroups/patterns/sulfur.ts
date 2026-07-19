@@ -27,6 +27,8 @@ export const sulfurGroups: FunctionalGroupPattern[] = [
       "Sulfonamides contain a sulfonyl group bonded to nitrogen. They are common in medicinal chemistry and sulfa drugs.",
     category: "functionalGroup",
     },
+  
+    
   {
     name: "Thiol",
     priority: 11,
@@ -78,6 +80,20 @@ export const sulfurGroups: FunctionalGroupPattern[] = [
     displaySmarts: "[SX3](=O)",
     mcatNote:
       "Sulfoxides contain sulfur bonded to oxygen and two carbon groups. The S=O bond is polar.",
+    category: "functionalGroup",
+    },
+    {  
+    name: "Sulfonyl chloride",
+    priority: 32.6,
+    nomenclaturePriority: 23.6,
+    confidence: "High",
+    suffix: "sulfonyl chloride",
+    prefix: "chlorosulfonyl",
+    equivalentNames: ["sulfonic acid chloride"],
+    smarts: "[#6][SX4](=[OX1])(=[OX1])Cl",
+    displaySmarts: "[SX4](=[OX1])(=[OX1])Cl",
+    mcatNote:
+      "Sulfonyl chlorides contain the R-SO2-Cl group. They are reactive sulfonic acid derivatives commonly used to make sulfonamides and sulfonate esters.",
     category: "functionalGroup",
     },
   {

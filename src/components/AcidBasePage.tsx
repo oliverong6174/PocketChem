@@ -5,11 +5,33 @@ import {
   getMoleculeSvg,
   type FunctionalGroupResult,
 } from "../utils/functionalGroups";
-import { analyzeAcidity, type AcidityResult } from "../utils/analyzeAcidity";
-import { analyzeBasicity, type BasicityResult } from "../utils/analyzeBasicity";
+import { analyzeAcidity, type AcidityResult } from "../utils/ranking/analyzeAcidity";
+import { analyzeBasicity, type BasicityResult } from "../utils/ranking/analyzeBasicity";
+import {
+  analyzeCarbanionStability,
+  getBestCarbanionStabilityResult,
+  type CarbanionStabilityResult,
+} from "../utils/ranking/anionStability";
+
+import {
+  analyzeCarbocationStability,
+  getBestCarbocationStabilityResult,
+  type CarbocationStabilityResult,
+} from "../utils/ranking/cationStability";
+
+import {
+  analyzeCarbonRadicalStability,
+  getBestCarbonRadicalStabilityResult,
+  type CarbonRadicalStabilityResult,
+} from "../utils/ranking/radicalStability";
 import "ketcher-react/dist/index.css";
 
-type RankingMode = "acidity" | "basicity" | "anionStability";
+type RankingMode =
+  | "acidity"
+  | "basicity"
+  | "anionStability"
+  | "cationStability"
+  | "radicalStability";
 
 type ComparisonMolecule = {
   id: number;
@@ -19,6 +41,9 @@ type ComparisonMolecule = {
   functionalGroups: FunctionalGroupResult[];
   acidityResults: AcidityResult[];
   basicityResults: BasicityResult[];
+  anionStabilityResults: CarbanionStabilityResult[];
+  cationStabilityResults: CarbocationStabilityResult[];
+  radicalStabilityResults: CarbonRadicalStabilityResult[];
 };
 
 function isMolBlockLike(value: unknown) {
@@ -45,6 +70,12 @@ function sanitizeDisplayedSmiles(value: unknown) {
 }
 
 function getAnionStabilityScore(molecule: ComparisonMolecule) {
+  const directResult = getBestCarbanionStabilityResult(
+    molecule.anionStabilityResults
+  );
+
+  if (directResult) return directResult.stabilityScore;
+
   const bestBase = molecule.basicityResults[0];
 
   if (!bestBase) return 999;
@@ -73,6 +104,20 @@ function getAnionStabilityScore(molecule: ComparisonMolecule) {
   return 999;
 }
 
+function getCationStabilityScore(molecule: ComparisonMolecule) {
+  return (
+    getBestCarbocationStabilityResult(molecule.cationStabilityResults)
+      ?.stabilityScore ?? 999
+  );
+}
+
+function getRadicalStabilityScore(molecule: ComparisonMolecule) {
+  return (
+    getBestCarbonRadicalStabilityResult(molecule.radicalStabilityResults)
+      ?.stabilityScore ?? 999
+  );
+}
+
 export default function AcidBasePage() {
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -82,6 +127,15 @@ export default function AcidBasePage() {
   const [functionalGroups, setFunctionalGroups] = useState<FunctionalGroupResult[]>([]);
   const [acidityResults, setAcidityResults] = useState<AcidityResult[]>([]);
   const [basicityResults, setBasicityResults] = useState<BasicityResult[]>([]);
+  const [anionStabilityResults, setAnionStabilityResults] = useState<
+    CarbanionStabilityResult[]
+  >([]);
+  const [cationStabilityResults, setCationStabilityResults] = useState<
+    CarbocationStabilityResult[]
+  >([]);
+  const [radicalStabilityResults, setRadicalStabilityResults] = useState<
+    CarbonRadicalStabilityResult[]
+  >([]);
   const [comparisonMolecules, setComparisonMolecules] = useState<ComparisonMolecule[]>([]);
   const [rankingMode, setRankingMode] = useState<RankingMode>("acidity");
 
@@ -103,6 +157,54 @@ export default function AcidBasePage() {
         if (bAcidScore === undefined) return -1;
 
         return aAcidScore - bAcidScore;
+      }
+
+      if (rankingMode === "cationStability") {
+        const aStabilityScore = getCationStabilityScore(a);
+        const bStabilityScore = getCationStabilityScore(b);
+
+        if (aStabilityScore !== bStabilityScore) {
+          return aStabilityScore - bStabilityScore;
+        }
+
+        const aResult = getBestCarbocationStabilityResult(
+          a.cationStabilityResults
+        );
+        const bResult = getBestCarbocationStabilityResult(
+          b.cationStabilityResults
+        );
+
+        if (!aResult && !bResult) return 0;
+        if (!aResult) return 1;
+        if (!bResult) return -1;
+
+        return aResult.stabilityShift - bResult.stabilityShift;
+      }
+
+      if (rankingMode === "radicalStability") {
+        const aStabilityScore = getRadicalStabilityScore(a);
+        const bStabilityScore = getRadicalStabilityScore(b);
+
+        if (aStabilityScore !== bStabilityScore) {
+          return aStabilityScore - bStabilityScore;
+        }
+
+        const aResult = getBestCarbonRadicalStabilityResult(
+          a.radicalStabilityResults
+        );
+        const bResult = getBestCarbonRadicalStabilityResult(
+          b.radicalStabilityResults
+        );
+
+        if (!aResult && !bResult) return 0;
+        if (!aResult) return 1;
+        if (!bResult) return -1;
+
+        if (aResult.stabilityShift !== bResult.stabilityShift) {
+          return aResult.stabilityShift - bResult.stabilityShift;
+        }
+
+        return bResult.stabilizerCount - aResult.stabilizerCount;
       }
 
       const aScore =
@@ -146,6 +248,9 @@ export default function AcidBasePage() {
         setFunctionalGroups([]);
         setAcidityResults([]);
         setBasicityResults([]);
+        setAnionStabilityResults([]);
+        setCationStabilityResults([]);
+        setRadicalStabilityResults([]);
         setStatus("Draw a molecule before analyzing.");
         return;
       }
@@ -156,21 +261,39 @@ export default function AcidBasePage() {
         setFunctionalGroups([]);
         setAcidityResults([]);
         setBasicityResults([]);
+        setAnionStabilityResults([]);
+        setCationStabilityResults([]);
+        setRadicalStabilityResults([]);
         setStatus("Please draw only one molecule at a time for acid/base analysis.");
         return;
       }
 
       const hierarchy = await analyzeFunctionalGroupHierarchy(safeSmiles);
-      const acidity = await analyzeAcidity(safeSmiles, hierarchy.primaryGroups);
-      const basicity = await analyzeBasicity(safeSmiles, hierarchy.primaryGroups);
-      const svg = await getMoleculeSvg(safeSmiles);
+      const [
+        acidity,
+        basicity,
+        anionStability,
+        cationStability,
+        radicalStability,
+        svg,
+      ] = await Promise.all([
+        analyzeAcidity(safeSmiles, hierarchy.primaryGroups),
+        analyzeBasicity(safeSmiles, hierarchy.primaryGroups),
+        analyzeCarbanionStability(safeSmiles),
+        analyzeCarbocationStability(safeSmiles),
+        analyzeCarbonRadicalStability(safeSmiles),
+        getMoleculeSvg(safeSmiles),
+      ]);
 
       setSmiles(safeSmiles);
       setStructureSvg(svg);
       setFunctionalGroups(hierarchy.functionalGroups);
       setAcidityResults(acidity);
       setBasicityResults(basicity);
-      setStatus("Acid/base analysis complete.");
+      setAnionStabilityResults(anionStability);
+      setCationStabilityResults(cationStability);
+      setRadicalStabilityResults(radicalStability);
+      setStatus("Acid/base and stability analysis complete.");
     } catch (error) {
       console.error("Acid/base analysis error:", error);
       setStatus("Something went wrong while analyzing acid/base behavior.");
@@ -205,9 +328,21 @@ export default function AcidBasePage() {
       }
 
       const hierarchy = await analyzeFunctionalGroupHierarchy(safeSmiles);
-      const acidity = await analyzeAcidity(safeSmiles, hierarchy.primaryGroups);
-      const basicity = await analyzeBasicity(safeSmiles, hierarchy.primaryGroups);
-      const svg = await getMoleculeSvg(safeSmiles);
+      const [
+        acidity,
+        basicity,
+        anionStability,
+        cationStability,
+        radicalStability,
+        svg,
+      ] = await Promise.all([
+        analyzeAcidity(safeSmiles, hierarchy.primaryGroups),
+        analyzeBasicity(safeSmiles, hierarchy.primaryGroups),
+        analyzeCarbanionStability(safeSmiles),
+        analyzeCarbocationStability(safeSmiles),
+        analyzeCarbonRadicalStability(safeSmiles),
+        getMoleculeSvg(safeSmiles),
+      ]);
 
       const nextLabel = `Molecule ${String.fromCharCode(65 + comparisonMolecules.length)}`;
 
@@ -219,6 +354,9 @@ export default function AcidBasePage() {
         functionalGroups: hierarchy.functionalGroups,
         acidityResults: acidity,
         basicityResults: basicity,
+        anionStabilityResults: anionStability,
+        cationStabilityResults: cationStability,
+        radicalStabilityResults: radicalStability,
       };
 
       setComparisonMolecules((prev) => [...prev, newMolecule]);
@@ -227,6 +365,9 @@ export default function AcidBasePage() {
       setFunctionalGroups(hierarchy.functionalGroups);
       setAcidityResults(acidity);
       setBasicityResults(basicity);
+      setAnionStabilityResults(anionStability);
+      setCationStabilityResults(cationStability);
+      setRadicalStabilityResults(radicalStability);
       setStatus(`${nextLabel} added to comparison.`);
     } catch (error) {
       console.error("Add to acid/base comparison error:", error);
@@ -247,6 +388,9 @@ export default function AcidBasePage() {
     setFunctionalGroups([]);
     setAcidityResults([]);
     setBasicityResults([]);
+    setAnionStabilityResults([]);
+    setCationStabilityResults([]);
+    setRadicalStabilityResults([]);
   }
 
   function clearComparison() {
@@ -256,6 +400,13 @@ export default function AcidBasePage() {
 
   const strongestAcid = acidityResults[0];
   const strongestBase = basicityResults[0];
+  const strongestAnion = getBestCarbanionStabilityResult(anionStabilityResults);
+  const strongestCation = getBestCarbocationStabilityResult(
+    cationStabilityResults
+  );
+  const strongestRadical = getBestCarbonRadicalStabilityResult(
+    radicalStabilityResults
+  );
 
   return (
     <section className="acid-base-page">
@@ -264,8 +415,8 @@ export default function AcidBasePage() {
           <p className="eyebrow">Acid/Base Workspace</p>
           <h2>Acidity, basicity, and comparison</h2>
           <p>
-            Use this page when you want to reason about pKa, conjugate-base stability,
-            basic sites, and relative rankings between molecules.
+            Use this page to compare acidity, basicity, anion stability,
+            carbocation stability, and carbon-radical stability.
           </p>
         </div>
 
@@ -436,6 +587,76 @@ export default function AcidBasePage() {
             )}
           </div>
 
+          {(anionStabilityResults.length > 0 ||
+            cationStabilityResults.length > 0 ||
+            radicalStabilityResults.length > 0) && (
+            <div className="card acid-base-result-card">
+              <p className="label">Carbon Intermediate Stability</p>
+
+              <div className="group-list">
+                {strongestAnion && (
+                  <div className="group-card">
+                    <div className="group-card-header">
+                      <h3>
+                        Carbanion at atom {strongestAnion.chargedAtomIndex + 1}
+                      </h3>
+                      <span>score {strongestAnion.stabilityScore}</span>
+                    </div>
+                    <p>
+                      <strong>Substitution:</strong> {strongestAnion.substitution}
+                    </p>
+                    <p>
+                      <strong>Nearest stabilizer:</strong>{" "}
+                      {strongestAnion.nearestStabilizer ?? "None detected"}
+                    </p>
+                    <p>{strongestAnion.explanation}</p>
+                  </div>
+                )}
+
+                {strongestCation && (
+                  <div className="group-card">
+                    <div className="group-card-header">
+                      <h3>
+                        Carbocation at atom {strongestCation.chargedAtomIndex + 1}
+                      </h3>
+                      <span>score {strongestCation.stabilityScore}</span>
+                    </div>
+                    <p>
+                      <strong>Substitution:</strong> {strongestCation.substitution}
+                    </p>
+                    <p>
+                      <strong>Nearest stabilizer:</strong>{" "}
+                      {strongestCation.nearestStabilizer ?? "None detected"}
+                    </p>
+                    <p>{strongestCation.explanation}</p>
+                  </div>
+                )}
+
+                {strongestRadical && (
+                  <div className="group-card">
+                    <div className="group-card-header">
+                      <h3>
+                        Carbon radical at atom {strongestRadical.radicalAtomIndex + 1}
+                      </h3>
+                      <span>score {strongestRadical.stabilityScore}</span>
+                    </div>
+                    <p>
+                      <strong>Type:</strong> {strongestRadical.centerType}
+                    </p>
+                    <p>
+                      <strong>Substitution:</strong> {strongestRadical.substitution}
+                    </p>
+                    <p>
+                      <strong>Nearest stabilizer:</strong>{" "}
+                      {strongestRadical.nearestStabilizer ?? "None detected"}
+                    </p>
+                    <p>{strongestRadical.explanation}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="card acid-base-result-card">
             <div className="group-card-header">
               <div>
@@ -477,6 +698,28 @@ export default function AcidBasePage() {
                 />
                 Rank by anion stability
               </label>
+
+              <label>
+                <input
+                  type="radio"
+                  name="acidBaseRankingMode"
+                  value="cationStability"
+                  checked={rankingMode === "cationStability"}
+                  onChange={() => setRankingMode("cationStability")}
+                />
+                Rank by cation stability
+              </label>
+
+              <label>
+                <input
+                  type="radio"
+                  name="acidBaseRankingMode"
+                  value="radicalStability"
+                  checked={rankingMode === "radicalStability"}
+                  onChange={() => setRankingMode("radicalStability")}
+                />
+                Rank by radical stability
+              </label>
             </div>
 
             {comparisonMolecules.length === 0 ? (
@@ -486,8 +729,25 @@ export default function AcidBasePage() {
                 {rankedComparison.map((molecule, index) => {
                   const bestAcid = molecule.acidityResults[0];
                   const bestBase = molecule.basicityResults[0];
+                  const bestAnion = getBestCarbanionStabilityResult(
+                    molecule.anionStabilityResults
+                  );
+                  const bestCation = getBestCarbocationStabilityResult(
+                    molecule.cationStabilityResults
+                  );
+                  const bestRadical = getBestCarbonRadicalStabilityResult(
+                    molecule.radicalStabilityResults
+                  );
                   const hasRankableSite =
-                    rankingMode === "acidity" ? Boolean(bestAcid) : Boolean(bestBase);
+                    rankingMode === "acidity"
+                      ? Boolean(bestAcid)
+                      : rankingMode === "basicity"
+                      ? Boolean(bestBase)
+                      : rankingMode === "anionStability"
+                      ? getAnionStabilityScore(molecule) < 999
+                      : rankingMode === "cationStability"
+                      ? Boolean(bestCation)
+                      : Boolean(bestRadical);
 
                   return (
                     <div className="group-card comparison-card" key={molecule.id}>
@@ -519,7 +779,23 @@ export default function AcidBasePage() {
                           {hasRankableSite ? (
                             rankingMode === "anionStability" ? (
                               <p>
-                                <strong>Stability basis:</strong> {bestBase.relatedGroup}
+                                <strong>Stability basis:</strong>{" "}
+                                {bestAnion
+                                  ? bestAnion.nearestStabilizer ??
+                                    `${bestAnion.substitution} substitution`
+                                  : bestBase?.relatedGroup ?? "Detected anion"}
+                              </p>
+                            ) : rankingMode === "cationStability" ? (
+                              <p>
+                                <strong>Stability basis:</strong>{" "}
+                                {bestCation?.nearestStabilizer ??
+                                  `${bestCation?.substitution ?? "unknown"} substitution`}
+                              </p>
+                            ) : rankingMode === "radicalStability" ? (
+                              <p>
+                                <strong>Stability basis:</strong>{" "}
+                                {bestRadical?.nearestStabilizer ??
+                                  `${bestRadical?.substitution ?? "unknown"} substitution`}
                               </p>
                             ) : (
                               <p>
@@ -529,13 +805,23 @@ export default function AcidBasePage() {
                                     : "Conjugate acid pKa:"}
                                 </strong>{" "}
                                 {rankingMode === "acidity"
-                                  ? bestAcid.estimatedPka
-                                  : bestBase.conjugateAcidPka}
+                                  ? bestAcid?.estimatedPka
+                                  : bestBase?.conjugateAcidPka}
                               </p>
                             )
                           ) : (
                             <p className="empty">
-                              No {rankingMode === "acidity" ? "acidic" : "basic"} site detected for ranking.
+                              No {
+                                rankingMode === "acidity"
+                                  ? "acidic"
+                                  : rankingMode === "basicity"
+                                  ? "basic"
+                                  : rankingMode === "anionStability"
+                                  ? "anionic carbon"
+                                  : rankingMode === "cationStability"
+                                  ? "cationic carbon"
+                                  : "carbon radical"
+                              } site detected for ranking.
                             </p>
                           )}
 
@@ -543,23 +829,69 @@ export default function AcidBasePage() {
                             <strong>SMILES:</strong> <code>{molecule.smiles}</code>
                           </p>
 
-                          {hasRankableSite && rankingMode === "acidity" && (
-                            <>
-                              <p>
-                                <strong>Strongest acidic site:</strong> {bestAcid.acidicSite}
-                              </p>
-                              <p>{bestAcid.explanation}</p>
-                            </>
-                          )}
+                          {hasRankableSite &&
+                            rankingMode === "acidity" &&
+                            bestAcid && (
+                              <>
+                                <p>
+                                  <strong>Strongest acidic site:</strong>{" "}
+                                  {bestAcid.acidicSite}
+                                </p>
+                                <p>{bestAcid.explanation}</p>
+                              </>
+                            )}
 
-                          {hasRankableSite && rankingMode !== "acidity" && (
-                            <>
-                              <p>
-                                <strong>Strongest basic site:</strong> {bestBase.basicSite}
-                              </p>
-                              <p>{bestBase.explanation}</p>
-                            </>
-                          )}
+                          {hasRankableSite &&
+                            rankingMode === "basicity" &&
+                            bestBase && (
+                              <>
+                                <p>
+                                  <strong>Strongest basic site:</strong>{" "}
+                                  {bestBase.basicSite}
+                                </p>
+                                <p>{bestBase.explanation}</p>
+                              </>
+                            )}
+
+                          {hasRankableSite &&
+                            rankingMode === "anionStability" &&
+                            bestAnion && (
+                              <>
+                                <p>
+                                  <strong>Charged carbon:</strong> Atom{" "}
+                                  {bestAnion.chargedAtomIndex + 1}
+                                </p>
+                                <p>{bestAnion.explanation}</p>
+                              </>
+                            )}
+
+                          {hasRankableSite &&
+                            rankingMode === "cationStability" &&
+                            bestCation && (
+                              <>
+                                <p>
+                                  <strong>Charged carbon:</strong> Atom{" "}
+                                  {bestCation.chargedAtomIndex + 1}
+                                </p>
+                                <p>{bestCation.explanation}</p>
+                              </>
+                            )}
+
+                          {hasRankableSite &&
+                            rankingMode === "radicalStability" &&
+                            bestRadical && (
+                              <>
+                                <p>
+                                  <strong>Radical carbon:</strong> Atom{" "}
+                                  {bestRadical.radicalAtomIndex + 1}
+                                </p>
+                                <p>
+                                  <strong>Radical type:</strong>{" "}
+                                  {bestRadical.centerType}
+                                </p>
+                                <p>{bestRadical.explanation}</p>
+                              </>
+                            )}
                         </div>
                       </div>
                     </div>

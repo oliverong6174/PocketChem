@@ -77,6 +77,7 @@ export const phosphorusGroups: FunctionalGroupPattern[] = [
       "Phosphate triesters contain a phosphate center with three P-O-C ester bonds.",
     category: "functionalGroup",
   },
+    //displaySmarts breaks convention for the phosphonate esters but this helps with understanding according to test audiences
   {
     name: "Phosphonate",
     priority: 33.2,
@@ -86,7 +87,7 @@ export const phosphorusGroups: FunctionalGroupPattern[] = [
     prefix: "phosphonato",
     equivalentNames: ["phosphonic acid derivative"],
     smarts: "[#6][PX4](=[OX1])([O;X1,X2])([O;X1,X2])",
-    displaySmarts: "[PX4](=[OX1])([O;X1,X2])([O;X1,X2])",
+    displaySmarts: "[#6][PX4](=[OX1])([O;X1,X2])([O;X1,X2])",
     mcatNote:
       "Phosphonates contain one direct carbon-phosphorus bond and two phosphorus-oxygen single bonds: R-P(=O)(O)2. This separates them from phosphates, which have no direct P-C bond.",
     category: "functionalGroup",
@@ -102,7 +103,7 @@ export const phosphorusGroups: FunctionalGroupPattern[] = [
     smarts:
       "[#6][PX4](=[OX1])([OX2][#6])[O;X1,X2;!$([OX2][#6])]",
     displaySmarts:
-      "[PX4](=[OX1])([OX2])[O;X1,X2;!$([OX2][#6])]",
+       "[#6][PX4](=[OX1])([OX2])[O;X1,X2;!$([OX2][#6])]",
     mcatNote:
       "Phosphonate esters contain one direct carbon-phosphorus bond and one P-O-C ester bond: R-P(=O)(OR)(O). This is different from phosphate esters, which do not have a direct P-C bond.",
     category: "functionalGroup",
@@ -118,7 +119,7 @@ export const phosphorusGroups: FunctionalGroupPattern[] = [
     smarts:
       "[#6][PX4](=[OX1])([OX2][#6])[OX2][#6]",
     displaySmarts:
-      "[PX4](=[OX1])([OX2])[OX2]",
+       "[#6][PX4](=[OX1])([OX2])[OX2]",
     mcatNote:
       "Phosphonate diesters contain one direct carbon-phosphorus bond and two P-O-C ester bonds: R-P(=O)(OR)2.",
     category: "functionalGroup",

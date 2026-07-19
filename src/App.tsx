@@ -75,6 +75,7 @@
     { id: "lonePairs", label: "Lone Pairs" },
     { id: "acidBaseSites", label: "Acid/Base Sites" },
     { id: "reactiveSites", label: "Reactive Sites" },
+    { id: "resonance", label: "Resonance Sites" },
     { id: "chirality", label: "Chirality" },
   ];
 
@@ -278,7 +279,7 @@
 
   analyzeInFlightRef.current = true;
   setIsAnalyzing(true);
-  setStatus("Analyzing molecule...");
+  setStatus("Analyzing");
 
   try {
     const result = await window.ketcher.getSmiles();
@@ -1514,6 +1515,13 @@
                               ? "all bond orbital overlaps"
                               : `${selectedBondType} bond orbital overlaps`}
                             .
+                          </p>
+                        )}
+
+                        {selectedConcept === "resonance" && (
+                          <p className="annotation-summary">
+                            Showing atoms or bonds that can participate in resonance, conjugation, or
+                            electron delocalization.
                           </p>
                         )}
 
