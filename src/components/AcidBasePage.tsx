@@ -5,25 +5,44 @@ import {
   getMoleculeSvg,
   type FunctionalGroupResult,
 } from "../utils/functionalGroups";
-import { analyzeAcidity, type AcidityResult } from "../utils/ranking/analyzeAcidity";
-import { analyzeBasicity, type BasicityResult } from "../utils/ranking/analyzeBasicity";
+import {
+  analyzeAcidity,
+  type AcidityResult,
+} from "../utils/ranking/analyzeAcidity";
+import {
+  analyzeBasicity,
+  type BasicityResult,
+} from "../utils/ranking/analyzeBasicity";
 import {
   analyzeCarbanionStability,
   getBestCarbanionStabilityResult,
   type CarbanionStabilityResult,
 } from "../utils/ranking/anionStability";
-
 import {
   analyzeCarbocationStability,
   getBestCarbocationStabilityResult,
   type CarbocationStabilityResult,
 } from "../utils/ranking/cationStability";
-
 import {
   analyzeCarbonRadicalStability,
   getBestCarbonRadicalStabilityResult,
   type CarbonRadicalStabilityResult,
 } from "../utils/ranking/radicalStability";
+import {
+  analyzeBoilingPointRanking,
+  compareBoilingPointResults,
+  type BoilingPointRankingResult,
+} from "../utils/ranking/boilingPoint";
+import {
+  analyzeSolubilityRanking,
+  compareSolubilityResults,
+  type SolubilityRankingResult,
+} from "../utils/ranking/solubility";
+import {
+  analyzeCipSubstituentPriority,
+  compareCipSubstituentResults,
+  type CipSubstituentPriorityResult,
+} from "../utils/ranking/cipPriority";
 import "ketcher-react/dist/index.css";
 
 type RankingMode =
@@ -31,7 +50,10 @@ type RankingMode =
   | "basicity"
   | "anionStability"
   | "cationStability"
-  | "radicalStability";
+  | "radicalStability"
+  | "boilingPoint"
+  | "solubility"
+  | "cipPriority";
 
 type ComparisonMolecule = {
   id: number;
@@ -44,6 +66,9 @@ type ComparisonMolecule = {
   anionStabilityResults: CarbanionStabilityResult[];
   cationStabilityResults: CarbocationStabilityResult[];
   radicalStabilityResults: CarbonRadicalStabilityResult[];
+  boilingPointResult: BoilingPointRankingResult | null;
+  solubilityResult: SolubilityRankingResult | null;
+  cipPriorityResult: CipSubstituentPriorityResult | null;
 };
 
 function isMolBlockLike(value: unknown) {
@@ -207,6 +232,39 @@ export default function AcidBasePage() {
         return bResult.stabilizerCount - aResult.stabilizerCount;
       }
 
+      if (rankingMode === "boilingPoint") {
+        if (!a.boilingPointResult && !b.boilingPointResult) return 0;
+        if (!a.boilingPointResult) return 1;
+        if (!b.boilingPointResult) return -1;
+
+        return compareBoilingPointResults(
+          a.boilingPointResult,
+          b.boilingPointResult
+        );
+      }
+
+      if (rankingMode === "solubility") {
+        if (!a.solubilityResult && !b.solubilityResult) return 0;
+        if (!a.solubilityResult) return 1;
+        if (!b.solubilityResult) return -1;
+
+        return compareSolubilityResults(
+          a.solubilityResult,
+          b.solubilityResult
+        );
+      }
+
+      if (rankingMode === "cipPriority") {
+        if (!a.cipPriorityResult && !b.cipPriorityResult) return 0;
+        if (!a.cipPriorityResult) return 1;
+        if (!b.cipPriorityResult) return -1;
+
+        return compareCipSubstituentResults(
+          a.cipPriorityResult,
+          b.cipPriorityResult
+        );
+      }
+
       const aScore =
         rankingMode === "acidity"
           ? a.acidityResults[0]?.estimatedPkaNumber
@@ -334,6 +392,9 @@ export default function AcidBasePage() {
         anionStability,
         cationStability,
         radicalStability,
+        boilingPoint,
+        solubility,
+        cipPriority,
         svg,
       ] = await Promise.all([
         analyzeAcidity(safeSmiles, hierarchy.primaryGroups),
@@ -341,6 +402,9 @@ export default function AcidBasePage() {
         analyzeCarbanionStability(safeSmiles),
         analyzeCarbocationStability(safeSmiles),
         analyzeCarbonRadicalStability(safeSmiles),
+        analyzeBoilingPointRanking(safeSmiles, hierarchy.functionalGroups),
+        analyzeSolubilityRanking(safeSmiles, hierarchy.functionalGroups),
+        analyzeCipSubstituentPriority(safeSmiles),
         getMoleculeSvg(safeSmiles),
       ]);
 
@@ -357,6 +421,9 @@ export default function AcidBasePage() {
         anionStabilityResults: anionStability,
         cationStabilityResults: cationStability,
         radicalStabilityResults: radicalStability,
+        boilingPointResult: boilingPoint,
+        solubilityResult: solubility,
+        cipPriorityResult: cipPriority,
       };
 
       setComparisonMolecules((prev) => [...prev, newMolecule]);
@@ -415,8 +482,8 @@ export default function AcidBasePage() {
           <p className="eyebrow">Acid/Base Workspace</p>
           <h2>Acidity, basicity, and comparison</h2>
           <p>
-            Use this page to compare acidity, basicity, anion stability,
-            carbocation stability, and carbon-radical stability.
+            Compare acid/base behavior, charged intermediates, radicals,
+            physical-property tendencies, and CIP substituent priority.
           </p>
         </div>
 
@@ -720,6 +787,40 @@ export default function AcidBasePage() {
                 />
                 Rank by radical stability
               </label>
+
+
+              <label>
+                <input
+                  type="radio"
+                  name="acidBaseRankingMode"
+                  value="boilingPoint"
+                  checked={rankingMode === "boilingPoint"}
+                  onChange={() => setRankingMode("boilingPoint")}
+                />
+                Rank by boiling point
+              </label>
+
+              <label>
+                <input
+                  type="radio"
+                  name="acidBaseRankingMode"
+                  value="solubility"
+                  checked={rankingMode === "solubility"}
+                  onChange={() => setRankingMode("solubility")}
+                />
+                Rank by water solubility
+              </label>
+
+              <label>
+                <input
+                  type="radio"
+                  name="acidBaseRankingMode"
+                  value="cipPriority"
+                  checked={rankingMode === "cipPriority"}
+                  onChange={() => setRankingMode("cipPriority")}
+                />
+                Rank by CIP priority
+              </label>
             </div>
 
             {comparisonMolecules.length === 0 ? (
@@ -747,7 +848,13 @@ export default function AcidBasePage() {
                       ? getAnionStabilityScore(molecule) < 999
                       : rankingMode === "cationStability"
                       ? Boolean(bestCation)
-                      : Boolean(bestRadical);
+                      : rankingMode === "radicalStability"
+                      ? Boolean(bestRadical)
+                      : rankingMode === "boilingPoint"
+                      ? Boolean(molecule.boilingPointResult)
+                      : rankingMode === "solubility"
+                      ? Boolean(molecule.solubilityResult)
+                      : Boolean(molecule.cipPriorityResult);
 
                   return (
                     <div className="group-card comparison-card" key={molecule.id}>
@@ -797,6 +904,24 @@ export default function AcidBasePage() {
                                 {bestRadical?.nearestStabilizer ??
                                   `${bestRadical?.substitution ?? "unknown"} substitution`}
                               </p>
+                            ) : rankingMode === "boilingPoint" ? (
+                              <p>
+                                <strong>Boiling-point tendency:</strong>{" "}
+                                {molecule.boilingPointResult?.tendency} (score{" "}
+                                {molecule.boilingPointResult?.boilingPointScore})
+                              </p>
+                            ) : rankingMode === "solubility" ? (
+                              <p>
+                                <strong>Water-solubility tendency:</strong>{" "}
+                                {molecule.solubilityResult?.tendency} (score{" "}
+                                {molecule.solubilityResult?.waterSolubilityScore})
+                              </p>
+                            ) : rankingMode === "cipPriority" ? (
+                              <p>
+                                <strong>CIP attachment atom:</strong>{" "}
+                                {molecule.cipPriorityResult?.rootElement} at atom{" "}
+                                {(molecule.cipPriorityResult?.rootAtomIndex ?? 0) + 1}
+                              </p>
                             ) : (
                               <p>
                                 <strong>
@@ -820,8 +945,14 @@ export default function AcidBasePage() {
                                   ? "anionic carbon"
                                   : rankingMode === "cationStability"
                                   ? "cationic carbon"
-                                  : "carbon radical"
-                              } site detected for ranking.
+                                  : rankingMode === "radicalStability"
+                                  ? "carbon radical"
+                                  : rankingMode === "boilingPoint"
+                                  ? "boiling-point result"
+                                  : rankingMode === "solubility"
+                                  ? "water-solubility result"
+                                  : "CIP attachment atom"
+                              } detected for ranking.
                             </p>
                           )}
 
@@ -890,6 +1021,52 @@ export default function AcidBasePage() {
                                   {bestRadical.centerType}
                                 </p>
                                 <p>{bestRadical.explanation}</p>
+                              </>
+                            )}
+
+
+                          {hasRankableSite &&
+                            rankingMode === "boilingPoint" &&
+                            molecule.boilingPointResult && (
+                              <>
+                                <p>
+                                  <strong>Molecular weight:</strong>{" "}
+                                  {molecule.boilingPointResult.molecularWeight?.toFixed(2) ??
+                                    "Unavailable"}
+                                </p>
+                                <p>{molecule.boilingPointResult.explanation}</p>
+                              </>
+                            )}
+
+                          {hasRankableSite &&
+                            rankingMode === "solubility" &&
+                            molecule.solubilityResult && (
+                              <>
+                                <p>
+                                  <strong>logP:</strong>{" "}
+                                  {molecule.solubilityResult.logP?.toFixed(2) ??
+                                    "Unavailable"}
+                                </p>
+                                <p>{molecule.solubilityResult.explanation}</p>
+                              </>
+                            )}
+
+                          {hasRankableSite &&
+                            rankingMode === "cipPriority" &&
+                            molecule.cipPriorityResult && (
+                              <>
+                                <p>
+                                  <strong>Direct atomic number:</strong>{" "}
+                                  {molecule.cipPriorityResult.directAtomicNumber}
+                                </p>
+                                <p>{molecule.cipPriorityResult.explanation}</p>
+                                {molecule.cipPriorityResult.attachmentSource ===
+                                  "firstAtomFallback" && (
+                                  <p className="empty">
+                                    Draw * bonded to the substituent for an explicit
+                                    CIP attachment point.
+                                  </p>
+                                )}
                               </>
                             )}
                         </div>
