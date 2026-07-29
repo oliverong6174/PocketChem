@@ -71,6 +71,20 @@ type ComparisonMolecule = {
   cipPriorityResult: CipSubstituentPriorityResult | null;
 };
 
+
+const COMPARISON_LABELS = [
+  "Molecule A",
+  "Molecule B",
+  "Molecule C",
+  "Molecule D",
+  "Molecule E",
+] as const;
+
+function getNextComparisonLabel(molecules: ComparisonMolecule[]): string {
+  const usedLabels = new Set(molecules.map((molecule) => molecule.label));
+  return COMPARISON_LABELS.find((label) => !usedLabels.has(label)) ?? "Molecule";
+}
+
 function isMolBlockLike(value: unknown) {
   if (typeof value !== "string") return false;
 
@@ -141,6 +155,27 @@ function getRadicalStabilityScore(molecule: ComparisonMolecule) {
     getBestCarbonRadicalStabilityResult(molecule.radicalStabilityResults)
       ?.stabilityScore ?? 999
   );
+}
+
+const ACID_BASE_TIE_TOLERANCE = 0.15;
+
+function getAcidBaseRankingScore(
+  molecule: ComparisonMolecule,
+  rankingMode: RankingMode
+): number | null {
+  if (rankingMode === "acidity") {
+    return molecule.acidityResults[0]?.estimatedPkaNumber ?? null;
+  }
+
+  if (rankingMode === "basicity") {
+    return molecule.basicityResults[0]?.conjugateAcidPkaNumber ?? null;
+  }
+
+  return null;
+}
+
+function formatPkaRange(range: readonly [number, number]): string {
+  return `${range[0]}–${range[1]}`;
 }
 
 export default function AcidBasePage() {
@@ -287,6 +322,62 @@ export default function AcidBasePage() {
     });
   }, [comparisonMolecules, rankingMode]);
 
+  const comparisonRankById = useMemo(() => {
+    const rankById = new Map<number, number>();
+    let previousAcidBaseScore: number | null = null;
+    let previousRank = 0;
+    let rankablePosition = 0;
+
+    for (const molecule of rankedComparison) {
+      const hasRankableResult =
+        rankingMode === "acidity"
+          ? Boolean(molecule.acidityResults[0])
+          : rankingMode === "basicity"
+          ? Boolean(molecule.basicityResults[0])
+          : rankingMode === "anionStability"
+          ? getAnionStabilityScore(molecule) < 999
+          : rankingMode === "cationStability"
+          ? getCationStabilityScore(molecule) < 999
+          : rankingMode === "radicalStability"
+          ? getRadicalStabilityScore(molecule) < 999
+          : rankingMode === "boilingPoint"
+          ? Boolean(molecule.boilingPointResult)
+          : rankingMode === "solubility"
+          ? Boolean(molecule.solubilityResult)
+          : Boolean(molecule.cipPriorityResult);
+
+      if (!hasRankableResult) continue;
+
+      rankablePosition += 1;
+      const currentAcidBaseScore = getAcidBaseRankingScore(
+        molecule,
+        rankingMode
+      );
+      const sharesApproximateRank =
+        currentAcidBaseScore !== null &&
+        previousAcidBaseScore !== null &&
+        Math.abs(currentAcidBaseScore - previousAcidBaseScore) <=
+          ACID_BASE_TIE_TOLERANCE;
+
+      const rank = sharesApproximateRank ? previousRank : rankablePosition;
+      rankById.set(molecule.id, rank);
+      previousRank = rank;
+      previousAcidBaseScore = currentAcidBaseScore;
+    }
+
+    return rankById;
+  }, [rankedComparison, rankingMode]);
+
+  const comparisonRankCounts = useMemo(() => {
+    const counts = new Map<number, number>();
+
+    for (const rank of comparisonRankById.values()) {
+      counts.set(rank, (counts.get(rank) ?? 0) + 1);
+    }
+
+    return counts;
+  }, [comparisonRankById]);
+
   async function analyzeAcidBaseMolecule() {
     if (!ketcher) {
       setStatus("Molecule editor is still loading. Try again in a second.");
@@ -366,10 +457,15 @@ export default function AcidBasePage() {
       return;
     }
 
+    if (isAnalyzing) return;
+
     if (comparisonMolecules.length >= 5) {
       setStatus("Comparison list is full. You can compare up to 5 molecules.");
       return;
     }
+
+    setIsAnalyzing(true);
+    setStatus("Analyzing molecule for comparison...");
 
     try {
       const rawSmiles = await ketcher.getSmiles();
@@ -382,6 +478,11 @@ export default function AcidBasePage() {
 
       if (safeSmiles.includes(".")) {
         setStatus("Please draw only one molecule at a time before adding it to comparison.");
+        return;
+      }
+
+      if (comparisonMolecules.some((molecule) => molecule.smiles === safeSmiles)) {
+        setStatus("That molecule is already in the comparison list.");
         return;
       }
 
@@ -408,10 +509,10 @@ export default function AcidBasePage() {
         getMoleculeSvg(safeSmiles),
       ]);
 
-      const nextLabel = `Molecule ${String.fromCharCode(65 + comparisonMolecules.length)}`;
+      const nextLabel = getNextComparisonLabel(comparisonMolecules);
 
       const newMolecule: ComparisonMolecule = {
-        id: Date.now(),
+        id: Date.now() + Math.random(),
         label: nextLabel,
         smiles: safeSmiles,
         structureSvg: svg,
@@ -439,6 +540,8 @@ export default function AcidBasePage() {
     } catch (error) {
       console.error("Add to acid/base comparison error:", error);
       setStatus("Something went wrong while adding the molecule to comparison.");
+    } finally {
+      setIsAnalyzing(false);
     }
   }
 
@@ -462,7 +565,7 @@ export default function AcidBasePage() {
 
   function clearComparison() {
     setComparisonMolecules([]);
-    setStatus("Comparison list cleared.");
+    setStatus("All comparison molecules deleted.");
   }
 
   const strongestAcid = acidityResults[0];
@@ -477,18 +580,6 @@ export default function AcidBasePage() {
 
   return (
     <section className="acid-base-page">
-      <div className="card acid-base-intro-card">
-        <div>
-          <p className="eyebrow">Acid/Base Workspace</p>
-          <h2>Acidity, basicity, and comparison</h2>
-          <p>
-            Compare acid/base behavior, charged intermediates, radicals,
-            physical-property tendencies, and CIP substituent priority.
-          </p>
-        </div>
-
-        <div className="acid-base-status-pill">{status}</div>
-      </div>
 
       <section className="acid-base-workspace">
         <div className="card acid-base-drawer-card">
@@ -516,15 +607,27 @@ export default function AcidBasePage() {
               {isAnalyzing ? "Analyzing..." : "Analyze Acid/Base"}
             </button>
 
-            <button className="secondary-button" onClick={addCurrentMoleculeToComparison}>
+            <button
+              className="secondary-button"
+              onClick={addCurrentMoleculeToComparison}
+              disabled={isAnalyzing}
+            >
               Add to Comparison
             </button>
 
-            <button className="secondary-button" onClick={clearAcidBaseWorkspace}>
+            <button
+              className="secondary-button"
+              onClick={clearAcidBaseWorkspace}
+              disabled={isAnalyzing}
+            >
               Clear Molecule
             </button>
 
-            <button className="secondary-button" onClick={clearComparison}>
+            <button
+              className="secondary-button"
+              onClick={clearComparison}
+              disabled={isAnalyzing || comparisonMolecules.length === 0}
+            >
               Clear Comparison
             </button>
           </div>
@@ -549,16 +652,30 @@ export default function AcidBasePage() {
           <div className="acid-base-summary-grid">
             <div className="acid-base-summary-card">
               <span>Strongest acidic site</span>
-              <strong>{strongestAcid?.acidicSite ?? "None detected"}</strong>
-              <p>{strongestAcid ? `Estimated pKa ${strongestAcid.estimatedPka}` : "Analyze a molecule first."}</p>
+              <strong>
+                {strongestAcid
+                  ? `${strongestAcid.acidicSite} (atom ${strongestAcid.siteAtomIndex + 1})`
+                  : "None detected"}
+              </strong>
+              <p>
+                {strongestAcid
+                  ? `Estimated pKa ${strongestAcid.estimatedPka} · typical range ${formatPkaRange(
+                      strongestAcid.estimatedPkaRange
+                    )} · ${strongestAcid.confidence.toLowerCase()} confidence`
+                  : "Analyze a molecule first."}
+              </p>
             </div>
 
             <div className="acid-base-summary-card">
               <span>Strongest basic site</span>
-              <strong>{strongestBase?.basicSite ?? "None detected"}</strong>
+              <strong>
+                {strongestBase
+                  ? `${strongestBase.basicSite} (atom ${strongestBase.siteAtomIndex + 1})`
+                  : "None detected"}
+              </strong>
               <p>
                 {strongestBase
-                  ? `Conjugate acid pKa ${strongestBase.conjugateAcidPka}`
+                  ? `Conjugate acid pKa ${strongestBase.conjugateAcidPka} · ${strongestBase.confidence.toLowerCase()} confidence`
                   : "Analyze a molecule first."}
               </p>
             </div>
@@ -595,6 +712,13 @@ export default function AcidBasePage() {
 
                     <p>
                       <strong>Related group:</strong> {result.relatedGroup}
+                    </p>
+                    <p>
+                      <strong>Detected atom:</strong> Atom {result.siteAtomIndex + 1} · {result.confidence.toLowerCase()} confidence
+                    </p>
+                    <p>
+                      <strong>Typical pKa range:</strong>{" "}
+                      {formatPkaRange(result.estimatedPkaRange)}
                     </p>
                     <p>
                       <strong>A — Atom:</strong> {result.atom}
@@ -640,6 +764,9 @@ export default function AcidBasePage() {
 
                     <p>
                       <strong>Related group:</strong> {result.relatedGroup}
+                    </p>
+                    <p>
+                      <strong>Detected atom:</strong> Atom {result.siteAtomIndex + 1} · {result.confidence.toLowerCase()} confidence
                     </p>
                     <p>{result.explanation}</p>
 
@@ -730,6 +857,7 @@ export default function AcidBasePage() {
                 <p className="label">Compare Molecules</p>
                 <p className="empty">Add up to five molecules, then choose the ranking mode.</p>
               </div>
+
             </div>
 
             <div className="acid-base-ranking-row">
@@ -827,7 +955,7 @@ export default function AcidBasePage() {
               <p className="empty">Draw molecules and click Add to Comparison.</p>
             ) : (
               <div className="group-list acid-base-comparison-list">
-                {rankedComparison.map((molecule, index) => {
+                {rankedComparison.map((molecule) => {
                   const bestAcid = molecule.acidityResults[0];
                   const bestBase = molecule.basicityResults[0];
                   const bestAnion = getBestCarbanionStabilityResult(
@@ -839,6 +967,11 @@ export default function AcidBasePage() {
                   const bestRadical = getBestCarbonRadicalStabilityResult(
                     molecule.radicalStabilityResults
                   );
+                  const displayRank = comparisonRankById.get(molecule.id);
+                  const hasApproximateTie =
+                    displayRank !== undefined &&
+                    (comparisonRankCounts.get(displayRank) ?? 0) > 1 &&
+                    (rankingMode === "acidity" || rankingMode === "basicity");
                   const hasRankableSite =
                     rankingMode === "acidity"
                       ? Boolean(bestAcid)
@@ -860,8 +993,8 @@ export default function AcidBasePage() {
                     <div className="group-card comparison-card" key={molecule.id}>
                       <div className="group-card-header">
                         <h3>
-                          {hasRankableSite
-                            ? `#${index + 1}: ${molecule.label}`
+                          {hasRankableSite && displayRank !== undefined
+                            ? `#${displayRank}: ${molecule.label}`
                             : `Unranked: ${molecule.label}`}
                         </h3>
 
@@ -956,6 +1089,21 @@ export default function AcidBasePage() {
                             </p>
                           )}
 
+                          {hasRankableSite &&
+                            rankingMode === "acidity" &&
+                            bestAcid && (
+                              <p>
+                                <strong>Typical pKa range:</strong>{" "}
+                                {formatPkaRange(bestAcid.estimatedPkaRange)}
+                              </p>
+                            )}
+
+                          {hasApproximateTie && (
+                            <p className="empty">
+                              Approximate tie: the estimated pKa centers differ by 0.15 or less.
+                            </p>
+                          )}
+
                           <p className="comparison-smiles">
                             <strong>SMILES:</strong> <code>{molecule.smiles}</code>
                           </p>
@@ -966,7 +1114,7 @@ export default function AcidBasePage() {
                               <>
                                 <p>
                                   <strong>Strongest acidic site:</strong>{" "}
-                                  {bestAcid.acidicSite}
+                                  {bestAcid.acidicSite} at atom {bestAcid.siteAtomIndex + 1}
                                 </p>
                                 <p>{bestAcid.explanation}</p>
                               </>
@@ -978,7 +1126,7 @@ export default function AcidBasePage() {
                               <>
                                 <p>
                                   <strong>Strongest basic site:</strong>{" "}
-                                  {bestBase.basicSite}
+                                  {bestBase.basicSite} at atom {bestBase.siteAtomIndex + 1}
                                 </p>
                                 <p>{bestBase.explanation}</p>
                               </>
