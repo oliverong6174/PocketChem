@@ -1,9 +1,13 @@
 import type { ReactionRule } from "../reactionTypes";
 
 const aldehydeTrigger = {
-  functionalGroups: [
+  anyFunctionalGroups: [
     "Aldehyde",
-    "Benzaldehyde derivative",
+    "Benzaldehyde",
+    "Cinnamaldehyde",
+    "Crotonaldehyde",
+    "Acrolein",
+    "Enal",
   ],
 };
 
@@ -20,8 +24,9 @@ export const aldehydeReactionRules: ReactionRule[] = [
     trigger: aldehydeTrigger,
     transform: {
       type: "engineHandler",
-      handler: "oneTwoAddition",
+      handler: "addition",
       options: {
+        mode: "oneTwoAddition",
         nucleophile: "hydride",
       },
     },
@@ -38,12 +43,8 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Grignard and organolithium reagents add to aldehydes to form secondary alcohols after acidic workup. Formaldehyde gives primary alcohols.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
-      options: {
-        mode: "oneTwoAddition",
-        nucleophile: "organometallic",
-      },
+      type: "conceptOnly",
+      reason: "The Grignard or organolithium carbon group must be specified before an exact alcohol can be generated.",
     },
     priority: 910,
   },
@@ -117,11 +118,8 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Aldehydes react with alcohols under acidic conditions to form acetals through hemiacetal intermediates.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "condensation",
-      options: {
-        mode: "acetalFormation",
-      },
+      type: "conceptOnly",
+      reason: "The alcohol identity must be specified before an exact acetal can be generated.",
     },
     priority: 960,
   },
@@ -136,12 +134,9 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Aldehydes react with primary amines to form imines through dehydration.",
     trigger: aldehydeTrigger,
     transform: {
-    type: "engineHandler",
-    handler: "condensation",
-    options: {
-      mode: "imineFormation",
+      type: "conceptOnly",
+      reason: "The primary amine substituent must be specified before an exact imine can be generated.",
     },
-  },
     priority: 970,
   },
   {
@@ -155,8 +150,8 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Aldehydes with alpha hydrogens can react with secondary amines to form enamines.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[C:1]=CN(C)C",
+      type: "conceptOnly",
+      reason: "The secondary amine substituents must be specified before an exact enamine can be generated.",
     },
     priority: 980,
   },
@@ -190,12 +185,9 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Aldehydes react with hydrazines to form hydrazones.",
     trigger: aldehydeTrigger,
     transform: {
-    type: "engineHandler",
-    handler: "condensation",
-    options: {
-      mode: "hydrazoneFormation",
+      type: "conceptOnly",
+      reason: "A substituted hydrazine can change the product; specify it for an exact structure.",
     },
-  },
     priority: 1000,
   },
   {
@@ -247,51 +239,10 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Wittig reagents convert aldehydes into alkenes.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
-      options: {
-        mode: "wittigReaction",
-      },
+      type: "conceptOnly",
+      reason: "The ylide substituent must be specified before an exact alkene can be generated.",
     },
     priority: 1030,
-  },
-  {
-    id: "aldehyde-aldol-addition",
-    family: "aldehydes",
-    title: "Aldol Addition",
-    reagents: "NaOH, H₂O",
-    reagentNote: "Requires alpha hydrogens",
-    productHint: "Beta-hydroxy aldehyde",
-    explanation:
-      "Aldehydes with alpha hydrogens can form enolates that add to another aldehyde, producing beta-hydroxy aldehydes.",
-    trigger: aldehydeTrigger,
-    transform: {
-      type: "engineHandler",
-      handler: "addition",
-      options: {
-        mode: "aldolAddition",
-      },
-    },
-    priority: 1040,
-  },
-  {
-    id: "aldehyde-aldol-condensation",
-    family: "aldehydes",
-    title: "Aldol Condensation",
-    reagents: "NaOH, heat",
-    reagentNote: "Addition then dehydration",
-    productHint: "Alpha,beta-unsaturated aldehyde",
-    explanation:
-      "Under stronger or heated conditions, aldol products dehydrate to alpha,beta-unsaturated aldehydes.",
-    trigger: aldehydeTrigger,
-    transform: {
-      type: "engineHandler",
-      handler: "condensation",
-      options: {
-        mode: "aldolCondensation",
-      },
-    },
-    priority: 1050,
   },
   {
     id: "aldehyde-cannizzaro",
@@ -302,10 +253,10 @@ export const aldehydeReactionRules: ReactionRule[] = [
     productHint: "Alcohol and carboxylate",
     explanation:
       "Aldehydes without alpha hydrogens can disproportionate under strong base to give an alcohol and carboxylate.",
-    trigger: aldehydeTrigger,
+    trigger: { ...aldehydeTrigger, excludeSmarts: ["[C;H1,H2,H3][CX3H1](=O)"] },
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[CH:1]=[O:2]>>[CH2:1][OH:2].[C:1](=[O:2])[O-]",
+      type: "conceptOnly",
+      reason: "Cannizzaro disproportionation consumes two aldehyde molecules; the one-reactant engine does not duplicate stoichiometric reactants.",
     },
     priority: 1060,
   },

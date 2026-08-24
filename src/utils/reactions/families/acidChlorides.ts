@@ -1,7 +1,8 @@
 import type { ReactionRule } from "../reactionTypes";
 
 const acidChlorideTrigger = {
-  functionalGroups: ["Acid chloride"],
+  anyFunctionalGroups: ["Acyl halide"],
+  includeSmarts: ["[CX3](=O)[F,Cl,Br,I]"],
 };
 
 export const acidChlorideReactionRules: ReactionRule[] = [
@@ -17,7 +18,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
     trigger: acidChlorideTrigger,
     transform: {
       type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])[Cl:3]>>[C:1](=[O:2])[OH]",
+      smarts: "[C:1](=[O:2])[F,Cl,Br,I:3]>>[C:1](=[O:2])[OH]",
     },
     priority: 1500,
   },
@@ -33,8 +34,8 @@ export const acidChlorideReactionRules: ReactionRule[] = [
       "Alcohols react with acid chlorides to produce esters.",
     trigger: acidChlorideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])[Cl:3]>>[C:1](=[O:2])OC",
+      type: "conceptOnly",
+      reason: "The alcohol substituent is not specified by the one-molecule reaction drawer.",
     },
     priority: 1510,
   },
@@ -50,8 +51,8 @@ export const acidChlorideReactionRules: ReactionRule[] = [
       "Ammonia and amines convert acid chlorides into amides.",
     trigger: acidChlorideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])[Cl:3]>>[C:1](=[O:2])N",
+      type: "conceptOnly",
+      reason: "The amine substituent is not specified by the one-molecule reaction drawer.",
     },
     priority: 1520,
   },
@@ -88,12 +89,8 @@ export const acidChlorideReactionRules: ReactionRule[] = [
       "Acid chlorides react twice with Grignard or organolithium reagents to form tertiary alcohols.",
     trigger: acidChlorideTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
-      options: {
-        mode: "oneTwoAddition",
-        nucleophile: "organometallic",
-      },
+      type: "conceptOnly",
+      reason: "The organometallic carbon group must be specified before an exact product can be generated.",
     },
     priority: 1540,
   },
@@ -109,8 +106,8 @@ export const acidChlorideReactionRules: ReactionRule[] = [
       "Gilman reagents convert acid chlorides into ketones without over-addition.",
     trigger: acidChlorideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])[Cl:3]>>[C:1](=[O:2])C",
+      type: "conceptOnly",
+      reason: "The Gilman reagent carbon group must be specified before an exact ketone can be generated.",
     },
     priority: 1550,
   },

@@ -1,38 +1,28 @@
-import { getRDKit, analyzeFunctionalGroupHierarchy, } from "../../functionalGroups";
+import {
+  analyzeFunctionalGroupHierarchy,
+  type FunctionalGroupResult,
+} from "../../functionalGroups";
 import { analyzeNomenclatureAndProperties } from "../../nomenclatureUtils";
-import type { FunctionalGroupResult } from "../../functionalGroups";
-import type { ReactionPathway, ReactionRule } from "../reactionTypes";
+import { getRuleChapter, getRuleCourse } from "../reactionCurriculum";
+import type {
+  ProductGenerationStatus,
+  ReactionPathway,
+  ReactionRule,
+} from "../reactionTypes";
 import { runEngineHandler } from "./handlers";
+import { runReactionSmarts } from "./rdkitReaction";
+import { ruleMatchesReactant } from "./ruleMatcher";
 
-function normalizeName(name: string) {
-  return name.trim().toLowerCase();
-}
-
-function ruleMatchesFunctionalGroups(
-  rule: ReactionRule,
-  functionalGroups: FunctionalGroupResult[] = []
-) {
-  const detectedNames = functionalGroups.map((group) =>
-    normalizeName(group.name)
-  );
-
-  return rule.trigger.functionalGroups.some((triggerName) => {
-    const normalizedTrigger = normalizeName(triggerName);
-
-    return detectedNames.some(
-      (detectedName) =>
-        detectedName === normalizedTrigger ||
-        detectedName.includes(normalizedTrigger) ||
-        normalizedTrigger.includes(detectedName)
-    );
-  });
-}
+type RuleExecution = {
+  products: string[];
+  productStatus: ProductGenerationStatus;
+};
 
 async function getDisplayName(
   smiles: string,
   functionalGroups: FunctionalGroupResult[],
   fallback: string
-) {
+): Promise<string> {
   const identity = await analyzeNomenclatureAndProperties(
     smiles,
     functionalGroups,
@@ -46,86 +36,89 @@ async function getDisplayName(
   );
 }
 
-async function runReactionSmarts(
-  reactantSmiles: string,
-  reactionSmarts: string
-): Promise<string | null> {
-  const RDKit = await getRDKit();
+async function getProductName(
+  productSmiles: string,
+  fallback: string
+): Promise<string> {
+  const productParts = productSmiles
+    .split(".")
+    .map((part) => part.trim())
+    .filter(Boolean);
 
-  let reaction: any = null;
-  let reactant: any = null;
-  let molList: any = null;
-  let products: any = null;
-  let firstSet: any = null;
+  const productNames: string[] = [];
 
-  try {
-    reaction = RDKit.get_rxn(reactionSmarts);
-    reactant = RDKit.get_mol(reactantSmiles);
+  for (const productPart of productParts) {
+    try {
+      const hierarchy = await analyzeFunctionalGroupHierarchy(productPart);
+      const identity = await analyzeNomenclatureAndProperties(
+        productPart,
+        hierarchy.primaryGroups,
+        hierarchy.mainGroup
+      );
 
-    molList = new RDKit.MolList();
-    molList.append(reactant);
-
-    products = reaction.run_reactants(molList);
-
-    if (
-      !products ||
-      typeof products.size !== "function" ||
-      products.size() === 0 ||
-      typeof products.get !== "function"
-    ) {
-      return null;
+      productNames.push(
+        identity.nomenclature.displayName ||
+          identity.nomenclature.estimatedName ||
+          fallback
+      );
+    } catch {
+      productNames.push(fallback);
     }
-
-    firstSet = products.get(0);
-
-    if (
-      !firstSet ||
-      typeof firstSet.size !== "function" ||
-      firstSet.size() === 0 ||
-      typeof firstSet.at !== "function"
-    ) {
-      return null;
-    }
-
-    const productSmiles: string[] = [];
-
-    for (let i = 0; i < firstSet.size(); i += 1) {
-      const productMol = firstSet.at(i);
-      const smiles = productMol?.get_smiles?.();
-
-      if (smiles) productSmiles.push(smiles);
-
-      productMol?.delete?.();
-    }
-
-    return productSmiles.length > 0 ? productSmiles.join(".") : null;
-  } catch (error) {
-    console.error("Reaction SMARTS failed:", reactionSmarts, error);
-    return null;
-  } finally {
-    firstSet?.delete?.();
-    products?.delete?.();
-    molList?.delete?.();
-    reactant?.delete?.();
-    reaction?.delete?.();
   }
+
+  return productNames.length > 0 ? productNames.join(" + ") : fallback;
 }
 
-async function applyRule(rule: ReactionRule, reactantSmiles: string) {
+async function applyRule(
+  rule: ReactionRule,
+  reactantSmiles: string
+): Promise<RuleExecution> {
   switch (rule.transform.type) {
     case "rdkitReactionSmarts":
-      return runReactionSmarts(reactantSmiles, rule.transform.smarts);
+      return {
+        products: await runReactionSmarts(
+          reactantSmiles,
+          rule.transform.smarts,
+          rule.transform.maxProducts
+        ),
+        productStatus: rule.productStatus ?? "computed",
+      };
 
-    case "engineHandler":
-      return runEngineHandler(
+    case "engineHandler": {
+      const products = await runEngineHandler(
         rule.transform.handler,
         reactantSmiles,
         rule.transform.options
       );
 
-    default:
-      return null;
+      return {
+        products,
+        productStatus: rule.productStatus ?? "representative",
+      };
+    }
+
+    case "conceptOnly":
+      return {
+        products: [],
+        productStatus: "concept-only",
+      };
   }
+}
+
+function createPathwayBase(rule: ReactionRule) {
+  return {
+    ruleId: rule.id,
+    family: rule.family,
+    title: rule.title,
+    reagentLabel: rule.reagents,
+    reagentNote: rule.reagentNote,
+    shortExplanation: rule.explanation,
+    course: getRuleCourse(rule),
+    chapter: getRuleChapter(rule),
+    mechanism: rule.mechanism ?? null,
+    selectivity: rule.selectivity ?? [],
+    limitations: rule.limitations ?? [],
+  };
 }
 
 export async function predictReactionPathwaysFromRules(
@@ -133,9 +126,17 @@ export async function predictReactionPathwaysFromRules(
   functionalGroups: FunctionalGroupResult[] = [],
   rules: ReactionRule[]
 ): Promise<ReactionPathway[]> {
-  const matchingRules = rules
-    .filter((rule) => ruleMatchesFunctionalGroups(rule, functionalGroups))
-    .sort((a, b) => a.priority - b.priority || a.title.localeCompare(b.title));
+  const matchingRules: ReactionRule[] = [];
+
+  for (const rule of rules) {
+    if (await ruleMatchesReactant(rule, reactantSmiles, functionalGroups)) {
+      matchingRules.push(rule);
+    }
+  }
+
+  matchingRules.sort(
+    (a, b) => a.priority - b.priority || a.title.localeCompare(b.title)
+  );
 
   const reactantName = await getDisplayName(
     reactantSmiles,
@@ -146,54 +147,60 @@ export async function predictReactionPathwaysFromRules(
   const pathways: ReactionPathway[] = [];
 
   for (const rule of matchingRules) {
-    const productSmiles = await applyRule(rule, reactantSmiles);
+    const execution = await applyRule(rule, reactantSmiles);
+    const base = createPathwayBase(rule);
 
-    if (!productSmiles) continue;
-
-    
-    
-    const productParts = productSmiles
-      .split(".")
-      .map((part) => part.trim())
-      .filter(Boolean);
-
-    const productNames: string[] = [];
-
-    for (const productPart of productParts) {
-      try {
-        const singleProductHierarchy =
-          await analyzeFunctionalGroupHierarchy(productPart);
-
-        const singleProductIdentity = await analyzeNomenclatureAndProperties(
-          productPart,
-          singleProductHierarchy.primaryGroups,
-          singleProductHierarchy.mainGroup
-        );
-
-        productNames.push(
-          singleProductIdentity.nomenclature.displayName ||
-            singleProductIdentity.nomenclature.estimatedName ||
-            rule.productHint
-        );
-      } catch {
-        productNames.push(rule.productHint);
-      }
+    if (rule.transform.type === "conceptOnly") {
+      pathways.push({
+        ...base,
+        id: rule.id,
+        reactantSmiles,
+        reactantLabel: reactantName,
+        productSmiles: null,
+        productLabel: rule.productHint,
+        productStatus: execution.productStatus,
+        limitations: [
+          ...(rule.limitations ?? []),
+          rule.transform.reason,
+        ],
+      });
+      continue;
     }
 
-    const productName =
-      productNames.length > 0 ? productNames.join(" + ") : rule.productHint;
+    if (execution.products.length === 0) {
+      pathways.push({
+        ...base,
+        id: rule.id,
+        reactantSmiles,
+        reactantLabel: reactantName,
+        productSmiles: null,
+        productLabel: rule.productHint,
+        productStatus:
+          execution.productStatus === "computed"
+            ? "representative"
+            : execution.productStatus,
+        limitations: [
+          ...(rule.limitations ?? []),
+          "The rule matched this substrate, but the current structure generator did not produce a valid product molecule.",
+        ],
+      });
+      continue;
+    }
 
-    pathways.push({
-      id: rule.id,
-      title: rule.title,
-      reactantSmiles,
-      reactantLabel: reactantName,
-      reagentLabel: rule.reagents,
-      reagentNote: rule.reagentNote,
-      productSmiles,
-      productLabel: productName,
-      shortExplanation: rule.explanation,
-    });
+    for (let productIndex = 0; productIndex < execution.products.length; productIndex += 1) {
+      const productSmiles = execution.products[productIndex];
+      const productName = await getProductName(productSmiles, rule.productHint);
+
+      pathways.push({
+        ...base,
+        id: productIndex === 0 ? rule.id : `${rule.id}--${productIndex + 1}`,
+        reactantSmiles,
+        reactantLabel: reactantName,
+        productSmiles,
+        productLabel: productName,
+        productStatus: execution.productStatus,
+      });
+    }
   }
 
   return pathways;

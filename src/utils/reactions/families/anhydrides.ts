@@ -1,7 +1,7 @@
 import type { ReactionRule } from "../reactionTypes";
 
 const anhydrideTrigger = {
-  functionalGroups: ["Anhydride", "Acid anhydride"],
+  anyFunctionalGroups: ["Acid anhydride"],
 };
 
 export const anhydrideReactionRules: ReactionRule[] = [
@@ -32,8 +32,8 @@ export const anhydrideReactionRules: ReactionRule[] = [
       "Alcohols react with acid anhydrides to form esters and carboxylic acids.",
     trigger: anhydrideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])O[C:3](=[O:4])>>[C:1](=[O:2])OC.[C:3](=[O:4])O",
+      type: "conceptOnly",
+      reason: "The alcohol substituent must be specified before an exact ester can be generated.",
     },
     priority: 1910,
   },
@@ -48,8 +48,8 @@ export const anhydrideReactionRules: ReactionRule[] = [
       "Ammonia or amines react with acid anhydrides to form amides and carboxylic acids.",
     trigger: anhydrideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])O[C:3](=[O:4])>>[C:1](=[O:2])N.[C:3](=[O:4])O",
+      type: "conceptOnly",
+      reason: "The amine substituent must be specified before an exact amide can be generated.",
     },
     priority: 1920,
   },
@@ -64,12 +64,8 @@ export const anhydrideReactionRules: ReactionRule[] = [
       "LiAlH₄ reduces acid anhydrides to primary alcohols.",
     trigger: anhydrideTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
-      options: {
-        mode: "oneTwoAddition",
-        nucleophile: "hydride",
-      },
+      type: "rdkitReactionSmarts",
+      smarts: "[C:1](=[O:2])O[C:3](=[O:4])>>[CH2:1][OH:2].[CH2:3][OH:4]",
     },
     priority: 1930,
   },
@@ -84,8 +80,8 @@ export const anhydrideReactionRules: ReactionRule[] = [
       "Acid anhydrides can act as acylating reagents in Friedel-Crafts acylation.",
     trigger: anhydrideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])O[C:3](=[O:4])>>[C:1](=[O:2])c1ccccc1.[C:3](=[O:4])O",
+      type: "conceptOnly",
+      reason: "The aromatic reaction partner and substitution position must be specified.",
     },
     priority: 1940,
   },

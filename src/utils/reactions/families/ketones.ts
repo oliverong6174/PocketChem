@@ -1,10 +1,7 @@
 import type { ReactionRule } from "../reactionTypes";
 
 const ketoneTrigger = {
-  functionalGroups: [
-    "Ketone",
-    "Aryl ketone",
-  ],
+  anyFunctionalGroups: ["Ketone", "Enone", "Chalcone"],
 };
 
 export const ketoneReactionRules: ReactionRule[] = [
@@ -20,8 +17,9 @@ export const ketoneReactionRules: ReactionRule[] = [
     trigger: ketoneTrigger,
     transform: {
       type: "engineHandler",
-      handler: "oneTwoAddition",
+      handler: "addition",
       options: {
+        mode: "oneTwoAddition",
         nucleophile: "hydride",
       },
     },
@@ -38,12 +36,8 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Grignard reagents and organolithium reagents add to ketones to form tertiary alcohols after acidic workup.",
     trigger: ketoneTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "oneTwoAddition",
-      options: {
-        nucleophile: "organometallic",
-        reagents: ["Grignard", "Organolithium"],
-      },
+      type: "conceptOnly",
+      reason: "The Grignard or organolithium carbon group must be specified before an exact alcohol can be generated.",
     },
     priority: 1110,
   },
@@ -98,11 +92,8 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Ketones react with alcohols under acidic conditions to form ketals through hemiketal intermediates.",
     trigger: ketoneTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "condensation",
-      options: {
-        mode: "acetalFormation",
-      },
+      type: "conceptOnly",
+      reason: "The alcohol identity must be specified before an exact ketal can be generated.",
     },
     priority: 1150,
   },
@@ -117,11 +108,8 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Ketones react with primary amines to form imines through dehydration.",
     trigger: ketoneTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "condensation",
-      options: {
-        mode: "imineFormation",
-      },
+      type: "conceptOnly",
+      reason: "The primary amine substituent must be specified before an exact imine can be generated.",
     },
     priority: 1160,
   },
@@ -136,8 +124,8 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Ketones with alpha hydrogens can react with secondary amines to form enamines.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](=CN(C)C)[C:3]",
+      type: "conceptOnly",
+      reason: "The secondary amine substituents must be specified before an exact enamine can be generated.",
     },
     priority: 1170,
   },
@@ -171,11 +159,8 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Ketones react with hydrazines to form hydrazones.",
     trigger: ketoneTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "condensation",
-      options: {
-        mode: "hydrazoneFormation",
-      },
+      type: "conceptOnly",
+      reason: "A substituted hydrazine can change the product; specify it for an exact structure.",
     },
     priority: 1190,
   },
@@ -228,51 +213,10 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Wittig reagents convert ketones into substituted alkenes.",
     trigger: ketoneTrigger,
     transform: {
-    type: "engineHandler",
-    handler: "addition",
-    options: {
-      mode: "wittigReaction",
+      type: "conceptOnly",
+      reason: "The ylide substituent must be specified before an exact alkene can be generated.",
     },
-  },
     priority: 1220,
-  },
-  {
-    id: "ketone-aldol-addition",
-    family: "ketones",
-    title: "Aldol Addition",
-    reagents: "NaOH, H₂O",
-    reagentNote: "Requires alpha hydrogens",
-    productHint: "Beta-hydroxy ketone",
-    explanation:
-      "Ketones with alpha hydrogens can form enolates that add to another carbonyl compound, producing beta-hydroxy ketones.",
-    trigger: ketoneTrigger,
-    transform: {
-      type: "engineHandler",
-      handler: "addition",
-      options: {
-        mode: "aldolAddition",
-      },
-    },
-    priority: 1230,
-  },
-  {
-    id: "ketone-aldol-condensation",
-    family: "ketones",
-    title: "Aldol Condensation",
-    reagents: "NaOH, heat",
-    reagentNote: "Addition then dehydration",
-    productHint: "Alpha,beta-unsaturated ketone",
-    explanation:
-      "Under heated basic conditions, aldol products dehydrate to alpha,beta-unsaturated ketones.",
-    trigger: ketoneTrigger,
-    transform: {
-      type: "engineHandler",
-      handler: "condensation",
-      options: {
-        mode: "aldolCondensation",
-      },
-    },
-    priority: 1240,
   },
   {
     id: "ketone-baeyer-villiger",
@@ -285,12 +229,18 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Baeyer-Villiger oxidation inserts oxygen next to the carbonyl carbon of a ketone, forming an ester.",
     trigger: ketoneTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "oxidation",
-      options: {
-        mode: "baeyerVilliger",
-      },
+      type: "rdkitReactionSmarts",
+      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](=[O:2])([C:4])O[C:3]",
+      maxProducts: 8,
     },
+    mechanism: "Criegee rearrangement",
+    selectivity: [
+      "The group with greater migratory aptitude usually migrates; stereochemistry at a migrating stereocenter is retained.",
+    ],
+    productStatus: "representative",
+    limitations: [
+      "The engine enumerates both possible oxygen-insertion orientations but does not rank migratory aptitude.",
+    ],
     priority: 1250,
   },
 ];

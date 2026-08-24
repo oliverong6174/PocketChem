@@ -141,13 +141,29 @@ export default function ReactionsPage({ initialPathways }: Props) {
         ) : (
         <>
           <p className="empty">
-            These are starter predicted reaction pathways. Product structures are representative and will become more exact as the reaction engine develops.
+            Computed products are drawn when the current molecule is enough to determine them. Concept-only cards identify reactions that need a second reactant, a regioselectivity model, or a polymer/organometallic representation.
           </p>
 
           <div className="reaction-pathway-list">
             {pathways.map((pathway) => (
               <div className="reaction-pathway-card" key={pathway.id}>
-                <h3>{pathway.title}</h3>
+                <div className="reaction-card-heading">
+                  <div>
+                    <h3>{pathway.title}</h3>
+                    <p className="reaction-curriculum">
+                      {pathway.course === "ochem-1" ? "O-Chem I" : pathway.course === "ochem-2" ? "O-Chem II" : "Advanced"}
+                      {" · "}{pathway.chapter}
+                      {pathway.mechanism ? ` · ${pathway.mechanism}` : ""}
+                    </p>
+                  </div>
+                  <span className={`reaction-status reaction-status-${pathway.productStatus}`}>
+                    {pathway.productStatus === "computed"
+                      ? "Computed product"
+                      : pathway.productStatus === "representative"
+                        ? "Representative product"
+                        : "Concept only"}
+                  </span>
+                </div>
 
                 <div className="reaction-three-column">
                   <div className="reaction-column">
@@ -176,7 +192,9 @@ export default function ReactionsPage({ initialPathways }: Props) {
                       />
                     ) : (
                       <div className="reaction-svg-box reaction-placeholder">
-                        Product not drawn yet
+                        {pathway.productStatus === "concept-only"
+                          ? "Exact structure needs more reaction input"
+                          : "No valid product structure was generated"}
                       </div>
                     )}
                     <p>{pathway.productLabel}</p>
@@ -184,6 +202,18 @@ export default function ReactionsPage({ initialPathways }: Props) {
                 </div>
 
                 <p className="reaction-note">{pathway.shortExplanation}</p>
+
+                {pathway.selectivity.length > 0 && (
+                  <p className="reaction-detail">
+                    <strong>Selectivity:</strong> {pathway.selectivity.join(" · ")}
+                  </p>
+                )}
+
+                {pathway.limitations.length > 0 && (
+                  <p className="reaction-detail reaction-limitation">
+                    <strong>Model note:</strong> {pathway.limitations.join(" ")}
+                  </p>
+                )}
               </div>
             ))}
           </div>

@@ -1,10 +1,7 @@
 import type { ReactionRule } from "../reactionTypes";
 
 const epoxideTrigger = {
-  functionalGroups: [
-    "Epoxide",
-    "Oxirane",
-  ],
+  anyFunctionalGroups: ["Epoxide"],
 };
 
 export const epoxideReactionRules: ReactionRule[] = [
@@ -59,12 +56,8 @@ export const epoxideReactionRules: ReactionRule[] = [
       "Alcohols open protonated epoxides under acidic conditions to form alkoxy alcohols.",
     trigger: epoxideTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
-      options: {
-        mode: "epoxideOpening",
-        nucleophile: "hydroxide",
-      },
+      type: "conceptOnly",
+      reason: "The alcohol substituent must be specified before an exact beta-alkoxy alcohol can be generated.",
     },
     priority: 820,
   },
@@ -79,12 +72,8 @@ export const epoxideReactionRules: ReactionRule[] = [
       "Alkoxides open epoxides under basic conditions, usually attacking the less substituted carbon.",
     trigger: epoxideTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
-      options: {
-        mode: "epoxideOpening",
-        nucleophile: "hydroxide",
-      },
+      type: "conceptOnly",
+      reason: "The alkoxide substituent must be specified before an exact beta-alkoxy alcohol can be generated.",
     },
     priority: 830,
   },
@@ -115,8 +104,8 @@ export const epoxideReactionRules: ReactionRule[] = [
       "Grignard and organolithium reagents open epoxides to form alcohols with a new carbon-carbon bond.",
     trigger: epoxideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1]1[O:2][C:3]1>>[C:1](C)[C:3][OH]",
+      type: "conceptOnly",
+      reason: "The organometallic carbon group must be specified before an exact chain-extended alcohol can be generated.",
     },
     priority: 850,
   },

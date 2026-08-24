@@ -1,25 +1,34 @@
 import { addition } from "./addition";
+import { condensation } from "./condensation";
 import { oxidation } from "./oxidation";
 import { reduction } from "./reduction";
+import type { ReactionTransform } from "../../reactionTypes";
 
-export async function runEngineHandler(
-  handler: string,
+type HandlerName = Extract<
+  ReactionTransform,
+  { type: "engineHandler" }
+>["handler"];
+
+type HandlerResult = string | string[] | null;
+type ReactionHandler = (
   reactantSmiles: string,
   options?: Record<string, unknown>
-) {
-  switch (handler) {
-    case "addition":
-      return addition(reactantSmiles, options);
-    
-    case "oxidation":
-      return oxidation(reactantSmiles, options);
-      
-    case "reduction":
-      return reduction(reactantSmiles, options);
-    
+) => Promise<HandlerResult>;
 
-    default:
-      console.warn(`Unknown reaction handler: ${handler}`);
-      return null;
-  }
+const handlers: Record<HandlerName, ReactionHandler> = {
+  addition,
+  condensation,
+  oxidation,
+  reduction,
+};
+
+export async function runEngineHandler(
+  handler: HandlerName,
+  reactantSmiles: string,
+  options?: Record<string, unknown>
+): Promise<string[]> {
+  const result = await handlers[handler](reactantSmiles, options);
+
+  if (!result) return [];
+  return Array.isArray(result) ? result.filter(Boolean) : [result];
 }

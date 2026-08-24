@@ -1,7 +1,18 @@
 import type { ReactionRule } from "../reactionTypes";
 
 const amineTrigger = {
-  functionalGroups: ["Amine"],
+  anyFunctionalGroups: [
+    "Amine",
+    "Primary amine",
+    "Secondary amine",
+    "Tertiary amine",
+    "Benzyl amine",
+    "Aniline",
+    "Aryl amine",
+    "Primary aryl amine",
+    "Secondary aryl amine",
+    "Tertiary aryl amine",
+  ],
 };
 
 export const amineReactionRules: ReactionRule[] = [
@@ -14,10 +25,10 @@ export const amineReactionRules: ReactionRule[] = [
     productHint: "Amide",
     explanation:
       "Primary and secondary amines react with acid chlorides or acid anhydrides to form amides.",
-    trigger: amineTrigger,
+    trigger: { anyFunctionalGroups: ["Primary amine", "Secondary amine", "Benzyl amine", "Aniline", "Primary aryl amine", "Secondary aryl amine"] },
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[N:1]>>[N:1]C(=O)C",
+      type: "conceptOnly",
+      reason: "The acyl donor must be specified before an exact amide can be generated.",
     },
     priority: 1700,
   },
@@ -33,8 +44,8 @@ export const amineReactionRules: ReactionRule[] = [
       "Amines can undergo successive alkylation with alkyl halides.",
     trigger: amineTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[N:1]>>[N:1]C",
+      type: "conceptOnly",
+      reason: "The alkyl halide must be specified before an exact alkylated amine can be generated.",
     },
     priority: 1710,
   },
@@ -50,8 +61,8 @@ export const amineReactionRules: ReactionRule[] = [
       "Excess methyl iodide converts amines into quaternary ammonium salts.",
     trigger: amineTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[N:1]>>[N+:1](C)(C)(C)C",
+      type: "conceptOnly",
+      reason: "The current one-molecule engine does not explicitly model repeated equivalents and counterions.",
     },
     priority: 1720,
   },
@@ -67,8 +78,8 @@ export const amineReactionRules: ReactionRule[] = [
       "Quaternary ammonium hydroxides undergo Hofmann elimination to form the least substituted alkene.",
     trigger: amineTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[N+:1](C)(C)(C)C>>C=C",
+      type: "conceptOnly",
+      reason: "The elimination site and least-substituted alkene depend on the substrate and require a dedicated regioselective handler.",
     },
     priority: 1730,
   },
@@ -82,10 +93,10 @@ export const amineReactionRules: ReactionRule[] = [
     productHint: "Diazonium salt",
     explanation:
       "Primary aromatic amines react with nitrous acid to form diazonium salts.",
-    trigger: amineTrigger,
+    trigger: { anyFunctionalGroups: ["Aniline", "Primary aryl amine"], includeSmarts: ["[c][NH2]"] },
     transform: {
       type: "rdkitReactionSmarts",
-      smarts: "[N:1]>>[N+]#N",
+      smarts: "[c:1][NH2:2]>>[c:1][N+:2]#N",
     },
     priority: 1740,
   },
@@ -99,10 +110,10 @@ export const amineReactionRules: ReactionRule[] = [
     productHint: "Sulfonamide",
     explanation:
       "Primary and secondary amines react with benzenesulfonyl chloride to form sulfonamides.",
-    trigger: amineTrigger,
+    trigger: { anyFunctionalGroups: ["Primary amine", "Secondary amine", "Benzyl amine", "Aniline", "Primary aryl amine", "Secondary aryl amine"] },
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[N:1]>>[N:1]S(=O)(=O)c1ccccc1",
+      type: "conceptOnly",
+      reason: "The sulfonylating reagent is external; the card is retained as a qualitative classification reaction.",
     },
     priority: 1750,
   },
