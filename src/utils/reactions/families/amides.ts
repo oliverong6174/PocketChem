@@ -1,13 +1,26 @@
 import type { ReactionRule } from "../reactionTypes";
 
 const amideTrigger = {
-  functionalGroups: ["Amide"],
+  anyFunctionalGroups: [
+    "Amide",
+    "Primary amide",
+    "Secondary amide",
+    "Tertiary amide",
+    "Benzamide",
+    "Lactam",
+    "Alpha lactam",
+    "Beta lactam",
+    "Gamma lactam",
+    "Delta lactam",
+    "Epsilon lactam",
+  ],
 };
 
 export const amideReactionRules: ReactionRule[] = [
   {
     id: "amide-hydrolysis-acidic",
     family: "amides",
+    reactionType: "substitution",
     title: "Acidic Amide Hydrolysis",
     reagents: "H₃O⁺, heat",
     reagentNote: "Strong acidic hydrolysis",
@@ -16,14 +29,17 @@ export const amideReactionRules: ReactionRule[] = [
       "Amides hydrolyze under strong acidic conditions to form carboxylic acids.",
     trigger: amideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1](=[O:2])[N:3]>>[C:1](=[O:2])O",
     },
+    productStatus: "representative",
+    limitations: ["The displayed structure emphasizes the acyl-side product; the amine or ammonium coproduct is not yet drawn."],
     priority: 1600,
   },
   {
     id: "amide-hydrolysis-basic",
     family: "amides",
+    reactionType: "substitution",
     title: "Basic Amide Hydrolysis",
     reagents: "NaOH, heat",
     reagentNote: "Strong basic hydrolysis",
@@ -32,14 +48,17 @@ export const amideReactionRules: ReactionRule[] = [
       "Amides hydrolyze under strong basic conditions to form carboxylates.",
     trigger: amideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1](=[O:2])[N:3]>>[C:1](=[O:2])[O-]",
     },
+    productStatus: "representative",
+    limitations: ["The displayed structure emphasizes the acyl-side product; the amine or ammonium coproduct is not yet drawn."],
     priority: 1610,
   },
   {
     id: "amide-lah-reduction",
     family: "amides",
+    reactionType: "reduction",
     title: "Amide Reduction",
     reagents: "1) LiAlH₄  2) H₃O⁺",
     reagentNote: "Strong hydride reduction",
@@ -48,8 +67,8 @@ export const amideReactionRules: ReactionRule[] = [
       "LiAlH₄ reduces amides to amines by removing the carbonyl oxygen.",
     trigger: amideTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
+      type: "customHandler",
+      handler: "reduction",
       options: {
         mode: "oneTwoAddition",
         nucleophile: "hydride",
@@ -60,32 +79,34 @@ export const amideReactionRules: ReactionRule[] = [
   {
     id: "amide-dehydration-nitrile",
     family: "amides",
+    reactionType: "elimination",
     title: "Amide Dehydration",
     reagents: "SOCl₂, POCl₃, or P₂O₅",
     reagentNote: "Dehydration",
     productHint: "Nitrile",
     explanation:
       "Primary amides can dehydrate to nitriles using strong dehydrating reagents.",
-    trigger: amideTrigger,
+    trigger: { anyFunctionalGroups: ["Primary amide", "Benzamide"], includeSmarts: ["[CX3](=O)[NH2]"] },
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])[NH2:3]>>[C:1]#N",
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[NH2:3]>>[C:1]#[N:3]",
     },
     priority: 1630,
   },
   {
     id: "amide-hofmann-rearrangement",
     family: "amides",
+    reactionType: "rearrangement",
     title: "Hofmann Rearrangement",
     reagents: "Br₂, NaOH",
     reagentNote: "Loss of carbonyl carbon",
     productHint: "Amine with one fewer carbon",
     explanation:
       "Primary amides undergo Hofmann rearrangement to form amines with one fewer carbon.",
-    trigger: amideTrigger,
+    trigger: { anyFunctionalGroups: ["Primary amide", "Benzamide"], includeSmarts: ["[CX3](=O)[NH2]"] },
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1](=[O:2])[NH2:3]>>[NH2:3]",
+      type: "conceptOnly",
+      reason: "The migrating carbon group must be remapped from the carbonyl carbon to nitrogen while the carbonyl carbon is lost as carbon dioxide.",
     },
     priority: 1640,
   },

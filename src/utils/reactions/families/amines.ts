@@ -19,6 +19,7 @@ export const amineReactionRules: ReactionRule[] = [
   {
     id: "amine-acylation",
     family: "amines",
+    reactionType: "substitution",
     title: "Acylation",
     reagents: "Acid chloride or anhydride",
     reagentNote: "Nucleophilic acyl substitution",
@@ -36,6 +37,7 @@ export const amineReactionRules: ReactionRule[] = [
   {
     id: "amine-alkylation",
     family: "amines",
+    reactionType: "substitution",
     title: "Alkylation",
     reagents: "R-X",
     reagentNote: "SN2 alkylation",
@@ -53,6 +55,7 @@ export const amineReactionRules: ReactionRule[] = [
   {
     id: "amine-exhaustive-methylation",
     family: "amines",
+    reactionType: "substitution",
     title: "Exhaustive Methylation",
     reagents: "Excess CH₃I",
     reagentNote: "Quaternary ammonium formation",
@@ -70,6 +73,7 @@ export const amineReactionRules: ReactionRule[] = [
   {
     id: "amine-hofmann-elimination",
     family: "amines",
+    reactionType: "elimination",
     title: "Hofmann Elimination",
     reagents: "1) Excess CH₃I  2) Ag₂O, heat",
     reagentNote: "Elimination",
@@ -87,6 +91,7 @@ export const amineReactionRules: ReactionRule[] = [
   {
     id: "amine-diazotization",
     family: "amines",
+    reactionType: "substitution",
     title: "Diazotization",
     reagents: "NaNO₂, HCl, 0°C",
     reagentNote: "Primary aromatic amines",
@@ -95,7 +100,7 @@ export const amineReactionRules: ReactionRule[] = [
       "Primary aromatic amines react with nitrous acid to form diazonium salts.",
     trigger: { anyFunctionalGroups: ["Aniline", "Primary aryl amine"], includeSmarts: ["[c][NH2]"] },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[c:1][NH2:2]>>[c:1][N+:2]#N",
     },
     priority: 1740,
@@ -104,6 +109,7 @@ export const amineReactionRules: ReactionRule[] = [
   {
     id: "amine-hinsberg",
     family: "amines",
+    reactionType: "substitution",
     title: "Hinsberg Test",
     reagents: "Benzenesulfonyl chloride, NaOH",
     reagentNote: "Classification test",

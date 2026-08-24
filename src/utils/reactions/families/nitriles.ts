@@ -8,6 +8,7 @@ export const nitrileReactionRules: ReactionRule[] = [
   {
     id: "nitrile-acidic-hydrolysis",
     family: "nitriles",
+    reactionType: "addition",
     title: "Acidic Nitrile Hydrolysis",
     reagents: "H₃O⁺, heat",
     reagentNote: "Hydrolysis through an amide intermediate",
@@ -16,7 +17,7 @@ export const nitrileReactionRules: ReactionRule[] = [
       "A nitrile hydrolyzes through an amide intermediate and ultimately forms a carboxylic acid under strongly acidic aqueous conditions.",
     trigger: nitrileTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]#[N:2]>>[C:1](=O)O",
     },
     mechanism: "Nucleophilic addition and hydrolysis",
@@ -25,6 +26,7 @@ export const nitrileReactionRules: ReactionRule[] = [
   {
     id: "nitrile-basic-hydrolysis",
     family: "nitriles",
+    reactionType: "addition",
     title: "Basic Nitrile Hydrolysis",
     reagents: "NaOH, H₂O, heat",
     reagentNote: "Hydrolysis to a carboxylate",
@@ -33,7 +35,7 @@ export const nitrileReactionRules: ReactionRule[] = [
       "Strong base hydrolyzes a nitrile through an amide intermediate to a carboxylate. Acidic workup gives the carboxylic acid.",
     trigger: nitrileTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]#[N:2]>>[C:1](=O)[O-]",
     },
     mechanism: "Nucleophilic addition and hydrolysis",
@@ -42,6 +44,7 @@ export const nitrileReactionRules: ReactionRule[] = [
   {
     id: "nitrile-lah-reduction",
     family: "nitriles",
+    reactionType: "reduction",
     title: "Nitrile Reduction to a Primary Amine",
     reagents: "1) LiAlH₄  2) H₂O",
     reagentNote: "Strong hydride reduction",
@@ -50,7 +53,7 @@ export const nitrileReactionRules: ReactionRule[] = [
       "LiAlH₄ reduces the nitrile carbon to a methylene while retaining nitrogen, producing a primary amine.",
     trigger: nitrileTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]#[N:2]>>[CH2:1][NH2:2]",
     },
     mechanism: "Hydride addition and reduction",
@@ -59,6 +62,7 @@ export const nitrileReactionRules: ReactionRule[] = [
   {
     id: "nitrile-dibal-aldehyde",
     family: "nitriles",
+    reactionType: "reduction",
     title: "Partial Reduction of a Nitrile",
     reagents: "1) DIBAL-H, −78 °C  2) H₃O⁺",
     reagentNote: "Controlled partial reduction",
@@ -67,7 +71,7 @@ export const nitrileReactionRules: ReactionRule[] = [
       "A controlled amount of DIBAL-H reduces a nitrile to an imine-aluminum intermediate that hydrolyzes to an aldehyde.",
     trigger: nitrileTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]#[N:2]>>[CH:1]=O",
     },
     mechanism: "Partial hydride reduction",
@@ -76,6 +80,7 @@ export const nitrileReactionRules: ReactionRule[] = [
   {
     id: "nitrile-grignard-ketone",
     family: "nitriles",
+    reactionType: "addition",
     title: "Grignard Addition to a Nitrile",
     reagents: "1) RMgX  2) H₃O⁺",
     reagentNote: "Addition followed by imine hydrolysis",

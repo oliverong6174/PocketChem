@@ -8,6 +8,7 @@ export const anhydrideReactionRules: ReactionRule[] = [
   {
     id: "anhydride-hydrolysis",
     family: "anhydrides",
+    reactionType: "substitution",
     title: "Anhydride Hydrolysis",
     reagents: "H₂O",
     reagentNote: "Nucleophilic acyl substitution",
@@ -16,7 +17,7 @@ export const anhydrideReactionRules: ReactionRule[] = [
       "Acid anhydrides hydrolyze with water to form carboxylic acids.",
     trigger: anhydrideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1](=[O:2])O[C:3](=[O:4])>>[C:1](=[O:2])O.[C:3](=[O:4])O",
     },
     priority: 1900,
@@ -24,6 +25,7 @@ export const anhydrideReactionRules: ReactionRule[] = [
   {
     id: "anhydride-alcoholysis",
     family: "anhydrides",
+    reactionType: "substitution",
     title: "Anhydride Alcoholysis",
     reagents: "ROH",
     reagentNote: "Ester formation",
@@ -40,6 +42,7 @@ export const anhydrideReactionRules: ReactionRule[] = [
   {
     id: "anhydride-aminolysis",
     family: "anhydrides",
+    reactionType: "substitution",
     title: "Anhydride Aminolysis",
     reagents: "NH₃ or RNH₂",
     reagentNote: "Amide formation",
@@ -56,6 +59,7 @@ export const anhydrideReactionRules: ReactionRule[] = [
   {
     id: "anhydride-lah-reduction",
     family: "anhydrides",
+    reactionType: "reduction",
     title: "Anhydride Reduction",
     reagents: "1) LiAlH₄  2) H₃O⁺",
     reagentNote: "Strong hydride reduction",
@@ -64,7 +68,7 @@ export const anhydrideReactionRules: ReactionRule[] = [
       "LiAlH₄ reduces acid anhydrides to primary alcohols.",
     trigger: anhydrideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1](=[O:2])O[C:3](=[O:4])>>[CH2:1][OH:2].[CH2:3][OH:4]",
     },
     priority: 1930,
@@ -72,6 +76,7 @@ export const anhydrideReactionRules: ReactionRule[] = [
   {
     id: "anhydride-friedel-crafts-acylation",
     family: "anhydrides",
+    reactionType: "substitution",
     title: "Friedel-Crafts Acylation",
     reagents: "AlCl₃",
     reagentNote: "Anhydride as acylating reagent",

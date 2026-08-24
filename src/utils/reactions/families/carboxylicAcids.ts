@@ -16,6 +16,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   {
     id: "carboxylic-acid-deprotonation",
     family: "carboxylic-acids",
+    reactionType: "acidBase",
     title: "Carboxylic Acid Deprotonation",
     reagents: "NaOH, NaHCO₃, or another base",
     reagentNote: "Acid–base reaction",
@@ -24,7 +25,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
       "A base removes the acidic O–H proton to form a resonance-stabilized carboxylate.",
     trigger: carboxylicAcidTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1](=[O:2])[OH:3]>>[C:1](=[O:2])[O-:3]",
     },
     mechanism: "Proton transfer",
@@ -33,6 +34,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   {
     id: "carboxylic-acid-lah-reduction",
     family: "carboxylic-acids",
+    reactionType: "reduction",
     title: "LiAlH₄ Reduction",
     reagents: "1) LiAlH₄  2) H₃O⁺",
     reagentNote: "Strong hydride reduction",
@@ -41,8 +43,8 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
       "LiAlH₄ reduces a carboxylic acid carbonyl carbon to a primary alcohol. NaBH₄ is normally too weak.",
     trigger: carboxylicAcidTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
+      type: "customHandler",
+      handler: "reduction",
       options: {
         mode: "oneTwoAddition",
         nucleophile: "hydride",
@@ -55,6 +57,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   {
     id: "carboxylic-acid-borane-reduction",
     family: "carboxylic-acids",
+    reactionType: "reduction",
     title: "Borane Reduction",
     reagents: "1) BH₃·THF  2) H₂O",
     reagentNote: "Chemoselective carboxylic-acid reduction",
@@ -63,7 +66,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
       "Borane rapidly reduces carboxylic acids to primary alcohols and can be more selective than LiAlH₄ in multifunctional molecules.",
     trigger: carboxylicAcidTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1](=[O:2])[OH:3]>>[CH2:1][OH:2]",
     },
     mechanism: "Hydride reduction",
@@ -73,6 +76,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   {
     id: "carboxylic-acid-fischer-esterification",
     family: "carboxylic-acids",
+    reactionType: "substitution",
     title: "Fischer Esterification",
     reagents: "ROH, catalytic H₂SO₄, heat",
     reagentNote: "Equilibrium esterification",
@@ -91,6 +95,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   {
     id: "carboxylic-acid-to-acid-chloride",
     family: "carboxylic-acids",
+    reactionType: "substitution",
     title: "Acid Chloride Formation",
     reagents: "SOCl₂, (COCl)₂, or PCl₅",
     reagentNote: "Activates the carboxylic acid",
@@ -99,7 +104,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
       "Thionyl chloride, oxalyl chloride, or phosphorus chlorides replace the acid hydroxyl group with chlorine.",
     trigger: carboxylicAcidTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1](=[O:2])[OH:3]>>[C:1](=[O:2])Cl",
     },
     mechanism: "Nucleophilic acyl substitution",
@@ -108,6 +113,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   {
     id: "carboxylic-acid-amide-formation",
     family: "carboxylic-acids",
+    reactionType: "substitution",
     title: "Amide Formation",
     reagents: "1) SOCl₂  2) NH₃ or RNH₂",
     reagentNote: "Activation followed by aminolysis",
@@ -125,6 +131,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   {
     id: "carboxylic-acid-coupling-reagent-amidation",
     family: "carboxylic-acids",
+    reactionType: "substitution",
     title: "Coupling-Reagent Amidation",
     reagents: "RNH₂, DCC or EDC (often with DMAP/HOBt)",
     reagentNote: "Direct activated coupling",
@@ -143,6 +150,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   {
     id: "beta-keto-acid-decarboxylation",
     family: "carboxylic-acids",
+    reactionType: "cleavage",
     title: "β-Keto Acid Decarboxylation",
     reagents: "heat",
     reagentNote: "Six-membered cyclic transition state",
@@ -163,6 +171,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   {
     id: "malonic-acid-derivative-decarboxylation",
     family: "carboxylic-acids",
+    reactionType: "cleavage",
     title: "Malonic Acid Derivative Decarboxylation",
     reagents: "H₃O⁺, heat",
     reagentNote: "Hydrolysis followed by CO₂ loss",
@@ -184,6 +193,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   {
     id: "carboxylic-acid-alpha-halogenation-hvz",
     family: "carboxylic-acids",
+    reactionType: "substitution",
     title: "Hell–Volhard–Zelinsky Reaction",
     reagents: "1) Br₂, PBr₃  2) H₂O",
     reagentNote: "α-Bromination of a carboxylic acid",
@@ -195,7 +205,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
       includeSmarts: ["[C;H1,H2,H3][CX3](=O)[OX2H1]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C;H1,H2,H3:1][C:2](=[O:3])[OH:4]>>[C:1]([Br])[C:2](=[O:3])[OH:4]",
       maxProducts: 8,
     },

@@ -7,15 +7,58 @@ export type ProductGenerationStatus =
   | "representative"
   | "concept-only";
 
+/**
+ * What kind of reaction this is chemically.
+ *
+ * This is classification metadata only. It does NOT choose executable code.
+ */
+export type ReactionType =
+  | "addition"
+  | "substitution"
+  | "elimination"
+  | "oxidation"
+  | "reduction"
+  | "condensation"
+  | "rearrangement"
+  | "acidBase"
+  | "cleavage"
+  | "cyclization"
+  | "ringOpening"
+  | "coupling"
+  | "pericyclic"
+  | "radical"
+  | "tautomerization"
+  | "isomerization";
+
+/**
+ * Custom executors that currently contain reusable chemistry logic.
+ *
+ * Do not add a handler just because a new ReactionType exists. Add one only
+ * when multiple rules genuinely need substrate-aware code that cannot be
+ * expressed cleanly as one reaction SMARTS.
+ */
+export type ReactionHandlerName =
+  | "addition"
+  | "substitution"
+  | "elimination"
+  | "carbonyl"
+  | "oxidation"
+  | "reduction"
+  | "ring"
+  | "rearrangement";
+
+export type ReactionPurpose = "protection" | "deprotection";
+
+/** How PocketChem generates the product structure. */
 export type ReactionTransform =
   | {
-      type: "rdkitReactionSmarts";
+      type: "reactionSmarts";
       smarts: string;
       maxProducts?: number;
     }
   | {
-      type: "engineHandler";
-      handler: "addition" | "condensation" | "oxidation" | "reduction";
+      type: "customHandler";
+      handler: ReactionHandlerName;
       options?: Record<string, unknown>;
     }
   | {
@@ -41,6 +84,10 @@ export type ReactionTrigger = {
 export type ReactionRule = {
   id: string;
   family: string;
+
+  /** Chemical classification. This does not select executable code. */
+  reactionType: ReactionType;
+
   title: string;
   reagents: string;
   reagentNote: string;
@@ -53,6 +100,8 @@ export type ReactionRule = {
   course?: OrganicChemCourse;
   chapter?: string;
   mechanism?: string;
+  reactionClass?: string;
+  purpose?: ReactionPurpose;
   selectivity?: string[];
   limitations?: string[];
   productStatus?: ProductGenerationStatus;
@@ -62,6 +111,7 @@ export type ReactionPathway = {
   id: string;
   ruleId: string;
   family: string;
+  reactionType: ReactionType;
   title: string;
   reactantSmiles: string;
   reactantLabel: string;
@@ -74,6 +124,8 @@ export type ReactionPathway = {
   course: OrganicChemCourse;
   chapter: string;
   mechanism: string | null;
+  reactionClass: string | null;
+  purpose: ReactionPurpose | null;
   selectivity: string[];
   limitations: string[];
   productStatus: ProductGenerationStatus;

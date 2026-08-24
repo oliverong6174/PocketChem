@@ -9,6 +9,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
   {
     id: "acid-chloride-water",
     family: "acid-chlorides",
+    reactionType: "substitution",
     title: "Hydrolysis",
     reagents: "H₂O",
     reagentNote: "Nucleophilic acyl substitution",
@@ -17,7 +18,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
       "Acid chlorides hydrolyze rapidly in water to form carboxylic acids.",
     trigger: acidChlorideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1](=[O:2])[F,Cl,Br,I:3]>>[C:1](=[O:2])[OH]",
     },
     priority: 1500,
@@ -26,6 +27,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
   {
     id: "acid-chloride-alcohol",
     family: "acid-chlorides",
+    reactionType: "substitution",
     title: "Alcoholysis",
     reagents: "ROH",
     reagentNote: "Nucleophilic acyl substitution",
@@ -43,6 +45,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
   {
     id: "acid-chloride-amine",
     family: "acid-chlorides",
+    reactionType: "substitution",
     title: "Amidation",
     reagents: "NH₃ or RNH₂",
     reagentNote: "Nucleophilic acyl substitution",
@@ -60,6 +63,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
   {
     id: "acid-chloride-lah",
     family: "acid-chlorides",
+    reactionType: "reduction",
     title: "Reduction",
     reagents: "1) LiAlH₄  2) H₃O⁺",
     reagentNote: "Strong hydride reduction",
@@ -68,8 +72,8 @@ export const acidChlorideReactionRules: ReactionRule[] = [
       "LiAlH₄ reduces acid chlorides completely to primary alcohols.",
     trigger: acidChlorideTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
+      type: "customHandler",
+      handler: "reduction",
       options: {
         mode: "oneTwoAddition",
         nucleophile: "hydride",
@@ -81,6 +85,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
   {
     id: "acid-chloride-grignard",
     family: "acid-chlorides",
+    reactionType: "addition",
     title: "Organometallic Addition",
     reagents: "1) excess RMgBr, RMgCl, or RLi  2) H₃O⁺",
     reagentNote: "Double addition",
@@ -98,6 +103,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
   {
     id: "acid-chloride-gilman",
     family: "acid-chlorides",
+    reactionType: "substitution",
     title: "Gilman Reagent",
     reagents: "R₂CuLi",
     reagentNote: "Single addition",

@@ -9,6 +9,7 @@ export const dieneReactionRules: ReactionRule[] = [
   {
     id: "diene-hx-1-2-addition",
     family: "dienes",
+    reactionType: "addition",
     title: "Electrophilic Addition to a Diene: 1,2 Product",
     reagents: "HBr or HCl, low temperature",
     reagentNote: "Kinetic addition",
@@ -28,6 +29,7 @@ export const dieneReactionRules: ReactionRule[] = [
   {
     id: "diene-hx-1-4-addition",
     family: "dienes",
+    reactionType: "addition",
     title: "Electrophilic Addition to a Diene: 1,4 Product",
     reagents: "HBr or HCl, higher temperature",
     reagentNote: "Thermodynamic addition",
@@ -47,6 +49,7 @@ export const dieneReactionRules: ReactionRule[] = [
   {
     id: "diene-diels-alder",
     family: "dienes",
+    reactionType: "pericyclic",
     title: "Diels–Alder Cycloaddition",
     reagents: "Dienophile, heat",
     reagentNote: "Concerted [4+2] cycloaddition",
@@ -67,6 +70,7 @@ export const dieneReactionRules: ReactionRule[] = [
   {
     id: "diene-polymerization",
     family: "dienes",
+    reactionType: "addition",
     title: "Conjugated Diene Polymerization",
     reagents: "Radical, cationic, anionic, or coordination initiator",
     reagentNote: "Chain-growth polymerization",

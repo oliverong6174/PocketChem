@@ -4,6 +4,7 @@ export const sulfurReactionRules: ReactionRule[] = [
   {
     id: "thiol-deprotonation",
     family: "sulfur",
+    reactionType: "acidBase",
     title: "Thiol Deprotonation",
     reagents: "NaH, NaNH₂, or another sufficiently strong base",
     reagentNote: "Forms a thiolate nucleophile",
@@ -15,7 +16,7 @@ export const sulfurReactionRules: ReactionRule[] = [
       includeSmarts: ["[#6][SX2H]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[S;H1:1]>>[S-:1]",
     },
     mechanism: "Proton transfer",
@@ -24,6 +25,7 @@ export const sulfurReactionRules: ReactionRule[] = [
   {
     id: "thiolate-alkylation",
     family: "sulfur",
+    reactionType: "substitution",
     title: "Thioether Formation by Alkylation",
     reagents: "1) base  2) primary R–X",
     reagentNote: "Thiolate SN2 substitution",
@@ -43,6 +45,7 @@ export const sulfurReactionRules: ReactionRule[] = [
   {
     id: "thiol-oxidation-disulfide",
     family: "sulfur",
+    reactionType: "oxidation",
     title: "Thiol Oxidation to a Disulfide",
     reagents: "mild oxidant",
     reagentNote: "Couples two thiol molecules",
@@ -62,6 +65,7 @@ export const sulfurReactionRules: ReactionRule[] = [
   {
     id: "disulfide-reduction",
     family: "sulfur",
+    reactionType: "reduction",
     title: "Disulfide Reduction",
     reagents: "Zn/H⁺, DTT, or another reducing agent",
     reagentNote: "Cleaves the S–S bond",
@@ -73,7 +77,7 @@ export const sulfurReactionRules: ReactionRule[] = [
       includeSmarts: ["[SX2][SX2]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[S:1][S:2]>>[SH:1].[SH:2]",
     },
     mechanism: "Reduction",
@@ -82,6 +86,7 @@ export const sulfurReactionRules: ReactionRule[] = [
   {
     id: "thioether-oxidation-sulfoxide",
     family: "sulfur",
+    reactionType: "oxidation",
     title: "Controlled Thioether Oxidation",
     reagents: "1 equivalent mCPBA or H₂O₂",
     reagentNote: "One oxygen transfer",
@@ -93,7 +98,7 @@ export const sulfurReactionRules: ReactionRule[] = [
       includeSmarts: ["[#6][SX2][#6]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[S;X2:1]([#6:2])[#6:3]>>[S:1](=O)([#6:2])[#6:3]",
     },
     mechanism: "Oxygen-atom transfer",
@@ -102,6 +107,7 @@ export const sulfurReactionRules: ReactionRule[] = [
   {
     id: "thioether-oxidation-sulfone",
     family: "sulfur",
+    reactionType: "oxidation",
     title: "Thioether Oxidation to a Sulfone",
     reagents: "excess mCPBA, H₂O₂, or Oxone",
     reagentNote: "Two oxygen transfers",
@@ -113,7 +119,7 @@ export const sulfurReactionRules: ReactionRule[] = [
       includeSmarts: ["[#6][SX2][#6]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[S;X2:1]([#6:2])[#6:3]>>[S:1](=O)(=O)([#6:2])[#6:3]",
     },
     mechanism: "Oxygen-atom transfer",
@@ -122,6 +128,7 @@ export const sulfurReactionRules: ReactionRule[] = [
   {
     id: "sulfoxide-oxidation-sulfone",
     family: "sulfur",
+    reactionType: "oxidation",
     title: "Sulfoxide Oxidation",
     reagents: "mCPBA, H₂O₂, or Oxone",
     reagentNote: "Adds the second sulfur-bound oxygen",
@@ -133,7 +140,7 @@ export const sulfurReactionRules: ReactionRule[] = [
       includeSmarts: ["[#6][SX3](=O)[#6]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[S:1](=[O:2])([#6:3])[#6:4]>>[S:1](=[O:2])(=O)([#6:3])[#6:4]",
     },
     mechanism: "Oxygen-atom transfer",
@@ -142,6 +149,7 @@ export const sulfurReactionRules: ReactionRule[] = [
   {
     id: "sulfoxide-reduction-thioether",
     family: "sulfur",
+    reactionType: "reduction",
     title: "Sulfoxide Reduction",
     reagents: "PPh₃, Zn/AcOH, or another deoxygenating reagent",
     reagentNote: "Removes sulfur-bound oxygen",
@@ -153,7 +161,7 @@ export const sulfurReactionRules: ReactionRule[] = [
       includeSmarts: ["[#6][SX3](=O)[#6]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[S:1](=[O:2])([#6:3])[#6:4]>>[S:1]([#6:3])[#6:4]",
     },
     mechanism: "Deoxygenation",
@@ -162,6 +170,7 @@ export const sulfurReactionRules: ReactionRule[] = [
   {
     id: "sulfonyl-chloride-sulfonamide",
     family: "sulfur",
+    reactionType: "substitution",
     title: "Sulfonamide Formation",
     reagents: "NH₃, RNH₂, or R₂NH; base",
     reagentNote: "Sulfonyl substitution",
@@ -181,6 +190,7 @@ export const sulfurReactionRules: ReactionRule[] = [
   {
     id: "sulfonyl-chloride-sulfonate-ester",
     family: "sulfur",
+    reactionType: "substitution",
     title: "Sulfonate Ester Formation",
     reagents: "ROH, pyridine or another base",
     reagentNote: "Sulfonylation of an alcohol",

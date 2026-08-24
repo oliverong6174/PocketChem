@@ -5,10 +5,13 @@ import { reactionRegistry } from "./reactionRegistry";
 export type {
   OrganicChemCourse,
   ProductGenerationStatus,
+  ReactionHandlerName,
   ReactionPathway,
   ReactionRule,
+  ReactionPurpose,
   ReactionTransform,
   ReactionTrigger,
+  ReactionType,
 } from "./reactionTypes";
 export { reactionRegistry } from "./reactionRegistry";
 export { validateReactionRegistry } from "./reactionValidation";

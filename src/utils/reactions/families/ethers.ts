@@ -9,6 +9,7 @@ export const etherReactionRules: ReactionRule[] = [
   {
     id: "ether-cleavage-hbr",
     family: "ethers",
+    reactionType: "cleavage",
     title: "Ether Cleavage with HBr",
     reagents: "excess HBr, heat",
     reagentNote: "Strong-acid cleavage",
@@ -17,7 +18,7 @@ export const etherReactionRules: ReactionRule[] = [
       "Protonation of the ether oxygen is followed by C–O bond cleavage. Primary and methyl groups usually react by SN2; tertiary groups can react by SN1.",
     trigger: etherTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1][O:2][C:3]>>[C:1]Br.[C:3][OH:2]",
       maxProducts: 8,
     },
@@ -33,6 +34,7 @@ export const etherReactionRules: ReactionRule[] = [
   {
     id: "ether-cleavage-hi",
     family: "ethers",
+    reactionType: "cleavage",
     title: "Ether Cleavage with HI",
     reagents: "excess HI, heat",
     reagentNote: "Strong-acid cleavage",
@@ -41,7 +43,7 @@ export const etherReactionRules: ReactionRule[] = [
       "HI protonates the ether and iodide cleaves a carbon–oxygen bond. With excess HI, a primary alcohol product may be converted further to an iodide.",
     trigger: etherTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1][O:2][C:3]>>[C:1]I.[C:3][OH:2]",
       maxProducts: 8,
     },
@@ -57,6 +59,7 @@ export const etherReactionRules: ReactionRule[] = [
   {
     id: "ether-autoxidation",
     family: "ethers",
+    reactionType: "radical",
     title: "Ether Autoxidation",
     reagents: "O₂, light, prolonged storage",
     reagentNote: "Radical peroxide formation",

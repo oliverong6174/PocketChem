@@ -20,6 +20,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   {
     id: "haloalkane-sn2-hydroxide",
     family: "haloalkanes",
+    reactionType: "substitution",
     title: "SN2 with Hydroxide",
     reagents: "NaOH or KOH, polar aprotic solvent",
     reagentNote: "Backside substitution",
@@ -28,8 +29,9 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Hydroxide displaces the leaving group in one step. Methyl and primary substrates react fastest, and a stereocenter inverts.",
     trigger: primaryOrMethylHalideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C;X4:1][Cl,Br,I:2]>>[C:1]O",
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "alkylHalideSubstitution", nucleophile: "hydroxide" },
     },
     mechanism: "SN2",
     selectivity: ["Backside attack", "Inversion at the reacting carbon"],
@@ -38,6 +40,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   {
     id: "haloalkane-sn2-cyanide",
     family: "haloalkanes",
+    reactionType: "substitution",
     title: "SN2 with Cyanide",
     reagents: "NaCN or KCN, polar aprotic solvent",
     reagentNote: "One-carbon chain extension",
@@ -46,8 +49,9 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Cyanide attacks through carbon and replaces the leaving group, extending the carbon skeleton by one carbon.",
     trigger: primaryOrMethylHalideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C;X4:1][Cl,Br,I:2]>>[C:1]C#N",
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "alkylHalideSubstitution", nucleophile: "cyanide" },
     },
     mechanism: "SN2",
     selectivity: ["Inversion at the reacting carbon"],
@@ -56,6 +60,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   {
     id: "haloalkane-sn2-azide",
     family: "haloalkanes",
+    reactionType: "substitution",
     title: "SN2 with Azide",
     reagents: "NaN₃, DMF or DMSO",
     reagentNote: "Azide substitution",
@@ -64,8 +69,9 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Azide is a strong nucleophile and weak base, so it favors substitution on methyl and primary alkyl halides.",
     trigger: primaryOrMethylHalideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C;X4:1][Cl,Br,I:2]>>[C:1][N-][N+]#N",
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "alkylHalideSubstitution", nucleophile: "azide" },
     },
     mechanism: "SN2",
     selectivity: ["Inversion at the reacting carbon"],
@@ -74,6 +80,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   {
     id: "haloalkane-sn2-ammonia",
     family: "haloalkanes",
+    reactionType: "substitution",
     title: "Alkylation with Ammonia",
     reagents: "Excess NH₃",
     reagentNote: "SN2 amination",
@@ -82,8 +89,9 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Ammonia displaces the leaving group. Excess ammonia reduces further alkylation of the amine product.",
     trigger: primaryOrMethylHalideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C;X4:1][Cl,Br,I:2]>>[C:1]N",
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "alkylHalideSubstitution", nucleophile: "ammonia" },
     },
     mechanism: "SN2",
     priority: 230,
@@ -91,6 +99,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   {
     id: "haloalkane-williamson-ether",
     family: "haloalkanes",
+    reactionType: "substitution",
     title: "Williamson Ether Synthesis",
     reagents: "RO⁻ Na⁺ or RO⁻ K⁺",
     reagentNote: "Alkoxide SN2 substitution",
@@ -110,6 +119,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   {
     id: "haloalkane-acetylide-alkylation",
     family: "haloalkanes",
+    reactionType: "substitution",
     title: "Alkylation with an Acetylide",
     reagents: "RC≡C⁻ Na⁺",
     reagentNote: "Carbon-carbon bond formation",
@@ -128,6 +138,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   {
     id: "haloalkane-sn1-solvolysis-water",
     family: "haloalkanes",
+    reactionType: "substitution",
     title: "SN1 Solvolysis in Water",
     reagents: "H₂O, polar protic solvent",
     reagentNote: "Carbocation substitution",
@@ -136,7 +147,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Secondary and tertiary alkyl halides can ionize in water, followed by nucleophilic capture to form an alcohol.",
     trigger: secondaryOrTertiaryHalideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C;X4:1][Cl,Br,I:2]>>[C:1]O",
       maxProducts: 4,
     },
@@ -148,6 +159,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   {
     id: "haloalkane-e2-zaitsev",
     family: "haloalkanes",
+    reactionType: "elimination",
     title: "E2 Elimination: Zaitsev Product",
     reagents: "NaOEt/EtOH or another small strong base, heat",
     reagentNote: "Concerted beta elimination",
@@ -167,6 +179,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   {
     id: "haloalkane-e2-hofmann",
     family: "haloalkanes",
+    reactionType: "elimination",
     title: "E2 Elimination: Hofmann Product",
     reagents: "KOtBu or another bulky strong base, heat",
     reagentNote: "Sterically controlled beta elimination",
@@ -186,6 +199,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   {
     id: "haloalkane-e1-elimination",
     family: "haloalkanes",
+    reactionType: "elimination",
     title: "E1 Elimination",
     reagents: "Weak base, polar protic solvent, heat",
     reagentNote: "Carbocation elimination",
@@ -205,6 +219,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   {
     id: "haloalkane-grignard-formation",
     family: "haloalkanes",
+    reactionType: "substitution",
     title: "Grignard Reagent Formation",
     reagents: "Mg, dry ether",
     reagentNote: "Metal insertion into C–X",

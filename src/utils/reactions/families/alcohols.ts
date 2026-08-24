@@ -32,6 +32,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-deprotonation",
     family: "alcohols",
+    reactionType: "acidBase",
     title: "Alcohol Deprotonation",
     reagents: "NaH, KH, or Na metal",
     reagentNote: "Formation of an alkoxide",
@@ -40,7 +41,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "A sufficiently strong base removes the alcohol proton to form an alkoxide, a strong nucleophile and base.",
     trigger: alcoholTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1][OH:2]>>[C:1][O-:2]",
     },
     mechanism: "Proton transfer",
@@ -49,6 +50,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-dehydration-alkene",
     family: "alcohols",
+    reactionType: "elimination",
     title: "Alcohol Dehydration to an Alkene",
     reagents: "Concentrated H₂SO₄ or H₃PO₄, heat",
     reagentNote: "Acid-catalyzed elimination",
@@ -60,9 +62,13 @@ export const alcoholReactionRules: ReactionRule[] = [
       includeSmarts: ["[C;H1,H2,H3][C;H0,H1,H2][OH]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C;H1,H2,H3:1][C:2][OH:3]>>[C:1]=[C:2]",
-      maxProducts: 6,
+      type: "customHandler",
+      handler: "elimination",
+      options: {
+        mode: "betaElimination",
+        leavingGroup: "alcohol",
+        maxProducts: 6,
+      },
     },
     productStatus: "representative",
     mechanism: "E1 or E2 dehydration",
@@ -75,6 +81,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-dehydration-ether",
     family: "alcohols",
+    reactionType: "substitution",
     title: "Intermolecular Alcohol Dehydration",
     reagents: "Concentrated H₂SO₄, about 130–140 °C",
     reagentNote: "Bimolecular ether formation",
@@ -94,6 +101,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-hbr-substitution",
     family: "alcohols",
+    reactionType: "substitution",
     title: "Alcohol Conversion with HBr",
     reagents: "HBr",
     reagentNote: "Conversion of OH into Br",
@@ -102,8 +110,9 @@ export const alcoholReactionRules: ReactionRule[] = [
       "After protonation of hydroxyl, bromide replaces water. Primary alcohols tend to react by SN2; secondary and tertiary alcohols can react by SN1.",
     trigger: alcoholTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1][OH:2]>>[C:1]Br",
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "alcoholToHalide", halide: "bromide" },
     },
     productStatus: "representative",
     mechanism: "SN1 or SN2",
@@ -113,6 +122,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-lucas-reagent",
     family: "alcohols",
+    reactionType: "substitution",
     title: "Lucas Reagent Conversion",
     reagents: "Concentrated HCl, ZnCl₂",
     reagentNote: "Fast for tertiary; slower for secondary alcohols",
@@ -123,8 +133,9 @@ export const alcoholReactionRules: ReactionRule[] = [
       anyFunctionalGroups: ["Secondary alcohol", "Tertiary alcohol", "Benzyl alcohol"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1][OH:2]>>[C:1]Cl",
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "alcoholToHalide", halide: "chloride" },
     },
     productStatus: "representative",
     mechanism: "Usually SN1 for tertiary and many secondary alcohols",
@@ -134,6 +145,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-pbr3",
     family: "alcohols",
+    reactionType: "substitution",
     title: "Alcohol to Alkyl Bromide with PBr₃",
     reagents: "PBr₃",
     reagentNote: "Best for primary and secondary alcohols",
@@ -142,8 +154,9 @@ export const alcoholReactionRules: ReactionRule[] = [
       "PBr₃ converts primary and secondary alcohols into alkyl bromides without forming a free carbocation.",
     trigger: primaryOrSecondaryAlcoholTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1][OH:2]>>[C:1]Br",
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "alcoholToHalide", halide: "bromide" },
     },
     productStatus: "representative",
     mechanism: "SN2 substitution",
@@ -153,6 +166,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-socl2",
     family: "alcohols",
+    reactionType: "substitution",
     title: "Alcohol to Alkyl Chloride with SOCl₂",
     reagents: "SOCl₂, pyridine",
     reagentNote: "Formation and displacement of a chlorosulfite",
@@ -161,8 +175,9 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Thionyl chloride converts alcohols into alkyl chlorides; pyridine commonly promotes substitution with inversion.",
     trigger: primaryOrSecondaryAlcoholTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1][OH:2]>>[C:1]Cl",
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "alcoholToHalide", halide: "chloride" },
     },
     productStatus: "representative",
     mechanism: "Substitution through a chlorosulfite intermediate",
@@ -172,6 +187,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "primary-alcohol-mild-oxidation",
     family: "alcohols",
+    reactionType: "oxidation",
     title: "Primary Alcohol Oxidation to an Aldehyde",
     reagents: "PCC, DMP, or Swern oxidation",
     reagentNote: "Anhydrous mild oxidation",
@@ -180,7 +196,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Mild, water-free oxidants convert a primary alcohol into an aldehyde without substantial overoxidation.",
     trigger: primaryAlcoholTrigger,
     transform: {
-      type: "engineHandler",
+      type: "customHandler",
       handler: "oxidation",
       options: {
         mode: "alcoholOxidation",
@@ -194,6 +210,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "primary-alcohol-strong-oxidation",
     family: "alcohols",
+    reactionType: "oxidation",
     title: "Primary Alcohol Oxidation to a Carboxylic Acid",
     reagents: "Jones reagent, Na₂Cr₂O₇/H₂SO₄, or hot KMnO₄",
     reagentNote: "Strong aqueous oxidation",
@@ -202,7 +219,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Strong aqueous oxidants convert a primary alcohol through the aldehyde hydrate to a carboxylic acid.",
     trigger: primaryAlcoholTrigger,
     transform: {
-      type: "engineHandler",
+      type: "customHandler",
       handler: "oxidation",
       options: {
         mode: "alcoholOxidation",
@@ -216,6 +233,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "secondary-alcohol-oxidation",
     family: "alcohols",
+    reactionType: "oxidation",
     title: "Secondary Alcohol Oxidation",
     reagents: "PCC, DMP, Jones reagent, or NaOCl",
     reagentNote: "Oxidation to a ketone",
@@ -224,7 +242,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "A secondary alcohol loses one hydrogen from oxygen and one from carbon to form a ketone.",
     trigger: secondaryAlcoholTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1][CH:2]([OH:3])[C:4]>>[C:1][C:2](=[O:3])[C:4]",
     },
     mechanism: "Oxidation",
@@ -233,6 +251,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "benzylic-allylic-alcohol-oxidation",
     family: "alcohols",
+    reactionType: "oxidation",
     title: "Selective Allylic or Benzylic Alcohol Oxidation",
     reagents: "MnO₂",
     reagentNote: "Selective oxidation beside a pi system",
@@ -246,7 +265,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       ],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C,c:1][CH1,CH2:2][OH:3]>>[C,c:1][C:2]=[O:3]",
       maxProducts: 4,
     },
@@ -256,6 +275,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "fischer-esterification",
     family: "alcohols",
+    reactionType: "substitution",
     title: "Fischer Esterification",
     reagents: "Carboxylic acid, catalytic H₂SO₄, heat",
     reagentNote: "Reversible condensation",
@@ -275,6 +295,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-acid-chloride-esterification",
     family: "alcohols",
+    reactionType: "substitution",
     title: "Ester Formation with an Acyl Halide",
     reagents: "Acyl chloride, pyridine or another base",
     reagentNote: "Nucleophilic acyl substitution",
@@ -293,6 +314,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-tosylation",
     family: "alcohols",
+    reactionType: "substitution",
     title: "Tosylate Formation",
     reagents: "TsCl, pyridine",
     reagentNote: "Convert OH into a good leaving group",
@@ -301,7 +323,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "The alcohol oxygen attacks tosyl chloride. The carbon-oxygen bond is retained, so configuration at carbon is unchanged during tosylate formation.",
     trigger: alcoholTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1][OH:2]>>[C:1][O:2]S(=O)(=O)c1ccc(C)cc1",
     },
     mechanism: "Sulfonyl substitution",
@@ -311,6 +333,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-mesylation",
     family: "alcohols",
+    reactionType: "substitution",
     title: "Mesylate Formation",
     reagents: "MsCl, triethylamine or pyridine",
     reagentNote: "Convert OH into a good leaving group",
@@ -319,7 +342,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Methanesulfonyl chloride converts an alcohol into a mesylate without breaking the carbon-oxygen bond.",
     trigger: alcoholTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1][OH:2]>>[C:1][O:2]S(=O)(=O)C",
     },
     mechanism: "Sulfonyl substitution",
@@ -329,6 +352,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-nitrate-ester",
     family: "alcohols",
+    reactionType: "substitution",
     title: "Nitrate Ester Formation",
     reagents: "HNO₃ under controlled conditions",
     reagentNote: "O-nitration",
@@ -337,7 +361,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Alcohol oxygen can be converted into an organic nitrate ester under strongly acidic nitrating conditions.",
     trigger: alcoholTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1][OH:2]>>[C:1][O:2][N+](=O)[O-]",
     },
     course: "advanced",
@@ -347,6 +371,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-phosphate-ester",
     family: "alcohols",
+    reactionType: "substitution",
     title: "Phosphate Ester Formation",
     reagents: "Activated phosphoric acid derivative",
     reagentNote: "O-phosphorylation",
@@ -355,7 +380,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Alcohols form phosphate esters through activated phosphorus reagents; direct reaction with phosphoric acid is generally equilibrium-limited.",
     trigger: alcoholTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1][OH:2]>>[C:1][O:2]P(=O)(O)O",
     },
     course: "advanced",
@@ -365,6 +390,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "pinacol-rearrangement",
     family: "alcohols",
+    reactionType: "rearrangement",
     title: "Pinacol Rearrangement",
     reagents: "Strong acid, heat",
     reagentNote: "Vicinal diol rearrangement",

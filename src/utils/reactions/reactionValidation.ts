@@ -1,10 +1,37 @@
-import type { ReactionRule } from "./reactionTypes";
+import type {
+  ReactionHandlerName,
+  ReactionRule,
+  ReactionType,
+} from "./reactionTypes";
 
-const VALID_HANDLERS = new Set([
+const VALID_REACTION_TYPES = new Set<ReactionType>([
   "addition",
-  "condensation",
+  "substitution",
+  "elimination",
   "oxidation",
   "reduction",
+  "condensation",
+  "rearrangement",
+  "acidBase",
+  "cleavage",
+  "cyclization",
+  "ringOpening",
+  "coupling",
+  "pericyclic",
+  "radical",
+  "tautomerization",
+  "isomerization",
+]);
+
+const VALID_CUSTOM_HANDLERS = new Set<ReactionHandlerName>([
+  "addition",
+  "substitution",
+  "elimination",
+  "carbonyl",
+  "oxidation",
+  "reduction",
+  "ring",
+  "rearrangement",
 ]);
 
 export type ReactionRegistryIssue = {
@@ -40,6 +67,13 @@ export function validateReactionRegistry(
       }
     }
 
+    if (!VALID_REACTION_TYPES.has(rule.reactionType)) {
+      issues.push({
+        ruleId,
+        message: `Unknown reaction type: ${String(rule.reactionType)}`,
+      });
+    }
+
     if (!Number.isFinite(rule.priority)) {
       issues.push({ ruleId, message: "Priority must be a finite number." });
     }
@@ -58,17 +92,7 @@ export function validateReactionRegistry(
       });
     }
 
-    if (
-      rule.transform.type === "engineHandler" &&
-      !VALID_HANDLERS.has(rule.transform.handler)
-    ) {
-      issues.push({
-        ruleId,
-        message: `Unknown engine handler: ${rule.transform.handler}`,
-      });
-    }
-
-    if (rule.transform.type === "rdkitReactionSmarts") {
+    if (rule.transform.type === "reactionSmarts") {
       if (!rule.transform.smarts.includes(">>")) {
         issues.push({
           ruleId,
@@ -84,6 +108,15 @@ export function validateReactionRegistry(
         issues.push({
           ruleId,
           message: "maxProducts must be a positive integer.",
+        });
+      }
+    }
+
+    if (rule.transform.type === "customHandler") {
+      if (!VALID_CUSTOM_HANDLERS.has(rule.transform.handler)) {
+        issues.push({
+          ruleId,
+          message: `Unknown custom handler: ${String(rule.transform.handler)}`,
         });
       }
     }

@@ -8,6 +8,7 @@ export const epoxideReactionRules: ReactionRule[] = [
   {
     id: "epoxide-acid-water-opening",
     family: "epoxides",
+    reactionType: "ringOpening",
     title: "Acid-Catalyzed Epoxide Opening with Water",
     reagents: "H₃O⁺, H₂O",
     reagentNote: "Anti opening; attacks more substituted carbon",
@@ -16,8 +17,8 @@ export const epoxideReactionRules: ReactionRule[] = [
       "Under acidic conditions, water opens protonated epoxides to form trans diols. Nucleophilic attack favors the more substituted carbon.",
     trigger: epoxideTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
+      type: "customHandler",
+      handler: "ring",
       options: {
         mode: "epoxideOpening",
         nucleophile: "water",
@@ -28,6 +29,7 @@ export const epoxideReactionRules: ReactionRule[] = [
   {
     id: "epoxide-base-hydroxide-opening",
     family: "epoxides",
+    reactionType: "ringOpening",
     title: "Base-Catalyzed Epoxide Opening with Hydroxide",
     reagents: "1) NaOH or KOH  2) H₂O",
     reagentNote: "Anti opening; attacks less substituted carbon",
@@ -36,8 +38,8 @@ export const epoxideReactionRules: ReactionRule[] = [
       "Under basic conditions, hydroxide opens epoxides by attacking the less substituted carbon, followed by protonation.",
     trigger: epoxideTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
+      type: "customHandler",
+      handler: "ring",
       options: {
         mode: "epoxideOpening",
         nucleophile: "hydroxide",
@@ -48,6 +50,7 @@ export const epoxideReactionRules: ReactionRule[] = [
   {
     id: "epoxide-acid-alcohol-opening",
     family: "epoxides",
+    reactionType: "ringOpening",
     title: "Acid-Catalyzed Epoxide Opening with Alcohol",
     reagents: "ROH, H⁺",
     reagentNote: "Forms alkoxy alcohol",
@@ -64,6 +67,7 @@ export const epoxideReactionRules: ReactionRule[] = [
   {
     id: "epoxide-base-alkoxide-opening",
     family: "epoxides",
+    reactionType: "ringOpening",
     title: "Base-Catalyzed Epoxide Opening with Alkoxide",
     reagents: "1) RO⁻  2) H₃O⁺",
     reagentNote: "Forms alkoxy alcohol",
@@ -80,6 +84,7 @@ export const epoxideReactionRules: ReactionRule[] = [
   {
     id: "epoxide-hx-opening",
     family: "epoxides",
+    reactionType: "ringOpening",
     title: "Epoxide Opening with HX",
     reagents: "HBr, HCl, or HI",
     reagentNote: "Halohydrin formation",
@@ -88,7 +93,7 @@ export const epoxideReactionRules: ReactionRule[] = [
       "Hydrohalic acids open epoxides to form halohydrins.",
     trigger: epoxideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]1[O:2][C:3]1>>[C:1]([Br])[C:3][OH]",
     },
     priority: 840,
@@ -96,6 +101,7 @@ export const epoxideReactionRules: ReactionRule[] = [
   {
     id: "epoxide-grignard-opening",
     family: "epoxides",
+    reactionType: "ringOpening",
     title: "Epoxide Opening with Grignard Reagent",
     reagents: "1) RMgBr or RLi  2) H₃O⁺",
     reagentNote: "C-C bond formation",
@@ -112,6 +118,7 @@ export const epoxideReactionRules: ReactionRule[] = [
   {
     id: "epoxide-ammonia-opening",
     family: "epoxides",
+    reactionType: "ringOpening",
     title: "Epoxide Opening with Ammonia",
     reagents: "NH₃",
     reagentNote: "Amino alcohol formation",
@@ -120,7 +127,7 @@ export const epoxideReactionRules: ReactionRule[] = [
       "Ammonia can open epoxides to form amino alcohols.",
     trigger: epoxideTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]1[O:2][C:3]1>>[C:1]([NH2])[C:3][OH]",
     },
     priority: 860,

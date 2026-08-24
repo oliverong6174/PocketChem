@@ -8,6 +8,7 @@ export const phenolReactionRules: ReactionRule[] = [
   {
     id: "phenol-deprotonation",
     family: "phenols",
+    reactionType: "acidBase",
     title: "Phenol Deprotonation",
     reagents: "NaOH or NaH",
     reagentNote: "Acid-base reaction",
@@ -16,7 +17,7 @@ export const phenolReactionRules: ReactionRule[] = [
       "Phenols are more acidic than ordinary alcohols because the phenoxide conjugate base is resonance stabilized.",
     trigger: phenolTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[c:1][OH:2]>>[c:1][O-:2]",
     },
     mechanism: "Proton transfer",
@@ -25,6 +26,7 @@ export const phenolReactionRules: ReactionRule[] = [
   {
     id: "phenol-williamson-ether",
     family: "phenols",
+    reactionType: "substitution",
     title: "Phenoxide Williamson Ether Synthesis",
     reagents: "1) NaOH or NaH  2) primary R–X",
     reagentNote: "O-alkylation",
@@ -43,6 +45,7 @@ export const phenolReactionRules: ReactionRule[] = [
   {
     id: "phenol-bromination-water",
     family: "phenols",
+    reactionType: "substitution",
     title: "Bromination of Phenol",
     reagents: "Br₂, H₂O",
     reagentNote: "Strongly activated electrophilic aromatic substitution",
@@ -62,6 +65,7 @@ export const phenolReactionRules: ReactionRule[] = [
   {
     id: "phenol-nitration",
     family: "phenols",
+    reactionType: "substitution",
     title: "Nitration of Phenol",
     reagents: "Dilute HNO₃ or HNO₃/H₂SO₄",
     reagentNote: "Electrophilic aromatic substitution",
@@ -81,6 +85,7 @@ export const phenolReactionRules: ReactionRule[] = [
   {
     id: "phenol-kolbe-schmitt",
     family: "phenols",
+    reactionType: "substitution",
     title: "Kolbe–Schmitt Reaction",
     reagents: "1) NaOH  2) CO₂, pressure, heat  3) H₃O⁺",
     reagentNote: "Carboxylation of phenoxide",
@@ -100,6 +105,7 @@ export const phenolReactionRules: ReactionRule[] = [
   {
     id: "phenol-reimer-tiemann",
     family: "phenols",
+    reactionType: "substitution",
     title: "Reimer–Tiemann Formylation",
     reagents: "CHCl₃, NaOH, heat; then H₃O⁺",
     reagentNote: "Ortho formylation",
@@ -119,6 +125,7 @@ export const phenolReactionRules: ReactionRule[] = [
   {
     id: "phenol-oxidation-quinone",
     family: "phenols",
+    reactionType: "oxidation",
     title: "Oxidation to a Quinone",
     reagents: "Na₂Cr₂O₇/H₂SO₄, Fremy’s salt, or another suitable oxidant",
     reagentNote: "Oxidative dearomatization",

@@ -16,6 +16,7 @@ export const alkaneReactionRules: ReactionRule[] = [
   {
     id: "alkane-radical-chlorination",
     family: "alkanes",
+    reactionType: "radical",
     title: "Free-Radical Chlorination",
     reagents: "Cl₂, hν or heat",
     reagentNote: "Radical chain substitution",
@@ -35,6 +36,7 @@ export const alkaneReactionRules: ReactionRule[] = [
   {
     id: "alkane-radical-bromination",
     family: "alkanes",
+    reactionType: "radical",
     title: "Free-Radical Bromination",
     reagents: "Br₂, hν or heat",
     reagentNote: "Selective radical chain substitution",

@@ -22,6 +22,7 @@ export const enolateReactionRules: ReactionRule[] = [
   {
     id: "carbonyl-acid-alpha-halogenation",
     family: "enolates",
+    reactionType: "substitution",
     title: "Acid-Catalyzed Alpha Halogenation",
     reagents: "Br₂ or Cl₂, H₃O⁺",
     reagentNote: "Halogenation through the enol",
@@ -41,6 +42,7 @@ export const enolateReactionRules: ReactionRule[] = [
   {
     id: "carbonyl-base-alpha-halogenation",
     family: "enolates",
+    reactionType: "substitution",
     title: "Base-Promoted Alpha Halogenation",
     reagents: "Br₂ or Cl₂, OH⁻",
     reagentNote: "Halogenation through an enolate",
@@ -59,6 +61,7 @@ export const enolateReactionRules: ReactionRule[] = [
   {
     id: "methyl-ketone-haloform",
     family: "enolates",
+    reactionType: "cleavage",
     title: "Haloform Reaction",
     reagents: "Excess X₂, OH⁻; then H₃O⁺",
     reagentNote: "Oxidative cleavage of a methyl ketone",
@@ -77,6 +80,7 @@ export const enolateReactionRules: ReactionRule[] = [
   {
     id: "enolate-alkylation",
     family: "enolates",
+    reactionType: "substitution",
     title: "Enolate Alkylation",
     reagents: "1) LDA, NaH, or alkoxide  2) methyl or primary R–X",
     reagentNote: "Alpha carbon-carbon bond formation",
@@ -96,6 +100,7 @@ export const enolateReactionRules: ReactionRule[] = [
   {
     id: "aldol-addition-general",
     family: "enolates",
+    reactionType: "addition",
     title: "Aldol Addition",
     reagents: "Dilute NaOH or alkoxide, low temperature",
     reagentNote: "Carbonyl addition by an enolate",
@@ -114,6 +119,7 @@ export const enolateReactionRules: ReactionRule[] = [
   {
     id: "aldol-condensation-general",
     family: "enolates",
+    reactionType: "condensation",
     title: "Aldol Condensation",
     reagents: "Base or acid, heat",
     reagentNote: "Aldol addition followed by dehydration",
@@ -132,6 +138,7 @@ export const enolateReactionRules: ReactionRule[] = [
   {
     id: "claisen-condensation-general",
     family: "enolates",
+    reactionType: "condensation",
     title: "Claisen Condensation",
     reagents: "1) Matching alkoxide base  2) H₃O⁺",
     reagentNote: "Ester enolate acyl substitution",
@@ -154,6 +161,7 @@ export const enolateReactionRules: ReactionRule[] = [
   {
     id: "michael-addition",
     family: "enolates",
+    reactionType: "addition",
     title: "Michael Addition",
     reagents: "Stabilized enolate or other soft nucleophile, base",
     reagentNote: "Conjugate 1,4-addition",
@@ -175,6 +183,7 @@ export const enolateReactionRules: ReactionRule[] = [
   {
     id: "robinson-annulation",
     family: "enolates",
+    reactionType: "cyclization",
     title: "Robinson Annulation",
     reagents: "Enolate donor, alpha,beta-unsaturated carbonyl, base, heat",
     reagentNote: "Michael addition plus intramolecular aldol condensation",
@@ -195,6 +204,7 @@ export const enolateReactionRules: ReactionRule[] = [
   {
     id: "malonic-acetoacetic-synthesis",
     family: "enolates",
+    reactionType: "cleavage",
     title: "Malonic Ester or Acetoacetic Ester Synthesis",
     reagents: "1) Alkoxide  2) primary R–X  3) hydrolysis and heat",
     reagentNote: "Alkylation followed by decarboxylation",

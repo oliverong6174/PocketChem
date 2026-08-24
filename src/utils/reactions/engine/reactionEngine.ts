@@ -9,7 +9,7 @@ import type {
   ReactionPathway,
   ReactionRule,
 } from "../reactionTypes";
-import { runEngineHandler } from "./handlers";
+import { runCustomHandler } from "./handlers";
 import { runReactionSmarts } from "./rdkitReaction";
 import { ruleMatchesReactant } from "./ruleMatcher";
 
@@ -74,7 +74,7 @@ async function applyRule(
   reactantSmiles: string
 ): Promise<RuleExecution> {
   switch (rule.transform.type) {
-    case "rdkitReactionSmarts":
+    case "reactionSmarts":
       return {
         products: await runReactionSmarts(
           reactantSmiles,
@@ -84,8 +84,8 @@ async function applyRule(
         productStatus: rule.productStatus ?? "computed",
       };
 
-    case "engineHandler": {
-      const products = await runEngineHandler(
+    case "customHandler": {
+      const products = await runCustomHandler(
         rule.transform.handler,
         reactantSmiles,
         rule.transform.options
@@ -109,6 +109,7 @@ function createPathwayBase(rule: ReactionRule) {
   return {
     ruleId: rule.id,
     family: rule.family,
+    reactionType: rule.reactionType,
     title: rule.title,
     reagentLabel: rule.reagents,
     reagentNote: rule.reagentNote,
@@ -116,6 +117,8 @@ function createPathwayBase(rule: ReactionRule) {
     course: getRuleCourse(rule),
     chapter: getRuleChapter(rule),
     mechanism: rule.mechanism ?? null,
+    reactionClass: rule.reactionClass ?? null,
+    purpose: rule.purpose ?? null,
     selectivity: rule.selectivity ?? [],
     limitations: rule.limitations ?? [],
   };
@@ -159,10 +162,7 @@ export async function predictReactionPathwaysFromRules(
         productSmiles: null,
         productLabel: rule.productHint,
         productStatus: execution.productStatus,
-        limitations: [
-          ...(rule.limitations ?? []),
-          rule.transform.reason,
-        ],
+        limitations: [...(rule.limitations ?? []), rule.transform.reason],
       });
       continue;
     }
@@ -187,7 +187,11 @@ export async function predictReactionPathwaysFromRules(
       continue;
     }
 
-    for (let productIndex = 0; productIndex < execution.products.length; productIndex += 1) {
+    for (
+      let productIndex = 0;
+      productIndex < execution.products.length;
+      productIndex += 1
+    ) {
       const productSmiles = execution.products[productIndex];
       const productName = await getProductName(productSmiles, rule.productHint);
 

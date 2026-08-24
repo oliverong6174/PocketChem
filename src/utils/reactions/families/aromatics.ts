@@ -28,6 +28,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "aromatic-nitration",
     family: "aromatics",
+    reactionType: "substitution",
     title: "Aromatic Nitration",
     reagents: "HNO₃, H₂SO₄",
     reagentNote: "Generates the nitronium electrophile",
@@ -36,7 +37,7 @@ export const aromaticReactionRules: ReactionRule[] = [
       "The aromatic ring attacks NO₂⁺ and then loses a proton to restore aromaticity.",
     trigger: aromaticTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[cH:1]>>[c:1][N+](=O)[O-]",
       maxProducts: 12,
     },
@@ -47,6 +48,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "aromatic-sulfonation",
     family: "aromatics",
+    reactionType: "substitution",
     title: "Aromatic Sulfonation",
     reagents: "SO₃, H₂SO₄",
     reagentNote: "Reversible electrophilic substitution",
@@ -55,7 +57,7 @@ export const aromaticReactionRules: ReactionRule[] = [
       "Sulfur trioxide electrophilically substitutes for an aromatic hydrogen. Hot dilute acid can reverse the reaction (desulfonation).",
     trigger: aromaticTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[cH:1]>>[c:1]S(=O)(=O)O",
       maxProducts: 12,
     },
@@ -67,6 +69,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "aromatic-halogenation-bromination",
     family: "aromatics",
+    reactionType: "substitution",
     title: "Aromatic Bromination",
     reagents: "Br₂, FeBr₃",
     reagentNote: "Lewis-acid-activated bromination",
@@ -75,7 +78,7 @@ export const aromaticReactionRules: ReactionRule[] = [
       "FeBr₃ activates bromine, and the ring substitutes bromine for an aromatic hydrogen.",
     trigger: aromaticTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[cH:1]>>[c:1]Br",
       maxProducts: 12,
     },
@@ -86,6 +89,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "aromatic-halogenation-chlorination",
     family: "aromatics",
+    reactionType: "substitution",
     title: "Aromatic Chlorination",
     reagents: "Cl₂, FeCl₃",
     reagentNote: "Lewis-acid-activated chlorination",
@@ -94,7 +98,7 @@ export const aromaticReactionRules: ReactionRule[] = [
       "FeCl₃ activates chlorine, and the ring substitutes chlorine for an aromatic hydrogen.",
     trigger: aromaticTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[cH:1]>>[c:1]Cl",
       maxProducts: 12,
     },
@@ -105,6 +109,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "aromatic-friedel-crafts-alkylation",
     family: "aromatics",
+    reactionType: "substitution",
     title: "Friedel–Crafts Alkylation",
     reagents: "R–Cl, AlCl₃",
     reagentNote: "Installs an alkyl group",
@@ -127,6 +132,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "aromatic-friedel-crafts-acylation",
     family: "aromatics",
+    reactionType: "substitution",
     title: "Friedel–Crafts Acylation",
     reagents: "RCOCl or anhydride, AlCl₃",
     reagentNote: "Installs an acyl group",
@@ -145,6 +151,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "aromatic-catalytic-hydrogenation",
     family: "aromatics",
+    reactionType: "reduction",
     title: "Aromatic Ring Hydrogenation",
     reagents: "H₂, Pt/Pd/Ni, high pressure and heat",
     reagentNote: "Forcing catalytic reduction",
@@ -162,6 +169,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "aromatic-birch-reduction",
     family: "aromatics",
+    reactionType: "acidBase",
     title: "Birch Reduction",
     reagents: "Na or Li, NH₃(l), ROH",
     reagentNote: "Dissolving-metal partial reduction",
@@ -180,6 +188,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "benzylic-bromination",
     family: "aromatics",
+    reactionType: "radical",
     title: "Benzylic Bromination",
     reagents: "NBS, hν or radical initiator",
     reagentNote: "Selective radical substitution",
@@ -191,7 +200,7 @@ export const aromaticReactionRules: ReactionRule[] = [
       includeSmarts: ["[c][C;H1,H2,H3]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[c:1][C;H1,H2,H3:2]>>[c:1][C:2]Br",
       maxProducts: 8,
     },
@@ -204,6 +213,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "benzylic-oxidation",
     family: "aromatics",
+    reactionType: "oxidation",
     title: "Benzylic Side-Chain Oxidation",
     reagents: "1) KMnO₄, OH⁻, heat  2) H₃O⁺",
     reagentNote: "Requires at least one benzylic hydrogen",
@@ -224,6 +234,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "nitroarene-reduction",
     family: "aromatics",
+    reactionType: "reduction",
     title: "Nitro Group Reduction",
     reagents: "H₂, Pd/C; or Fe/HCl; or Sn/HCl",
     reagentNote: "Nitro-to-amine reduction",
@@ -235,7 +246,7 @@ export const aromaticReactionRules: ReactionRule[] = [
       includeSmarts: ["[c][N+](=O)[O-]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[c:1][N+:2](=[O:3])[O-:4]>>[c:1][NH2+0:2]",
     },
     mechanism: "Multi-step reduction",
@@ -244,6 +255,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   {
     id: "aryl-halide-snar",
     family: "aromatics",
+    reactionType: "substitution",
     title: "Nucleophilic Aromatic Substitution",
     reagents: "Nu⁻, heat",
     reagentNote: "Addition–elimination on an activated aryl halide",

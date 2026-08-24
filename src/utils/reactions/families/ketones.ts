@@ -8,6 +8,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-reduction",
     family: "ketones",
+    reactionType: "reduction",
     title: "Ketone Reduction",
     reagents: "NaBH₄ or LiAlH₄, then H₃O⁺",
     reagentNote: "Hydride reduction",
@@ -16,8 +17,8 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Hydride reagents reduce ketones to secondary alcohols.",
     trigger: ketoneTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
+      type: "customHandler",
+      handler: "reduction",
       options: {
         mode: "oneTwoAddition",
         nucleophile: "hydride",
@@ -28,6 +29,7 @@ export const ketoneReactionRules: ReactionRule[] = [
     {
     id: "ketone-organometallic-addition",
     family: "ketones",
+    reactionType: "addition",
     title: "Organometallic Addition",
     reagents: "1) RMgBr, RMgCl, or RLi  2) H₃O⁺",
     reagentNote: "Grignard and organolithium addition",
@@ -44,6 +46,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-hydration",
     family: "ketones",
+    reactionType: "addition",
     title: "Ketone Hydration",
     reagents: "H₂O, acid or base",
     reagentNote: "Reversible nucleophilic addition",
@@ -52,8 +55,8 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Water can add reversibly to ketones to form geminal diols, although ketones are usually less hydrated than aldehydes.",
     trigger: ketoneTrigger,
     transform: {
-    type: "engineHandler",
-    handler: "addition",
+    type: "customHandler",
+      handler: "addition",
     options: {
       mode: "oneTwoAddition",
       nucleophile: "water",
@@ -64,6 +67,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-cyanohydrin",
     family: "ketones",
+    reactionType: "addition",
     title: "Cyanohydrin Formation",
     reagents: "HCN, NaCN/HCl",
     reagentNote: "CN⁻ addition",
@@ -72,8 +76,8 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Cyanide adds to ketones followed by protonation to form cyanohydrins.",
     trigger: ketoneTrigger,
     transform: {
-    type: "engineHandler",
-    handler: "addition",
+    type: "customHandler",
+      handler: "addition",
     options: {
       mode: "oneTwoAddition",
       nucleophile: "cyanide",
@@ -84,6 +88,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-ketal-formation",
     family: "ketones",
+    reactionType: "condensation",
     title: "Ketal Formation",
     reagents: "ROH, H⁺",
     reagentNote: "Acid-catalyzed alcohol addition",
@@ -100,6 +105,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-imine-formation",
     family: "ketones",
+    reactionType: "condensation",
     title: "Imine Formation",
     reagents: "Primary amine, acid catalyst",
     reagentNote: "Condensation with primary amine",
@@ -116,6 +122,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-enamine-formation",
     family: "ketones",
+    reactionType: "condensation",
     title: "Enamine Formation",
     reagents: "Secondary amine, acid catalyst",
     reagentNote: "Condensation with secondary amine",
@@ -132,6 +139,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-oxime-formation",
     family: "ketones",
+    reactionType: "condensation",
     title: "Oxime Formation",
     reagents: "NH₂OH",
     reagentNote: "Condensation with hydroxylamine",
@@ -140,8 +148,8 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Ketones react with hydroxylamine to form oximes.",
     trigger: ketoneTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "condensation",
+      type: "customHandler",
+      handler: "carbonyl",
       options: {
         mode: "oximeFormation",
       },
@@ -151,6 +159,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-hydrazone-formation",
     family: "ketones",
+    reactionType: "condensation",
     title: "Hydrazone Formation",
     reagents: "NH₂NH₂ or substituted hydrazine",
     reagentNote: "Condensation with hydrazine",
@@ -167,6 +176,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-wolff-kishner",
     family: "ketones",
+    reactionType: "reduction",
     title: "Wolff-Kishner Reduction",
     reagents: "NH₂NH₂, KOH, heat",
     reagentNote: "Carbonyl to alkane",
@@ -175,7 +185,7 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Wolff-Kishner reduction converts ketones to alkanes under strongly basic conditions.",
     trigger: ketoneTrigger,
     transform: {
-      type: "engineHandler",
+      type: "customHandler",
       handler: "reduction",
       options: {
         mode: "carbonylToAlkane",
@@ -186,6 +196,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-clemmensen",
     family: "ketones",
+    reactionType: "reduction",
     title: "Clemmensen Reduction",
     reagents: "Zn(Hg), HCl",
     reagentNote: "Carbonyl to alkane",
@@ -194,7 +205,7 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Clemmensen reduction converts ketones to alkanes under acidic conditions.",
     trigger: ketoneTrigger,
     transform: {
-      type: "engineHandler",
+      type: "customHandler",
       handler: "reduction",
       options: {
         mode: "carbonylToAlkane",
@@ -205,6 +216,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-wittig",
     family: "ketones",
+    reactionType: "coupling",
     title: "Wittig Reaction",
     reagents: "Ph₃P=CHR",
     reagentNote: "Carbonyl alkene formation",
@@ -221,6 +233,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-baeyer-villiger",
     family: "ketones",
+    reactionType: "oxidation",
     title: "Baeyer-Villiger Oxidation",
     reagents: "mCPBA or peroxyacid",
     reagentNote: "Oxygen insertion",
@@ -229,7 +242,7 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Baeyer-Villiger oxidation inserts oxygen next to the carbonyl carbon of a ketone, forming an ester.",
     trigger: ketoneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](=[O:2])([C:4])O[C:3]",
       maxProducts: 8,
     },

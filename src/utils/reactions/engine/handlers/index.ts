@@ -1,13 +1,12 @@
 import { addition } from "./addition";
-import { condensation } from "./condensation";
+import { substitution } from "./substitution";
+import { elimination } from "./elimination";
+import { carbonyl } from "./carbonyl";
 import { oxidation } from "./oxidation";
 import { reduction } from "./reduction";
-import type { ReactionTransform } from "../../reactionTypes";
-
-type HandlerName = Extract<
-  ReactionTransform,
-  { type: "engineHandler" }
->["handler"];
+import { ring } from "./ring";
+import { rearrangement } from "./rearrangement";
+import type { ReactionHandlerName } from "../../reactionTypes";
 
 type HandlerResult = string | string[] | null;
 type ReactionHandler = (
@@ -15,15 +14,19 @@ type ReactionHandler = (
   options?: Record<string, unknown>
 ) => Promise<HandlerResult>;
 
-const handlers: Record<HandlerName, ReactionHandler> = {
+const handlers: Record<ReactionHandlerName, ReactionHandler> = {
   addition,
-  condensation,
+  substitution,
+  elimination,
+  carbonyl,
   oxidation,
   reduction,
+  ring,
+  rearrangement,
 };
 
-export async function runEngineHandler(
-  handler: HandlerName,
+export async function runCustomHandler(
+  handler: ReactionHandlerName,
   reactantSmiles: string,
   options?: Record<string, unknown>
 ): Promise<string[]> {

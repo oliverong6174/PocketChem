@@ -1,18 +1,34 @@
 import type { ReactionRule } from "../reactionTypes";
 
 const alkeneTrigger = {
-  functionalGroups: [
+  anyFunctionalGroups: [
     "Alkene",
-    "Alkenes",
-    "C=C",
-    "Carbon-carbon double bond",
+    "Cycloalkene",
+    "Diene",
+    "Conjugated diene",
+    "Cumulated diene",
+    "Triene",
+    "Enyne",
+    "Enal",
+    "Enone",
+    "Enoic acid",
+    "Enoate",
+    "Chalcone",
+    "Cinnamic acid",
+    "Cinnamaldehyde",
+    "Crotonic acid",
+    "Crotonaldehyde",
+    "Acrylic acid",
+    "Acrolein",
   ],
+  includeSmarts: ["[C;!a]=[C;!a]"],
 };
 
 export const alkeneReactionRules: ReactionRule[] = [
   {
     id: "alkene-hydrogenation",
     family: "alkenes",
+    reactionType: "reduction",
     title: "Alkene Hydrogenation",
     reagents: "H₂, Pd/C",
     reagentNote: "Catalytic reduction",
@@ -21,7 +37,7 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Hydrogenation adds H₂ across the C=C bond, reducing the alkene to an alkane.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1][C:2]",
     },
     priority: 100,
@@ -30,6 +46,8 @@ export const alkeneReactionRules: ReactionRule[] = [
   {
     id: "deuteration",
 
+
+    reactionType: "reduction",
     family: "alkenes",
 
     title: "Catalytic Deuteration",
@@ -46,8 +64,8 @@ export const alkeneReactionRules: ReactionRule[] = [
     trigger: alkeneTrigger,
 
     transform: {
-        type: "rdkitReactionSmarts",
-        smarts: "[C:1]=[C:2]>>[C:1][C:2]"
+      type: "reactionSmarts",
+      smarts: "[C:1]=[C:2]>>[C:1]([2H])[C:2]([2H])",
     },
 
     priority: 105
@@ -56,6 +74,7 @@ export const alkeneReactionRules: ReactionRule[] = [
   {
     id: "alkene-hx-addition-hbr",
     family: "alkenes",
+    reactionType: "addition",
     title: "HX Addition: Hydrobromination",
     reagents: "HBr",
     reagentNote: "Markovnikov hydrohalogenation",
@@ -64,15 +83,19 @@ export const alkeneReactionRules: ReactionRule[] = [
       "HBr adds across the alkene to form an alkyl bromide.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]([Br])[C:2]",
     },
+    productStatus: "representative",
+    selectivity: ["Markovnikov orientation; carbocation rearrangements may occur"],
     priority: 110,
   },
 
   {
     id: "alkene-hbr-peroxide",
 
+
+    reactionType: "radical",
     family: "alkenes",
 
     title: "Hydrobromination (Peroxide Effect)",
@@ -89,9 +112,11 @@ export const alkeneReactionRules: ReactionRule[] = [
     trigger: alkeneTrigger,
 
     transform: {
-        type: "rdkitReactionSmarts",
+        type: "reactionSmarts",
         smarts: "[C:1]=[C:2]>>[C:1][C:2]([Br])"
     },
+    productStatus: "representative",
+    selectivity: ["Anti-Markovnikov orientation; radical mechanism"],
 
     priority: 115
 },
@@ -99,6 +124,7 @@ export const alkeneReactionRules: ReactionRule[] = [
   {
     id: "alkene-halogenation-bromine",
     family: "alkenes",
+    reactionType: "addition",
     title: "Halogenation",
     reagents: "Br₂, CCl₄",
     reagentNote: "Anti addition of halogen",
@@ -107,15 +133,18 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Halogenation adds one bromine to each alkene carbon.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]([Br])[C:2]([Br])",
     },
+    productStatus: "representative",
+    selectivity: ["Anti addition"],
     priority: 120,
   },
 
   {
     id: "alkene-halohydrin-formation",
     family: "alkenes",
+    reactionType: "addition",
     title: "Halohydrin Formation",
     reagents: "Br₂, H₂O",
     reagentNote: "Anti addition of Br and OH",
@@ -124,15 +153,18 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Water opens the bromonium ion, giving an alcohol and bromide on adjacent carbons.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]([Br])[C:2]([OH])",
     },
+    productStatus: "representative",
+    selectivity: ["OH goes to the more substituted carbon; anti addition"],
     priority: 130,
   },
 
   {
     id: "alkene-acid-hydration",
     family: "alkenes",
+    reactionType: "addition",
     title: "Acid-Catalyzed Hydration",
     reagents: "H₃O⁺",
     reagentNote: "Markovnikov hydration",
@@ -141,15 +173,18 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Acid-catalyzed hydration adds water across the alkene to form an alcohol.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]([OH])[C:2]",
     },
+    productStatus: "representative",
+    selectivity: ["Markovnikov orientation; rearrangements may occur"],
     priority: 140,
   },
 
   {
     id: "alkene-hydroboration-oxidation",
     family: "alkenes",
+    reactionType: "oxidation",
     title: "Hydroboration-Oxidation",
     reagents: "1) BH₃·THF  2) H₂O₂, NaOH",
     reagentNote: "Anti-Markovnikov, syn hydration",
@@ -158,17 +193,20 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Hydroboration-oxidation hydrates the alkene with anti-Markovnikov orientation.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1][C:2]([OH])",
     },
+    productStatus: "representative",
+    selectivity: ["Anti-Markovnikov and syn addition"],
     priority: 150,
   },
 
-  
+
 
   {
     id: "alkene-oxymercuration-demercuration",
     family: "alkenes",
+    reactionType: "addition",
     title: "Oxymercuration-Demercuration",
     reagents: "1) Hg(OAc)₂, H₂O  2) NaBH₄",
     reagentNote: "Markovnikov hydration, no rearrangement",
@@ -177,15 +215,19 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Oxymercuration-demercuration converts an alkene to a Markovnikov alcohol without rearrangement.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]([OH])[C:2]",
     },
+    productStatus: "representative",
+    selectivity: ["Markovnikov orientation without rearrangement"],
     priority: 160,
   },
 
   {
     id: "alkene-simmons-smith",
 
+
+    reactionType: "addition",
     family: "alkenes",
 
     title: "Simmons–Smith Cyclopropanation",
@@ -202,9 +244,11 @@ export const alkeneReactionRules: ReactionRule[] = [
     trigger: alkeneTrigger,
 
     transform: {
-        type: "rdkitReactionSmarts",
+        type: "reactionSmarts",
         smarts: "[C:1]=[C:2]>>[C:1]1[C][C:2]1"
     },
+    productStatus: "representative",
+    selectivity: ["Stereospecific syn cyclopropanation"],
 
     priority: 165
   },
@@ -212,6 +256,7 @@ export const alkeneReactionRules: ReactionRule[] = [
   {
     id: "alkene-epoxidation",
     family: "alkenes",
+    reactionType: "oxidation",
     title: "Epoxidation",
     reagents: "mCPBA",
     reagentNote: "Concerted oxygen transfer",
@@ -220,43 +265,18 @@ export const alkeneReactionRules: ReactionRule[] = [
       "A peroxyacid converts the alkene into a three-membered epoxide ring.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]1[O][C:2]1",
     },
+    productStatus: "representative",
+    selectivity: ["Stereospecific oxygen transfer"],
     priority: 170,
-  },
-
-  {
-    id: "epoxide-opening",
-
-    family: "alkenes",
-
-    title: "Epoxide Ring Opening",
-
-    reagents: "H3O+",
-
-    reagentNote: "Acid-catalyzed",
-
-    productHint: "Trans diol",
-
-    explanation:
-        "Acidic opening of an epoxide produces a trans vicinal diol.",
-
-    trigger: {
-        functionalGroups: ["Epoxide"]
-    },
-
-    transform: {
-        type: "rdkitReactionSmarts",
-        smarts: "[C:1]1O[C:2]1>>[C:1](O)[C:2](O)"
-    },
-
-    priority: 175
   },
 
   {
     id: "alkene-syn-dihydroxylation",
     family: "alkenes",
+    reactionType: "oxidation",
     title: "Syn Dihydroxylation",
     reagents: "OsO₄, NMO",
     reagentNote: "Syn addition of two OH groups",
@@ -265,15 +285,19 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Syn dihydroxylation adds two hydroxyl groups across the alkene.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]([OH])[C:2]([OH])",
     },
+    productStatus: "representative",
+    selectivity: ["Syn addition"],
     priority: 180,
   },
 
   {
     id: "cold-kmno4",
 
+
+    reactionType: "oxidation",
     family: "alkenes",
 
     title: "Cold Permanganate Oxidation",
@@ -290,9 +314,11 @@ export const alkeneReactionRules: ReactionRule[] = [
     trigger: alkeneTrigger,
 
     transform: {
-        type: "rdkitReactionSmarts",
+        type: "reactionSmarts",
         smarts: "[C:1]=[C:2]>>[C:1](O)[C:2](O)"
     },
+    productStatus: "representative",
+    selectivity: ["Syn addition"],
 
     priority: 181
   },
@@ -300,6 +326,7 @@ export const alkeneReactionRules: ReactionRule[] = [
   {
     id: "alkene-anti-dihydroxylation",
     family: "alkenes",
+    reactionType: "oxidation",
     title: "Anti Dihydroxylation",
     reagents: "1) mCPBA  2) H₃O⁺",
     reagentNote: "Epoxidation then anti opening",
@@ -308,15 +335,18 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Epoxidation followed by acid-catalyzed ring opening gives an anti vicinal diol.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]([OH])[C:2]([OH])",
     },
+    productStatus: "representative",
+    selectivity: ["Anti addition"],
     priority: 190,
   },
 
     {
         id: "alkene-ozonolysis-reductive",
         family: "alkenes",
+        reactionType: "cleavage",
         title: "Reductive Ozonolysis",
         reagents: "1) O₃  2) (CH₃)₂S or Zn/H₂O",
         reagentNote: "Reductive workup",
@@ -325,7 +355,7 @@ export const alkeneReactionRules: ReactionRule[] = [
             "Ozone cleaves the alkene. Dimethyl sulfide or zinc prevents further oxidation, giving aldehydes and ketones.",
         trigger: alkeneTrigger,
         transform: {
-            type: "rdkitReactionSmarts",
+            type: "reactionSmarts",
             smarts:
                 "[C:1]=[C:2]>>[C:1]=O.[C:2]=O"
         },
@@ -335,6 +365,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     {
     id: "alkene-ozonolysis-oxidative",
     family: "alkenes",
+    reactionType: "cleavage",
     title: "Oxidative Ozonolysis",
     reagents: "1) O₃  2) H₂O₂",
     reagentNote: "Oxidative workup",
@@ -343,9 +374,8 @@ export const alkeneReactionRules: ReactionRule[] = [
         "Oxidative workup converts any aldehydes formed during ozonolysis into carboxylic acids while ketones remain ketones.",
     trigger: alkeneTrigger,
     transform: {
-        type: "rdkitReactionSmarts",
-        smarts:
-            "[C:1]=[C:2]>>[C:1](=O)O.[C:2](=O)O"
+      type: "conceptOnly",
+      reason: "Oxidative workup treats alkene carbons differently depending on whether they bear hydrogen; an oxidation-state-aware cleavage handler is required.",
     },
     priority: 201
 },
@@ -353,6 +383,7 @@ export const alkeneReactionRules: ReactionRule[] = [
   {
     id: "alkene-oxidative-cleavage",
     family: "alkenes",
+    reactionType: "cleavage",
     title: "Oxidative Cleavage",
     reagents: "KMnO₄, heat",
     reagentNote: "Strong oxidative cleavage",
@@ -361,26 +392,57 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Hot permanganate cleaves the alkene under strongly oxidative conditions.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1]=[C:2]>>[C:1](=O)O.[C:2](=O)O",
+      type: "conceptOnly",
+      reason: "Hot permanganate gives ketones, carboxylic acids, or carbon dioxide according to the substitution and hydrogen count of each alkene carbon.",
     },
     priority: 210,
   },
 
+
   {
-    id: "ether-ozonolysis-reductive-workup",
-    family: "ethers",
-    title: "Ether as Reductive Workup Reagent",
-    reagents: "1) O₃  2) sulfide ether",
-    reagentNote: "Thioether-type reducing workup",
-    productHint: "Carbonyl products",
+    id: "alkene-allylic-bromination",
+    family: "alkenes",
+    reactionType: "radical",
+    title: "Allylic Bromination",
+    reagents: "NBS, hν or radical initiator",
+    reagentNote: "Radical substitution at an allylic carbon",
+    productHint: "Allylic bromide",
     explanation:
-      "Thioethers can act as reducing agents during ozonolysis workup, giving aldehydes and ketones.",
+      "NBS replaces an allylic hydrogen with bromine while minimizing direct addition of Br₂ across the double bond.",
+    trigger: {
+      ...alkeneTrigger,
+      includeSmarts: ["[C]=[C][C;H1,H2,H3]"],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1]=[C:2][C;H1,H2,H3:3]>>[C:1]=[C:2][C:3]Br",
+      maxProducts: 8,
+    },
+    mechanism: "Radical-chain substitution",
+    productStatus: "representative",
+    selectivity: ["Reaction occurs at an allylic C–H bond."],
+    limitations: [
+      "Resonance-related allylic bromides can form; the engine enumerates local sites but does not rank the product mixture.",
+    ],
+    priority: 215,
+  },
+  {
+    id: "alkene-addition-polymerization",
+    family: "alkenes",
+    reactionType: "addition",
+    title: "Addition Polymerization",
+    reagents: "radical, cationic, anionic, or coordination initiator",
+    reagentNote: "Chain-growth polymerization",
+    productHint: "Polyalkene repeat unit",
+    explanation:
+      "Many alkenes undergo chain-growth addition polymerization in which the pi bond becomes part of a saturated polymer backbone.",
     trigger: alkeneTrigger,
     transform: {
-      type: "rdkitReactionSmarts",
-      smarts: "[C:1][O:2][C:3]>>[C:1][O:2][C:3]",
+      type: "conceptOnly",
+      reason: "A polymer requires repeat-unit, tacticity, end-group, and chain-length representation rather than a finite small-molecule SMILES product.",
     },
+    mechanism: "Chain-growth polymerization",
+    course: "advanced",
     priority: 220,
   },
 ];

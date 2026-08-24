@@ -15,6 +15,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
     {
     id: "aldehyde-reduction",
     family: "aldehydes",
+    reactionType: "reduction",
     title: "Aldehyde Reduction",
     reagents: "NaBH₄ or LiAlH₄, then H₃O⁺",
     reagentNote: "Hydride reduction",
@@ -23,8 +24,8 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Hydride reagents reduce aldehydes to primary alcohols.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "engineHandler",
-      handler: "addition",
+      type: "customHandler",
+      handler: "reduction",
       options: {
         mode: "oneTwoAddition",
         nucleophile: "hydride",
@@ -35,6 +36,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-organometallic-addition",
     family: "aldehydes",
+    reactionType: "addition",
     title: "Organometallic Addition",
     reagents: "1) RMgBr, RMgCl, or RLi  2) H₃O⁺",
     reagentNote: "Grignard and organolithium addition",
@@ -51,6 +53,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-oxidation",
     family: "aldehydes",
+    reactionType: "oxidation",
     title: "Aldehyde Oxidation",
     reagents: "KMnO₄, CrO₃/H₃O⁺, Ag₂O, or Tollens reagent",
     reagentNote: "Oxidation to carboxylic acid",
@@ -59,7 +62,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Aldehydes are easily oxidized to carboxylic acids.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "engineHandler",
+      type: "customHandler",
       handler: "oxidation",
       options: {
         mode: "aldehydeOxidation",
@@ -70,6 +73,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-hydration",
     family: "aldehydes",
+    reactionType: "addition",
     title: "Aldehyde Hydration",
     reagents: "H₂O, acid or base",
     reagentNote: "Nucleophilic addition of water",
@@ -78,7 +82,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Water adds reversibly to aldehydes to form geminal diols.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "engineHandler",
+      type: "customHandler",
       handler: "addition",
       options: {
         mode: "oneTwoAddition",
@@ -90,6 +94,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-cyanohydrin",
     family: "aldehydes",
+    reactionType: "addition",
     title: "Cyanohydrin Formation",
     reagents: "HCN, NaCN/HCl",
     reagentNote: "CN⁻ addition",
@@ -98,8 +103,8 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Cyanide adds to aldehydes followed by protonation to form cyanohydrins.",
     trigger: aldehydeTrigger,
     transform: {
-    type: "engineHandler",
-    handler: "addition",
+    type: "customHandler",
+      handler: "addition",
     options: {
       mode: "oneTwoAddition",
       nucleophile: "cyanide",
@@ -110,6 +115,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-acetal-formation",
     family: "aldehydes",
+    reactionType: "condensation",
     title: "Acetal Formation",
     reagents: "ROH, H⁺",
     reagentNote: "Acid-catalyzed addition of alcohol",
@@ -126,6 +132,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-imine-formation",
     family: "aldehydes",
+    reactionType: "condensation",
     title: "Imine Formation",
     reagents: "Primary amine, acid catalyst",
     reagentNote: "Condensation with primary amine",
@@ -142,6 +149,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-enamine-formation",
     family: "aldehydes",
+    reactionType: "condensation",
     title: "Enamine Formation",
     reagents: "Secondary amine, acid catalyst",
     reagentNote: "Condensation with secondary amine",
@@ -158,6 +166,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-oxime-formation",
     family: "aldehydes",
+    reactionType: "condensation",
     title: "Oxime Formation",
     reagents: "NH₂OH",
     reagentNote: "Condensation with hydroxylamine",
@@ -166,8 +175,8 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Aldehydes react with hydroxylamine to form oximes.",
     trigger: aldehydeTrigger,
       transform: {
-    type: "engineHandler",
-    handler: "condensation",
+    type: "customHandler",
+      handler: "carbonyl",
     options: {
       mode: "oximeFormation",
     },
@@ -177,6 +186,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-hydrazone-formation",
     family: "aldehydes",
+    reactionType: "condensation",
     title: "Hydrazone Formation",
     reagents: "NH₂NH₂ or substituted hydrazine",
     reagentNote: "Condensation with hydrazine",
@@ -193,6 +203,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-wolff-kishner",
     family: "aldehydes",
+    reactionType: "reduction",
     title: "Wolff-Kishner Reduction",
     reagents: "NH₂NH₂, KOH, heat",
     reagentNote: "Carbonyl to alkane",
@@ -201,7 +212,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Wolff-Kishner reduction converts aldehydes to alkanes under strongly basic conditions.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "engineHandler",
+      type: "customHandler",
       handler: "reduction",
       options: {
         mode: "carbonylToAlkane",
@@ -212,6 +223,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-clemmensen",
     family: "aldehydes",
+    reactionType: "reduction",
     title: "Clemmensen Reduction",
     reagents: "Zn(Hg), HCl",
     reagentNote: "Carbonyl to alkane",
@@ -220,7 +232,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
       "Clemmensen reduction converts aldehydes to alkanes under acidic conditions.",
     trigger: aldehydeTrigger,
     transform: {
-      type: "engineHandler",
+      type: "customHandler",
       handler: "reduction",
       options: {
         mode: "carbonylToAlkane",
@@ -231,6 +243,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-wittig",
     family: "aldehydes",
+    reactionType: "coupling",
     title: "Wittig Reaction",
     reagents: "Ph₃P=CHR",
     reagentNote: "Carbonyl alkene formation",
@@ -247,6 +260,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   {
     id: "aldehyde-cannizzaro",
     family: "aldehydes",
+    reactionType: "oxidation",
     title: "Cannizzaro Reaction",
     reagents: "concentrated NaOH",
     reagentNote: "No alpha hydrogens",

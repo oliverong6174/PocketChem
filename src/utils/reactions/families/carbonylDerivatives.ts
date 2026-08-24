@@ -18,6 +18,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
   {
     id: "carbonyl-reductive-amination",
     family: "carbonyl-derivatives",
+    reactionType: "reduction",
     title: "Reductive Amination",
     reagents: "1) NH₃, RNH₂, or R₂NH  2) NaBH₃CN or NaBH(OAc)₃",
     reagentNote: "C=N formation followed by selective reduction",
@@ -35,6 +36,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
   {
     id: "acetal-acid-hydrolysis",
     family: "carbonyl-derivatives",
+    reactionType: "cleavage",
     title: "Acetal or Ketal Hydrolysis",
     reagents: "aqueous H₃O⁺",
     reagentNote: "Carbonyl deprotection",
@@ -55,6 +57,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
   {
     id: "hemiacetal-equilibration",
     family: "carbonyl-derivatives",
+    reactionType: "cleavage",
     title: "Hemiacetal Hydrolysis",
     reagents: "H₂O, catalytic acid",
     reagentNote: "Reversible carbonyl addition",
@@ -75,6 +78,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
   {
     id: "imine-hydrolysis",
     family: "carbonyl-derivatives",
+    reactionType: "cleavage",
     title: "Imine Hydrolysis",
     reagents: "H₃O⁺, H₂O",
     reagentNote: "Reverse of imine formation",
@@ -87,7 +91,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
       excludedFunctionalGroups: ["Hydrazone", "Aldoxime", "Ketoxime", "Aminoxime"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[N:2]>>[C:1]=O.[N:2]",
     },
     mechanism: "Acid-catalyzed addition–elimination",
@@ -96,6 +100,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
   {
     id: "imine-reduction",
     family: "carbonyl-derivatives",
+    reactionType: "reduction",
     title: "Imine Reduction",
     reagents: "NaBH₄, NaBH₃CN, LiAlH₄, or H₂/catalyst",
     reagentNote: "Reduces C=N to C–N",
@@ -108,7 +113,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
       excludedFunctionalGroups: ["Hydrazone", "Aldoxime", "Ketoxime", "Aminoxime"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[N:2]>>[C:1][N:2]",
     },
     mechanism: "Hydride addition or catalytic hydrogenation",
@@ -117,6 +122,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
   {
     id: "hydrazone-hydrolysis",
     family: "carbonyl-derivatives",
+    reactionType: "cleavage",
     title: "Hydrazone Hydrolysis",
     reagents: "H₃O⁺, H₂O",
     reagentNote: "Regenerates the carbonyl",
@@ -128,7 +134,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
       includeSmarts: ["[CX3]=[NX2][NX3]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[N:2][N:3]>>[C:1]=O.[N:2][N:3]",
     },
     mechanism: "Acid-catalyzed hydrolysis",
@@ -137,6 +143,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
   {
     id: "oxime-hydrolysis",
     family: "carbonyl-derivatives",
+    reactionType: "cleavage",
     title: "Oxime Hydrolysis",
     reagents: "H₃O⁺, H₂O",
     reagentNote: "Regenerates the carbonyl",
@@ -148,7 +155,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
       includeSmarts: ["[CX3]=[NX2][OX2H]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[C:1]=[N:2][O:3]>>[C:1]=O.[N:2][O:3]",
     },
     mechanism: "Acid-catalyzed hydrolysis",
@@ -157,6 +164,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
   {
     id: "enamine-hydrolysis",
     family: "carbonyl-derivatives",
+    reactionType: "cleavage",
     title: "Enamine Hydrolysis",
     reagents: "H₃O⁺, H₂O",
     reagentNote: "Regenerates the carbonyl",
@@ -168,7 +176,7 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
       includeSmarts: ["[NX3][CX3]=[CX3]"],
     },
     transform: {
-      type: "rdkitReactionSmarts",
+      type: "reactionSmarts",
       smarts: "[N:1][C:2]=[C:3]>>[N:1].[C:2](=O)[C:3]",
     },
     mechanism: "Acid-catalyzed hydrolysis",
