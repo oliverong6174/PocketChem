@@ -2,9 +2,9 @@ import type { ParsedMol } from "../types.ts";
 
 import { CHAIN_PREFIXES } from "../constants.ts";
 
-import { orientBranchPathForNaming } from "./branchOrientation";
-import { formatBranchSubstituents } from "./branchPrefixes";
-import { buildAromaticBranchName } from "./branchAromatics";
+import { orientBranchPathForNaming } from "./branchOrientation.ts";
+import { formatBranchSubstituents } from "./branchPrefixes.ts";
+import { buildAromaticBranchName } from "./branchAromatics.ts";
 
 import {
   collectBranchCarbons,

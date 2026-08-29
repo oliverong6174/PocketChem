@@ -9,26 +9,42 @@ function canonicalizeProductSet(productSmiles: string): string {
     .join(".");
 }
 
+/**
+ * Run a reaction SMARTS with one or more structural reactants.
+ *
+ * For multi-reactant rules, `reactantSmiles` must be ordered to match the
+ * reactant templates on the left side of the reaction SMARTS. The rule
+ * matcher is responsible for producing that role order; drawing order in
+ * Ketcher does not matter.
+ */
 export async function runReactionSmarts(
-  reactantSmiles: string,
+  reactantSmiles: string | string[],
   reactionSmarts: string,
   maxProducts = 8
 ): Promise<string[]> {
   const rdkit = await getRDKit();
+  const reactantList = Array.isArray(reactantSmiles)
+    ? reactantSmiles
+    : [reactantSmiles];
 
   let reaction: any = null;
-  let reactant: any = null;
   let molList: any = null;
   let products: any = null;
+  const reactants: any[] = [];
 
   try {
     reaction = rdkit.get_rxn(reactionSmarts);
-    reactant = rdkit.get_mol(reactantSmiles);
-
-    if (!reaction || !reactant) return [];
+    if (!reaction) return [];
 
     molList = new rdkit.MolList();
-    molList.append(reactant);
+
+    for (const smiles of reactantList) {
+      const reactant = rdkit.get_mol(smiles);
+      if (!reactant) return [];
+      reactants.push(reactant);
+      molList.append(reactant);
+    }
+
     products = reaction.run_reactants(molList);
 
     if (
@@ -83,7 +99,7 @@ export async function runReactionSmarts(
   } finally {
     products?.delete?.();
     molList?.delete?.();
-    reactant?.delete?.();
+    for (const reactant of reactants) reactant?.delete?.();
     reaction?.delete?.();
   }
 }

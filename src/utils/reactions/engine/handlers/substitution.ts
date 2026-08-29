@@ -4,7 +4,10 @@ import {
   warnUnsupportedHandlerMode,
 } from "./handlerUtils";
 
-type SubstitutionMode = "alkylHalideSubstitution" | "alcoholToHalide";
+type SubstitutionMode =
+  | "alkylHalideSubstitution"
+  | "alcoholToHalide"
+  | "intermolecularAlcoholDehydration";
 type AlkylHalideNucleophile = "hydroxide" | "cyanide" | "azide" | "ammonia";
 type IncomingHalide = "chloride" | "bromide" | "iodide";
 
@@ -74,6 +77,16 @@ export async function substitution(
     }
 
     return runReactionSmarts(reactantSmiles, alcoholToHalideSmarts[halide]);
+  }
+
+  if (mode === "intermolecularAlcoholDehydration") {
+    // Symmetrical ether formation consumes two molecules of the same
+    // unhindered primary alcohol. The reaction rule is responsible for
+    // restricting this mode to appropriate substrates.
+    return runReactionSmarts(
+      [reactantSmiles, reactantSmiles],
+      "[C:1][O;H1:2].[C:3][O;H1:4]>>[C:1][O:2][C:3]"
+    );
   }
 
   warnUnsupportedHandlerMode("Substitution", options);

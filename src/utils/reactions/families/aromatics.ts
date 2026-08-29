@@ -215,7 +215,7 @@ export const aromaticReactionRules: ReactionRule[] = [
     family: "aromatics",
     reactionType: "oxidation",
     title: "Benzylic Side-Chain Oxidation",
-    reagents: "1) KMnO₄, OH⁻, heat  2) H₃O⁺",
+    reagents: "1) KMnO4, OH⁻, heat  2) H₃O⁺",
     reagentNote: "Requires at least one benzylic hydrogen",
     productHint: "Aromatic carboxylic acid",
     explanation:

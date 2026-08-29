@@ -5,6 +5,7 @@ export type OrganicChemCourse = "ochem-1" | "ochem-2" | "advanced";
 export type ProductGenerationStatus =
   | "computed"
   | "representative"
+  | "generic"
   | "concept-only";
 
 /**
@@ -81,6 +82,13 @@ export type ReactionTrigger = {
   excludeSmarts?: string[];
 };
 
+export type ReactionReactantRequirement = {
+  /** Human-readable role shown when this reactant is missing. */
+  label: string;
+  /** Structural requirements for this additional reactant. */
+  trigger: ReactionTrigger;
+};
+
 export type ReactionRule = {
   id: string;
   family: string;
@@ -94,6 +102,14 @@ export type ReactionRule = {
   productHint: string;
   explanation: string;
   trigger: ReactionTrigger;
+
+  /**
+   * Additional structural reactants required by the rule. The first reactant
+   * is described by `trigger`; these are matched order-independently against
+   * other disconnected structures drawn in Ketcher.
+   */
+  additionalReactants?: ReactionReactantRequirement[];
+
   transform: ReactionTransform;
   priority: number;
 
@@ -129,6 +145,14 @@ export type ReactionPathway = {
   selectivity: string[];
   limitations: string[];
   productStatus: ProductGenerationStatus;
+  reactantComponents: string[];
+  hasGenericReactant: boolean;
+};
+
+export type ReactionComponent = {
+  smiles: string;
+  functionalGroups: FunctionalGroupResult[];
+  isGeneric: boolean;
 };
 
 export type ReactionPredictionInput = {

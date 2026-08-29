@@ -295,32 +295,26 @@ export const alkeneReactionRules: ReactionRule[] = [
 
   {
     id: "cold-kmno4",
-
-
-    reactionType: "oxidation",
     family: "alkenes",
-
+    reactionType: "oxidation",
     title: "Cold Permanganate Oxidation",
-
-    reagents: "KMnO4, OH-, cold",
-
-    reagentNote: "Syn hydroxylation",
-
-    productHint: "Cis diol",
-
+    reagents: "KMnO4, OH⁻, H₂O, cold/dilute",
+    reagentNote: "Syn dihydroxylation",
+    productHint: "Vicinal syn diol",
     explanation:
-        "Cold dilute permanganate adds two hydroxyl groups syn across the alkene.",
-
+      "Cold, dilute permanganate adds two hydroxyl groups syn across an alkene.",
     trigger: alkeneTrigger,
-
     transform: {
-        type: "reactionSmarts",
-        smarts: "[C:1]=[C:2]>>[C:1](O)[C:2](O)"
+      type: "reactionSmarts",
+      smarts: "[C:1]=[C:2]>>[C:1]([OH])[C:2]([OH])",
     },
     productStatus: "representative",
-    selectivity: ["Syn addition"],
-
-    priority: 181
+    mechanism: "Syn dihydroxylation",
+    selectivity: ["Syn addition of the two hydroxyl groups"],
+    limitations: [
+      "The current product graph does not encode newly formed stereocenters explicitly.",
+    ],
+    priority: 181,
   },
 
   {
@@ -384,19 +378,25 @@ export const alkeneReactionRules: ReactionRule[] = [
     id: "alkene-oxidative-cleavage",
     family: "alkenes",
     reactionType: "cleavage",
-    title: "Oxidative Cleavage",
-    reagents: "KMnO₄, heat",
+    title: "Hot Permanganate Oxidative Cleavage",
+    reagents: "1) KMnO4, OH⁻, heat  2) H₃O⁺",
     reagentNote: "Strong oxidative cleavage",
-    productHint: "Oxidized carbonyl products",
+    productHint: "Ketones, carboxylic acids, and/or CO₂",
     explanation:
-      "Hot permanganate cleaves the alkene under strongly oxidative conditions.",
+      "Hot permanganate cleaves the alkene. An alkene carbon with no hydrogen gives a ketone, one bearing a hydrogen gives a carboxylic acid, and a terminal CH₂ carbon is oxidized to CO₂.",
     trigger: alkeneTrigger,
     transform: {
-      type: "conceptOnly",
-      reason: "Hot permanganate gives ketones, carboxylic acids, or carbon dioxide according to the substitution and hydrogen count of each alkene carbon.",
+      type: "customHandler",
+      handler: "oxidation",
+      options: {
+        mode: "alkeneOxidativeCleavage",
+      },
     },
+    productStatus: "computed",
+    mechanism: "Strong oxidative cleavage",
     priority: 210,
   },
+
 
 
   {

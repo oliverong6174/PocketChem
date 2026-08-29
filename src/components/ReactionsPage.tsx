@@ -24,6 +24,7 @@ export default function ReactionsPage({ initialPathways }: Props) {
   const [pathways, setPathways] = useState<ReactionPathway[]>(initialPathways);
   const [reactantSvgs, setReactantSvgs] = useState<SvgMap>({});
   const [productSvgs, setProductSvgs] = useState<SvgMap>({});
+  const [reactionError, setReactionError] = useState<string | null>(null);
 
   useEffect(() => {
     setPathways(initialPathways);
@@ -54,7 +55,20 @@ export default function ReactionsPage({ initialPathways }: Props) {
     async function analyzeReactionMolecule() {
         if (!ketcher) return;
 
-        const smiles = await ketcher.getSmiles();
+        let smiles: string;
+
+        try {
+          smiles = await ketcher.getSmiles();
+        } catch (error) {
+          console.error("Ketcher could not export reaction SMILES:", error);
+          setReactionError(
+            "This Ketcher structure could not be exported as SMILES. For a generic R group, use the pseudoatom R / wildcard atom (*) rather than a full Markush R-group definition."
+          );
+          setPathways([]);
+          return;
+        }
+
+        setReactionError(null);
 
         if (!smiles.trim()) {
             setReactionSmiles("");
@@ -62,20 +76,19 @@ export default function ReactionsPage({ initialPathways }: Props) {
             return;
         }
 
-        if (smiles.includes(".")) {
-          setReactionSmiles(smiles);
-          setPathways([]);
-          alert("Please draw only one molecule at a time for reaction prediction.");
-          return;
-        }
-
         setReactionSmiles(smiles);
 
-        const hierarchy = await analyzeFunctionalGroupHierarchy(smiles);
+        // A dot-separated SMILES represents disconnected structures. The
+        // reaction engine now analyzes each component independently and can
+        // match multi-reactant rules without requiring a second Ketcher.
+        const isMultiReactant = smiles.includes(".");
+        const hierarchy = isMultiReactant
+          ? null
+          : await analyzeFunctionalGroupHierarchy(smiles);
 
         const pathways = await predictReactionPathways(
             smiles,
-            hierarchy.primaryGroups
+            hierarchy?.primaryGroups ?? []
             );
 
             setPathways(pathways);
@@ -88,7 +101,10 @@ export default function ReactionsPage({ initialPathways }: Props) {
       <div className="reaction-ketcher-panel">
         <h3>Reaction Drawer</h3>
         <p className="empty">
-          Draw a molecule here for the reactions workspace.
+          Draw one molecule, or draw multiple disconnected molecules for a multi-reactant reaction. Ketcher exports disconnected structures as dot-separated SMILES (for example, CCO.CC(=O)O).
+        </p>
+        <p className="empty">
+          Generic R groups are accepted as wildcard atoms. For reaction calculations, the safest Ketcher workaround is the pseudoatom R (keyboard r) or a wildcard atom (*), rather than a full Markush R-group definition. PocketChem also normalizes [R], R1, R2, and mapped wildcard forms such as [*:1].
         </p>
 
         <div className="reaction-ketcher-box">
@@ -118,6 +134,7 @@ export default function ReactionsPage({ initialPathways }: Props) {
             onClick={async () => {
               await ketcher?.setMolecule("");
               setReactionSmiles("");
+              setReactionError(null);
               setPathways([]);
             }}
           >
@@ -127,8 +144,11 @@ export default function ReactionsPage({ initialPathways }: Props) {
 
         {reactionSmiles && (
           <p className="empty">
-            Current reaction molecule: <code>{reactionSmiles}</code>
+            Current reaction input: <code>{reactionSmiles}</code>
           </p>
+        )}
+        {reactionError && (
+          <p className="reaction-detail reaction-limitation">{reactionError}</p>
         )}
       </div>
 
@@ -141,7 +161,7 @@ export default function ReactionsPage({ initialPathways }: Props) {
         ) : (
         <>
           <p className="empty">
-            Computed products are drawn when the current molecule is enough to determine them. Concept-only cards identify reactions that need a second reactant, a regioselectivity model, or a polymer/organometallic representation.
+            Computed products are drawn when the structures on the canvas are enough to determine them. Multi-reactant rules use disconnected structures from the same Ketcher canvas; generic wildcard inputs are marked as generic products.
           </p>
 
           <div className="reaction-pathway-list">
@@ -159,9 +179,11 @@ export default function ReactionsPage({ initialPathways }: Props) {
                   <span className={`reaction-status reaction-status-${pathway.productStatus}`}>
                     {pathway.productStatus === "computed"
                       ? "Computed product"
-                      : pathway.productStatus === "representative"
-                        ? "Representative product"
-                        : "Concept only"}
+                      : pathway.productStatus === "generic"
+                        ? "Generic R-group product"
+                        : pathway.productStatus === "representative"
+                          ? "Representative product"
+                          : "Concept only"}
                   </span>
                 </div>
 

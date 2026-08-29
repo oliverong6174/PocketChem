@@ -55,7 +55,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
     family: "aldehydes",
     reactionType: "oxidation",
     title: "Aldehyde Oxidation",
-    reagents: "KMnO₄, CrO₃/H₃O⁺, Ag₂O, or Tollens reagent",
+    reagents: "KMnO4, CrO₃/H₃O⁺, Ag₂O, or Tollens reagent",
     reagentNote: "Oxidation to carboxylic acid",
     productHint: "Carboxylic acid",
     explanation:

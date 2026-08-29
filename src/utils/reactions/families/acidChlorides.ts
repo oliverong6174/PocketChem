@@ -47,15 +47,24 @@ export const acidChlorideReactionRules: ReactionRule[] = [
     family: "acid-chlorides",
     reactionType: "substitution",
     title: "Amidation",
-    reagents: "NH₃ or RNH₂",
-    reagentNote: "Nucleophilic acyl substitution",
+    reagents: "Base as needed",
+    reagentNote: "Draw an acid chloride and NH₃, a primary amine, or a secondary amine",
     productHint: "Amide",
     explanation:
-      "Ammonia and amines convert acid chlorides into amides.",
+      "Ammonia and amines convert acid chlorides into amides by nucleophilic acyl substitution.",
     trigger: acidChlorideTrigger,
+    additionalReactants: [
+      {
+        label: "NH₃, primary amine, or secondary amine",
+        trigger: {
+          includeSmarts: ["[N;H1,H2,H3;!$(N[C,S,P]=O)]"],
+        },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The amine substituent is not specified by the one-molecule reaction drawer.",
+      type: "reactionSmarts",
+      smarts:
+        "[C:1](=[O:2])[Cl,Br,I].[N;H1,H2,H3:3]>>[C:1](=[O:2])[N:3]",
     },
     priority: 1520,
   },

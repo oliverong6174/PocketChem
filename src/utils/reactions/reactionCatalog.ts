@@ -55,6 +55,7 @@ export function getReactionCatalogSummary(
     byProductStatus: {
       computed: 0,
       representative: 0,
+      generic: 0,
       "concept-only": 0,
     },
   };

@@ -101,16 +101,24 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     family: "haloalkanes",
     reactionType: "substitution",
     title: "Williamson Ether Synthesis",
-    reagents: "RO⁻ Na⁺ or RO⁻ K⁺",
-    reagentNote: "Alkoxide SN2 substitution",
+    reagents: "Alkoxide salt",
+    reagentNote: "Draw a methyl/primary alkyl halide and an alkoxide as disconnected structures",
     productHint: "Ether",
     explanation:
       "An alkoxide displaces a leaving group from a methyl or primary alkyl halide to form an ether.",
     trigger: primaryOrMethylHalideTrigger,
+    additionalReactants: [
+      {
+        label: "alkoxide ion",
+        trigger: {
+          includeSmarts: ["[#6,#0][O-]"],
+        },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "The alkoxide carbon group must be specified before an exact ether can be generated.",
+      type: "reactionSmarts",
+      smarts:
+        "[C;X4:1][Cl,Br,I].[#6,#0:2][O-:3]>>[C:1][O+0:3][#6,#0:2]",
     },
     mechanism: "SN2",
     limitations: ["Secondary and tertiary halides favor elimination instead."],
@@ -121,16 +129,24 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     family: "haloalkanes",
     reactionType: "substitution",
     title: "Alkylation with an Acetylide",
-    reagents: "RC≡C⁻ Na⁺",
-    reagentNote: "Carbon-carbon bond formation",
+    reagents: "Acetylide salt",
+    reagentNote: "Draw a methyl/primary alkyl halide and an acetylide ion",
     productHint: "Higher alkyne",
     explanation:
       "An acetylide ion displaces the leaving group from a methyl or primary alkyl halide, forming a new carbon-carbon bond.",
     trigger: primaryOrMethylHalideTrigger,
+    additionalReactants: [
+      {
+        label: "acetylide ion",
+        trigger: {
+          includeSmarts: ["[#6]#[C-]"],
+        },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "The acetylide substituent must be specified before an exact alkyne can be generated.",
+      type: "reactionSmarts",
+      smarts:
+        "[C;X4:1][Cl,Br,I].[#6:2]#[C-:3]>>[C:1][C+0:3]#[C:2]",
     },
     mechanism: "SN2",
     priority: 250,

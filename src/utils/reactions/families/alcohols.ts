@@ -90,10 +90,11 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Under controlled lower-temperature acidic conditions, unhindered primary alcohols can form symmetrical ethers.",
     trigger: primaryAlcoholTrigger,
     transform: {
-      type: "conceptOnly",
-      reason:
-        "This reaction consumes two alcohol molecules, so the one-reactant engine must duplicate the substrate before generating an exact ether.",
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "intermolecularAlcoholDehydration" },
     },
+    productStatus: "computed",
     mechanism: "SN2 after alcohol protonation",
     limitations: ["Most useful for unhindered primary alcohols."],
     priority: 510,
@@ -212,7 +213,7 @@ export const alcoholReactionRules: ReactionRule[] = [
     family: "alcohols",
     reactionType: "oxidation",
     title: "Primary Alcohol Oxidation to a Carboxylic Acid",
-    reagents: "Jones reagent, Na₂Cr₂O₇/H₂SO₄, or hot KMnO₄",
+    reagents: "Jones reagent, Na₂Cr₂O₇/H₂SO₄, or hot KMnO4",
     reagentNote: "Strong aqueous oxidation",
     productHint: "Carboxylic acid",
     explanation:
@@ -235,7 +236,7 @@ export const alcoholReactionRules: ReactionRule[] = [
     family: "alcohols",
     reactionType: "oxidation",
     title: "Secondary Alcohol Oxidation",
-    reagents: "PCC, DMP, Jones reagent, or NaOCl",
+    reagents: "PCC, DMP, Jones reagent, NaOCl, or KMnO4",
     reagentNote: "Oxidation to a ketone",
     productHint: "Ketone",
     explanation:
@@ -277,19 +278,29 @@ export const alcoholReactionRules: ReactionRule[] = [
     family: "alcohols",
     reactionType: "substitution",
     title: "Fischer Esterification",
-    reagents: "Carboxylic acid, catalytic H₂SO₄, heat",
-    reagentNote: "Reversible condensation",
+    reagents: "Catalytic H₂SO₄, heat",
+    reagentNote: "Draw an alcohol and a carboxylic acid as disconnected structures",
     productHint: "Ester",
     explanation:
       "An alcohol and a carboxylic acid equilibrate with an ester and water under acid catalysis.",
-    trigger: alcoholTrigger,
+    trigger: {
+      includeSmarts: ["[#6X4,#0][OX2H1]"],
+    },
+    additionalReactants: [
+      {
+        label: "carboxylic acid",
+        trigger: {
+          includeSmarts: ["[CX3](=O)[OX2H1]"],
+        },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "The carboxylic acid reactant must be specified before an exact ester can be generated.",
+      type: "reactionSmarts",
+      smarts:
+        "[#6X4,#0:1][O;H1:2].[C:3](=[O:4])[O;H1]>>[#6,#0:1][O:2][C:3](=[O:4])",
     },
     mechanism: "Acid-catalyzed nucleophilic acyl substitution",
-    limitations: ["Removing water or using excess reactant drives the equilibrium toward ester."],
+    limitations: ["Reversible; removing water or using excess reactant drives the equilibrium toward ester."],
     priority: 600,
   },
   {
@@ -297,16 +308,26 @@ export const alcoholReactionRules: ReactionRule[] = [
     family: "alcohols",
     reactionType: "substitution",
     title: "Ester Formation with an Acyl Halide",
-    reagents: "Acyl chloride, pyridine or another base",
-    reagentNote: "Nucleophilic acyl substitution",
+    reagents: "Pyridine or another base",
+    reagentNote: "Draw an alcohol and an acyl chloride as disconnected structures",
     productHint: "Ester",
     explanation:
       "An alcohol attacks an acyl halide to form an ester; base neutralizes the hydrogen halide byproduct.",
-    trigger: alcoholTrigger,
+    trigger: {
+      includeSmarts: ["[#6X4,#0][OX2H1]"],
+    },
+    additionalReactants: [
+      {
+        label: "acyl chloride",
+        trigger: {
+          includeSmarts: ["[CX3](=O)[Cl,Br,I]"],
+        },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "The acyl halide reactant must be specified before an exact ester can be generated.",
+      type: "reactionSmarts",
+      smarts:
+        "[#6X4,#0:1][O;H1:2].[C:3](=[O:4])[Cl,Br,I]>>[#6,#0:1][O:2][C:3](=[O:4])",
     },
     mechanism: "Nucleophilic acyl substitution",
     priority: 610,

@@ -6,7 +6,9 @@ export type {
   OrganicChemCourse,
   ProductGenerationStatus,
   ReactionHandlerName,
+  ReactionComponent,
   ReactionPathway,
+  ReactionReactantRequirement,
   ReactionRule,
   ReactionPurpose,
   ReactionTransform,
@@ -24,6 +26,12 @@ export {
   type ReactionCatalogSummary,
 } from "./reactionCatalog";
 export { predictReactionPathwaysFromRules } from "./engine/reactionEngine";
+export {
+  analyzeReactionComponents,
+  isGenericReactionSmiles,
+  normalizeKetcherRGroups,
+  splitReactionComponents,
+} from "./engine/reactionInput";
 
 export async function predictReactionPathways(
   reactantSmiles: string,

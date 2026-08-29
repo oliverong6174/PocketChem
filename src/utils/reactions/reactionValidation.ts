@@ -78,18 +78,37 @@ export function validateReactionRegistry(
       issues.push({ ruleId, message: "Priority must be a finite number." });
     }
 
-    const trigger = rule.trigger;
-    const hasFunctionalGroupTrigger = Boolean(
-      trigger.functionalGroups?.length ||
-        trigger.anyFunctionalGroups?.length ||
-        trigger.allFunctionalGroups?.length
-    );
+    const triggers = [
+      rule.trigger,
+      ...(rule.additionalReactants ?? []).map((item) => item.trigger),
+    ];
 
-    if (!hasFunctionalGroupTrigger) {
-      issues.push({
-        ruleId,
-        message: "Rule has no functional-group trigger.",
-      });
+    for (const [triggerIndex, trigger] of triggers.entries()) {
+      const hasNameTrigger = Boolean(
+        trigger.functionalGroups?.length ||
+          trigger.anyFunctionalGroups?.length ||
+          trigger.allFunctionalGroups?.length
+      );
+      const hasSmartsTrigger = Boolean(
+        trigger.includeSmarts?.length || trigger.excludeSmarts?.length
+      );
+
+      if (!hasNameTrigger && !hasSmartsTrigger) {
+        issues.push({
+          ruleId,
+          message: `${triggerIndex === 0 ? "Primary" : "Additional"} reactant trigger is empty.`,
+        });
+      }
+    }
+
+
+    for (const requirement of rule.additionalReactants ?? []) {
+      if (!requirement.label.trim()) {
+        issues.push({
+          ruleId,
+          message: "Additional reactant label is empty.",
+        });
+      }
     }
 
     if (rule.transform.type === "reactionSmarts") {
@@ -109,6 +128,21 @@ export function validateReactionRegistry(
           ruleId,
           message: "maxProducts must be a positive integer.",
         });
+      }
+
+      if ((rule.additionalReactants?.length ?? 0) > 0) {
+        const reactantTemplateCount = rule.transform.smarts
+          .split(">>", 1)[0]
+          .split(".")
+          .filter(Boolean).length;
+        const requiredReactantCount = 1 + (rule.additionalReactants?.length ?? 0);
+
+        if (reactantTemplateCount !== requiredReactantCount) {
+          issues.push({
+            ruleId,
+            message: `Multi-reactant SMARTS has ${reactantTemplateCount} reactant template(s), but the rule declares ${requiredReactantCount} structural reactant(s).`,
+          });
+        }
       }
     }
 
