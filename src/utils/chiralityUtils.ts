@@ -140,15 +140,18 @@ function findPotentialTetrahedralCentersFromRDKit(
   const candidateAtomIndices: number[] = [];
 
   for (const smarts of candidateSmarts) {
+    let query: any = null;
     try {
-      const query = RDKit.get_qmol(smarts);
+      query = RDKit.get_qmol(smarts);
       const matches = extractAtomMatches(mol.get_substruct_matches(query));
 
       for (const match of matches) {
         candidateAtomIndices.push(...match);
       }
     } catch (error) {
-      console.log("Chirality SMARTS failed:", smarts, error);
+      console.warn("Chirality SMARTS failed:", smarts, error);
+    } finally {
+      query?.delete?.();
     }
   }
 
@@ -765,17 +768,13 @@ export async function analyzeChirality(
 
   if (!mol) return [];
 
-  const parsedMol = parseMolBlock(mol.get_molblock());
+  try {
+    const parsedMol = parseMolBlock(mol.get_molblock());
 
   const potentialCenters = findPotentialTetrahedralCentersFromRDKit(
     RDKit,
     mol,
     parsedMol
-  );
-
-  console.log(
-    "FINAL CHIRALITY CENTERS:",
-    potentialCenters.map((i) => i + 1)
   );
 
   let stereoMap = new Map<number, ChiralityConfiguration>();
@@ -791,7 +790,7 @@ export async function analyzeChirality(
       stereoMap = parseStereoTags(stereoTags);
     }
   } catch (error) {
-    console.log("Could not read RDKit stereo tags:", error);
+    console.warn("Could not read RDKit stereo tags:", error);
   }
 
   const shouldFlipFallback = shouldFlipFallbackAssignments(
@@ -800,7 +799,7 @@ export async function analyzeChirality(
     stereoMap
   );
 
-  return potentialCenters.map((atomIndex) => {
+    return potentialCenters.map((atomIndex) => {
     const atom = parsedMol.atoms[atomIndex];
 
     const rdkitConfiguration =
@@ -862,5 +861,8 @@ export async function analyzeChirality(
       whyChiralExplanation,
       configurationExplanation,
     };
-  });
+    });
+  } finally {
+    mol.delete?.();
+  }
 }

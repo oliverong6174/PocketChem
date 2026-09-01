@@ -16,6 +16,17 @@ function loadRDKitScript(): Promise<void> {
     'script[data-pocketchem-rdkit="true"]',
   );
   if (existing) {
+    if (existing.dataset.loadState === "loaded") {
+      return Promise.reject(
+        new Error("RDKit script loaded without exposing initRDKitModule."),
+      );
+    }
+
+    if (existing.dataset.loadState === "failed") {
+      existing.remove();
+      return loadRDKitScript();
+    }
+
     return new Promise((resolve, reject) => {
       existing.addEventListener("load", () => resolve(), { once: true });
       existing.addEventListener("error", () => reject(new Error(
@@ -30,6 +41,7 @@ function loadRDKitScript(): Promise<void> {
     script.async = true;
     script.dataset.pocketchemRdkit = "true";
     script.onload = () => {
+      script.dataset.loadState = "loaded";
       if (window.initRDKitModule) {
         resolve();
       } else {
@@ -38,9 +50,12 @@ function loadRDKitScript(): Promise<void> {
         ));
       }
     };
-    script.onerror = () => reject(new Error(
-      `Failed to load RDKit_minimal.js from ${script.src}. Check the public/rdkit files.`
-    ));
+    script.onerror = () => {
+      script.dataset.loadState = "failed";
+      reject(new Error(
+        `Failed to load RDKit_minimal.js from ${script.src}. Check the public/rdkit files.`
+      ));
+    };
     document.head.appendChild(script);
   });
 }
@@ -64,6 +79,11 @@ export async function getRDKit() {
     })();
   }
 
-  RDKitModule = await RDKitLoadPromise;
-  return RDKitModule;
+  try {
+    RDKitModule = await RDKitLoadPromise;
+    return RDKitModule;
+  } catch (error) {
+    RDKitLoadPromise = null;
+    throw error;
+  }
 }

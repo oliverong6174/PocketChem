@@ -1,9 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import { Editor } from "ketcher-react";
-import { StandaloneStructServiceProvider } from "ketcher-standalone";
-import "ketcher-react/dist/index.css";
+import {
+  Component,
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ErrorInfo,
+  type ReactNode,
+} from "react";
 
-const structServiceProvider = new StandaloneStructServiceProvider();
+const KetcherEditor = lazy(() => import("./KetcherEditor"));
 
 export type KetcherApi = {
   getSmiles: () => Promise<string>;
@@ -23,6 +30,49 @@ type MoleculeDrawerProps = {
   onReady?: (ketcher: KetcherApi) => void;
   globalKey?: "ketcher" | "reactionKetcher" | "acidBaseKetcher";
 };
+
+type ErrorBoundaryProps = {
+  children: ReactNode;
+  onError: (error: unknown) => void;
+};
+
+type ErrorBoundaryState = { failed: boolean };
+
+class KetcherErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
+  state: ErrorBoundaryState = { failed: false };
+
+  static getDerivedStateFromError(): ErrorBoundaryState {
+    return { failed: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    this.props.onError({ error, info });
+  }
+
+  render() {
+    if (this.state.failed) {
+      return (
+        <div className="ketcher-error" role="alert">
+          The molecule editor could not load. Refresh the page and try again.
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+function KetcherLoadingState() {
+  return (
+    <div className="ketcher-wait" role="status" aria-live="polite">
+      <span className="loading-spinner" aria-hidden="true" />
+      <span>Loading molecule editor…</span>
+    </div>
+  );
+}
 
 let activeKetcherScrollLocks = 0;
 let originalFocus: typeof HTMLElement.prototype.focus | null = null;
@@ -85,70 +135,44 @@ function MoleculeDrawer({
   onReady,
   globalKey = "ketcher",
 }: MoleculeDrawerProps) {
-  const [mounted, setMounted] = useState(false);
   const [ready, setReady] = useState(false);
-  const shellRef = useRef<HTMLDivElement | null>(null);
+  const [failed, setFailed] = useState(false);
+  const apiRef = useRef<KetcherApi | null>(null);
 
   useEffect(() => {
     return installKetcherScrollLock();
   }, []);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setMounted(true);
-    }, 300);
+    return () => {
+      if (window[globalKey] === apiRef.current) {
+        delete window[globalKey];
+      }
+    };
+  }, [globalKey]);
 
-    return () => window.clearTimeout(timer);
+  const handleError = useCallback((error: unknown) => {
+    console.error("Ketcher error:", error);
+    setFailed(true);
   }, []);
 
-  const scrollPageTopOnce = () => {
-    const appScroller = shellRef.current?.closest(".app") as HTMLElement | null;
-
-    appScroller?.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "auto",
-    });
-
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "auto",
-    });
-
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  };
-
-  const handleError = (error: unknown) => {
-    console.error("Ketcher error:", error);
-  };
+  const handleReady = useCallback((api: KetcherApi) => {
+    apiRef.current = api;
+    window[globalKey] = api;
+    onReady?.(api);
+    setFailed(false);
+    setReady(true);
+  }, [globalKey, onReady]);
 
   return (
-    <div className="ketcher-shell" ref={shellRef}>
-      {!ready && <div className="ketcher-badge loading">Ketcher Loading</div>}
+    <div className="ketcher-shell">
+      {!ready && !failed && <div className="ketcher-badge loading">Loading</div>}
 
-      {mounted ? (
-        <Editor
-          staticResourcesUrl=""
-          structServiceProvider={structServiceProvider}
-          errorHandler={handleError}
-          onInit={(ketcher) => {
-            const api = ketcher as KetcherApi;
-
-            window[globalKey] = api;
-            onReady?.(api);
-
-            setReady(true);
-
-            requestAnimationFrame(() => {
-              scrollPageTopOnce();
-            });
-          }}
-        />
-      ) : (
-        <div className="ketcher-wait">Preparing molecule editor...</div>
-      )}
+      <KetcherErrorBoundary onError={handleError}>
+        <Suspense fallback={<KetcherLoadingState />}>
+          <KetcherEditor onError={handleError} onReady={handleReady} />
+        </Suspense>
+      </KetcherErrorBoundary>
     </div>
   );
 }

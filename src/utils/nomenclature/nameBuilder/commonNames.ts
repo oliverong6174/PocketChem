@@ -19,7 +19,7 @@ function normalizeCommonNameKey(value: string) {
     .replace(/γ/g, "gamma")
     .replace(/δ/g, "delta")
     .replace(/[‐‑‒–—−]/g, "-")
-    .replace(/[’′]/g, "\'")
+    .replace(/[’′]/g, "'")
     .replace(/″/g, "\"")
     .replace(/\s+/g, " ")
     .replace(/\s*,\s*/g, ",");

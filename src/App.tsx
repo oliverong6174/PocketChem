@@ -1,14 +1,25 @@
-  import {
+ import {
     getMoleculeAnnotation,
     getHighlightedMoleculeSvg,
     type AnnotationConcept,
     type MoleculeAnnotation,
   } from "./utils/moleculeAnnotation";
-  import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+  import {
+    lazy,
+    Suspense,
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+    type KeyboardEvent as ReactKeyboardEvent,
+  } from "react";
   import MoleculeDrawer from "./components/MoleculeDrawer";
   import {
     analyzeFunctionalGroupHierarchy,
     flattenFunctionalGroupOccurrences,
+    getRDKit,
     type FunctionalGroupResult,
     type FunctionalGroupOccurrence,
   } from "./utils/functionalGroups";
@@ -26,14 +37,12 @@
     type MoleculeIdentityResult,
   } from "./utils/nomenclatureUtils";
 
-  import ReactionsPage from "./components/ReactionsPage";
-  import AcidBasePage from "./components/AcidBasePage";
-  import {
-    predictReactionPathways,
-    type ReactionPathway,
-  } from "./utils/reactionUtils";
+  import type { ReactionPathway } from "./utils/reactionUtils";
 
   import { initializeFunctionalGroups } from "./utils/functionalGroups/bootstrap";
+
+  const ReactionsPage = lazy(() => import("./components/ReactionsPage"));
+  const AcidBasePage = lazy(() => import("./components/AcidBasePage"));
 
 
   type AnnotationCarouselItem =
@@ -60,6 +69,13 @@
     
 
   type AnalysisPanel = "overview" | "groups" | "concepts" | "properties";
+  type AppPage = "analysis" | "acidBase" | "reactions";
+
+  const APP_PAGES: Array<{ id: AppPage; label: string }> = [
+    { id: "analysis", label: "Analysis" },
+    { id: "acidBase", label: "Acid/Base" },
+    { id: "reactions", label: "Reactions" },
+  ];
 
   const ANALYSIS_PANELS: Array<{ id: AnalysisPanel; label: string }> = [
     { id: "overview", label: "Overview" },
@@ -111,6 +127,7 @@
     const analyzeInFlightRef = useRef(false);
     const latestAnalyzeRunRef = useRef(0);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [isMainEditorReady, setIsMainEditorReady] = useState(false);
     const [smiles, setSmiles] = useState("Not analyzed yet");
     const [status, setStatus] = useState("Draw a molecule first");
     const [, setMainGroup] = useState<FunctionalGroupResult | null>(
@@ -143,10 +160,19 @@
     const [moleculeIdentity, setMoleculeIdentity] =
     useState<MoleculeIdentityResult | null>(null);
 
-    const [activePage, setActivePage] = useState<"analysis" | "acidBase" | "reactions">("analysis");
+    const [activePage, setActivePage] = useState<AppPage>("analysis");
     const [analysisPanel, setAnalysisPanel] = useState<AnalysisPanel>("overview");
     const [reactionPathways, setReactionPathways] = useState<ReactionPathway[]>([]);
     const appShellRef = useRef<HTMLElement | null>(null);
+
+    const handleMainEditorReady = useCallback(() => {
+      setIsMainEditorReady(true);
+      window.setTimeout(() => {
+        void getRDKit().catch((error) => {
+          console.warn("RDKit warm-up was deferred after a load failure.", error);
+        });
+      }, 800);
+    }, []);
 
     const scrollToAppTop = () => {
       const activeElement = document.activeElement as HTMLElement | null;
@@ -164,21 +190,35 @@
         behavior: "auto",
       });
 
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
     };
 
-    const switchPage = (page: "analysis" | "acidBase" | "reactions") => {
-      scrollToAppTop();
+    const switchPage = (page: AppPage) => {
       setActivePage(page);
+    };
+
+    const handlePageTabKeyDown = (
+      event: ReactKeyboardEvent<HTMLButtonElement>,
+      currentPage: AppPage,
+    ) => {
+      const currentIndex = APP_PAGES.findIndex((page) => page.id === currentPage);
+      let nextIndex = currentIndex;
+
+      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % APP_PAGES.length;
+      if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + APP_PAGES.length) % APP_PAGES.length;
+      if (event.key === "Home") nextIndex = 0;
+      if (event.key === "End") nextIndex = APP_PAGES.length - 1;
+      if (nextIndex === currentIndex) return;
+
+      event.preventDefault();
+      const nextPage = APP_PAGES[nextIndex].id;
+      switchPage(nextPage);
+      requestAnimationFrame(() => {
+        document.getElementById(`page-tab-${nextPage}`)?.focus();
+      });
     };
 
     useLayoutEffect(() => {
       scrollToAppTop();
-
-      requestAnimationFrame(() => {
-        scrollToAppTop();
-      });
     }, [activePage]);
 
     const PROPERTY_INFO: Record<string, string> = {
@@ -267,97 +307,90 @@
     }
 
     const analyzeMolecule = async () => {
-  if (analyzeInFlightRef.current) {
-    console.warn("Analyze suppressed: analysis already in progress.");
-    return;
-  }
+      if (analyzeInFlightRef.current) return;
 
-  if (!window.ketcher) {
-    setStatus("Molecule editor is still loading. Try again in a second.");
-    return;
-  }
+      const editor = window.ketcher;
+      if (!editor) {
+        setStatus("The molecule editor is still loading.");
+        return;
+      }
 
-  analyzeInFlightRef.current = true;
-  setIsAnalyzing(true);
-  setStatus("Analyzing");
+      const runId = latestAnalyzeRunRef.current + 1;
+      latestAnalyzeRunRef.current = runId;
+      analyzeInFlightRef.current = true;
+      setIsAnalyzing(true);
+      setStatus("Reading the structure…");
 
-  try {
-    const result = await window.ketcher.getSmiles();
-    const currentMolfile = await window.ketcher.getMolfile();
+      try {
+        const [result, currentMolfile] = await Promise.all([
+          editor.getSmiles(),
+          editor.getMolfile(),
+        ]);
+        const safeSmiles = sanitizeDisplayedSmiles(result);
 
-    const safeSmiles = sanitizeDisplayedSmiles(result);
+        if (!safeSmiles) {
+          setSmiles("No molecule detected");
+          setMolfile(null);
+          setStatus("Draw a molecule before analyzing.");
+          return;
+        }
 
-    console.log("SMILES result:", result);
-    console.log("Safe SMILES:", safeSmiles);
-    console.log("MOLFILE result:", currentMolfile);
+        const moleculeSource = currentMolfile || safeSmiles;
+        setSmiles(safeSmiles);
+        setMolfile(currentMolfile);
+        setStatus("Finding groups, orbitals, and stereochemistry…");
 
-    if (!safeSmiles) {
-      setSmiles("No molecule detected");
-      setMolfile(null);
-      setStatus("Draw a molecule before analyzing.");
-      return;
-    }
+        const [annotation, resonance, chirality, hierarchy] = await Promise.all([
+          getMoleculeAnnotation(moleculeSource),
+          analyzeResonance(moleculeSource),
+          analyzeChirality(safeSmiles, currentMolfile),
+          analyzeFunctionalGroupHierarchy(moleculeSource),
+        ]);
 
-    setSmiles(safeSmiles);
-    setMolfile(currentMolfile);
+        if (latestAnalyzeRunRef.current !== runId) return;
 
-    const moleculeSource = currentMolfile || safeSmiles;
+        const detectedFunctionalGroups = hierarchy.functionalGroups ?? [];
+        setMoleculeAnnotation(annotation);
+        setResonanceResults(resonance);
+        setChiralityResults(chirality);
+        setMainGroup(hierarchy.mainGroup ?? detectedFunctionalGroups[0] ?? null);
+        setFunctionalGroups(detectedFunctionalGroups);
+        setStatus("Calculating properties and supported reactions…");
 
-    const annotation = await getMoleculeAnnotation(moleculeSource);
-    setMoleculeAnnotation(annotation);
+        const [pathways, identity] = await Promise.all([
+          import("./utils/reactionUtils").then(({ predictReactionPathways }) =>
+            predictReactionPathways(safeSmiles, detectedFunctionalGroups),
+          ),
+          analyzeNomenclatureAndProperties(
+            safeSmiles,
+            hierarchy.primaryGroups,
+            hierarchy.mainGroup,
+          ).catch((nomenclatureError) => {
+            console.error(
+              "Nomenclature/property analysis failed:",
+              nomenclatureError,
+            );
+            return null;
+          }),
+        ]);
 
-    const resonance = await analyzeResonance(moleculeSource);
-    setResonanceResults(resonance);
-    console.log("Resonance results:", resonance);
+        if (latestAnalyzeRunRef.current !== runId) return;
 
-    const chirality = await analyzeChirality(safeSmiles, currentMolfile);
-    setChiralityResults(chirality);
-    console.log("Chirality results:", chirality);
-
-    const hierarchy = await analyzeFunctionalGroupHierarchy(moleculeSource);
-
-    const detectedFunctionalGroups = hierarchy.functionalGroups ?? [];
-
-    setMainGroup(hierarchy.mainGroup ?? detectedFunctionalGroups[0] ?? null);
-    setFunctionalGroups(detectedFunctionalGroups);
-
-    const pathways = await predictReactionPathways(
-      safeSmiles,
-      detectedFunctionalGroups
-    );
-
-    setReactionPathways(pathways);
-
-    let identity: MoleculeIdentityResult | null = null;
-
-    try {
-      // Use the exact same molecular representation that produced the
-      // functional-group matches. This keeps atom indices / ring topology
-      // synchronized between functional-group detection and nomenclature.
-      identity = await analyzeNomenclatureAndProperties(
-        safeSmiles,
-        hierarchy.primaryGroups,
-        hierarchy.mainGroup
-      );
-    } catch (nomenclatureError) {
-      console.error("Nomenclature/property analysis failed:", nomenclatureError);
-      identity = null;
-    }
-
-    console.log("SMILES leaving App.tsx:", JSON.stringify(safeSmiles));
-
-    setMoleculeIdentity(identity);
-
-    setStatus("Success");
-  } catch (error) {
-    console.error("Analyze error:", error);
-    setStatus("Error");
-  } finally {
-    // Always unlock. Do not condition this on latestAnalyzeRunRef.
-    analyzeInFlightRef.current = false;
-    setIsAnalyzing(false);
-  }
-};
+        setReactionPathways(pathways);
+        setMoleculeIdentity(identity);
+        setStatus("Analysis complete");
+      } catch (error) {
+        console.error("Analyze error:", error);
+        if (latestAnalyzeRunRef.current === runId) {
+          setStatus("Analysis failed. Check the structure and try again.");
+        }
+      } finally {
+        if (latestAnalyzeRunRef.current === runId) {
+          analyzeInFlightRef.current = false;
+          setIsAnalyzing(false);
+        }
+      }
+    };
   
   const getAtomCardClassName = (atom: MoleculeAnnotation["atoms"][number]) => {
     const classes = ["annotation-card"];
@@ -402,7 +435,7 @@
     return classes.join(" ");
   };
 
-  const getVisibleAtomAnnotations = () => {
+  const getVisibleAtomAnnotations = useCallback(() => {
 
     
     if (!moleculeAnnotation) return [];
@@ -448,9 +481,9 @@
     }
 
     return [];
-  };
+  }, [moleculeAnnotation, selectedConcept, selectedHybridization]);
 
-  const getVisibleBondAnnotations = () => {
+  const getVisibleBondAnnotations = useCallback(() => {
     if (!moleculeAnnotation) return [];
 
     if (selectedConcept === "bondOrbitals") {
@@ -461,9 +494,9 @@
     }
 
     return [];
-  };
+  }, [moleculeAnnotation, selectedBondType, selectedConcept]);
 
-  const getHighlightedAtomIndices = () => {
+  const getHighlightedAtomIndices = useCallback(() => {
     const visibleAtomIndices = getVisibleAtomAnnotations().map(
       (atom) => atom.atomIndex
     );
@@ -506,9 +539,18 @@
     }
 
     return Array.from(new Set(visibleAtomIndices));
-  };
+  }, [
+    chiralityResults,
+    functionalGroupOccurrences,
+    getVisibleAtomAnnotations,
+    moleculeAnnotation,
+    resonanceResults,
+    selectedAtomIndex,
+    selectedBondIndex,
+    selectedConcept,
+  ]);
 
-  const getHighlightedBondIndices = () => {
+  const getHighlightedBondIndices = useCallback(() => {
     const visibleBondIndices: number[] = [];
 
     if (selectedConcept === "functionalGroups") {
@@ -538,9 +580,59 @@
     }
 
     return Array.from(new Set(visibleBondIndices));
-  };
+  }, [
+    functionalGroupOccurrences,
+    getVisibleBondAnnotations,
+    resonanceResults,
+    selectedBondIndex,
+    selectedConcept,
+  ]);
 
-  const getSelectedFunctionalGroupAtomIndices = () => {
+  const annotationCarouselItems = useMemo<AnnotationCarouselItem[]>(() => {
+    if (selectedConcept === "resonance") {
+      return resonanceResults.map((resonance) => ({
+        kind: "resonance" as const,
+        resonance,
+      }));
+    }
+
+    if (selectedConcept === "functionalGroups") {
+      return functionalGroupOccurrences.map((functionalGroup) => ({
+        kind: "functionalGroup" as const,
+        functionalGroup,
+      }));
+    }
+
+    if (selectedConcept === "chirality") {
+      return chiralityResults.map((chirality) => ({
+        kind: "chirality" as const,
+        chirality,
+      }));
+    }
+
+    const atomItems = getVisibleAtomAnnotations().map((atom) => ({
+      kind: "atom" as const,
+      atom,
+    }));
+    const bondItems = getVisibleBondAnnotations().map((bond) => ({
+      kind: "bond" as const,
+      bond,
+    }));
+
+    return [...atomItems, ...bondItems];
+  }, [
+    selectedConcept,
+    resonanceResults,
+    chiralityResults,
+    functionalGroupOccurrences,
+    getVisibleAtomAnnotations,
+    getVisibleBondAnnotations,
+  ]);
+
+  const currentAnnotationItem =
+    annotationCarouselItems[annotationCardIndex] ?? null;
+
+  const getSelectedFunctionalGroupAtomIndices = useCallback(() => {
     if (
       selectedConcept !== "functionalGroups" ||
       currentAnnotationItem?.kind !== "functionalGroup"
@@ -549,9 +641,9 @@
     }
 
     return currentAnnotationItem.functionalGroup.atoms;
-  };
+  }, [currentAnnotationItem, selectedConcept]);
 
-  const getSelectedFunctionalGroupBondIndices = () => {
+  const getSelectedFunctionalGroupBondIndices = useCallback(() => {
     if (
       selectedConcept !== "functionalGroups" ||
       currentAnnotationItem?.kind !== "functionalGroup"
@@ -560,9 +652,9 @@
     }
 
     return currentAnnotationItem.functionalGroup.bonds;
-  };
+  }, [currentAnnotationItem, selectedConcept]);
 
-  const getSelectedResonanceAtomIndices = () => {
+  const getSelectedResonanceAtomIndices = useCallback(() => {
     if (
       selectedConcept !== "resonance" ||
       currentAnnotationItem?.kind !== "resonance"
@@ -576,9 +668,9 @@
         ...(currentAnnotationItem.resonance.possibleRadicalSites ?? []),
       ])
     );
-  };
+  }, [currentAnnotationItem, selectedConcept]);
 
-  const getSelectedResonanceBondIndices = () => {
+  const getSelectedResonanceBondIndices = useCallback(() => {
     if (
       selectedConcept !== "resonance" ||
       currentAnnotationItem?.kind !== "resonance"
@@ -589,9 +681,9 @@
     return Array.from(
       new Set(currentAnnotationItem.resonance.resonanceBondIndices ?? [])
     );
-  };
+  }, [currentAnnotationItem, selectedConcept]);
 
-  const getSelectedChiralityAtomIndices = () => {
+  const getSelectedChiralityAtomIndices = useCallback(() => {
     if (
       selectedConcept !== "chirality" ||
       currentAnnotationItem?.kind !== "chirality"
@@ -600,12 +692,14 @@
     }
 
     return [currentAnnotationItem.chirality.atomIndex];
-  };
+  }, [currentAnnotationItem, selectedConcept]);
 
   useEffect(() => {
+    let cancelled = false;
+
     const updateHighlightedSvg = async () => {
       if (!moleculeAnnotation || smiles === "Not analyzed yet") {
-        setHighlightedMoleculeSvg(null);
+        if (!cancelled) setHighlightedMoleculeSvg(null);
         return;
       }
 
@@ -636,10 +730,14 @@
     ]
   );
 
-      setHighlightedMoleculeSvg(svg);
+      if (!cancelled) setHighlightedMoleculeSvg(svg);
     };
 
-    updateHighlightedSvg();
+    void updateHighlightedSvg();
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     moleculeAnnotation,
     smiles,
@@ -651,113 +749,56 @@
     selectedBondIndex,
     resonanceResults,
     annotationCardIndex,
+    getHighlightedAtomIndices,
+    getHighlightedBondIndices,
+    getSelectedChiralityAtomIndices,
+    getSelectedFunctionalGroupAtomIndices,
+    getSelectedFunctionalGroupBondIndices,
+    getSelectedResonanceAtomIndices,
+    getSelectedResonanceBondIndices,
   ]);
 
   useEffect(() => {
     initializeFunctionalGroups();
   }, []);
 
-  const annotationCarouselItems = useMemo<AnnotationCarouselItem[]>(() => {
-    if (selectedConcept === "resonance") {
-      return resonanceResults.map((resonance) => ({
-        kind: "resonance" as const,
-        resonance,
-      }));
-    }
+  useEffect(() => {
+    const nextAtomIndex =
+      currentAnnotationItem?.kind === "atom"
+        ? currentAnnotationItem.atom.atomIndex
+        : null;
+    const nextBondIndex =
+      currentAnnotationItem?.kind === "bond"
+        ? currentAnnotationItem.bond.bondIndex
+        : null;
 
-    if (selectedConcept === "functionalGroups") {
-    return functionalGroupOccurrences.map((functionalGroup) => ({
-      kind: "functionalGroup" as const,
-      functionalGroup,
-    }));
-  }
+    const frame = requestAnimationFrame(() => {
+      setSelectedAtomIndex(nextAtomIndex);
+      setSelectedBondIndex(nextBondIndex);
+    });
 
-    if (selectedConcept === "chirality") {
-    return chiralityResults.map((chirality) => ({
-      kind: "chirality" as const,
-      chirality,
-    }));
-  }
-
-    const atomItems = getVisibleAtomAnnotations().map((atom) => ({
-      kind: "atom" as const,
-      atom,
-    }));
-
-    const bondItems = getVisibleBondAnnotations().map((bond) => ({
-      kind: "bond" as const,
-      bond,
-    }));
-
-    return [...atomItems, ...bondItems];
-  }, [
-    moleculeAnnotation,
-    selectedConcept,
-    selectedHybridization,
-    selectedBondType,
-    resonanceResults,
-    chiralityResults,
-    functionalGroupOccurrences,
-  ]);
-
-  const currentAnnotationItem =
-    annotationCarouselItems[annotationCardIndex] ?? null;
-
-    useEffect(() => {
-    if (!currentAnnotationItem) {
-      setSelectedAtomIndex(null);
-      setSelectedBondIndex(null);
-      return;
-    }
-
-    if (currentAnnotationItem.kind === "atom") {
-      setSelectedAtomIndex(currentAnnotationItem.atom.atomIndex);
-      setSelectedBondIndex(null);
-    }
-
-    if (currentAnnotationItem.kind === "bond") {
-      setSelectedBondIndex(currentAnnotationItem.bond.bondIndex);
-      setSelectedAtomIndex(null);
-    }
-
-    if (currentAnnotationItem.kind === "resonance") {
-      setSelectedAtomIndex(null);
-      setSelectedBondIndex(null);
-    }
-
-    if (currentAnnotationItem.kind === "chirality") {
-    setSelectedAtomIndex(null);
-    setSelectedBondIndex(null);
-    return;
-  }
-
-    if (currentAnnotationItem.kind === "functionalGroup") {
-    setSelectedAtomIndex(null);
-    setSelectedBondIndex(null);
-    return;
-  }
-
+    return () => cancelAnimationFrame(frame);
   }, [currentAnnotationItem]);
 
-  const goToPreviousAnnotationCard = () => {
+  const goToPreviousAnnotationCard = useCallback(() => {
     if (annotationCarouselItems.length === 0) return;
 
     setAnnotationCardIndex((currentIndex) =>
       currentIndex === 0 ? annotationCarouselItems.length - 1 : currentIndex - 1
     );
-  };
+  }, [annotationCarouselItems.length]);
 
-  const goToNextAnnotationCard = () => {
+  const goToNextAnnotationCard = useCallback(() => {
     if (annotationCarouselItems.length === 0) return;
 
     setAnnotationCardIndex((currentIndex) =>
       currentIndex === annotationCarouselItems.length - 1 ? 0 : currentIndex + 1
     );
-  };
+  }, [annotationCarouselItems.length]);
 
   {/* FAST MOLECULE NAVIGATION CLICKER */}
 
-  const jumpToAnnotationItem = (kind: "atom" | "bond", index: number) => {
+  const jumpToAnnotationItem = useCallback((kind: "atom" | "bond", index: number) => {
 
       if (selectedConcept === "functionalGroups") {
     const targetIndex = annotationCarouselItems.findIndex((item) => {
@@ -846,10 +887,11 @@
       setSelectedBondIndex(index);
       setSelectedAtomIndex(null);
     }
-  };
+  }, [annotationCarouselItems, selectedConcept]);
 
   useEffect(() => {
-    setAnnotationCardIndex(0);
+    const frame = requestAnimationFrame(() => setAnnotationCardIndex(0));
+    return () => cancelAnimationFrame(frame);
   }, [selectedConcept, selectedHybridization, selectedBondType, moleculeAnnotation]);
 
   useEffect(() => {
@@ -872,7 +914,11 @@
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [annotationCarouselItems.length]);
+  }, [
+    annotationCarouselItems.length,
+    goToNextAnnotationCard,
+    goToPreviousAnnotationCard,
+  ]);
 
   {/* CLICKER FUNCTION */}
   useEffect(() => {
@@ -919,7 +965,7 @@
     return () => {
       cleanupFunctions.forEach((cleanup) => cleanup());
     };
-  }, [highlightedMoleculeSvg, annotationCarouselItems]);
+  }, [highlightedMoleculeSvg, annotationCarouselItems, jumpToAnnotationItem]);
 
   const renderCurrentAnnotationCard = () => {
     if (!currentAnnotationItem) return null;
@@ -929,6 +975,12 @@
         <div
           className={getAtomCardClassName(currentAnnotationItem.atom)}
           onClick={() => {
+            setSelectedAtomIndex(currentAnnotationItem.atom.atomIndex);
+            setSelectedBondIndex(null);
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            event.preventDefault();
             setSelectedAtomIndex(currentAnnotationItem.atom.atomIndex);
             setSelectedBondIndex(null);
           }}
@@ -989,6 +1041,12 @@
         <div
           className={getBondCardClassName(currentAnnotationItem.bond)}
           onClick={() => {
+            setSelectedBondIndex(currentAnnotationItem.bond.bondIndex);
+            setSelectedAtomIndex(null);
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            event.preventDefault();
             setSelectedBondIndex(currentAnnotationItem.bond.bondIndex);
             setSelectedAtomIndex(null);
           }}
@@ -1122,7 +1180,7 @@
 
   const clearAnalysis = () => {
     analyzeInFlightRef.current = false;
-    latestAnalyzeRunRef.current = 0;
+    latestAnalyzeRunRef.current += 1;
     setIsAnalyzing(false);
 
     setSmiles("Not analyzed yet");
@@ -1145,71 +1203,77 @@
 
   return (
     <main className="app" ref={appShellRef}>
-      <section className="hero">
+      <a className="skip-link" href="#page-panel-analysis">
+        Skip to molecule workspace
+      </a>
+
+      <header className="hero">
         <div>
-          <p className="eyebrow">Multipurpose Organic Chemistry Tool</p>
-          <h1>PocketChem</h1>
+          <div className="brand-row">
+            <h1>PocketChem</h1>
+            <p className="eyebrow">Organic chemistry workspace</p>
+          </div>
           <p className="subtitle">
-            Draw molecules, identify functional groups, understand mechanisms,
-            and connect organic chemistry to biochemistry.
+            Draw, analyze, compare, and predict reactions in one workspace.
           </p>
         </div>
-      </section>
+      </header>
 
-      <div className="page-tabs">
-        <button
-          className={activePage === "analysis" ? "page-tab active" : "page-tab"}
-          onClick={() => switchPage("analysis")}
-          type="button"
-        >
-          Analysis
-        </button>
-
-        <button
-          className={activePage === "acidBase" ? "page-tab active" : "page-tab"}
-          onClick={() => switchPage("acidBase")}
-          type="button"
-        >
-          Acid/Base
-        </button>
-
-        <button
-          className={activePage === "reactions" ? "page-tab active" : "page-tab"}
-          onClick={() => switchPage("reactions")}
-          type="button"
-        >
-          Reactions
-        </button>
-      </div>
+      <nav className="page-tabs" aria-label="PocketChem tools" role="tablist">
+        {APP_PAGES.map((page) => (
+          <button
+            aria-controls={`page-panel-${page.id}`}
+            aria-selected={activePage === page.id}
+            className={activePage === page.id ? "page-tab active" : "page-tab"}
+            id={`page-tab-${page.id}`}
+            key={page.id}
+            onClick={() => switchPage(page.id)}
+            onKeyDown={(event) => handlePageTabKeyDown(event, page.id)}
+            role="tab"
+            tabIndex={activePage === page.id ? 0 : -1}
+            type="button"
+          >
+            {page.label}
+          </button>
+        ))}
+      </nav>
 
       {activePage === "analysis" ? (
-        <section className="workspace workspace-compact">
+        <section
+          aria-labelledby="page-tab-analysis"
+          className="workspace workspace-compact"
+          id="page-panel-analysis"
+          role="tabpanel"
+        >
           <div className="card molecule-card molecule-card-compact">
             <div className="card-header">
               <div>
                 <h2>Molecule Drawer</h2>
                 <p>Draw a molecule, then click Analyze Molecule.</p>
               </div>
-              <span className="status">Draw Mode</span>
+              <span className={`status ${isMainEditorReady ? "ready" : "loading"}`}>
+                {isMainEditorReady ? "Editor ready" : "Loading editor"}
+              </span>
             </div>
 
             <div className="drawer-placeholder drawer-placeholder-compact">
-              <MoleculeDrawer />
+              <MoleculeDrawer onReady={handleMainEditorReady} />
             </div>
 
             <div className="button-row">
               <button
                 className="primary-button"
                 onClick={analyzeMolecule}
-                disabled={isAnalyzing}
+                disabled={isAnalyzing || !isMainEditorReady}
                 type="button"
               >
-                {isAnalyzing ? "Analyzing..." : "Analyze Molecule"}
+                {isAnalyzing ? "Analyzing…" : "Analyze Molecule"}
               </button>
 
               <button
                 className="secondary-button"
                 onClick={clearAnalysis}
+                disabled={isAnalyzing}
                 type="button"
               >
                 Clear Analysis
@@ -1238,7 +1302,7 @@
             <div className="dashboard-mini-grid">
               <div>
                 <p className="label">Status</p>
-                <strong>{status}</strong>
+                <strong aria-live="polite">{status}</strong>
               </div>
 
               <div>
@@ -1264,6 +1328,7 @@
             <div className="dashboard-tab-row">
               {ANALYSIS_PANELS.map((panel) => (
                 <button
+                  aria-pressed={analysisPanel === panel.id}
                   key={panel.id}
                   className={
                     analysisPanel === panel.id
@@ -1415,6 +1480,7 @@
                     <div className="concept-button-row compact-concept-grid">
                       {CONCEPT_OPTIONS.map((concept) => (
                         <button
+                          aria-pressed={selectedConcept === concept.id}
                           key={concept.id}
                           className={
                             selectedConcept === concept.id
@@ -1438,6 +1504,7 @@
                         {(["all", "sp", "sp2", "sp3"] as const).map(
                           (hybridization) => (
                             <button
+                              aria-pressed={selectedHybridization === hybridization}
                               key={hybridization}
                               className={
                                 selectedHybridization === hybridization
@@ -1461,6 +1528,7 @@
                         {(["all", "single", "double", "triple"] as const).map(
                           (bondType) => (
                             <button
+                              aria-pressed={selectedBondType === bondType}
                               key={bondType}
                               className={
                                 selectedBondType === bondType
@@ -1763,10 +1831,21 @@
             </div>
           </div>
         </section>
-      ) : activePage === "acidBase" ? (
-        <AcidBasePage />
       ) : (
-        <ReactionsPage initialPathways={reactionPathways} />
+        <section
+          aria-labelledby={`page-tab-${activePage}`}
+          className="page-panel"
+          id={`page-panel-${activePage}`}
+          role="tabpanel"
+        >
+          <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
+            {activePage === "acidBase" ? (
+              <AcidBasePage />
+            ) : (
+              <ReactionsPage initialPathways={reactionPathways} />
+            )}
+          </Suspense>
+        </section>
       )}
     </main>
   );

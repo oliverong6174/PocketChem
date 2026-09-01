@@ -16,7 +16,10 @@ import {
   isGenericReactionSmiles,
 } from "./reactionInput";
 import { runReactionSmarts } from "./rdkitReaction";
-import { matchAllRuleReactants, ruleMatchesReactant } from "./ruleMatcher";
+import {
+  filterRulesMatchingReactant,
+  matchAllRuleReactants,
+} from "./ruleMatcher";
 
 type RuleExecution = {
   products: string[];
@@ -336,10 +339,13 @@ export async function predictReactionPathwaysFromRules(
   const missingMulti: Array<{ rule: ReactionRule; reactant: ReactionComponent }> = [];
 
   for (const component of components) {
-    for (const rule of rules) {
-      if (!(await ruleMatchesReactant(rule, component.smiles, component.functionalGroups))) {
-        continue;
-      }
+    const componentRules = await filterRulesMatchingReactant(
+      rules,
+      component.smiles,
+      component.functionalGroups,
+    );
+
+    for (const rule of componentRules) {
 
       if ((rule.additionalReactants?.length ?? 0) > 0) {
         if (components.length === 1) missingMulti.push({ rule, reactant: component });

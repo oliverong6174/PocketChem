@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
@@ -11,7 +11,6 @@ import {
   type ReactionPathway,
   type RetrosynthesisPathway,
 } from "../utils/reactionUtils";
-import "ketcher-react/dist/index.css";
 
 type Props = {
   initialPathways: ReactionPathway[];
@@ -19,6 +18,7 @@ type Props = {
 
 type SvgListMap = Record<string, string[]>;
 type AnalysisMode = "forward" | "retrosynthesis";
+const RESULTS_PER_BATCH = 12;
 
 function courseLabel(course: ReactionPathway["course"]) {
   return course === "ochem-1"
@@ -39,17 +39,28 @@ export default function ReactionsPage({ initialPathways }: Props) {
   const [retroTargetSvgs, setRetroTargetSvgs] = useState<SvgListMap>({});
   const [retroPrecursorSvgs, setRetroPrecursorSvgs] = useState<SvgListMap>({});
   const [reactionError, setReactionError] = useState<string | null>(null);
+  const [reactionStatus, setReactionStatus] = useState("Draw a structure to begin.");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [visibleResultCount, setVisibleResultCount] = useState(RESULTS_PER_BATCH);
+  const analysisRunRef = useRef(0);
+
+  const visiblePathways = useMemo(
+    () => pathways.slice(0, visibleResultCount),
+    [pathways, visibleResultCount],
+  );
+  const visibleRetroPathways = useMemo(
+    () => retroPathways.slice(0, visibleResultCount),
+    [retroPathways, visibleResultCount],
+  );
 
   useEffect(() => {
-    setPathways(initialPathways);
-  }, [initialPathways]);
+    let cancelled = false;
 
-  useEffect(() => {
     async function buildSvgs() {
       const nextReactants: SvgListMap = {};
       const nextProducts: SvgListMap = {};
 
-      for (const pathway of pathways) {
+      for (const pathway of visiblePathways) {
         const reactantComponents = pathway.reactantComponents.length > 0
           ? pathway.reactantComponents
           : pathway.reactantSmiles.split(".").filter(Boolean);
@@ -76,19 +87,27 @@ export default function ReactionsPage({ initialPathways }: Props) {
         }
       }
 
-      setReactantSvgs(nextReactants);
-      setProductSvgs(nextProducts);
+      if (!cancelled) {
+        setReactantSvgs(nextReactants);
+        setProductSvgs(nextProducts);
+      }
     }
 
     void buildSvgs();
-  }, [pathways]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [visiblePathways]);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function buildRetroSvgs() {
       const nextTargets: SvgListMap = {};
       const nextPrecursors: SvgListMap = {};
 
-      for (const pathway of retroPathways) {
+      for (const pathway of visibleRetroPathways) {
         const targetComponents = pathway.targetSmiles
           .split(".")
           .map((component) => component.trim())
@@ -109,12 +128,18 @@ export default function ReactionsPage({ initialPathways }: Props) {
         ).filter((svg): svg is string => Boolean(svg));
       }
 
-      setRetroTargetSvgs(nextTargets);
-      setRetroPrecursorSvgs(nextPrecursors);
+      if (!cancelled) {
+        setRetroTargetSvgs(nextTargets);
+        setRetroPrecursorSvgs(nextPrecursors);
+      }
     }
 
     void buildRetroSvgs();
-  }, [retroPathways]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [visibleRetroPathways]);
 
   async function getDrawerSmiles(): Promise<string | null> {
     if (!ketcher) return null;
@@ -133,48 +158,85 @@ export default function ReactionsPage({ initialPathways }: Props) {
   }
 
   async function analyzeReactionMolecule(mode: AnalysisMode) {
-    const smiles = await getDrawerSmiles();
-    if (smiles === null) return;
+    if (isAnalyzing) return;
 
+    const runId = analysisRunRef.current + 1;
+    analysisRunRef.current = runId;
+    setIsAnalyzing(true);
     setReactionError(null);
-    setAnalysisMode(mode);
-
-    if (!smiles.trim()) {
-      setReactionSmiles("");
-      setPathways([]);
-      setRetroPathways([]);
-      return;
-    }
-
-    setReactionSmiles(smiles);
-
-    if (mode === "retrosynthesis") {
-      setPathways([]);
-      setRetroPathways(await predictRetrosynthesisPathways(smiles));
-      return;
-    }
-
-    setRetroPathways([]);
-
-    // A dot-separated SMILES represents disconnected structures. The forward
-    // engine analyzes each component independently and can match multi-reactant
-    // rules without requiring a second Ketcher.
-    const isMultiReactant = smiles.includes(".");
-    const hierarchy = isMultiReactant
-      ? null
-      : await analyzeFunctionalGroupHierarchy(smiles);
-
-    setPathways(
-      await predictReactionPathways(smiles, hierarchy?.primaryGroups ?? []),
+    setReactionStatus(
+      mode === "retrosynthesis"
+        ? "Searching and forward-checking precursor routes…"
+        : "Matching the reaction catalog and generating products…",
     );
+
+    try {
+      const smiles = await getDrawerSmiles();
+      if (smiles === null || analysisRunRef.current !== runId) return;
+
+      setAnalysisMode(mode);
+      setVisibleResultCount(RESULTS_PER_BATCH);
+
+      if (!smiles.trim()) {
+        setReactionSmiles("");
+        setPathways([]);
+        setRetroPathways([]);
+        setReactionStatus("Draw a structure before predicting reactions.");
+        return;
+      }
+
+      setReactionSmiles(smiles);
+
+      if (mode === "retrosynthesis") {
+        const results = await predictRetrosynthesisPathways(smiles);
+        if (analysisRunRef.current !== runId) return;
+        setPathways([]);
+        setRetroPathways(results);
+        setReactionStatus(
+          results.length > 0
+            ? `${results.length} verified precursor route${results.length === 1 ? "" : "s"} found.`
+            : "No verified precursor routes were found.",
+        );
+        return;
+      }
+
+      const isMultiReactant = smiles.includes(".");
+      const hierarchy = isMultiReactant
+        ? null
+        : await analyzeFunctionalGroupHierarchy(smiles);
+      const results = await predictReactionPathways(
+        smiles,
+        hierarchy?.primaryGroups ?? [],
+      );
+
+      if (analysisRunRef.current !== runId) return;
+      setRetroPathways([]);
+      setPathways(results);
+      setReactionStatus(
+        results.length > 0
+          ? `${results.length} supported reaction${results.length === 1 ? "" : "s"} found.`
+          : "No supported reactions were found.",
+      );
+    } catch (error) {
+      console.error("Reaction analysis failed:", error);
+      if (analysisRunRef.current === runId) {
+        setReactionStatus("Reaction analysis failed. Check the structure and try again.");
+      }
+    } finally {
+      if (analysisRunRef.current === runId) setIsAnalyzing(false);
+    }
   }
 
   async function clearAnalysis() {
+    analysisRunRef.current += 1;
     await ketcher?.setMolecule("");
     setReactionSmiles("");
     setReactionError(null);
     setPathways([]);
     setRetroPathways([]);
+    setIsAnalyzing(false);
+    setVisibleResultCount(RESULTS_PER_BATCH);
+    setReactionStatus("Draw a structure to begin.");
   }
 
   return (
@@ -197,27 +259,34 @@ export default function ReactionsPage({ initialPathways }: Props) {
         <div className="reaction-ketcher-box">
           <MoleculeDrawer
             globalKey="reactionKetcher"
-            onReady={(api) => setKetcher(api)}
+            onReady={setKetcher}
           />
         </div>
 
         <div className="reaction-actions">
           <button
             className="primary-button"
+            disabled={!ketcher || isAnalyzing}
             onClick={() => void analyzeReactionMolecule("forward")}
           >
-            Predict Products
+            {isAnalyzing && analysisMode === "forward"
+              ? "Predicting…"
+              : "Predict Products"}
           </button>
 
           <button
             className="primary-button"
+            disabled={!ketcher || isAnalyzing}
             onClick={() => void analyzeReactionMolecule("retrosynthesis")}
           >
-            Predict Reactants
+            {isAnalyzing && analysisMode === "retrosynthesis"
+              ? "Searching…"
+              : "Predict Reactants"}
           </button>
 
           <button
             className="secondary-button"
+            disabled={!ketcher || isAnalyzing}
             onClick={() => void clearAnalysis()}
           >
             Clear Analysis
@@ -235,15 +304,19 @@ export default function ReactionsPage({ initialPathways }: Props) {
         {reactionError && (
           <p className="reaction-detail reaction-limitation">{reactionError}</p>
         )}
+        <p className="reaction-progress" aria-live="polite">
+          {isAnalyzing && <span className="loading-spinner" aria-hidden="true" />}
+          {reactionStatus}
+        </p>
       </div>
 
       {analysisMode === "forward" ? (
         pathways.length === 0 ? (
-          <p className="empty">
-            {reactionSmiles
-              ? "No supported reactions found yet for this molecule."
-              : "Draw and analyze a molecule first."}
-          </p>
+          reactionSmiles ? (
+            <p className="empty">
+              No supported reactions found yet for this molecule.
+            </p>
+          ) : null
         ) : (
           <>
             <p className="empty">
@@ -253,7 +326,7 @@ export default function ReactionsPage({ initialPathways }: Props) {
             </p>
 
             <div className="reaction-pathway-list">
-              {pathways.map((pathway) => (
+              {visiblePathways.map((pathway) => (
                 <div className="reaction-pathway-card" key={pathway.id}>
                   <div className="reaction-card-heading">
                     <div>
@@ -344,14 +417,30 @@ export default function ReactionsPage({ initialPathways }: Props) {
                 </div>
               ))}
             </div>
+            {visiblePathways.length < pathways.length && (
+              <button
+                className="secondary-button load-more-button"
+                onClick={() =>
+                  setVisibleResultCount((count) => count + RESULTS_PER_BATCH)
+                }
+                type="button"
+              >
+                Show{" "}
+                {Math.min(
+                  RESULTS_PER_BATCH,
+                  pathways.length - visiblePathways.length,
+                )}{" "}
+                more reactions
+              </button>
+            )}
           </>
         )
       ) : retroPathways.length === 0 ? (
-        <p className="empty">
-          {reactionSmiles
-            ? "No forward-verified precursor sets were found from the current reaction catalog."
-            : "Draw a target product, then choose Predict Reactants."}
-        </p>
+        reactionSmiles ? (
+          <p className="empty">
+            No forward-verified precursor sets were found from the current reaction catalog.
+          </p>
+        ) : null
       ) : (
         <>
           <p className="empty">
@@ -362,7 +451,7 @@ export default function ReactionsPage({ initialPathways }: Props) {
           </p>
 
           <div className="reaction-pathway-list">
-            {retroPathways.map((pathway) => (
+            {visibleRetroPathways.map((pathway) => (
               <div className="reaction-pathway-card" key={pathway.id}>
                 <div className="reaction-card-heading">
                   <div>
@@ -464,6 +553,22 @@ export default function ReactionsPage({ initialPathways }: Props) {
               </div>
             ))}
           </div>
+          {visibleRetroPathways.length < retroPathways.length && (
+            <button
+              className="secondary-button load-more-button"
+              onClick={() =>
+                setVisibleResultCount((count) => count + RESULTS_PER_BATCH)
+              }
+              type="button"
+            >
+              Show{" "}
+              {Math.min(
+                RESULTS_PER_BATCH,
+                retroPathways.length - visibleRetroPathways.length,
+              )}{" "}
+              more routes
+            </button>
+          )}
         </>
       )}
     </section>

@@ -19,11 +19,6 @@ function chooseBestDisplayMatch(
     )
     .sort((a, b) => b.atoms.length - a.atoms.length);
 
-    console.log("DISPLAY MATCH CHOICE", {
-        detectionMatch,
-        displayMatches,
-      });
-
   return subsetMatches[0] ?? detectionMatch;
 }
 

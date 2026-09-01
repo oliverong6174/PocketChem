@@ -43,7 +43,6 @@ import {
   compareCipSubstituentResults,
   type CipSubstituentPriorityResult,
 } from "../utils/ranking/cipPriority";
-import "ketcher-react/dist/index.css";
 
 type RankingMode =
   | "acidity"
@@ -594,7 +593,7 @@ export default function AcidBasePage() {
           <div className="acid-base-ketcher-box">
             <MoleculeDrawer
               globalKey="acidBaseKetcher"
-              onReady={(api) => setKetcher(api)}
+              onReady={setKetcher}
             />
           </div>
 
@@ -602,7 +601,7 @@ export default function AcidBasePage() {
             <button
               className="primary-button"
               onClick={analyzeAcidBaseMolecule}
-              disabled={isAnalyzing}
+              disabled={isAnalyzing || !ketcher}
             >
               {isAnalyzing ? "Analyzing..." : "Analyze Acid/Base"}
             </button>
@@ -610,7 +609,7 @@ export default function AcidBasePage() {
             <button
               className="secondary-button"
               onClick={addCurrentMoleculeToComparison}
-              disabled={isAnalyzing}
+              disabled={isAnalyzing || !ketcher || comparisonMolecules.length >= 5}
             >
               Add to Comparison
             </button>
@@ -618,7 +617,7 @@ export default function AcidBasePage() {
             <button
               className="secondary-button"
               onClick={clearAcidBaseWorkspace}
-              disabled={isAnalyzing}
+              disabled={isAnalyzing || !ketcher}
             >
               Clear Molecule
             </button>
@@ -631,6 +630,11 @@ export default function AcidBasePage() {
               Clear Comparison
             </button>
           </div>
+
+          <p className="reaction-progress" aria-live="polite">
+            {isAnalyzing && <span className="loading-spinner" aria-hidden="true" />}
+            {status}
+          </p>
 
           <div className="analysis-section">
             <p className="label">SMILES</p>

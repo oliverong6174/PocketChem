@@ -62,15 +62,6 @@ export async function analyzeFunctionalGroupHierarchy(
           finalMatches
         );
 
-        if (group.name === "Ketone") {
-          console.log("KETONE MATCH DEBUG", {
-            smarts: group.smarts,
-            displaySmarts: group.displaySmarts,
-            finalMatches,
-            displayMatches,
-          });
-        }
-
       if (finalMatches.length > 0) {
         detectedGroups.push({
           name: group.name,

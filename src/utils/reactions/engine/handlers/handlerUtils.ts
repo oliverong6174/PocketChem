@@ -16,6 +16,16 @@ export function readStringOption<T extends string>(
 export function readPositiveIntegerOption(
   options: Record<string, unknown> | undefined,
   key: string,
+  fallback: number
+): number;
+export function readPositiveIntegerOption(
+  options: Record<string, unknown> | undefined,
+  key: string,
+  fallback?: undefined
+): number | undefined;
+export function readPositiveIntegerOption(
+  options: Record<string, unknown> | undefined,
+  key: string,
   fallback?: number
 ): number | undefined {
   const value = options?.[key];

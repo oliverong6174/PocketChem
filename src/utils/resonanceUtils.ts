@@ -517,11 +517,12 @@ export async function analyzeResonance(
 
   if (!mol) return [];
 
-  const results: ResonanceResult[] = [];
-  const seen = new Set<string>();
-  const molblock = mol.get_molblock();
-  const parsedMol = parseMolBlock(molblock);
-  const radicalAtomIndices = getRadicalAtomIndicesFromMolBlock(molblock);
+  try {
+    const results: ResonanceResult[] = [];
+    const seen = new Set<string>();
+    const molblock = mol.get_molblock();
+    const parsedMol = parseMolBlock(molblock);
+    const radicalAtomIndices = getRadicalAtomIndicesFromMolBlock(molblock);
 
   const radicalResults = findAllylicRadicalResults(
     parsedMol,
@@ -537,32 +538,40 @@ for (const radicalResult of radicalResults) {
   results.push(radicalResult);
 }
 
-  for (const rule of RESONANCE_RULES) {
-    const query = RDKit.get_qmol(rule.siteSmarts);
-    const matches = extractAtomMatches(mol.get_substruct_matches(query));
+    for (const rule of RESONANCE_RULES) {
+      let query: any = null;
+      try {
+        query = RDKit.get_qmol(rule.siteSmarts);
+        const matches = extractAtomMatches(mol.get_substruct_matches(query));
 
-    for (const matchedAtoms of matches) {
-      const key = makeResultKey(rule.type, matchedAtoms);
+        for (const matchedAtoms of matches) {
+          const key = makeResultKey(rule.type, matchedAtoms);
 
-      if (seen.has(key)) continue;
-      seen.add(key);
+          if (seen.has(key)) continue;
+          seen.add(key);
 
-      results.push({
-        type: rule.type,
-        siteLabel: rule.siteLabel,
-        siteSmarts: rule.siteSmarts,
-        matchedAtoms,
-        isResonanceStabilized: rule.stabilizationStrength !== "none",
-        stabilizationStrength: rule.stabilizationStrength,
-        pkaShiftHint: rule.pkaShiftHint,
-        explanation: rule.explanation,
-        forms: rule.forms,
-        resonanceBondIndices: getBondIndicesAmongAtoms(parsedMol, matchedAtoms),
-      });
+          results.push({
+            type: rule.type,
+            siteLabel: rule.siteLabel,
+            siteSmarts: rule.siteSmarts,
+            matchedAtoms,
+            isResonanceStabilized: rule.stabilizationStrength !== "none",
+            stabilizationStrength: rule.stabilizationStrength,
+            pkaShiftHint: rule.pkaShiftHint,
+            explanation: rule.explanation,
+            forms: rule.forms,
+            resonanceBondIndices: getBondIndicesAmongAtoms(parsedMol, matchedAtoms),
+          });
+        }
+      } finally {
+        query?.delete?.();
+      }
     }
-  }
 
-  return results;
+    return results;
+  } finally {
+    mol.delete?.();
+  }
 }
 
 export function hasResonanceType(

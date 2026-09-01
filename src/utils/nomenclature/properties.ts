@@ -497,7 +497,7 @@ export function buildProperties(
     "molwt",
   ]);
 
-  let hbd = getNumberDescriptor(descriptors, [
+  const hbd = getNumberDescriptor(descriptors, [
     "lipinskiHBD",
     "NumHDonors",
     "hbd",

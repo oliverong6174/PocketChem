@@ -127,30 +127,6 @@ export function getAlcoholBearingCarbons(parsedMol: ParsedMol) {
   return Array.from(new Set(alcoholCarbons));
 }
 
-function getHeteroatomAttachedCarbons(
-  parsedMol: ParsedMol,
-  element: "N" | "O" | "S"
-) {
-  const carbons: number[] = [];
-
-  for (const heteroAtom of parsedMol.atoms.filter(
-    (atom) => atom.element === element
-  )) {
-    for (const bond of parsedMol.adjacency.get(heteroAtom.atomIndex) ?? []) {
-      if (bond.bondOrder !== 1) continue;
-
-      const carbonIndex = getOtherAtom(bond, heteroAtom.atomIndex);
-      const carbon = parsedMol.atoms[carbonIndex];
-
-      if (carbon?.element === "C") {
-        carbons.push(carbonIndex);
-      }
-    }
-  }
-
-  return Array.from(new Set(carbons));
-}
-
 export function getThiolBearingCarbons(parsedMol: ParsedMol) {
   const carbons: number[] = [];
 

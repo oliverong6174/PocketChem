@@ -241,18 +241,18 @@ function getShortestBondDistance(
   return null;
 }
 
-async function getCarbanionAtomIndices(smiles: string): Promise<number[]> {
-  const RDKit = await getRDKit();
-  const mol = RDKit.get_mol(smiles);
-
-  if (!mol) return [];
-
+function getCarbanionAtomIndices(RDKit: any, mol: any): number[] {
   const query = RDKit.get_qmol("[#6-]");
-  const matches = extractAtomMatches(mol.get_substruct_matches(query));
+  if (!query) return [];
 
-  return matches
-    .map((match) => match[0])
-    .filter((atomIndex) => typeof atomIndex === "number");
+  try {
+    const matches = extractAtomMatches(mol.get_substruct_matches(query));
+    return matches
+      .map((match) => match[0])
+      .filter((atomIndex) => typeof atomIndex === "number");
+  } finally {
+    query.delete?.();
+  }
 }
 
 export async function analyzeCarbanionStability(
@@ -263,18 +263,13 @@ export async function analyzeCarbanionStability(
 
   if (!mol) return [];
 
-  const carbanionAtomIndices = await getCarbanionAtomIndices(smiles);
-  const results: CarbanionStabilityResult[] = [];
-  const parsedMol = parseMolBlock(mol.get_molblock());
+  try {
+    const carbanionAtomIndices = getCarbanionAtomIndices(RDKit, mol);
+    const results: CarbanionStabilityResult[] = [];
+    const parsedMol = parseMolBlock(mol.get_molblock());
 
   for (const chargedAtomIndex of carbanionAtomIndices) {
     const substitution = getCarbanionSubstitutionFromMol(mol, chargedAtomIndex);    
-    console.log("CARBANION SUBSTITUTION DEBUG:", {
-        smiles,
-        chargedAtomIndex,
-        substitution,
-        });
-
     let bestResult: CarbanionStabilityResult = {
       chargedAtomIndex,
       nearestStabilizer: null,
@@ -307,7 +302,10 @@ export async function analyzeCarbanionStability(
 
     for (const stabilizer of STABILIZER_RULES) {
       const query = RDKit.get_qmol(stabilizer.smarts);
-      const matches = extractAtomMatches(mol.get_substruct_matches(query));
+      if (!query) continue;
+
+      try {
+        const matches = extractAtomMatches(mol.get_substruct_matches(query));
 
       for (const match of matches) {
         const stabilizerAtomIndex = match[stabilizer.atomIndexInMatch];
@@ -368,13 +366,19 @@ export async function analyzeCarbanionStability(
             ? `This carbanion is alpha to a ${stabilizer.label}, so the negative charge can be resonance-stabilized. Resonance stabilization overrides substitution effects in this ranking.`
             : bestResult.explanation,
         };
+        }
+      } finally {
+        query.delete?.();
       }
     }
 
     results.push(bestResult);
   }
 
-  return results;
+    return results;
+  } finally {
+    mol.delete?.();
+  }
 }
 
 export function getBestCarbanionStabilityResult(
@@ -398,4 +402,3 @@ export function getBestCarbanionStabilityResult(
     return a.distance - b.distance;
   })[0];
 }
-

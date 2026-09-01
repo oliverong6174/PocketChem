@@ -30,13 +30,13 @@ export function normalizeKetcherRGroups(smiles: string): string {
   });
 
   normalized = normalized.replace(
-    /(^|[.()=#+\-])R(\d+)(?=$|[.()=#+\-])/g,
+    /(^|[.()=#+-])R(\d+)(?=$|[.()=#+-])/g,
     (_match, prefix: string, number: string) =>
       `${prefix}[*:${allocateMap(number)}]`
   );
 
   normalized = normalized.replace(
-    /(^|[.()=#+\-])R(?=$|[.()=#+\-])/g,
+    /(^|[.()=#+-])R(?=$|[.()=#+-])/g,
     (_match, prefix: string) => `${prefix}[*:${allocateMap()}]`
   );
 

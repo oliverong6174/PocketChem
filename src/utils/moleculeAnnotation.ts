@@ -445,7 +445,8 @@ export async function getMoleculeAnnotation(
     return { atoms: [], bonds: [] };
   }
 
-  const parsedMol = parseMolBlock(mol.get_molblock());
+  try {
+    const parsedMol = parseMolBlock(mol.get_molblock());
 
   const atoms: AtomAnnotation[] = parsedMol.atoms.map((atom) => {
   const hybridization = inferHybridization(parsedMol, atom);
@@ -494,7 +495,10 @@ const bonds: BondAnnotation[] = parsedMol.bonds.map((bond) => {
   };
 });
 
-  return { atoms, bonds };
+    return { atoms, bonds };
+  } finally {
+    mol.delete?.();
+  }
 }
 
 export async function getHighlightedMoleculeSvg(
@@ -576,7 +580,9 @@ export async function getHighlightedMoleculeSvg(
   try {
     return mol.get_svg_with_highlights(JSON.stringify(highlightDetails));
   } catch (error) {
-    console.log("Highlighted SVG failed:", error);
+    console.warn("Highlighted SVG failed; using the standard drawing.", error);
     return mol.get_svg();
+  } finally {
+    mol.delete?.();
   }
 }
