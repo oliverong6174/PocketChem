@@ -15,6 +15,7 @@ const KetcherEditor = lazy(() => import("./KetcherEditor"));
 export type KetcherApi = {
   getSmiles: () => Promise<string>;
   getMolfile: () => Promise<string>;
+  getKet: () => Promise<string>;
   setMolecule: (structure: string) => Promise<void>;
 };
 
@@ -23,12 +24,18 @@ declare global {
     ketcher?: KetcherApi;
     reactionKetcher?: KetcherApi;
     acidBaseKetcher?: KetcherApi;
+    synthesisReactantKetcher?: KetcherApi;
+    synthesisProductKetcher?: KetcherApi;
   }
 }
 
 type MoleculeDrawerProps = {
   onReady?: (ketcher: KetcherApi) => void;
-  globalKey?: "ketcher" | "reactionKetcher" | "acidBaseKetcher";
+  /**
+   * Optional debug/global handle. Synthesis can create dynamic additional
+   * reactant editors, so this intentionally accepts a unique string key.
+   */
+  globalKey?: string;
 };
 
 type ErrorBoundaryProps = {
@@ -145,20 +152,35 @@ function MoleculeDrawer({
 
   useEffect(() => {
     return () => {
-      if (window[globalKey] === apiRef.current) {
-        delete window[globalKey];
+      const globalKetchers = window as unknown as Record<
+        string,
+        KetcherApi | undefined
+      >;
+      if (globalKetchers[globalKey] === apiRef.current) {
+        delete globalKetchers[globalKey];
       }
     };
   }, [globalKey]);
 
   const handleError = useCallback((error: unknown) => {
-    console.error("Ketcher error:", error);
+    console.error(`[PocketChem:Ketcher:${globalKey}] drawer error`, error);
     setFailed(true);
-  }, []);
+  }, [globalKey]);
 
   const handleReady = useCallback((api: KetcherApi) => {
+    console.info(`[PocketChem:Ketcher:${globalKey}] drawer ready`, {
+      api,
+      hasGetMolfile: typeof api.getMolfile === "function",
+      hasGetKet: typeof api.getKet === "function",
+      hasGetSmiles: typeof api.getSmiles === "function",
+      hasSetMolecule: typeof api.setMolecule === "function",
+    });
     apiRef.current = api;
-    window[globalKey] = api;
+    const globalKetchers = window as unknown as Record<
+      string,
+      KetcherApi | undefined
+    >;
+    globalKetchers[globalKey] = api;
     onReady?.(api);
     setFailed(false);
     setReady(true);
@@ -170,7 +192,11 @@ function MoleculeDrawer({
 
       <KetcherErrorBoundary onError={handleError}>
         <Suspense fallback={<KetcherLoadingState />}>
-          <KetcherEditor onError={handleError} onReady={handleReady} />
+          <KetcherEditor
+            debugLabel={globalKey}
+            onError={handleError}
+            onReady={handleReady}
+          />
         </Suspense>
       </KetcherErrorBoundary>
     </div>

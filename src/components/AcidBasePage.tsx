@@ -584,10 +584,12 @@ export default function AcidBasePage() {
         <div className="card acid-base-drawer-card">
           <div className="card-header">
             <div>
-              <h2>Acid/Base Drawer</h2>
+              <h2>Molecule Drawer</h2>
               <p>Draw one molecule, then analyze or add it to the comparison set.</p>
             </div>
-            <span className="status">Draw Mode</span>
+            <span className={`status ${ketcher ? "ready" : "loading"}`}>
+              {ketcher ? "Editor ready" : "Loading editor"}
+            </span>
           </div>
 
           <div className="acid-base-ketcher-box">

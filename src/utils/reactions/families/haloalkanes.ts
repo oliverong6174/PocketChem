@@ -37,6 +37,16 @@ const resonanceStabilizedPrimaryHalideTrigger = {
   excludedFunctionalGroups: ["Aryl halide", "Vinyl halide"],
 };
 
+/** Alkyl halide that does not contain an obvious proton source that would quench RMgX. */
+const grignardCompatibleHalideTrigger = {
+  ...alkylHalideTrigger,
+  excludeSmarts: [
+    "[O,S;H1]",
+    "[N;H1,H2,H3]",
+    "[C]#[C;H1]",
+  ],
+};
+
 const hydroxideReactant = {
   label: "hydroxide ion",
   trigger: { includeSmarts: ["[O-;H1]"] },
@@ -92,6 +102,39 @@ const amideBaseReactant = {
 };
 
 export const haloalkaneReactionRules: ReactionRule[] = [
+  {
+    id: "haloalkane-intramolecular-amine-cyclization-5",
+    family: "haloalkanes",
+    reactionType: "cyclization",
+    reactionClass: "intramolecular nucleophilic substitution",
+    title: "Intramolecular SN2 Amine Cyclization",
+    reagents: "Base; heat as needed",
+    reagentNote: "5-membered ring closure",
+    productHint: "Pyrrolidine derivative",
+    explanation:
+      "A primary or secondary amine tethered four carbons from a primary alkyl halide can cyclize by intramolecular SN2 displacement to form a five-membered nitrogen heterocycle.",
+    trigger: {
+      includeSmarts: [
+        "[N;H1,H2;+0]-[C;X4]-[C;X4]-[C;X4]-[C;X4][Cl,Br,I]",
+      ],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts:
+        "[N;+0:1]-[C:2]-[C:3]-[C:4]-[C:5]-[Cl,Br,I:6]>>[N;+0:1]1[C:2][C:3][C:4][C:5]1",
+      maxProducts: 4,
+    },
+    mechanism: "Intramolecular SN2",
+    selectivity: [
+      "Five-membered ring formation is favored",
+      "Backside displacement at the carbon bearing the leaving group",
+    ],
+    limitations: [
+      "Best for an unhindered primary tethered halide; competing intermolecular alkylation can occur at high concentration.",
+    ],
+    priority: 190,
+  },
+
   // ---------------------------------------------------------------------------
   // SN2: the nucleophile is an explicitly drawn second reactant.
   // ---------------------------------------------------------------------------
@@ -607,23 +650,82 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   },
 
   {
-    id: "haloalkane-grignard-formation",
+    id: "haloalkane-grignard-formation-bromide",
     family: "haloalkanes",
     reactionType: "substitution",
     title: "Grignard Reagent Formation",
     reagents: "Mg, dry ether",
-    reagentNote: "Metal insertion into C–X",
-    productHint: "Organomagnesium halide",
+    reagentNote: "Convert R–Br to RMgBr",
+    productHint: "Alkylmagnesium bromide",
     explanation:
-      "Magnesium inserts into the carbon-halogen bond to form a Grignard reagent. Water, alcohols, acids, and other protic groups destroy the reagent.",
-    trigger: alkylHalideTrigger,
+      "Magnesium inserts into an alkyl carbon-bromine bond to form the corresponding Grignard reagent. The carbon group remains explicit so PocketChem can carry that exact R group into a later carbon-carbon bond-forming step.",
+    trigger: {
+      ...grignardCompatibleHalideTrigger,
+      includeSmarts: ["[C;X4][Br]"],
+    },
     transform: {
-      type: "conceptOnly",
-      reason:
-        "Organometallic salts and counterions need a dedicated representation rather than a neutral product SMILES shortcut.",
+      type: "reactionSmarts",
+      smarts: "[C;X4:1][Br:2]>>[C:1][Mg][Br:2]",
+      maxProducts: 8,
     },
     mechanism: "Single-electron transfer / metal insertion",
-    limitations: ["Requires rigorously dry conditions", "Incompatible with protic groups"],
+    limitations: [
+      "Requires rigorously dry ether or THF conditions.",
+      "Incompatible with alcohols, water, carboxylic acids, terminal alkynes, and other sufficiently acidic/protic groups in the same molecule.",
+    ],
     priority: 300,
+  },
+  {
+    id: "haloalkane-grignard-formation-chloride",
+    family: "haloalkanes",
+    reactionType: "substitution",
+    title: "Grignard Reagent Formation",
+    reagents: "Mg, dry ether",
+    reagentNote: "Convert R–Cl to RMgCl",
+    productHint: "Alkylmagnesium chloride",
+    explanation:
+      "Magnesium inserts into an alkyl carbon-chlorine bond to form the corresponding Grignard reagent. The carbon group remains explicit so PocketChem can carry that exact R group into a later carbon-carbon bond-forming step.",
+    trigger: {
+      ...grignardCompatibleHalideTrigger,
+      includeSmarts: ["[C;X4][Cl]"],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C;X4:1][Cl:2]>>[C:1][Mg][Cl:2]",
+      maxProducts: 8,
+    },
+    mechanism: "Single-electron transfer / metal insertion",
+    limitations: [
+      "Requires rigorously dry ether or THF conditions.",
+      "Alkyl chlorides are generally less reactive toward magnesium than the corresponding bromides or iodides.",
+      "Incompatible with alcohols, water, carboxylic acids, terminal alkynes, and other sufficiently acidic/protic groups in the same molecule.",
+    ],
+    priority: 302,
+  },
+  {
+    id: "haloalkane-grignard-formation-iodide",
+    family: "haloalkanes",
+    reactionType: "substitution",
+    title: "Grignard Reagent Formation",
+    reagents: "Mg, dry ether",
+    reagentNote: "Convert R–I to RMgI",
+    productHint: "Alkylmagnesium iodide",
+    explanation:
+      "Magnesium inserts into an alkyl carbon-iodine bond to form the corresponding Grignard reagent. The carbon group remains explicit so PocketChem can carry that exact R group into a later carbon-carbon bond-forming step.",
+    trigger: {
+      ...grignardCompatibleHalideTrigger,
+      includeSmarts: ["[C;X4][I]"],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C;X4:1][I:2]>>[C:1][Mg][I:2]",
+      maxProducts: 8,
+    },
+    mechanism: "Single-electron transfer / metal insertion",
+    limitations: [
+      "Requires rigorously dry ether or THF conditions.",
+      "Incompatible with alcohols, water, carboxylic acids, terminal alkynes, and other sufficiently acidic/protic groups in the same molecule.",
+    ],
+    priority: 301,
   },
 ];

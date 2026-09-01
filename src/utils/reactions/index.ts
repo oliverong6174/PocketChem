@@ -1,7 +1,8 @@
 import type { FunctionalGroupResult } from "../functionalGroups/types";
 import { predictReactionPathwaysFromRules } from "./engine/reactionEngine";
 import { reactionRegistry } from "./reactionRegistry";
-import { predictRetrosynthesisPathwaysFromRules } from "./engine/retrosynthesisEngine";
+import { predictRetrosynthesisPathwaysFromRules } from "./engine/retroSynthesis";
+import { findMultistepSynthesisRoutesFromRules } from "./engine/multistepSynthesis";
 
 export type {
   OrganicChemCourse,
@@ -17,6 +18,12 @@ export type {
   ReactionType,
   RetrosynthesisConfidence,
   RetrosynthesisPathway,
+  MultistepSynthesisRoute,
+  MultistepSynthesisSearchOptions,
+  MultistepSynthesisProgress,
+  SynthesisRouteConfidence,
+  SynthesisStep,
+  SynthesisStepSource,
 } from "./reactionTypes";
 export { reactionRegistry } from "./reactionRegistry";
 export { validateReactionRegistry } from "./reactionValidation";
@@ -29,7 +36,8 @@ export {
   type ReactionCatalogSummary,
 } from "./reactionCatalog";
 export { predictReactionPathwaysFromRules } from "./engine/reactionEngine";
-export { predictRetrosynthesisPathwaysFromRules } from "./engine/retrosynthesisEngine";
+export { predictRetrosynthesisPathwaysFromRules } from "./engine/retroSynthesis";
+export { findMultistepSynthesisRoutesFromRules } from "./engine/multistepSynthesis";
 export {
   analyzeReactionComponents,
   isGenericReactionSmiles,
@@ -50,4 +58,19 @@ export async function predictReactionPathways(
 
 export async function predictRetrosynthesisPathways(targetSmiles: string) {
   return predictRetrosynthesisPathwaysFromRules(targetSmiles, reactionRegistry);
+}
+
+export async function findMultistepSynthesisRoutes(
+  startingSmiles: string,
+  targetSmiles: string,
+  options: import("./reactionTypes").MultistepSynthesisSearchOptions = {},
+  onProgress?: (progress: import("./reactionTypes").MultistepSynthesisProgress) => void,
+) {
+  return findMultistepSynthesisRoutesFromRules(
+    startingSmiles,
+    targetSmiles,
+    reactionRegistry,
+    options,
+    onProgress,
+  );
 }

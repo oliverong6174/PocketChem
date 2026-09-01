@@ -225,3 +225,64 @@ export type RetrosynthesisPathway = {
   /** Other catalog rules that produce the same exact precursor set. */
   alternativeRoutes: RetrosynthesisAlternativeRoute[];
 };
+
+
+export type SynthesisStepSource = "forward-search" | "retrosynthesis-search";
+
+export type SynthesisStep = {
+  id: string;
+  stepNumber: number;
+  source: SynthesisStepSource;
+  ruleId: string;
+  family: string;
+  reactionType: ReactionType;
+  title: string;
+
+  reactantSmiles: string;
+  reactantComponents: string[];
+  reactantLabel: string;
+
+  productSmiles: string;
+  productComponents: string[];
+  productLabel: string;
+
+  reagentLabel: string;
+  reagentNote: string;
+  shortExplanation: string;
+
+  course: OrganicChemCourse;
+  chapter: string;
+  mechanism: string | null;
+  reactionClass: string | null;
+  purpose: ReactionPurpose | null;
+  selectivity: string[];
+  limitations: string[];
+
+  retrosynthesisConfidence: RetrosynthesisConfidence | null;
+};
+
+export type SynthesisRouteConfidence = "verified" | "connectivity-verified";
+
+export type MultistepSynthesisRoute = {
+  id: string;
+  startingSmiles: string;
+  targetSmiles: string;
+  steps: SynthesisStep[];
+  confidence: SynthesisRouteConfidence;
+  score: number;
+};
+
+export type MultistepSynthesisSearchOptions = {
+  maxSteps?: number;
+  beamWidth?: number;
+  branchLimit?: number;
+  maxRoutes?: number;
+  /** Optional cancellation signal for long multistep searches. */
+  signal?: AbortSignal;
+};
+
+export type MultistepSynthesisProgress = {
+  phase: "forward" | "retrosynthesis" | "matching";
+  depth: number;
+  maxSteps: number;
+};

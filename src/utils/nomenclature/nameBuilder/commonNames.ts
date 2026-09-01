@@ -747,6 +747,9 @@ const RAW_COMMON_NAME_MAP: Record<string, string> = {
   "beta-carotene": "beta-carotene",
   "β-carotene": "beta-carotene",
   "lycopene": "lycopene",
+
+  //Just add on
+  "1-ethylpyrrolidine": "N-ethylpyrrolidine",
 };
 
 const COMMON_NAME_MAP: Readonly<Record<string, string>> = Object.freeze(

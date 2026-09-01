@@ -173,11 +173,18 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Acid-catalyzed hydration adds water across the alkene to form an alcohol.",
     trigger: alkeneTrigger,
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]=[C:2]>>[C:1]([OH])[C:2]",
+      type: "customHandler",
+      handler: "addition",
+      options: {
+        mode: "alkeneHydration",
+        regioselectivity: "markovnikov",
+      },
     },
     productStatus: "representative",
     selectivity: ["Markovnikov orientation; rearrangements may occur"],
+    limitations: [
+      "The current hydration handler enforces constitutional Markovnikov regiochemistry but does not yet model carbocation rearrangements.",
+    ],
     priority: 140,
   },
 
@@ -193,11 +200,18 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Hydroboration-oxidation hydrates the alkene with anti-Markovnikov orientation.",
     trigger: alkeneTrigger,
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]=[C:2]>>[C:1][C:2]([OH])",
+      type: "customHandler",
+      handler: "addition",
+      options: {
+        mode: "alkeneHydration",
+        regioselectivity: "anti-markovnikov",
+      },
     },
     productStatus: "representative",
     selectivity: ["Anti-Markovnikov and syn addition"],
+    limitations: [
+      "The current hydration handler enforces anti-Markovnikov connectivity; syn stereochemistry is not yet assigned explicitly in the product structure.",
+    ],
     priority: 150,
   },
 
@@ -215,8 +229,12 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Oxymercuration-demercuration converts an alkene to a Markovnikov alcohol without rearrangement.",
     trigger: alkeneTrigger,
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]=[C:2]>>[C:1]([OH])[C:2]",
+      type: "customHandler",
+      handler: "addition",
+      options: {
+        mode: "alkeneHydration",
+        regioselectivity: "markovnikov",
+      },
     },
     productStatus: "representative",
     selectivity: ["Markovnikov orientation without rearrangement"],

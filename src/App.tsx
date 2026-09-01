@@ -43,6 +43,7 @@
 
   const ReactionsPage = lazy(() => import("./components/ReactionsPage"));
   const AcidBasePage = lazy(() => import("./components/AcidBasePage"));
+  const SynthesisPage = lazy(() => import("./components/SynthesisPage"));
 
 
   type AnnotationCarouselItem =
@@ -69,12 +70,13 @@
     
 
   type AnalysisPanel = "overview" | "groups" | "concepts" | "properties";
-  type AppPage = "analysis" | "acidBase" | "reactions";
+  type AppPage = "analysis" | "acidBase" | "reactions" | "synthesis";
 
   const APP_PAGES: Array<{ id: AppPage; label: string }> = [
     { id: "analysis", label: "Analysis" },
     { id: "acidBase", label: "Acid/Base" },
     { id: "reactions", label: "Reactions" },
+    { id: "synthesis", label: "Synthesis" },
   ];
 
   const ANALYSIS_PANELS: Array<{ id: AnalysisPanel; label: string }> = [
@@ -1841,8 +1843,10 @@
           <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
             {activePage === "acidBase" ? (
               <AcidBasePage />
-            ) : (
+            ) : activePage === "reactions" ? (
               <ReactionsPage initialPathways={reactionPathways} />
+            ) : (
+              <SynthesisPage />
             )}
           </Suspense>
         </section>

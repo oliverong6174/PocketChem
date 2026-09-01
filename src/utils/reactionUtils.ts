@@ -1,6 +1,7 @@
 export {
   predictReactionPathways,
   predictRetrosynthesisPathways,
+  findMultistepSynthesisRoutes,
   reactionRegistry,
   alkeneReactionRules,
   analyzeReactionComponents,
@@ -16,4 +17,10 @@ export type {
   ReactionRule,
   RetrosynthesisConfidence,
   RetrosynthesisPathway,
+  MultistepSynthesisRoute,
+  MultistepSynthesisSearchOptions,
+  MultistepSynthesisProgress,
+  SynthesisRouteConfidence,
+  SynthesisStep,
+  SynthesisStepSource,
 } from "./reactions";

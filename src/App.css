@@ -888,11 +888,28 @@ button:disabled {
 }
 
 .reaction-ketcher-box {
+  position: relative;
+  width: 100%;
+  min-width: 0;
   height: 520px;
-  margin: 14px 0;
+  margin: 18px 0 14px;
+  background: white;
+  color: #020617;
+  border-radius: 16px;
+  overflow: hidden;
+  contain: layout paint;
 }
 
 .reaction-ketcher-box .ketcher-shell {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.reaction-ketcher-box .ketcher-shell > div {
+  width: 100%;
+  min-width: 0;
   height: 100%;
 }
 
@@ -1289,5 +1306,286 @@ body,
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Multistep synthesis */
+.synthesis-page {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+
+.synthesis-intro-card,
+.synthesis-route-header,
+.synthesis-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.synthesis-intro-card h2,
+.synthesis-route-header h2 {
+  margin-bottom: 6px;
+}
+
+.synthesis-intro-card p,
+.synthesis-route-header p {
+  margin: 0;
+}
+
+.synthesis-drawers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.synthesis-drawer-card {
+  min-width: 0;
+  padding: 12px;
+}
+
+.synthesis-drawer-header {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+}
+
+.synthesis-drawer-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.synthesis-ketcher-box {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: clamp(275px, 34vh, 340px);
+  margin-top: 8px;
+  background: white;
+  color: #020617;
+  border-radius: 12px;
+  overflow: hidden;
+  contain: layout paint;
+}
+
+.synthesis-ketcher-box .ketcher-shell,
+.synthesis-ketcher-box .ketcher-shell > div {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.synthesis-controls-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px 18px;
+}
+
+.synthesis-controls-row {
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.synthesis-progress {
+  min-height: 0;
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.synthesis-actions {
+  margin: 0;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.synthesis-error {
+  margin: 0 !important;
+}
+
+.synthesis-loading-track {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border: 1px solid #334155;
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.7);
+}
+
+.synthesis-loading-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  transition: width 180ms ease-out;
+}
+
+.synthesis-page.is-searching .synthesis-ketcher-box {
+  pointer-events: none;
+  cursor: default;
+}
+
+.synthesis-page.is-searching .synthesis-ketcher-box .ketcher-shell {
+  cursor: default !important;
+}
+
+.synthesis-identity-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  background: rgba(2, 6, 23, 0.55);
+}
+
+.synthesis-identity-row p {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.synthesis-identity-row > span {
+  color: #38bdf8;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.synthesis-route-card {
+  display: grid;
+  gap: 16px;
+}
+
+.synthesis-step-list {
+  display: grid;
+  gap: 14px;
+}
+
+.synthesis-step-card {
+  border: 1px solid #334155;
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(2, 6, 23, 0.48);
+}
+
+.synthesis-step-card h3 {
+  margin: 2px 0 0;
+  color: #e2e8f0;
+}
+
+.synthesis-step-label {
+  margin: 0 !important;
+  color: #7dd3fc !important;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.synthesis-source-pill {
+  border: 1px solid #475569;
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: #bae6fd;
+  background: rgba(30, 41, 59, 0.78);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@media (max-width: 1120px) {
+  .synthesis-drawers {
+    grid-template-columns: 1fr;
+  }
+
+  .synthesis-ketcher-box {
+    height: 340px;
+  }
+}
+
+@media (max-width: 720px) {
+  .synthesis-intro-card,
+  .synthesis-route-header,
+  .synthesis-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .synthesis-actions {
+    width: 100%;
+  }
+
+  .synthesis-actions > button {
+    flex: 1 1 0;
+  }
+
+  .synthesis-ketcher-box {
+    height: 320px;
+  }
+
+  .synthesis-identity-row {
+    grid-template-columns: 1fr;
+  }
+
+  .synthesis-identity-row > span {
+    transform: rotate(90deg);
+    justify-self: center;
+  }
+
+  .synthesis-source-pill {
+    white-space: normal;
+  }
+}
+
+/* Ketcher usability: resizable editor panes + wheel-scrollable side toolbars */
+.drawer-placeholder,
+.drawer-placeholder-compact,
+.reaction-ketcher-box,
+.acid-base-ketcher-box,
+.synthesis-ketcher-box {
+  resize: vertical;
+  min-height: 300px;
+  max-height: 82vh;
+}
+
+/* Ketcher intentionally hides overflow in its vertical toolbar button tracks.
+   Override that behavior so the mouse wheel / trackpad can reach every tool. */
+.ketcher-shell [data-testid="left-toolbar-buttons"],
+.ketcher-shell [data-testid="right-toolbar"] > div:first-child {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+}
+
+.ketcher-shell [data-testid="left-toolbar-buttons"]::-webkit-scrollbar,
+.ketcher-shell [data-testid="right-toolbar"] > div:first-child::-webkit-scrollbar {
+  width: 5px;
+}
+
+.ketcher-shell [data-testid="left-toolbar-buttons"]::-webkit-scrollbar-track,
+.ketcher-shell [data-testid="right-toolbar"] > div:first-child::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Keep Ketcher's own arrow-scrolling controls usable while allowing wheel scroll. */
+.ketcher-shell [data-testid="left-toolbar"],
+.ketcher-shell [data-testid="right-toolbar"] {
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 700px) {
+  .drawer-placeholder,
+  .drawer-placeholder-compact,
+  .reaction-ketcher-box,
+  .acid-base-ketcher-box,
+  .synthesis-ketcher-box {
+    min-height: 280px;
+    max-height: 88vh;
   }
 }

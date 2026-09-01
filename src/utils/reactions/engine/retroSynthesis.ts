@@ -9,6 +9,7 @@ import type {
   RetrosynthesisPathway,
 } from "../reactionTypes";
 import { runCustomHandler } from "./handlers";
+import { alkeneHydrationReactionSmarts } from "./handlers/addition";
 import {
   analyzeReactionComponents,
   isGenericReactionSmiles,
@@ -412,11 +413,27 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
   const mode = String(options.mode ?? "");
   const output: string[] = [];
 
-  if (handler === "addition" && mode === "oneTwoAddition") {
-    if (options.nucleophile === "water") {
-      output.push("[C:1]([OH:2])O>>[C:1]=[O:2]");
-    } else if (options.nucleophile === "cyanide") {
-      output.push("[C:1]([OH:2])C#N>>[C:1]=[O:2]");
+  if (handler === "addition") {
+    if (mode === "oneTwoAddition") {
+      if (options.nucleophile === "water") {
+        output.push("[C:1]([OH:2])O>>[C:1]=[O:2]");
+      } else if (options.nucleophile === "cyanide") {
+        output.push("[C:1]([OH:2])C#N>>[C:1]=[O:2]");
+      }
+    }
+
+    if (mode === "alkeneHydration") {
+      const regioselectivity = options.regioselectivity;
+      if (
+        regioselectivity === "markovnikov" ||
+        regioselectivity === "anti-markovnikov"
+      ) {
+        output.push(
+          ...alkeneHydrationReactionSmarts(regioselectivity)
+            .map(reverseReactionSmarts)
+            .filter((item): item is string => Boolean(item)),
+        );
+      }
     }
   }
 

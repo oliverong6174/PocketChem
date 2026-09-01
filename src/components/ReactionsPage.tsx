@@ -241,21 +241,20 @@ export default function ReactionsPage({ initialPathways }: Props) {
 
   return (
     <section className="card reactions-page-card">
-      <h2>Reactions</h2>
+      <div className="card-header">
+        <div>
+          <h2>Molecule Drawer</h2>
+          <p>
+            Draw reactant(s) to predict products, or draw a product to predict
+            reactants. Use R or * for generic groups.
+          </p>
+        </div>
+        <span className={`status ${ketcher ? "ready" : "loading"}`}>
+          {ketcher ? "Editor ready" : "Loading editor"}
+        </span>
+      </div>
 
       <div className="reaction-ketcher-panel">
-        <h3>Reaction Drawer</h3>
-        <p className="empty">
-          For forward prediction, draw one reactant or multiple disconnected
-          reactants. For retrosynthesis, draw the product you want to make and
-          choose Predict Reactants.
-        </p>
-        <p className="empty">
-          Generic R groups are accepted as wildcard atoms. The safest Ketcher
-          workaround is the pseudoatom R (keyboard r) or a wildcard atom (*),
-          rather than a full Markush R-group definition.
-        </p>
-
         <div className="reaction-ketcher-box">
           <MoleculeDrawer
             globalKey="reactionKetcher"
