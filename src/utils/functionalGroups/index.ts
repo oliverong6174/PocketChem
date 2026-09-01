@@ -12,3 +12,8 @@ export type {
   FunctionalGroupHierarchy,
   FunctionalGroupConfidence,
 } from "./types";
+export {
+  normalizeFunctionalGroupName,
+  toFunctionalGroupId,
+} from "./groupIds";
+export type { FunctionalGroupId } from "./groupIds";

@@ -13,12 +13,80 @@ import { getOtherAtom } from "../molParser";
 import { buildBranchName } from "../branch/branchConstructor";
 import { getNamingIntent } from "./namingIntent";
 
-export type AromaticSuffixContext = {
+export type RingSuffixContext = {
   suffixName: string;
   anchorAtom: number;
   representedExternalAtoms: ReadonlySet<number>;
   primaryFeature: NamingFeature;
 };
+
+export type AromaticSuffixContext = RingSuffixContext;
+
+/**
+ * For a monosubstituted saturated ring, the attachment locant of an
+ * exocyclic characteristic group is normally implicit:
+ *
+ *   cyclohexanecarboxylic acid
+ *
+ * Once the ring has another substituent, the attachment atom is written as
+ * locant 1 so the other ring locants are explicit:
+ *
+ *   2-acetylcyclohexane-1-carboxylic acid
+ *
+ * Ring orientation already places the suffix anchor at position 1. This
+ * helper only controls whether that implicit 1 is printed in the name.
+ */
+export function getRenderedRingSuffixName(
+  parent: ParentDescriptor,
+  context: RingSuffixContext,
+  substituentCount: number
+): string {
+  if (parent.kind !== "ring" || parent.aromaticRing) {
+    return context.suffixName;
+  }
+
+  if (substituentCount === 0) {
+    return context.suffixName;
+  }
+
+  const exocyclicSuffixTypes = new Set<NamingFeature["type"]>([
+    "carboxylicAcid",
+    "aldehyde",
+    "nitrile",
+    "amide",
+    "acidChloride",
+    "ester",
+  ]);
+
+  if (!exocyclicSuffixTypes.has(context.primaryFeature.type)) {
+    return context.suffixName;
+  }
+
+  const ringName = parent.parentHydrocarbon;
+  if (!ringName) return context.suffixName;
+
+  if (context.suffixName.startsWith(ringName)) {
+    const suffixRemainder = context.suffixName.slice(ringName.length);
+    return `${ringName}-1-${suffixRemainder}`;
+  }
+
+  // Esters begin with the O-alkyl name, e.g.
+  // "methyl cyclohexanecarboxylate". Insert the locant into the embedded
+  // ring parent without disturbing the alkyl portion.
+  const embeddedRingName = ` ${ringName}`;
+  const ringPosition = context.suffixName.indexOf(embeddedRingName);
+
+  if (ringPosition >= 0) {
+    const before = context.suffixName.slice(0, ringPosition + 1);
+    const after = context.suffixName.slice(
+      ringPosition + embeddedRingName.length
+    );
+
+    return `${before}${ringName}-1-${after}`;
+  }
+
+  return context.suffixName;
+}
 
 type RingAttachedGroupMatch = {
   anchorAtom: number;
@@ -32,6 +100,224 @@ const HALIDE_NAMES: Record<string, string> = {
   Br: "bromide",
   I: "iodide",
 };
+
+export function getRingSuffixContext(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor,
+  primaryGroup: FunctionalGroupResult | null
+): RingSuffixContext | null {
+  if (parent.kind !== "ring") return null;
+
+  // Aromatic retained-parent naming still depends on the functional-group
+  // hierarchy because names such as benzoic acid / benzamide are retained
+  // parent choices rather than purely graph-local suffix transformations.
+  if (parent.aromaticRing) {
+    return primaryGroup
+      ? getAromaticSuffixContext(parsedMol, parent, primaryGroup)
+      : null;
+  }
+
+  // Normal route: use the functional-group hierarchy to choose the suffix.
+  if (primaryGroup) {
+    const contextual = getNonAromaticRingSuffixContext(
+      parsedMol,
+      parent,
+      primaryGroup
+    );
+
+    if (contextual) return contextual;
+  }
+
+  // Defensive structural fallback. Ring-attached terminal suffix groups are
+  // unambiguous from the molecular graph and must never be flattened into an
+  // acyclic path merely because the external functional-group metadata was
+  // absent, stale, or generated from a different atom ordering.
+  //
+  //   C1CCCCC1C(=O)O  -> cyclohexanecarboxylic acid
+  //   C1CCCCC1C=O     -> cyclohexanecarbaldehyde
+  //   C1CCCCC1C#N     -> cyclohexanecarbonitrile
+  //   C1CCCCC1C(=O)N  -> cyclohexanecarboxamide
+  return getStructuralNonAromaticRingSuffixContext(parsedMol, parent);
+}
+
+function getStructuralNonAromaticRingSuffixContext(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor
+): RingSuffixContext | null {
+  const ringName = parent.parentHydrocarbon;
+  if (!ringName) return null;
+
+  const acid = findRingAttachedAcylGroup(
+    parsedMol,
+    parent,
+    isCarboxylicAcidCarbon
+  );
+
+  if (acid) {
+    return makeContext(acid, `${ringName}carboxylic acid`, {
+      type: "carboxylicAcid",
+      suffix: "carboxylic acid",
+      prefix: "carboxy",
+      priority: 1,
+    });
+  }
+
+  const amide = findRingAttachedAcylGroup(parsedMol, parent, isAmideCarbon);
+  if (amide) {
+    return makeContext(amide, `${ringName}carboxamide`, {
+      type: "amide",
+      suffix: "amide",
+      prefix: "carbamoyl",
+      priority: 1.5,
+    });
+  }
+
+  const acidHalide = findRingAttachedAcylGroup(
+    parsedMol,
+    parent,
+    isAcidHalideCarbon
+  );
+  const halideName = acidHalide
+    ? getAcidHalideName(parsedMol, acidHalide.externalAtom)
+    : null;
+
+  if (acidHalide && halideName) {
+    return makeContext(acidHalide, `${ringName}carbonyl ${halideName}`, {
+      type: "acidChloride",
+      suffix: `oyl ${halideName}`,
+      prefix: "halocarbonyl",
+      priority: 1.4,
+    });
+  }
+
+  const ester = findRingAttachedAcylGroup(parsedMol, parent, isEsterCarbon);
+  const esterAlkyl = ester
+    ? getEsterAlkylName(parsedMol, ester.externalAtom)
+    : null;
+
+  if (ester && esterAlkyl) {
+    return makeContext(ester, `${esterAlkyl} ${ringName}carboxylate`, {
+      type: "ester",
+      suffix: "oate",
+      prefix: "alkoxycarbonyl",
+      priority: 1,
+      alkylName: esterAlkyl,
+    });
+  }
+
+  const nitrile = findRingAttachedNitrileGroup(parsedMol, parent);
+  if (nitrile) {
+    return makeContext(nitrile, `${ringName}carbonitrile`, {
+      type: "nitrile",
+      suffix: "nitrile",
+      prefix: "cyano",
+      priority: 1.7,
+    });
+  }
+
+  const aldehyde = findRingAttachedAcylGroup(
+    parsedMol,
+    parent,
+    isAldehydeCarbon
+  );
+  if (aldehyde) {
+    return makeContext(aldehyde, `${ringName}carbaldehyde`, {
+      type: "aldehyde",
+      suffix: "al",
+      prefix: "formyl",
+      priority: 2,
+    });
+  }
+
+  return null;
+}
+
+function getNonAromaticRingSuffixContext(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor,
+  primaryGroup: FunctionalGroupResult
+): RingSuffixContext | null {
+  const intent = getNamingIntent(primaryGroup);
+  const ringName = parent.parentHydrocarbon;
+  if (!ringName) return null;
+
+  if (intent.featureType === "carboxylicAcid") {
+    const match = findRingAttachedAcylGroup(parsedMol, parent, isCarboxylicAcidCarbon);
+    if (match) {
+      return makeContext(match, `${ringName}carboxylic acid`, {
+        type: "carboxylicAcid",
+        suffix: "carboxylic acid",
+        prefix: "carboxy",
+        priority: 1,
+      });
+    }
+  }
+
+  if (intent.featureType === "aldehyde") {
+    const match = findRingAttachedAcylGroup(parsedMol, parent, isAldehydeCarbon);
+    if (match) {
+      return makeContext(match, `${ringName}carbaldehyde`, {
+        type: "aldehyde",
+        suffix: "al",
+        prefix: "formyl",
+        priority: 2,
+      });
+    }
+  }
+
+  if (intent.featureType === "nitrile") {
+    const match = findRingAttachedNitrileGroup(parsedMol, parent);
+    if (match) {
+      return makeContext(match, `${ringName}carbonitrile`, {
+        type: "nitrile",
+        suffix: "nitrile",
+        prefix: "cyano",
+        priority: 1.7,
+      });
+    }
+  }
+
+  if (intent.featureType === "amide") {
+    const match = findRingAttachedAcylGroup(parsedMol, parent, isAmideCarbon);
+    if (match) {
+      return makeContext(match, `${ringName}carboxamide`, {
+        type: "amide",
+        suffix: "amide",
+        prefix: "carbamoyl",
+        priority: 1.5,
+      });
+    }
+  }
+
+  if (intent.featureType === "acidChloride") {
+    const match = findRingAttachedAcylGroup(parsedMol, parent, isAcidHalideCarbon);
+    const halideName = match ? getAcidHalideName(parsedMol, match.externalAtom) : null;
+    if (match && halideName) {
+      return makeContext(match, `${ringName}carbonyl ${halideName}`, {
+        type: "acidChloride",
+        suffix: `oyl ${halideName}`,
+        prefix: "halocarbonyl",
+        priority: 1.4,
+      });
+    }
+  }
+
+  if (intent.featureType === "ester") {
+    const match = findRingAttachedAcylGroup(parsedMol, parent, isEsterCarbon);
+    const alkylName = match ? getEsterAlkylName(parsedMol, match.externalAtom) : null;
+    if (match && alkylName) {
+      return makeContext(match, `${alkylName} ${ringName}carboxylate`, {
+        type: "ester",
+        suffix: "oate",
+        prefix: "alkoxycarbonyl",
+        priority: 1,
+        alkylName,
+      });
+    }
+  }
+
+  return null;
+}
 
 export function getAromaticSuffixContext(
   parsedMol: ParsedMol,
@@ -185,6 +471,82 @@ export function getAromaticSuffixContext(
     }
   }
 
+  if (intent.featureType === "sulfonicAcid") {
+    const match = findRingAttachedSulfurGroup(
+      parsedMol,
+      parent,
+      (sulfurIndex) =>
+        countDoubleBondedOxygens(parsedMol, sulfurIndex) >= 2 &&
+        hasHydroxyOxygen(parsedMol, sulfurIndex)
+    );
+
+    if (match) {
+      return makeContext(match, "benzenesulfonic acid", {
+        type: "sulfonicAcid",
+        suffix: "sulfonic acid",
+        prefix: "sulfo",
+        priority: 0.9,
+      });
+    }
+  }
+
+  if (intent.featureType === "sulfinicAcid") {
+    const match = findRingAttachedSulfurGroup(
+      parsedMol,
+      parent,
+      (sulfurIndex) =>
+        countDoubleBondedOxygens(parsedMol, sulfurIndex) === 1 &&
+        hasHydroxyOxygen(parsedMol, sulfurIndex)
+    );
+
+    if (match) {
+      return makeContext(match, "benzenesulfinic acid", {
+        type: "sulfinicAcid",
+        suffix: "sulfinic acid",
+        prefix: "sulfino",
+        priority: 1.1,
+      });
+    }
+  }
+
+  if (intent.featureType === "sulfenicAcid") {
+    const match = findRingAttachedSulfurGroup(
+      parsedMol,
+      parent,
+      (sulfurIndex) =>
+        countDoubleBondedOxygens(parsedMol, sulfurIndex) === 0 &&
+        hasHydroxyOxygen(parsedMol, sulfurIndex)
+    );
+
+    if (match) {
+      return makeContext(match, "benzenesulfenic acid", {
+        type: "sulfenicAcid",
+        suffix: "sulfenic acid",
+        prefix: "sulfenyl",
+        priority: 6.5,
+      });
+    }
+  }
+
+  if (intent.featureType === "sulfonamide") {
+    const match = findRingAttachedSulfurGroup(
+      parsedMol,
+      parent,
+      (sulfurIndex) =>
+        countDoubleBondedOxygens(parsedMol, sulfurIndex) >= 2 &&
+        hasSingleBondedElement(parsedMol, sulfurIndex, "N")
+    );
+
+    if (match) {
+      return makeContext(match, "benzenesulfonamide", {
+        type: "sulfonamide",
+        suffix: "sulfonamide",
+        prefix: "sulfonamido",
+        priority: 1.25,
+      });
+    }
+  }
+
   if (intent.featureType === "thiol") {
     const match = findRingAttachedHeteroGroup(parsedMol, parent, "S");
 
@@ -201,12 +563,12 @@ export function getAromaticSuffixContext(
   return null;
 }
 
-export function orientAromaticParentForSuffix(
+export function orientRingParentForSuffix(
   parsedMol: ParsedMol,
   parent: ParentDescriptor,
-  context: AromaticSuffixContext
+  context: RingSuffixContext
 ): ParentDescriptor {
-  if (!parent.aromaticRing) return parent;
+  if (parent.kind !== "ring") return parent;
 
   return {
     ...parent,
@@ -217,6 +579,14 @@ export function orientAromaticParentForSuffix(
       context.representedExternalAtoms
     ),
   };
+}
+
+export function orientAromaticParentForSuffix(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor,
+  context: AromaticSuffixContext
+): ParentDescriptor {
+  return orientRingParentForSuffix(parsedMol, parent, context);
 }
 
 function makeContext(
@@ -309,6 +679,66 @@ function isSimpleRetainedHeteroGroup(
   if (element === "N") return !bonds.some((bond) => bond.bondOrder > 1);
 
   return true;
+}
+
+function findRingAttachedSulfurGroup(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor,
+  predicate: (sulfurIndex: number) => boolean
+): RingAttachedGroupMatch | null {
+  const ringSet = new Set(parent.path);
+
+  for (const ringAtom of parent.path) {
+    for (const bond of parsedMol.adjacency.get(ringAtom) ?? []) {
+      if (bond.bondOrder !== 1) continue;
+      const sulfurIndex = getOtherAtom(bond, ringAtom);
+      if (ringSet.has(sulfurIndex)) continue;
+      if (parsedMol.atoms[sulfurIndex]?.element !== "S") continue;
+      if (!predicate(sulfurIndex)) continue;
+
+      return {
+        anchorAtom: ringAtom,
+        externalAtom: sulfurIndex,
+        representedExternalAtoms: collectExternalGroupAtoms(
+          parsedMol,
+          sulfurIndex,
+          ringSet
+        ),
+      };
+    }
+  }
+
+  return null;
+}
+
+function countDoubleBondedOxygens(parsedMol: ParsedMol, atomIndex: number) {
+  return (parsedMol.adjacency.get(atomIndex) ?? []).filter((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, atomIndex)];
+    return attached?.element === "O" && bond.bondOrder === 2;
+  }).length;
+}
+
+function hasHydroxyOxygen(parsedMol: ParsedMol, atomIndex: number) {
+  return (parsedMol.adjacency.get(atomIndex) ?? []).some((bond) => {
+    if (bond.bondOrder !== 1) return false;
+    const oxygenIndex = getOtherAtom(bond, atomIndex);
+    const oxygen = parsedMol.atoms[oxygenIndex];
+    return (
+      oxygen?.element === "O" &&
+      countImplicitHydrogens(oxygen, parsedMol.adjacency) > 0
+    );
+  });
+}
+
+function hasSingleBondedElement(
+  parsedMol: ParsedMol,
+  atomIndex: number,
+  element: string
+) {
+  return (parsedMol.adjacency.get(atomIndex) ?? []).some((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, atomIndex)];
+    return bond.bondOrder === 1 && attached?.element === element;
+  });
 }
 
 function findRingAttachedNitrileGroup(

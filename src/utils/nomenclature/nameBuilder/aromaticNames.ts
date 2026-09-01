@@ -12,6 +12,10 @@ export function getSimpleBenzeneDerivativeName(
   if (primaryFeature.type === "nitrile") return "benzonitrile";
   if (primaryFeature.type === "amide") return "benzamide";
   if (primaryFeature.type === "acidChloride") return "benzoyl chloride";
+  if (primaryFeature.type === "sulfonicAcid") return "benzenesulfonic acid";
+  if (primaryFeature.type === "sulfinicAcid") return "benzenesulfinic acid";
+  if (primaryFeature.type === "sulfenicAcid") return "benzenesulfenic acid";
+  if (primaryFeature.type === "sulfonamide") return "benzenesulfonamide";
 
   return "benzene";
 }

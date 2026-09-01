@@ -34,10 +34,13 @@ export const phenolReactionRules: ReactionRule[] = [
     explanation:
       "Phenoxide attacks a methyl or primary alkyl halide by SN2 to form an aryl ether.",
     trigger: phenolTrigger,
+    additionalReactants: [
+      { label: "methyl or primary alkyl halide", trigger: { includeSmarts: ["[C;X4;H2,H3][Cl,Br,I]"] } },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "The alkyl halide must be specified before an exact aryl ether can be generated.",
+      type: "reactionSmarts",
+      smarts: "[c:1][O;H1:2].[C;X4:3][Cl,Br,I]>>[c:1][O:2]-[C:3]",
+      maxProducts: 8,
     },
     mechanism: "SN2",
     priority: 1610,

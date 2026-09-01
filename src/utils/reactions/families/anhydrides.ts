@@ -33,10 +33,16 @@ export const anhydrideReactionRules: ReactionRule[] = [
     explanation:
       "Alcohols react with acid anhydrides to form esters and carboxylic acids.",
     trigger: anhydrideTrigger,
+    additionalReactants: [
+      { label: "alcohol", trigger: { includeSmarts: ["[O;H1][#6]"] } },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The alcohol substituent must be specified before an exact ester can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])O[C:3](=[O:4]).[O;H1:5][#6:6]>>[C:1](=[O:2])[O:5][#6:6].[C:3](=[O:4])O",
+      maxProducts: 8,
     },
+    productStatus: "representative",
+    limitations: ["Unsymmetrical anhydrides can react at either acyl group; the engine enumerates constitutional products but does not rank acyl transfer selectivity."],
     priority: 1910,
   },
   {
@@ -50,10 +56,19 @@ export const anhydrideReactionRules: ReactionRule[] = [
     explanation:
       "Ammonia or amines react with acid anhydrides to form amides and carboxylic acids.",
     trigger: anhydrideTrigger,
+    additionalReactants: [
+      {
+        label: "ammonia, primary amine, or secondary amine",
+        trigger: { includeSmarts: ["[N;H1,H2,H3;!$(N[C,S,P]=O)]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The amine substituent must be specified before an exact amide can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])O[C:3](=[O:4]).[N;H1,H2,H3:5]>>[C:1](=[O:2])[N:5].[C:3](=[O:4])O",
+      maxProducts: 8,
     },
+    productStatus: "representative",
+    limitations: ["Unsymmetrical anhydrides can react at either acyl group; the engine enumerates constitutional products but does not rank acyl transfer selectivity."],
     priority: 1920,
   },
   {
@@ -84,10 +99,19 @@ export const anhydrideReactionRules: ReactionRule[] = [
     explanation:
       "Acid anhydrides can act as acylating reagents in Friedel-Crafts acylation.",
     trigger: anhydrideTrigger,
+    additionalReactants: [
+      {
+        label: "aromatic ring",
+        trigger: { includeSmarts: ["[cH]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The aromatic reaction partner and substitution position must be specified.",
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])O[C:3](=[O:4]).[cH:5]>>[C:1](=[O:2])-[c:5].[C:3](=[O:4])O",
+      maxProducts: 16,
     },
+    productStatus: "representative",
+    limitations: ["The engine enumerates available aromatic C-H sites and either acyl half of an unsymmetrical anhydride, but does not rank directing effects or acyl-transfer selectivity."],
     priority: 1940,
   },
 ];

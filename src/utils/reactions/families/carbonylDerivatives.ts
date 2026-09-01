@@ -26,9 +26,16 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
     explanation:
       "An aldehyde or ketone condenses with an amine to form an imine or iminium ion, which is reduced to an amine without normally reducing the starting carbonyl directly.",
     trigger: carbonylTrigger,
+    additionalReactants: [
+      {
+        label: "ammonia, primary amine, or secondary amine",
+        trigger: { includeSmarts: ["[N;H1,H2,H3;!$(N[C,S,P]=O)]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The ammonia or amine reactant must be specified before the exact carbon–nitrogen product can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1]=[O:2].[N;H1,H2,H3:3]>>[C:1]-[N:3]",
+      maxProducts: 8,
     },
     mechanism: "Condensation followed by hydride reduction",
     priority: 1260,

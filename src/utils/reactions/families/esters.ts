@@ -155,10 +155,18 @@ export const esterReactionRules: ReactionRule[] = [
     productHint: "Tertiary alcohol",
     explanation:
       "Esters normally undergo two additions of a Grignard or organolithium reagent, giving a tertiary alcohol after workup.",
-    trigger: { anyFunctionalGroups: ["Ester", "Enoate", "Lactone", "Alpha lactone", "Beta lactone", "Gamma lactone", "Delta lactone", "Epsilon lactone"] },
+    trigger: acyclicEsterTrigger,
+    additionalReactants: [
+      {
+        label: "Grignard or organolithium reagent (2 equivalents)",
+        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+        equivalents: 2,
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The organometallic carbon group must be specified before an exact tertiary alcohol can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[O:3][#6:4].[#6:5][Mg,Li].[#6:6][Mg,Li]>>[C:1]([OH:2])([#6:5])([#6:6])",
+      maxProducts: 8,
     },
     mechanism: "Addition–elimination followed by nucleophilic addition",
     priority: 1430,
@@ -174,12 +182,37 @@ export const esterReactionRules: ReactionRule[] = [
     explanation:
       "An ester can exchange its alkoxy group with another alcohol under acid or base catalysis.",
     trigger: acyclicEsterTrigger,
+    additionalReactants: [
+      { label: "alcohol", trigger: { includeSmarts: ["[O;H1][#6]"] } },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The incoming alcohol or alkoxide must be specified before an exact ester can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[O:3][#6:4].[O;H1:5][#6:6]>>[C:1](=[O:2])[O:5][#6:6].[OH:3][#6:4]",
+      maxProducts: 8,
     },
     mechanism: "Nucleophilic acyl substitution",
     priority: 1440,
+  },
+  {
+    id: "ester-transesterification-alkoxide",
+    family: "esters",
+    reactionType: "substitution",
+    title: "Base-Promoted Transesterification",
+    reagents: "RO⁻ / ROH",
+    reagentNote: "Draw the ester and incoming alkoxide as disconnected structures",
+    productHint: "New ester",
+    explanation:
+      "An alkoxide can exchange the alkoxy group of an ester by nucleophilic acyl substitution when the equilibrium and leaving-group relationship are favorable.",
+    trigger: acyclicEsterTrigger,
+    additionalReactants: [
+      { label: "alkoxide ion", trigger: { includeSmarts: ["[O-][#6]"] } },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[O:3][#6:4].[O-:5][#6:6]>>[C:1](=[O:2])[O+0:5][#6:6].[O-:3][#6:4]",
+      maxProducts: 8,
+    },
+    priority: 1445,
   },
   {
     id: "ester-aminolysis",
@@ -192,9 +225,16 @@ export const esterReactionRules: ReactionRule[] = [
     explanation:
       "Ammonia or an amine displaces the alkoxy group of an ester to form an amide, often with heating.",
     trigger: acyclicEsterTrigger,
+    additionalReactants: [
+      {
+        label: "ammonia, primary amine, or secondary amine",
+        trigger: { includeSmarts: ["[N;H1,H2,H3;!$(N[C,S,P]=O)]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The amine reactant must be specified before an exact amide can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[O:3][#6:4].[N;H1,H2,H3:5]>>[C:1](=[O:2])[N:5].[OH:3][#6:4]",
+      maxProducts: 8,
     },
     mechanism: "Nucleophilic acyl substitution",
     priority: 1450,

@@ -88,10 +88,16 @@ export const nitrileReactionRules: ReactionRule[] = [
     explanation:
       "A Grignard reagent adds once to a nitrile. Hydrolysis of the resulting imine gives a ketone.",
     trigger: nitrileTrigger,
+    additionalReactants: [
+      {
+        label: "Grignard or organolithium reagent",
+        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "The Grignard carbon group must be specified before an exact ketone can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1]#[N:2].[#6:3][Mg,Li]>>[C:1](=O)-[#6:3]",
+      maxProducts: 8,
     },
     mechanism: "Nucleophilic addition",
     priority: 1740,

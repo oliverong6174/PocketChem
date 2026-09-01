@@ -331,6 +331,9 @@
     let identity: MoleculeIdentityResult | null = null;
 
     try {
+      // Use the exact same molecular representation that produced the
+      // functional-group matches. This keeps atom indices / ring topology
+      // synchronized between functional-group detection and nomenclature.
       identity = await analyzeNomenclatureAndProperties(
         safeSmiles,
         hierarchy.primaryGroups,

@@ -22,6 +22,16 @@ export const CHAIN_PREFIXES: Record<number, string> = {
   8: "oct",
   9: "non",
   10: "dec",
+  11: "undec",
+  12: "dodec",
+  13: "tridec",
+  14: "tetradec",
+  15: "pentadec",
+  16: "hexadec",
+  17: "heptadec",
+  18: "octadec",
+  19: "nonadec",
+  20: "eicos",
 };
 
 export const COMMON_VALENCES: Record<string, number> = {
@@ -30,6 +40,8 @@ export const COMMON_VALENCES: Record<string, number> = {
   O: 2,
   S: 2,
   P: 3,
+  B: 3,
+  Si: 4,
   F: 1,
   Cl: 1,
   Br: 1,

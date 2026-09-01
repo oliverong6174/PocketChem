@@ -36,6 +36,10 @@ function getAromaticDirectSuffix(feature: NamingFeature) {
   if (feature.type === "alcohol") return "ol";
   if (feature.type === "amine") return "amine";
   if (feature.type === "thiol") return "thiol";
+  if (feature.type === "sulfonicAcid") return "sulfonic acid";
+  if (feature.type === "sulfinicAcid") return "sulfinic acid";
+  if (feature.type === "sulfenicAcid") return "sulfenic acid";
+  if (feature.type === "sulfonamide") return "sulfonamide";
 
   // Ring ketones are not normal retained benzene derivatives.
   // Aromatic acyl groups are handled by ringNomenclature.ts.
@@ -163,7 +167,9 @@ export function buildFunctionalGroupSuffixName(
 function shouldUseDetectedFeatureSuffix(feature: NamingFeature) {
   return (
     feature.type === "ester" ||
+    feature.type === "peroxyAcid" ||
     feature.type === "carboxylicAcid" ||
+    feature.type === "acylAzide" ||
     feature.type === "amide" ||
     feature.type === "acidChloride" ||
     feature.type === "aldehyde" ||
@@ -171,7 +177,16 @@ function shouldUseDetectedFeatureSuffix(feature: NamingFeature) {
     feature.type === "ketone" ||
     feature.type === "alcohol" ||
     feature.type === "amine" ||
-    feature.type === "thiol"
+    feature.type === "thiol" ||
+    feature.type === "sulfonicAcid" ||
+    feature.type === "sulfinicAcid" ||
+    feature.type === "sulfenicAcid" ||
+    feature.type === "sulfonamide" ||
+    feature.type === "imine" ||
+    feature.type === "thioaldehyde" ||
+    feature.type === "thioketone" ||
+    feature.type === "thioamide" ||
+    feature.type === "thiocarboxylicAcid"
   );
 }
 
@@ -235,7 +250,9 @@ export function buildSuffixName(
 function isRealSuffixFeature(feature: NamingFeature) {
   return (
     feature.type === "ester" ||
+    feature.type === "peroxyAcid" ||
     feature.type === "carboxylicAcid" ||
+    feature.type === "acylAzide" ||
     feature.type === "amide" ||
     feature.type === "acidChloride" ||
     feature.type === "aldehyde" ||
@@ -243,7 +260,16 @@ function isRealSuffixFeature(feature: NamingFeature) {
     feature.type === "ketone" ||
     feature.type === "alcohol" ||
     feature.type === "amine" ||
-    feature.type === "thiol"
+    feature.type === "thiol" ||
+    feature.type === "sulfonicAcid" ||
+    feature.type === "sulfinicAcid" ||
+    feature.type === "sulfenicAcid" ||
+    feature.type === "sulfonamide" ||
+    feature.type === "imine" ||
+    feature.type === "thioaldehyde" ||
+    feature.type === "thioketone" ||
+    feature.type === "thioamide" ||
+    feature.type === "thiocarboxylicAcid"
   );
 }
 
@@ -342,22 +368,37 @@ function isTerminalSuffixFeature(feature: NamingFeature) {
   const suffix = feature.suffix.trim().toLowerCase();
 
   return (
+    feature.type === "peroxyAcid" ||
     feature.type === "carboxylicAcid" ||
+    feature.type === "acylAzide" ||
     feature.type === "amide" ||
     feature.type === "aldehyde" ||
     feature.type === "nitrile" ||
+    feature.type === "thioaldehyde" ||
+    feature.type === "thioamide" ||
+    feature.type === "thiocarboxylicAcid" ||
+    suffix === "peroxoic acid" ||
     suffix === "oic acid" ||
+    suffix === "oyl azide" ||
     suffix === "amide" ||
     suffix === "al" ||
-    suffix === "nitrile"
+    suffix === "nitrile" ||
+    suffix === "thial" ||
+    suffix === "thioamide" ||
+    suffix === "thioic acid"
   );
 }
 
 function getTerminalSuffix(feature: NamingFeature) {
+  if (feature.type === "peroxyAcid") return "peroxoic acid";
   if (feature.type === "carboxylicAcid") return "oic acid";
+  if (feature.type === "acylAzide") return "oyl azide";
   if (feature.type === "amide") return "amide";
   if (feature.type === "aldehyde") return "al";
   if (feature.type === "nitrile") return "nitrile";
+  if (feature.type === "thioaldehyde") return "thial";
+  if (feature.type === "thioamide") return "thioamide";
+  if (feature.type === "thiocarboxylicAcid") return "thioic acid";
 
   return feature.suffix;
 }
@@ -438,6 +479,33 @@ export function buildPrimarySuffixName(
     return joinSuffixWithLocants(parentStem, parent, "thiol", locants);
   }
 
+  if (feature.type === "thioketone") {
+    if (count > 1) {
+      return joinSuffixWithLocants(parentStem, parent, "thione", locants, multiplier);
+    }
+    if (shouldOmitSingleLocant(parent, feature)) {
+      return joinSuffixWithoutLocant(parentStem, parent, "thione");
+    }
+    return joinSuffixWithLocants(parentStem, parent, "thione", locants);
+  }
+
+  if (
+    feature.type === "sulfonicAcid" ||
+    feature.type === "sulfinicAcid" ||
+    feature.type === "sulfenicAcid" ||
+    feature.type === "sulfonamide" ||
+    feature.type === "imine"
+  ) {
+    const suffix = feature.suffix;
+    if (count > 1) {
+      return joinSuffixWithLocants(parentStem, parent, suffix, locants, multiplier);
+    }
+    if (shouldOmitSingleLocant(parent, feature)) {
+      return joinSuffixWithoutLocant(parentStem, parent, suffix);
+    }
+    return joinSuffixWithLocants(parentStem, parent, suffix, locants);
+  }
+
   if (count > 1) {
     return joinSuffixWithLocants(
       parentStem,
@@ -463,10 +531,23 @@ export function shouldOmitSingleLocant(
 
   const locant = feature.locants[0];
 
+  // A single principal suffix on a monocyclic parent defines position 1.
+  // cyclohexanol, cyclohexanone, cyclohexanamine,
+  // cyclohexanesulfonic acid, etc. do not need an explicit "1-" locant.
+  if (parent.kind === "ring" && locant === 1) return true;
+
   return (
     (feature.type === "alcohol" && parent.carbonCount <= 2 && locant === 1) ||
     (feature.type === "ketone" && parent.carbonCount <= 3) ||
-    (feature.type === "thiol" && parent.carbonCount <= 2 && locant === 1)
+    (feature.type === "thioketone" && parent.carbonCount <= 3) ||
+    (feature.type === "thiol" && parent.carbonCount <= 2 && locant === 1) ||
+    (feature.type === "imine" && parent.carbonCount <= 2 && locant === 1) ||
+    ((feature.type === "sulfonicAcid" ||
+      feature.type === "sulfinicAcid" ||
+      feature.type === "sulfenicAcid" ||
+      feature.type === "sulfonamide") &&
+      parent.carbonCount <= 2 &&
+      locant === 1)
   );
 }
 

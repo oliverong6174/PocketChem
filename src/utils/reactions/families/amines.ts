@@ -44,12 +44,51 @@ export const amineReactionRules: ReactionRule[] = [
     productHint: "Higher substituted amine",
     explanation:
       "Amines can undergo successive alkylation with alkyl halides.",
-    trigger: amineTrigger,
-    transform: {
-      type: "conceptOnly",
-      reason: "The alkyl halide must be specified before an exact alkylated amine can be generated.",
+    trigger: {
+      anyFunctionalGroups: ["Primary amine", "Secondary amine", "Benzyl amine", "Aniline", "Primary aryl amine", "Secondary aryl amine"],
+      includeSmarts: ["[N;H1,H2;+0;!$(N[C,S,P]=O)]"],
     },
+    additionalReactants: [
+      {
+        label: "methyl or primary alkyl halide",
+        trigger: { includeSmarts: ["[C;X4;H2,H3][Cl,Br,I]"] },
+      },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[N;H1,H2;+0:1].[C;X4:2][Cl,Br,I]>>[N:1]-[C:2]",
+      maxProducts: 8,
+    },
+    limitations: ["Further alkylation can occur unless stoichiometry and reaction conditions are controlled."],
     priority: 1710,
+  },
+
+  {
+    id: "tertiary-amine-quaternization",
+    family: "amines",
+    reactionType: "substitution",
+    title: "Tertiary Amine Quaternization",
+    reagents: "methyl or primary R-X",
+    reagentNote: "Menshutkin alkylation",
+    productHint: "Quaternary ammonium salt",
+    explanation:
+      "A tertiary amine attacks a methyl or primary alkyl halide to form a quaternary ammonium ion.",
+    trigger: {
+      anyFunctionalGroups: ["Tertiary amine", "Tertiary aryl amine"],
+      includeSmarts: ["[N;H0;+0;X3;!$(N[C,S,P]=O)]"],
+    },
+    additionalReactants: [
+      {
+        label: "methyl or primary alkyl halide",
+        trigger: { includeSmarts: ["[C;X4;H2,H3][Cl,Br,I]"] },
+      },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[N;H0;+0:1].[C;X4:2][Cl,Br,I]>>[N+:1]-[C:2]",
+      maxProducts: 8,
+    },
+    priority: 1712,
   },
 
   {

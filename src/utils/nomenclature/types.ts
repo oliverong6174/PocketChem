@@ -38,11 +38,19 @@ export type MoleculePropertyResult = {
   volatilityTendency: PropertyTendencyResult;
 };
 
+export type NamingStatus =
+  | "systematic"
+  | "retained"
+  | "common"
+  | "functional-class"
+  | "unsupported";
+
 export type NomenclatureResult = {
   estimatedName: string;
   commonName: string | null;
   displayName: string;
   namingConfidence: "High" | "Medium" | "Low";
+  namingStatus: NamingStatus;
   parentChain: string | null;
   parentChainLength: number;
   mainSuffix: string | null;
@@ -92,8 +100,10 @@ export type RingDescriptor = {
 
 export type NamingFeatureType =
   | "carboxylicAcid"
+  | "peroxyAcid"
   | "ester"
   | "acidChloride"
+  | "acylAzide"
   | "anhydride"
   | "aldehyde"
   | "ketone"
@@ -102,6 +112,15 @@ export type NamingFeatureType =
   | "thiol"
   | "nitrile"
   | "amide"
+  | "sulfonicAcid"
+  | "sulfinicAcid"
+  | "sulfenicAcid"
+  | "sulfonamide"
+  | "imine"
+  | "thioaldehyde"
+  | "thioketone"
+  | "thioamide"
+  | "thiocarboxylicAcid"
   | "alkene"
   | "alkyne";
 

@@ -6,107 +6,213 @@ const alkylHalideTrigger = {
   excludedFunctionalGroups: ["Aryl halide", "Vinyl halide"],
 };
 
+/** Methyl, primary, or secondary alkyl halide; tertiary centers are excluded. */
+const sn2EligibleHalideTrigger = {
+  ...alkylHalideTrigger,
+  includeSmarts: ["[C;X4;H1,H2,H3][Cl,Br,I]"],
+};
+
+/** Methyl or primary alkyl halide, used where steric demand must stay very low. */
 const primaryOrMethylHalideTrigger = {
   ...alkylHalideTrigger,
   includeSmarts: ["[C;X4;H2,H3][Cl,Br,I]"],
 };
 
+/** Secondary or tertiary alkyl halide, the usual simple-substrate SN1/E1 domain. */
 const secondaryOrTertiaryHalideTrigger = {
   ...alkylHalideTrigger,
   includeSmarts: ["[C;X4;H0,H1][Cl,Br,I]"],
 };
 
+/** Primary, secondary, or tertiary halide, but not methyl; a beta site is still required. */
+const e2EligibleHalideTrigger = {
+  ...alkylHalideTrigger,
+  includeSmarts: ["[C;X4;H0,H1,H2][Cl,Br,I]"],
+};
+
+/** Primary benzylic/allylic halides can ionize because the carbocation is resonance-stabilized. */
+const resonanceStabilizedPrimaryHalideTrigger = {
+  anyFunctionalGroups: ["Allylic halide", "Benzyl halide"],
+  includeSmarts: ["[C;X4;H2][Cl,Br,I]"],
+  excludedFunctionalGroups: ["Aryl halide", "Vinyl halide"],
+};
+
+const hydroxideReactant = {
+  label: "hydroxide ion",
+  trigger: { includeSmarts: ["[O-;H1]"] },
+};
+
+const cyanideReactant = {
+  label: "cyanide ion",
+  trigger: { includeSmarts: ["[C-]#N"] },
+};
+
+const azideReactant = {
+  label: "azide ion",
+  trigger: { includeSmarts: ["[N-]~[N+]~[N]"] },
+};
+
+const ammoniaReactant = {
+  label: "ammonia",
+  trigger: { includeSmarts: ["[N;H3;+0]"] },
+};
+
+const waterReactant = {
+  label: "water",
+  trigger: { includeSmarts: ["[O;H2;+0]"] },
+};
+
+const neutralAlcoholReactant = {
+  label: "alcohol solvent / nucleophile",
+  trigger: {
+    includeSmarts: ["[#6][O;H1;+0]"],
+    excludeSmarts: ["[CX3](=O)[O;H1]"],
+  },
+};
+
+const unhinderedAlkoxideReactant = {
+  label: "unhindered alkoxide base",
+  trigger: {
+    includeSmarts: ["[C;H1,H2,H3][O-]"],
+  },
+};
+
+const tertButoxideReactant = {
+  label: "tert-butoxide ion",
+  trigger: {
+    includeSmarts: ["[O-][C;H0;X4]([#6])([#6])[#6]"],
+  },
+};
+
+const amideBaseReactant = {
+  label: "amide base",
+  trigger: {
+    includeSmarts: ["[N-;H2]"],
+  },
+};
+
 export const haloalkaneReactionRules: ReactionRule[] = [
+  // ---------------------------------------------------------------------------
+  // SN2: the nucleophile is an explicitly drawn second reactant.
+  // ---------------------------------------------------------------------------
   {
     id: "haloalkane-sn2-hydroxide",
     family: "haloalkanes",
     reactionType: "substitution",
+    reactionClass: "nucleophilic substitution",
     title: "SN2 with Hydroxide",
-    reagents: "NaOH or KOH, polar aprotic solvent",
-    reagentNote: "Backside substitution",
+    reagents: "Polar aprotic conditions",
+    reagentNote: "Draw the alkyl halide and hydroxide as disconnected structures",
     productHint: "Alcohol",
     explanation:
-      "Hydroxide displaces the leaving group in one step. Methyl and primary substrates react fastest, and a stereocenter inverts.",
-    trigger: primaryOrMethylHalideTrigger,
+      "Hydroxide attacks the carbon bearing the leaving group in one concerted backside-displacement step. Methyl and primary substrates react fastest; secondary substrates can compete with E2.",
+    trigger: sn2EligibleHalideTrigger,
+    additionalReactants: [hydroxideReactant],
     transform: {
       type: "customHandler",
       handler: "substitution",
-      options: { mode: "alkylHalideSubstitution", nucleophile: "hydroxide" },
+      options: { mode: "sn2", nucleophile: "hydroxide", maxProducts: 8 },
     },
     mechanism: "SN2",
-    selectivity: ["Backside attack", "Inversion at the reacting carbon"],
+    selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
+    limitations: [
+      "SN2 inversion is explicitly encoded at a stereogenic reacting carbon; other stereocenters are retained.",
+      "Secondary substrates may also undergo E2; tertiary substrates are excluded from this SN2 rule.",
+    ],
+    productStatus: "representative",
     priority: 200,
   },
   {
     id: "haloalkane-sn2-cyanide",
     family: "haloalkanes",
     reactionType: "substitution",
+    reactionClass: "nucleophilic substitution",
     title: "SN2 with Cyanide",
-    reagents: "NaCN or KCN, polar aprotic solvent",
-    reagentNote: "One-carbon chain extension",
+    reagents: "Polar aprotic conditions",
+    reagentNote: "Draw the alkyl halide and cyanide ion as disconnected structures",
     productHint: "Nitrile",
     explanation:
-      "Cyanide attacks through carbon and replaces the leaving group, extending the carbon skeleton by one carbon.",
-    trigger: primaryOrMethylHalideTrigger,
+      "Cyanide attacks through carbon and displaces the leaving group in an SN2 reaction, extending the carbon skeleton by one carbon.",
+    trigger: sn2EligibleHalideTrigger,
+    additionalReactants: [cyanideReactant],
     transform: {
       type: "customHandler",
       handler: "substitution",
-      options: { mode: "alkylHalideSubstitution", nucleophile: "cyanide" },
+      options: { mode: "sn2", nucleophile: "cyanide", maxProducts: 8 },
     },
     mechanism: "SN2",
-    selectivity: ["Inversion at the reacting carbon"],
+    selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
+    limitations: [
+      "SN2 inversion is explicitly encoded at a stereogenic reacting carbon.",
+      "Secondary substrates can compete with E2.",
+    ],
+    productStatus: "representative",
     priority: 210,
   },
   {
     id: "haloalkane-sn2-azide",
     family: "haloalkanes",
     reactionType: "substitution",
+    reactionClass: "nucleophilic substitution",
     title: "SN2 with Azide",
-    reagents: "NaN₃, DMF or DMSO",
-    reagentNote: "Azide substitution",
+    reagents: "Polar aprotic solvent such as DMF or DMSO",
+    reagentNote: "Draw the alkyl halide and azide ion as disconnected structures",
     productHint: "Alkyl azide",
     explanation:
-      "Azide is a strong nucleophile and weak base, so it favors substitution on methyl and primary alkyl halides.",
-    trigger: primaryOrMethylHalideTrigger,
+      "Azide is a strong nucleophile and weak base, so it commonly undergoes SN2 substitution with methyl, primary, and many secondary alkyl halides.",
+    trigger: sn2EligibleHalideTrigger,
+    additionalReactants: [azideReactant],
     transform: {
       type: "customHandler",
       handler: "substitution",
-      options: { mode: "alkylHalideSubstitution", nucleophile: "azide" },
+      options: { mode: "sn2", nucleophile: "azide", maxProducts: 8 },
     },
     mechanism: "SN2",
-    selectivity: ["Inversion at the reacting carbon"],
+    selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
+    limitations: [
+      "SN2 inversion is explicitly encoded at a stereogenic reacting carbon.",
+    ],
+    productStatus: "representative",
     priority: 220,
   },
   {
     id: "haloalkane-sn2-ammonia",
     family: "haloalkanes",
     reactionType: "substitution",
-    title: "Alkylation with Ammonia",
-    reagents: "Excess NH₃",
-    reagentNote: "SN2 amination",
+    reactionClass: "nucleophilic substitution",
+    title: "SN2 Alkylation with Ammonia",
+    reagents: "Excess ammonia; polar conditions",
+    reagentNote: "Draw the alkyl halide and ammonia as disconnected structures",
     productHint: "Primary amine",
     explanation:
-      "Ammonia displaces the leaving group. Excess ammonia reduces further alkylation of the amine product.",
-    trigger: primaryOrMethylHalideTrigger,
+      "Ammonia attacks the electrophilic carbon and displaces the leaving group by SN2. Excess ammonia helps limit further alkylation of the amine product.",
+    trigger: sn2EligibleHalideTrigger,
+    additionalReactants: [ammoniaReactant],
     transform: {
       type: "customHandler",
       handler: "substitution",
-      options: { mode: "alkylHalideSubstitution", nucleophile: "ammonia" },
+      options: { mode: "sn2", nucleophile: "ammonia", maxProducts: 8 },
     },
     mechanism: "SN2",
+    limitations: [
+      "Further alkylation can occur if the alkyl halide is not limiting.",
+      "Secondary substrates are more hindered and can show competing elimination.",
+    ],
+    productStatus: "representative",
     priority: 230,
   },
   {
     id: "haloalkane-williamson-ether",
     family: "haloalkanes",
     reactionType: "substitution",
+    reactionClass: "nucleophilic substitution",
     title: "Williamson Ether Synthesis",
-    reagents: "Alkoxide salt",
-    reagentNote: "Draw a methyl/primary alkyl halide and an alkoxide as disconnected structures",
+    reagents: "Polar aprotic conditions",
+    reagentNote: "Draw the alkyl halide and alkoxide as disconnected structures",
     productHint: "Ether",
     explanation:
-      "An alkoxide displaces a leaving group from a methyl or primary alkyl halide to form an ether.",
-    trigger: primaryOrMethylHalideTrigger,
+      "An alkoxide displaces the leaving group by SN2 to form an ether. Methyl and primary halides are best; secondary halides can undergo competing E2.",
+    trigger: sn2EligibleHalideTrigger,
     additionalReactants: [
       {
         label: "alkoxide ion",
@@ -116,24 +222,30 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     ],
     transform: {
-      type: "reactionSmarts",
-      smarts:
-        "[C;X4:1][Cl,Br,I].[#6,#0:2][O-:3]>>[C:1][O+0:3][#6,#0:2]",
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "sn2", nucleophile: "alkoxide", maxProducts: 8 },
     },
     mechanism: "SN2",
-    limitations: ["Secondary and tertiary halides favor elimination instead."],
+    selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
+    limitations: [
+      "Secondary halides can undergo substantial E2; tertiary halides are excluded.",
+      "SN2 inversion is explicitly encoded when the reacting carbon is stereogenic.",
+    ],
+    productStatus: "representative",
     priority: 240,
   },
   {
     id: "haloalkane-acetylide-alkylation",
     family: "haloalkanes",
     reactionType: "substitution",
-    title: "Alkylation with an Acetylide",
-    reagents: "Acetylide salt",
+    reactionClass: "nucleophilic substitution",
+    title: "SN2 Alkylation with an Acetylide",
+    reagents: "Polar aprotic conditions",
     reagentNote: "Draw a methyl/primary alkyl halide and an acetylide ion",
     productHint: "Higher alkyne",
     explanation:
-      "An acetylide ion displaces the leaving group from a methyl or primary alkyl halide, forming a new carbon-carbon bond.",
+      "An acetylide ion displaces the leaving group from a methyl or primary alkyl halide by SN2, forming a new carbon-carbon bond.",
     trigger: primaryOrMethylHalideTrigger,
     additionalReactants: [
       {
@@ -144,94 +256,356 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     ],
     transform: {
-      type: "reactionSmarts",
-      smarts:
-        "[C;X4:1][Cl,Br,I].[#6:2]#[C-:3]>>[C:1][C+0:3]#[C:2]",
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "sn2", nucleophile: "acetylide", maxProducts: 8 },
     },
     mechanism: "SN2",
     priority: 250,
   },
+
+  // ---------------------------------------------------------------------------
+  // SN1: weak neutral nucleophile is explicitly drawn.
+  // ---------------------------------------------------------------------------
   {
     id: "haloalkane-sn1-solvolysis-water",
     family: "haloalkanes",
     reactionType: "substitution",
+    reactionClass: "solvolysis",
     title: "SN1 Solvolysis in Water",
-    reagents: "H₂O, polar protic solvent",
-    reagentNote: "Carbocation substitution",
+    reagents: "Polar protic conditions",
+    reagentNote: "Draw a secondary/tertiary alkyl halide and water",
     productHint: "Alcohol",
     explanation:
-      "Secondary and tertiary alkyl halides can ionize in water, followed by nucleophilic capture to form an alcohol.",
+      "The leaving group ionizes to form a carbocation, then water captures the carbocation and deprotonation gives an alcohol. E1 competes increasingly as temperature rises.",
     trigger: secondaryOrTertiaryHalideTrigger,
+    additionalReactants: [waterReactant],
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C;X4:1][Cl,Br,I:2]>>[C:1]O",
-      maxProducts: 4,
+      type: "customHandler",
+      handler: "substitution",
+      options: {
+        mode: "sn1",
+        nucleophile: "water",
+        allowRearrangement: true,
+        maxShiftDepth: 2,
+        maxProducts: 12,
+      },
     },
     mechanism: "SN1",
-    selectivity: ["Racemization is common", "Rearrangements are possible"],
+    selectivity: ["Racemization is common", "Carbocation rearrangements are possible"],
+    limitations: [
+      "The handler enumerates strictly favorable 1,2-hydride and 1,2-alkyl shifts (up to two consecutive shifts) before capture.",
+      "SN1 attack from both faces is explicitly enumerated when the reacting carbocation gives a stereogenic product; real reactions may show incomplete racemization because of ion-pair effects.",
+      "Equal-stability rearrangements and detailed migratory aptitude are not ranked automatically.",
+    ],
     productStatus: "representative",
     priority: 260,
+  },
+  {
+    id: "haloalkane-sn1-solvolysis-alcohol",
+    family: "haloalkanes",
+    reactionType: "substitution",
+    reactionClass: "solvolysis",
+    title: "SN1 Solvolysis in an Alcohol",
+    reagents: "Polar protic conditions",
+    reagentNote: "Draw a secondary/tertiary alkyl halide and the alcohol solvent",
+    productHint: "Ether",
+    explanation:
+      "After ionization of a secondary or tertiary alkyl halide, a neutral alcohol can capture the carbocation to form an ether after deprotonation.",
+    trigger: secondaryOrTertiaryHalideTrigger,
+    additionalReactants: [neutralAlcoholReactant],
+    transform: {
+      type: "customHandler",
+      handler: "substitution",
+      options: {
+        mode: "sn1",
+        nucleophile: "alcohol",
+        allowRearrangement: true,
+        maxShiftDepth: 2,
+        maxProducts: 12,
+      },
+    },
+    mechanism: "SN1",
+    selectivity: ["Racemization is common", "Carbocation rearrangements are possible"],
+    limitations: [
+      "The handler enumerates strictly favorable 1,2-hydride and 1,2-alkyl shifts (up to two consecutive shifts) before alcohol capture.",
+      "Both faces of a planar carbocation are enumerated when the product center is stereogenic; ion-pair effects can make experimental racemization incomplete.",
+      "Equal-stability rearrangements and detailed migratory aptitude are not ranked automatically.",
+    ],
+    productStatus: "representative",
+    priority: 265,
+  },
+
+  // ---------------------------------------------------------------------------
+  // E2: the strong base is an explicitly drawn second reactant. It is used for
+  // matching/competition but is not incorporated into the alkene product.
+  // ---------------------------------------------------------------------------
+  {
+    id: "haloalkane-sn1-resonance-water",
+    family: "haloalkanes",
+    reactionType: "substitution",
+    reactionClass: "solvolysis",
+    title: "SN1 Solvolysis of a Primary Allylic/Benzylic Halide",
+    reagents: "Polar protic conditions",
+    reagentNote: "Draw the resonance-stabilized alkyl halide and water",
+    productHint: "Allylic/benzylic alcohol",
+    explanation:
+      "Although ordinary primary alkyl halides do not favor SN1, primary allylic and benzylic halides can ionize because the carbocation is resonance-stabilized; water then captures the cation.",
+    trigger: resonanceStabilizedPrimaryHalideTrigger,
+    additionalReactants: [waterReactant],
+    transform: {
+      type: "customHandler",
+      handler: "substitution",
+      options: {
+        mode: "sn1",
+        nucleophile: "water",
+        allowRearrangement: false,
+        maxProducts: 8,
+      },
+    },
+    mechanism: "SN1",
+    selectivity: ["Resonance-stabilized carbocation", "Allylic resonance can create more than one capture site"],
+    limitations: [
+      "The current transform shows capture at the original leaving-group carbon and does not yet enumerate all resonance-related allylic substitution products.",
+    ],
+    productStatus: "representative",
+    priority: 266,
+  },
+  {
+    id: "haloalkane-sn1-resonance-alcohol",
+    family: "haloalkanes",
+    reactionType: "substitution",
+    reactionClass: "solvolysis",
+    title: "SN1 Alcohol Solvolysis of a Primary Allylic/Benzylic Halide",
+    reagents: "Polar protic conditions",
+    reagentNote: "Draw the resonance-stabilized alkyl halide and the alcohol solvent",
+    productHint: "Allylic/benzylic ether",
+    explanation:
+      "A primary allylic or benzylic leaving group can ionize through resonance stabilization, after which the drawn alcohol traps the carbocation to form an ether.",
+    trigger: resonanceStabilizedPrimaryHalideTrigger,
+    additionalReactants: [neutralAlcoholReactant],
+    transform: {
+      type: "customHandler",
+      handler: "substitution",
+      options: {
+        mode: "sn1",
+        nucleophile: "alcohol",
+        allowRearrangement: false,
+        maxProducts: 8,
+      },
+    },
+    mechanism: "SN1",
+    selectivity: ["Resonance-stabilized carbocation"],
+    limitations: [
+      "Allylic resonance can permit alternative capture positions; the current transform displays the unrearranged capture constitution.",
+    ],
+    productStatus: "representative",
+    priority: 267,
+  },
+
+  {
+    id: "haloalkane-e2-hydroxide",
+    family: "haloalkanes",
+    reactionType: "elimination",
+    reactionClass: "beta elimination",
+    title: "E2 with Hydroxide",
+    reagents: "Heat when elimination is desired",
+    reagentNote: "Draw the alkyl halide and hydroxide ion",
+    productHint: "Alkene",
+    explanation:
+      "Hydroxide can remove a beta hydrogen while the leaving group departs in one concerted E2 step. More substituted alkenes are normally favored when conformational access is comparable.",
+    trigger: e2EligibleHalideTrigger,
+    additionalReactants: [hydroxideReactant],
+    transform: {
+      type: "customHandler",
+      handler: "elimination",
+      options: {
+        mode: "e2",
+        leavingGroup: "halide",
+        preference: "zaitsev",
+        maxProducts: 8,
+      },
+    },
+    mechanism: "E2",
+    selectivity: ["Anti-periplanar beta H / leaving-group geometry", "Usually Zaitsev"],
+    limitations: [
+      "The handler ranks constitutional alkene substitution but does not yet test 3D anti-periplanar conformers or assign E/Z geometry.",
+      "Primary and secondary substrates can show competing SN2.",
+    ],
+    productStatus: "representative",
+    priority: 270,
   },
   {
     id: "haloalkane-e2-zaitsev",
     family: "haloalkanes",
     reactionType: "elimination",
-    title: "E2 Elimination: Zaitsev Product",
-    reagents: "NaOEt/EtOH or another small strong base, heat",
-    reagentNote: "Concerted beta elimination",
+    reactionClass: "beta elimination",
+    title: "E2 with an Unhindered Alkoxide",
+    reagents: "Heat when elimination is desired",
+    reagentNote: "Draw the alkyl halide and an unhindered alkoxide base",
     productHint: "More substituted alkene",
     explanation:
-      "A small strong base usually removes a beta hydrogen to give the more substituted alkene.",
-    trigger: alkylHalideTrigger,
+      "A strong, relatively unhindered alkoxide removes a beta hydrogen as the leaving group departs. The more substituted Zaitsev alkene is normally favored.",
+    trigger: e2EligibleHalideTrigger,
+    additionalReactants: [unhinderedAlkoxideReactant],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "A correct product requires enumerating beta carbons, anti-periplanar hydrogens, and alkene substitution.",
+      type: "customHandler",
+      handler: "elimination",
+      options: {
+        mode: "e2",
+        leavingGroup: "halide",
+        preference: "zaitsev",
+        maxProducts: 8,
+      },
     },
     mechanism: "E2",
     selectivity: ["Anti-periplanar geometry", "Usually Zaitsev"],
-    priority: 270,
+    limitations: [
+      "The handler ranks constitutional substitution but does not yet determine anti-periplanar conformer availability or E/Z stereochemistry.",
+      "Secondary substrates can show competing SN2.",
+    ],
+    productStatus: "representative",
+    priority: 272,
   },
   {
     id: "haloalkane-e2-hofmann",
     family: "haloalkanes",
     reactionType: "elimination",
-    title: "E2 Elimination: Hofmann Product",
-    reagents: "KOtBu or another bulky strong base, heat",
-    reagentNote: "Sterically controlled beta elimination",
+    reactionClass: "beta elimination",
+    title: "E2 with tert-Butoxide: Hofmann Preference",
+    reagents: "Heat",
+    reagentNote: "Draw the alkyl halide and tert-butoxide ion",
     productHint: "Less substituted alkene",
     explanation:
-      "A bulky base often removes the least hindered beta hydrogen, favoring the less substituted alkene.",
-    trigger: alkylHalideTrigger,
+      "Bulky tert-butoxide preferentially removes a less hindered beta hydrogen, often shifting the major constitutional product toward the less substituted Hofmann alkene.",
+    trigger: e2EligibleHalideTrigger,
+    additionalReactants: [tertButoxideReactant],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "A correct product requires beta-site enumeration and steric ranking of accessible hydrogens.",
+      type: "customHandler",
+      handler: "elimination",
+      options: {
+        mode: "e2",
+        leavingGroup: "halide",
+        preference: "hofmann",
+        maxProducts: 8,
+      },
     },
     mechanism: "E2",
-    selectivity: ["Anti-periplanar geometry", "Often Hofmann"],
-    priority: 280,
+    selectivity: ["Anti-periplanar geometry", "Often Hofmann with a bulky base"],
+    limitations: [
+      "The handler ranks constitutional alkene substitution but does not explicitly model steric approach trajectories, conformer populations, or E/Z geometry.",
+    ],
+    productStatus: "representative",
+    priority: 274,
   },
+  {
+    id: "haloalkane-e2-amide-base",
+    family: "haloalkanes",
+    reactionType: "elimination",
+    reactionClass: "beta elimination",
+    title: "E2 with Amide Base",
+    reagents: "Strong-base conditions",
+    reagentNote: "Draw the alkyl halide and amide base (for example NH₂⁻)",
+    productHint: "Alkene",
+    explanation:
+      "A very strong amide base can remove a beta hydrogen in a concerted E2 elimination. Constitutional products are ranked toward the more substituted alkene unless steric effects dictate otherwise.",
+    trigger: e2EligibleHalideTrigger,
+    additionalReactants: [amideBaseReactant],
+    transform: {
+      type: "customHandler",
+      handler: "elimination",
+      options: {
+        mode: "e2",
+        leavingGroup: "halide",
+        preference: "zaitsev",
+        maxProducts: 8,
+      },
+    },
+    mechanism: "E2",
+    selectivity: ["Anti-periplanar geometry", "Often Zaitsev with a small strong base"],
+    limitations: [
+      "The handler does not yet model anti-periplanar conformer populations or E/Z stereochemistry.",
+    ],
+    productStatus: "representative",
+    priority: 276,
+  },
+
+  // ---------------------------------------------------------------------------
+  // E1: a weak neutral base/solvent is explicitly drawn. SN1 and E1 are both
+  // returned when both are chemically plausible; heat is represented as a
+  // condition rather than a structural reactant.
+  // ---------------------------------------------------------------------------
   {
     id: "haloalkane-e1-elimination",
     family: "haloalkanes",
     reactionType: "elimination",
-    title: "E1 Elimination",
-    reagents: "Weak base, polar protic solvent, heat",
-    reagentNote: "Carbocation elimination",
+    reactionClass: "carbocation elimination",
+    title: "E1 Elimination in Water",
+    reagents: "Heat",
+    reagentNote: "Draw a secondary/tertiary alkyl halide and water",
     productHint: "Alkene mixture",
     explanation:
-      "Secondary and tertiary alkyl halides can ionize, then lose a beta proton to form alkenes. Heat favors elimination over substitution.",
+      "The leaving group ionizes to a carbocation, then water removes a beta proton. Heating shifts the SN1/E1 competition toward elimination, and the more substituted alkene is usually favored.",
     trigger: secondaryOrTertiaryHalideTrigger,
+    additionalReactants: [waterReactant],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "E1 products require carbocation rearrangement analysis and beta-site enumeration.",
+      type: "customHandler",
+      handler: "elimination",
+      options: {
+        mode: "e1",
+        leavingGroup: "halide",
+        preference: "zaitsev",
+        maxProducts: 12,
+        maxShiftDepth: 2,
+        allowRearrangement: true,
+      },
     },
     mechanism: "E1",
-    selectivity: ["Usually Zaitsev", "Rearrangements are possible"],
+    selectivity: ["Usually Zaitsev", "Carbocation rearrangements are possible"],
+    limitations: [
+      "The E1 handler enumerates strictly favorable 1,2-hydride and 1,2-alkyl shifts before beta elimination, then ranks constitutional alkenes by Zaitsev substitution.",
+      "E/Z stereoisomers are not yet explicitly generated or ranked.",
+      "Equal-stability shifts and detailed migratory aptitude are not automatically ranked.",
+    ],
+    productStatus: "representative",
     priority: 290,
   },
+  {
+    id: "haloalkane-e1-alcohol-solvolysis",
+    family: "haloalkanes",
+    reactionType: "elimination",
+    reactionClass: "carbocation elimination",
+    title: "E1 Elimination in an Alcohol Solvent",
+    reagents: "Heat",
+    reagentNote: "Draw a secondary/tertiary alkyl halide and the alcohol solvent",
+    productHint: "Alkene mixture",
+    explanation:
+      "A polar protic alcohol can support carbocation formation; at elevated temperature, beta deprotonation competes with SN1 capture and produces an alkene, usually favoring the Zaitsev constitution.",
+    trigger: secondaryOrTertiaryHalideTrigger,
+    additionalReactants: [neutralAlcoholReactant],
+    transform: {
+      type: "customHandler",
+      handler: "elimination",
+      options: {
+        mode: "e1",
+        leavingGroup: "halide",
+        preference: "zaitsev",
+        maxProducts: 12,
+        maxShiftDepth: 2,
+        allowRearrangement: true,
+      },
+    },
+    mechanism: "E1",
+    selectivity: ["Usually Zaitsev", "Carbocation rearrangements are possible"],
+    limitations: [
+      "The E1 handler includes strictly favorable hydride/alkyl rearrangements before elimination.",
+      "E/Z stereoisomers are not yet explicitly generated or ranked.",
+      "Equal-stability shifts and detailed migratory aptitude are not automatically ranked.",
+    ],
+    productStatus: "representative",
+    priority: 292,
+  },
+
   {
     id: "haloalkane-grignard-formation",
     family: "haloalkanes",

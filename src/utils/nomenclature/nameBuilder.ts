@@ -2,6 +2,7 @@ import type { FunctionalGroupResult } from "../functionalGroups/types";
 
 import type {
   NamingFeature,
+  NamingStatus,
   ParentDescriptor,
   ParsedMol,
   Substituent,
@@ -31,9 +32,10 @@ import { getPrimaryFunctionalGroup } from "./nameBuilder/primaryGroup";
 import { getParentStrategy } from "./nameBuilder/parentStrategy";
 
 import {
-  getAromaticSuffixContext,
-  orientAromaticParentForSuffix,
-  type AromaticSuffixContext,
+  getRenderedRingSuffixName,
+  getRingSuffixContext,
+  orientRingParentForSuffix,
+  type RingSuffixContext,
 } from "./nameBuilder/ringNomenclature";
 
 import {
@@ -46,15 +48,20 @@ import { getExoticParentDescriptor } from "./nameBuilder/exoticParents";
 import {
   getRetainedHeterocycleSpecsFromGroups,
 } from "./nameBuilder/functionalGroupNaming";
+import { getWholeMoleculeRetainedName } from "./nameBuilder/retainedNames";
+import { getFunctionalClassName } from "./nameBuilder/functionalClassNames";
+import { getNamingGuardResult } from "./nameBuilder/namingGuard";
 
 type EstimatedIupacResult = {
   estimatedName: string;
   confidence: "low" | "medium" | "high";
+  status: NamingStatus;
   reason: string;
   parent: ParentDescriptor | null;
   features: NamingFeature[];
   primaryFeature: NamingFeature | null;
   substituents: Substituent[];
+  parentIndependent?: boolean;
 };
 
 export function buildEstimatedIupacName(
@@ -62,20 +69,13 @@ export function buildEstimatedIupacName(
   functionalGroups: FunctionalGroupResult[],
   mainGroup: FunctionalGroupResult | null
 ): EstimatedIupacResult | null {
-
-  console.log("NAME BUILDER ENTERED", {
-  functionalGroups: functionalGroups.map((group) => ({
-    name: group.name,
-    suffix: group.suffix,
-    prefix: group.prefix,
-  })),
-});
   if (!parsedMol || parsedMol.atoms.length === 0) {
     
 
     return {
       estimatedName: "Name not estimated yet",
       confidence: "low",
+      status: "unsupported",
       reason: "Could not parse molecule.",
       parent: null,
       features: [],
@@ -83,7 +83,69 @@ export function buildEstimatedIupacName(
       substituents: [],
     };
   }
+  const retainedWholeMoleculeName = getWholeMoleculeRetainedName(
+    parsedMol,
+    functionalGroups,
+    mainGroup
+  );
+
+  if (retainedWholeMoleculeName) {
+    return {
+      estimatedName: retainedWholeMoleculeName,
+      confidence: "high",
+      status: "retained",
+      reason: "Recognized a complete retained-name scaffold from the functional-group pattern registry.",
+      parent: null,
+      features: [],
+      primaryFeature: null,
+      substituents: [],
+      parentIndependent: true,
+    };
+  }
+
   const rawPrimaryGroup = getPrimaryFunctionalGroup(functionalGroups, mainGroup);
+  const rawNamingIntent = getNamingIntent(rawPrimaryGroup);
+
+  // Some O-chem families are more legible as functional-class names than as
+  // forced hydrocarbon suffixes (e.g. dimethyl sulfoxide, methyl hydroperoxide,
+  // ethylboronic acid). Use that route only when no structurally supported
+  // principal suffix is competing for the molecule.
+  if (!rawNamingIntent.featureType) {
+    const functionalClassName = getFunctionalClassName(
+      parsedMol,
+      functionalGroups,
+      mainGroup
+    );
+
+    if (functionalClassName) {
+      return {
+        estimatedName: functionalClassName.name,
+        confidence: functionalClassName.confidence,
+        status: "functional-class",
+        reason: functionalClassName.reason,
+        parent: null,
+        features: [],
+        primaryFeature: null,
+        substituents: [],
+        parentIndependent: true,
+      };
+    }
+  }
+
+  const namingGuard = getNamingGuardResult(rawPrimaryGroup);
+  if (namingGuard.blocked) {
+    return {
+      estimatedName: "Name not yet supported",
+      confidence: "low",
+      status: "unsupported",
+      reason: namingGuard.reason ?? "Recognized functional group is not yet safely nameable.",
+      parent: null,
+      features: [],
+      primaryFeature: null,
+      substituents: [],
+      parentIndependent: true,
+    };
+  }
 
       const retainedHeterocycleSpecs =
         getRetainedHeterocycleSpecsFromGroups(functionalGroups);
@@ -109,30 +171,6 @@ const preferredParentAtoms = getParentCandidateAtomsForPrimaryGroup(
   primaryGroup
 );
 
-console.log("PRIMARY GROUP VALIDATION", {
-  rawPrimaryGroup: rawPrimaryGroup?.name,
-  rawPrimaryGroupSuffix: rawPrimaryGroup?.suffix,
-  neutralParent: {
-    kind: neutralParent.kind,
-    hydrocarbon: neutralParent.parentHydrocarbon,
-    stem: neutralParent.parentStem,
-    path: neutralParent.path,
-  },
-  neutralFeatures,
-  effectivePrimaryGroup: primaryGroup?.name,
-  effectivePrimaryGroupSuffix: primaryGroup?.suffix,
-  namingIntent,
-  preferredParentAtoms,
-});
-
-  console.log("PARENT ROUTE DEBUG", {
-  primaryGroup: primaryGroup?.name,
-  primaryGroupSuffix: primaryGroup?.suffix,
-  namingIntent,
-  preferredParentAtoms,
-  parentStrategy: getParentStrategy(primaryGroup),
-});
-
   const carbonDefaultParent = getParentDescriptor(
     parsedMol,
     preferredParentAtoms
@@ -147,15 +185,7 @@ console.log("PRIMARY GROUP VALIDATION", {
     ? exoticParent
     : carbonDefaultParent;
 
-    console.log("EXOTIC PARENT DEBUG", {
-  rawPrimaryGroup,
-  retainedHeterocycleSpecs,
-  exoticParent,
-  shouldUseExoticParent,
-  defaultParent,
-});
-
-  const initialAromaticSuffixContext = getAromaticSuffixContext(
+  const initialRingSuffixContext = getRingSuffixContext(
   parsedMol,
   defaultParent,
   primaryGroup
@@ -167,7 +197,7 @@ const shouldUseAcylParent =
   preferredParentAtoms.length > 0;
 
 const unorientedParent =
-  initialAromaticSuffixContext
+  initialRingSuffixContext
     ? defaultParent
     : shouldUseAcylParent
     ? getBestAcylParentDescriptor(parsedMol, preferredParentAtoms) ?? defaultParent
@@ -183,24 +213,17 @@ const parentBeforeAromaticOrientation =
       );
 
 const parent =
-  initialAromaticSuffixContext && !shouldUseExoticParent
-    ? orientAromaticParentForSuffix(
+  initialRingSuffixContext && !shouldUseExoticParent
+    ? orientRingParentForSuffix(
         parsedMol,
         parentBeforeAromaticOrientation,
-        initialAromaticSuffixContext
+        initialRingSuffixContext
       )
     : parentBeforeAromaticOrientation;
 
-  console.log("FINAL PARENT DEBUG", {
-  parentKind: parent.kind,
-  parentPath: parent.path,
-  parentHydrocarbon: parent.parentHydrocarbon,
-  parentStem: parent.parentStem,
-});
-
-  const finalAromaticSuffixContext = initialAromaticSuffixContext
-    ? getAromaticSuffixContext(parsedMol, parent, primaryGroup) ??
-      initialAromaticSuffixContext
+  const finalRingSuffixContext = initialRingSuffixContext
+    ? getRingSuffixContext(parsedMol, parent, primaryGroup) ??
+      initialRingSuffixContext
     : null;
 
   const features = detectNamingFeatures(parsedMol, parent);
@@ -208,17 +231,12 @@ const parent =
   const primaryFeature = selectPrimaryFeature(
     features,
     namingIntent,
-    finalAromaticSuffixContext,
+    finalRingSuffixContext,
     primaryGroup
   );
 
-  console.log("FEATURE DEBUG", {
-  features,
-  primaryFeature,
-});
-
-  const effectiveAromaticSuffixContext = getEffectiveAromaticSuffixContext(
-  finalAromaticSuffixContext,
+  const effectiveRingSuffixContext = getEffectiveRingSuffixContext(
+  finalRingSuffixContext,
   primaryFeature
 );
 
@@ -226,19 +244,22 @@ const parent =
   parsedMol,
   parent,
   features,
-  effectiveAromaticSuffixContext?.representedExternalAtoms ?? new Set(),
+  effectiveRingSuffixContext?.representedExternalAtoms ?? new Set(),
   primaryGroup
 );
 
-  const suffixName =
-    effectiveAromaticSuffixContext?.suffixName ??
-    buildFunctionalGroupSuffixName(
-      parsedMol,
-      parent,
-      primaryGroup,
-      primaryFeature
-    ) ??
-    buildSuffixName(parsedMol, parent, primaryFeature);
+  const suffixName = effectiveRingSuffixContext
+    ? getRenderedRingSuffixName(
+        parent,
+        effectiveRingSuffixContext,
+        substituents.length
+      )
+    : buildFunctionalGroupSuffixName(
+        parsedMol,
+        parent,
+        primaryGroup,
+        primaryFeature
+      ) ?? buildSuffixName(parsedMol, parent, primaryFeature);
 
   if (!suffixName) return null;
 
@@ -255,7 +276,7 @@ const parent =
     substituents,
     primaryGroup,
     primaryFeature,
-    finalAromaticSuffixContext
+    finalRingSuffixContext
   );
 
   const estimatedName =
@@ -265,6 +286,7 @@ const parent =
   return {
       estimatedName,
       confidence: "medium",
+      status: "systematic",
       reason: "Estimated from detected parent chain, suffix group, and substituents.",
       parent,
       features,
@@ -300,14 +322,15 @@ function getSimpleAromaticAlias(
   substituents: Substituent[],
   primaryGroup: FunctionalGroupResult | null,
   primaryFeature: NamingFeature | null,
-  aromaticSuffixContext: { suffixName: string } | null
+  ringSuffixContext: { suffixName: string } | null
 ) {
   if (!parent.aromaticRing) return null;
+  if (parent.parentHydrocarbon !== "benzene") return null;
 
   // Retained aromatic functional parents are base/suffix names, not complete
   // final names. Otherwise prefixes such as 4-amino in 4-aminobenzoic acid get
   // thrown away.
-  if (primaryGroup || primaryFeature || aromaticSuffixContext) return null;
+  if (primaryGroup || primaryFeature || ringSuffixContext) return null;
 
   if (substituents.length !== 1) return null;
 
@@ -322,8 +345,8 @@ function getSimpleAromaticAlias(
   return null;
 }
 
-function getEffectiveAromaticSuffixContext(
-  context: AromaticSuffixContext | null,
+function getEffectiveRingSuffixContext(
+  context: RingSuffixContext | null,
   primaryFeature: NamingFeature | null
 ) {
   if (!context) return null;
@@ -345,7 +368,7 @@ function getEffectiveAromaticSuffixContext(
 function selectPrimaryFeature(
   features: NamingFeature[],
   namingIntent: ReturnType<typeof getNamingIntent>,
-  aromaticContext: AromaticSuffixContext | null,
+  aromaticContext: RingSuffixContext | null,
   primaryGroup: FunctionalGroupResult | null
 ) {
   let detectedFeature: NamingFeature | null = null;
@@ -431,7 +454,9 @@ function validatePrimaryGroupAgainstStructuralFeatures(
 
 function isStructurallyReliableSuffixFeature(feature: NamingFeature) {
   return (
+    feature.type === "peroxyAcid" ||
     feature.type === "carboxylicAcid" ||
+    feature.type === "acylAzide" ||
     feature.type === "ester" ||
     feature.type === "amide" ||
     feature.type === "acidChloride" ||
@@ -440,6 +465,15 @@ function isStructurallyReliableSuffixFeature(feature: NamingFeature) {
     feature.type === "nitrile" ||
     feature.type === "alcohol" ||
     feature.type === "amine" ||
-    feature.type === "thiol"
+    feature.type === "thiol" ||
+    feature.type === "sulfonicAcid" ||
+    feature.type === "sulfinicAcid" ||
+    feature.type === "sulfenicAcid" ||
+    feature.type === "sulfonamide" ||
+    feature.type === "imine" ||
+    feature.type === "thioaldehyde" ||
+    feature.type === "thioketone" ||
+    feature.type === "thioamide" ||
+    feature.type === "thiocarboxylicAcid"
   );
 }

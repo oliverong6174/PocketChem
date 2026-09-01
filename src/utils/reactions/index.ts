@@ -1,6 +1,7 @@
 import type { FunctionalGroupResult } from "../functionalGroups/types";
 import { predictReactionPathwaysFromRules } from "./engine/reactionEngine";
 import { reactionRegistry } from "./reactionRegistry";
+import { predictRetrosynthesisPathwaysFromRules } from "./engine/retrosynthesisEngine";
 
 export type {
   OrganicChemCourse,
@@ -14,6 +15,8 @@ export type {
   ReactionTransform,
   ReactionTrigger,
   ReactionType,
+  RetrosynthesisConfidence,
+  RetrosynthesisPathway,
 } from "./reactionTypes";
 export { reactionRegistry } from "./reactionRegistry";
 export { validateReactionRegistry } from "./reactionValidation";
@@ -26,6 +29,7 @@ export {
   type ReactionCatalogSummary,
 } from "./reactionCatalog";
 export { predictReactionPathwaysFromRules } from "./engine/reactionEngine";
+export { predictRetrosynthesisPathwaysFromRules } from "./engine/retrosynthesisEngine";
 export {
   analyzeReactionComponents,
   isGenericReactionSmiles,
@@ -42,4 +46,8 @@ export async function predictReactionPathways(
     functionalGroups,
     reactionRegistry
   );
+}
+
+export async function predictRetrosynthesisPathways(targetSmiles: string) {
+  return predictRetrosynthesisPathwaysFromRules(targetSmiles, reactionRegistry);
 }

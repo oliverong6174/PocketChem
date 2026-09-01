@@ -181,6 +181,20 @@ export const nitrogenGroups: FunctionalGroupPattern[] = [
       "Diazo compounds contain a carbon attached to a diazo group. They are reactive nitrogen-containing functional groups.",
   },
   {
+    name: "Nitrate ester",
+    priority: 25.9,
+    nomenclaturePriority: 19.9,
+    confidence: "High",
+    suffix: "functional class",
+    prefix: "nitrooxy",
+    equivalentNames: ["alkyl nitrate", "organic nitrate"],
+    smarts: "[#6][OX2][N+](=O)[O-]",
+    displaySmarts: "[#6]-O-[N+](=O)[O-]",
+    mcatNote:
+      "Nitrate esters contain the R-O-NO2 group. They are esters of nitric acid and are distinct from nitro compounds, where carbon is bonded directly to nitrogen.",
+    category: "functionalGroup",
+  },
+  {
     name: "Nitro",
     category: "functionalGroup",
     priority: 26,

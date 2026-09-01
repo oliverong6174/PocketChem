@@ -1,15 +1,15 @@
 import { warnUnsupportedHandlerMode } from "./handlerUtils";
 
 /**
- * Reserved for true substrate-aware skeletal rearrangements.
+ * Reserved for standalone substrate-aware skeletal rearrangements.
  *
- * This executor is intentionally conservative today. Rearrangements such as
- * pinacol, Wagner–Meerwein, hydride shifts, and alkyl shifts require migration
- * mapping/ranking that a one-line SMARTS shortcut can easily get wrong.
- * Existing rules therefore stay concept-only until that logic is implemented.
+ * SN1/E1 1,2-hydride and 1,2-alkyl shifts are now implemented in the shared
+ * `carbocationUtils.ts` layer because they are intermediates inside
+ * substitution/elimination pathways rather than standalone reactions.
  *
- * Keeping the handler boundary now prevents those future algorithms from being
- * scattered through family files or folded into unrelated handlers.
+ * Named rearrangements such as pinacol and broader Wagner-Meerwein chemistry
+ * still require dedicated migration mapping / functional-group logic before
+ * they should be routed through this handler.
  */
 export async function rearrangement(
   _reactantSmiles: string,

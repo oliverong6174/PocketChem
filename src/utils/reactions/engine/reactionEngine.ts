@@ -16,7 +16,7 @@ import {
   isGenericReactionSmiles,
 } from "./reactionInput";
 import { runReactionSmarts } from "./rdkitReaction";
-import { matchRuleReactants, ruleMatchesReactant } from "./ruleMatcher";
+import { matchAllRuleReactants, ruleMatchesReactant } from "./ruleMatcher";
 
 type RuleExecution = {
   products: string[];
@@ -120,12 +120,12 @@ async function applyRule(
       };
 
     case "customHandler": {
-      // Current custom handlers are substrate-aware one-reactant executors.
-      // Multi-reactant chemistry should use reaction SMARTS until a handler
-      // genuinely needs access to multiple structural reactants.
+      // Custom handlers receive the ordered structural reactants. Most handlers
+      // still use only the primary substrate, but substitution now consumes the
+      // drawn nucleophile/solvent directly for SN1/SN2 stereochemistry.
       const products = await runCustomHandler(
         rule.transform.handler,
-        reactantSmiles[0],
+        reactantSmiles,
         rule.transform.options
       );
 
@@ -310,8 +310,10 @@ export async function predictReactionPathwaysFromRules(
 
   if (components.length > 1) {
     for (const rule of multiRules) {
-      const reactants = await matchRuleReactants(rule, components);
-      if (reactants) multiMatches.push({ rule, reactants });
+      const assignments = await matchAllRuleReactants(rule, components);
+      for (const reactants of assignments) {
+        multiMatches.push({ rule, reactants });
+      }
     }
 
     // When the user intentionally draws multiple compatible structures, show

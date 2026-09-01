@@ -13,9 +13,9 @@ export function buildLimitations(
 ): string[] {
   const limitations: string[] = [];
 
-  if (parent.carbonCount > 10) {
+  if (parent.carbonCount > 20) {
     limitations.push(
-      "Parent chains longer than ten carbons have limited naming support."
+      "Parent chains longer than twenty carbons have limited naming support."
     );
   }
 
@@ -49,12 +49,9 @@ export function buildLimitations(
     );
   }
 
-  if (
-    parent.aromaticRing &&
-    substituents.length > 2
-  ) {
+  if (parent.aromaticRing && substituents.length > 3) {
     limitations.push(
-      "Multi-substituted aromatic nomenclature is still being expanded."
+      "Highly substituted aromatic and heteroaromatic numbering remains heuristic."
     );
   }
 

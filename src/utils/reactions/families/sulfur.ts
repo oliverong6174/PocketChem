@@ -35,9 +35,16 @@ export const sulfurReactionRules: ReactionRule[] = [
     trigger: {
       anyFunctionalGroups: ["Thiol", "Thiolate"],
     },
+    additionalReactants: [
+      {
+        label: "methyl or primary alkyl halide",
+        trigger: { includeSmarts: ["[C;X4;H2,H3][Cl,Br,I]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The alkyl halide reactant must be specified before an exact thioether can be generated.",
+      type: "reactionSmarts",
+      smarts: "[S;H1,-1:1].[C;X4:2][Cl,Br,I]>>[S+0:1]-[C:2]",
+      maxProducts: 8,
     },
     mechanism: "SN2",
     priority: 2110,
@@ -54,10 +61,15 @@ export const sulfurReactionRules: ReactionRule[] = [
       "Mild oxidation joins two thiols through an S–S bond to form a disulfide.",
     trigger: {
       anyFunctionalGroups: ["Thiol"],
+      includeSmarts: ["[S;H1]"],
     },
+    additionalReactants: [
+      { label: "second thiol", trigger: { includeSmarts: ["[S;H1]"] } },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "Disulfide formation consumes two thiol molecules, while the current predictor accepts one drawn reactant molecule.",
+      type: "reactionSmarts",
+      smarts: "[S;H1:1].[S;H1:2]>>[S:1]-[S:2]",
+      maxProducts: 8,
     },
     mechanism: "Oxidative coupling",
     priority: 2120,
@@ -179,10 +191,18 @@ export const sulfurReactionRules: ReactionRule[] = [
       "An amine displaces chloride from a sulfonyl chloride to form a sulfonamide.",
     trigger: {
       anyFunctionalGroups: ["Sulfonyl chloride"],
+      includeSmarts: ["[S](=O)(=O)Cl"],
     },
+    additionalReactants: [
+      {
+        label: "ammonia, primary amine, or secondary amine",
+        trigger: { includeSmarts: ["[N;H1,H2,H3;!$(N[C,S,P]=O)]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The amine reactant must be specified before an exact sulfonamide can be generated.",
+      type: "reactionSmarts",
+      smarts: "[S:1](=[O:2])(=[O:3])Cl.[N;H1,H2,H3:4]>>[S:1](=[O:2])(=[O:3])[N:4]",
+      maxProducts: 8,
     },
     mechanism: "Nucleophilic substitution at sulfur",
     priority: 2180,
@@ -199,10 +219,15 @@ export const sulfurReactionRules: ReactionRule[] = [
       "An alcohol reacts with a sulfonyl chloride to form a sulfonate ester such as a tosylate or mesylate.",
     trigger: {
       anyFunctionalGroups: ["Sulfonyl chloride"],
+      includeSmarts: ["[S](=O)(=O)Cl"],
     },
+    additionalReactants: [
+      { label: "alcohol", trigger: { includeSmarts: ["[O;H1][#6]"] } },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The alcohol reactant must be specified before an exact sulfonate ester can be generated.",
+      type: "reactionSmarts",
+      smarts: "[S:1](=[O:2])(=[O:3])Cl.[O;H1:4][#6:5]>>[S:1](=[O:2])(=[O:3])[O:4][#6:5]",
+      maxProducts: 8,
     },
     mechanism: "Nucleophilic substitution at sulfur",
     priority: 2190,

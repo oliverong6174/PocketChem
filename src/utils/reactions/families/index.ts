@@ -10,6 +10,7 @@ import { anhydrideReactionRules } from "./anhydrides";
 import { aromaticReactionRules } from "./aromatics";
 import { carboxylicAcidReactionRules } from "./carboxylicAcids";
 import { carbonylDerivativeReactionRules } from "./carbonylDerivatives";
+import { couplingReactionRules } from "./couplings";
 import { diazoniumReactionRules } from "./diazonium";
 import { dieneReactionRules } from "./dienes";
 import { enolateReactionRules } from "./enolates";
@@ -36,6 +37,7 @@ export {
   aromaticReactionRules,
   carboxylicAcidReactionRules,
   carbonylDerivativeReactionRules,
+  couplingReactionRules,
   diazoniumReactionRules,
   dieneReactionRules,
   enolateReactionRules,
@@ -63,6 +65,7 @@ export const reactionFamilies: ReadonlyArray<ReadonlyArray<ReactionRule>> = [
   aldehydeReactionRules,
   ketoneReactionRules,
   carbonylDerivativeReactionRules,
+  couplingReactionRules,
   enolateReactionRules,
   carboxylicAcidReactionRules,
   acidChlorideReactionRules,

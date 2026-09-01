@@ -9,7 +9,6 @@ export function getExoticParentDescriptor(
 ): ParentDescriptor | null {
   for (const spec of specs) {
     const parent = getRetainedHeterocycleParentDescriptor(parsedMol, spec);
-
     if (parent) return parent;
   }
 
@@ -20,108 +19,84 @@ function getRetainedHeterocycleParentDescriptor(
   parsedMol: ParsedMol,
   spec: RetainedHeterocycleSpec
 ): ParentDescriptor | null {
-  for (const heteroAtom of parsedMol.atoms.filter(
-    (atom) => atom.element === spec.heteroElement
-  )) {
-    const ringPath = findSimpleRetainedHeterocycleRing(
-      parsedMol,
-      heteroAtom.atomIndex,
-      spec
-    );
+  const candidates = findMatchingRingPaths(parsedMol, spec);
+  if (candidates.length === 0) return null;
 
-    if (!ringPath) continue;
+  const bestPath = [...candidates].sort((a, b) =>
+    compareLocants(
+      getExternalSubstituentLocants(parsedMol, a),
+      getExternalSubstituentLocants(parsedMol, b)
+    )
+  )[0];
 
-    const orientedPath = orientRetainedHeterocycleRing(
-      parsedMol,
-      ringPath
-    );
-
-    return {
-      kind: "ring",
-      path: orientedPath,
-      carbonCount: spec.carbonCount,
-      parentHydrocarbon: spec.parentHydrocarbon,
-      parentStem: spec.parentStem,
-      aromaticRing: false,
-    };
-  }
-
-  return null;
+  return {
+    kind: "ring",
+    path: bestPath,
+    carbonCount: spec.ringElements.filter((element) => element === "C").length,
+    parentHydrocarbon: spec.parentHydrocarbon,
+    parentStem: spec.parentStem,
+    aromaticRing: spec.aromatic,
+  };
 }
 
-function findSimpleRetainedHeterocycleRing(
+function findMatchingRingPaths(
   parsedMol: ParsedMol,
-  heteroAtom: number,
   spec: RetainedHeterocycleSpec
 ) {
-  let found: number[] | null = null;
+  const ringSize = spec.ringElements.length;
+  const matches: number[][] = [];
 
-  const allowedElements = new Set(["C", spec.heteroElement]);
+  const firstElement = spec.ringElements[0];
+  const startAtoms = parsedMol.atoms.filter(
+    (atom) => atom.element === firstElement
+  );
 
-  const dfs = (current: number, path: number[]) => {
-    if (found) return;
+  for (const start of startAtoms) {
+    const dfs = (current: number, path: number[]) => {
+      const expectedIndex = path.length;
 
-    if (path.length === spec.ringSize) {
-      const closesToStart = (parsedMol.adjacency.get(current) ?? []).some(
-        (bond) => getOtherAtom(bond, current) === heteroAtom
-      );
-
-      if (!closesToStart) return;
-
-      const carbonCount = path.filter(
-        (atomIndex) => parsedMol.atoms[atomIndex]?.element === "C"
-      ).length;
-
-      const heteroCount = path.filter(
-        (atomIndex) =>
-          parsedMol.atoms[atomIndex]?.element === spec.heteroElement
-      ).length;
-
-      if (carbonCount === spec.carbonCount && heteroCount === 1) {
-        found = path;
+      if (path.length === ringSize) {
+        const closes = (parsedMol.adjacency.get(current) ?? []).some(
+          (bond) => getOtherAtom(bond, current) === start.atomIndex
+        );
+        if (closes) matches.push(path);
+        return;
       }
 
-      return;
-    }
+      const expectedElement = spec.ringElements[expectedIndex];
 
-    for (const bond of parsedMol.adjacency.get(current) ?? []) {
-      if (bond.bondOrder !== 1) continue;
+      for (const bond of parsedMol.adjacency.get(current) ?? []) {
+        const next = getOtherAtom(bond, current);
+        if (next === start.atomIndex) continue;
+        if (path.includes(next)) continue;
 
-      const next = getOtherAtom(bond, current);
+        const nextAtom = parsedMol.atoms[next];
+        if (!nextAtom || nextAtom.element !== expectedElement) continue;
 
-      if (next === heteroAtom) continue;
-      if (path.includes(next)) continue;
+        // Both Kekule (1/2) and aromatic (1.5) representations are valid.
+        if (bond.bondOrder <= 0) continue;
+        dfs(next, [...path, next]);
+      }
+    };
 
-      const nextAtom = parsedMol.atoms[next];
+    dfs(start.atomIndex, [start.atomIndex]);
+  }
 
-      if (!nextAtom) continue;
-      if (!allowedElements.has(nextAtom.element)) continue;
-
-      dfs(next, [...path, next]);
-    }
-  };
-
-  dfs(heteroAtom, [heteroAtom]);
-
-  return found;
+  return dedupePaths(matches);
 }
 
-function orientRetainedHeterocycleRing(
-  parsedMol: ParsedMol,
-  ringPath: number[]
-) {
-  if (ringPath.length <= 2) return ringPath;
+function dedupePaths(paths: number[][]) {
+  const seen = new Set<string>();
+  const result: number[][] = [];
 
-  // Heteroatom is always locant 1. Compare the two directions around the ring.
-  const forward = ringPath;
-  const reverse = [ringPath[0], ...ringPath.slice(1).reverse()];
+  for (const path of paths) {
+    const key = path.join(",");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(path);
+  }
 
-  const forwardLocants = getExternalSubstituentLocants(parsedMol, forward);
-  const reverseLocants = getExternalSubstituentLocants(parsedMol, reverse);
-
-  return compareLocants(reverseLocants, forwardLocants) < 0
-    ? reverse
-    : forward;
+  return result;
 }
 
 function getExternalSubstituentLocants(
@@ -134,14 +109,10 @@ function getExternalSubstituentLocants(
   path.forEach((atomIndex, index) => {
     for (const bond of parsedMol.adjacency.get(atomIndex) ?? []) {
       const other = getOtherAtom(bond, atomIndex);
-
       if (ringSet.has(other)) continue;
 
       const otherAtom = parsedMol.atoms[other];
-
-      if (!otherAtom) continue;
-      if (otherAtom.element === "H") continue;
-
+      if (!otherAtom || otherAtom.element === "H") continue;
       locants.push(index + 1);
     }
   });

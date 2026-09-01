@@ -9,6 +9,8 @@ import type {
 import { formatLocants } from "../formatUtils";
 import { getMultiplier } from "./suffixBuilder";
 import { getNamingIntent } from "./namingIntent";
+import { compareNomenclatureLocants, getLocantSortValue } from "./locantUtils";
+import { getAlphabetizationKey } from "./prefixAlphabetization";
 
 export type PrefixEntry = {
   text: string;
@@ -194,35 +196,13 @@ function shouldOmitSubstituentLocants(
 }
 
 function sortLocants(locants: Array<number | string>) {
-  return [...locants].sort(compareLocants);
-}
-
-function compareLocants(a: number | string, b: number | string) {
-  const valueA = getLocantSortValue(a);
-  const valueB = getLocantSortValue(b);
-
-  if (valueA !== valueB) return valueA - valueB;
-
-  return String(a).localeCompare(String(b));
+  return [...locants].sort(compareNomenclatureLocants);
 }
 
 function getFirstLocantSortValue(locants: Array<number | string>) {
   return locants.length > 0
     ? getLocantSortValue(locants[0])
     : Number.POSITIVE_INFINITY;
-}
-
-function getLocantSortValue(locant: number | string) {
-  if (typeof locant === "number") return locant;
-
-  const normalized = locant.trim().toUpperCase();
-
-  // N-substitution should render as N-methyl, N,N-dimethyl,
-  // N,6-dimethyl, etc.
-  if (normalized === "N") return -1;
-
-  const numeric = Number(normalized);
-  return Number.isFinite(numeric) ? numeric : Number.POSITIVE_INFINITY;
 }
 
 function formatSubstituentGroup(
@@ -268,9 +248,7 @@ export function formatFeaturePrefix(feature: NamingFeature) {
 }
 
 export function getPrefixSortKey(prefix: string) {
-  return prefix
-    .toLowerCase()
-    .replace(/^(di|tri|tetra|penta|hexa|bis|tris)/, "");
+  return getAlphabetizationKey(prefix);
 }
 
 export function sortPrefixEntries(entries: PrefixEntry[]) {

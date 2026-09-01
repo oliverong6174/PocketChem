@@ -37,7 +37,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
     trigger: acidChlorideTrigger,
     transform: {
       type: "conceptOnly",
-      reason: "The alcohol substituent is not specified by the one-molecule reaction drawer.",
+      reason: "Draw an alcohol in the same Ketcher canvas to generate the ester through the alcohol-side multi-reactant rule.",
     },
     priority: 1510,
   },
@@ -69,6 +69,48 @@ export const acidChlorideReactionRules: ReactionRule[] = [
     priority: 1520,
   },
 
+  {
+    id: "acid-chloride-thiol",
+    family: "acid-chlorides",
+    reactionType: "substitution",
+    title: "Thioester Formation",
+    reagents: "RSH or RS⁻, base as needed",
+    reagentNote: "Draw the acid chloride and thiol/thiolate as disconnected structures",
+    productHint: "Thioester",
+    explanation:
+      "A thiol or thiolate substitutes for chloride at an acid chloride to form a thioester.",
+    trigger: acidChlorideTrigger,
+    additionalReactants: [
+      { label: "thiol or thiolate", trigger: { includeSmarts: ["[S;H1,-1]"] } },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[Cl,Br,I].[S;H1,-1:3]>>[C:1](=[O:2])[S+0:3]",
+      maxProducts: 8,
+    },
+    priority: 1525,
+  },
+  {
+    id: "acid-chloride-carboxylate-anhydride",
+    family: "acid-chlorides",
+    reactionType: "substitution",
+    title: "Anhydride Formation from an Acid Chloride",
+    reagents: "Carboxylate salt",
+    reagentNote: "Draw the acid chloride and carboxylate as disconnected structures",
+    productHint: "Acid anhydride",
+    explanation:
+      "A carboxylate nucleophile displaces chloride from an acid chloride to form an acid anhydride.",
+    trigger: acidChlorideTrigger,
+    additionalReactants: [
+      { label: "carboxylate", trigger: { includeSmarts: ["[C](=O)[O-]"] } },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[Cl,Br,I].[C:3](=[O:4])[O-:5]>>[C:1](=[O:2])[O+0:5][C:3](=[O:4])",
+      maxProducts: 8,
+    },
+    priority: 1527,
+  },
   {
     id: "acid-chloride-lah",
     family: "acid-chlorides",
@@ -102,9 +144,17 @@ export const acidChlorideReactionRules: ReactionRule[] = [
     explanation:
       "Acid chlorides react twice with Grignard or organolithium reagents to form tertiary alcohols.",
     trigger: acidChlorideTrigger,
+    additionalReactants: [
+      {
+        label: "Grignard or organolithium reagent (2 equivalents)",
+        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+        equivalents: 2,
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The organometallic carbon group must be specified before an exact product can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[Cl,Br,I].[#6:5][Mg,Li].[#6:6][Mg,Li]>>[C:1]([OH:2])([#6:5])([#6:6])",
+      maxProducts: 8,
     },
     priority: 1540,
   },
@@ -120,9 +170,16 @@ export const acidChlorideReactionRules: ReactionRule[] = [
     explanation:
       "Gilman reagents convert acid chlorides into ketones without over-addition.",
     trigger: acidChlorideTrigger,
+    additionalReactants: [
+      {
+        label: "Gilman or organocuprate reagent",
+        trigger: { includeSmarts: ["[#6][Cu]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The Gilman reagent carbon group must be specified before an exact ketone can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[Cl,Br,I].[#6:3][Cu]>>[C:1](=[O:2])-[#6:3]",
+      maxProducts: 8,
     },
     priority: 1550,
   },

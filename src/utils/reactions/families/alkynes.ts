@@ -333,10 +333,18 @@ export const alkyneReactionRules: ReactionRule[] = [
     explanation:
       "The acetylide ion attacks a methyl or primary alkyl halide, forming a new carbon-carbon bond.",
     trigger: terminalAlkyneTrigger,
+    additionalReactants: [
+      {
+        label: "methyl or primary alkyl halide",
+        trigger: {
+          includeSmarts: ["[C;X4;H2,H3][Cl,Br,I]"],
+        },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "The alkyl halide must be specified before an exact carbon-chain extension can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1]#[CH:2].[C;X4:3][Cl,Br,I]>>[C:1]#[C:2]-[C:3]",
+      maxProducts: 8,
     },
     mechanism: "Proton transfer followed by SN2",
     limitations: ["Secondary and tertiary alkyl halides favor elimination."],

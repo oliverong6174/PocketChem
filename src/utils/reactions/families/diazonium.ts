@@ -142,11 +142,22 @@ export const diazoniumReactionRules: ReactionRule[] = [
     explanation:
       "An arenediazonium ion acts as an electrophile toward a strongly activated aromatic ring, forming an intensely colored azo linkage.",
     trigger: diazoniumTrigger,
+    additionalReactants: [
+      {
+        label: "activated aromatic ring (phenol or aniline type)",
+        trigger: {
+          anyFunctionalGroups: ["Phenol", "Aniline", "Aryl amine", "Primary aryl amine", "Secondary aryl amine"],
+          includeSmarts: ["[cH]"],
+        },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "The activated aromatic coupling partner and its substitution position must be specified before an exact azo product can be generated.",
+      type: "reactionSmarts",
+      smarts: "[c:1][N+:2]#[N:3].[cH:4]>>[c:1][N+0:2]=[N:3][c:4]",
+      maxProducts: 12,
     },
+    productStatus: "representative",
+    limitations: ["The engine enumerates available aromatic C-H coupling sites but does not yet rank para versus ortho preference or electronic activation quantitatively."],
     mechanism: "Electrophilic aromatic substitution",
     selectivity: ["Usually para coupling when the para position is open"],
     priority: 2070,

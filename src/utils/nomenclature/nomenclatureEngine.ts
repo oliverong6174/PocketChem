@@ -14,6 +14,7 @@ export type {
   MoleculePropertyResult,
   NomenclatureResult,
   MoleculeIdentityResult,
+  NamingStatus,
 } from "./types";
 
 import { parseMolBlock } from "./molParser";
@@ -27,7 +28,8 @@ import {
    formatDisplayName,
 } from "./displayName";
 
-import { getCommonName } from "./nameBuilder/commonNames";
+import { getCommonNameMatch } from "./nameBuilder/commonNames";
+import { getHeterocycleNomenclature } from "./nameBuilder/heterocycleNomenclature";
 
 import {
   buildProperties,
@@ -67,11 +69,6 @@ export async function analyzeNomenclatureAndProperties(
   const cleanInput = normalizeMoleculeInput(moleculeInput);
   const inputKind = isMolBlockInput(cleanInput) ? "molblock" : "smiles";
 
-  console.log("Molecule input received by nomenclature:", {
-    inputKind,
-    raw: moleculeInput,
-  });
-
   const mol = RDKit.get_mol(cleanInput);
 
   if (!mol) {
@@ -89,9 +86,19 @@ export async function analyzeNomenclatureAndProperties(
   try {
     const parsedMol = parseMolBlock(mol.get_molblock());
 
-    const molWithDescriptors = mol as {
+    const molWithHelpers = mol as {
       get_descriptors?: () => unknown;
+      get_smiles?: () => string;
     };
+
+    let canonicalSmiles: string | null = null;
+    try {
+      canonicalSmiles = molWithHelpers.get_smiles?.() ?? null;
+    } catch {
+      canonicalSmiles = inputKind === "smiles" ? cleanInput : null;
+    }
+
+    const molWithDescriptors = molWithHelpers;
 
     const descriptors = safeParseDescriptors(
       molWithDescriptors.get_descriptors?.()
@@ -99,9 +106,12 @@ export async function analyzeNomenclatureAndProperties(
 
     return {
       nomenclature: estimateNomenclature(
+        RDKit,
+        mol as unknown as { get_substruct_matches: (query: { delete?: () => void }) => string },
         parsedMol,
         functionalGroups,
-        mainGroup
+        mainGroup,
+        canonicalSmiles
       ),
       properties: buildProperties(parsedMol, descriptors, functionalGroups),
     };
@@ -124,19 +134,131 @@ function getPrefixes(
 
 
 function estimateNomenclature(
+  RDKit: { get_qmol: (smarts: string) => { delete?: () => void } | null },
+  mol: { get_substruct_matches: (query: { delete?: () => void }) => string },
   parsedMol: ParsedMol,
   functionalGroups: FunctionalGroupResult[],
-  mainGroup: FunctionalGroupResult | null
+  mainGroup: FunctionalGroupResult | null,
+  canonicalSmiles: string | null
 ): NomenclatureResult {
+  // Structure recognition supplies the common/biological identity, but it no
+  // longer replaces the systematic name.  This lets glucose display a normal
+  // chain name + "glucose", and lets adenine display 6-aminopurine + adenine.
+  const structureCommonName = getCommonNameMatch(
+    null,
+    parsedMol,
+    canonicalSmiles
+  );
+
+  // Retained heterocyclic parents must be resolved before the generic feature
+  // engine. Otherwise aromatic/Kekule N=C bonds can be misread as standalone
+  // imines and a purine/pyrimidine ring gets flattened into an acyclic chain.
+  const heterocycleResult = getHeterocycleNomenclature(
+    RDKit,
+    mol,
+    parsedMol
+  );
+
+  const prefixes = getPrefixes(functionalGroups, mainGroup);
+  const motifs = detectAromaticMotifs(parsedMol);
+
+  // Whole-molecule carbohydrate recognition has priority over generic
+  // saturated O-heterocycle naming.  Otherwise a perfectly recognized sugar
+  // or disaccharide gets flattened into a huge substituted oxane/oxolane name.
+  //
+  // This priority is intentionally narrow: nucleobases such as adenine still
+  // continue through retained heterocycle nomenclature so PocketChem can show
+  // "6-aminopurine (adenine)" instead of only "adenine".
+  const structureFirstCarbohydrates = new Set([
+    "glucose",
+    "galactose",
+    "mannose",
+    "ribose",
+    "arabinose",
+    "xylose",
+    "fructose",
+    "2-deoxyribose",
+    "sucrose",
+    "lactose",
+    "maltose",
+    "cellobiose",
+    "trehalose",
+    "isomaltose",
+  ]);
+
+  const recognizedWholeCarbohydrate =
+    structureCommonName?.source === "structure" &&
+    structureFirstCarbohydrates.has(structureCommonName.name);
+
+  if (recognizedWholeCarbohydrate && structureCommonName) {
+    return {
+      estimatedName: structureCommonName.name,
+      commonName: structureCommonName.name,
+      displayName: structureCommonName.name,
+      namingConfidence: "High",
+      namingStatus: "common",
+      parentChain: heterocycleResult?.parentName ?? null,
+      parentChainLength: 0,
+      mainSuffix: null,
+      prefixes,
+      motifs,
+      explanation:
+        `Recognized the complete stereochemically specified carbohydrate structure as ${structureCommonName.name}.`,
+      limitations: [],
+    };
+  }
+
+  if (heterocycleResult) {
+    const aliasMatch = getCommonNameMatch(heterocycleResult.name);
+    const commonName =
+      structureCommonName?.name ?? aliasMatch?.name ?? null;
+    const displayName = formatDisplayName(
+      heterocycleResult.name,
+      commonName && commonName !== heterocycleResult.name ? commonName : null
+    );
+
+    return {
+      estimatedName: heterocycleResult.name,
+      commonName,
+      displayName,
+      namingConfidence:
+        heterocycleResult.confidence === "high" ? "High" : "Medium",
+      namingStatus: "retained",
+      parentChain: heterocycleResult.parentName,
+      parentChainLength: 0,
+      mainSuffix: heterocycleResult.mainSuffix,
+      prefixes,
+      motifs,
+      explanation: heterocycleResult.explanation,
+      limitations: heterocycleResult.limitations,
+    };
+  }
+
   const namingResult = buildEstimatedIupacName(
     parsedMol,
     functionalGroups,
     mainGroup
   );
 
-  const prefixes = getPrefixes(functionalGroups, mainGroup);
-
   if (!namingResult) {
+    if (structureCommonName?.name) {
+      return {
+        estimatedName: structureCommonName.name,
+        commonName: structureCommonName.name,
+        displayName: structureCommonName.name,
+        namingConfidence: "High",
+        namingStatus: "common",
+        parentChain: null,
+        parentChainLength: 0,
+        mainSuffix: mainGroup?.suffix ?? null,
+        prefixes,
+        motifs,
+        explanation:
+          `Recognized this molecular structure as ${structureCommonName.name}; a systematic parent name is not yet available for this structure.`,
+        limitations: [],
+      };
+    }
+
     const fallbackName = mainGroup
       ? `${mainGroup.name} derivative`
       : "Name not estimated yet";
@@ -146,10 +268,12 @@ function estimateNomenclature(
       commonName: null,
       displayName: fallbackName,
       namingConfidence: "Low",
+      namingStatus: "unsupported",
       parentChain: null,
       parentChainLength: 0,
       mainSuffix: mainGroup?.suffix ?? null,
       prefixes,
+      motifs,
       explanation:
         "PocketChem could not build a parent-based name for this structure yet.",
       limitations: [
@@ -164,9 +288,12 @@ function estimateNomenclature(
   const primaryFeature = namingResult.primaryFeature ?? null;
   const substituents = namingResult.substituents ?? [];
 
-  const commonName = getCommonName(estimatedName);
-  const displayName = formatDisplayName(estimatedName, commonName);
-  const motifs = detectAromaticMotifs(parsedMol);
+  const aliasMatch = getCommonNameMatch(estimatedName);
+  const commonName = structureCommonName?.name ?? aliasMatch?.name ?? null;
+  const displayName = formatDisplayName(
+    estimatedName,
+    commonName && commonName !== estimatedName ? commonName : null
+  );
 
   if (!parent) {
     return {
@@ -178,17 +305,20 @@ function estimateNomenclature(
         : namingResult.confidence === "medium"
         ? "Medium"
         : "Low",
+      namingStatus: namingResult.status,
       parentChain: null,
       parentChainLength: 0,
-      mainSuffix: mainGroup?.suffix ?? (primaryFeature ? `-${primaryFeature.suffix}` : null),
+      mainSuffix: primaryFeature ? `-${primaryFeature.suffix}` : mainGroup?.suffix ?? null,
       prefixes,
       motifs,
       explanation:
         namingResult.reason ??
         "PocketChem estimated a name but could not resolve a parent chain or ring.",
-      limitations: [
-        "Parent-chain/ring resolution is incomplete for this structure.",
-      ],
+      limitations: namingResult.status === "unsupported"
+        ? [namingResult.reason]
+        : namingResult.parentIndependent
+        ? []
+        : ["Parent-chain/ring resolution is incomplete for this structure."],
     };
   }
 
@@ -207,7 +337,9 @@ function estimateNomenclature(
 
   explanationLines.push(
     parent.aromaticRing
-      ? "Detected benzene-like aromatic ring as the parent structure."
+      ? parent.parentHydrocarbon === "benzene"
+        ? "Detected benzene-like aromatic ring as the parent structure."
+        : `Detected retained aromatic heterocycle ${parent.parentHydrocarbon} as the parent structure.`
       : parent.kind === "ring"
       ? `Detected ${parent.parentHydrocarbon} as the parent ring.`
       : `Parent chain contains ${parent.carbonCount} carbons.`
@@ -228,9 +360,10 @@ function estimateNomenclature(
     commonName,
     displayName,
     namingConfidence,
+    namingStatus: namingResult.status,
     parentChain: parent.parentHydrocarbon,
     parentChainLength: parent.carbonCount,
-    mainSuffix: mainGroup?.suffix ?? (primaryFeature ? `-${primaryFeature.suffix}` : null),
+    mainSuffix: primaryFeature ? `-${primaryFeature.suffix}` : mainGroup?.suffix ?? null,
     prefixes,
     motifs,
     explanation: explanationLines.join(" "),

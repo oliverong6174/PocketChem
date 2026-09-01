@@ -1,13 +1,13 @@
 import type { FunctionalGroupResult } from "../../functionalGroups/types";
+import { normalizeFunctionalGroupName as normalizeGroupName } from "../../functionalGroups/groupIds";
 
 export type RetainedHeterocycleSpec = {
   groupName: string;
   parentHydrocarbon: string;
   parentStem: string;
   prefix: string;
-  heteroElement: "O" | "N" | "S";
-  ringSize: number;
-  carbonCount: number;
+  ringElements: string[];
+  aromatic: boolean;
 };
 
 export const DEFAULT_RETAINED_HETEROCYCLE_SPECS: RetainedHeterocycleSpec[] = [
@@ -16,36 +16,124 @@ export const DEFAULT_RETAINED_HETEROCYCLE_SPECS: RetainedHeterocycleSpec[] = [
     parentHydrocarbon: "oxirane",
     parentStem: "oxiran",
     prefix: "epoxy",
-    heteroElement: "O",
-    ringSize: 3,
-    carbonCount: 2,
+    ringElements: ["O", "C", "C"],
+    aromatic: false,
   },
   {
     groupName: "Oxetane",
     parentHydrocarbon: "oxetane",
     parentStem: "oxetan",
     prefix: "oxetanyl",
-    heteroElement: "O",
-    ringSize: 4,
-    carbonCount: 3,
+    ringElements: ["O", "C", "C", "C"],
+    aromatic: false,
   },
   {
     groupName: "Aziridine",
     parentHydrocarbon: "aziridine",
     parentStem: "aziridin",
     prefix: "aziridinyl",
-    heteroElement: "N",
-    ringSize: 3,
-    carbonCount: 2,
+    ringElements: ["N", "C", "C"],
+    aromatic: false,
   },
   {
     groupName: "Thiirane",
     parentHydrocarbon: "thiirane",
     parentStem: "thiiran",
     prefix: "thiiranyl",
-    heteroElement: "S",
-    ringSize: 3,
-    carbonCount: 2,
+    ringElements: ["S", "C", "C"],
+    aromatic: false,
+  },
+
+  // Common retained aromatic heterocycles. The element order is the retained
+  // numbering order, so locant 1 starts at the senior heteroatom and the two
+  // possible directions are compared using substituent locants.
+  {
+    groupName: "Pyridine",
+    parentHydrocarbon: "pyridine",
+    parentStem: "pyridin",
+    prefix: "pyridinyl",
+    ringElements: ["N", "C", "C", "C", "C", "C"],
+    aromatic: true,
+  },
+  {
+    groupName: "Pyrrole",
+    parentHydrocarbon: "pyrrole",
+    parentStem: "pyrrol",
+    prefix: "pyrrolyl",
+    ringElements: ["N", "C", "C", "C", "C"],
+    aromatic: true,
+  },
+  {
+    groupName: "Furan",
+    parentHydrocarbon: "furan",
+    parentStem: "furan",
+    prefix: "furyl",
+    ringElements: ["O", "C", "C", "C", "C"],
+    aromatic: true,
+  },
+  {
+    groupName: "Thiophene",
+    parentHydrocarbon: "thiophene",
+    parentStem: "thiophen",
+    prefix: "thienyl",
+    ringElements: ["S", "C", "C", "C", "C"],
+    aromatic: true,
+  },
+  {
+    groupName: "Imidazole",
+    parentHydrocarbon: "imidazole",
+    parentStem: "imidazol",
+    prefix: "imidazolyl",
+    ringElements: ["N", "C", "N", "C", "C"],
+    aromatic: true,
+  },
+  {
+    groupName: "Pyrazole",
+    parentHydrocarbon: "pyrazole",
+    parentStem: "pyrazol",
+    prefix: "pyrazolyl",
+    ringElements: ["N", "N", "C", "C", "C"],
+    aromatic: true,
+  },
+  {
+    groupName: "Oxazole",
+    parentHydrocarbon: "oxazole",
+    parentStem: "oxazol",
+    prefix: "oxazolyl",
+    ringElements: ["O", "C", "N", "C", "C"],
+    aromatic: true,
+  },
+  {
+    groupName: "Isoxazole",
+    parentHydrocarbon: "isoxazole",
+    parentStem: "isoxazol",
+    prefix: "isoxazolyl",
+    ringElements: ["O", "N", "C", "C", "C"],
+    aromatic: true,
+  },
+  {
+    groupName: "Thiazole",
+    parentHydrocarbon: "thiazole",
+    parentStem: "thiazol",
+    prefix: "thiazolyl",
+    ringElements: ["S", "C", "N", "C", "C"],
+    aromatic: true,
+  },
+  {
+    groupName: "Isothiazole",
+    parentHydrocarbon: "isothiazole",
+    parentStem: "isothiazol",
+    prefix: "isothiazolyl",
+    ringElements: ["S", "N", "C", "C", "C"],
+    aromatic: true,
+  },
+  {
+    groupName: "Pyrimidine",
+    parentHydrocarbon: "pyrimidine",
+    parentStem: "pyrimidin",
+    prefix: "pyrimidinyl",
+    ringElements: ["N", "C", "N", "C", "C", "C"],
+    aromatic: true,
   },
 ];
 
@@ -72,7 +160,7 @@ const UNSAFE_PRIMARY_NAMES = new Set([
 ]);
 
 export function normalizeFunctionalGroupName(name: string) {
-  return name.trim().toLowerCase();
+  return normalizeGroupName(name);
 }
 
 export function normalizeFunctionalGroupSuffix(suffix: string | null | undefined) {
@@ -134,12 +222,18 @@ export function getRetainedHeterocycleSpecsFromGroups(
     .map(getRetainedHeterocycleSpecFromGroup)
     .filter((spec): spec is RetainedHeterocycleSpec => spec !== null);
 
+  // Detected specs come first so the engine does not needlessly scan every
+  // possible heterocycle for each molecule. Defaults are retained for the
+  // small saturated rings because overlap filtering can occasionally suppress
+  // their specific pattern in favor of another oxygen/nitrogen group.
+  const fallbackNames = new Set(["oxirane", "oxetane", "aziridine", "thiirane"]);
+  const fallbackSpecs = DEFAULT_RETAINED_HETEROCYCLE_SPECS.filter((spec) =>
+    fallbackNames.has(spec.parentHydrocarbon)
+  );
+
   const merged = new Map<string, RetainedHeterocycleSpec>();
 
-  for (const spec of [
-    ...detectedSpecs,
-    ...DEFAULT_RETAINED_HETEROCYCLE_SPECS,
-  ]) {
+  for (const spec of [...detectedSpecs, ...fallbackSpecs]) {
     merged.set(spec.parentHydrocarbon, spec);
   }
 

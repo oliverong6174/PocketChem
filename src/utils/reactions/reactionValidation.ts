@@ -109,6 +109,17 @@ export function validateReactionRegistry(
           message: "Additional reactant label is empty.",
         });
       }
+
+      if (
+        requirement.equivalents !== undefined &&
+        (!Number.isInteger(requirement.equivalents) ||
+          requirement.equivalents <= 0)
+      ) {
+        issues.push({
+          ruleId,
+          message: "Additional reactant equivalents must be a positive integer.",
+        });
+      }
     }
 
     if (rule.transform.type === "reactionSmarts") {
@@ -135,12 +146,30 @@ export function validateReactionRegistry(
           .split(">>", 1)[0]
           .split(".")
           .filter(Boolean).length;
-        const requiredReactantCount = 1 + (rule.additionalReactants?.length ?? 0);
+        // Count stoichiometric reactant templates, not just distinct drawn
+        // reactant roles. A role with `equivalents: 2` is drawn once by the
+        // user but is duplicated internally by the matcher, so it occupies
+        // two templates in the reaction SMARTS.
+        const requiredReactantTemplateCount =
+          1 +
+          (rule.additionalReactants ?? []).reduce((count, requirement) => {
+            const equivalents = requirement.equivalents ?? 1;
 
-        if (reactantTemplateCount !== requiredReactantCount) {
+            // Invalid equivalents are reported separately above. Count them
+            // as one here so this validation does not emit a misleading
+            // second error.
+            return (
+              count +
+              (Number.isInteger(equivalents) && equivalents > 0
+                ? equivalents
+                : 1)
+            );
+          }, 0);
+
+        if (reactantTemplateCount !== requiredReactantTemplateCount) {
           issues.push({
             ruleId,
-            message: `Multi-reactant SMARTS has ${reactantTemplateCount} reactant template(s), but the rule declares ${requiredReactantCount} structural reactant(s).`,
+            message: `Multi-reactant SMARTS has ${reactantTemplateCount} reactant template(s), but the rule requires ${requiredReactantTemplateCount} stoichiometric reactant template(s).`,
           });
         }
       }

@@ -58,10 +58,16 @@ export const epoxideReactionRules: ReactionRule[] = [
     explanation:
       "Alcohols open protonated epoxides under acidic conditions to form alkoxy alcohols.",
     trigger: epoxideTrigger,
+    additionalReactants: [
+      { label: "alcohol", trigger: { includeSmarts: ["[O;H1][#6]"] } },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The alcohol substituent must be specified before an exact beta-alkoxy alcohol can be generated.",
+      type: "reactionSmarts",
+      smarts: "[O:1]1[C:2][C:3]1.[O;H1:4][#6:5]>>[OH:1][C:2][C:3][O:4][#6:5]",
+      maxProducts: 8,
     },
+    productStatus: "representative",
+    limitations: ["The engine enumerates constitutional openings but does not yet rank the more-substituted acid-catalyzed attack site or assign anti stereochemistry."],
     priority: 820,
   },
   {
@@ -75,10 +81,16 @@ export const epoxideReactionRules: ReactionRule[] = [
     explanation:
       "Alkoxides open epoxides under basic conditions, usually attacking the less substituted carbon.",
     trigger: epoxideTrigger,
+    additionalReactants: [
+      { label: "alkoxide ion", trigger: { includeSmarts: ["[O-][#6]"] } },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The alkoxide substituent must be specified before an exact beta-alkoxy alcohol can be generated.",
+      type: "reactionSmarts",
+      smarts: "[O:1]1[C:2][C:3]1.[O-:4][#6:5]>>[OH:1][C:2][C:3][O+0:4][#6:5]",
+      maxProducts: 8,
     },
+    productStatus: "representative",
+    limitations: ["The engine enumerates constitutional openings but does not yet rank the less-substituted SN2 attack site or assign anti stereochemistry."],
     priority: 830,
   },
   {
@@ -109,11 +121,43 @@ export const epoxideReactionRules: ReactionRule[] = [
     explanation:
       "Grignard and organolithium reagents open epoxides to form alcohols with a new carbon-carbon bond.",
     trigger: epoxideTrigger,
+    additionalReactants: [
+      {
+        label: "Grignard or organolithium reagent",
+        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The organometallic carbon group must be specified before an exact chain-extended alcohol can be generated.",
+      type: "reactionSmarts",
+      smarts: "[O:1]1[C:2][C:3]1.[#6:4][Mg,Li]>>[OH:1][C:2][C:3]-[#6:4]",
+      maxProducts: 8,
     },
+    productStatus: "representative",
+    limitations: ["The engine enumerates constitutional openings but does not yet rank the less-substituted attack site or assign anti stereochemistry."],
     priority: 850,
+  },
+  {
+    id: "epoxide-amine-opening",
+    family: "epoxides",
+    reactionType: "ringOpening",
+    title: "Epoxide Opening with an Amine",
+    reagents: "primary or secondary amine; then proton transfer/workup",
+    reagentNote: "Draw the epoxide and amine as disconnected structures",
+    productHint: "Beta-amino alcohol",
+    explanation:
+      "Primary and secondary amines can open epoxides by nucleophilic attack to form beta-amino alcohols.",
+    trigger: epoxideTrigger,
+    additionalReactants: [
+      { label: "primary or secondary amine", trigger: { includeSmarts: ["[N;H1,H2;+0;!$(N[C,S,P]=O)]"] } },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[O:1]1[C:2][C:3]1.[N;H1,H2:4]>>[OH:1][C:2][C:3]-[N:4]",
+      maxProducts: 8,
+    },
+    productStatus: "representative",
+    limitations: ["The engine enumerates constitutional openings but does not yet rank the less-hindered attack site or assign anti stereochemistry."],
+    priority: 855,
   },
   {
     id: "epoxide-ammonia-opening",

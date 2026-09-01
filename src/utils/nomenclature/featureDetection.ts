@@ -10,6 +10,7 @@ import { COMMON_VALENCES } from "./constants";
 import { getOtherAtom } from "./molParser";
 import { buildBranchName } from "./branch/branchConstructor";
 import { getHydroxyBearingCarbon } from "./heteroAtomClassifiers";
+import { isSimpleAmineNitrogen } from "./classifiers/nitrogen";
 import { alkylNameToAlkoxyName } from "./alkoxyNames";
 
 import {
@@ -73,6 +74,87 @@ function isAnhydrideBridgeOxygen(
     carbonylCarbonNeighbors.includes(acylCarbonIndex) &&
     carbonylCarbonNeighbors.length >= 2
   );
+}
+
+
+function isPeroxyAcidCarbon(parsedMol: ParsedMol, carbonIndex: number) {
+  if (parsedMol.atoms[carbonIndex]?.element !== "C") return false;
+
+  const bonds = parsedMol.adjacency.get(carbonIndex) ?? [];
+  const hasCarbonylOxygen = bonds.some((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
+    return attached?.element === "O" && bond.bondOrder === 2;
+  });
+  if (!hasCarbonylOxygen) return false;
+
+  return bonds.some((bond) => {
+    if (bond.bondOrder !== 1) return false;
+    const firstOxygen = getOtherAtom(bond, carbonIndex);
+    if (parsedMol.atoms[firstOxygen]?.element !== "O") return false;
+
+    return (parsedMol.adjacency.get(firstOxygen) ?? []).some((ooBond) => {
+      if (ooBond.bondOrder !== 1) return false;
+      const terminalOxygen = getOtherAtom(ooBond, firstOxygen);
+      if (terminalOxygen === carbonIndex) return false;
+      const oxygen = parsedMol.atoms[terminalOxygen];
+      return (
+        oxygen?.element === "O" &&
+        countImplicitHydrogens(oxygen, parsedMol.adjacency) > 0
+      );
+    });
+  });
+}
+
+export function getPeroxyAcidCarbons(parsedMol: ParsedMol) {
+  return parsedMol.atoms
+    .filter((atom) => atom.element === "C")
+    .map((atom) => atom.atomIndex)
+    .filter((atomIndex) => isPeroxyAcidCarbon(parsedMol, atomIndex));
+}
+
+function isAcylAzideCarbon(parsedMol: ParsedMol, carbonIndex: number) {
+  if (parsedMol.atoms[carbonIndex]?.element !== "C") return false;
+  const bonds = parsedMol.adjacency.get(carbonIndex) ?? [];
+
+  const hasCarbonylOxygen = bonds.some((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
+    return attached?.element === "O" && bond.bondOrder === 2;
+  });
+  if (!hasCarbonylOxygen) return false;
+
+  const firstNitrogens = bonds
+    .filter((bond) => {
+      const attached = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
+      return attached?.element === "N";
+    })
+    .map((bond) => getOtherAtom(bond, carbonIndex));
+
+  return firstNitrogens.some((firstNitrogen) => {
+    const secondNitrogens = (parsedMol.adjacency.get(firstNitrogen) ?? [])
+      .map((bond) => getOtherAtom(bond, firstNitrogen))
+      .filter(
+        (atomIndex) =>
+          atomIndex !== carbonIndex &&
+          parsedMol.atoms[atomIndex]?.element === "N"
+      );
+
+    return secondNitrogens.some((secondNitrogen) =>
+      (parsedMol.adjacency.get(secondNitrogen) ?? []).some((bond) => {
+        const thirdNitrogen = getOtherAtom(bond, secondNitrogen);
+        return (
+          thirdNitrogen !== firstNitrogen &&
+          parsedMol.atoms[thirdNitrogen]?.element === "N"
+        );
+      })
+    );
+  });
+}
+
+export function getAcylAzideCarbons(parsedMol: ParsedMol) {
+  return parsedMol.atoms
+    .filter((atom) => atom.element === "C")
+    .map((atom) => atom.atomIndex)
+    .filter((atomIndex) => isAcylAzideCarbon(parsedMol, atomIndex));
 }
 
 export function getCarboxylicAcidCarbons(parsedMol: ParsedMol) {
@@ -236,37 +318,19 @@ export function getAmineLocants(parsedMol: ParsedMol, parent: ParentDescriptor) 
   const locants: number[] = [];
 
   for (const nitrogen of parsedMol.atoms.filter((atom) => atom.element === "N")) {
-    const bonds = parsedMol.adjacency.get(nitrogen.atomIndex) ?? [];
+    if (!isSimpleAmineNitrogen(parsedMol, nitrogen.atomIndex)) continue;
 
-    const hasMultipleBond = bonds.some((bond) => bond.bondOrder > 1);
-    if (hasMultipleBond) continue;
-
-    const attachedToCarbonyl = bonds.some((bond) => {
+    for (const bond of parsedMol.adjacency.get(nitrogen.atomIndex) ?? []) {
+      if (bond.bondOrder !== 1) continue;
       const carbonIndex = getOtherAtom(bond, nitrogen.atomIndex);
-      const carbon = parsedMol.atoms[carbonIndex];
-
-      if (carbon?.element !== "C") return false;
-
-      return (parsedMol.adjacency.get(carbonIndex) ?? []).some((b) => {
-        const other = parsedMol.atoms[getOtherAtom(b, carbonIndex)];
-        return other?.element === "O" && b.bondOrder === 2;
-      });
-    });
-
-    if (attachedToCarbonyl) continue;
-
-    for (const bond of bonds) {
-      const carbonIndex = getOtherAtom(bond, nitrogen.atomIndex);
-      const carbon = parsedMol.atoms[carbonIndex];
-
-      if (carbon?.element !== "C") continue;
+      if (parsedMol.atoms[carbonIndex]?.element !== "C") continue;
 
       const locant = locantMap.get(carbonIndex);
       if (locant) locants.push(locant);
     }
   }
 
-  return locants.sort((a, b) => a - b);
+  return Array.from(new Set(locants)).sort((a, b) => a - b);
 }
 
 export function getThiolLocants(parsedMol: ParsedMol, parent: ParentDescriptor) {
@@ -276,18 +340,26 @@ export function getThiolLocants(parsedMol: ParsedMol, parent: ParentDescriptor) 
   for (const sulfur of parsedMol.atoms.filter((atom) => atom.element === "S")) {
     const bonds = parsedMol.adjacency.get(sulfur.atomIndex) ?? [];
 
-    for (const bond of bonds) {
+    // A thiol sulfur is R-SH. Previously every sulfur attached to carbon was
+    // treated as a thiol, which mislabeled thioethers, sulfoxides, sulfones,
+    // disulfides, and sulfonyl derivatives. Requiring an available implicit
+    // hydrogen cleanly separates the -SH motif from those groups.
+    if (bonds.some((bond) => bond.bondOrder > 1)) continue;
+    if (countImplicitHydrogens(sulfur, parsedMol.adjacency) < 1) continue;
+
+    const carbonBonds = bonds.filter((bond) => {
       const carbonIndex = getOtherAtom(bond, sulfur.atomIndex);
-      const carbon = parsedMol.atoms[carbonIndex];
+      return bond.bondOrder === 1 && parsedMol.atoms[carbonIndex]?.element === "C";
+    });
 
-      if (carbon?.element !== "C") continue;
+    if (carbonBonds.length !== 1) continue;
 
-      const locant = locantMap.get(carbonIndex);
-      if (locant) locants.push(locant);
-    }
+    const carbonIndex = getOtherAtom(carbonBonds[0], sulfur.atomIndex);
+    const locant = locantMap.get(carbonIndex);
+    if (locant) locants.push(locant);
   }
 
-  return locants.sort((a, b) => a - b);
+  return Array.from(new Set(locants)).sort((a, b) => a - b);
 }
 
 export function getNitrileLocants(parsedMol: ParsedMol, parent: ParentDescriptor) {
@@ -334,6 +406,7 @@ export function getAmideLocants(parsedMol: ParsedMol, parent: ParentDescriptor) 
     });
 
     if (!hasCarbonylOxygen || !hasSingleNitrogen) continue;
+    if (isAcylAzideCarbon(parsedMol, carbon.atomIndex)) continue;
 
     const locant = locantMap.get(carbon.atomIndex);
     if (locant) locants.push(locant);
@@ -415,6 +488,184 @@ export function getAcidHalideGroups(
   return acidHalides;
 }
 
+
+function getDoubleBondedElementCount(
+  parsedMol: ParsedMol,
+  atomIndex: number,
+  element: string
+) {
+  return (parsedMol.adjacency.get(atomIndex) ?? []).filter((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, atomIndex)];
+    return attached?.element === element && bond.bondOrder === 2;
+  }).length;
+}
+
+function hasSingleBondedHydroxyOxygen(
+  parsedMol: ParsedMol,
+  atomIndex: number
+) {
+  return (parsedMol.adjacency.get(atomIndex) ?? []).some((bond) => {
+    if (bond.bondOrder !== 1) return false;
+    const oxygenIndex = getOtherAtom(bond, atomIndex);
+    const oxygen = parsedMol.atoms[oxygenIndex];
+    return (
+      oxygen?.element === "O" &&
+      countImplicitHydrogens(oxygen, parsedMol.adjacency) > 0
+    );
+  });
+}
+
+function hasSingleBondedElement(
+  parsedMol: ParsedMol,
+  atomIndex: number,
+  element: string
+) {
+  return (parsedMol.adjacency.get(atomIndex) ?? []).some((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, atomIndex)];
+    return bond.bondOrder === 1 && attached?.element === element;
+  });
+}
+
+function getSulfurFunctionalLocants(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor,
+  predicate: (sulfurIndex: number) => boolean
+) {
+  const locantMap = getLocantMap(parent);
+  const locants: number[] = [];
+
+  for (const sulfur of parsedMol.atoms.filter((atom) => atom.element === "S")) {
+    if (!predicate(sulfur.atomIndex)) continue;
+
+    for (const bond of parsedMol.adjacency.get(sulfur.atomIndex) ?? []) {
+      if (bond.bondOrder !== 1) continue;
+      const carbonIndex = getOtherAtom(bond, sulfur.atomIndex);
+      if (parsedMol.atoms[carbonIndex]?.element !== "C") continue;
+      const locant = locantMap.get(carbonIndex);
+      if (locant) locants.push(locant);
+    }
+  }
+
+  return Array.from(new Set(locants)).sort((a, b) => a - b);
+}
+
+export function getSulfonicAcidLocants(parsedMol: ParsedMol, parent: ParentDescriptor) {
+  return getSulfurFunctionalLocants(parsedMol, parent, (sulfurIndex) =>
+    getDoubleBondedElementCount(parsedMol, sulfurIndex, "O") >= 2 &&
+    hasSingleBondedHydroxyOxygen(parsedMol, sulfurIndex)
+  );
+}
+
+export function getSulfinicAcidLocants(parsedMol: ParsedMol, parent: ParentDescriptor) {
+  return getSulfurFunctionalLocants(parsedMol, parent, (sulfurIndex) =>
+    getDoubleBondedElementCount(parsedMol, sulfurIndex, "O") === 1 &&
+    hasSingleBondedHydroxyOxygen(parsedMol, sulfurIndex)
+  );
+}
+
+export function getSulfenicAcidLocants(parsedMol: ParsedMol, parent: ParentDescriptor) {
+  return getSulfurFunctionalLocants(parsedMol, parent, (sulfurIndex) =>
+    getDoubleBondedElementCount(parsedMol, sulfurIndex, "O") === 0 &&
+    hasSingleBondedHydroxyOxygen(parsedMol, sulfurIndex)
+  );
+}
+
+export function getSulfonamideLocants(parsedMol: ParsedMol, parent: ParentDescriptor) {
+  return getSulfurFunctionalLocants(parsedMol, parent, (sulfurIndex) =>
+    getDoubleBondedElementCount(parsedMol, sulfurIndex, "O") >= 2 &&
+    hasSingleBondedElement(parsedMol, sulfurIndex, "N")
+  );
+}
+
+export function getImineLocants(parsedMol: ParsedMol, parent: ParentDescriptor) {
+  const locantMap = getLocantMap(parent);
+  const locants: number[] = [];
+
+  for (const carbonIndex of parent.path) {
+    if (parsedMol.atoms[carbonIndex]?.element !== "C") continue;
+
+    const imineBond = (parsedMol.adjacency.get(carbonIndex) ?? []).find((bond) => {
+      if (bond.bondOrder !== 2) return false;
+      const nitrogenIndex = getOtherAtom(bond, carbonIndex);
+      if (parsedMol.atoms[nitrogenIndex]?.element !== "N") return false;
+
+      // Oximes, hydrazones, nitrones, etc. have an additional N-O or N-N
+      // bond and are intentionally left to retained/descriptive naming.
+      return !(parsedMol.adjacency.get(nitrogenIndex) ?? []).some((nBond) => {
+        const attached = getOtherAtom(nBond, nitrogenIndex);
+        if (attached === carbonIndex) return false;
+        const element = parsedMol.atoms[attached]?.element;
+        return element === "O" || element === "N";
+      });
+    });
+
+    if (!imineBond) continue;
+    const locant = locantMap.get(carbonIndex);
+    if (locant) locants.push(locant);
+  }
+
+  return Array.from(new Set(locants)).sort((a, b) => a - b);
+}
+
+type ThioCarbonylKind =
+  | "thiocarboxylicAcid"
+  | "thioamide"
+  | "thioaldehyde"
+  | "thioketone";
+
+function classifyThioCarbonylCarbon(
+  parsedMol: ParsedMol,
+  carbonIndex: number
+): ThioCarbonylKind | null {
+  if (parsedMol.atoms[carbonIndex]?.element !== "C") return null;
+  const bonds = parsedMol.adjacency.get(carbonIndex) ?? [];
+
+  const hasThiocarbonylSulfur = bonds.some((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
+    return attached?.element === "S" && bond.bondOrder === 2;
+  });
+  if (!hasThiocarbonylSulfur) return null;
+
+  const hasHydroxyOxygen = bonds.some((bond) => {
+    if (bond.bondOrder !== 1) return false;
+    const oxygenIndex = getOtherAtom(bond, carbonIndex);
+    const oxygen = parsedMol.atoms[oxygenIndex];
+    return oxygen?.element === "O" && countImplicitHydrogens(oxygen, parsedMol.adjacency) > 0;
+  });
+  if (hasHydroxyOxygen) return "thiocarboxylicAcid";
+
+  const hasAmideNitrogen = bonds.some((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
+    return bond.bondOrder === 1 && attached?.element === "N";
+  });
+  if (hasAmideNitrogen) return "thioamide";
+
+  const carbonNeighborCount = bonds.filter((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
+    return attached?.element === "C";
+  }).length;
+
+  if (carbonNeighborCount >= 2) return "thioketone";
+  if (countImplicitHydrogens(parsedMol.atoms[carbonIndex], parsedMol.adjacency) > 0) {
+    return "thioaldehyde";
+  }
+
+  return null;
+}
+
+export function getThioCarbonylLocants(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor,
+  kind: ThioCarbonylKind
+) {
+  const locantMap = getLocantMap(parent);
+  return parent.path
+    .filter((atomIndex) => classifyThioCarbonylCarbon(parsedMol, atomIndex) === kind)
+    .map((atomIndex) => locantMap.get(atomIndex))
+    .filter((locant): locant is number => typeof locant === "number")
+    .sort((a, b) => a - b);
+}
+
 export function detectNamingFeatures(
   parsedMol: ParsedMol,
   parent: ParentDescriptor
@@ -422,9 +673,19 @@ export function detectNamingFeatures(
   const esterGroups = getEsterGroups(parsedMol, parent);
   const acidHalideGroups = getAcidHalideGroups(parsedMol, parent);
 
+  const peroxyAcidLocants = getFeatureLocantsFromCarbonIndexes(
+    parent,
+    getPeroxyAcidCarbons(parsedMol)
+  );
+
   const acidLocants = getFeatureLocantsFromCarbonIndexes(
     parent,
     getCarboxylicAcidCarbons(parsedMol)
+  );
+
+  const acylAzideLocants = getFeatureLocantsFromCarbonIndexes(
+    parent,
+    getAcylAzideCarbons(parsedMol)
   );
 
   const aldehydeLocants = getFeatureLocantsFromCarbonIndexes(
@@ -442,8 +703,37 @@ export function detectNamingFeatures(
   const nitrileLocants = getNitrileLocants(parsedMol, parent);
   const amineLocants = getAmineLocants(parsedMol, parent);
   const thiolLocants = getThiolLocants(parsedMol, parent);
+  const sulfonicAcidLocants = getSulfonicAcidLocants(parsedMol, parent);
+  const sulfinicAcidLocants = getSulfinicAcidLocants(parsedMol, parent);
+  const sulfenicAcidLocants = getSulfenicAcidLocants(parsedMol, parent);
+  const sulfonamideLocants = getSulfonamideLocants(parsedMol, parent);
+  const imineLocants = getImineLocants(parsedMol, parent);
+  const thiocarboxylicAcidLocants = getThioCarbonylLocants(parsedMol, parent, "thiocarboxylicAcid");
+  const thioamideLocants = getThioCarbonylLocants(parsedMol, parent, "thioamide");
+  const thioaldehydeLocants = getThioCarbonylLocants(parsedMol, parent, "thioaldehyde");
+  const thioketoneLocants = getThioCarbonylLocants(parsedMol, parent, "thioketone");
 
   const features: NamingFeature[] = [];
+
+  if (peroxyAcidLocants.length > 0) {
+    features.push({
+      type: "peroxyAcid",
+      locants: peroxyAcidLocants,
+      suffix: "peroxoic acid",
+      prefix: "peroxy",
+      priority: 0.8,
+    });
+  }
+
+  if (acylAzideLocants.length > 0) {
+    features.push({
+      type: "acylAzide",
+      locants: acylAzideLocants,
+      suffix: "oyl azide",
+      prefix: "azidocarbonyl",
+      priority: 1.45,
+    });
+  }
 
   for (const acidHalide of acidHalideGroups) {
     const acidHalideLocants = getFeatureLocantsFromCarbonIndexes(parent, [
@@ -572,6 +862,96 @@ export function detectNamingFeatures(
       suffix: "thiol",
       prefix: "sulfanyl",
       priority: 7,
+    });
+  }
+
+  if (sulfonicAcidLocants.length > 0) {
+    features.push({
+      type: "sulfonicAcid",
+      locants: sulfonicAcidLocants,
+      suffix: "sulfonic acid",
+      prefix: "sulfo",
+      priority: 0.9,
+    });
+  }
+
+  if (sulfinicAcidLocants.length > 0) {
+    features.push({
+      type: "sulfinicAcid",
+      locants: sulfinicAcidLocants,
+      suffix: "sulfinic acid",
+      prefix: "sulfino",
+      priority: 1.1,
+    });
+  }
+
+  if (sulfenicAcidLocants.length > 0) {
+    features.push({
+      type: "sulfenicAcid",
+      locants: sulfenicAcidLocants,
+      suffix: "sulfenic acid",
+      prefix: "sulfenyl",
+      priority: 6.5,
+    });
+  }
+
+  if (sulfonamideLocants.length > 0) {
+    features.push({
+      type: "sulfonamide",
+      locants: sulfonamideLocants,
+      suffix: "sulfonamide",
+      prefix: "sulfonamido",
+      priority: 1.25,
+    });
+  }
+
+  if (thiocarboxylicAcidLocants.length > 0) {
+    features.push({
+      type: "thiocarboxylicAcid",
+      locants: thiocarboxylicAcidLocants,
+      suffix: "thioic acid",
+      prefix: "sulfanylcarbonyl",
+      priority: 1.3,
+    });
+  }
+
+  if (thioamideLocants.length > 0) {
+    features.push({
+      type: "thioamide",
+      locants: thioamideLocants,
+      suffix: "thioamide",
+      prefix: "carbothioamido",
+      priority: 1.6,
+    });
+  }
+
+  if (thioaldehydeLocants.length > 0) {
+    features.push({
+      type: "thioaldehyde",
+      locants: thioaldehydeLocants,
+      suffix: "thial",
+      prefix: "thioxo",
+      priority: 2.2,
+    });
+  }
+
+  if (thioketoneLocants.length > 0) {
+    features.push({
+      type: "thioketone",
+      locants: thioketoneLocants,
+      suffix: "thione",
+      prefix: "thioxo",
+      priority: 3.2,
+    });
+  }
+
+  if (imineLocants.length > 0) {
+    features.push({
+      type: "imine",
+      locants: imineLocants,
+      suffix: "imine",
+      prefix: "imino",
+      priority: 5.5,
     });
   }
 

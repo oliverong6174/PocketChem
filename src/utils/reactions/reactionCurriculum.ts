@@ -19,6 +19,7 @@ const FAMILY_CURRICULUM: Record<string, FamilyCurriculum> = {
   aldehydes: { course: "ochem-2", chapter: "Aldehydes and ketones" },
   ketones: { course: "ochem-2", chapter: "Aldehydes and ketones" },
   "carbonyl-derivatives": { course: "ochem-2", chapter: "Carbonyl derivatives and protecting groups" },
+  couplings: { course: "ochem-2", chapter: "Carbon-carbon cross-coupling" },
   enolates: { course: "ochem-2", chapter: "Enols and enolates" },
   "carboxylic-acids": { course: "ochem-2", chapter: "Carboxylic acids" },
   "acid-chlorides": {

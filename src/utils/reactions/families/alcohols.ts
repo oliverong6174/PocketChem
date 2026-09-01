@@ -274,6 +274,31 @@ export const alcoholReactionRules: ReactionRule[] = [
     priority: 590,
   },
   {
+    id: "alcohol-williamson-ether",
+    family: "alcohols",
+    reactionType: "substitution",
+    title: "Williamson Ether Synthesis from an Alcohol",
+    reagents: "1) NaH or another strong base  2) methyl or primary R-X",
+    reagentNote: "Draw the alcohol and alkyl halide as disconnected structures",
+    productHint: "Ether",
+    explanation:
+      "Strong base converts the alcohol to an alkoxide, which then displaces a leaving group from a methyl or primary alkyl halide by SN2.",
+    trigger: {
+      includeSmarts: ["[#6][O;H1]"],
+    },
+    additionalReactants: [
+      { label: "methyl or primary alkyl halide", trigger: { includeSmarts: ["[C;X4;H2,H3][Cl,Br,I]"] } },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[#6:1][O;H1:2].[C;X4:3][Cl,Br,I]>>[#6:1][O:2]-[C:3]",
+      maxProducts: 8,
+    },
+    mechanism: "SN2",
+    limitations: ["Secondary and tertiary alkyl halides favor elimination rather than Williamson substitution."],
+    priority: 595,
+  },
+  {
     id: "fischer-esterification",
     family: "alcohols",
     reactionType: "substitution",

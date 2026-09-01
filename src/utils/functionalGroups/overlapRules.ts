@@ -96,6 +96,7 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
 
   //Nitrogens
   "N-oxide": ["Amine"],
+  "Nitrate ester": ["Nitro", "N-oxide"],
   "Nitro": ["N-oxide", "Nitroso", "Amine"],
   Azide: [],
 
@@ -280,18 +281,26 @@ Aminoxime: [
   Sulfoxide: ["Thioether"],
   Sulfone: ["Sulfoxide", "Thioether"],
   "Sulfonic acid": ["Sulfone"],
-    Thioester: ["Ester, Thioether"],
+    Thioester: ["Ester", "Thioether"],
   Thioamide: [
     "Primary amide",
     "Secondary amide",
     "Tertiary amide",
     "Amide",
+    "Primary amine",
+    "Secondary amine",
+    "Tertiary amine",
+    "Amine",
   ],
-    Sulfonamide: [
+  Sulfonamide: [
     "Primary amide",
     "Secondary amide",
     "Tertiary amide",
     "Amide",
+    "Primary amine",
+    "Secondary amine",
+    "Tertiary amine",
+    "Amine",
   ],
   Thioketone: ["Ketone"],
   Thioaldehyde: ["Aldehyde"],

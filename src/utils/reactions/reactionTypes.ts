@@ -87,6 +87,12 @@ export type ReactionReactantRequirement = {
   label: string;
   /** Structural requirements for this additional reactant. */
   trigger: ReactionTrigger;
+  /**
+   * Stoichiometric copies of the same drawn reactant needed by the transform.
+   * The user only needs to draw the structure once; the engine duplicates it
+   * internally for reaction SMARTS that require multiple equivalents.
+   */
+  equivalents?: number;
 };
 
 export type ReactionRule = {
@@ -158,4 +164,64 @@ export type ReactionComponent = {
 export type ReactionPredictionInput = {
   reactantSmiles: string;
   functionalGroups: FunctionalGroupResult[];
+};
+
+/** Confidence assigned to a retrosynthetic disconnection after replaying the
+ * original forward rule against the proposed precursors. */
+export type RetrosynthesisConfidence = "confirmed" | "connectivity-confirmed";
+
+/** A second forward reaction that reaches the exact same retrosynthetic
+ * disconnection/precursor set. These are collapsed into the primary card so
+ * symmetric or otherwise equivalent substrates do not create duplicate cards. */
+export type RetrosynthesisAlternativeRoute = {
+  ruleId: string;
+  title: string;
+  reagentLabel: string;
+  reagentNote: string;
+  mechanism: string | null;
+  reactionClass: string | null;
+  selectivity: string[];
+};
+
+/**
+ * One backwards application of an existing forward ReactionRule.
+ *
+ * `precursorComponents` contains only structures that can be reconstructed
+ * from the target. Non-incorporated bases/solvents remain in
+ * `requiredReactantLabels` and in the original rule's reagent metadata rather
+ * than being invented as arbitrary molecules.
+ */
+export type RetrosynthesisPathway = {
+  id: string;
+  ruleId: string;
+  family: string;
+  reactionType: ReactionType;
+  title: string;
+
+  targetSmiles: string;
+  targetLabel: string;
+
+  precursorSmiles: string;
+  precursorComponents: string[];
+  precursorLabel: string;
+  requiredReactantLabels: string[];
+
+  reagentLabel: string;
+  reagentNote: string;
+  shortExplanation: string;
+  priority: number;
+
+  course: OrganicChemCourse;
+  chapter: string;
+  mechanism: string | null;
+  reactionClass: string | null;
+  purpose: ReactionPurpose | null;
+  selectivity: string[];
+  limitations: string[];
+
+  confidence: RetrosynthesisConfidence;
+  source: "reversed-reaction-smarts" | "reversed-custom-handler";
+
+  /** Other catalog rules that produce the same exact precursor set. */
+  alternativeRoutes: RetrosynthesisAlternativeRoute[];
 };

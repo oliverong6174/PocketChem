@@ -1,5 +1,6 @@
 export {
   predictReactionPathways,
+  predictRetrosynthesisPathways,
   reactionRegistry,
   alkeneReactionRules,
   analyzeReactionComponents,
@@ -13,4 +14,6 @@ export type {
   ReactionPathway,
   ReactionReactantRequirement,
   ReactionRule,
+  RetrosynthesisConfidence,
+  RetrosynthesisPathway,
 } from "./reactions";

@@ -51,21 +51,57 @@ export const dieneReactionRules: ReactionRule[] = [
     family: "dienes",
     reactionType: "pericyclic",
     title: "Diels–Alder Cycloaddition",
-    reagents: "Dienophile, heat",
-    reagentNote: "Concerted [4+2] cycloaddition",
+    reagents: "heat",
+    reagentNote: "Draw the conjugated diene and dienophile as disconnected structures",
     productHint: "Cyclohexene derivative",
     explanation:
       "A conjugated diene in the s-cis conformation reacts with a dienophile in one concerted step to form a six-membered ring.",
     trigger: conjugatedDieneTrigger,
+    additionalReactants: [
+      {
+        label: "dienophile",
+        trigger: {
+          includeSmarts: ["[C,c]=[C,c]"],
+          excludeSmarts: ["[C,c]=[C,c]-[C,c]=[C,c]"],
+        },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason:
-        "The dienophile structure must be supplied as a second reactant before the cycloaddition product can be generated.",
+      type: "reactionSmarts",
+      smarts:
+        "[C:1]=[C:2]-[C:3]=[C:4].[C:5]=[C:6]>>[C:1]1-[C:2]=[C:3]-[C:4]-[C:5]-[C:6]-1",
+      maxProducts: 12,
     },
+    productStatus: "representative",
     mechanism: "Pericyclic [4+2] cycloaddition",
     selectivity: ["Stereospecific", "Endo product often favored kinetically"],
-    limitations: ["The diene must be able to adopt an s-cis conformation."],
+    limitations: ["The diene must be able to adopt an s-cis conformation.", "Constitutional products are generated, but endo/exo and facial stereochemistry are not yet assigned."],
     priority: 720,
+  },
+  {
+    id: "diene-diels-alder-alkyne",
+    family: "dienes",
+    reactionType: "pericyclic",
+    title: "Diels–Alder Cycloaddition with an Alkyne",
+    reagents: "heat",
+    reagentNote: "Draw the conjugated diene and alkyne dienophile as disconnected structures",
+    productHint: "Cyclohexadiene derivative",
+    explanation:
+      "A conjugated diene can undergo a concerted [4+2] cycloaddition with an alkyne dienophile, leaving a second double bond in the six-membered product.",
+    trigger: conjugatedDieneTrigger,
+    additionalReactants: [
+      { label: "alkyne dienophile", trigger: { includeSmarts: ["[C]#[C]"] } },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1]=[C:2]-[C:3]=[C:4].[C:5]#[C:6]>>[C:1]1-[C:2]=[C:3]-[C:4]-[C:5]=[C:6]-1",
+      maxProducts: 12,
+    },
+    mechanism: "Pericyclic [4+2] cycloaddition",
+    selectivity: ["Stereospecific", "Endo approach is often kinetically favored when applicable"],
+    productStatus: "representative",
+    limitations: ["The diene must be able to adopt an s-cis conformation.", "Facial and endo/exo stereochemistry are not yet assigned."],
+    priority: 722,
   },
   {
     id: "diene-polymerization",

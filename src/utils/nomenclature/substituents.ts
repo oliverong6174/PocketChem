@@ -12,6 +12,8 @@ import { getOtherAtom } from "./molParser";
 import { getLocantMap } from "./graph/parentSelection";
 import { buildBranchName } from "./branch/branchConstructor";
 import { alkylNameToAlkoxyName } from "./alkoxyNames";
+import { classifyOxygen } from "./classifiers/oxygen";
+import { getNitrogenSubstituentPrefix } from "./classifiers/nitrogen";
 
 const HALOGEN_PREFIXES: Record<string, string> = {
   F: "fluoro",
@@ -34,15 +36,170 @@ function getAlkoxyName(
   return alkylNameToAlkoxyName(branchName);
 }
 
-function getNitrogenSubstituentName(parsedMol: ParsedMol, nitrogenAtom: number) {
-  const nitrogenBonds = parsedMol.adjacency.get(nitrogenAtom) ?? [];
+function getNitrogenSubstituentName(
+  parsedMol: ParsedMol,
+  nitrogenAtom: number,
+  parentAtom?: number
+) {
+  return getNitrogenSubstituentPrefix(parsedMol, nitrogenAtom, parentAtom);
+}
 
-  const oxygenCount = nitrogenBonds.filter((nitrogenBond) => {
-    const attached = getOtherAtom(nitrogenBond, nitrogenAtom);
-    return parsedMol.atoms[attached]?.element === "O";
+function getSulfurSubstituentName(
+  parsedMol: ParsedMol,
+  sulfurAtom: number,
+  parentAtom: number
+) {
+  const bonds = parsedMol.adjacency.get(sulfurAtom) ?? [];
+  const doubleOCount = bonds.filter((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, sulfurAtom)];
+    return attached?.element === "O" && bond.bondOrder === 2;
   }).length;
 
-  return oxygenCount >= 2 ? "nitro" : "amino";
+  const hydroxyOxygen = bonds.find((bond) => {
+    if (bond.bondOrder !== 1) return false;
+    const oxygenIndex = getOtherAtom(bond, sulfurAtom);
+    if (parsedMol.atoms[oxygenIndex]?.element !== "O") return false;
+    const orderSum = (parsedMol.adjacency.get(oxygenIndex) ?? []).reduce(
+      (sum, candidate) => sum + candidate.bondOrder,
+      0
+    );
+    return orderSum < 2;
+  });
+
+  if (doubleOCount >= 2 && hydroxyOxygen) return "sulfo";
+  if (doubleOCount === 1 && hydroxyOxygen) return "sulfino";
+
+  const nitrogenBond = bonds.find((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, sulfurAtom)];
+    return bond.bondOrder === 1 && attached?.element === "N";
+  });
+  if (doubleOCount >= 2 && nitrogenBond) return "sulfonamido";
+
+  const chlorineBond = bonds.find((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, sulfurAtom)];
+    return bond.bondOrder === 1 && attached?.element === "Cl";
+  });
+  if (doubleOCount >= 2 && chlorineBond) return "chlorosulfonyl";
+
+  const otherCarbonBond = bonds.find((bond) => {
+    if (bond.bondOrder !== 1) return false;
+    const attached = getOtherAtom(bond, sulfurAtom);
+    return attached !== parentAtom && parsedMol.atoms[attached]?.element === "C";
+  });
+
+  if (otherCarbonBond) {
+    const carbonIndex = getOtherAtom(otherCarbonBond, sulfurAtom);
+    const branch = buildBranchName(parsedMol, carbonIndex, sulfurAtom).name;
+    if (doubleOCount >= 2) return `${branch}sulfonyl`;
+    if (doubleOCount === 1) return `${branch}sulfinyl`;
+    return `${branch}sulfanyl`;
+  }
+
+  const sulfurBond = bonds.find((bond) => {
+    const attached = getOtherAtom(bond, sulfurAtom);
+    return bond.bondOrder === 1 && parsedMol.atoms[attached]?.element === "S";
+  });
+
+  if (sulfurBond) {
+    const otherSulfur = getOtherAtom(sulfurBond, sulfurAtom);
+    const carbonBond = (parsedMol.adjacency.get(otherSulfur) ?? []).find((bond) => {
+      const attached = getOtherAtom(bond, otherSulfur);
+      return attached !== sulfurAtom &&
+        bond.bondOrder === 1 &&
+        parsedMol.atoms[attached]?.element === "C";
+    });
+
+    if (carbonBond) {
+      const carbonIndex = getOtherAtom(carbonBond, otherSulfur);
+      const branch = buildBranchName(parsedMol, carbonIndex, otherSulfur).name;
+      return `${branch}disulfanyl`;
+    }
+  }
+
+  return "sulfanyl";
+}
+
+function getOxygenSubstituentName(
+  parsedMol: ParsedMol,
+  oxygenAtom: number,
+  parentAtom: number
+) {
+  const classification = classifyOxygen(parsedMol, oxygenAtom);
+  const oxygenBonds = parsedMol.adjacency.get(oxygenAtom) ?? [];
+
+  if (!classification) return "oxy";
+
+  if (classification.kind === "nitrateEster") return "nitrooxy";
+  if (classification.kind === "sulfurOxygenEster") return "sulfonyloxy";
+  if (classification.kind === "phosphateEster") return "phosphoryloxy";
+  if (classification.kind === "silylEther") return "silyloxy";
+
+  if (classification.kind === "peroxide") {
+    const otherOxygenBond = oxygenBonds.find((bond) => {
+      const attached = getOtherAtom(bond, oxygenAtom);
+      return attached !== parentAtom && parsedMol.atoms[attached]?.element === "O";
+    });
+
+    if (otherOxygenBond) {
+      const otherOxygen = getOtherAtom(otherOxygenBond, oxygenAtom);
+      const peroxideCarbonBond = (parsedMol.adjacency.get(otherOxygen) ?? []).find(
+        (bond) => {
+          const attached = getOtherAtom(bond, otherOxygen);
+          return attached !== oxygenAtom && parsedMol.atoms[attached]?.element === "C";
+        }
+      );
+
+      if (peroxideCarbonBond) {
+        const carbonIndex = getOtherAtom(peroxideCarbonBond, otherOxygen);
+        const branch = buildBranchName(parsedMol, carbonIndex, otherOxygen).name;
+        return `${branch}peroxy`;
+      }
+    }
+    return "hydroperoxy";
+  }
+
+  if (classification.kind === "ether") {
+    const alkylBond = oxygenBonds.find((bond) => {
+      const attached = getOtherAtom(bond, oxygenAtom);
+      return attached !== parentAtom && parsedMol.atoms[attached]?.element === "C";
+    });
+    if (alkylBond) {
+      return getAlkoxyName(parsedMol, getOtherAtom(alkylBond, oxygenAtom), oxygenAtom);
+    }
+  }
+
+  if (classification.kind === "hydroxy") return "hydroxy";
+  if (classification.kind === "alkoxide") return "oxido";
+
+  // Unknown C-O-X connectivity should never silently become hydroxy.
+  return "oxy";
+}
+
+function getDirectHeteroSubstituentName(
+  parsedMol: ParsedMol,
+  atomIndex: number
+) {
+  const atom = parsedMol.atoms[atomIndex];
+  if (!atom) return null;
+
+  if (atom.element === "P") {
+    const hasTerminalO = (parsedMol.adjacency.get(atomIndex) ?? []).some((bond) => {
+      const attached = parsedMol.atoms[getOtherAtom(bond, atomIndex)];
+      return attached?.element === "O" && bond.bondOrder >= 1.5;
+    });
+    return hasTerminalO ? "phosphoryl" : "phosphanyl";
+  }
+
+  if (atom.element === "B") {
+    const oxygenCount = (parsedMol.adjacency.get(atomIndex) ?? []).filter((bond) => {
+      const attached = parsedMol.atoms[getOtherAtom(bond, atomIndex)];
+      return attached?.element === "O";
+    }).length;
+    return oxygenCount >= 2 ? "borono" : "boryl";
+  }
+
+  if (atom.element === "Si") return "silyl";
+  return null;
 }
 
 export function detectSubstituents(
@@ -141,7 +298,7 @@ export function detectSubstituents(
         if (bond.bondOrder > 1) continue;
 
         substituents.push({
-          name: getNitrogenSubstituentName(parsedMol, other),
+          name: getNitrogenSubstituentName(parsedMol, other, parentAtom),
           locant,
         });
 
@@ -151,20 +308,8 @@ export function detectSubstituents(
       if (atom.element === "O") {
         if (bond.bondOrder !== 1) continue;
 
-        const oxygenBonds = parsedMol.adjacency.get(other) ?? [];
-
-        const alkylBond = oxygenBonds.find((oxygenBond) => {
-          const attached = getOtherAtom(oxygenBond, other);
-
-          if (attached === parentAtom) return false;
-
-          return parsedMol.atoms[attached]?.element === "C";
-        });
-
         substituents.push({
-          name: alkylBond
-            ? getAlkoxyName(parsedMol, getOtherAtom(alkylBond, other), other)
-            : "hydroxy",
+          name: getOxygenSubstituentName(parsedMol, other, parentAtom),
           locant,
         });
 
@@ -173,10 +318,16 @@ export function detectSubstituents(
 
       if (atom.element === "S") {
         substituents.push({
-          name: "sulfanyl",
+          name: getSulfurSubstituentName(parsedMol, other, parentAtom),
           locant,
         });
 
+        continue;
+      }
+
+      const directHeteroName = getDirectHeteroSubstituentName(parsedMol, other);
+      if (directHeteroName) {
+        substituents.push({ name: directHeteroName, locant });
         continue;
       }
 
@@ -223,6 +374,20 @@ function getOwnedNitrogenSuffixSubstituents(
 
     const attachedAtom = parsedMol.atoms[attached];
 
+    if (attachedAtom?.element === "O") {
+      const oxygenHeavyBonds = (parsedMol.adjacency.get(attached) ?? []).filter(
+        (bond) => parsedMol.atoms[getOtherAtom(bond, attached)]?.element !== "H"
+      );
+
+      // Hydroxamic acids and related N-hydroxy amides are most clearly named
+      // as N-hydroxy amides. Restrict this to a terminal O-H-like oxygen so
+      // N-alkoxy substituents are not incorrectly collapsed to hydroxy.
+      if (oxygenHeavyBonds.length === 1 && attachedAtom.charge <= 0) {
+        substituents.push({ name: "hydroxy", locant: "N" });
+      }
+      continue;
+    }
+
     if (attachedAtom?.element !== "C") continue;
 
     const branch = buildBranchName(parsedMol, attached, nitrogenAtom);
@@ -244,6 +409,38 @@ function getCarbonFunctionalSubstituentName(
   if (isNitrileSubstituentCarbon(parsedMol, carbonIndex)) return "cyano";
 
   const bonds = parsedMol.adjacency.get(carbonIndex) ?? [];
+
+  const nitrogenBonds = bonds.filter((bond) => {
+    const attached = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
+    return attached?.element === "N";
+  });
+  const imineNitrogenBond = nitrogenBonds.find((bond) => bond.bondOrder === 2);
+
+  if (imineNitrogenBond) {
+    const imineNitrogen = getOtherAtom(imineNitrogenBond, carbonIndex);
+    const nNeighbors = parsedMol.adjacency.get(imineNitrogen) ?? [];
+
+    const nHasHydroxyOxygen = nNeighbors.some((bond) => {
+      if (bond.bondOrder !== 1) return false;
+      const oxygen = getOtherAtom(bond, imineNitrogen);
+      if (parsedMol.atoms[oxygen]?.element !== "O") return false;
+      const oxygenHeavyBonds = (parsedMol.adjacency.get(oxygen) ?? []).filter(
+        (candidate) =>
+          parsedMol.atoms[getOtherAtom(candidate, oxygen)]?.element !== "H"
+      );
+      return oxygenHeavyBonds.length === 1;
+    });
+    if (nHasHydroxyOxygen) return "hydroxyimino";
+
+    const nHasNitrogen = nNeighbors.some((bond) => {
+      const attached = getOtherAtom(bond, imineNitrogen);
+      return attached !== carbonIndex && parsedMol.atoms[attached]?.element === "N";
+    });
+    if (nHasNitrogen) return "hydrazono";
+
+    if (nitrogenBonds.length >= 3) return "guanidino";
+    if (nitrogenBonds.length >= 2) return "amidino";
+  }
 
   const hasCarbonylOxygen = bonds.some((bond) => {
     const attached = parsedMol.atoms[getOtherAtom(bond, carbonIndex)];
@@ -478,6 +675,31 @@ function isAlreadyRepresentedByNamingFeature(
         otherAtom,
         connectingBond
       );
+    }
+
+    if (
+      feature.type === "sulfonicAcid" ||
+      feature.type === "sulfinicAcid" ||
+      feature.type === "sulfenicAcid" ||
+      feature.type === "sulfonamide"
+    ) {
+      return parsedMol.atoms[otherAtom]?.element === "S" &&
+        connectingBond.bondOrder === 1;
+    }
+
+    if (feature.type === "imine") {
+      return parsedMol.atoms[otherAtom]?.element === "N" &&
+        connectingBond.bondOrder === 2;
+    }
+
+    if (
+      feature.type === "thioaldehyde" ||
+      feature.type === "thioketone" ||
+      feature.type === "thioamide" ||
+      feature.type === "thiocarboxylicAcid"
+    ) {
+      return parsedMol.atoms[otherAtom]?.element === "S" &&
+        connectingBond.bondOrder === 2;
     }
 
     return false;

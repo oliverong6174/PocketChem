@@ -37,9 +37,16 @@ export const ketoneReactionRules: ReactionRule[] = [
     explanation:
       "Grignard reagents and organolithium reagents add to ketones to form tertiary alcohols after acidic workup.",
     trigger: ketoneTrigger,
+    additionalReactants: [
+      {
+        label: "Grignard or organolithium reagent",
+        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The Grignard or organolithium carbon group must be specified before an exact alcohol can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1]=[O:2].[#6:3][Mg,Li]>>[C:1]([OH:2])-[#6:3]",
+      maxProducts: 8,
     },
     priority: 1110,
   },
@@ -96,9 +103,17 @@ export const ketoneReactionRules: ReactionRule[] = [
     explanation:
       "Ketones react with alcohols under acidic conditions to form ketals through hemiketal intermediates.",
     trigger: ketoneTrigger,
+    additionalReactants: [
+      {
+        label: "alcohol (2 equivalents)",
+        trigger: { includeSmarts: ["[O;H1][#6]"] },
+        equivalents: 2,
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The alcohol identity must be specified before an exact ketal can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1]=[O:2].[O;H1:3][#6:4].[O;H1:5][#6:6]>>[C:1]([O:3][#6:4])([O:5][#6:6])",
+      maxProducts: 8,
     },
     priority: 1150,
   },
@@ -113,9 +128,16 @@ export const ketoneReactionRules: ReactionRule[] = [
     explanation:
       "Ketones react with primary amines to form imines through dehydration.",
     trigger: ketoneTrigger,
+    additionalReactants: [
+      {
+        label: "primary amine or ammonia",
+        trigger: { includeSmarts: ["[N;H2,H3;!$(N[C,S,P]=O)]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The primary amine substituent must be specified before an exact imine can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1]=[O:2].[N;H2,H3:3]>>[C:1]=[N:3]",
+      maxProducts: 8,
     },
     priority: 1160,
   },
@@ -129,11 +151,20 @@ export const ketoneReactionRules: ReactionRule[] = [
     productHint: "Enamine",
     explanation:
       "Ketones with alpha hydrogens can react with secondary amines to form enamines.",
-    trigger: ketoneTrigger,
+    trigger: { ...ketoneTrigger, includeSmarts: ["[C;H1,H2,H3][C](=O)"] },
+    additionalReactants: [
+      {
+        label: "secondary amine",
+        trigger: { includeSmarts: ["[N;H1;+0;X3;!$(N[C,S,P]=O)]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The secondary amine substituents must be specified before an exact enamine can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C;H1,H2,H3:6][C:1](=[O:2]).[N;H1:3]>>[C:6]=[C:1]-[N:3]",
+      maxProducts: 12,
     },
+    productStatus: "representative",
+    limitations: ["The carbonyl must contain an alpha hydrogen. Unsymmetrical carbonyl compounds can form more than one constitutional enamine, and E/Z geometry is not assigned."],
     priority: 1170,
   },
   {
@@ -167,9 +198,16 @@ export const ketoneReactionRules: ReactionRule[] = [
     explanation:
       "Ketones react with hydrazines to form hydrazones.",
     trigger: ketoneTrigger,
+    additionalReactants: [
+      {
+        label: "hydrazine or substituted hydrazine",
+        trigger: { includeSmarts: ["[N;H1,H2][N]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "A substituted hydrazine can change the product; specify it for an exact structure.",
+      type: "reactionSmarts",
+      smarts: "[C:1]=[O:2].[N;H1,H2:3][N:4]>>[C:1]=[N:3][N:4]",
+      maxProducts: 8,
     },
     priority: 1190,
   },
@@ -224,10 +262,18 @@ export const ketoneReactionRules: ReactionRule[] = [
     explanation:
       "Wittig reagents convert ketones into substituted alkenes.",
     trigger: ketoneTrigger,
+    additionalReactants: [
+      {
+        label: "phosphorus ylide",
+        trigger: { includeSmarts: ["[C-][P+]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The ylide substituent must be specified before an exact alkene can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1]=[O:2].[C-:3][P+:4]>>[C:1]=[C+0:3]",
+      maxProducts: 8,
     },
+    productStatus: "representative",
     priority: 1220,
   },
   {

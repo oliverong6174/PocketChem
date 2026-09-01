@@ -121,26 +121,36 @@ export async function ruleMatchesReactant(
 
 /**
  * Match a rule's primary trigger plus any required additional reactants to
- * distinct disconnected structures. The returned array is ordered by the
- * reaction rule's reactant roles, not by drawing order, so reaction SMARTS
- * can be deterministic while users may draw molecules in either order.
+ * distinct disconnected structures. Results are ordered by reaction-role
+ * order, not drawing order. All valid role assignments are returned because
+ * crossed reactions (for example aldol chemistry) can legitimately swap which
+ * drawn carbonyl acts as donor versus electrophile.
  */
-export async function matchRuleReactants(
+export async function matchAllRuleReactants(
   rule: ReactionRule,
   components: ReactionComponent[]
-): Promise<ReactionComponent[] | null> {
+): Promise<ReactionComponent[][]> {
   const requirements = [
     { label: "primary reactant", trigger: rule.trigger },
     ...(rule.additionalReactants ?? []),
   ];
 
-  if (components.length < requirements.length) return null;
+  if (components.length < requirements.length) return [];
 
   const used = new Set<number>();
   const assignment: ReactionComponent[] = [];
+  const results: ReactionComponent[][] = [];
+  const seen = new Set<string>();
 
-  async function assign(requirementIndex: number): Promise<boolean> {
-    if (requirementIndex >= requirements.length) return true;
+  async function assign(requirementIndex: number): Promise<void> {
+    if (requirementIndex >= requirements.length) {
+      const key = assignment.map((component) => component.smiles).join("||");
+      if (!seen.has(key)) {
+        seen.add(key);
+        results.push([...assignment]);
+      }
+      return;
+    }
 
     const requirement = requirements[requirementIndex];
 
@@ -157,16 +167,25 @@ export async function matchRuleReactants(
       if (!matches) continue;
 
       used.add(componentIndex);
-      assignment.push(component);
-
-      if (await assign(requirementIndex + 1)) return true;
-
-      assignment.pop();
+      const equivalents = Math.max(1, Math.floor(requirement.equivalents ?? 1));
+      for (let copy = 0; copy < equivalents; copy += 1) {
+        assignment.push(component);
+      }
+      await assign(requirementIndex + 1);
+      assignment.splice(assignment.length - equivalents, equivalents);
       used.delete(componentIndex);
     }
-
-    return false;
   }
 
-  return (await assign(0)) ? assignment : null;
+  await assign(0);
+  return results;
+}
+
+/** Backward-compatible convenience helper for callers that only need one match. */
+export async function matchRuleReactants(
+  rule: ReactionRule,
+  components: ReactionComponent[]
+): Promise<ReactionComponent[] | null> {
+  const matches = await matchAllRuleReactants(rule, components);
+  return matches[0] ?? null;
 }

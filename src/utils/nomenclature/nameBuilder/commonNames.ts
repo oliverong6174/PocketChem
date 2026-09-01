@@ -1,314 +1,1013 @@
-const COMMON_NAME_MAP: Record<string, string> = {
-    // ----------------------------
-    // Carboxylic acids
-    // ----------------------------
-    "methanoic acid": "formic acid",
-    "ethanoic acid": "acetic acid",
-    "propanoic acid": "propionic acid",
-    "butanoic acid": "butyric acid",
-    "pentanoic acid": "valeric acid",
-    "hexanoic acid": "caproic acid",
-    "heptanoic acid": "enanthic acid",
-    "octanoic acid": "caprylic acid",
-    "nonanoic acid": "pelargonic acid",
-    "decanoic acid": "capric acid",
-    "dodecanoic acid": "lauric acid",
-    "tetradecanoic acid": "myristic acid",
-    "hexadecanoic acid": "palmitic acid",
-    "octadecanoic acid": "stearic acid",
+import type { ParsedMol } from "../types";
 
-    // Unsaturated fatty acids
-    "octadec-9-enoic acid": "oleic acid",
-    "octadeca-9,12-dienoic acid": "linoleic acid",
-    "octadeca-9,12,15-trienoic acid": "linolenic acid",
-    "eicosanoic acid": "arachidic acid",
-    "eicosa-5,8,11,14-tetraenoic acid": "arachidonic acid",
+/**
+ * Common-name alias layer for PocketChem nomenclature.
+ *
+ * This is intentionally name-based. It does not infer a stereospecific biomolecule
+ * from an ambiguous connectivity-only name. Large polymers such as DNA, RNA,
+ * proteins, starch, glycogen, and cellulose are represented through well-defined
+ * monomers/building blocks rather than pretending an arbitrary polymer has one
+ * unique small-molecule common name.
+ */
 
-    // Dicarboxylic acids
-    "ethanedioic acid": "oxalic acid",
-    "propanedioic acid": "malonic acid",
-    "butanedioic acid": "succinic acid",
-    "pentanedioic acid": "glutaric acid",
-    "hexanedioic acid": "adipic acid",
-    "heptanedioic acid": "pimelic acid",
-    "octanedioic acid": "suberic acid",
-    "nonanedioic acid": "azelaic acid",
-    "decanedioic acid": "sebacic acid",
+function normalizeCommonNameKey(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/α/g, "alpha")
+    .replace(/β/g, "beta")
+    .replace(/γ/g, "gamma")
+    .replace(/δ/g, "delta")
+    .replace(/[‐‑‒–—−]/g, "-")
+    .replace(/[’′]/g, "\'")
+    .replace(/″/g, "\"")
+    .replace(/\s+/g, " ")
+    .replace(/\s*,\s*/g, ",");
+}
 
-    // Hydroxy acids / keto acids
-    "2-hydroxypropanoic acid": "lactic acid",
-    "2-hydroxybutanedioic acid": "malic acid",
-    "2,3-dihydroxybutanedioic acid": "tartaric acid",
-    "2-hydroxypropane-1,2,3-tricarboxylic acid": "citric acid",
-    "2-oxopropanoic acid": "pyruvic acid",
-    "2-oxobutanedioic acid": "oxaloacetic acid",
-    "2-oxopentanedioic acid": "alpha-ketoglutaric acid",
+const RAW_COMMON_NAME_MAP: Record<string, string> = {
+  // Existing PocketChem aliases
+  "methanoic acid": "formic acid",
+  "ethanoic acid": "acetic acid",
+  "propanoic acid": "propionic acid",
+  "butanoic acid": "butyric acid",
+  "pentanoic acid": "valeric acid",
+  "hexanoic acid": "caproic acid",
+  "heptanoic acid": "enanthic acid",
+  "octanoic acid": "caprylic acid",
+  "nonanoic acid": "pelargonic acid",
+  "decanoic acid": "capric acid",
+  "dodecanoic acid": "lauric acid",
+  "tetradecanoic acid": "myristic acid",
+  "hexadecanoic acid": "palmitic acid",
+  "octadecanoic acid": "stearic acid",
+  "octadec-9-enoic acid": "oleic acid",
+  "octadeca-9,12-dienoic acid": "linoleic acid",
+  "octadeca-9,12,15-trienoic acid": "linolenic acid",
+  "eicosanoic acid": "arachidic acid",
+  "eicosa-5,8,11,14-tetraenoic acid": "arachidonic acid",
+  "ethanedioic acid": "oxalic acid",
+  "propanedioic acid": "malonic acid",
+  "butanedioic acid": "succinic acid",
+  "pentanedioic acid": "glutaric acid",
+  "hexanedioic acid": "adipic acid",
+  "heptanedioic acid": "pimelic acid",
+  "octanedioic acid": "suberic acid",
+  "nonanedioic acid": "azelaic acid",
+  "decanedioic acid": "sebacic acid",
+  "2-hydroxypropanoic acid": "lactic acid",
+  "2-hydroxybutanedioic acid": "malic acid",
+  "2,3-dihydroxybutanedioic acid": "tartaric acid",
+  "2-hydroxypropane-1,2,3-tricarboxylic acid": "citric acid",
+  "2-oxopropanoic acid": "pyruvic acid",
+  "2-oxobutanedioic acid": "oxaloacetic acid",
+  "2-oxopentanedioic acid": "alpha-ketoglutaric acid",
+  "benzenecarboxylic acid": "benzoic acid",
+  "2-hydroxybenzoic acid": "salicylic acid",
+  "4-hydroxybenzoic acid": "p-hydroxybenzoic acid",
+  "benzene-1,2-dicarboxylic acid": "phthalic acid",
+  "benzene-1,3-dicarboxylic acid": "isophthalic acid",
+  "benzene-1,4-dicarboxylic acid": "terephthalic acid",
+  "methanoate": "formate",
+  "ethanoate": "acetate",
+  "propanoate": "propionate",
+  "butanoate": "butyrate",
+  "pentanoate": "valerate",
+  "hexanoate": "caproate",
+  "benzoate": "benzoate",
+  "2-hydroxypropanoate": "lactate",
+  "2-oxopropanoate": "pyruvate",
+  "ethanedioate": "oxalate",
+  "propanedioate": "malonate",
+  "butanedioate": "succinate",
+  "pentanedioate": "glutarate",
+  "hexanedioate": "adipate",
+  "methanal": "formaldehyde",
+  "ethanal": "acetaldehyde",
+  "propanal": "propionaldehyde",
+  "butanal": "butyraldehyde",
+  "pentanal": "valeraldehyde",
+  "hexanal": "caproaldehyde",
+  "2-hydroxybenzaldehyde": "salicylaldehyde",
+  "4-hydroxybenzaldehyde": "p-hydroxybenzaldehyde",
+  "2-oxopropanedial": "mesoxaldehyde",
+  "prop-2-enal": "acrolein",
+  "propanone": "acetone",
+  "butanone": "methyl ethyl ketone",
+  "pentan-2-one": "methyl propyl ketone",
+  "pentan-3-one": "diethyl ketone",
+  "hexan-2-one": "methyl butyl ketone",
+  "hexan-3-one": "ethyl propyl ketone",
+  "cyclohexanone": "cyclohexanone",
+  "phenylethanone": "acetophenone",
+  "1-phenylethanone": "acetophenone",
+  "diphenylmethanone": "benzophenone",
+  "methanol": "methyl alcohol",
+  "ethanol": "ethyl alcohol",
+  "propanol": "propyl alcohol",
+  "propan-1-ol": "n-propyl alcohol",
+  "propan-2-ol": "isopropyl alcohol",
+  "butanol": "butyl alcohol",
+  "butan-1-ol": "n-butyl alcohol",
+  "butan-2-ol": "sec-butyl alcohol",
+  "2-methylpropan-1-ol": "isobutyl alcohol",
+  "2-methylpropan-2-ol": "tert-butyl alcohol",
+  "ethane-1,2-diol": "ethylene glycol",
+  "propane-1,2-diol": "propylene glycol",
+  "propane-1,2,3-triol": "glycerol",
+  "cyclohexanol": "cyclohexanol",
+  "phenylmethanol": "benzyl alcohol",
+  "hydroxybenzene": "phenol",
+  "methylphenol": "cresol",
+  "2-methylphenol": "o-cresol",
+  "3-methylphenol": "m-cresol",
+  "4-methylphenol": "p-cresol",
+  "benzene-1,2-diol": "catechol",
+  "benzene-1,3-diol": "resorcinol",
+  "benzene-1,4-diol": "hydroquinone",
+  "benzene-1,2,3-triol": "pyrogallol",
+  "2-nitrophenol": "o-nitrophenol",
+  "3-nitrophenol": "m-nitrophenol",
+  "4-nitrophenol": "p-nitrophenol",
+  "methoxybenzene": "anisole",
+  "ethoxybenzene": "phenetole",
+  "methoxymethane": "dimethyl ether",
+  "ethoxyethane": "diethyl ether",
+  "methoxyethane": "methyl ethyl ether",
+  "2-methoxy-2-methylpropane": "MTBE",
+  "2-(2-hydroxyethoxy)ethan-1-ol": "diethylene glycol",
+  "2-(2-hydroxyethoxy)ethanol": "diethylene glycol",
+  "2,2'-oxydiethanol": "diethylene glycol",
+  "2,2-oxydiethanol": "diethylene glycol",
+  "2,2'-oxybis(ethan-1-ol)": "diethylene glycol",
+  "2,2-oxybis(ethan-1-ol)": "diethylene glycol",
+  "methanamine": "methylamine",
+  "ethanamine": "ethylamine",
+  "propan-1-amine": "propylamine",
+  "propan-2-amine": "isopropylamine",
+  "butan-1-amine": "butylamine",
+  "aminobenzene": "aniline",
+  "phenylmethanamine": "benzylamine",
+  "dimethylamine": "dimethylamine",
+  "trimethylamine": "trimethylamine",
+  "diethylamine": "diethylamine",
+  "triethylamine": "triethylamine",
+  "methanamide": "formamide",
+  "ethanamide": "acetamide",
+  "propanamide": "propionamide",
+  "butanamide": "butyramide",
+  "n,n-dimethylmethanamide": "DMF",
+  "n,n-dimethylformamide": "DMF",
+  "n,n-dimethylethanamide": "DMA",
+  "n,n-dimethylacetamide": "DMA",
+  "N-(2-hydroxyethyl)-2-aminoethanol": "DEA",
+  "methyl methanoate": "methyl formate",
+  "methyl ethanoate": "methyl acetate",
+  "ethyl ethanoate": "ethyl acetate",
+  "propyl ethanoate": "propyl acetate",
+  "butyl ethanoate": "butyl acetate",
+  "methyl propanoate": "methyl propionate",
+  "ethyl propanoate": "ethyl propionate",
+  "methyl butanoate": "methyl butyrate",
+  "ethyl butanoate": "ethyl butyrate",
+  "methanenitrile": "hydrogen cyanide",
+  "ethanenitrile": "acetonitrile",
+  "propanenitrile": "propionitrile",
+  "butanenitrile": "butyronitrile",
+  "benzenecarbonitrile": "benzonitrile",
+  "2-aminoethanenitrile": "aminoacetonitrile",
+  "aminoethanenitrile": "aminoacetonitrile",
+  "2-aminoacetonitrile": "aminoacetonitrile",
+  "methanethiol": "methyl mercaptan",
+  "ethanethiol": "ethyl mercaptan",
+  "propanethiol": "propyl mercaptan",
+  "benzenethiol": "thiophenol",
+  "dimethyl sulfide": "dimethyl sulfide",
+  "dimethyl sulfoxide": "DMSO",
+  "benzene": "benzene",
+  "methylbenzene": "toluene",
+  "ethylbenzene": "ethylbenzene",
+  "ethenylbenzene": "styrene",
+  "vinylbenzene": "styrene",
+  "dimethylbenzene": "xylene",
+  "1,2-dimethylbenzene": "o-xylene",
+  "1,3-dimethylbenzene": "m-xylene",
+  "1,4-dimethylbenzene": "p-xylene",
+  "isopropylbenzene": "cumene",
+  "propan-2-ylbenzene": "cumene",
+  "naphthalene": "naphthalene",
+  "anthracene": "anthracene",
+  "phenanthrene": "phenanthrene",
+  "chloromethane": "methyl chloride",
+  "dichloromethane": "methylene chloride",
+  "trichloromethane": "chloroform",
+  "tetrachloromethane": "carbon tetrachloride",
+  "bromoethane": "ethyl bromide",
+  "iodoethane": "ethyl iodide",
+  "chloroethane": "ethyl chloride",
+  "fluoroethane": "ethyl fluoride",
+  "1,1,1-trichloroethane": "methyl chloroform",
+  "tetrachloroethene": "perchloroethylene",
+  "trichloroethene": "trichloroethylene",
+  "water": "water",
+  "ammonia": "ammonia",
+  "methane": "methane",
+  "ethane": "ethane",
+  "propane": "propane",
+  "butane": "butane",
+  "ethene": "ethylene",
+  "propene": "propylene",
+  "ethyne": "acetylene",
+  "carbon dioxide": "carbon dioxide",
+  "carbon monoxide": "carbon monoxide",
+  "glucose": "glucose",
+  "fructose": "fructose",
+  "galactose": "galactose",
+  "ribose": "ribose",
+  "deoxyribose": "deoxyribose",
+  "sucrose": "sucrose",
+  "lactose": "lactose",
+  "maltose": "maltose",
+  "2-aminoethanoic acid": "glycine",
+  "2-aminopropanoic acid": "alanine",
+  "2-amino-3-methylbutanoic acid": "valine",
+  "2-amino-4-methylpentanoic acid": "leucine",
+  "2-amino-3-methylpentanoic acid": "isoleucine",
+  "2-amino-3-hydroxypropanoic acid": "serine",
+  "2-amino-3-hydroxybutanoic acid": "threonine",
+  "2-amino-3-phenylpropanoic acid": "phenylalanine",
+  "2-amino-3-(4-hydroxyphenyl)propanoic acid": "tyrosine",
+  "2-amino-3-sulfanylpropanoic acid": "cysteine",
+  "2-amino-4-methylsulfanylbutanoic acid": "methionine",
+  "2-aminopentanedioic acid": "glutamic acid",
+  "2-aminobutanedioic acid": "aspartic acid",
+  "2,6-diaminohexanoic acid": "lysine",
+  "2-amino-5-guanidinopentanoic acid": "arginine",
+  "2-amino-3-(1h-imidazol-4-yl)propanoic acid": "histidine",
+  "pyrrolidine-2-carboxylic acid": "proline",
+  "2-amino-3-(1h-indol-3-yl)propanoic acid": "tryptophan",
+  "2-amino-3-carbamoylpropanoic acid": "asparagine",
+  "2-amino-4-carbamoylbutanoic acid": "glutamine",
+  "2-methylprop-1-ene": "isobutylene",
+  "2-methylpropene": "isobutylene",
 
-    // Aromatic acids
-    "benzenecarboxylic acid": "benzoic acid",
-    "2-hydroxybenzoic acid": "salicylic acid",
-    "4-hydroxybenzoic acid": "p-hydroxybenzoic acid",
-    "benzene-1,2-dicarboxylic acid": "phthalic acid",
-    "benzene-1,3-dicarboxylic acid": "isophthalic acid",
-    "benzene-1,4-dicarboxylic acid": "terephthalic acid",
-
-    // ----------------------------
-    // Carboxylates
-    // ----------------------------
-    "methanoate": "formate",
-    "ethanoate": "acetate",
-    "propanoate": "propionate",
-    "butanoate": "butyrate",
-    "pentanoate": "valerate",
-    "hexanoate": "caproate",
-    "benzoate": "benzoate",
-    "2-hydroxypropanoate": "lactate",
-    "2-oxopropanoate": "pyruvate",
-    "ethanedioate": "oxalate",
-    "propanedioate": "malonate",
-    "butanedioate": "succinate",
-    "pentanedioate": "glutarate",
-    "hexanedioate": "adipate",
-
-    // ----------------------------
-    // Aldehydes
-    // ----------------------------
-    "methanal": "formaldehyde",
-    "ethanal": "acetaldehyde",
-    "propanal": "propionaldehyde",
-    "butanal": "butyraldehyde",
-    "pentanal": "valeraldehyde",
-    "hexanal": "caproaldehyde",
-    "2-hydroxybenzaldehyde": "salicylaldehyde",
-    "4-hydroxybenzaldehyde": "p-hydroxybenzaldehyde",
-    "2-oxopropanedial": "mesoxaldehyde",
-
-    "prop-2-enal": "acrolein",
-
-    // ----------------------------
-    // Ketones
-    // ----------------------------
-    "propanone": "acetone",
-    "butanone": "methyl ethyl ketone",
-    "pentan-2-one": "methyl propyl ketone",
-    "pentan-3-one": "diethyl ketone",
-    "hexan-2-one": "methyl butyl ketone",
-    "hexan-3-one": "ethyl propyl ketone",
-    "cyclohexanone": "cyclohexanone",
-    "phenylethanone": "acetophenone",
-    "1-phenylethanone": "acetophenone",
-    "diphenylmethanone": "benzophenone",
-
-    // ----------------------------
-    // Alcohols
-    // ----------------------------
-    "methanol": "methyl alcohol",
-    "ethanol": "ethyl alcohol",
-    "propanol": "propyl alcohol",
-    "propan-1-ol": "n-propyl alcohol",
-    "propan-2-ol": "isopropyl alcohol",
-    "butanol": "butyl alcohol",
-    "butan-1-ol": "n-butyl alcohol",
-    "butan-2-ol": "sec-butyl alcohol",
-    "2-methylpropan-1-ol": "isobutyl alcohol",
-    "2-methylpropan-2-ol": "tert-butyl alcohol",
-    "ethane-1,2-diol": "ethylene glycol",
-    "propane-1,2-diol": "propylene glycol",
-    "propane-1,2,3-triol": "glycerol",
-    "cyclohexanol": "cyclohexanol",
-    "phenylmethanol": "benzyl alcohol",
-
-    // ----------------------------
-    // Phenols / aromatic alcohol-like compounds
-    // ----------------------------
-    "hydroxybenzene": "phenol",
-    "methylphenol": "cresol",
-    "2-methylphenol": "o-cresol",
-    "3-methylphenol": "m-cresol",
-    "4-methylphenol": "p-cresol",
-    "benzene-1,2-diol": "catechol",
-    "benzene-1,3-diol": "resorcinol",
-    "benzene-1,4-diol": "hydroquinone",
-    "benzene-1,2,3-triol": "pyrogallol",
-    "2-nitrophenol": "o-nitrophenol",
-    "3-nitrophenol": "m-nitrophenol",
-    "4-nitrophenol": "p-nitrophenol",
-
-    // ----------------------------
-    // Ethers
-    // ----------------------------
-    "methoxybenzene": "anisole",
-    "ethoxybenzene": "phenetole",
-    "methoxymethane": "dimethyl ether",
-    "ethoxyethane": "diethyl ether",
-    "methoxyethane": "methyl ethyl ether",
-    "2-methoxy-2-methylpropane": "MTBE",
-
-        // Glycol ethers / polyether alcohols
-    "2-(2-hydroxyethoxy)ethan-1-ol": "diethylene glycol",
-    "2-(2-hydroxyethoxy)ethanol": "diethylene glycol",
-    "2,2'-oxydiethanol": "diethylene glycol",
-    "2,2-oxydiethanol": "diethylene glycol",
-    "2,2'-oxybis(ethan-1-ol)": "diethylene glycol",
-    "2,2-oxybis(ethan-1-ol)": "diethylene glycol",
-
-    // ----------------------------
-    // Amines
-    // ----------------------------
-    "methanamine": "methylamine",
-    "ethanamine": "ethylamine",
-    "propan-1-amine": "propylamine",
-    "propan-2-amine": "isopropylamine",
-    "butan-1-amine": "butylamine",
-    "aminobenzene": "aniline",
-    "phenylmethanamine": "benzylamine",
-    "dimethylamine": "dimethylamine",
-    "trimethylamine": "trimethylamine",
-    "diethylamine": "diethylamine",
-    "triethylamine": "triethylamine",
-
-    // ----------------------------
-    // Amides
-    // ----------------------------
-    "methanamide": "formamide",
-    "ethanamide": "acetamide",
-    "propanamide": "propionamide",
-    "butanamide": "butyramide",
-    "n,n-dimethylmethanamide": "DMF",
-    "n,n-dimethylformamide": "DMF",
-    "n,n-dimethylethanamide": "DMA",
-    "n,n-dimethylacetamide": "DMA",
-    "N-(2-hydroxyethyl)-2-aminoethanol": "DEA",
-
-    // ----------------------------
-    // Esters
-    // ----------------------------
-    "methyl methanoate": "methyl formate",
-    "methyl ethanoate": "methyl acetate",
-    "ethyl ethanoate": "ethyl acetate",
-    "propyl ethanoate": "propyl acetate",
-    "butyl ethanoate": "butyl acetate",
-    "methyl propanoate": "methyl propionate",
-    "ethyl propanoate": "ethyl propionate",
-    "methyl butanoate": "methyl butyrate",
-    "ethyl butanoate": "ethyl butyrate",
-
-    // ----------------------------
-    // Nitriles
-    // ----------------------------
-    "methanenitrile": "hydrogen cyanide",
-    "ethanenitrile": "acetonitrile",
-    "propanenitrile": "propionitrile",
-    "butanenitrile": "butyronitrile",
-    "benzenecarbonitrile": "benzonitrile",
-
-    "2-aminoethanenitrile": "aminoacetonitrile",
-    "aminoethanenitrile": "aminoacetonitrile",
-    "2-aminoacetonitrile": "aminoacetonitrile",
-
-    // ----------------------------
-    // Thiols / sulfur compounds
-    // ----------------------------
-    "methanethiol": "methyl mercaptan",
-    "ethanethiol": "ethyl mercaptan",
-    "propanethiol": "propyl mercaptan",
-    "benzenethiol": "thiophenol",
-    "dimethyl sulfide": "dimethyl sulfide",
-    "dimethyl sulfoxide": "DMSO",
-
-    // ----------------------------
-    // Aromatic hydrocarbons
-    // ----------------------------
-    "benzene": "benzene",
-    "methylbenzene": "toluene",
-    "ethylbenzene": "ethylbenzene",
-    "ethenylbenzene": "styrene",
-    "vinylbenzene": "styrene",
-    "dimethylbenzene": "xylene",
-    "1,2-dimethylbenzene": "o-xylene",
-    "1,3-dimethylbenzene": "m-xylene",
-    "1,4-dimethylbenzene": "p-xylene",
-    "isopropylbenzene": "cumene",
-    "propan-2-ylbenzene": "cumene",
-    "naphthalene": "naphthalene",
-    "anthracene": "anthracene",
-    "phenanthrene": "phenanthrene",
-
-    // ----------------------------
-    // Halogenated compounds
-    // ----------------------------
-    "chloromethane": "methyl chloride",
-    "dichloromethane": "methylene chloride",
-    "trichloromethane": "chloroform",
-    "tetrachloromethane": "carbon tetrachloride",
-    "bromoethane": "ethyl bromide",
-    "iodoethane": "ethyl iodide",
-    "chloroethane": "ethyl chloride",
-    "fluoroethane": "ethyl fluoride",
-    "1,1,1-trichloroethane": "methyl chloroform",
-    "tetrachloroethene": "perchloroethylene",
-    "trichloroethene": "trichloroethylene",
-
-    // ----------------------------
-    // Common small inorganic/simple molecules
-    // ----------------------------
-    "water": "water",
-    "ammonia": "ammonia",
-    "methane": "methane",
-    "ethane": "ethane",
-    "propane": "propane",
-    "butane": "butane",
-    "ethene": "ethylene",
-    "propene": "propylene",
-    "ethyne": "acetylene",
-    "carbon dioxide": "carbon dioxide",
-    "carbon monoxide": "carbon monoxide",
-
-    // ----------------------------
-    // Sugars / biomolecule names
-    // ----------------------------
-    "glucose": "glucose",
-    "fructose": "fructose",
-    "galactose": "galactose",
-    "ribose": "ribose",
-    "deoxyribose": "deoxyribose",
-    "sucrose": "sucrose",
-    "lactose": "lactose",
-    "maltose": "maltose",
-
-    // ----------------------------
-    // Amino acids
-    // ----------------------------
-    "2-aminoethanoic acid": "glycine",
-    "2-aminopropanoic acid": "alanine",
-    "2-amino-3-methylbutanoic acid": "valine",
-    "2-amino-4-methylpentanoic acid": "leucine",
-    "2-amino-3-methylpentanoic acid": "isoleucine",
-    "2-amino-3-hydroxypropanoic acid": "serine",
-    "2-amino-3-hydroxybutanoic acid": "threonine",
-    "2-amino-3-phenylpropanoic acid": "phenylalanine",
-    "2-amino-3-(4-hydroxyphenyl)propanoic acid": "tyrosine",
-    "2-amino-3-sulfanylpropanoic acid": "cysteine",
-    "2-amino-4-methylsulfanylbutanoic acid": "methionine",
-    "2-aminopentanedioic acid": "glutamic acid",
-    "2-aminobutanedioic acid": "aspartic acid",
-    "2,6-diaminohexanoic acid": "lysine",
-    "2-amino-5-guanidinopentanoic acid": "arginine",
-    "2-amino-3-(1h-imidazol-4-yl)propanoic acid": "histidine",
-    "pyrrolidine-2-carboxylic acid": "proline",
-    "2-amino-3-(1h-indol-3-yl)propanoic acid": "tryptophan",
-    "2-amino-3-carbamoylpropanoic acid": "asparagine",
-    "2-amino-4-carbamoylbutanoic acid": "glutamine",
-
-    //Alkenes
-    "2-methylprop-1-ene": "isobutylene",
-    "2-methylpropene": "isobutylene",
+  // Expanded biochemical / pharmacological / natural-product aliases
+  "D-glucose": "glucose",
+  "dextrose": "glucose",
+  "D-fructose": "fructose",
+  "levulose": "fructose",
+  "D-galactose": "galactose",
+  "mannose": "mannose",
+  "D-mannose": "mannose",
+  "D-ribose": "ribose",
+  "2-deoxyribose": "2-deoxyribose",
+  "2-deoxy-D-ribose": "2-deoxyribose",
+  "xylose": "xylose",
+  "D-xylose": "xylose",
+  "wood sugar": "xylose",
+  "arabinose": "arabinose",
+  "L-arabinose": "arabinose",
+  "ribulose": "ribulose",
+  "D-ribulose": "ribulose",
+  "xylulose": "xylulose",
+  "D-xylulose": "xylulose",
+  "erythrose": "erythrose",
+  "D-erythrose": "erythrose",
+  "threose": "threose",
+  "D-threose": "threose",
+  "glyceraldehyde": "glyceraldehyde",
+  "2,3-dihydroxypropanal": "glyceraldehyde",
+  "dihydroxyacetone": "dihydroxyacetone",
+  "1,3-dihydroxypropan-2-one": "dihydroxyacetone",
+  "table sugar": "sucrose",
+  "milk sugar": "lactose",
+  "malt sugar": "maltose",
+  "cellobiose": "cellobiose",
+  "trehalose": "trehalose",
+  "isomaltose": "isomaltose",
+  "sorbitol": "sorbitol",
+  "glucitol": "sorbitol",
+  "mannitol": "mannitol",
+  "xylitol": "xylitol",
+  "erythritol": "erythritol",
+  "ribitol": "ribitol",
+  "adonitol": "ribitol",
+  "inositol": "inositol",
+  "myo-inositol": "myo-inositol",
+  "glucosamine": "glucosamine",
+  "2-amino-2-deoxyglucose": "glucosamine",
+  "N-acetylglucosamine": "N-acetylglucosamine",
+  "N-acetyl-D-glucosamine": "N-acetylglucosamine",
+  "GlcNAc": "N-acetylglucosamine",
+  "galactosamine": "galactosamine",
+  "2-amino-2-deoxygalactose": "galactosamine",
+  "glucuronic acid": "glucuronic acid",
+  "galacturonic acid": "galacturonic acid",
+  "gluconic acid": "gluconic acid",
+  "glycine": "glycine",
+  "alanine": "alanine",
+  "valine": "valine",
+  "leucine": "leucine",
+  "isoleucine": "isoleucine",
+  "serine": "serine",
+  "threonine": "threonine",
+  "phenylalanine": "phenylalanine",
+  "tyrosine": "tyrosine",
+  "cysteine": "cysteine",
+  "methionine": "methionine",
+  "glutamic acid": "glutamic acid",
+  "aspartic acid": "aspartic acid",
+  "lysine": "lysine",
+  "arginine": "arginine",
+  "2-amino-3-(1H-imidazol-4-yl)propanoic acid": "histidine",
+  "histidine": "histidine",
+  "proline": "proline",
+  "2-amino-3-(1H-indol-3-yl)propanoic acid": "tryptophan",
+  "tryptophan": "tryptophan",
+  "asparagine": "asparagine",
+  "glutamine": "glutamine",
+  "2-amino-3-selanylpropanoic acid": "selenocysteine",
+  "selenocysteine": "selenocysteine",
+  "2,5-diaminopentanoic acid": "ornithine",
+  "ornithine": "ornithine",
+  "2-amino-5-(carbamoylamino)pentanoic acid": "citrulline",
+  "citrulline": "citrulline",
+  "2-amino-4-sulfanylbutanoic acid": "homocysteine",
+  "homocysteine": "homocysteine",
+  "3-aminopropanoic acid": "beta-alanine",
+  "beta-alanine": "beta-alanine",
+  "β-alanine": "beta-alanine",
+  "4-aminobutanoic acid": "GABA",
+  "gamma-aminobutyric acid": "GABA",
+  "γ-aminobutyric acid": "GABA",
+  "GABA": "GABA",
+  "adenine": "adenine",
+  "6-aminopurine": "adenine",
+  "7H-purin-6-amine": "adenine",
+  "9H-purin-6-amine": "adenine",
+  "guanine": "guanine",
+  "2-aminopurin-6-one": "guanine",
+  "2-amino-1,7-dihydropurin-6-one": "guanine",
+  "2-amino-3,7-dihydropurin-6-one": "guanine",
+  "cytosine": "cytosine",
+  "4-aminopyrimidin-2-one": "cytosine",
+  "6-aminopyrimidin-2-one": "cytosine",
+  "4-amino-1H-pyrimidin-2-one": "cytosine",
+  "6-amino-1H-pyrimidin-2-one": "cytosine",
+  "thymine": "thymine",
+  "5-methylpyrimidin-2,4-dione": "thymine",
+  "5-methyl-1H-pyrimidine-2,4-dione": "thymine",
+  "uracil": "uracil",
+  "pyrimidin-2,4-dione": "uracil",
+  "1H-pyrimidine-2,4-dione": "uracil",
+  "hypoxanthine": "hypoxanthine",
+  "purin-6-one": "hypoxanthine",
+  "1,7-dihydropurin-6-one": "hypoxanthine",
+  "xanthine": "xanthine",
+  "purin-2,6-dione": "xanthine",
+  "3,7-dihydropurine-2,6-dione": "xanthine",
+  "adenosine": "adenosine",
+  "guanosine": "guanosine",
+  "cytidine": "cytidine",
+  "uridine": "uridine",
+  "thymidine": "thymidine",
+  "deoxythymidine": "thymidine",
+  "2'-deoxyadenosine": "deoxyadenosine",
+  "deoxyadenosine": "deoxyadenosine",
+  "2'-deoxyguanosine": "deoxyguanosine",
+  "deoxyguanosine": "deoxyguanosine",
+  "2'-deoxycytidine": "deoxycytidine",
+  "deoxycytidine": "deoxycytidine",
+  "adenosine monophosphate": "AMP",
+  "adenosine 5'-monophosphate": "AMP",
+  "AMP": "AMP",
+  "adenosine diphosphate": "ADP",
+  "adenosine 5'-diphosphate": "ADP",
+  "ADP": "ADP",
+  "adenosine triphosphate": "ATP",
+  "adenosine 5'-triphosphate": "ATP",
+  "ATP": "ATP",
+  "guanosine monophosphate": "GMP",
+  "guanosine 5'-monophosphate": "GMP",
+  "GMP": "GMP",
+  "guanosine diphosphate": "GDP",
+  "guanosine 5'-diphosphate": "GDP",
+  "GDP": "GDP",
+  "guanosine triphosphate": "GTP",
+  "guanosine 5'-triphosphate": "GTP",
+  "GTP": "GTP",
+  "cytidine monophosphate": "CMP",
+  "cytidine 5'-monophosphate": "CMP",
+  "CMP": "CMP",
+  "cytidine triphosphate": "CTP",
+  "cytidine 5'-triphosphate": "CTP",
+  "CTP": "CTP",
+  "uridine monophosphate": "UMP",
+  "uridine 5'-monophosphate": "UMP",
+  "UMP": "UMP",
+  "uridine triphosphate": "UTP",
+  "uridine 5'-triphosphate": "UTP",
+  "UTP": "UTP",
+  "thymidine monophosphate": "TMP",
+  "thymidine 5'-monophosphate": "TMP",
+  "TMP": "TMP",
+  "deoxyadenosine triphosphate": "dATP",
+  "2'-deoxyadenosine 5'-triphosphate": "dATP",
+  "dATP": "dATP",
+  "deoxyguanosine triphosphate": "dGTP",
+  "2'-deoxyguanosine 5'-triphosphate": "dGTP",
+  "dGTP": "dGTP",
+  "deoxycytidine triphosphate": "dCTP",
+  "2'-deoxycytidine 5'-triphosphate": "dCTP",
+  "dCTP": "dCTP",
+  "deoxythymidine triphosphate": "dTTP",
+  "thymidine 5'-triphosphate": "dTTP",
+  "dTTP": "dTTP",
+  "cyclic AMP": "cAMP",
+  "3',5'-cyclic adenosine monophosphate": "cAMP",
+  "cAMP": "cAMP",
+  "cyclic GMP": "cGMP",
+  "3',5'-cyclic guanosine monophosphate": "cGMP",
+  "cGMP": "cGMP",
+  "undecanoic acid": "undecylic acid",
+  "undecylic acid": "undecylic acid",
+  "tridecanoic acid": "tridecylic acid",
+  "tridecylic acid": "tridecylic acid",
+  "pentadecanoic acid": "pentadecylic acid",
+  "pentadecylic acid": "pentadecylic acid",
+  "heptadecanoic acid": "margaric acid",
+  "margaric acid": "margaric acid",
+  "nonadecanoic acid": "nonadecylic acid",
+  "nonadecylic acid": "nonadecylic acid",
+  "docosanoic acid": "behenic acid",
+  "behenic acid": "behenic acid",
+  "tetracosanoic acid": "lignoceric acid",
+  "lignoceric acid": "lignoceric acid",
+  "hexacosanoic acid": "cerotic acid",
+  "cerotic acid": "cerotic acid",
+  "octacosanoic acid": "montanic acid",
+  "montanic acid": "montanic acid",
+  "triacontanoic acid": "melissic acid",
+  "melissic acid": "melissic acid",
+  "hexadec-9-enoic acid": "palmitoleic acid",
+  "(9Z)-hexadec-9-enoic acid": "palmitoleic acid",
+  "palmitoleic acid": "palmitoleic acid",
+  "(9Z)-octadec-9-enoic acid": "oleic acid",
+  "oleic acid": "oleic acid",
+  "(9E)-octadec-9-enoic acid": "elaidic acid",
+  "elaidic acid": "elaidic acid",
+  "octadec-11-enoic acid": "vaccenic acid",
+  "vaccenic acid": "vaccenic acid",
+  "(9Z,12Z)-octadeca-9,12-dienoic acid": "linoleic acid",
+  "linoleic acid": "linoleic acid",
+  "α-linolenic acid": "alpha-linolenic acid",
+  "alpha-linolenic acid": "alpha-linolenic acid",
+  "γ-linolenic acid": "gamma-linolenic acid",
+  "gamma-linolenic acid": "gamma-linolenic acid",
+  "arachidonic acid": "arachidonic acid",
+  "eicosapentaenoic acid": "EPA",
+  "EPA": "EPA",
+  "docosahexaenoic acid": "DHA",
+  "DHA": "DHA",
+  "docos-13-enoic acid": "erucic acid",
+  "erucic acid": "erucic acid",
+  "tetracos-15-enoic acid": "nervonic acid",
+  "nervonic acid": "nervonic acid",
+  "12-hydroxyoctadec-9-enoic acid": "ricinoleic acid",
+  "ricinoleic acid": "ricinoleic acid",
+  "glyceryl tripalmitate": "tripalmitin",
+  "tripalmitin": "tripalmitin",
+  "glyceryl tristearate": "tristearin",
+  "tristearin": "tristearin",
+  "glyceryl trioleate": "triolein",
+  "triolein": "triolein",
+  "phosphatidylcholine": "lecithin",
+  "lecithin": "lecithin",
+  "phosphatidylethanolamine": "cephalin",
+  "cephalin": "cephalin",
+  "phosphatidylserine": "phosphatidylserine",
+  "phosphatidylinositol": "phosphatidylinositol",
+  "sphingomyelin": "sphingomyelin",
+  "ceramide": "ceramide",
+  "sphingosine": "sphingosine",
+  "prostaglandin E2": "prostaglandin E2",
+  "PGE2": "prostaglandin E2",
+  "leukotriene B4": "leukotriene B4",
+  "LTB4": "leukotriene B4",
+  "retinol": "vitamin A1",
+  "vitamin A1": "vitamin A1",
+  "retinal": "retinal",
+  "retinaldehyde": "retinal",
+  "retinoic acid": "retinoic acid",
+  "tretinoin": "retinoic acid",
+  "all-trans-retinoic acid": "retinoic acid",
+  "thiamine": "vitamin B1",
+  "thiamin": "vitamin B1",
+  "vitamin B1": "vitamin B1",
+  "riboflavin": "vitamin B2",
+  "vitamin B2": "vitamin B2",
+  "niacin": "vitamin B3",
+  "nicotinic acid": "vitamin B3",
+  "vitamin B3": "vitamin B3",
+  "nicotinamide": "niacinamide",
+  "niacinamide": "niacinamide",
+  "pantothenic acid": "vitamin B5",
+  "vitamin B5": "vitamin B5",
+  "pyridoxine": "vitamin B6",
+  "vitamin B6": "vitamin B6",
+  "pyridoxal": "pyridoxal",
+  "pyridoxamine": "pyridoxamine",
+  "pyridoxal 5'-phosphate": "PLP",
+  "pyridoxal phosphate": "PLP",
+  "PLP": "PLP",
+  "biotin": "vitamin B7",
+  "vitamin B7": "vitamin B7",
+  "vitamin H": "vitamin B7",
+  "folic acid": "vitamin B9",
+  "folate": "vitamin B9",
+  "vitamin B9": "vitamin B9",
+  "cobalamin": "vitamin B12",
+  "cyanocobalamin": "vitamin B12",
+  "vitamin B12": "vitamin B12",
+  "ascorbic acid": "vitamin C",
+  "L-ascorbic acid": "vitamin C",
+  "vitamin C": "vitamin C",
+  "ergocalciferol": "vitamin D2",
+  "vitamin D2": "vitamin D2",
+  "cholecalciferol": "vitamin D3",
+  "vitamin D3": "vitamin D3",
+  "alpha-tocopherol": "vitamin E",
+  "α-tocopherol": "vitamin E",
+  "tocopherol": "vitamin E",
+  "vitamin E": "vitamin E",
+  "phylloquinone": "vitamin K1",
+  "vitamin K1": "vitamin K1",
+  "menaquinone": "vitamin K2",
+  "vitamin K2": "vitamin K2",
+  "nicotinamide adenine dinucleotide": "NAD+",
+  "NAD+": "NAD+",
+  "NAD": "NAD+",
+  "reduced nicotinamide adenine dinucleotide": "NADH",
+  "NADH": "NADH",
+  "nicotinamide adenine dinucleotide phosphate": "NADP+",
+  "NADP+": "NADP+",
+  "NADP": "NADP+",
+  "reduced nicotinamide adenine dinucleotide phosphate": "NADPH",
+  "NADPH": "NADPH",
+  "flavin adenine dinucleotide": "FAD",
+  "FAD": "FAD",
+  "flavin mononucleotide": "FMN",
+  "FMN": "FMN",
+  "coenzyme A": "coenzyme A",
+  "CoA": "coenzyme A",
+  "Co-A": "coenzyme A",
+  "acetyl-CoA": "acetyl-CoA",
+  "acetyl coenzyme A": "acetyl-CoA",
+  "S-adenosylmethionine": "SAM",
+  "SAM": "SAM",
+  "cholesterol": "cholesterol",
+  "cholestanol": "cholestanol",
+  "pregnenolone": "pregnenolone",
+  "progesterone": "progesterone",
+  "testosterone": "testosterone",
+  "androstenedione": "androstenedione",
+  "androst-4-ene-3,17-dione": "androstenedione",
+  "dehydroepiandrosterone": "DHEA",
+  "DHEA": "DHEA",
+  "estradiol": "estradiol",
+  "17beta-estradiol": "estradiol",
+  "17β-estradiol": "estradiol",
+  "estrone": "estrone",
+  "estriol": "estriol",
+  "cortisol": "cortisol",
+  "hydrocortisone": "cortisol",
+  "cortisone": "cortisone",
+  "corticosterone": "corticosterone",
+  "aldosterone": "aldosterone",
+  "cholic acid": "cholic acid",
+  "chenodeoxycholic acid": "chenodeoxycholic acid",
+  "deoxycholic acid": "deoxycholic acid",
+  "lithocholic acid": "lithocholic acid",
+  "ursodeoxycholic acid": "ursodeoxycholic acid",
+  "ursodiol": "ursodeoxycholic acid",
+  "4-(2-aminoethyl)benzene-1,2-diol": "dopamine",
+  "dopamine": "dopamine",
+  "4-(2-amino-1-hydroxyethyl)benzene-1,2-diol": "norepinephrine",
+  "norepinephrine": "norepinephrine",
+  "noradrenaline": "norepinephrine",
+  "4-[1-hydroxy-2-(methylamino)ethyl]benzene-1,2-diol": "epinephrine",
+  "epinephrine": "epinephrine",
+  "adrenaline": "epinephrine",
+  "3-(2-aminoethyl)-1H-indol-5-ol": "serotonin",
+  "serotonin": "serotonin",
+  "5-hydroxytryptamine": "serotonin",
+  "5-HT": "serotonin",
+  "N-[2-(5-methoxy-1H-indol-3-yl)ethyl]acetamide": "melatonin",
+  "melatonin": "melatonin",
+  "2-(1H-imidazol-4-yl)ethanamine": "histamine",
+  "histamine": "histamine",
+  "acetylcholine": "acetylcholine",
+  "nitric oxide": "nitric oxide",
+  "nitrogen monoxide": "nitric oxide",
+  "urea": "urea",
+  "carbamide": "urea",
+  "uric acid": "uric acid",
+  "creatine": "creatine",
+  "creatinine": "creatinine",
+  "carnitine": "carnitine",
+  "L-carnitine": "carnitine",
+  "2-aminoethanesulfonic acid": "taurine",
+  "taurine": "taurine",
+  "trimethylglycine": "betaine",
+  "betaine": "betaine",
+  "choline": "choline",
+  "glutathione": "glutathione",
+  "GSH": "glutathione",
+  "glutathione disulfide": "oxidized glutathione",
+  "GSSG": "oxidized glutathione",
+  "oxidized glutathione": "oxidized glutathione",
+  "heme b": "heme b",
+  "protoheme": "heme b",
+  "bilirubin": "bilirubin",
+  "biliverdin": "biliverdin",
+  "porphobilinogen": "porphobilinogen",
+  "5-aminolevulinic acid": "delta-aminolevulinic acid",
+  "delta-aminolevulinic acid": "delta-aminolevulinic acid",
+  "δ-aminolevulinic acid": "delta-aminolevulinic acid",
+  "(E)-but-2-enedioic acid": "fumaric acid",
+  "fumaric acid": "fumaric acid",
+  "(Z)-but-2-enedioic acid": "maleic acid",
+  "maleic acid": "maleic acid",
+  "(E)-but-2-enedioate": "fumarate",
+  "fumarate": "fumarate",
+  "(Z)-but-2-enedioate": "maleate",
+  "maleate": "maleate",
+  "N-(4-hydroxyphenyl)acetamide": "acetaminophen",
+  "N-(4-hydroxyphenyl)ethanamide": "acetaminophen",
+  "paracetamol": "acetaminophen",
+  "acetaminophen": "acetaminophen",
+  "2-acetyloxybenzoic acid": "aspirin",
+  "2-(acetyloxy)benzoic acid": "aspirin",
+  "acetylsalicylic acid": "aspirin",
+  "aspirin": "aspirin",
+  "2-[4-(2-methylpropyl)phenyl]propanoic acid": "ibuprofen",
+  "ibuprofen": "ibuprofen",
+  "2-(6-methoxynaphthalen-2-yl)propanoic acid": "naproxen",
+  "(2S)-2-(6-methoxynaphthalen-2-yl)propanoic acid": "naproxen",
+  "naproxen": "naproxen",
+  "1,3,7-trimethylpurine-2,6-dione": "caffeine",
+  "caffeine": "caffeine",
+  "1,3-dimethyl-7H-purine-2,6-dione": "theophylline",
+  "theophylline": "theophylline",
+  "3,7-dimethylpurine-2,6-dione": "theobromine",
+  "theobromine": "theobromine",
+  "3-(1-methylpyrrolidin-2-yl)pyridine": "nicotine",
+  "nicotine": "nicotine",
+  "2-(diethylamino)-N-(2,6-dimethylphenyl)acetamide": "lidocaine",
+  "lidocaine": "lidocaine",
+  "ethyl 4-aminobenzoate": "benzocaine",
+  "benzocaine": "benzocaine",
+  "2-(diethylamino)ethyl 4-aminobenzoate": "procaine",
+  "procaine": "procaine",
+  "2-(diphenylmethoxy)-N,N-dimethylethanamine": "diphenhydramine",
+  "diphenhydramine": "diphenhydramine",
+  "3-(2-methoxyphenoxy)propane-1,2-diol": "guaifenesin",
+  "guaifenesin": "guaifenesin",
+  "3-[1-hydroxy-2-(methylamino)ethyl]phenol": "phenylephrine",
+  "phenylephrine": "phenylephrine",
+  "pseudoephedrine": "pseudoephedrine",
+  "dextromethorphan": "dextromethorphan",
+  "1,1-dimethylbiguanide": "metformin",
+  "metformin": "metformin",
+  "famotidine": "famotidine",
+  "omeprazole": "omeprazole",
+  "cetirizine": "cetirizine",
+  "loratadine": "loratadine",
+  "amoxicillin": "amoxicillin",
+  "benzylpenicillin": "penicillin G",
+  "penicillin G": "penicillin G",
+  "phenoxymethylpenicillin": "penicillin V",
+  "penicillin V": "penicillin V",
+  "cephalexin": "cephalexin",
+  "cefalexin": "cephalexin",
+  "ciprofloxacin": "ciprofloxacin",
+  "doxycycline": "doxycycline",
+  "azithromycin": "azithromycin",
+  "erythromycin": "erythromycin",
+  "sulfamethoxazole": "sulfamethoxazole",
+  "trimethoprim": "trimethoprim",
+  "fluoxetine": "fluoxetine",
+  "sertraline": "sertraline",
+  "bupropion": "bupropion",
+  "venlafaxine": "venlafaxine",
+  "duloxetine": "duloxetine",
+  "diazepam": "diazepam",
+  "alprazolam": "alprazolam",
+  "clonazepam": "clonazepam",
+  "zolpidem": "zolpidem",
+  "morphine": "morphine",
+  "codeine": "codeine",
+  "oxycodone": "oxycodone",
+  "fentanyl": "fentanyl",
+  "naloxone": "naloxone",
+  "atropine": "atropine",
+  "scopolamine": "scopolamine",
+  "warfarin": "warfarin",
+  "4-hydroxy-3-methoxybenzaldehyde": "vanillin",
+  "vanillin": "vanillin",
+  "4-allyl-2-methoxyphenol": "eugenol",
+  "eugenol": "eugenol",
+  "capsaicin": "capsaicin",
+  "curcumin": "curcumin",
+  "resveratrol": "resveratrol",
+  "quercetin": "quercetin",
+  "catechin": "catechin",
+  "3,4,5-trihydroxybenzoic acid": "gallic acid",
+  "gallic acid": "gallic acid",
+  "3-phenylprop-2-enoic acid": "cinnamic acid",
+  "cinnamic acid": "cinnamic acid",
+  "3-phenylprop-2-enal": "cinnamaldehyde",
+  "cinnamaldehyde": "cinnamaldehyde",
+  "menthol": "menthol",
+  "camphor": "camphor",
+  "limonene": "limonene",
+  "alpha-pinene": "alpha-pinene",
+  "α-pinene": "alpha-pinene",
+  "beta-pinene": "beta-pinene",
+  "β-pinene": "beta-pinene",
+  "carvone": "carvone",
+  "2-isopropyl-5-methylphenol": "thymol",
+  "thymol": "thymol",
+  "5-isopropyl-2-methylphenol": "carvacrol",
+  "carvacrol": "carvacrol",
+  "indole": "indole",
+  "3-methylindole": "skatole",
+  "skatole": "skatole",
+  "indigo": "indigo",
+  "beta-carotene": "beta-carotene",
+  "β-carotene": "beta-carotene",
+  "lycopene": "lycopene",
 };
 
-export function getCommonName(estimatedName: string | null | undefined) {
+const COMMON_NAME_MAP: Readonly<Record<string, string>> = Object.freeze(
+  Object.fromEntries(
+    Object.entries(RAW_COMMON_NAME_MAP).map(([key, value]) => [
+      normalizeCommonNameKey(key),
+      value,
+    ])
+  )
+);
+
+export type CommonNameMatch = {
+  name: string;
+  source: "structure" | "alias";
+};
+
+const CONNECTIVITY_COMMON_NAME_MAP: Readonly<Record<string, string>> = Object.freeze({
+  "10|C5,N5|85f9c622": "adenine",
+  "11|C5,N5,O1|2b8c5cda": "guanine",
+  "8|C4,N3,O1|cc43f92c": "cytosine",
+  "9|C5,N2,O2|8f38e2f7": "thymine",
+  "8|C4,N2,O2|53461757": "uracil",
+  "10|C5,N4,O1|26f2aae0": "hypoxanthine",
+  "11|C5,N4,O2|26d91a18": "xanthine",
+  "5|C2,N1,O2|2ad9a490": "glycine",
+  "6|C3,N1,O2|f98737a6": "alanine",
+  "8|C5,N1,O2|0c49cd48": "valine",
+  "9|C6,N1,O2|cd74c29d": "leucine",
+  "9|C6,N1,O2|38bd8bbd": "isoleucine",
+  "7|C3,N1,O3|bbff2e36": "serine",
+  "8|C4,N1,O3|4eb40d8c": "threonine",
+  "7|C3,N1,O2,S1|8741ddb3": "cysteine",
+  "9|C5,N1,O2,S1|3dd57a1c": "methionine",
+  "9|C4,N1,O4|19a8adcc": "aspartic acid",
+  "10|C5,N1,O4|9007b41c": "glutamic acid",
+  "9|C4,N2,O3|7a855e18": "asparagine",
+  "10|C5,N2,O3|cb5cb663": "glutamine",
+  "10|C6,N2,O2|54d80dbd": "lysine",
+  "12|C6,N4,O2|37a7a1e8": "arginine",
+  "11|C6,N3,O2|936b6b05": "histidine",
+  "12|C9,N1,O2|3f2e1e97": "phenylalanine",
+  "13|C9,N1,O3|44bbe2a5": "tyrosine",
+  "15|C11,N2,O2|1fa10b3f": "tryptophan",
+  "8|C5,N1,O2|e0321832": "proline",
+  "9|C5,N2,O2|c4272132": "ornithine",
+  "6|C3,N1,O2|7568144d": "beta-alanine",
+  "7|C4,N1,O2|80b237e6": "GABA",
+  "11|C8,N1,O2|10c083f7": "dopamine",
+  "12|C8,N1,O3|a7b217d5": "norepinephrine",
+  "13|C9,N1,O3|4cdb693b": "epinephrine",
+  "13|C10,N2,O1|c79423d4": "serotonin",
+  "8|C5,N3|e7c6526b": "histamine",
+  "17|C13,N2,O2|1a1c6281": "melatonin",
+  "10|C7,N1,O2|a20c8387": "acetylcholine",
+  "4|C1,N2,O1|08504f05": "urea",
+  "7|C2,N1,O3,S1|71482f8a": "taurine",
+  "7|C5,N1,O1|8e31c0df": "choline",
+  "9|C6,N1,O2|75f60df7": "niacin",
+  "9|C6,N2,O1|d9ce3a14": "nicotinamide",
+  "11|C8,N1,O2|0ca5f028": "acetaminophen",
+  "13|C9,O4|33aefd24": "aspirin",
+  "15|C13,O2|0987cb95": "ibuprofen",
+  "14|C8,N4,O2|229396b5": "caffeine",
+  "13|C7,N4,O2|d1086ca8": "theophylline",
+  "13|C7,N4,O2|7020da3d": "theobromine",
+  "12|C9,N1,O2|a2809327": "benzocaine",
+  "15|C13,N1,O1|00fe5fa2": "lidocaine",
+  "9|C4,N5|816a1bb5": "metformin",
+  "11|C8,O3|6d9ba8bc": "vanillin",
+  "12|C10,O2|c7c21ccf": "eugenol",
+  "12|C7,O5|b26df18e": "gallic acid",
+  "11|C9,O2|5253a20a": "cinnamic acid",
+  "10|C9,O1|ac2d1b42": "cinnamaldehyde"
+});
+
+const EXACT_STEREO_COMMON_NAME_MAP: Readonly<Record<string, string>> = Object.freeze({
+  // Carbohydrates.  Keys are RDKit canonical isomeric SMILES, not arbitrary
+  // source SMILES.  Multiple constitutional forms are deliberately listed
+  // because open-chain and cyclic hemiacetal forms are both legitimate ways
+  // users draw the same reducing sugar in Ketcher.
+  "O=C[C@H](O)[C@@H](O)[C@H](O)[C@H](O)CO": "glucose",
+  "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O": "glucose",
+  "O=C[C@H](O)[C@@H](O)[C@@H](O)[C@H](O)CO": "galactose",
+  "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@H]1O": "galactose",
+  "O=C[C@@H](O)[C@@H](O)[C@H](O)[C@H](O)CO": "mannose",
+  "OC[C@H]1OC(O)[C@@H](O)[C@@H](O)[C@@H]1O": "mannose",
+  "O=C[C@H](O)[C@H](O)[C@H](O)CO": "ribose",
+  "OC1OC[C@@H](O)[C@@H](O)[C@H]1O": "ribose",
+  "O=C[C@@H](O)[C@H](O)[C@H](O)CO": "arabinose",
+  "O=C[C@H](O)[C@@H](O)[C@H](O)CO": "xylose",
+  "O=C(CO)[C@@H](O)[C@H](O)[C@H](O)CO": "fructose",
+  "OC[C@H]1OC(O)C[C@@H]1O": "2-deoxyribose",
+
+  // Additional common cyclic monosaccharide forms. These prevent the retained
+  // oxane/oxolane layer from winning when the complete stereochemical sugar is
+  // already known.
+  "OC1OC[C@H](O)[C@H](O)[C@H]1O": "arabinose",
+  "OC1OC[C@@H](O)[C@H](O)[C@H]1O": "xylose",
+  "OC[C@H]1OC(O)(CO)[C@@H](O)[C@@H]1O": "fructose",
+  "OC[C@H]1O[C@](O)(CO)[C@@H](O)[C@@H]1O": "fructose",
+
+  // Disaccharides / glycosides. These keys were canonicalized with the same
+  // RDKit build used by PocketChem. Reducing sugars are listed in generic and
+  // explicit anomeric forms where practical; sucrose/trehalose have fixed
+  // anomeric configurations at their glycosidic centers.
+  "OC[C@H]1O[C@@](CO)(O[C@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)[C@@H](O)[C@@H]1O": "sucrose",
+
+  // lactose: beta-D-galactopyranosyl-(1->4)-D-glucose
+  "OC[C@H]1O[C@@H](O[C@H]2[C@H](O)[C@@H](O)C(O)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@H]1O": "lactose",
+  "OC[C@H]1O[C@@H](O[C@H]2[C@H](O)[C@@H](O)[C@@H](O)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@H]1O": "lactose",
+  "OC[C@H]1O[C@@H](O[C@H]2[C@H](O)[C@@H](O)[C@H](O)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@H]1O": "lactose",
+
+  // maltose: alpha-D-glucopyranosyl-(1->4)-D-glucose
+  "OC[C@H]1O[C@H](O[C@H]2[C@H](O)[C@@H](O)C(O)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@@H]1O": "maltose",
+  "OC[C@H]1O[C@H](O[C@H]2[C@H](O)[C@@H](O)[C@@H](O)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@@H]1O": "maltose",
+  "OC[C@H]1O[C@H](O[C@H]2[C@H](O)[C@@H](O)[C@H](O)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@@H]1O": "maltose",
+
+  // cellobiose: beta-D-glucopyranosyl-(1->4)-D-glucose
+  "OC[C@H]1O[C@@H](O[C@H]2[C@H](O)[C@@H](O)C(O)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@@H]1O": "cellobiose",
+
+  // trehalose: alpha-D-glucopyranosyl-(1<->1)-alpha-D-glucopyranoside
+  "OC[C@H]1O[C@H](O[C@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@@H]1O": "trehalose",
+
+  // isomaltose: alpha-D-glucopyranosyl-(1->6)-D-glucose
+  "OC[C@H]1O[C@H](OC[C@H]2OC(O)[C@H](O)[C@@H](O)[C@@H]2O)[C@H](O)[C@@H](O)[C@@H]1O": "isomaltose",
+
+  // Steroids / vitamins / stereospecific drugs. These are also stored in the
+  // exact RDKit-canonical form expected from mol.get_smiles().
+  "CC(C)CCC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O)CC[C@]4(C)[C@H]3CC[C@]12C": "cholesterol",
+  "C[C@]12CC[C@H]3[C@@H](CCC4=CC(=O)CC[C@@]43C)[C@@H]1CC[C@@H]2O": "testosterone",
+  "CC(=O)[C@H]1CC[C@H]2[C@@H]3CCC4=CC(=O)CC[C@]4(C)[C@H]3CC[C@]12C": "progesterone",
+  "C[C@]12CC[C@@H]3c4ccc(O)cc4CC[C@H]3[C@@H]1CC[C@@H]2O": "estradiol",
+  "C[C@]12CC[C@@H]3c4ccc(O)cc4CC[C@H]3[C@@H]1CCC2=O": "estrone",
+  "C[C@]12CCC(=O)C=C1CC[C@@H]1[C@@H]2[C@@H](O)C[C@@]2(C)[C@H]1CC[C@]2(O)C(=O)CO": "cortisol",
+  "O=C(O)CCCC[C@@H]1SC[C@@H]2NC(=O)N[C@@H]21": "biotin",
+  "CC1=C(/C=C/C(C)=C/C=C/C(C)=C/CO)C(C)(C)CCC1": "retinol",
+  "CC1=C(/C=C/C(C)=C/C=C/C(C)=C/C=O)C(C)(C)CCC1": "retinal",
+  "C=C1CC[C@H](O)C/C1=C/C=C1\\CCC[C@]2(C)[C@@H]([C@H](C)CCCC(C)C)CC[C@@H]12": "vitamin D3",
+  "COc1ccc2cc([C@@H](C)C(=O)O)ccc2c1": "naproxen",
+  "CN1CCC[C@H]1c1cccnc1": "nicotine"
+});
+
+/** FNV-1a: small deterministic hash used only for graph-signature lookup. */
+function hashCommonNameSignature(value: string) {
+  let hash = 0x811c9dc5;
+
+  for (let i = 0; i < value.length; i += 1) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+
+  return hash.toString(16).padStart(8, "0");
+}
+
+/**
+ * Builds an atom-order-independent heavy-atom connectivity signature.
+ *
+ * Bond order, formal charge, and hydrogen placement are intentionally ignored.
+ * This makes exact common-name recognition robust to resonance/tautomer drawings
+ * such as the several valid adenine representations that Ketcher/RDKit can emit.
+ *
+ * Only compounds whose common identity does not depend on stereochemistry are
+ * placed in CONNECTIVITY_COMMON_NAME_MAP. Stereochemistry-sensitive molecules
+ * (sugars, steroids, vitamins, naproxen, etc.) use exact canonical SMILES instead.
+ */
+export function getCommonNameConnectivityKey(parsedMol: ParsedMol) {
+  const atomCount = parsedMol.atoms.length;
+  if (atomCount === 0) return null;
+
+  const labelsByAtom = new Map<number, string>();
+
+  for (const atom of parsedMol.atoms) {
+    const degree = (parsedMol.adjacency.get(atom.atomIndex) ?? []).length;
+    labelsByAtom.set(atom.atomIndex, `${atom.element}:${degree}`);
+  }
+
+  const iterations = Math.max(3, Math.min(atomCount, 12));
+
+  for (let iteration = 0; iteration < iterations; iteration += 1) {
+    const previous = new Map(labelsByAtom);
+
+    for (const atom of parsedMol.atoms) {
+      const neighborLabels = (parsedMol.adjacency.get(atom.atomIndex) ?? [])
+        .map((bond) => {
+          const neighborIndex =
+            bond.atomA === atom.atomIndex ? bond.atomB : bond.atomA;
+          return previous.get(neighborIndex) ?? "?";
+        })
+        .sort();
+
+      const ownLabel = previous.get(atom.atomIndex) ?? atom.element;
+      labelsByAtom.set(
+        atom.atomIndex,
+        hashCommonNameSignature(`${ownLabel}|${neighborLabels.join(",")}`)
+      );
+    }
+  }
+
+  const elementCounts = new Map<string, number>();
+  for (const atom of parsedMol.atoms) {
+    elementCounts.set(atom.element, (elementCounts.get(atom.element) ?? 0) + 1);
+  }
+
+  const elementKey = [...elementCounts.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([element, count]) => `${element}${count}`)
+    .join(",");
+
+  const finalLabels = [...labelsByAtom.values()].sort().join("|");
+
+  return `${atomCount}|${elementKey}|${hashCommonNameSignature(finalLabels)}`;
+}
+
+export function getCommonNameMatch(
+  estimatedName: string | null | undefined,
+  parsedMol?: ParsedMol | null,
+  canonicalSmiles?: string | null
+): CommonNameMatch | null {
+  if (canonicalSmiles) {
+    const exactStructureName = EXACT_STEREO_COMMON_NAME_MAP[canonicalSmiles];
+    if (exactStructureName) {
+      return { name: exactStructureName, source: "structure" };
+    }
+  }
+
+  if (parsedMol) {
+    const connectivityKey = getCommonNameConnectivityKey(parsedMol);
+    const connectivityName = connectivityKey
+      ? CONNECTIVITY_COMMON_NAME_MAP[connectivityKey]
+      : null;
+
+    if (connectivityName) {
+      return { name: connectivityName, source: "structure" };
+    }
+  }
+
   if (!estimatedName) return null;
 
-  const normalized = estimatedName.trim().toLowerCase();
+  const alias = COMMON_NAME_MAP[normalizeCommonNameKey(estimatedName)] ?? null;
+  return alias ? { name: alias, source: "alias" } : null;
+}
 
-  return COMMON_NAME_MAP[normalized] ?? null;
+export function getCommonName(
+  estimatedName: string | null | undefined,
+  parsedMol?: ParsedMol | null,
+  canonicalSmiles?: string | null
+) {
+  return getCommonNameMatch(estimatedName, parsedMol, canonicalSmiles)?.name ?? null;
+}
+
+export function hasCommonNameAlias(name: string) {
+  return normalizeCommonNameKey(name) in COMMON_NAME_MAP;
+}
+
+export function getCommonNameAliasCount() {
+  return Object.keys(COMMON_NAME_MAP).length;
+}
+
+export function getStructureCommonNameCount() {
+  return (
+    Object.keys(CONNECTIVITY_COMMON_NAME_MAP).length +
+    Object.keys(EXACT_STEREO_COMMON_NAME_MAP).length
+  );
 }

@@ -1,4 +1,5 @@
 import type { FunctionalGroupResult } from "../../functionalGroups/types";
+import { normalizeFunctionalGroupName } from "../../functionalGroups/groupIds";
 import type { NamingFeature, NamingFeatureType } from "../types";
 
 export type ParentStrategy = "hydrocarbon" | "acyl";
@@ -17,7 +18,7 @@ export function getNamingIntent(
 ): NamingIntent {
   const cleanSuffix =
     primaryGroup?.suffix?.toLowerCase().replace(/^-/, "") ?? "";
-  const groupName = primaryGroup?.name?.toLowerCase() ?? "";
+  const groupName = primaryGroup ? normalizeFunctionalGroupName(primaryGroup.name) : "";
 
   const featureType = getExpectedFeatureType(cleanSuffix, groupName);
 
@@ -84,12 +85,77 @@ function getExpectedFeatureType(
     normalizedName.includes("hemiacetal") ||
     normalizedName.includes("hemiketal") ||
     normalizedName.includes("acetal") ||
-    normalizedName.includes("ketal")
+    normalizedName.includes("ketal") ||
+    normalizedName === "thioester" ||
+    normalizedName === "sulfonyl chloride" ||
+    normalizedName === "silanol"
   ) {
     return null;
   }
 
-  if (normalizedSuffix.includes("oicacid")) {
+  if (normalizedName === "peroxyacid" || normalizedSuffix.includes("peroxoicacid")) {
+    return "peroxyAcid";
+  }
+
+  if (normalizedName === "acyl azide" || normalizedSuffix.includes("oylazide")) {
+    return "acylAzide";
+  }
+
+  if (
+    normalizedSuffix.includes("sulfonicacid") ||
+    normalizedName === "sulfonic acid"
+  ) {
+    return "sulfonicAcid";
+  }
+
+  if (
+    normalizedSuffix.includes("sulfinicacid") ||
+    normalizedName === "sulfinic acid"
+  ) {
+    return "sulfinicAcid";
+  }
+
+  if (
+    normalizedSuffix.includes("sulfenicacid") ||
+    normalizedName === "sulfenic acid"
+  ) {
+    return "sulfenicAcid";
+  }
+
+  if (
+    normalizedSuffix.includes("sulfonamide") ||
+    normalizedName === "sulfonamide"
+  ) {
+    return "sulfonamide";
+  }
+
+  if (normalizedSuffix.endsWith("imine") && normalizedName === "imine") {
+    return "imine";
+  }
+
+  if (normalizedName === "thioaldehyde" || normalizedSuffix.endsWith("thial")) {
+    return "thioaldehyde";
+  }
+
+  if (normalizedName === "thioketone") {
+    return "thioketone";
+  }
+
+  if (normalizedName === "thioamide" || normalizedSuffix.includes("thioamide")) {
+    return "thioamide";
+  }
+
+  if (normalizedName === "thiocarboxylic acid") {
+    return "thiocarboxylicAcid";
+  }
+
+  if (
+    normalizedSuffix.includes("oicacid") ||
+    normalizedName === "acrylic acid" ||
+    normalizedName === "crotonic acid" ||
+    normalizedName === "cinnamic acid" ||
+    normalizedName === "benzoic acid"
+  ) {
     return "carboxylicAcid";
   }
 
@@ -107,7 +173,11 @@ function getExpectedFeatureType(
 
   // Covers:
   // al, enal, dienal, ynal, diynal, etc.
-  if (normalizedSuffix.endsWith("al")) {
+  if (
+    normalizedSuffix.endsWith("al") ||
+    normalizedName === "benzaldehyde" ||
+    normalizedName === "cinnamaldehyde"
+  ) {
     return "aldehyde";
   }
 
@@ -148,10 +218,29 @@ function getExpectedFeatureType(
     return "nitrile";
   }
 
+
+
   return null;
 }
 
 function isAcylLike(suffix: string, name: string) {
+  // Sulfur suffix families are anchored to the hydrocarbon parent carbon, not
+  // to an O-carbonyl acyl parent. getBestAcylParentDescriptor specifically
+  // searches C=O centers, so routing these groups through it would select the
+  // wrong skeleton when another carbonyl is present.
+  if (
+    name.includes("sulfonic acid") ||
+    name.includes("sulfinic acid") ||
+    name.includes("sulfenic acid") ||
+    name.includes("sulfonamide") ||
+    name.includes("thioaldehyde") ||
+    name.includes("thioketone") ||
+    name.includes("thioamide") ||
+    name.includes("thiocarboxylic acid")
+  ) {
+    return false;
+  }
+
   return (
     suffix === "al" ||
     suffix.endsWith("enal") ||
@@ -168,7 +257,13 @@ function isAcylLike(suffix: string, name: string) {
     name.includes("carboxylic acid") ||
     name.includes("ester") ||
     name.includes("amide") ||
-    name.includes("nitrile")
+    name.includes("nitrile") ||
+    name.includes("thioaldehyde") ||
+    name.includes("thioketone") ||
+    name.includes("thioamide") ||
+    name.includes("thiocarboxylic acid") ||
+    suffix.includes("thial") ||
+    suffix.includes("thioamide")
   );
 }
 
@@ -192,6 +287,10 @@ function isAromaticRetainedParentCandidate(
     featureType === "ester" ||
     featureType === "acidChloride" ||
     featureType === "ketone" ||
+    featureType === "sulfonicAcid" ||
+    featureType === "sulfinicAcid" ||
+    featureType === "sulfenicAcid" ||
+    featureType === "sulfonamide" ||
     suffix.includes("phenol") ||
     suffix.includes("aniline") ||
     name.includes("benz")

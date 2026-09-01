@@ -121,9 +121,16 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
     explanation:
       "The acid is first converted into a more reactive derivative, commonly an acid chloride, and then treated with ammonia or an amine.",
     trigger: carboxylicAcidTrigger,
+    additionalReactants: [
+      {
+        label: "ammonia, primary amine, or secondary amine",
+        trigger: { includeSmarts: ["[N;H1,H2,H3;!$(N[C,S,P]=O)]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The amine reactant must be specified before an exact amide can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[OH:3].[N;H1,H2,H3:4]>>[C:1](=[O:2])[N:4]",
+      maxProducts: 8,
     },
     mechanism: "Nucleophilic acyl substitution",
     priority: 1330,
@@ -139,9 +146,16 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
     explanation:
       "A carbodiimide or related coupling reagent activates the carboxylic acid so an amine can form an amide under comparatively mild conditions.",
     trigger: carboxylicAcidTrigger,
+    additionalReactants: [
+      {
+        label: "ammonia, primary amine, or secondary amine",
+        trigger: { includeSmarts: ["[N;H1,H2,H3;!$(N[C,S,P]=O)]"] },
+      },
+    ],
     transform: {
-      type: "conceptOnly",
-      reason: "The amine reactant and coupling conditions must be specified before an exact amide can be generated.",
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[OH:3].[N;H1,H2,H3:4]>>[C:1](=[O:2])[N:4]",
+      maxProducts: 8,
     },
     course: "advanced",
     mechanism: "Activated acyl substitution",
@@ -214,5 +228,27 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
     productStatus: "representative",
     limitations: ["Unsymmetrical acids can generate more than one alpha-brominated constitutional product."],
     priority: 1350,
+  },
+  {
+    id: "organometallic-carboxylation",
+    family: "carboxylic-acids",
+    reactionType: "coupling",
+    title: "Grignard or Organolithium Carboxylation",
+    reagents: "1) CO₂  2) H₃O⁺",
+    reagentNote: "Draw the organometallic reagent and carbon dioxide as disconnected structures",
+    productHint: "Carboxylic acid",
+    explanation:
+      "A Grignard or organolithium carbon nucleophile attacks carbon dioxide, adding one carbon to the carbon skeleton; acidic workup gives a carboxylic acid.",
+    trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+    additionalReactants: [
+      { label: "carbon dioxide", trigger: { includeSmarts: ["O=C=O"] } },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[#6:1][Mg,Li].[O:2]=[C:3]=[O:4]>>[#6:1][C:3](=[O:2])[OH:4]",
+      maxProducts: 8,
+    },
+    mechanism: "Nucleophilic addition to carbon dioxide",
+    priority: 1360,
   },
 ];
