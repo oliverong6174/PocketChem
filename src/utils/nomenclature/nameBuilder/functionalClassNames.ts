@@ -4,6 +4,7 @@ import type { ParsedMol } from "../types";
 import { getOtherAtom } from "../molParser";
 import { buildBranchName } from "../branch/branchConstructor";
 import { alkylNameToAlkoxyName } from "../alkoxyNames";
+import { getHydrocarbonBaseName, getParentDescriptor } from "../graph/parentSelection";
 
 export type FunctionalClassNameResult = {
   name: string;
@@ -87,6 +88,16 @@ const FUNCTIONAL_CLASS_GROUPS = new Set([
   "disilane",
 
   // Common charged organic classes
+  "acetylide anion",
+  "methyl carbanion",
+  "benzylic carbanion",
+  "allylic carbanion",
+  "carbanion",
+  "carbocation",
+  "amide anion",
+  "deprotonated carboxamide",
+  "acylammonium ion",
+  "benzenediazonium",
   "alkoxide",
   "phenoxide",
   "carboxylate",
@@ -1191,6 +1202,65 @@ function buildSiliconClassName(
 }
 
 
+function chargedCarbonCenter(parsedMol: ParsedMol, chargeSign: -1 | 1) {
+  return parsedMol.atoms.find(
+    (atom) => atom.element === "C" && (chargeSign < 0 ? atom.charge < 0 : atom.charge > 0),
+  )?.atomIndex ?? null;
+}
+
+function chargeLocant(parentPath: number[], atomIndex: number) {
+  const position = parentPath.indexOf(atomIndex);
+  return position >= 0 ? position + 1 : null;
+}
+
+function hydrocarbonAnionName(parsedMol: ParsedMol, atomIndex: number): string | null {
+  const parent = getParentDescriptor(parsedMol, [atomIndex]);
+  if (!parent) return null;
+  const base = getHydrocarbonBaseName(parsedMol, parent.path);
+  if (!base) return null;
+
+  const locant = chargeLocant(parent.path, atomIndex);
+  if (locant === null) return null;
+
+  if (base === "methane") return "methanide";
+  if (base === "ethane") return "ethanide";
+  if (base === "ethyne") return "ethynide";
+  if (base === "ethene") return "ethenide";
+  if (base === "benzene" && parent.carbonCount === parsedMol.atoms.filter((atom) => atom.element === "C").length) {
+    return "benzenide";
+  }
+
+  const stem = base.endsWith("e") ? base.slice(0, -1) : base;
+  return `${stem}-${locant}-ide`;
+}
+
+function hydrocarbonCationName(parsedMol: ParsedMol, atomIndex: number): string | null {
+  const parent = getParentDescriptor(parsedMol, [atomIndex]);
+  if (!parent) return null;
+  const base = getHydrocarbonBaseName(parsedMol, parent.path);
+  if (!base) return null;
+
+  const locant = chargeLocant(parent.path, atomIndex);
+  if (locant === null) return null;
+
+  if (base === "methane") return "methylium";
+  if (base === "ethane") return "ethylium";
+  if (base === "benzene" && parent.carbonCount === parsedMol.atoms.filter((atom) => atom.element === "C").length) {
+    return "phenylium";
+  }
+
+  const stem = base.endsWith("e") ? base.slice(0, -1) : base;
+  return `${stem}-${locant}-ylium`;
+}
+
+function simpleCarboxamideNameFromAcylCarbon(parsedMol: ParsedMol, carbonIndex: number) {
+  const acid = simpleAcidNameFromAcylCarbon(parsedMol, carbonIndex);
+  if (acid === "benzoic acid") return "benzamide";
+  if (acid.endsWith("oic acid")) return `${acid.slice(0, -"oic acid".length)}amide`;
+  if (acid.endsWith("ic acid")) return `${acid.slice(0, -"ic acid".length)}amide`;
+  return `${acid.replace(/ acid$/, "")} amide`;
+}
+
 function alkoxideNameFromBranch(branch: string) {
   const retained: Record<string, string> = {
     methyl: "methoxide",
@@ -1211,6 +1281,104 @@ function buildIonClassName(
   parsedMol: ParsedMol,
   groupName: string
 ): FunctionalClassNameResult | null {
+  if (groupName === "acetylide anion") {
+    const center = chargedCarbonCenter(parsedMol, -1);
+    const name = center === null ? null : hydrocarbonAnionName(parsedMol, center);
+    if (name) {
+      return {
+        name,
+        confidence: "high",
+        reason: "Named the terminal alkynide from the carbon skeleton and the negatively charged terminal carbon.",
+      };
+    }
+  }
+
+  if (groupName === "benzylic carbanion") {
+    return {
+      name: "benzyl anion",
+      confidence: "medium",
+      reason: "Recognized a benzylic carbanion; the retained functional-class name is clearer than an unsupported hydrocarbon fallback.",
+    };
+  }
+
+  if (groupName === "allylic carbanion") {
+    return {
+      name: "allyl anion",
+      confidence: "medium",
+      reason: "Recognized an allylic carbanion; the retained functional-class name is clearer than an unsupported hydrocarbon fallback.",
+    };
+  }
+
+  if (groupName === "methyl carbanion" || groupName === "carbanion") {
+    const center = chargedCarbonCenter(parsedMol, -1);
+    const name = center === null ? null : hydrocarbonAnionName(parsedMol, center);
+    if (name) {
+      return {
+        name,
+        confidence: "medium",
+        reason: "Named the carbon anion by applying the -ide ion suffix at the charged carbon.",
+      };
+    }
+  }
+
+  if (groupName === "carbocation") {
+    const center = chargedCarbonCenter(parsedMol, 1);
+    const name = center === null ? null : hydrocarbonCationName(parsedMol, center);
+    if (name) {
+      return {
+        name,
+        confidence: "medium",
+        reason: "Named the carbon cation by applying the -ylium ion suffix at the charged carbon.",
+      };
+    }
+  }
+
+  if (groupName === "amide anion") {
+    for (const nitrogen of getCenters(parsedMol, "N")) {
+      if ((parsedMol.atoms[nitrogen]?.charge ?? 0) >= 0) continue;
+      const carbonNames = carbonBranchNamesAtAtom(parsedMol, nitrogen);
+      return {
+        name: carbonNames.length > 0
+          ? `${compactLigandPrefix(carbonNames)}amide`
+          : "amide",
+        confidence: carbonNames.length > 0 ? "medium" : "high",
+        reason: "Named the negatively charged nitrogen as an amide/azanide-class anion.",
+      };
+    }
+  }
+
+  if (groupName === "deprotonated carboxamide") {
+    for (const nitrogen of getCenters(parsedMol, "N")) {
+      if ((parsedMol.atoms[nitrogen]?.charge ?? 0) >= 0) continue;
+      const carbonylBond = (parsedMol.adjacency.get(nitrogen) ?? []).find((bond) => {
+        const carbon = getOtherAtom(bond, nitrogen);
+        return bond.bondOrder === 1 && parsedMol.atoms[carbon]?.element === "C" && isCarbonylCarbon(parsedMol, carbon);
+      });
+      if (!carbonylBond) continue;
+      const carbonylCarbon = getOtherAtom(carbonylBond, nitrogen);
+      return {
+        name: `${simpleCarboxamideNameFromAcylCarbon(parsedMol, carbonylCarbon)} anion`,
+        confidence: "medium",
+        reason: "Named the structure as the conjugate-base anion of the corresponding carboxamide.",
+      };
+    }
+  }
+
+  if (groupName === "benzenediazonium") {
+    return {
+      name: "benzenediazonium",
+      confidence: "high",
+      reason: "Recognized an aryl diazonium center on a benzene parent.",
+    };
+  }
+
+  if (groupName === "acylammonium ion") {
+    return {
+      name: "acylammonium ion",
+      confidence: "medium",
+      reason: "Recognized the positively charged acylammonium intermediate; exact N-substituent assembly remains a future refinement.",
+    };
+  }
   if (groupName === "phenoxide") {
     return {
       name: "phenoxide",
@@ -1403,6 +1571,16 @@ export function getFunctionalClassName(
   }
 
   if (
+    groupName === "acetylide anion" ||
+    groupName === "methyl carbanion" ||
+    groupName === "benzylic carbanion" ||
+    groupName === "allylic carbanion" ||
+    groupName === "carbanion" ||
+    groupName === "carbocation" ||
+    groupName === "amide anion" ||
+    groupName === "deprotonated carboxamide" ||
+    groupName === "acylammonium ion" ||
+    groupName === "benzenediazonium" ||
     groupName === "alkoxide" ||
     groupName === "phenoxide" ||
     groupName === "carboxylate" ||

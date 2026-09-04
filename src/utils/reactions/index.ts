@@ -10,9 +10,14 @@ export type {
   ReactionHandlerName,
   ReactionComponent,
   ReactionPathway,
+  ReactionProductMixture,
+  ReactionProductMixtureKind,
   ReactionReactantRequirement,
   ReactionRule,
   ReactionPurpose,
+  ReactionSelectivityProfile,
+  StereochemicalMode,
+  RegiochemicalMode,
   ReactionTransform,
   ReactionTrigger,
   ReactionType,
@@ -38,6 +43,19 @@ export {
 export { predictReactionPathwaysFromRules } from "./engine/reactionEngine";
 export { predictRetrosynthesisPathwaysFromRules } from "./engine/retroSynthesis";
 export { findMultistepSynthesisRoutesFromRules } from "./engine/multistepSynthesis";
+export {
+  getSequentialConditionOptions,
+  runSequentialSynthesis,
+  type SequentialConditionOption,
+  type SequentialSynthesisBranch,
+  type SequentialSynthesisOptions,
+  type SequentialSynthesisStep,
+} from "./engine/sequentialSynthesis";
+export {
+  explainNoReactionForRule,
+  predictNoReactionOutcomes,
+  type NoReactionOutcome,
+} from "./engine/noReaction";
 export {
   analyzeReactionComponents,
   isGenericReactionSmiles,

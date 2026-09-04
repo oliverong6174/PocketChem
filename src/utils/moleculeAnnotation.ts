@@ -1,5 +1,7 @@
 import { getRDKit } from "./rdkit";
 
+const DEUTERIUM_DRAW_OPTION = { atomLabelDeuteriumTritium: true };
+
 export type Hybridization = "sp" | "sp2" | "sp3" | "unknown";
 
 export type BondType = "single" | "double" | "triple" | "aromatic" | "unknown";
@@ -575,13 +577,14 @@ export async function getHighlightedMoleculeSvg(
       ])
     ),
     highlightBondWidthMultiplier: 6,
+    ...DEUTERIUM_DRAW_OPTION,
   };
 
   try {
     return mol.get_svg_with_highlights(JSON.stringify(highlightDetails));
   } catch (error) {
     console.warn("Highlighted SVG failed; using the standard drawing.", error);
-    return mol.get_svg();
+    return mol.get_svg_with_highlights(JSON.stringify(DEUTERIUM_DRAW_OPTION));
   } finally {
     mol.delete?.();
   }

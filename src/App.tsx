@@ -44,6 +44,7 @@
   const ReactionsPage = lazy(() => import("./components/ReactionsPage"));
   const AcidBasePage = lazy(() => import("./components/AcidBasePage"));
   const SynthesisPage = lazy(() => import("./components/SynthesisPage"));
+  const MultiCatalyticPage = lazy(() => import("./components/MultiCatalyticPage"));
 
 
   type AnnotationCarouselItem =
@@ -70,13 +71,14 @@
     
 
   type AnalysisPanel = "overview" | "groups" | "concepts" | "properties";
-  type AppPage = "analysis" | "acidBase" | "reactions" | "synthesis";
+  type AppPage = "analysis" | "acidBase" | "reactions" | "multiStep" | "multiCatalytic";
 
   const APP_PAGES: Array<{ id: AppPage; label: string }> = [
     { id: "analysis", label: "Analysis" },
     { id: "acidBase", label: "Acid/Base" },
     { id: "reactions", label: "Reactions" },
-    { id: "synthesis", label: "Synthesis" },
+    { id: "multiStep", label: "Multi-Step" },
+    { id: "multiCatalytic", label: "Multi-Catalytic" },
   ];
 
   const ANALYSIS_PANELS: Array<{ id: AnalysisPanel; label: string }> = [
@@ -1845,8 +1847,10 @@
               <AcidBasePage />
             ) : activePage === "reactions" ? (
               <ReactionsPage initialPathways={reactionPathways} />
-            ) : (
+            ) : activePage === "multiStep" ? (
               <SynthesisPage />
+            ) : (
+              <MultiCatalyticPage />
             )}
           </Suspense>
         </section>

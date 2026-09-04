@@ -1,5 +1,6 @@
 import { getRDKit } from "../../../rdkit";
 import { runReactionSmarts } from "../rdkitReaction";
+import { canonicalizeStereoStructure } from "../stereochemistry";
 import { enumerateCarbocationPrecursors } from "./carbocationUtils";
 import {
   readPositiveIntegerOption,
@@ -19,6 +20,26 @@ const betaEliminationSmarts: Record<LeavingGroup, string> = {
   alcohol: "[C;H1,H2,H3:1][C:2][OH:3]>>[C:1]=[C:2]",
 };
 
+/**
+ * Explicit E/Z templates for the common acyclic case where the newly formed
+ * alkene has one hydrogen on each sp2 carbon. More highly substituted alkenes
+ * still fall back to the constitutional product until the general alkene
+ * stereochemistry enumerator is added.
+ */
+const betaEliminationStereoSmarts: Record<
+  LeavingGroup,
+  { e: string; z: string }
+> = {
+  halide: {
+    e: "[*:4][C;H1;X4:2]([Cl,Br,I:3])-[C;H2:1][*:5]>>[*:4]/[C:2]=[C:1]/[*:5]",
+    z: "[*:4][C;H1;X4:2]([Cl,Br,I:3])-[C;H2:1][*:5]>>[*:4]/[C:2]=[C:1]\\[*:5]",
+  },
+  alcohol: {
+    e: "[*:4][C;H1:2]([OH:3])-[C;H2:1][*:5]>>[*:4]/[C:2]=[C:1]/[*:5]",
+    z: "[*:4][C;H1:2]([OH:3])-[C;H2:1][*:5]>>[*:4]/[C:2]=[C:1]\\[*:5]",
+  },
+};
+
 function uniqueProducts(products: string[]): string[] {
   return [...new Set(products.filter(Boolean))];
 }
@@ -28,8 +49,8 @@ function uniqueProducts(products: string[]): string[] {
  *
  * For a simple carbon-carbon alkene, the number of carbon substituents equals
  * 4 minus the total number of hydrogens on the two alkene carbons. The query
- * ladder below therefore gives a useful Zaitsev/Hofmann ranking without
- * pretending to solve 3D antiperiplanar conformations or E/Z stereochemistry.
+ * ladder below therefore gives a useful Zaitsev/Hofmann ranking. E/Z is
+ * handled separately for the common acyclic disubstituted-alkene case.
  */
 async function alkeneSubstitutionScore(smiles: string): Promise<number> {
   const rdkit = await getRDKit();
@@ -97,10 +118,12 @@ async function eliminateFromPrecursors(
   preference: AlkenePreference,
   maxProducts: number
 ): Promise<string[]> {
-  const products: string[] = [];
+  const constitutionalProducts: string[] = [];
+  const eProducts: string[] = [];
+  const zProducts: string[] = [];
 
   for (const precursor of precursorSmiles) {
-    products.push(
+    constitutionalProducts.push(
       ...(await runReactionSmarts(
         precursor,
         betaEliminationSmarts[leavingGroup],
@@ -108,11 +131,54 @@ async function eliminateFromPrecursors(
       ))
     );
 
-    if (uniqueProducts(products).length >= maxProducts * 2) break;
+    // Encode the newly formed double bond directly in the elimination SMARTS.
+    // This avoids accidentally assigning geometry to an unrelated alkene that
+    // was already present elsewhere in the substrate.
+    const stereoSmarts = betaEliminationStereoSmarts[leavingGroup];
+    eProducts.push(
+      ...(await runReactionSmarts(precursor, stereoSmarts.e, maxProducts))
+    );
+    zProducts.push(
+      ...(await runReactionSmarts(precursor, stereoSmarts.z, maxProducts))
+    );
+
+    if (
+      uniqueProducts([
+        ...constitutionalProducts,
+        ...eProducts,
+        ...zProducts,
+      ]).length >= maxProducts * 3
+    ) {
+      break;
+    }
   }
 
-  const unique = uniqueProducts(products);
-  const preferred = await applyAlkenePreference(unique, preference);
+  const stereoProducts = uniqueProducts([...eProducts, ...zProducts]);
+  const stereoConnectivity = new Set<string>();
+  for (const product of stereoProducts) {
+    const structure = await canonicalizeStereoStructure(product);
+    if (structure) stereoConnectivity.add(structure.connectivity);
+  }
+
+  const constitutionalWithoutStereoDuplicates: string[] = [];
+  for (const product of constitutionalProducts) {
+    const structure = await canonicalizeStereoStructure(product);
+    if (!structure || !stereoConnectivity.has(structure.connectivity)) {
+      constitutionalWithoutStereoDuplicates.push(product);
+    }
+  }
+
+  // When explicit E/Z products exist for a constitution, suppress the
+  // duplicate stereo-unspecified version. E products are intentionally kept
+  // before Z products so ordinary E1/E2 ranking prefers the less-crowded
+  // geometry without removing the valid Z alternative.
+  const merged = uniqueProducts([
+    ...eProducts,
+    ...zProducts,
+    ...constitutionalWithoutStereoDuplicates,
+  ]);
+
+  const preferred = await applyAlkenePreference(merged, preference);
   return uniqueProducts(preferred).slice(0, maxProducts);
 }
 
@@ -124,8 +190,9 @@ async function eliminateFromPrecursors(
  * then performs beta elimination from each accessible carbocation precursor.
  * The legacy `betaElimination` mode remains for older dehydration rules.
  *
- * The handler deliberately does not claim to solve 3D anti-periplanar
- * conformer availability or E/Z stereochemistry yet.
+ * The handler now enumerates E/Z for the common acyclic disubstituted alkene
+ * case. General trisubstituted/tetrasubstituted geometry and 3D
+ * anti-periplanar conformer availability remain future work.
  */
 export async function elimination(
   reactantSmiles: string,
@@ -152,7 +219,7 @@ export async function elimination(
     readStringOption(options, "preference", ALKENE_PREFERENCES) ?? "all";
   const maxProducts = readPositiveIntegerOption(options, "maxProducts", 8);
 
-  if (mode === "e1" && leavingGroup === "halide") {
+  if (mode === "e1") {
     const maxShiftDepth = readPositiveIntegerOption(options, "maxShiftDepth", 2);
     const allowRearrangement = options?.allowRearrangement !== false;
 
@@ -161,6 +228,7 @@ export async function elimination(
           maxShiftDepth,
           maxCandidates: Math.max(6, maxProducts),
           includeUnrearranged: true,
+          leavingGroup,
         })
       : [{
           smiles: reactantSmiles,

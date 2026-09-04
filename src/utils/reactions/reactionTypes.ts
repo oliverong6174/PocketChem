@@ -50,6 +50,65 @@ export type ReactionHandlerName =
 
 export type ReactionPurpose = "protection" | "deprotection";
 
+export type ReactionProductMixtureKind =
+  | "racemic"
+  | "diastereomeric"
+  | "stereoisomeric";
+
+/**
+ * One generated structure can be a member of a chemically inseparable/expected
+ * product mixture. The members remain individually addressable by the reaction
+ * and synthesis engines, but this metadata prevents one member of an SN1
+ * racemate from being misrepresented as an enantiopure product.
+ */
+export type ReactionProductMixture = {
+  kind: ReactionProductMixtureKind;
+  groupId: string;
+  label: string;
+  memberIndex: number;
+  memberCount: number;
+  memberSmiles: string[];
+  /** Optional shared display name such as `rac-butan-2-ol`. */
+  displayName: string | null;
+};
+
+export type StereochemicalMode =
+  | "none"
+  | "retention"
+  | "inversion"
+  | "racemization"
+  | "syn-addition"
+  | "anti-addition"
+  | "e-preferred"
+  | "z-preferred";
+
+export type RegiochemicalMode =
+  | "none"
+  | "markovnikov"
+  | "anti-markovnikov"
+  | "zaitsev"
+  | "hofmann"
+  | "directed";
+
+/**
+ * Machine-readable selectivity metadata. The existing string `selectivity`
+ * field remains the human-facing explanation; this profile is what the
+ * reaction and synthesis engines should use for chemistry decisions.
+ */
+export type ReactionSelectivityProfile = {
+  stereochemistry?: {
+    mode: StereochemicalMode;
+    stereospecific?: boolean;
+    stereoselective?: boolean;
+  };
+  regiochemistry?: {
+    mode: RegiochemicalMode;
+    regioselective?: boolean;
+  };
+  mixture?: "single" | "possible" | "expected";
+  allowsRearrangement?: boolean;
+};
+
 /** How PocketChem generates the product structure. */
 export type ReactionTransform =
   | {
@@ -125,6 +184,7 @@ export type ReactionRule = {
   reactionClass?: string;
   purpose?: ReactionPurpose;
   selectivity?: string[];
+  selectivityProfile?: ReactionSelectivityProfile;
   limitations?: string[];
   productStatus?: ProductGenerationStatus;
 };
@@ -149,10 +209,12 @@ export type ReactionPathway = {
   reactionClass: string | null;
   purpose: ReactionPurpose | null;
   selectivity: string[];
+  selectivityProfile: ReactionSelectivityProfile | null;
   limitations: string[];
   productStatus: ProductGenerationStatus;
   reactantComponents: string[];
   hasGenericReactant: boolean;
+  productMixture: ReactionProductMixture | null;
 };
 
 export type ReactionComponent = {
@@ -181,6 +243,7 @@ export type RetrosynthesisAlternativeRoute = {
   mechanism: string | null;
   reactionClass: string | null;
   selectivity: string[];
+  selectivityProfile: ReactionSelectivityProfile | null;
 };
 
 /**
@@ -217,6 +280,7 @@ export type RetrosynthesisPathway = {
   reactionClass: string | null;
   purpose: ReactionPurpose | null;
   selectivity: string[];
+  selectivityProfile: ReactionSelectivityProfile | null;
   limitations: string[];
 
   confidence: RetrosynthesisConfidence;
@@ -224,6 +288,8 @@ export type RetrosynthesisPathway = {
 
   /** Other catalog rules that produce the same exact precursor set. */
   alternativeRoutes: RetrosynthesisAlternativeRoute[];
+  /** Mixture produced when these precursors are replayed through the forward rule. */
+  productMixture: ReactionProductMixture | null;
 };
 
 
@@ -256,9 +322,11 @@ export type SynthesisStep = {
   reactionClass: string | null;
   purpose: ReactionPurpose | null;
   selectivity: string[];
+  selectivityProfile: ReactionSelectivityProfile | null;
   limitations: string[];
 
   retrosynthesisConfidence: RetrosynthesisConfidence | null;
+  productMixture: ReactionProductMixture | null;
 };
 
 export type SynthesisRouteConfidence = "verified" | "connectivity-verified";

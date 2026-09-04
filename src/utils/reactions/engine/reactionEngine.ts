@@ -16,6 +16,7 @@ import {
   isGenericReactionSmiles,
 } from "./reactionInput";
 import { runReactionSmarts } from "./rdkitReaction";
+import { classifyReactionProducts } from "./productMixtures";
 import {
   filterRulesMatchingReactant,
   matchAllRuleReactants,
@@ -69,7 +70,7 @@ async function getReactantLabel(components: ReactionComponent[]): Promise<string
 
 async function getProductName(
   productSmiles: string,
-  fallback: string
+  fallback: string,
 ): Promise<string> {
   if (isGenericReactionSmiles(productSmiles)) return fallback;
 
@@ -92,7 +93,7 @@ async function getProductName(
       productNames.push(
         identity.nomenclature.displayName ||
           identity.nomenclature.estimatedName ||
-          fallback
+          fallback,
       );
     } catch {
       productNames.push(fallback);
@@ -163,8 +164,60 @@ function createPathwayBase(rule: ReactionRule) {
     reactionClass: rule.reactionClass ?? null,
     purpose: rule.purpose ?? null,
     selectivity: rule.selectivity ?? [],
+    selectivityProfile: rule.selectivityProfile ?? null,
     limitations: rule.limitations ?? [],
   };
+}
+
+function formatNameList(names: string[]): string {
+  if (names.length === 0) return "";
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+}
+
+function stripLeadingStereoDescriptor(name: string): string {
+  return name
+    .replace(/^rac-/i, "")
+    .replace(/^meso-/i, "")
+    .replace(/^\((?:(?:\d+)?[RSEZ])(?:,(?:(?:\d+)?[RSEZ]))*\)-/, "");
+}
+
+function sharedMixtureDisplayName(
+  kind: "racemic" | "diastereomeric" | "stereoisomeric",
+  names: string[],
+): string | null {
+  const uniqueNames = Array.from(
+    new Set(names.map((name) => name.trim()).filter(Boolean)),
+  );
+
+  if (uniqueNames.length === 0) return null;
+
+  const bases = uniqueNames.map(stripLeadingStereoDescriptor);
+  const sameBase = Boolean(bases[0]) && bases.every((base) => base === bases[0]);
+
+  // A pair of enantiomers is cleanly represented by the conventional rac-
+  // prefix. The individual R/S structures remain stored in memberSmiles.
+  if (kind === "racemic" && sameBase) {
+    return `rac-${bases[0]}`;
+  }
+
+  // Diastereomers are NOT interchangeable. If PocketChem knows their exact
+  // stereochemical names, show those names instead of flattening both into one
+  // achiral base name. This is important for wedge/dash-specific products.
+  if (uniqueNames.length <= 3) {
+    return formatNameList(uniqueNames);
+  }
+
+  if (sameBase) {
+    if (kind === "diastereomeric") {
+      return `${bases[0]} (diastereomeric mixture)`;
+    }
+    return `${bases[0]} (stereoisomeric mixture)`;
+  }
+
+  if (kind === "diastereomeric") return "Diastereomeric mixture";
+  return "Stereoisomeric mixture";
 }
 
 async function createExecutedPathways(
@@ -189,6 +242,7 @@ async function createExecutedPathways(
       productStatus: execution.productStatus,
       reactantComponents,
       hasGenericReactant,
+      productMixture: null,
       limitations: [...(rule.limitations ?? []), rule.transform.reason],
     }];
   }
@@ -207,6 +261,7 @@ async function createExecutedPathways(
           : execution.productStatus,
       reactantComponents,
       hasGenericReactant,
+      productMixture: null,
       limitations: [
         ...(rule.limitations ?? []),
         "The rule matched these reactants, but the current structure generator did not produce a valid product molecule.",
@@ -214,24 +269,57 @@ async function createExecutedPathways(
     }];
   }
 
+  const classifiedProducts = await classifyReactionProducts(
+    rule,
+    execution.products,
+  );
+  const namedProducts = await Promise.all(
+    classifiedProducts.map(async (product) => ({
+      ...product,
+      productName: await getProductName(product.smiles, rule.productHint),
+    })),
+  );
+
+  const mixtureNames = new Map<string, string | null>();
+  for (const product of namedProducts) {
+    const mixture = product.mixture;
+    if (!mixture || mixtureNames.has(mixture.groupId)) continue;
+    const group = namedProducts.filter(
+      (candidate) => candidate.mixture?.groupId === mixture.groupId,
+    );
+    mixtureNames.set(
+      mixture.groupId,
+      sharedMixtureDisplayName(
+        mixture.kind,
+        group.map((candidate) => candidate.productName),
+      ),
+    );
+  }
+
   const pathways: ReactionPathway[] = [];
 
-  for (let productIndex = 0; productIndex < execution.products.length; productIndex += 1) {
-    const productSmiles = execution.products[productIndex];
-    const productName = await getProductName(productSmiles, rule.productHint);
+  for (let productIndex = 0; productIndex < namedProducts.length; productIndex += 1) {
+    const product = namedProducts[productIndex];
+    const mixture = product.mixture
+      ? {
+          ...product.mixture,
+          displayName: mixtureNames.get(product.mixture.groupId) ?? null,
+        }
+      : null;
 
     pathways.push({
       ...base,
       id: productIndex === 0 ? rule.id : `${rule.id}--${productIndex + 1}`,
       reactantSmiles,
       reactantLabel,
-      productSmiles,
-      productLabel: productName,
-      productStatus: isGenericReactionSmiles(productSmiles)
+      productSmiles: product.smiles,
+      productLabel: product.productName,
+      productStatus: isGenericReactionSmiles(product.smiles)
         ? "generic"
         : execution.productStatus,
       reactantComponents,
       hasGenericReactant,
+      productMixture: mixture,
     });
   }
 
@@ -289,6 +377,7 @@ async function createMissingReactantPathway(
     productStatus: "concept-only",
     reactantComponents: [primary.smiles],
     hasGenericReactant: primary.isGeneric,
+    productMixture: null,
     limitations: [
       ...(rule.limitations ?? []),
       `Draw the additional reactant${missingLabels.length === 1 ? "" : "s"} in the same Ketcher canvas: ${missingLabels.join(", ")}.`,

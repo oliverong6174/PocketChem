@@ -163,6 +163,33 @@ function findPotentialTetrahedralCentersFromRDKit(
 function parseStereoTags(stereoTagsText: string): Map<number, ChiralityConfiguration> {
   const result = new Map<number, ChiralityConfiguration>();
 
+  // RDKit MinimalLib returns JSON in the form:
+  // {"CIP_atoms":[[atomIndex,"(R)"], ...], "CIP_bonds":[...]}
+  // Parse that format first so molecules with multiple stereocenters retain
+  // every R/S assignment instead of accidentally matching only the first tag.
+  try {
+    const parsed = JSON.parse(stereoTagsText) as { CIP_atoms?: unknown };
+    if (Array.isArray(parsed.CIP_atoms)) {
+      for (const entry of parsed.CIP_atoms) {
+        if (!Array.isArray(entry) || entry.length < 2) continue;
+        const atomIndex = Number(entry[0]);
+        const rawConfig = typeof entry[1] === "string" ? entry[1] : "";
+        const config = rawConfig.replace(/^\(/, "").replace(/\)$/, "");
+
+        if (
+          Number.isInteger(atomIndex) &&
+          (config === "R" || config === "S")
+        ) {
+          result.set(atomIndex, config);
+        }
+      }
+
+      return result;
+    }
+  } catch {
+    // Fall through to the legacy text parser for older/custom RDKit builds.
+  }
+
   const lines = stereoTagsText.split(/\r?\n/);
 
   for (const line of lines) {
@@ -179,8 +206,6 @@ function parseStereoTags(stereoTagsText: string): Map<number, ChiralityConfigura
     const config = configMatch[1] as ChiralityConfiguration;
 
     if (Number.isFinite(atomNumber)) {
-      // RDKit stereo tags may report atoms as 0-based or 1-based depending on output.
-      // We first store as-is, then handle fallback in analyzeChirality.
       result.set(atomNumber, config);
     }
   }

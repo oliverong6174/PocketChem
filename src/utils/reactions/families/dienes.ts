@@ -11,7 +11,7 @@ export const dieneReactionRules: ReactionRule[] = [
     family: "dienes",
     reactionType: "addition",
     title: "Electrophilic Addition to a Diene: 1,2 Product",
-    reagents: "HBr or HCl, low temperature",
+    reagents: "HBr, HCl, or HI, low temperature",
     reagentNote: "Kinetic addition",
     productHint: "1,2-addition product",
     explanation:
@@ -31,7 +31,7 @@ export const dieneReactionRules: ReactionRule[] = [
     family: "dienes",
     reactionType: "addition",
     title: "Electrophilic Addition to a Diene: 1,4 Product",
-    reagents: "HBr or HCl, higher temperature",
+    reagents: "HBr, HCl, or HI, higher temperature",
     reagentNote: "Thermodynamic addition",
     productHint: "1,4-addition product",
     explanation:

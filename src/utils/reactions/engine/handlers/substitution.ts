@@ -11,6 +11,7 @@ type SubstitutionMode =
   | "sn2"
   | "alkylHalideSubstitution" // legacy alias for sn2
   | "alcoholToHalide"
+  | "alcoholSn1ToHalide"
   | "intermolecularAlcoholDehydration";
 
 type SubstitutionNucleophile =
@@ -42,10 +43,60 @@ const INCOMING_HALIDES = [
   "iodide",
 ] as const satisfies readonly IncomingHalide[];
 
-const alcoholToHalideSmarts: Record<IncomingHalide, string> = {
-  chloride: "[C:1][OH:2]>>[C:1]Cl",
-  bromide: "[C:1][OH:2]>>[C:1]Br",
-  iodide: "[C:1][OH:2]>>[C:1]I",
+type AlcoholToHalideSmartsSet = {
+  inversion: string;
+  generic: string;
+};
+
+const alcoholToHalideSmarts: Record<
+  IncomingHalide,
+  AlcoholToHalideSmartsSet
+> = {
+  chloride: {
+    inversion: "[C@H:1]([*:3])([*:4])[OH:2]>>[C@@H:1]([*:3])([*:4])Cl",
+    generic: "[C;X4:1][OH:2]>>[C:1]Cl",
+  },
+  bromide: {
+    inversion: "[C@H:1]([*:3])([*:4])[OH:2]>>[C@@H:1]([*:3])([*:4])Br",
+    generic: "[C;X4:1][OH:2]>>[C:1]Br",
+  },
+  iodide: {
+    inversion: "[C@H:1]([*:3])([*:4])[OH:2]>>[C@@H:1]([*:3])([*:4])I",
+    generic: "[C;X4:1][OH:2]>>[C:1]I",
+  },
+};
+
+type AlcoholSn1CaptureSmartsSet = {
+  secondaryRacemization: string;
+  tertiaryRacemization: string;
+  generic: string;
+};
+
+const alcoholSn1CaptureSmarts: Record<
+  IncomingHalide,
+  AlcoholSn1CaptureSmartsSet
+> = {
+  chloride: {
+    secondaryRacemization:
+      "[C;H1;X4:1]([*:3])([*:4])[OH:2]>>[C@H:1]([*:3])([*:4])Cl",
+    tertiaryRacemization:
+      "[C;H0;X4:1]([*:3])([*:4])([*:7])[OH:2]>>[C@:1]([*:3])([*:4])([*:7])Cl",
+    generic: "[C;X4:1][OH:2]>>[C:1]Cl",
+  },
+  bromide: {
+    secondaryRacemization:
+      "[C;H1;X4:1]([*:3])([*:4])[OH:2]>>[C@H:1]([*:3])([*:4])Br",
+    tertiaryRacemization:
+      "[C;H0;X4:1]([*:3])([*:4])([*:7])[OH:2]>>[C@:1]([*:3])([*:4])([*:7])Br",
+    generic: "[C;X4:1][OH:2]>>[C:1]Br",
+  },
+  iodide: {
+    secondaryRacemization:
+      "[C;H1;X4:1]([*:3])([*:4])[OH:2]>>[C@H:1]([*:3])([*:4])I",
+    tertiaryRacemization:
+      "[C;H0;X4:1]([*:3])([*:4])([*:7])[OH:2]>>[C@:1]([*:3])([*:4])([*:7])I",
+    generic: "[C;X4:1][OH:2]>>[C:1]I",
+  },
 };
 
 function asReactantList(reactants: string | string[]): string[] {
@@ -132,6 +183,79 @@ const SN1_SMARTS: Record<"water" | "alcohol", Sn1SmartsSet> = {
   },
 };
 
+async function runAlcoholToHalide(
+  substrate: string,
+  halide: IncomingHalide,
+  invertStereo: boolean,
+): Promise<string[]> {
+  const smarts = alcoholToHalideSmarts[halide];
+
+  if (invertStereo) {
+    const stereospecific = await runReactionSmarts(
+      substrate,
+      smarts.inversion,
+      8,
+    );
+    if (stereospecific.length > 0) return uniqueProducts(stereospecific);
+  }
+
+  return uniqueProducts(await runReactionSmarts(substrate, smarts.generic, 8));
+}
+
+async function runAlcoholSn1ToHalide(
+  substrate: string,
+  halide: IncomingHalide,
+  maxProducts: number,
+  allowRearrangement: boolean,
+  maxShiftDepth: number,
+): Promise<string[]> {
+  const precursors = allowRearrangement
+    ? await enumerateCarbocationPrecursors(substrate, {
+        maxShiftDepth,
+        maxCandidates: Math.max(4, maxProducts),
+        includeUnrearranged: true,
+        leavingGroup: "alcohol",
+      })
+    : [{
+        smiles: substrate,
+        shiftType: "none" as const,
+        shiftDepth: 0,
+        stabilityScore: Number.POSITIVE_INFINITY,
+      }];
+
+  const smarts = alcoholSn1CaptureSmarts[halide];
+  const products: string[] = [];
+
+  for (const precursor of precursors) {
+    for (const stereochemicalSmarts of [
+      smarts.secondaryRacemization,
+      smarts.tertiaryRacemization,
+    ]) {
+      products.push(
+        ...(await runReactionSmarts(
+          precursor.smiles,
+          stereochemicalSmarts,
+          maxProducts,
+        )),
+      );
+    }
+
+    if (uniqueProducts(products).length >= maxProducts) break;
+  }
+
+  if (products.length > 0) {
+    return uniqueProducts(products).slice(0, maxProducts);
+  }
+
+  const fallback: string[] = [];
+  for (const precursor of precursors) {
+    fallback.push(
+      ...(await runReactionSmarts(precursor.smiles, smarts.generic, maxProducts)),
+    );
+  }
+  return uniqueProducts(fallback).slice(0, maxProducts);
+}
+
 async function runSn2(
   reactants: string[],
   nucleophile: Exclude<SubstitutionNucleophile, "water" | "alcohol">,
@@ -207,6 +331,7 @@ async function runSn1(
         maxShiftDepth,
         maxCandidates: Math.max(4, maxProducts),
         includeUnrearranged: true,
+        leavingGroup: "halide",
       })
     : [{
         smiles: substrate,
@@ -294,6 +419,26 @@ export async function substitution(
     );
   }
 
+  if (mode === "alcoholSn1ToHalide") {
+    const halide = readStringOption(options, "halide", INCOMING_HALIDES);
+    if (!halide) {
+      warnUnsupportedHandlerMode("Substitution", options);
+      return [];
+    }
+
+    const maxProducts = readPositiveIntegerOption(options, "maxProducts", 12);
+    const maxShiftDepth = readPositiveIntegerOption(options, "maxShiftDepth", 2);
+    const allowRearrangement = options?.allowRearrangement !== false;
+
+    return runAlcoholSn1ToHalide(
+      primaryReactant,
+      halide,
+      maxProducts,
+      allowRearrangement,
+      maxShiftDepth,
+    );
+  }
+
   if (mode === "alcoholToHalide") {
     const halide = readStringOption(options, "halide", INCOMING_HALIDES);
 
@@ -302,7 +447,17 @@ export async function substitution(
       return [];
     }
 
-    return runReactionSmarts(primaryReactant, alcoholToHalideSmarts[halide]);
+    const stereochemistry = readStringOption(
+      options,
+      "stereochemistry",
+      ["invert", "unspecified"] as const,
+    ) ?? "unspecified";
+
+    return runAlcoholToHalide(
+      primaryReactant,
+      halide,
+      stereochemistry === "invert",
+    );
   }
 
   if (mode === "intermolecularAlcoholDehydration") {

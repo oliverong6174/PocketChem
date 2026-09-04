@@ -4,6 +4,9 @@ export type {
   PropertyTendencyResult,
   MoleculePropertyResult,
   NomenclatureResult,
+  NomenclatureStereoDescriptor,
+  StereoDescriptorKind,
+  StereoDescriptorValue,
   NamingStatus,
   MoleculeIdentityResult,
 } from "./types";

@@ -1,21 +1,34 @@
 import { analyzeFunctionalGroupHierarchy } from "../../functionalGroups";
 import { analyzeNomenclatureAndProperties } from "../../nomenclatureUtils";
-import { getRDKit } from "../../rdkit";
 import { getRuleChapter, getRuleCourse } from "../reactionCurriculum";
 import type {
   ReactionComponent,
+  ReactionProductMixture,
   ReactionRule,
   RetrosynthesisConfidence,
   RetrosynthesisPathway,
 } from "../reactionTypes";
 import { runCustomHandler } from "./handlers";
-import { alkeneHydrationReactionSmarts } from "./handlers/addition";
+import {
+  alkeneHalohydrinReactionSmarts,
+  alkeneHaloetherReactionSmarts,
+  alkeneHydrationReactionSmarts,
+  alkeneHydrohalogenationReactionSmarts,
+  alkoxymercurationReactionSmarts,
+} from "./handlers/addition";
 import {
   analyzeReactionComponents,
   isGenericReactionSmiles,
   splitReactionComponents,
 } from "./reactionInput";
 import { runReactionSmarts } from "./rdkitReaction";
+import { classifyReactionProducts } from "./productMixtures";
+import {
+  canonicalizeStereoStructure,
+  compareProductStructureToTarget,
+  stereochemicalMixtureCanSatisfyTarget,
+  type CanonicalStereoStructure,
+} from "./stereochemistry";
 import { matchAllRuleReactants, ruleMatchesReactant } from "./ruleMatcher";
 
 type ReverseTransform = {
@@ -26,6 +39,7 @@ type ReverseTransform = {
 type ValidationResult = {
   confidence: RetrosynthesisConfidence;
   orderedReactants: string[];
+  productMixture: ReactionProductMixture | null;
 };
 
 const MAX_RESULTS_PER_RULE = 12;
@@ -101,55 +115,62 @@ function permutations<T>(items: T[]): T[][] {
   return output;
 }
 
-async function canonicalizeSmiles(smiles: string): Promise<string | null> {
-  const rdkit = await getRDKit();
-  const mol = rdkit.get_mol(smiles);
-  if (!mol) return null;
-
-  try {
-    return mol.get_smiles?.() ?? null;
-  } catch {
-    return null;
-  } finally {
-    mol.delete?.();
-  }
-}
-
-async function canonicalizeReactionSmiles(smiles: string): Promise<string | null> {
+async function canonicalizeReactionSmiles(
+  smiles: string,
+): Promise<CanonicalStereoStructure | null> {
   const components = splitReactionComponents(smiles);
   if (components.length === 0) return null;
 
-  const canonical: string[] = [];
+  const structures: CanonicalStereoStructure[] = [];
   for (const component of components) {
-    const normalized = await canonicalizeSmiles(component);
-    if (!normalized) return null;
-    canonical.push(normalized);
+    const structure = await canonicalizeStereoStructure(component);
+    if (!structure) return null;
+    structures.push(structure);
   }
 
-  return canonical.sort((a, b) => a.localeCompare(b)).join(".");
-}
-
-function connectivityKeyFromCanonicalSmiles(smiles: string): string {
-  // Forward transforms that intentionally omit E/Z or tetrahedral assignment
-  // should still be usable in retrosynthesis. Canonical RDKit SMILES is first
-  // generated above; removing stereochemical tokens leaves a stable enough
-  // connectivity key for the same constitutional graph.
-  return smiles.replace(/@@?/g, "").replace(/[\\/]/g, "");
+  return {
+    isomeric: structures
+      .map((structure) => structure.isomeric)
+      .sort((a, b) => a.localeCompare(b))
+      .join("."),
+    connectivity: structures
+      .map((structure) => structure.connectivity)
+      .sort((a, b) => a.localeCompare(b))
+      .join("."),
+    hasSpecifiedStereo: structures.some(
+      (structure) => structure.hasSpecifiedStereo,
+    ),
+  };
 }
 
 async function compareProductToTarget(
   productSmiles: string,
-  targetCanonical: string,
+  targetStructure: CanonicalStereoStructure,
+  productMixture: ReactionProductMixture | null,
 ): Promise<RetrosynthesisConfidence | null> {
-  const productCanonical = await canonicalizeReactionSmiles(productSmiles);
-  if (!productCanonical) return null;
+  const productStructure = await canonicalizeReactionSmiles(productSmiles);
+  if (!productStructure) return null;
 
-  if (productCanonical === targetCanonical) return "confirmed";
+  if (
+    !stereochemicalMixtureCanSatisfyTarget(
+      productMixture?.kind ?? null,
+      targetStructure,
+    )
+  ) {
+    return null;
+  }
 
-  return connectivityKeyFromCanonicalSmiles(productCanonical) ===
-    connectivityKeyFromCanonicalSmiles(targetCanonical)
-    ? "connectivity-confirmed"
-    : null;
+  const stereoMatch = compareProductStructureToTarget(
+    productStructure,
+    targetStructure,
+  );
+
+  if (stereoMatch === "exact") return "confirmed";
+  if (stereoMatch === "connectivity-only") return "connectivity-confirmed";
+
+  // If the target explicitly requests R/S or E/Z, an unspecified or opposite
+  // stereoisomer is not a verified retrosynthetic replay.
+  return null;
 }
 
 async function getDisplayName(smiles: string, fallback: string): Promise<string> {
@@ -226,7 +247,7 @@ async function executeForwardRule(
 async function validateForward(
   rule: ReactionRule,
   precursorSmiles: string,
-  targetCanonical: string,
+  targetStructure: CanonicalStereoStructure,
 ): Promise<ValidationResult | null> {
   const components = await componentsFromSmiles(precursorSmiles);
   if (components.length === 0) return null;
@@ -260,10 +281,21 @@ async function validateForward(
 
   for (const orderedReactants of orderedAssignments) {
     const products = await executeForwardRule(rule, orderedReactants);
+    const classifiedProducts = await classifyReactionProducts(rule, products);
 
-    for (const product of products) {
-      const confidence = await compareProductToTarget(product, targetCanonical);
-      if (confidence) return { confidence, orderedReactants };
+    for (const product of classifiedProducts) {
+      const confidence = await compareProductToTarget(
+        product.smiles,
+        targetStructure,
+        product.mixture,
+      );
+      if (confidence) {
+        return {
+          confidence,
+          orderedReactants,
+          productMixture: product.mixture,
+        };
+      }
     }
   }
 
@@ -362,6 +394,33 @@ function sn1ReverseSmarts(nucleophile: string): string[] {
   return output;
 }
 
+function alcoholToHalideReverseSmarts(
+  halide: "Cl" | "Br" | "I",
+  invertStereo: boolean,
+): string[] {
+  if (!invertStereo) {
+    return [`[C;X4:1]${halide}>>[C:1]O`];
+  }
+
+  return [
+    `[C@H:1]([*:3])([*:4])${halide}>>[C@@H:1]([*:3])([*:4])O`,
+    `[C@@H:1]([*:3])([*:4])${halide}>>[C@H:1]([*:3])([*:4])O`,
+    `[C;X4:1]${halide}>>[C:1]O`,
+  ];
+}
+
+function alcoholSn1ToHalideReverseSmarts(
+  halide: "Cl" | "Br" | "I",
+): string[] {
+  // The planar carbocation erases the precursor alcohol configuration, so a
+  // stereogenic target halide can arise from either alcohol enantiomer.
+  return [
+    `[C;H1;X4:1]([*:3])([*:4])${halide}>>[C@H:1]([*:3])([*:4])O`,
+    `[C;H1;X4:1]([*:3])([*:4])${halide}>>[C@@H:1]([*:3])([*:4])O`,
+    `[C;X4:1]${halide}>>[C:1]O`,
+  ];
+}
+
 function eliminationReverseSmarts(leavingGroup: string): string[] {
   if (leavingGroup === "alcohol") {
     return [
@@ -434,6 +493,56 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
             .filter((item): item is string => Boolean(item)),
         );
       }
+    }
+
+    if (mode === "alkeneHydrohalogenation") {
+      const regioselectivity = options.regioselectivity;
+      const halogen = options.halogen;
+      if (
+        (regioselectivity === "markovnikov" ||
+          regioselectivity === "anti-markovnikov") &&
+        (halogen === "Cl" || halogen === "Br" || halogen === "I")
+      ) {
+        output.push(
+          ...alkeneHydrohalogenationReactionSmarts(regioselectivity, halogen)
+            .map(reverseReactionSmarts)
+            .filter((item): item is string => Boolean(item)),
+        );
+      }
+    }
+
+    if (mode === "halohydrin") {
+      const halogen = options.halogen;
+      if (halogen === "Cl" || halogen === "Br" || halogen === "I") {
+        output.push(
+          ...alkeneHalohydrinReactionSmarts(halogen)
+            .map(reverseReactionSmarts)
+            .filter((item): item is string => Boolean(item)),
+        );
+      }
+    }
+
+    if (mode === "haloether") {
+      const halogen = options.halogen;
+      if (halogen === "Cl" || halogen === "Br" || halogen === "I") {
+        output.push(
+          ...alkeneHaloetherReactionSmarts(halogen)
+            .map(reverseReactionSmarts)
+            .filter((item): item is string => Boolean(item)),
+        );
+      }
+    }
+
+    if (mode === "alkoxymercuration") {
+      output.push(
+        ...alkoxymercurationReactionSmarts()
+          .map(reverseReactionSmarts)
+          .filter((item): item is string => Boolean(item)),
+      );
+    }
+
+    if (mode === "synDihydroxylation") {
+      output.push("[C:1]([OH])[C:2]([OH])>>[C:1]=[C:2]");
     }
   }
 
@@ -527,7 +636,7 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
       output.push(...sn1ReverseSmarts(String(options.nucleophile ?? "")));
     }
 
-    if (mode === "alcoholToHalide") {
+    if (mode === "alcoholToHalide" || mode === "alcoholSn1ToHalide") {
       const halide =
         options.halide === "chloride"
           ? "Cl"
@@ -536,7 +645,19 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
             : options.halide === "iodide"
               ? "I"
               : null;
-      if (halide) output.push(`[C:1]${halide}>>[C:1]O`);
+
+      if (halide) {
+        if (mode === "alcoholSn1ToHalide") {
+          output.push(...alcoholSn1ToHalideReverseSmarts(halide));
+        } else {
+          output.push(
+            ...alcoholToHalideReverseSmarts(
+              halide,
+              options.stereochemistry === "invert",
+            ),
+          );
+        }
+      }
     }
 
     if (mode === "intermolecularAlcoholDehydration") {
@@ -642,6 +763,7 @@ async function createRetrosynthesisPathway(
     reactionClass: rule.reactionClass ?? null,
     purpose: rule.purpose ?? null,
     selectivity: rule.selectivity ?? [],
+    selectivityProfile: rule.selectivityProfile ?? null,
     limitations: [
       ...(rule.limitations ?? []),
       ...(validation.confidence === "connectivity-confirmed"
@@ -649,10 +771,16 @@ async function createRetrosynthesisPathway(
             "The proposed precursors reproduce the target connectivity under the forward rule, but the current forward model does not fully specify the target stereochemistry.",
           ]
         : []),
+      ...(validation.productMixture
+        ? [
+            `Forward replay produces a ${validation.productMixture.label.toLowerCase()}; one member is not treated as an enantiopure product.`,
+          ]
+        : []),
     ],
     confidence: validation.confidence,
     source,
     alternativeRoutes: [],
+    productMixture: validation.productMixture,
   };
 }
 
@@ -680,7 +808,7 @@ async function precursorStructureKey(
   // while retaining stereochemistry. Retrosynthetic candidates that differ in
   // R/S or E/Z assignment therefore remain separate cards.
   return (
-    (await canonicalizeReactionSmiles(pathway.precursorSmiles)) ??
+    (await canonicalizeReactionSmiles(pathway.precursorSmiles))?.isomeric ??
     pathway.precursorComponents
       .slice()
       .sort((a, b) => a.localeCompare(b))
@@ -724,6 +852,7 @@ async function dedupeAndRank(
       mechanism: pathway.mechanism,
       reactionClass: pathway.reactionClass,
       selectivity: pathway.selectivity,
+      selectivityProfile: pathway.selectivityProfile,
     });
   }
 

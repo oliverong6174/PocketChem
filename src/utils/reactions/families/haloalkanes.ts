@@ -125,6 +125,10 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       maxProducts: 4,
     },
     mechanism: "Intramolecular SN2",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      mixture: "single",
+    },
     selectivity: [
       "Five-membered ring formation is favored",
       "Backside displacement at the carbon bearing the leaving group",
@@ -157,6 +161,10 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       options: { mode: "sn2", nucleophile: "hydroxide", maxProducts: 8 },
     },
     mechanism: "SN2",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      mixture: "single",
+    },
     selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
     limitations: [
       "SN2 inversion is explicitly encoded at a stereogenic reacting carbon; other stereocenters are retained.",
@@ -184,6 +192,10 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       options: { mode: "sn2", nucleophile: "cyanide", maxProducts: 8 },
     },
     mechanism: "SN2",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      mixture: "single",
+    },
     selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
     limitations: [
       "SN2 inversion is explicitly encoded at a stereogenic reacting carbon.",
@@ -211,6 +223,10 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       options: { mode: "sn2", nucleophile: "azide", maxProducts: 8 },
     },
     mechanism: "SN2",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      mixture: "single",
+    },
     selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
     limitations: [
       "SN2 inversion is explicitly encoded at a stereogenic reacting carbon.",
@@ -237,6 +253,10 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       options: { mode: "sn2", nucleophile: "ammonia", maxProducts: 8 },
     },
     mechanism: "SN2",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      mixture: "single",
+    },
     limitations: [
       "Further alkylation can occur if the alkyl halide is not limiting.",
       "Secondary substrates are more hindered and can show competing elimination.",
@@ -270,6 +290,10 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       options: { mode: "sn2", nucleophile: "alkoxide", maxProducts: 8 },
     },
     mechanism: "SN2",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      mixture: "single",
+    },
     selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
     limitations: [
       "Secondary halides can undergo substantial E2; tertiary halides are excluded.",
@@ -304,6 +328,10 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       options: { mode: "sn2", nucleophile: "acetylide", maxProducts: 8 },
     },
     mechanism: "SN2",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      mixture: "single",
+    },
     priority: 250,
   },
 
@@ -335,6 +363,11 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     },
     mechanism: "SN1",
+    selectivityProfile: {
+      stereochemistry: { mode: "racemization" },
+      mixture: "possible",
+      allowsRearrangement: true,
+    },
     selectivity: ["Racemization is common", "Carbocation rearrangements are possible"],
     limitations: [
       "The handler enumerates strictly favorable 1,2-hydride and 1,2-alkyl shifts (up to two consecutive shifts) before capture.",
@@ -369,6 +402,11 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     },
     mechanism: "SN1",
+    selectivityProfile: {
+      stereochemistry: { mode: "racemization" },
+      mixture: "possible",
+      allowsRearrangement: true,
+    },
     selectivity: ["Racemization is common", "Carbocation rearrangements are possible"],
     limitations: [
       "The handler enumerates strictly favorable 1,2-hydride and 1,2-alkyl shifts (up to two consecutive shifts) before alcohol capture.",
@@ -407,6 +445,11 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     },
     mechanism: "SN1",
+    selectivityProfile: {
+      stereochemistry: { mode: "racemization" },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
     selectivity: ["Resonance-stabilized carbocation", "Allylic resonance can create more than one capture site"],
     limitations: [
       "The current transform shows capture at the original leaving-group carbon and does not yet enumerate all resonance-related allylic substitution products.",
@@ -438,6 +481,11 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     },
     mechanism: "SN1",
+    selectivityProfile: {
+      stereochemistry: { mode: "racemization" },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
     selectivity: ["Resonance-stabilized carbocation"],
     limitations: [
       "Allylic resonance can permit alternative capture positions; the current transform displays the unrearranged capture constitution.",
@@ -470,9 +518,14 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     },
     mechanism: "E2",
+    selectivityProfile: {
+      stereochemistry: { mode: "e-preferred", stereoselective: true },
+      regiochemistry: { mode: "zaitsev", regioselective: true },
+      mixture: "possible",
+    },
     selectivity: ["Anti-periplanar beta H / leaving-group geometry", "Usually Zaitsev"],
     limitations: [
-      "The handler ranks constitutional alkene substitution but does not yet test 3D anti-periplanar conformers or assign E/Z geometry.",
+      "The handler ranks alkene constitution and explicitly generates E/Z for common acyclic disubstituted alkenes; 3D anti-periplanar conformers and more highly substituted alkene geometry are not yet solved.",
       "Primary and secondary substrates can show competing SN2.",
     ],
     productStatus: "representative",
@@ -502,9 +555,14 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     },
     mechanism: "E2",
+    selectivityProfile: {
+      stereochemistry: { mode: "e-preferred", stereoselective: true },
+      regiochemistry: { mode: "zaitsev", regioselective: true },
+      mixture: "possible",
+    },
     selectivity: ["Anti-periplanar geometry", "Usually Zaitsev"],
     limitations: [
-      "The handler ranks constitutional substitution but does not yet determine anti-periplanar conformer availability or E/Z stereochemistry.",
+      "The handler generates E/Z for common acyclic disubstituted alkenes, but does not yet determine anti-periplanar conformer availability or general trisubstituted/tetrasubstituted alkene geometry.",
       "Secondary substrates can show competing SN2.",
     ],
     productStatus: "representative",
@@ -534,9 +592,14 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     },
     mechanism: "E2",
+    selectivityProfile: {
+      stereochemistry: { mode: "e-preferred", stereoselective: true },
+      regiochemistry: { mode: "hofmann", regioselective: true },
+      mixture: "possible",
+    },
     selectivity: ["Anti-periplanar geometry", "Often Hofmann with a bulky base"],
     limitations: [
-      "The handler ranks constitutional alkene substitution but does not explicitly model steric approach trajectories, conformer populations, or E/Z geometry.",
+      "The handler generates common disubstituted E/Z products but does not explicitly model steric approach trajectories, conformer populations, or general highly substituted alkene geometry.",
     ],
     productStatus: "representative",
     priority: 274,
@@ -565,9 +628,14 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     },
     mechanism: "E2",
+    selectivityProfile: {
+      stereochemistry: { mode: "e-preferred", stereoselective: true },
+      regiochemistry: { mode: "zaitsev", regioselective: true },
+      mixture: "possible",
+    },
     selectivity: ["Anti-periplanar geometry", "Often Zaitsev with a small strong base"],
     limitations: [
-      "The handler does not yet model anti-periplanar conformer populations or E/Z stereochemistry.",
+      "The handler generates common acyclic disubstituted E/Z products but does not yet model anti-periplanar conformer populations or general highly substituted alkene geometry.",
     ],
     productStatus: "representative",
     priority: 276,
@@ -604,10 +672,16 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     },
     mechanism: "E1",
+    selectivityProfile: {
+      stereochemistry: { mode: "e-preferred", stereoselective: true },
+      regiochemistry: { mode: "zaitsev", regioselective: true },
+      mixture: "expected",
+      allowsRearrangement: true,
+    },
     selectivity: ["Usually Zaitsev", "Carbocation rearrangements are possible"],
     limitations: [
       "The E1 handler enumerates strictly favorable 1,2-hydride and 1,2-alkyl shifts before beta elimination, then ranks constitutional alkenes by Zaitsev substitution.",
-      "E/Z stereoisomers are not yet explicitly generated or ranked.",
+      "E/Z stereoisomers are explicitly generated for common acyclic disubstituted alkenes with E listed first; general highly substituted alkene geometry is not yet enumerated.",
       "Equal-stability shifts and detailed migratory aptitude are not automatically ranked.",
     ],
     productStatus: "representative",
@@ -639,10 +713,16 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       },
     },
     mechanism: "E1",
+    selectivityProfile: {
+      stereochemistry: { mode: "e-preferred", stereoselective: true },
+      regiochemistry: { mode: "zaitsev", regioselective: true },
+      mixture: "expected",
+      allowsRearrangement: true,
+    },
     selectivity: ["Usually Zaitsev", "Carbocation rearrangements are possible"],
     limitations: [
       "The E1 handler includes strictly favorable hydride/alkyl rearrangements before elimination.",
-      "E/Z stereoisomers are not yet explicitly generated or ranked.",
+      "E/Z stereoisomers are explicitly generated for common acyclic disubstituted alkenes with E listed first; general highly substituted alkene geometry is not yet enumerated.",
       "Equal-stability shifts and detailed migratory aptitude are not automatically ranked.",
     ],
     productStatus: "representative",

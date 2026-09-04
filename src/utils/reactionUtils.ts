@@ -8,13 +8,21 @@ export {
   isGenericReactionSmiles,
   normalizeKetcherRGroups,
   splitReactionComponents,
+  getSequentialConditionOptions,
+  runSequentialSynthesis,
+  predictNoReactionOutcomes,
 } from "./reactions";
 
 export type {
   ReactionComponent,
   ReactionPathway,
+  ReactionProductMixture,
+  ReactionProductMixtureKind,
   ReactionReactantRequirement,
   ReactionRule,
+  ReactionSelectivityProfile,
+  StereochemicalMode,
+  RegiochemicalMode,
   RetrosynthesisConfidence,
   RetrosynthesisPathway,
   MultistepSynthesisRoute,
@@ -23,4 +31,9 @@ export type {
   SynthesisRouteConfidence,
   SynthesisStep,
   SynthesisStepSource,
+  SequentialConditionOption,
+  SequentialSynthesisBranch,
+  SequentialSynthesisOptions,
+  SequentialSynthesisStep,
+  NoReactionOutcome,
 } from "./reactions";

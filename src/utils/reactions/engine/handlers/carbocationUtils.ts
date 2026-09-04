@@ -5,10 +5,11 @@ import {
 import { runReactionSmarts } from "../rdkitReaction";
 
 export type CarbocationShiftType = "none" | "hydride" | "alkyl";
+export type CarbocationLeavingGroup = "halide" | "alcohol";
 
 export type CarbocationPrecursor = {
   /**
-   * A virtual alkyl-halide precursor whose C-X bond marks the carbocation
+   * A virtual precursor whose C-leaving-group bond marks the carbocation
    * center after ionization. Shifted precursors are internal bookkeeping
    * structures; they are never shown directly to the user.
    */
@@ -22,44 +23,55 @@ type RearrangementOptions = {
   maxShiftDepth?: number;
   maxCandidates?: number;
   includeUnrearranged?: boolean;
+  leavingGroup?: CarbocationLeavingGroup;
 };
 
-const HALIDE_IONIZATION_SMARTS =
-  "[C;X4:1][Cl,Br,I:2]>>[C+:1]";
+const IONIZATION_SMARTS: Record<CarbocationLeavingGroup, string> = {
+  halide: "[C;X4:1][Cl,Br,I:2]>>[C+:1]",
+  // Acid-catalyzed alcohol reactions ionize after protonation. The neutral OH
+  // group is used as the graph marker here; protonation itself is a condition
+  // rather than a separate structural intermediate in PocketChem.
+  alcohol: "[C;X4:1][O;H1:2]>>[C+:1]",
+};
 
 /**
  * Virtual 1,2-hydride shift.
  *
  * Instead of trying to carry an explicit hydride atom through RDKit, the
- * leaving group is moved to the adjacent carbon. Ionizing this virtual halide
- * gives the same carbon skeleton / implicit-H bookkeeping as the rearranged
+ * leaving group is moved to the adjacent carbon. Ionizing this virtual
+ * precursor gives the same carbon skeleton / implicit-H bookkeeping as the rearranged
  * carbocation. The virtual structure is used only as an internal precursor.
  */
-const HYDRIDE_SHIFT_PRECURSOR_SMARTS =
-  "[C;X4:1]([Cl,Br,I:4])-[C;H1,H2,H3:2]>>[C:1]-[C:2][*:4]";
+const HYDRIDE_SHIFT_PRECURSOR_SMARTS: Record<CarbocationLeavingGroup, string> = {
+  halide:
+    "[C;X4:1]([Cl,Br,I:4])-[C;H1,H2,H3:2]>>[C:1]-[C:2][*:4]",
+  alcohol:
+    "[C;X4:1]([O;H1:4])-[C;H1,H2,H3:2]>>[C:1]-[C:2][O;H1:4]",
+};
 
 /**
  * Virtual 1,2-alkyl shift. A carbon substituent migrates from the carbon next
  * to the cation center onto the original cation carbon; the leaving-group
  * marker moves to the newly generated cation center.
- *
- * This representation can also capture simple ring-expansion migrations when
- * the migrated C-C bond belongs to a ring. Candidates are retained only when
- * the resulting carbocation is more stable than the precursor carbocation.
  */
-const ALKYL_SHIFT_PRECURSOR_SMARTS =
-  "[C;X4:1]([Cl,Br,I:4])-[C;X4:2]-[C:3]>>[C:1](-[C:3])-[C:2][*:4]";
+const ALKYL_SHIFT_PRECURSOR_SMARTS: Record<CarbocationLeavingGroup, string> = {
+  halide:
+    "[C;X4:1]([Cl,Br,I:4])-[C;X4:2]-[C:3]>>[C:1](-[C:3])-[C:2][*:4]",
+  alcohol:
+    "[C;X4:1]([O;H1:4])-[C;X4:2]-[C:3]>>[C:1](-[C:3])-[C:2][O;H1:4]",
+};
 
 function unique<T>(values: T[]): T[] {
   return [...new Set(values)];
 }
 
 async function getBestIonizedCarbocationScore(
-  virtualHalideSmiles: string
+  virtualPrecursorSmiles: string,
+  leavingGroup: CarbocationLeavingGroup,
 ): Promise<number | null> {
   const carbocations = await runReactionSmarts(
-    virtualHalideSmiles,
-    HALIDE_IONIZATION_SMARTS,
+    virtualPrecursorSmiles,
+    IONIZATION_SMARTS[leavingGroup],
     16
   );
 
@@ -81,12 +93,13 @@ async function getBestIonizedCarbocationScore(
 
 async function generateShiftedPrecursors(
   precursor: CarbocationPrecursor,
-  shiftType: Exclude<CarbocationShiftType, "none">
+  shiftType: Exclude<CarbocationShiftType, "none">,
+  leavingGroup: CarbocationLeavingGroup,
 ): Promise<CarbocationPrecursor[]> {
   const smarts =
     shiftType === "hydride"
-      ? HYDRIDE_SHIFT_PRECURSOR_SMARTS
-      : ALKYL_SHIFT_PRECURSOR_SMARTS;
+      ? HYDRIDE_SHIFT_PRECURSOR_SMARTS[leavingGroup]
+      : ALKYL_SHIFT_PRECURSOR_SMARTS[leavingGroup];
 
   const candidates = await runReactionSmarts(precursor.smiles, smarts, 24);
   const shifted: CarbocationPrecursor[] = [];
@@ -94,7 +107,7 @@ async function generateShiftedPrecursors(
   for (const candidateSmiles of unique(candidates)) {
     if (candidateSmiles === precursor.smiles) continue;
 
-    const score = await getBestIonizedCarbocationScore(candidateSmiles);
+    const score = await getBestIonizedCarbocationScore(candidateSmiles, leavingGroup);
     if (score === null) continue;
 
     // A 1,2-shift is only promoted automatically when it produces a clearly
@@ -115,8 +128,9 @@ async function generateShiftedPrecursors(
 }
 
 /**
- * Enumerate favorable 1,2-hydride and 1,2-alkyl rearrangements for an alkyl
- * halide that is about to undergo SN1/E1 ionization.
+ * Enumerate favorable 1,2-hydride and 1,2-alkyl rearrangements for a substrate
+ * about to undergo carbocation-forming SN1/E1 ionization. Alkyl halides and
+ * acid-activated alcohols share this same rearrangement engine.
  *
  * The algorithm deliberately follows only a short, strictly downhill path in
  * carbocation stability. That captures the standard O-Chem rearrangements
@@ -129,8 +143,12 @@ export async function enumerateCarbocationPrecursors(
   const maxShiftDepth = Math.max(0, options.maxShiftDepth ?? 2);
   const maxCandidates = Math.max(1, options.maxCandidates ?? 12);
   const includeUnrearranged = options.includeUnrearranged ?? true;
+  const leavingGroup = options.leavingGroup ?? "halide";
 
-  const originalScore = await getBestIonizedCarbocationScore(substrateSmiles);
+  const originalScore = await getBestIonizedCarbocationScore(
+    substrateSmiles,
+    leavingGroup,
+  );
   if (originalScore === null) {
     return includeUnrearranged
       ? [{
@@ -158,7 +176,11 @@ export async function enumerateCarbocationPrecursors(
 
     for (const precursor of frontier) {
       for (const shiftType of ["hydride", "alkyl"] as const) {
-        const candidates = await generateShiftedPrecursors(precursor, shiftType);
+        const candidates = await generateShiftedPrecursors(
+          precursor,
+          shiftType,
+          leavingGroup,
+        );
 
         for (const candidate of candidates) {
           if (seen.has(candidate.smiles)) continue;

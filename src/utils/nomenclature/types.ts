@@ -45,6 +45,19 @@ export type NamingStatus =
   | "functional-class"
   | "unsupported";
 
+
+export type StereoDescriptorKind = "tetrahedral" | "double-bond";
+export type StereoDescriptorValue = "R" | "S" | "E" | "Z";
+
+export type NomenclatureStereoDescriptor = {
+  kind: StereoDescriptorKind;
+  descriptor: StereoDescriptorValue;
+  locant: number | null;
+  atomIndex?: number;
+  bondAtomIndices?: [number, number];
+  source: "rdkit-cip";
+};
+
 export type NomenclatureResult = {
   estimatedName: string;
   commonName: string | null;
@@ -58,6 +71,8 @@ export type NomenclatureResult = {
   explanation: string;
   limitations: string[];
   motifs?: string[];
+  stereodescriptors?: NomenclatureStereoDescriptor[];
+  stereoPrefix?: string | null;
 };
 
 export type MoleculeIdentityResult = {

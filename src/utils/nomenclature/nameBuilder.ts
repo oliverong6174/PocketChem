@@ -104,6 +104,40 @@ export function buildEstimatedIupacName(
   }
 
   const rawPrimaryGroup = getPrimaryFunctionalGroup(functionalGroups, mainGroup);
+
+  // Charged intermediates need to be named before suffix intent is inferred.
+  // Otherwise names such as "amide anion" are mistaken for the neutral amide
+  // suffix family and valid reaction intermediates fall through as unsupported.
+  const hasIonNamingCandidate = [
+    ...(mainGroup ? [mainGroup] : []),
+    ...functionalGroups,
+  ].some((group) =>
+    group.category === "ion" ||
+    group.name.trim().toLowerCase() === "benzenediazonium"
+  );
+
+  if (hasIonNamingCandidate) {
+    const ionClassName = getFunctionalClassName(
+      parsedMol,
+      functionalGroups,
+      mainGroup
+    );
+
+    if (ionClassName) {
+      return {
+        estimatedName: ionClassName.name,
+        confidence: ionClassName.confidence,
+        status: "functional-class",
+        reason: ionClassName.reason,
+        parent: null,
+        features: [],
+        primaryFeature: null,
+        substituents: [],
+        parentIndependent: true,
+      };
+    }
+  }
+
   const rawNamingIntent = getNamingIntent(rawPrimaryGroup);
 
   // Some O-chem families are more legible as functional-class names than as

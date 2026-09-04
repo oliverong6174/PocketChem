@@ -4,6 +4,7 @@ import type { FunctionalGroupResult } from "../functionalGroups/types";
 import type {
   MoleculeIdentityResult,
   NomenclatureResult,
+  ParentDescriptor,
   ParsedMol,
 } from "./types";
 
@@ -13,6 +14,9 @@ export type {
   PropertyTendencyResult,
   MoleculePropertyResult,
   NomenclatureResult,
+  NomenclatureStereoDescriptor,
+  StereoDescriptorKind,
+  StereoDescriptorValue,
   MoleculeIdentityResult,
   NamingStatus,
 } from "./types";
@@ -40,6 +44,7 @@ import { getNamingConfidence } from "./confidence";
 import { buildLimitations } from "./limitations";
 
 import { detectAromaticMotifs } from "./motifs";
+import { analyzeStereoNomenclature, applyStereoPrefix } from "./stereoNomenclature";
 
 function isMolBlockInput(input: string) {
   return (
@@ -135,7 +140,10 @@ function getPrefixes(
 
 function estimateNomenclature(
   RDKit: { get_qmol: (smarts: string) => { delete?: () => void } | null },
-  mol: { get_substruct_matches: (query: { delete?: () => void }) => string },
+  mol: {
+    get_substruct_matches: (query: { delete?: () => void }) => string;
+    get_stereo_tags?: () => string;
+  },
   parsedMol: ParsedMol,
   functionalGroups: FunctionalGroupResult[],
   mainGroup: FunctionalGroupResult | null,
@@ -161,6 +169,49 @@ function estimateNomenclature(
 
   const prefixes = getPrefixes(functionalGroups, mainGroup);
   const motifs = detectAromaticMotifs(parsedMol);
+
+  const finalize = (
+    result: NomenclatureResult,
+    parent: ParentDescriptor | null,
+    applyToName = true,
+  ): NomenclatureResult => {
+    const stereo = analyzeStereoNomenclature(mol, parsedMol, parent);
+    if (stereo.descriptors.length === 0) return result;
+
+    if (!applyToName || !stereo.prefix) {
+      return {
+        ...result,
+        stereodescriptors: stereo.descriptors,
+        stereoPrefix: null,
+        limitations: [...result.limitations, ...stereo.limitations],
+      };
+    }
+
+    const decoratedEstimatedName = applyStereoPrefix(
+      result.estimatedName,
+      stereo.prefix,
+    );
+    const commonAlias =
+      result.commonName && result.commonName !== result.estimatedName
+        ? result.commonName
+        : null;
+
+    return {
+      ...result,
+      estimatedName: decoratedEstimatedName,
+      displayName: formatDisplayName(decoratedEstimatedName, commonAlias),
+      stereodescriptors: stereo.descriptors,
+      stereoPrefix: stereo.prefix,
+      explanation: `${result.explanation} Assigned ${stereo.descriptors
+        .map((descriptor) =>
+          descriptor.locant === null
+            ? descriptor.descriptor
+            : `${descriptor.locant}${descriptor.descriptor}`,
+        )
+        .join(", ")} stereochemistry from the molecular structure.`,
+      limitations: [...result.limitations, ...stereo.limitations],
+    };
+  };
 
   // Whole-molecule carbohydrate recognition has priority over generic
   // saturated O-heterocycle naming.  Otherwise a perfectly recognized sugar
@@ -191,7 +242,7 @@ function estimateNomenclature(
     structureFirstCarbohydrates.has(structureCommonName.name);
 
   if (recognizedWholeCarbohydrate && structureCommonName) {
-    return {
+    return finalize({
       estimatedName: structureCommonName.name,
       commonName: structureCommonName.name,
       displayName: structureCommonName.name,
@@ -205,7 +256,7 @@ function estimateNomenclature(
       explanation:
         `Recognized the complete stereochemically specified carbohydrate structure as ${structureCommonName.name}.`,
       limitations: [],
-    };
+    }, null, false);
   }
 
   if (heterocycleResult) {
@@ -217,7 +268,7 @@ function estimateNomenclature(
       commonName && commonName !== heterocycleResult.name ? commonName : null
     );
 
-    return {
+    return finalize({
       estimatedName: heterocycleResult.name,
       commonName,
       displayName,
@@ -231,7 +282,7 @@ function estimateNomenclature(
       motifs,
       explanation: heterocycleResult.explanation,
       limitations: heterocycleResult.limitations,
-    };
+    }, null);
   }
 
   const namingResult = buildEstimatedIupacName(
@@ -242,7 +293,7 @@ function estimateNomenclature(
 
   if (!namingResult) {
     if (structureCommonName?.name) {
-      return {
+      return finalize({
         estimatedName: structureCommonName.name,
         commonName: structureCommonName.name,
         displayName: structureCommonName.name,
@@ -256,14 +307,14 @@ function estimateNomenclature(
         explanation:
           `Recognized this molecular structure as ${structureCommonName.name}; a systematic parent name is not yet available for this structure.`,
         limitations: [],
-      };
+      }, null);
     }
 
     const fallbackName = mainGroup
       ? `${mainGroup.name} derivative`
       : "Name not estimated yet";
 
-    return {
+    return finalize({
       estimatedName: fallbackName,
       commonName: null,
       displayName: fallbackName,
@@ -279,7 +330,7 @@ function estimateNomenclature(
       limitations: [
         "Complex branching, fused rings, stereochemistry, and full IUPAC tie-breaking are still in development.",
       ],
-    };
+    }, null, false);
   }
 
   const estimatedName = namingResult.estimatedName ?? "Name not estimated yet";
@@ -296,7 +347,7 @@ function estimateNomenclature(
   );
 
   if (!parent) {
-    return {
+    return finalize({
       estimatedName,
       commonName,
       displayName,
@@ -319,7 +370,7 @@ function estimateNomenclature(
         : namingResult.parentIndependent
         ? []
         : ["Parent-chain/ring resolution is incomplete for this structure."],
-    };
+    }, null);
   }
 
   const lowerPriorityFeatures = features.filter(
@@ -355,7 +406,7 @@ function estimateNomenclature(
     explanationLines.push(`Detected ${substituents.length} substituent(s).`);
   }
 
-  return {
+  return finalize({
     estimatedName,
     commonName,
     displayName,
@@ -373,5 +424,5 @@ function estimateNomenclature(
         : [
             "This is an estimated learning name, not a full IUPAC engine yet.",
           ],
-  };
+  }, parent);
 }

@@ -45,30 +45,27 @@ export const alkeneReactionRules: ReactionRule[] = [
 
   {
     id: "deuteration",
-
-
-    reactionType: "reduction",
     family: "alkenes",
-
+    reactionType: "reduction",
     title: "Catalytic Deuteration",
-
-    reagents: "D2, Pd",
-
-    reagentNote: "Syn deuterium addition",
-
-    productHint: "Deuterated alkane",
-
+    reagents: "D₂, Pd/C",
+    reagentNote: "Syn addition of D₂",
+    productHint: "1,2-Dideuterated alkane",
     explanation:
-        "Catalytic addition of deuterium labels the alkene with two deuterium atoms.",
-
+      "Catalytic deuteration adds one explicit deuterium (D) to each alkene carbon. PocketChem keeps the isotope atoms in the product structure so the D labels can be drawn.",
     trigger: alkeneTrigger,
-
     transform: {
       type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]([2H])[C:2]([2H])",
     },
-
-    priority: 105
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: ["D and D add to the same face of the alkene (syn addition)."],
+    priority: 105,
   },
 
   {
@@ -77,49 +74,137 @@ export const alkeneReactionRules: ReactionRule[] = [
     reactionType: "addition",
     title: "HX Addition: Hydrobromination",
     reagents: "HBr",
-    reagentNote: "Markovnikov hydrohalogenation",
+    reagentNote: "Hydrohalogenation",
     productHint: "Alkyl bromide",
     explanation:
-      "HBr adds across the alkene to form an alkyl bromide.",
+      "Under ordinary ionic conditions, HBr protonates the alkene and bromide attacks the more stable carbocation. For an unsymmetrical alkene this normally places Br on the more substituted carbon.",
     trigger: alkeneTrigger,
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]=[C:2]>>[C:1]([Br])[C:2]",
+      type: "customHandler",
+      handler: "addition",
+      options: {
+        mode: "alkeneHydrohalogenation",
+        halogen: "Br",
+        regioselectivity: "markovnikov",
+      },
     },
-    productStatus: "representative",
-    selectivity: ["Markovnikov orientation; carbocation rearrangements may occur"],
+    productStatus: "computed",
+    selectivityProfile: {
+      regiochemistry: { mode: "markovnikov", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: true,
+    },
+    selectivity: [
+      "For an unsymmetrical alkene, Br is normally placed on the more substituted carbon (Markovnikov orientation).",
+      "Carbocation rearrangements can occur under the ionic mechanism.",
+    ],
+    limitations: [
+      "The current hydrohalogenation handler enforces the unrearranged Markovnikov connectivity; carbocation rearrangements are not yet generated for this alkene rule.",
+    ],
     priority: 110,
   },
 
   {
-    id: "alkene-hbr-peroxide",
-
-
-    reactionType: "radical",
+    id: "alkene-hx-addition-hcl",
     family: "alkenes",
-
-    title: "Hydrobromination (Peroxide Effect)",
-
-    reagents: "HBr, ROOR",
-
-    reagentNote: "Anti-Markovnikov radical addition",
-
-    productHint: "Alkyl bromide",
-
+    reactionType: "addition",
+    title: "HX Addition: Hydrochlorination",
+    reagents: "HCl",
+    reagentNote: "Hydrohalogenation",
+    productHint: "Alkyl chloride",
     explanation:
-        "Radical addition of HBr in the presence of peroxides gives the anti-Markovnikov product.",
-
+      "Under ordinary ionic conditions, HCl protonates the alkene and chloride attacks the more stable carbocation. For an unsymmetrical alkene this normally places Cl on the more substituted carbon.",
     trigger: alkeneTrigger,
-
     transform: {
-        type: "reactionSmarts",
-        smarts: "[C:1]=[C:2]>>[C:1][C:2]([Br])"
+      type: "customHandler",
+      handler: "addition",
+      options: {
+        mode: "alkeneHydrohalogenation",
+        halogen: "Cl",
+        regioselectivity: "markovnikov",
+      },
     },
-    productStatus: "representative",
-    selectivity: ["Anti-Markovnikov orientation; radical mechanism"],
+    productStatus: "computed",
+    selectivityProfile: {
+      regiochemistry: { mode: "markovnikov", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: true,
+    },
+    selectivity: [
+      "For an unsymmetrical alkene, Cl is normally placed on the more substituted carbon (Markovnikov orientation).",
+      "Carbocation rearrangements can occur under the ionic mechanism.",
+    ],
+    limitations: [
+      "The current hydrohalogenation handler enforces the unrearranged Markovnikov connectivity; carbocation rearrangements are not yet generated for this alkene rule.",
+    ],
+    priority: 111,
+  },
 
-    priority: 115
-},
+  {
+    id: "alkene-hx-addition-hi",
+    family: "alkenes",
+    reactionType: "addition",
+    title: "HX Addition: Hydroiodination",
+    reagents: "HI",
+    reagentNote: "Hydrohalogenation",
+    productHint: "Alkyl iodide",
+    explanation:
+      "Under ordinary ionic conditions, HI protonates the alkene and iodide attacks the more stable carbocation. For an unsymmetrical alkene this normally places I on the more substituted carbon.",
+    trigger: alkeneTrigger,
+    transform: {
+      type: "customHandler",
+      handler: "addition",
+      options: {
+        mode: "alkeneHydrohalogenation",
+        halogen: "I",
+        regioselectivity: "markovnikov",
+      },
+    },
+    productStatus: "computed",
+    selectivityProfile: {
+      regiochemistry: { mode: "markovnikov", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: true,
+    },
+    selectivity: [
+      "For an unsymmetrical alkene, I is normally placed on the more substituted carbon (Markovnikov orientation).",
+      "Carbocation rearrangements can occur under the ionic mechanism.",
+    ],
+    limitations: [
+      "The current hydrohalogenation handler enforces the unrearranged Markovnikov connectivity; carbocation rearrangements are not yet generated for this alkene rule.",
+    ],
+    priority: 112,
+  },
+
+  {
+    id: "alkene-hbr-peroxide",
+    family: "alkenes",
+    reactionType: "radical",
+    title: "Hydrobromination (Peroxide Effect)",
+    reagents: "HBr, ROOR",
+    reagentNote: "Radical HBr addition",
+    productHint: "Alkyl bromide",
+    explanation:
+      "In the presence of peroxides, HBr adds by a radical-chain mechanism and gives the anti-Markovnikov constitutional product.",
+    trigger: alkeneTrigger,
+    transform: {
+      type: "customHandler",
+      handler: "addition",
+      options: {
+        mode: "alkeneHydrohalogenation",
+        halogen: "Br",
+        regioselectivity: "anti-markovnikov",
+      },
+    },
+    productStatus: "computed",
+    selectivityProfile: {
+      regiochemistry: { mode: "anti-markovnikov", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: ["Br goes to the less substituted alkene carbon (anti-Markovnikov)."],
+    priority: 115,
+  },
 
   {
     id: "alkene-halogenation-bromine",
@@ -150,15 +235,75 @@ export const alkeneReactionRules: ReactionRule[] = [
     reagentNote: "Anti addition of Br and OH",
     productHint: "Halohydrin",
     explanation:
-      "Water opens the bromonium ion, giving an alcohol and bromide on adjacent carbons.",
+      "The alkene forms a bromonium ion, then water attacks the more substituted carbon. The result is a vicinal bromohydrin with OH on the more substituted carbon and Br on the less substituted carbon.",
     trigger: alkeneTrigger,
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]=[C:2]>>[C:1]([Br])[C:2]([OH])",
+      type: "customHandler",
+      handler: "addition",
+      options: {
+        mode: "halohydrin",
+        halogen: "Br",
+      },
     },
-    productStatus: "representative",
-    selectivity: ["OH goes to the more substituted carbon; anti addition"],
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      regiochemistry: { mode: "directed", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "OH goes to the more substituted alkene carbon and Br to the less substituted carbon.",
+      "Br and OH add anti through bromonium-ion opening.",
+    ],
+    limitations: [
+      "The current product graph enforces the correct constitutional orientation; explicit anti stereocenter assignment will be completed in the alkene stereochemistry phase.",
+    ],
     priority: 130,
+  },
+
+  {
+    id: "alkene-haloether-formation",
+    family: "alkenes",
+    reactionType: "addition",
+    title: "Haloether Formation",
+    reagents: "Br₂, ROH",
+    reagentNote: "Anti addition of Br and OR",
+    productHint: "Vicinal bromoether",
+    explanation:
+      "An alcohol opens the bromonium ion formed from the alkene. The alcohol's OR group bonds to the more substituted alkene carbon while Br remains on the less substituted carbon, giving a haloether.",
+    trigger: alkeneTrigger,
+    additionalReactants: [
+      {
+        label: "alcohol (ROH)",
+        trigger: {
+          includeSmarts: ["[O;H1][C;X4;!$(C=O)]"],
+        },
+      },
+    ],
+    transform: {
+      type: "customHandler",
+      handler: "addition",
+      options: {
+        mode: "haloether",
+        halogen: "Br",
+      },
+    },
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      regiochemistry: { mode: "directed", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "OR goes to the more substituted alkene carbon and Br to the less substituted carbon.",
+      "Br and OR add anti through bromonium-ion opening.",
+    ],
+    limitations: [
+      "The supplied alcohol's actual R group is carried into the ether. Explicit anti stereocenter assignment will be completed in the alkene stereochemistry phase.",
+    ],
+    priority: 132,
   },
 
   {
@@ -166,11 +311,11 @@ export const alkeneReactionRules: ReactionRule[] = [
     family: "alkenes",
     reactionType: "addition",
     title: "Acid-Catalyzed Hydration",
-    reagents: "H₃O⁺",
-    reagentNote: "Markovnikov hydration",
+    reagents: "H₂O/H⁺ (e.g. H₂O + dilute H₂SO₄ or H₃PO₄)",
+    reagentNote: "Acid-catalyzed hydration",
     productHint: "Alcohol",
     explanation:
-      "Acid-catalyzed hydration adds water across the alkene to form an alcohol.",
+      "Water adds across the alkene under acidic conditions. For an unsymmetrical alkene, protonation favors the more stable carbocation, so OH normally ends up on the more substituted carbon.",
     trigger: alkeneTrigger,
     transform: {
       type: "customHandler",
@@ -180,10 +325,18 @@ export const alkeneReactionRules: ReactionRule[] = [
         regioselectivity: "markovnikov",
       },
     },
-    productStatus: "representative",
-    selectivity: ["Markovnikov orientation; rearrangements may occur"],
+    productStatus: "computed",
+    selectivityProfile: {
+      regiochemistry: { mode: "markovnikov", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: true,
+    },
+    selectivity: [
+      "For an unsymmetrical alkene, OH normally forms on the more substituted carbon (Markovnikov orientation).",
+      "Carbocation rearrangements may occur.",
+    ],
     limitations: [
-      "The current hydration handler enforces constitutional Markovnikov regiochemistry but does not yet model carbocation rearrangements.",
+      "The current hydration handler enforces the unrearranged Markovnikov connectivity but does not yet generate carbocation-rearranged hydration products.",
     ],
     priority: 140,
   },
@@ -194,7 +347,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     reactionType: "oxidation",
     title: "Hydroboration-Oxidation",
     reagents: "1) BH₃·THF  2) H₂O₂, NaOH",
-    reagentNote: "Anti-Markovnikov, syn hydration",
+    reagentNote: "Syn hydration",
     productHint: "Alcohol",
     explanation:
       "Hydroboration-oxidation hydrates the alkene with anti-Markovnikov orientation.",
@@ -208,6 +361,12 @@ export const alkeneReactionRules: ReactionRule[] = [
       },
     },
     productStatus: "representative",
+    selectivityProfile: {
+      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      regiochemistry: { mode: "anti-markovnikov", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
     selectivity: ["Anti-Markovnikov and syn addition"],
     limitations: [
       "The current hydration handler enforces anti-Markovnikov connectivity; syn stereochemistry is not yet assigned explicitly in the product structure.",
@@ -223,7 +382,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     reactionType: "addition",
     title: "Oxymercuration-Demercuration",
     reagents: "1) Hg(OAc)₂, H₂O  2) NaBH₄",
-    reagentNote: "Markovnikov hydration, no rearrangement",
+    reagentNote: "Hydration without rearrangement",
     productHint: "Alcohol",
     explanation:
       "Oxymercuration-demercuration converts an alkene to a Markovnikov alcohol without rearrangement.",
@@ -237,38 +396,127 @@ export const alkeneReactionRules: ReactionRule[] = [
       },
     },
     productStatus: "representative",
+    selectivityProfile: {
+      regiochemistry: { mode: "markovnikov", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
     selectivity: ["Markovnikov orientation without rearrangement"],
     priority: 160,
   },
 
   {
-    id: "alkene-simmons-smith",
-
-
-    reactionType: "addition",
+    id: "alkene-alkoxymercuration-demercuration",
     family: "alkenes",
-
-    title: "Simmons–Smith Cyclopropanation",
-
-    reagents: "CH2I2, Zn(Cu)",
-
-    reagentNote: "Cyclopropane formation",
-
-    productHint: "Cyclopropane",
-
+    reactionType: "addition",
+    title: "Alkoxymercuration-Demercuration",
+    reagents: "1) Hg(OAc)₂, ROH  2) NaBH₄",
+    reagentNote: "Markovnikov ether formation without rearrangement",
+    productHint: "Ether",
     explanation:
-        "A methylene carbene equivalent inserts across the double bond to form a cyclopropane.",
-
+      "Alkoxymercuration-demercuration adds OR and H across an alkene. The oxygen of the supplied alcohol becomes bonded to the more substituted alkene carbon, giving a Markovnikov ether without a free carbocation rearrangement.",
     trigger: alkeneTrigger,
-
+    additionalReactants: [
+      {
+        label: "alcohol (ROH)",
+        trigger: {
+          includeSmarts: ["[O;H1][C;X4;!$(C=O)]"],
+        },
+      },
+    ],
     transform: {
-        type: "reactionSmarts",
-        smarts: "[C:1]=[C:2]>>[C:1]1[C][C:2]1"
+      type: "customHandler",
+      handler: "addition",
+      options: {
+        mode: "alkoxymercuration",
+      },
+    },
+    productStatus: "computed",
+    selectivityProfile: {
+      regiochemistry: { mode: "markovnikov", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "OR goes to the more substituted alkene carbon (Markovnikov orientation).",
+      "No carbocation rearrangement is expected.",
+    ],
+    priority: 162,
+  },
+
+  {
+    id: "alkene-simmons-smith",
+    family: "alkenes",
+    reactionType: "addition",
+    title: "Simmons–Smith Cyclopropanation",
+    reagents: "CH₂I₂, Zn(Cu)",
+    reagentNote: "Cyclopropane formation",
+    productHint: "Cyclopropane",
+    explanation:
+      "A methylene carbenoid adds across the double bond to form a cyclopropane while preserving the alkene's relative stereochemistry.",
+    trigger: alkeneTrigger,
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1]=[C:2]>>[C:1]1[C][C:2]1",
     },
     productStatus: "representative",
-    selectivity: ["Stereospecific syn cyclopropanation"],
+    selectivityProfile: {
+      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: ["Stereospecific cyclopropanation; alkene geometry is retained in the ring relationship."],
+    priority: 165,
+  },
 
-    priority: 165
+  {
+    id: "alkene-dichlorocyclopropanation",
+    family: "alkenes",
+    reactionType: "addition",
+    title: "Dichlorocyclopropanation",
+    reagents: "CHCl₃, strong base (e.g. NaOH)",
+    reagentNote: "Dichlorocarbene cyclopropanation",
+    productHint: "Gem-dichlorocyclopropane",
+    explanation:
+      "Base generates dichlorocarbene (:CCl₂) from chloroform. The carbene adds across the alkene to form a cyclopropane bearing two chlorines on the newly inserted carbon.",
+    trigger: alkeneTrigger,
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1]=[C:2]>>[C:1]1[C]([Cl])([Cl])[C:2]1",
+    },
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: ["Carbene addition is stereospecific and preserves the alkene's relative stereochemistry."],
+    priority: 166,
+  },
+
+  {
+    id: "alkene-dibromocyclopropanation",
+    family: "alkenes",
+    reactionType: "addition",
+    title: "Dibromocyclopropanation",
+    reagents: "CHBr₃, strong base (e.g. NaOH)",
+    reagentNote: "Dibromocarbene cyclopropanation",
+    productHint: "Gem-dibromocyclopropane",
+    explanation:
+      "Base generates dibromocarbene (:CBr₂) from bromoform. The carbene adds across the alkene to form a cyclopropane bearing two bromines on the newly inserted carbon.",
+    trigger: alkeneTrigger,
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1]=[C:2]>>[C:1]1[C]([Br])([Br])[C:2]1",
+    },
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: ["Carbene addition is stereospecific and preserves the alkene's relative stereochemistry."],
+    priority: 167,
   },
 
   {
@@ -276,8 +524,8 @@ export const alkeneReactionRules: ReactionRule[] = [
     family: "alkenes",
     reactionType: "oxidation",
     title: "Epoxidation",
-    reagents: "mCPBA",
-    reagentNote: "Concerted oxygen transfer",
+    reagents: "mCPBA; or RCO₃H (peroxyacid)",
+    reagentNote: "Peroxyacid epoxidation",
     productHint: "Epoxide",
     explanation:
       "A peroxyacid converts the alkene into a three-membered epoxide ring.",
@@ -296,43 +544,26 @@ export const alkeneReactionRules: ReactionRule[] = [
     family: "alkenes",
     reactionType: "oxidation",
     title: "Syn Dihydroxylation",
-    reagents: "OsO₄, NMO",
+    reagents: "OsO₄/H₂O₂; OsO₄/NMO; or KMnO₄/OH⁻, cold/dilute",
     reagentNote: "Syn addition of two OH groups",
     productHint: "Vicinal diol",
     explanation:
-      "Syn dihydroxylation adds two hydroxyl groups across the alkene.",
+      "Syn dihydroxylation adds two hydroxyl groups to the same face of the alkene. Common reagent systems are OsO₄ with H₂O₂, OsO₄ with NMO, or cold dilute basic KMnO₄.",
     trigger: alkeneTrigger,
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]=[C:2]>>[C:1]([OH])[C:2]([OH])",
+      type: "customHandler",
+      handler: "addition",
+      options: { mode: "synDihydroxylation" },
     },
-    productStatus: "representative",
-    selectivity: ["Syn addition"],
-    priority: 180,
-  },
-
-  {
-    id: "cold-kmno4",
-    family: "alkenes",
-    reactionType: "oxidation",
-    title: "Cold Permanganate Oxidation",
-    reagents: "KMnO4, OH⁻, H₂O, cold/dilute",
-    reagentNote: "Syn dihydroxylation",
-    productHint: "Vicinal syn diol",
-    explanation:
-      "Cold, dilute permanganate adds two hydroxyl groups syn across an alkene.",
-    trigger: alkeneTrigger,
-    transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]=[C:2]>>[C:1]([OH])[C:2]([OH])",
-    },
-    productStatus: "representative",
+    productStatus: "computed",
     mechanism: "Syn dihydroxylation",
-    selectivity: ["Syn addition of the two hydroxyl groups"],
-    limitations: [
-      "The current product graph does not encode newly formed stereocenters explicitly.",
-    ],
-    priority: 181,
+    selectivityProfile: {
+      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      mixture: "expected",
+      allowsRearrangement: false,
+    },
+    selectivity: ["Both OH groups add to the same face of the alkene (syn addition)."],
+    priority: 180,
   },
 
   {
@@ -347,11 +578,17 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Epoxidation followed by acid-catalyzed ring opening gives an anti vicinal diol.",
     trigger: alkeneTrigger,
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]=[C:2]>>[C:1]([OH])[C:2]([OH])",
+      type: "customHandler",
+      handler: "addition",
+      options: { mode: "antiDihydroxylation" },
     },
-    productStatus: "representative",
-    selectivity: ["Anti addition"],
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      mixture: "expected",
+      allowsRearrangement: false,
+    },
+    selectivity: ["The two OH groups end up on opposite faces (anti addition)."],
     priority: 190,
   },
 
@@ -386,9 +623,13 @@ export const alkeneReactionRules: ReactionRule[] = [
         "Oxidative workup converts any aldehydes formed during ozonolysis into carboxylic acids while ketones remain ketones.",
     trigger: alkeneTrigger,
     transform: {
-      type: "conceptOnly",
-      reason: "Oxidative workup treats alkene carbons differently depending on whether they bear hydrogen; an oxidation-state-aware cleavage handler is required.",
+      type: "customHandler",
+      handler: "oxidation",
+      options: {
+        mode: "alkeneOxidativeCleavage",
+      },
     },
+    productStatus: "computed",
     priority: 201
 },
 

@@ -1,9 +1,9 @@
-import { getRDKit } from "../../functionalGroups";
 import type {
   MultistepSynthesisProgress,
   MultistepSynthesisRoute,
   MultistepSynthesisSearchOptions,
   ReactionPathway,
+  ReactionProductMixtureKind,
   ReactionRule,
   RetrosynthesisPathway,
   SynthesisStep,
@@ -15,6 +15,12 @@ import {
 } from "./reactionInput";
 import { predictReactionPathwaysFromRules } from "./reactionEngine";
 import { predictRetrosynthesisPathwaysFromRules } from "./retroSynthesis";
+import {
+  canonicalizeStereoStructure,
+  compareStereoStructureKeys,
+  stereochemicalMixtureCanSatisfyTarget,
+  type CanonicalStereoStructure,
+} from "./stereochemistry";
 
 const DEFAULT_MAX_STEPS = 6;
 const DEFAULT_BEAM_WIDTH = 10;
@@ -24,12 +30,16 @@ const DEFAULT_MAX_ROUTES = 4;
 type StartingMaterial = {
   smiles: string;
   canonical: string;
+  connectivity: string;
+  hasSpecifiedStereo: boolean;
 };
 
 type SearchNode = {
   smiles: string;
   canonical: string;
   connectivity: string;
+  hasSpecifiedStereo: boolean;
+  stereoMixture: ReactionProductMixtureKind | null;
   depth: number;
   rank: number;
   steps: SynthesisStep[];
@@ -59,23 +69,10 @@ function clampInteger(
   return Math.min(maximum, Math.max(minimum, Math.round(value)));
 }
 
-function connectivityKey(canonicalSmiles: string): string {
-  return canonicalSmiles.replace(/@@?/g, "").replace(/[\\/]/g, "");
-}
-
-async function canonicalizeSmiles(smiles: string): Promise<string | null> {
-  const normalized = normalizeKetcherRGroups(smiles);
-  const rdkit = await getRDKit();
-  const mol = rdkit.get_mol(normalized);
-  if (!mol) return null;
-
-  try {
-    return mol.get_smiles?.() ?? null;
-  } catch {
-    return null;
-  } finally {
-    mol.delete?.();
-  }
+async function canonicalizeSmiles(
+  smiles: string,
+): Promise<CanonicalStereoStructure | null> {
+  return canonicalizeStereoStructure(normalizeKetcherRGroups(smiles));
 }
 
 function pathwayPriority(
@@ -93,7 +90,7 @@ function containsCarbonAtom(smiles: string): boolean {
 
 function searchStateKey(node: SearchNode): string {
   const used = [...node.usedStartingMaterialIndices].sort((a, b) => a - b).join(",");
-  return `${node.canonical}::${used}`;
+  return `${node.canonical}::${node.stereoMixture ?? "pure-or-unspecified"}::${used}`;
 }
 
 function usedStartingMaterialsOverlap(a: SearchNode, b: SearchNode): boolean {
@@ -117,14 +114,14 @@ async function matchStartingMaterialSideReactants(
     // the product skeleton.
     if (!containsCarbonAtom(sideComponent)) continue;
 
-    const canonical = await canonicalizeSmiles(sideComponent);
-    if (!canonical) return null;
+    const structure = await canonicalizeSmiles(sideComponent);
+    if (!structure) return null;
 
     const matchIndex = startingMaterials.findIndex(
       (reactant, index) =>
         !unavailable.has(index) &&
         !allocated.includes(index) &&
-        reactant.canonical === canonical,
+        reactant.canonical === structure.isomeric,
     );
 
     if (matchIndex < 0) return null;
@@ -160,8 +157,10 @@ function forwardStepFromPathway(pathway: ReactionPathway): SynthesisStep | null 
     reactionClass: pathway.reactionClass,
     purpose: pathway.purpose,
     selectivity: pathway.selectivity,
+    selectivityProfile: pathway.selectivityProfile,
     limitations: pathway.limitations,
     retrosynthesisConfidence: null,
+    productMixture: pathway.productMixture,
   };
 }
 
@@ -189,9 +188,64 @@ function retroStepFromPathway(pathway: RetrosynthesisPathway): SynthesisStep {
     reactionClass: pathway.reactionClass,
     purpose: pathway.purpose,
     selectivity: pathway.selectivity,
+    selectivityProfile: pathway.selectivityProfile,
     limitations: pathway.limitations,
     retrosynthesisConfidence: pathway.confidence,
+    productMixture: pathway.productMixture,
   };
+}
+
+function nodeStructure(node: SearchNode): CanonicalStereoStructure {
+  return {
+    isomeric: node.canonical,
+    connectivity: node.connectivity,
+    hasSpecifiedStereo: node.hasSpecifiedStereo,
+  };
+}
+
+function propagatedStereoMixture(
+  parent: SearchNode,
+  step: SynthesisStep,
+  product: CanonicalStereoStructure,
+): ReactionProductMixtureKind | null {
+  // If the reaction destroys every currently specified stereogenic element,
+  // the former stereochemical mixture has converged to one achiral/unspecified
+  // structure and no longer blocks a later exact target match.
+  if (!product.hasSpecifiedStereo) return null;
+
+  if (step.productMixture) return step.productMixture.kind;
+
+  // A later stereospecific transformation of a racemate still operates on
+  // both members. Conservatively keep mixture provenance until a reaction
+  // explicitly removes the stereochemical distinction.
+  if (parent.stereoMixture) {
+    return parent.stereoMixture === "racemic"
+      ? "stereoisomeric"
+      : parent.stereoMixture;
+  }
+
+  return null;
+}
+
+function searchNodesCanMeet(
+  forwardNode: SearchNode,
+  retroNode: SearchNode,
+): boolean {
+  const match = compareStereoStructureKeys(
+    nodeStructure(forwardNode),
+    nodeStructure(retroNode),
+  );
+  if (match !== "exact" && match !== "connectivity-only") return false;
+
+  // If the backward side requires a specified stereoisomer, a forward state
+  // known to be a mixture cannot satisfy it merely because that mixture
+  // contains the requested member. The reverse case is included for symmetry
+  // even though current retro nodes normally describe precursor purity rather
+  // than product-mixture provenance.
+  if (forwardNode.stereoMixture && retroNode.hasSpecifiedStereo) return false;
+  if (retroNode.stereoMixture && forwardNode.hasSpecifiedStereo) return false;
+
+  return true;
 }
 
 function keepBestNodes(nodes: SearchNode[], beamWidth: number): SearchNode[] {
@@ -241,7 +295,7 @@ async function expandForwardLayer(
   beamWidth: number,
   branchLimit: number,
   allowGeneric: boolean,
-  targetCanonical: string,
+  targetStructure: CanonicalStereoStructure,
   preferredKeys: Set<string>,
   startingMaterials: StartingMaterial[],
   signal?: AbortSignal,
@@ -289,13 +343,24 @@ async function expandForwardLayer(
         for (let index = 0; index < productComponents.length; index += 1) {
           if (searchCancelled(signal)) return [];
           const continuation = productComponents[index];
-          const canonical = await canonicalizeSmiles(continuation);
-          if (!canonical || parent.history.includes(canonical)) continue;
+          const structure = await canonicalizeSmiles(continuation);
+          if (!structure || parent.history.includes(structure.isomeric)) continue;
 
-          const directTargetBonus = canonical === targetCanonical ? -1000 : 0;
-          const bridgeBonus = preferredKeys.has(canonical) ? -500 : 0;
+          const nextStereoMixture = propagatedStereoMixture(
+            parent,
+            step,
+            structure,
+          );
+          const exactTarget = structure.isomeric === targetStructure.isomeric;
+          const targetAcceptsMixture = stereochemicalMixtureCanSatisfyTarget(
+            nextStereoMixture,
+            targetStructure,
+          );
+          const directTargetBonus = exactTarget && targetAcceptsMixture ? -1000 : 0;
+          const bridgeBonus = preferredKeys.has(structure.isomeric) ? -500 : 0;
           const representationPenalty = pathway.productStatus === "computed" ? 0 : 12;
-          const mixturePenalty = Math.max(0, productComponents.length - 1) * 4;
+          const componentMixturePenalty = Math.max(0, productComponents.length - 1) * 4;
+          const stereochemicalMixturePenalty = nextStereoMixture ? 24 : 0;
           const continuationPenalty = index * 2;
           const suppliedReactantBonus = input.startingMaterialIndex === null ? 0 : -120;
           const usedStartingMaterialIndices = input.startingMaterialIndex === null
@@ -304,20 +369,23 @@ async function expandForwardLayer(
 
           candidates.push({
             smiles: continuation,
-            canonical,
-            connectivity: connectivityKey(canonical),
+            canonical: structure.isomeric,
+            connectivity: structure.connectivity,
+            hasSpecifiedStereo: structure.hasSpecifiedStereo,
+            stereoMixture: nextStereoMixture,
             depth: parent.depth + 1,
             rank:
               parent.rank +
               pathwayPriority(pathway.ruleId, priorityByRuleId) +
               representationPenalty +
-              mixturePenalty +
+              componentMixturePenalty +
+              stereochemicalMixturePenalty +
               continuationPenalty +
               suppliedReactantBonus +
               directTargetBonus +
               bridgeBonus,
             steps: [...parent.steps, step],
-            history: [...parent.history, canonical],
+            history: [...parent.history, structure.isomeric],
             usedStartingMaterialIndices,
           });
         }
@@ -356,8 +424,8 @@ async function expandRetroLayer(
       for (let index = 0; index < pathway.precursorComponents.length; index += 1) {
         if (searchCancelled(signal)) return [];
         const continuation = pathway.precursorComponents[index];
-        const canonical = await canonicalizeSmiles(continuation);
-        if (!canonical || parent.history.includes(canonical)) continue;
+        const structure = await canonicalizeSmiles(continuation);
+        if (!structure || parent.history.includes(structure.isomeric)) continue;
 
         const sideComponents = pathway.precursorComponents.filter(
           (_component, componentIndex) => componentIndex !== index,
@@ -370,8 +438,8 @@ async function expandRetroLayer(
         );
         if (matchedStartingMaterials === null) continue;
 
-        const directStartBonus = startCanonicals.has(canonical) ? -1000 : 0;
-        const bridgeBonus = preferredKeys.has(canonical) ? -500 : 0;
+        const directStartBonus = startCanonicals.has(structure.isomeric) ? -1000 : 0;
+        const bridgeBonus = preferredKeys.has(structure.isomeric) ? -500 : 0;
         const confidencePenalty = pathway.confidence === "confirmed" ? 0 : 18;
         const multiReactantPenalty = Math.max(0, sideComponents.length) * 6;
         const continuationPenalty = index * 2;
@@ -379,8 +447,10 @@ async function expandRetroLayer(
 
         candidates.push({
           smiles: continuation,
-          canonical,
-          connectivity: connectivityKey(canonical),
+          canonical: structure.isomeric,
+          connectivity: structure.connectivity,
+          hasSpecifiedStereo: structure.hasSpecifiedStereo,
+          stereoMixture: null,
           depth: parent.depth + 1,
           rank:
             parent.rank +
@@ -392,7 +462,7 @@ async function expandRetroLayer(
             directStartBonus +
             bridgeBonus,
           steps: [step, ...parent.steps],
-          history: [...parent.history, canonical],
+          history: [...parent.history, structure.isomeric],
           usedStartingMaterialIndices: [
             ...parent.usedStartingMaterialIndices,
             ...matchedStartingMaterials,
@@ -448,11 +518,16 @@ function buildRoutesFromLayers(
   const seen = new Map<string, MultistepSynthesisRoute>();
 
   for (const forwardNode of forwardNodes) {
-    const exactMatches = retroByCanonical.get(forwardNode.canonical) ?? [];
+    const exactMatches = (retroByCanonical.get(forwardNode.canonical) ?? [])
+      .filter((node) => searchNodesCanMeet(forwardNode, node));
     const matches = exactMatches.length > 0
       ? exactMatches.map((node) => ({ node, connectivityBridge: false }))
       : (retroByConnectivity.get(forwardNode.connectivity) ?? [])
-          .filter((node) => node.canonical !== forwardNode.canonical)
+          .filter(
+            (node) =>
+              node.canonical !== forwardNode.canonical &&
+              searchNodesCanMeet(forwardNode, node),
+          )
           .map((node) => ({ node, connectivityBridge: true }));
 
     for (const match of matches) {
@@ -477,7 +552,11 @@ function buildRoutesFromLayers(
         targetSmiles,
         steps,
         confidence: connectivityOnly ? "connectivity-verified" : "verified",
-        score: steps.length * 1000 + forwardNode.rank + retroNode.rank,
+        score:
+          steps.length * 1000 +
+          forwardNode.rank +
+          retroNode.rank +
+          (forwardNode.stereoMixture ? 40 : 0),
       };
 
       const existing = seen.get(signature);
@@ -555,12 +634,18 @@ export async function findMultistepSynthesisRoutesFromRules(
   const startingMaterials: StartingMaterial[] = [];
   for (const component of startComponents) {
     if (!(await yieldToBrowser(signal))) return [];
-    const canonical = await canonicalizeSmiles(component);
-    if (!canonical) return [];
-    startingMaterials.push({ smiles: component, canonical });
+    const structure = await canonicalizeSmiles(component);
+    if (!structure) return [];
+    startingMaterials.push({
+      smiles: component,
+      canonical: structure.isomeric,
+      connectivity: structure.connectivity,
+      hasSpecifiedStereo: structure.hasSpecifiedStereo,
+    });
   }
 
-  const targetCanonical: string = targetCanonicalResult;
+  const targetStructure = targetCanonicalResult;
+  const targetCanonical = targetStructure.isomeric;
   const startCanonicals = new Set(
     startingMaterials.map((material) => material.canonical),
   );
@@ -589,7 +674,9 @@ export async function findMultistepSynthesisRoutesFromRules(
     startingMaterials.map((material, index) => ({
       smiles: material.smiles,
       canonical: material.canonical,
-      connectivity: connectivityKey(material.canonical),
+      connectivity: material.connectivity,
+      hasSpecifiedStereo: material.hasSpecifiedStereo,
+      stereoMixture: null,
       depth: 0,
       rank: 0,
       steps: [],
@@ -602,7 +689,9 @@ export async function findMultistepSynthesisRoutesFromRules(
       {
         smiles: normalizedTarget,
         canonical: targetCanonical,
-        connectivity: connectivityKey(targetCanonical),
+        connectivity: targetStructure.connectivity,
+        hasSpecifiedStereo: targetStructure.hasSpecifiedStereo,
+        stereoMixture: null,
         depth: 0,
         rank: 0,
         steps: [],
@@ -624,7 +713,7 @@ export async function findMultistepSynthesisRoutesFromRules(
         beamWidth,
         branchLimit,
         allowGeneric,
-        targetCanonical,
+        targetStructure,
         knownStructureKeys(retroLayers),
         startingMaterials,
         signal,

@@ -28,12 +28,13 @@ function primaryOnly(handler: SingleReactantHandler): MultiReactantHandler {
 
 /**
  * Most chemistry handlers are still intentionally one-substrate executors.
- * Substitution is the first custom handler that genuinely consumes structural
- * partner reactants (SN1/SN2 nucleophiles), so it receives the whole ordered
- * reactant list. The adapter keeps all other handlers backward compatible.
+ * Addition and substitution can consume structural partner reactants (for
+ * example alkoxymercuration alcohols and SN1/SN2 nucleophiles), so they receive
+ * the whole ordered reactant list. The adapter keeps single-substrate handlers
+ * backward compatible.
  */
 const handlers: Record<ReactionHandlerName, MultiReactantHandler> = {
-  addition: primaryOnly(addition),
+  addition,
   substitution,
   elimination: primaryOnly(elimination),
   carbonyl: primaryOnly(carbonyl),
