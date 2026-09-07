@@ -6,6 +6,7 @@ import { oxidation } from "./oxidation";
 import { reduction } from "./reduction";
 import { ring } from "./ring";
 import { rearrangement } from "./rearrangement";
+import { pericyclic } from "./pericyclic";
 import type { ReactionHandlerName } from "../../reactionTypes";
 
 type HandlerResult = string | string[] | null;
@@ -28,10 +29,9 @@ function primaryOnly(handler: SingleReactantHandler): MultiReactantHandler {
 
 /**
  * Most chemistry handlers are still intentionally one-substrate executors.
- * Addition and substitution can consume structural partner reactants (for
- * example alkoxymercuration alcohols and SN1/SN2 nucleophiles), so they receive
- * the whole ordered reactant list. The adapter keeps single-substrate handlers
- * backward compatible.
+ * Addition, substitution, ring-opening, and pericyclic handlers can consume
+ * structural partner reactants, so they receive the whole ordered reactant
+ * list. The adapter keeps genuinely single-substrate handlers backward compatible.
  */
 const handlers: Record<ReactionHandlerName, MultiReactantHandler> = {
   addition,
@@ -40,8 +40,9 @@ const handlers: Record<ReactionHandlerName, MultiReactantHandler> = {
   carbonyl: primaryOnly(carbonyl),
   oxidation: primaryOnly(oxidation),
   reduction: primaryOnly(reduction),
-  ring: primaryOnly(ring),
+  ring,
   rearrangement: primaryOnly(rearrangement),
+  pericyclic,
 };
 
 export async function runCustomHandler(

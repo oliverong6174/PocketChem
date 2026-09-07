@@ -51,6 +51,8 @@ import {
 import { getWholeMoleculeRetainedName } from "./nameBuilder/retainedNames";
 import { getFunctionalClassName } from "./nameBuilder/functionalClassNames";
 import { getNamingGuardResult } from "./nameBuilder/namingGuard";
+import { getOrganometallicName } from "./nameBuilder/organometallicNames";
+import { getPolycyclicHydrocarbonName } from "./nameBuilder/polycyclicHydrocarbonNames";
 
 type EstimatedIupacResult = {
   estimatedName: string;
@@ -83,6 +85,38 @@ export function buildEstimatedIupacName(
       substituents: [],
     };
   }
+  const organometallicName = getOrganometallicName(parsedMol);
+
+  if (organometallicName) {
+    return {
+      estimatedName: organometallicName.name,
+      confidence: organometallicName.confidence,
+      status: "functional-class",
+      reason: organometallicName.reason,
+      parent: null,
+      features: [],
+      primaryFeature: null,
+      substituents: [],
+      parentIndependent: true,
+    };
+  }
+
+  const polycyclicHydrocarbonName = getPolycyclicHydrocarbonName(parsedMol);
+
+  if (polycyclicHydrocarbonName) {
+    return {
+      estimatedName: polycyclicHydrocarbonName.name,
+      confidence: polycyclicHydrocarbonName.confidence,
+      status: "systematic",
+      reason: polycyclicHydrocarbonName.reason,
+      parent: null,
+      features: [],
+      primaryFeature: null,
+      substituents: [],
+      parentIndependent: true,
+    };
+  }
+
   const retainedWholeMoleculeName = getWholeMoleculeRetainedName(
     parsedMol,
     functionalGroups,

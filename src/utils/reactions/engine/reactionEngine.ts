@@ -17,6 +17,7 @@ import {
 } from "./reactionInput";
 import { runReactionSmarts } from "./rdkitReaction";
 import { classifyReactionProducts } from "./productMixtures";
+import { applyRuleProductSelectivity } from "./productSelectivity";
 import {
   filterRulesMatchingReactant,
   matchAllRuleReactants,
@@ -269,9 +270,15 @@ async function createExecutedPathways(
     }];
   }
 
+  const selectedProducts = await applyRuleProductSelectivity(
+    rule,
+    reactants[0]?.smiles ?? reactantSmiles,
+    execution.products,
+  );
+
   const classifiedProducts = await classifyReactionProducts(
     rule,
-    execution.products,
+    selectedProducts,
   );
   const namedProducts = await Promise.all(
     classifiedProducts.map(async (product) => ({
@@ -334,7 +341,7 @@ function dedupeReactionPathways(pathways: ReactionPathway[]): ReactionPathway[] 
   for (const pathway of pathways) {
     const key = [
       pathway.ruleId,
-      pathway.reactantComponents.join("."),
+      [...pathway.reactantComponents].sort().join("."),
       pathway.productSmiles ?? "<no-product>",
       pathway.productStatus,
     ].join("||");
@@ -385,6 +392,41 @@ async function createMissingReactantPathway(
   };
 }
 
+function suppressCompetingSameConditionRules(rules: ReactionRule[]): ReactionRule[] {
+  const ids = new Set(rules.map((rule) => rule.id));
+  const suppressed = new Set<string>();
+
+  // A vicinal diol under concentrated strong acid + heat is a pinacol
+  // substrate. Do not simultaneously show the ordinary isolated-alcohol E1
+  // cards for the exact same condition; that was the source of duplicate
+  // alkenol products on cyclic 1,2-diols.
+  if (ids.has("pinacol-rearrangement")) {
+    suppressed.add("alcohol-dehydration-alkene");
+    suppressed.add("alcohol-dehydration-primary");
+  }
+
+  // Likewise, when the substrate-specific excess-HBr vicinal-diol rule is
+  // available, suppress the one-OH-at-a-time HBr rules. The dedicated rule
+  // consumes both adjacent hydroxyls and reports any stereoisomeric outcome as
+  // one mixture card rather than repeated identical HBr reaction lines.
+  if (ids.has("vicinal-diol-hbr-substitution")) {
+    suppressed.add("alcohol-hbr-substitution-primary");
+    suppressed.add("alcohol-hbr-substitution-sn1");
+  }
+
+  // A conjugated diene has allylic-cation 1,2/1,4 chemistry.  Once the diene
+  // rules are available, do not also run the ordinary isolated-alkene HX rule
+  // once for every C=C in the diene.  That produced duplicate HBr/HCl/HI cards
+  // and chemically hid the temperature-dependent 1,2 versus 1,4 outcome.
+  if ([...ids].some((id) => id.startsWith("diene-hx-"))) {
+    suppressed.add("alkene-hx-addition-hcl");
+    suppressed.add("alkene-hx-addition-hbr");
+    suppressed.add("alkene-hx-addition-hi");
+  }
+
+  return rules.filter((rule) => !suppressed.has(rule.id));
+}
+
 export async function predictReactionPathwaysFromRules(
   reactantSmiles: string,
   functionalGroups: FunctionalGroupResult[] = [],
@@ -428,10 +470,12 @@ export async function predictReactionPathwaysFromRules(
   const missingMulti: Array<{ rule: ReactionRule; reactant: ReactionComponent }> = [];
 
   for (const component of components) {
-    const componentRules = await filterRulesMatchingReactant(
-      rules,
-      component.smiles,
-      component.functionalGroups,
+    const componentRules = suppressCompetingSameConditionRules(
+      await filterRulesMatchingReactant(
+        rules,
+        component.smiles,
+        component.functionalGroups,
+      ),
     );
 
     for (const rule of componentRules) {

@@ -1,4 +1,5 @@
 import type { ReactionRule } from "../reactionTypes";
+import { GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS } from "../organometallic";
 
 const nitrileTrigger = {
   anyFunctionalGroups: ["Nitrile"],
@@ -81,17 +82,17 @@ export const nitrileReactionRules: ReactionRule[] = [
     id: "nitrile-grignard-ketone",
     family: "nitriles",
     reactionType: "addition",
-    title: "Grignard Addition to a Nitrile",
-    reagents: "1) RMgX  2) H₃O⁺",
+    title: "Grignard/Organolithium Addition to a Nitrile",
+    reagents: "1) RMgCl, RMgBr, RMgI, or RLi  2) H₃O⁺",
     reagentNote: "Addition followed by imine hydrolysis",
     productHint: "Ketone",
     explanation:
-      "A Grignard reagent adds once to a nitrile. Hydrolysis of the resulting imine gives a ketone.",
+      "A Grignard or organolithium reagent adds once to a nitrile. Hydrolysis of the resulting imine gives a ketone.",
     trigger: nitrileTrigger,
     additionalReactants: [
       {
         label: "Grignard or organolithium reagent",
-        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+        trigger: { includeSmarts: [GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS] },
       },
     ],
     transform: {

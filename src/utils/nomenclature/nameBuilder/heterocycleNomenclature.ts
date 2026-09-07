@@ -55,6 +55,42 @@ const HETEROCYCLE_TEMPLATES: HeterocycleTemplate[] = [
     minUnsaturatedBonds: 3,
   },
   {
+    name: "benzofuran",
+    stem: "benzofuran",
+    smarts: "[o]1[cH][cH][c]2[cH][cH][cH][cH][c]1~2",
+    locants: [1, 2, 3, "3a", 4, 5, 6, 7, "7a"],
+  },
+  {
+    name: "2,3-dihydrobenzofuran",
+    stem: "2,3-dihydrobenzofuran",
+    smarts: "[O]1[CH2][CH2][c]2[cH][cH][cH][cH][c]1~2",
+    locants: [1, 2, 3, "3a", 4, 5, 6, 7, "7a"],
+  },
+  {
+    name: "benzothiophene",
+    stem: "benzothiophen",
+    smarts: "[s]1[cH][cH][c]2[cH][cH][cH][cH][c]1~2",
+    locants: [1, 2, 3, "3a", 4, 5, 6, 7, "7a"],
+  },
+  {
+    name: "2,3-dihydrobenzothiophene",
+    stem: "2,3-dihydrobenzothiophen",
+    smarts: "[S]1[CH2][CH2][c]2[cH][cH][cH][cH][c]1~2",
+    locants: [1, 2, 3, "3a", 4, 5, 6, 7, "7a"],
+  },
+  {
+    name: "1,3-benzodioxole",
+    stem: "1,3-benzodioxol",
+    smarts: "[O]1[CH2][O][c]2[cH][cH][cH][cH][c]1~2",
+    locants: [1, 2, 3, "3a", 4, 5, 6, 7, "7a"],
+  },
+  {
+    name: "indoline",
+    stem: "indolin",
+    smarts: "[N;H1]1[CH2][CH2][c]2[cH][cH][cH][cH][c]1~2",
+    locants: [1, 2, 3, "3a", 4, 5, 6, 7, "7a"],
+  },
+  {
     name: "indole",
     stem: "indol",
     smarts: "[#7]1~[#6]~[#6]~[#6]2~[#6]~[#6]~[#6]~[#6]~[#6]1~2",

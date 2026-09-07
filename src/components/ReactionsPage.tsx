@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
@@ -25,6 +25,28 @@ type Props = {
 };
 
 type SvgListMap = Record<string, string[]>;
+type ProductVariantSvgMap = Record<string, string[][]>;
+
+type DisplayProductVariant = {
+  completeSmiles: string;
+  componentSmiles: string[];
+  label: string;
+};
+
+type HalogenSymbol = "Cl" | "Br" | "I";
+const HALOGEN_SYMBOLS: readonly HalogenSymbol[] = ["Cl", "Br", "I"];
+
+type HalogenDisplaySeries = {
+  key: string;
+  ruleIds: string[];
+  halogens: HalogenSymbol[];
+};
+
+type DisplayReactionPathway = ReactionPathway & {
+  productVariants: DisplayProductVariant[];
+  halogenSeries: HalogenDisplaySeries | null;
+};
+
 type AnalysisMode = "forward" | "retrosynthesis";
 const RESULTS_PER_BATCH = 12;
 
@@ -70,108 +92,280 @@ function missingReactionInputMessage(pathway: ReactionPathway): string {
   return `Add ${formatReactantList(requiredLabels)} to the same canvas to compute the exact structure`;
 }
 
-function shouldDisplayForwardPathway(pathway: ReactionPathway): boolean {
-  // A visible reaction card must either have a real product structure or tell
-  // the student exactly which additional structural reactant to draw.
-  if (pathway.productSmiles) return true;
-  return missingReactionInputLabels(pathway).length > 0;
+function shouldDisplayForwardPathway(_pathway: ReactionPathway): boolean {
+  // If a catalog rule matched the drawn substrate(s), keep it visible even
+  // when the current structure generator cannot yet draw the exact product.
+  // Hiding matched-but-uncomputed rules made legitimate chemistry appear to be
+  // absent from the database (notably highly substituted Diels–Alder cases and
+  // concept-level multistep reactions). The card already carries a product
+  // hint and model limitation, so showing it is more informative than silently
+  // dropping it.
+  return true;
 }
 
-function isGenericHalogenRuleId(ruleId: string): boolean {
-  return (
-    /^alkene-hx-addition-/.test(ruleId) ||
-    /^alkyne-(hcl|hbr|hi)-addition-/.test(ruleId) ||
-    /^alkyne-(bromination|chlorination)-/.test(ruleId) ||
-    ruleId === "alkene-halogenation-bromine" ||
-    ruleId === "alkene-halohydrin-formation" ||
-    ruleId === "alkene-haloether-formation" ||
-    ruleId === "alkene-allylic-bromination"
-  );
-}
-
-function normalizedHalogenDisplayRuleId(ruleId: string): string {
+function generalizeHalogenRuleId(ruleId: string): string {
   return ruleId
-    .replace(/alkene-hx-addition-(hcl|hbr|hi)/, "alkene-hx-addition-hx")
-    .replace(/alkyne-(hcl|hbr|hi)-addition-/g, "alkyne-hx-addition-")
-    .replace(/alkyne-(bromination|chlorination)-/g, "alkyne-halogenation-")
-    .replace(/allylic-bromination/g, "allylic-halogenation");
+    .toLowerCase()
+    .replace(/(^|-)(?:hcl|hbr|hi)(?=-|$)/g, "$1hx")
+    .replace(/chlorination|bromination|iodination/g, "halogenation")
+    .replace(/chloride|bromide|iodide/g, "halide")
+    .replace(/chlorine|bromine|iodine/g, "halogen")
+    .replace(/chloro|bromo|iodo/g, "halo")
+    .replace(/-{2,}/g, "-");
 }
 
-function collapseDisplayEquivalentPathways(pathways: ReactionPathway[]): ReactionPathway[] {
-  const seen = new Set<string>();
-
-  return pathways.filter((pathway) => {
-    const baseKey = pathway.productMixture
-      ? `${pathway.ruleId}::${pathway.reactantSmiles}::${pathway.productMixture.groupId}`
-      : `${pathway.ruleId}::${pathway.reactantSmiles}::${pathway.productSmiles ?? ""}`;
-
-    const key = isGenericHalogenRuleId(pathway.ruleId)
-      ? `${normalizedHalogenDisplayRuleId(pathway.ruleId)}::${pathway.reactantSmiles}::${pathway.productStatus}`
-      : baseKey;
-
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+function generalizeHalogenText(text: string): string {
+  return text
+    .replace(/chlorination|bromination|iodination/gi, "halogenation")
+    .replace(/chloride|bromide|iodide/gi, "halide")
+    .replace(/chlorine|bromine|iodine/gi, "halogen")
+    .replace(/chloro|bromo|iodo/gi, "halo")
+    .replace(/HCl|HBr|HI/g, "HX")
+    .replace(/Cl|Br/g, "X")
+    .replace(/\bI(?=[0-9₀-₉+\-.,;)\s]|$)/g, "X");
 }
 
-function displayPathwayTitle(pathway: Pick<ReactionPathway, "ruleId" | "title">): string {
-  if (/^alkene-hx-addition-/.test(pathway.ruleId)) return "HX Addition: Hydrohalogenation";
-  if (/^alkyne-hx-addition-/.test(normalizedHalogenDisplayRuleId(pathway.ruleId))) {
-    return pathway.ruleId.includes("excess")
-      ? "Hydrohalogenation: Excess HX"
-      : "Hydrohalogenation: HX (1 equiv)";
+
+function generalizeHalogenSeriesReagent(text: string): string {
+  return generalizeHalogenText(text)
+    // A catalog sibling may give one common classroom temperature explicitly
+    // (for example HBr at 40 °C) while the parallel HCl/HI rules say
+    // "higher temperature". Once the siblings are condensed into HX, do not
+    // make that one numerical example look mandatory for every X.
+    .replace(/40\s*°?\s*C/gi, "higher temperature")
+    .replace(/higher temperature\s*,\s*higher temperature/gi, "higher temperature");
+}
+function halogensMentionedByRule(rule: (typeof reactionRegistry)[number]): HalogenSymbol[] {
+  const source = `${rule.id} ${rule.title} ${rule.reagents} ${rule.productHint}`;
+  const found = new Set<HalogenSymbol>();
+
+  if (/hcl|chlor|\bCl\b|Cl[0-9₀-₉]/i.test(source)) found.add("Cl");
+  if (/hbr|brom|\bBr\b|Br[0-9₀-₉]/i.test(source)) found.add("Br");
+  if (/\bhi\b|iod|\bI\b|I[0-9₀-₉]/i.test(source)) found.add("I");
+
+  return HALOGEN_SYMBOLS.filter((symbol) => found.has(symbol));
+}
+
+function halogenSeriesSignature(rule: (typeof reactionRegistry)[number]): string | null {
+  if (halogensMentionedByRule(rule).length === 0) return null;
+
+  return [
+    rule.family,
+    rule.reactionType,
+    generalizeHalogenRuleId(rule.id),
+    generalizeHalogenText(rule.title).toLowerCase(),
+    generalizeHalogenText(rule.productHint).toLowerCase(),
+    generalizeHalogenText(rule.reagentNote).toLowerCase(),
+    rule.mechanism?.toLowerCase() ?? "",
+  ].join("::");
+}
+
+const HALOGEN_SERIES_BY_RULE_ID = (() => {
+  const candidates = new Map<
+    string,
+    { ruleIds: string[]; halogens: Set<HalogenSymbol> }
+  >();
+
+  for (const rule of reactionRegistry) {
+    const signature = halogenSeriesSignature(rule);
+    if (!signature) continue;
+    const entry = candidates.get(signature) ?? { ruleIds: [], halogens: new Set<HalogenSymbol>() };
+    entry.ruleIds.push(rule.id);
+    for (const halogen of halogensMentionedByRule(rule)) entry.halogens.add(halogen);
+    candidates.set(signature, entry);
   }
-  if (/^alkyne-halogenation-/.test(normalizedHalogenDisplayRuleId(pathway.ruleId))) {
-    return pathway.ruleId.includes("excess")
-      ? "Halogenation: Excess X₂"
-      : "Halogenation: X₂ (1 equiv)";
+
+  const byRuleId = new Map<
+    string,
+    { key: string; ruleIds: string[]; halogens: HalogenSymbol[] }
+  >();
+
+  for (const [key, entry] of candidates) {
+    // Only create a display series when the catalog actually contains at least
+    // two parallel rules differing by halogen identity. A lone HBr-specific
+    // reaction (for example the peroxide effect) must remain explicitly HBr.
+    if (entry.ruleIds.length < 2 || entry.halogens.size < 2) continue;
+    const series = {
+      key,
+      ruleIds: entry.ruleIds,
+      halogens: HALOGEN_SYMBOLS.filter((symbol) => entry.halogens.has(symbol)),
+    };
+    for (const ruleId of entry.ruleIds) byRuleId.set(ruleId, series);
   }
-  if (pathway.ruleId === "alkene-halogenation-bromine") return "Halogenation";
-  if (pathway.ruleId === "alkene-halohydrin-formation") return "Halohydrin Formation";
-  if (pathway.ruleId === "alkene-haloether-formation") return "Haloether Formation";
-  if (pathway.ruleId === "alkene-allylic-bromination") return "Allylic Halogenation";
+
+  return byRuleId;
+})();
+
+function activeHalogenSeriesKey(pathway: ReactionPathway): string | null {
+  return HALOGEN_SERIES_BY_RULE_ID.get(pathway.ruleId)?.key ?? null;
+}
+
+function hasFixedHalogenInReactants(pathway: ReactionPathway): boolean {
+  return pathway.reactantComponents.some((component) => /Cl|Br|\bI\b/.test(component));
+}
+
+function shouldRenderGenericHalogen(pathway: DisplayReactionPathway): boolean {
+  return Boolean(pathway.halogenSeries) && !hasFixedHalogenInReactants(pathway);
+}
+
+function productVariantsForPathway(pathway: ReactionPathway): DisplayProductVariant[] {
+  // A racemate is one reaction outcome, not two regioisomer alternatives.
+  // Keep both enantiomers in productMixture.memberSmiles for chemistry/search,
+  // but draw one representative enantiomer on the reaction card and label the
+  // bottle as racemic. Diastereomeric/constitutional alternatives remain
+  // individually visible because they are not interchangeable.
+  const completeProducts = pathway.productMixture?.kind === "racemic"
+    ? (pathway.productSmiles ? [pathway.productSmiles] : [])
+    : pathway.productMixture?.memberSmiles ??
+      (pathway.productSmiles ? [pathway.productSmiles] : []);
+
+  return completeProducts.map((completeSmiles) => ({
+    completeSmiles,
+    componentSmiles: completeSmiles
+      .split(".")
+      .map((component) => component.trim())
+      .filter(Boolean),
+    label: pathway.productMixture?.displayName ?? pathway.productLabel,
+  }));
+}
+
+/**
+ * One ReactionRule should render as one reaction line.  RDKit legitimately
+ * returns several products when the same rule can react at several equivalent
+ * or nonequivalent sites (EAS on a substituted arene, allylic substitution,
+ * etc.).  Those are product alternatives, not separate reactions.
+ *
+ * Keeping the alternatives on the grouped card fixes the old behavior where a
+ * molecule with four aromatic C-H sites produced four identical nitration,
+ * sulfonation, and bromination cards.
+ */
+function groupDisplayPathways(pathways: ReactionPathway[]): DisplayReactionPathway[] {
+  const candidates = collapseMixtureMembers(pathways).filter(shouldDisplayForwardPathway);
+
+  // A catalog-level halogen family is condensed only when two or more sibling
+  // rules are actually present for THIS substrate. This prevents a specific
+  // HBr-only reaction from being mislabeled HX merely because related rules
+  // exist elsewhere in the catalog.
+  const activeRulesByScopedSeries = new Map<string, Set<string>>();
+  for (const pathway of candidates) {
+    const seriesKey = activeHalogenSeriesKey(pathway);
+    if (!seriesKey) continue;
+    const scopedKey = [seriesKey, pathway.reactantSmiles, pathway.productStatus].join("::");
+    const ruleIds = activeRulesByScopedSeries.get(scopedKey) ?? new Set<string>();
+    ruleIds.add(pathway.ruleId);
+    activeRulesByScopedSeries.set(scopedKey, ruleIds);
+  }
+
+  const grouped = new Map<string, DisplayReactionPathway>();
+  const variantKeys = new Map<string, Set<string>>();
+
+  for (const pathway of candidates) {
+    const catalogSeries = HALOGEN_SERIES_BY_RULE_ID.get(pathway.ruleId) ?? null;
+    const scopedSeriesKey = catalogSeries
+      ? [catalogSeries.key, pathway.reactantSmiles, pathway.productStatus].join("::")
+      : null;
+    const activeRuleIds = scopedSeriesKey
+      ? activeRulesByScopedSeries.get(scopedSeriesKey) ?? new Set<string>()
+      : new Set<string>();
+    const useSeries = Boolean(catalogSeries && activeRuleIds.size >= 2);
+
+    const key = useSeries
+      ? `halogen-series::${scopedSeriesKey}`
+      : [pathway.ruleId, pathway.reactantSmiles, pathway.productStatus].join("::");
+
+    const variants = productVariantsForPathway(pathway);
+    const existing = grouped.get(key);
+
+    if (!existing) {
+      const actualHalogens: HalogenSymbol[] = useSeries
+        ? HALOGEN_SYMBOLS.filter((symbol) =>
+            [...activeRuleIds].some((ruleId) =>
+              HALOGEN_SERIES_BY_RULE_ID.get(ruleId)?.halogens.includes(symbol),
+            ),
+          )
+        : [];
+
+      grouped.set(key, {
+        ...pathway,
+        productVariants: [],
+        halogenSeries: useSeries && catalogSeries
+          ? {
+              key: catalogSeries.key,
+              ruleIds: [...activeRuleIds],
+              halogens: actualHalogens,
+            }
+          : null,
+      });
+      variantKeys.set(key, new Set<string>());
+    }
+
+    const target = grouped.get(key)!;
+
+    // If X can safely replace every product halogen (the starting structures
+    // contain no fixed Cl/Br/I), one sibling rule is enough to draw the generic
+    // product. Otherwise retain the literal sibling products on ONE card so a
+    // pre-existing halogen is never incorrectly relabeled X.
+    if (
+      target.halogenSeries &&
+      target.ruleId !== pathway.ruleId &&
+      shouldRenderGenericHalogen(target)
+    ) {
+      continue;
+    }
+
+    const seen = variantKeys.get(key)!;
+    for (const variant of variants) {
+      if (seen.has(variant.completeSmiles)) continue;
+      seen.add(variant.completeSmiles);
+      target.productVariants.push(variant);
+    }
+  }
+
+  return [...grouped.values()];
+}
+
+type HalogenAwareDisplayText = {
+  ruleId: string;
+  halogenSeries?: HalogenDisplaySeries | null;
+};
+
+function displayPathwayTitle(
+  pathway: HalogenAwareDisplayText & { title: string },
+): string {
+  if (pathway.halogenSeries) {
+    return generalizeHalogenText(pathway.title);
+  }
   return pathway.title;
 }
 
-function displayReagentLabel(pathway: Pick<ReactionPathway, "ruleId" | "reagentLabel">): string {
-  if (/^alkene-hx-addition-/.test(pathway.ruleId)) return "HX";
-  if (/^alkyne-hx-addition-/.test(normalizedHalogenDisplayRuleId(pathway.ruleId))) {
-    return pathway.ruleId.includes("excess") ? "excess HX" : "1 equiv HX";
+function displayReagentLabel(
+  pathway: HalogenAwareDisplayText & { reagentLabel: string },
+): string {
+  if (pathway.halogenSeries) {
+    return generalizeHalogenSeriesReagent(pathway.reagentLabel);
   }
-  if (pathway.ruleId === "alkene-halogenation-bromine") return "X₂";
-  if (pathway.ruleId === "alkene-halohydrin-formation") return "X₂; H₂O";
-  if (pathway.ruleId === "alkene-haloether-formation") return "X₂; ROH";
-  if (/^alkyne-halogenation-/.test(normalizedHalogenDisplayRuleId(pathway.ruleId))) {
-    return pathway.ruleId.includes("excess") ? "excess X₂" : "1 equiv X₂";
-  }
-  if (pathway.ruleId === "alkene-allylic-bromination") return "NXS; hν or radical initiator";
   return pathway.reagentLabel;
 }
 
-function displayProductLabel(pathway: ReactionPathway): string {
-  if (/^alkene-hx-addition-/.test(pathway.ruleId)) return "Alkyl halide";
-  if (/^alkyne-hx-addition-/.test(normalizedHalogenDisplayRuleId(pathway.ruleId))) {
-    return pathway.ruleId.includes("excess") ? "Geminal dihalide" : "Vinyl halide";
+function displayProductLabel(pathway: ReactionPathway | DisplayReactionPathway): string {
+  if ("halogenSeries" in pathway && pathway.halogenSeries) {
+    return generalizeHalogenText(pathway.productMixture?.displayName ?? pathway.productLabel);
   }
-  if (pathway.ruleId === "alkene-halogenation-bromine") return "Vicinal dihalide";
-  if (/^alkyne-halogenation-/.test(normalizedHalogenDisplayRuleId(pathway.ruleId))) {
-    return pathway.ruleId.includes("excess") ? "Tetrahalide" : "Dihaloalkene";
+  if ("productVariants" in pathway && pathway.productVariants.length > 1 && !pathway.productMixture) {
+    return `${pathway.productVariants.length} chemically competitive product alternatives`;
   }
-  if (pathway.ruleId === "alkene-halohydrin-formation") return "Halohydrin";
-  if (pathway.ruleId === "alkene-haloether-formation") return "Haloether";
-  if (pathway.ruleId === "alkene-allylic-bromination") return "Allylic halide";
   return pathway.productMixture?.displayName ?? pathway.productLabel;
 }
 
-function halogenLegend(ruleId: string): string | null {
-  if (ruleId === "alkene-allylic-bromination") {
-    return "X = Cl, Br, or I (for example NCS, NBS, or NIS).";
-  }
-  if (isGenericHalogenRuleId(ruleId)) {
-    return "X = Cl, Br, or I.";
-  }
-  return null;
+function formatHalogenList(halogens: HalogenSymbol[]): string {
+  if (halogens.length === 1) return halogens[0];
+  if (halogens.length === 2) return `${halogens[0]} or ${halogens[1]}`;
+  return `${halogens.slice(0, -1).join(", ")}, or ${halogens[halogens.length - 1]}`;
+}
+
+function halogenLegend(pathway: HalogenAwareDisplayText): string | null {
+  if (!pathway.halogenSeries) return null;
+  return `X = ${formatHalogenList(pathway.halogenSeries.halogens)}.`;
 }
 
 function collapseMixtureMembers(pathways: ReactionPathway[]): ReactionPathway[] {
@@ -222,7 +416,7 @@ export default function ReactionsPage({ initialPathways }: Props) {
   const [retroPathways, setRetroPathways] = useState<RetrosynthesisPathway[]>([]);
   const [noReactionOutcomes, setNoReactionOutcomes] = useState<NoReactionOutcome[]>([]);
   const [reactantSvgs, setReactantSvgs] = useState<SvgListMap>({});
-  const [productSvgs, setProductSvgs] = useState<SvgListMap>({});
+  const [productSvgs, setProductSvgs] = useState<ProductVariantSvgMap>({});
   const [retroTargetSvgs, setRetroTargetSvgs] = useState<SvgListMap>({});
   const [retroPrecursorSvgs, setRetroPrecursorSvgs] = useState<SvgListMap>({});
   const [reactionError, setReactionError] = useState<string | null>(null);
@@ -232,7 +426,7 @@ export default function ReactionsPage({ initialPathways }: Props) {
   const analysisRunRef = useRef(0);
 
   const displayPathways = useMemo(
-    () => collapseDisplayEquivalentPathways(collapseMixtureMembers(pathways)).filter(shouldDisplayForwardPathway),
+    () => groupDisplayPathways(pathways),
     [pathways],
   );
   const visiblePathways = useMemo(
@@ -249,7 +443,7 @@ export default function ReactionsPage({ initialPathways }: Props) {
 
     async function buildSvgs() {
       const nextReactants: SvgListMap = {};
-      const nextProducts: SvgListMap = {};
+      const nextProducts: ProductVariantSvgMap = {};
 
       for (const pathway of visiblePathways) {
         const reactantComponents = pathway.reactantComponents.length > 0
@@ -262,27 +456,21 @@ export default function ReactionsPage({ initialPathways }: Props) {
           )
         ).filter((svg): svg is string => Boolean(svg));
 
-        if (pathway.productSmiles) {
-          const productComponents = (
-            pathway.productMixture?.memberSmiles ?? [pathway.productSmiles]
-          ).flatMap((member) =>
-            member
-              .split(".")
-              .map((component) => component.trim())
-              .filter(Boolean),
-          );
-
+        if (pathway.productVariants.length > 0) {
           const productSvg = pathway.ruleId === "alkene-syn-dihydroxylation"
             ? getSynDiolSvg
-            : isGenericHalogenRuleId(pathway.ruleId)
+            : shouldRenderGenericHalogen(pathway)
               ? getGenericHalogenSvg
               : getCondensedSulfonateSvg;
 
-          nextProducts[pathway.id] = (
-            await Promise.all(
-              productComponents.map((component) => productSvg(component)),
-            )
-          ).filter((svg): svg is string => Boolean(svg));
+          nextProducts[pathway.id] = await Promise.all(
+            pathway.productVariants
+              .map(async (variant) => (
+                await Promise.all(
+                  variant.componentSmiles.map((component) => productSvg(component)),
+                )
+              ).filter((svg): svg is string => Boolean(svg))),
+          );
         } else {
           nextProducts[pathway.id] = [];
         }
@@ -423,10 +611,14 @@ export default function ReactionsPage({ initialPathways }: Props) {
         .filter((pathway) => Boolean(pathway.productSmiles))
         .map((pathway) => pathway.ruleId);
       setNoReactionOutcomes(
-        await predictNoReactionOutcomes(smiles, successfulRuleIds),
+        await predictNoReactionOutcomes(
+          smiles,
+          successfulRuleIds,
+          reactionRegistry,
+          hierarchy?.functionalGroups ?? hierarchy?.primaryGroups ?? [],
+        ),
       );
-      const outcomeCount = collapseDisplayEquivalentPathways(collapseMixtureMembers(results))
-        .filter(shouldDisplayForwardPathway).length;
+      const outcomeCount = groupDisplayPathways(results).length;
       setReactionStatus(
         outcomeCount > 0
           ? `${outcomeCount} supported reaction outcome${outcomeCount === 1 ? "" : "s"} found.`
@@ -451,10 +643,36 @@ export default function ReactionsPage({ initialPathways }: Props) {
     setPathways([]);
     setRetroPathways([]);
     setNoReactionOutcomes([]);
+    setReactantSvgs({});
+    setProductSvgs({});
+    setRetroTargetSvgs({});
+    setRetroPrecursorSvgs({});
     setIsAnalyzing(false);
     setVisibleResultCount(RESULTS_PER_BATCH);
     setReactionStatus("Draw a structure to begin.");
   }
+
+  const handleReactionCanvasChange = useCallback(() => {
+    // Results belong to an exact Ketcher snapshot.  As soon as the student
+    // changes that snapshot, invalidate both the old forward/retro result and
+    // any in-flight async analysis.  This prevents a Diels–Alder/other result
+    // from being displayed after the canvas has been edited for the next
+    // reaction.
+    analysisRunRef.current += 1;
+    setReactionSmiles("");
+    setReactionInputName("");
+    setReactionError(null);
+    setPathways([]);
+    setRetroPathways([]);
+    setNoReactionOutcomes([]);
+    setReactantSvgs({});
+    setProductSvgs({});
+    setRetroTargetSvgs({});
+    setRetroPrecursorSvgs({});
+    setIsAnalyzing(false);
+    setVisibleResultCount(RESULTS_PER_BATCH);
+    setReactionStatus("Structure changed. Predict again when the new input is ready.");
+  }, []);
 
   return (
     <section className="card reactions-page-card">
@@ -475,6 +693,7 @@ export default function ReactionsPage({ initialPathways }: Props) {
         <div className="reaction-ketcher-box">
           <MoleculeDrawer
             globalKey="reactionKetcher"
+            onChange={handleReactionCanvasChange}
             onReady={setKetcher}
           />
         </div>
@@ -560,8 +779,12 @@ export default function ReactionsPage({ initialPathways }: Props) {
                         : pathway.productStatus === "generic"
                           ? "Generic R-group product"
                           : pathway.productStatus === "representative"
-                            ? "Representative product"
-                            : "Needs reactant input"}
+                            ? pathway.productSmiles
+                              ? "Representative product"
+                              : "Supported reaction"
+                            : missingReactionInputLabels(pathway).length > 0
+                              ? "Needs reactant input"
+                              : "Concept / conditions"}
                     </span>
                   </div>
 
@@ -596,36 +819,52 @@ export default function ReactionsPage({ initialPathways }: Props) {
                       </div>
                       <span className="reaction-arrow">→</span>
                       <p>{pathway.reagentNote}</p>
-                      {halogenLegend(pathway.ruleId) && (
-                        <p className="reaction-detail">{halogenLegend(pathway.ruleId)}</p>
+                      {halogenLegend(pathway) && (
+                        <p className="reaction-detail">{halogenLegend(pathway)}</p>
                       )}
                     </div>
 
                     <div className="reaction-column">
-                      {(productSvgs[pathway.id] ?? []).length > 0 ? (
-                        <div className="reaction-svg-box reaction-component-box">
-                          {(productSvgs[pathway.id] ?? []).map((svg, index) => (
+                      {(productSvgs[pathway.id] ?? []).some((variant) => variant.length > 0) ? (
+                        <div className="reaction-svg-box reaction-product-variant-list">
+                          {(productSvgs[pathway.id] ?? []).map((variantSvgs, variantIndex) => (
                             <div
-                              className="reaction-component-item"
-                              key={`${pathway.id}-product-${index}`}
+                              className="reaction-product-variant"
+                              key={`${pathway.id}-product-variant-${variantIndex}`}
                             >
-                              {index > 0 && (
-                                <span className="reaction-component-plus">+</span>
+                              {variantIndex > 0 && (
+                                <span className="reaction-product-or">
+                                  {pathway.productMixture?.kind === "racemic"
+                                    ? "enantiomer"
+                                    : "or"}
+                                </span>
                               )}
-                              <div dangerouslySetInnerHTML={{ __html: svg }} />
+                              <div className="reaction-component-box">
+                                {variantSvgs.map((svg, componentIndex) => (
+                                  <div
+                                    className="reaction-component-item"
+                                    key={`${pathway.id}-product-${variantIndex}-${componentIndex}`}
+                                  >
+                                    {componentIndex > 0 && (
+                                      <span className="reaction-component-plus">+</span>
+                                    )}
+                                    <div dangerouslySetInnerHTML={{ __html: svg }} />
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           ))}
                         </div>
                       ) : (
                         <div className="reaction-svg-box reaction-placeholder">
                           {pathway.productStatus === "concept-only"
-                            ? missingReactionInputMessage(pathway)
-                            : "No valid product structure was generated"}
+                            ? missingReactionInputLabels(pathway).length > 0
+                              ? missingReactionInputMessage(pathway)
+                              : pathway.productLabel
+                            : "The reaction rule matched, but the exact product structure could not be generated for this substrate yet."}
                         </div>
                       )}
-                      <p>
-                        {displayProductLabel(pathway)}
-                      </p>
+                      <p>{displayProductLabel(pathway)}</p>
                     </div>
                   </div>
 
@@ -634,6 +873,15 @@ export default function ReactionsPage({ initialPathways }: Props) {
                       <strong>Product mixture:</strong>{" "}
                       {pathway.productMixture.label} · {pathway.productMixture.memberCount}{" "}
                       stereoisomer{pathway.productMixture.memberCount === 1 ? "" : "s"} shown
+                    </p>
+                  )}
+
+                  {!pathway.productMixture && pathway.productVariants.length > 1 && (
+                    <p className="reaction-detail">
+                      <strong>Alternative products:</strong>{" "}
+                      {pathway.halogenSeries
+                        ? "Parallel halogen variants are condensed onto this one card; any remaining structural alternatives are genuine selectivity ties after major-product ranking."
+                        : "Major-product ranking has already removed lower-probability atom-map/regioisomer matches; multiple structures remain only when the rule represents a genuine mixture or an unresolved chemical tie."}
                     </p>
                   )}
 
@@ -657,9 +905,9 @@ export default function ReactionsPage({ initialPathways }: Props) {
             </div>
             {noReactionOutcomes.length > 0 && (
               <div className="no-reaction-section">
-                <h3>Common NO REACTION cases for this substrate</h3>
+                <h3>Applicable NO REACTION conditions for this substrate</h3>
                 <p className="empty">
-                  These are conditions students often expect to work, but the required structural or mechanistic requirement is missing.
+                  These catalog reactions are chemically related to the functional groups you drew, but this substrate fails a required structural, steric, electronic, or mechanistic condition.
                 </p>
                 <div className="reaction-pathway-list">
                   {noReactionOutcomes.map((outcome) => (
@@ -772,8 +1020,8 @@ export default function ReactionsPage({ initialPathways }: Props) {
                     </div>
                     <span className="reaction-arrow">←</span>
                     <p>{pathway.reagentNote}</p>
-                    {halogenLegend(pathway.ruleId) && (
-                      <p className="reaction-detail">{halogenLegend(pathway.ruleId)}</p>
+                    {halogenLegend(pathway) && (
+                      <p className="reaction-detail">{halogenLegend(pathway)}</p>
                     )}
                     {pathway.requiredReactantLabels.length > 0 && (
                       <p>

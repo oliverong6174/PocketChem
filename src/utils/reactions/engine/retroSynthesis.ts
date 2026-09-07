@@ -338,6 +338,17 @@ function sn2ReverseSmarts(nucleophile: string): string[] {
         "[N-:5]~[N+:6]~[N:7]",
         true,
       );
+    case "iodide": {
+      const output: string[] = [];
+      for (const halide of ["Cl", "Br"]) {
+        output.push(
+          `[C@H:1]([*:3])([*:4])[I:5]>>[C@@H:1]([*:3])([*:4])${halide}.[I-:5]`,
+          `[C@@H:1]([*:3])([*:4])[I:5]>>[C@H:1]([*:3])([*:4])${halide}.[I-:5]`,
+          `[C;X4:1][I:5]>>[C:1]${halide}.[I-:5]`,
+        );
+      }
+      return output;
+    }
     case "ammonia":
       return halideReverseProducts("[N;H2;+0:5]", "[N;H3;+0:5]", true);
     case "alkoxide": {
@@ -623,6 +634,22 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
     output.push("[C:1](O)[C:3][OH:2]>>[C:1]1[O:2][C:3]1");
   }
 
+  if (handler === "rearrangement" && mode === "pinacol") {
+    // Reverse both the hydride-shift (ring-retaining ketone) and cyclic
+    // ring-contraction branches. Forward replay below rejects precursor sets
+    // that do not regenerate the requested target.
+    output.push(
+      "[C:1](=[O:2])-[C:3]>>[C:1]([OH:2])-[C:3]([OH])",
+      "[C;R:5]-[C;R:3]-[C:1](=[O:2])>>[C;R:5]-[C:1]([OH:2])-[C:3]([OH])",
+    );
+  }
+
+  if (handler === "pericyclic" && mode === "dielsAlder") {
+    output.push(
+      "[C:1]1-[C:2]=[C:3]-[C:4]-[C:5]-[C:6]-1>>[C:1]=[C:2]-[C:3]=[C:4].[C:5]=[C:6]",
+    );
+  }
+
   if (handler === "elimination") {
     output.push(...eliminationReverseSmarts(String(options.leavingGroup ?? "")));
   }
@@ -657,6 +684,23 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
             ),
           );
         }
+      }
+    }
+
+    if (mode === "vicinalDiolToDihalide") {
+      const halide =
+        options.halide === "chloride"
+          ? "Cl"
+          : options.halide === "bromide"
+            ? "Br"
+            : options.halide === "iodide"
+              ? "I"
+              : null;
+
+      if (halide) {
+        output.push(
+          `[C:1](${halide})-[C:3](${halide})>>[C:1](O)-[C:3](O)`,
+        );
       }
     }
 

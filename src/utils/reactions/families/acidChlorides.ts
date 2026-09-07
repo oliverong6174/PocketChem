@@ -1,4 +1,5 @@
 import type { ReactionRule } from "../reactionTypes";
+import { GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS } from "../organometallic";
 
 const acidChlorideTrigger = {
   anyFunctionalGroups: ["Acyl halide"],
@@ -138,7 +139,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
     family: "acid-chlorides",
     reactionType: "addition",
     title: "Organometallic Addition",
-    reagents: "1) excess RMgBr, RMgCl, or RLi  2) H₃O⁺",
+    reagents: "1) excess RMgCl, RMgBr, RMgI, or RLi  2) H₃O⁺",
     reagentNote: "Double addition",
     productHint: "Tertiary alcohol",
     explanation:
@@ -147,7 +148,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
     additionalReactants: [
       {
         label: "Grignard or organolithium reagent (2 equivalents)",
-        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+        trigger: { includeSmarts: [GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS] },
         equivalents: 2,
       },
     ],

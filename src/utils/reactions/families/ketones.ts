@@ -1,4 +1,5 @@
 import type { ReactionRule } from "../reactionTypes";
+import { GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS } from "../organometallic";
 
 const ketoneTrigger = {
   anyFunctionalGroups: ["Ketone", "Enone", "Chalcone"],
@@ -31,7 +32,7 @@ export const ketoneReactionRules: ReactionRule[] = [
     family: "ketones",
     reactionType: "addition",
     title: "Organometallic Addition",
-    reagents: "1) RMgBr, RMgCl, or RLi  2) H₃O⁺",
+    reagents: "1) RMgCl, RMgBr, RMgI, or RLi  2) H₃O⁺",
     reagentNote: "Grignard and organolithium addition",
     productHint: "Tertiary alcohol",
     explanation:
@@ -40,7 +41,7 @@ export const ketoneReactionRules: ReactionRule[] = [
     additionalReactants: [
       {
         label: "Grignard or organolithium reagent",
-        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+        trigger: { includeSmarts: [GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS] },
       },
     ],
     transform: {
@@ -288,9 +289,9 @@ export const ketoneReactionRules: ReactionRule[] = [
       "Baeyer-Villiger oxidation inserts oxygen next to the carbonyl carbon of a ketone, forming an ester.",
     trigger: ketoneTrigger,
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1](=[O:2])([C:3])[C:4]>>[C:1](=[O:2])([C:4])O[C:3]",
-      maxProducts: 8,
+      type: "customHandler",
+      handler: "oxidation",
+      options: { mode: "baeyerVilliger" },
     },
     mechanism: "Criegee rearrangement",
     selectivity: [
@@ -298,7 +299,7 @@ export const ketoneReactionRules: ReactionRule[] = [
     ],
     productStatus: "representative",
     limitations: [
-      "The engine enumerates both possible oxygen-insertion orientations but does not rank migratory aptitude.",
+      "When the two migrating groups have essentially equal aptitude, both genuinely competitive products may remain. Electronic substituent effects within a single aptitude class are not quantitatively modeled.",
     ],
     priority: 1250,
   },

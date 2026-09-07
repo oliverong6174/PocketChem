@@ -1,4 +1,5 @@
 import type { ReactionRule } from "../reactionTypes";
+import { GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS } from "../organometallic";
 
 const carboxylicAcidTrigger = {
   anyFunctionalGroups: [
@@ -239,7 +240,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
     productHint: "Carboxylic acid",
     explanation:
       "A Grignard or organolithium carbon nucleophile attacks carbon dioxide, adding one carbon to the carbon skeleton; acidic workup gives a carboxylic acid.",
-    trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+    trigger: { includeSmarts: [GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS] },
     additionalReactants: [
       { label: "carbon dioxide", trigger: { includeSmarts: ["O=C=O"] } },
     ],

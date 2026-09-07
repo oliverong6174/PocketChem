@@ -87,6 +87,83 @@ export const aromaticReactionRules: ReactionRule[] = [
     priority: 1820,
   },
   {
+    id: "aromatic-excess-bromination-phenol",
+    family: "aromatics",
+    reactionType: "substitution",
+    title: "Excess Bromination of Phenol",
+    reagents: "excess Br₂, H₂O",
+    reagentNote: "Strongly activated ring; rapid 2,4,6-tribromination",
+    productHint: "2,4,6-Tribromophenol",
+    explanation:
+      "Phenol is strongly activating and ortho/para-directing. With excess bromine, the two ortho positions and the para position are brominated rapidly, giving the 2,4,6-tribromo product when those positions are free.",
+    trigger: {
+      anyFunctionalGroups: ["Phenol"],
+      includeSmarts: ["[OH][c]1[cH][cH][cH][cH][cH]1"],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts:
+        "[OH:7][c:1]1[cH:2][cH:3][cH:4][cH:5][cH:6]1>>[OH:7][c:1]1[c:2](Br)[cH:3][c:4](Br)[cH:5][c:6](Br)1",
+      maxProducts: 4,
+    },
+    productStatus: "computed",
+    mechanism: "Repeated electrophilic aromatic substitution",
+    selectivityProfile: { mixture: "single", majorProductOnly: true },
+    selectivity: ["OH directs bromination ortho/para; with all three sites free, 2,4,6-tribromination is the characteristic excess-Br₂ outcome."],
+    limitations: ["If an ortho or para site is already substituted, the exact polybromination pattern must be ranked from the remaining available positions."],
+    priority: 1821,
+  },
+  {
+    id: "aromatic-excess-bromination-aniline",
+    family: "aromatics",
+    reactionType: "substitution",
+    title: "Excess Bromination of Aniline",
+    reagents: "excess Br₂, H₂O",
+    reagentNote: "Strongly activated ring; rapid 2,4,6-tribromination",
+    productHint: "2,4,6-Tribromoaniline",
+    explanation:
+      "Aniline is strongly activating and ortho/para-directing. In bromine water, excess bromine commonly substitutes at both ortho positions and the para position when they are available.",
+    trigger: {
+      anyFunctionalGroups: ["Aniline"],
+      includeSmarts: ["[NH2][c]1[cH][cH][cH][cH][cH]1"],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts:
+        "[NH2:7][c:1]1[cH:2][cH:3][cH:4][cH:5][cH:6]1>>[NH2:7][c:1]1[c:2](Br)[cH:3][c:4](Br)[cH:5][c:6](Br)1",
+      maxProducts: 4,
+    },
+    productStatus: "computed",
+    mechanism: "Repeated electrophilic aromatic substitution",
+    selectivityProfile: { mixture: "single", majorProductOnly: true },
+    selectivity: ["NH₂ directs bromination ortho/para; with all three sites free, 2,4,6-tribromination is the characteristic excess-Br₂ outcome."],
+    limitations: ["Protected or protonated amines have different directing strength and may not undergo this rapid tribromination pattern."],
+    priority: 1822,
+  },
+  {
+    id: "aromatic-excess-bromination-general",
+    family: "aromatics",
+    reactionType: "substitution",
+    title: "Aromatic Polybromination with Excess Br₂",
+    reagents: "excess Br₂, FeBr₃",
+    reagentNote: "Further EAS is possible under excess/forcing bromination conditions",
+    productHint: "Polybrominated arene",
+    explanation:
+      "Excess bromine can drive more than one electrophilic aromatic substitution when the ring remains sufficiently reactive. The exact number and positions of bromines depend on the substituents already present and on how each newly installed bromine changes ring reactivity.",
+    trigger: {
+      ...aromaticTrigger,
+      excludedFunctionalGroups: ["Phenol", "Aniline"],
+    },
+    transform: {
+      type: "conceptOnly",
+      reason:
+        "A general excess-Br₂ product cannot be represented as one universal structure: each substitution changes the directing/deactivating pattern. PocketChem computes the standard 2,4,6 products for unsubstituted phenol and aniline separately and keeps this broader case as an explicit polybromination possibility.",
+    },
+    mechanism: "Repeated electrophilic aromatic substitution",
+    limitations: ["Ordinary bromination is usually stopped at monobromination unless excess reagent and sufficient ring activation/forcing conditions are present."],
+    priority: 1825,
+  },
+  {
     id: "aromatic-halogenation-chlorination",
     family: "aromatics",
     reactionType: "substitution",
@@ -105,6 +182,56 @@ export const aromaticReactionRules: ReactionRule[] = [
     mechanism: "Electrophilic aromatic substitution",
     ...easModelNotes,
     priority: 1830,
+  },
+  {
+    id: "aromatic-gattermann-koch-benzene",
+    family: "aromatics",
+    reactionType: "substitution",
+    title: "Gattermann–Koch Formylation",
+    reagents: "CO, HCl, AlCl₃ (often CuCl)",
+    reagentNote: "Electrophilic aromatic formylation",
+    productHint: "Aromatic aldehyde",
+    explanation:
+      "CO and HCl under Lewis-acid catalysis generate a formylating electrophile. Benzene gives benzaldehyde by electrophilic aromatic substitution.",
+    trigger: {
+      includeSmarts: ["[cH]1[cH][cH][cH][cH][cH]1"],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[cH:1]>>[c:1][CH]=O",
+      maxProducts: 6,
+    },
+    productStatus: "computed",
+    mechanism: "Electrophilic aromatic substitution",
+    selectivityProfile: { mixture: "single", majorProductOnly: true },
+    limitations: ["Strongly deactivated rings do not undergo Gattermann–Koch formylation readily."],
+    priority: 1835,
+  },
+  {
+    id: "aromatic-gattermann-koch-alkylbenzene",
+    family: "aromatics",
+    reactionType: "substitution",
+    title: "Gattermann–Koch Formylation of an Alkylbenzene",
+    reagents: "CO, HCl, AlCl₃ (often CuCl)",
+    reagentNote: "Para formylation is usually favored for a simple monosubstituted alkylbenzene",
+    productHint: "para-Alkylbenzaldehyde",
+    explanation:
+      "An alkyl substituent activates the ring and directs electrophilic formylation ortho/para. For a simple monosubstituted alkylbenzene, the para product is normally favored because it avoids ortho steric crowding; the ortho product can be minor.",
+    trigger: {
+      includeSmarts: ["[cH]1[cH][cH][c]([C;X4])[cH][cH]1"],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts:
+        "[cH:1]1[cH:2][cH:3][c:4]([C;X4:8])[cH:5][cH:6]1>>[c:1]1([CH]=O)[cH:2][cH:3][c:4]([C:8])[cH:5][cH:6]1",
+      maxProducts: 6,
+    },
+    productStatus: "computed",
+    mechanism: "Electrophilic aromatic substitution",
+    selectivityProfile: { mixture: "single", majorProductOnly: true },
+    selectivity: ["Alkyl groups are ortho/para directors; the less hindered para formylation product is used as the major representative for a simple monosubstituted alkylbenzene."],
+    limitations: ["More highly substituted arenes require full directing-group competition rather than this monosubstituted-ring rule."],
+    priority: 1836,
   },
   {
     id: "aromatic-friedel-crafts-alkylation",
@@ -213,7 +340,9 @@ export const aromaticReactionRules: ReactionRule[] = [
     explanation:
       "NBS maintains a low bromine concentration and substitutes a benzylic hydrogen through a resonance-stabilized radical.",
     trigger: {
-      anyFunctionalGroups: ["Alkylbenzene", "Toluene"],
+      // Structural benzylic matching also covers fused systems such as
+      // 2,3-dihydrobenzofuran; requiring the high-level "Alkylbenzene" label
+      // caused those legitimate benzylic sites to be missed.
       includeSmarts: ["[c][C;H1,H2,H3]"],
     },
     transform: {
@@ -238,7 +367,6 @@ export const aromaticReactionRules: ReactionRule[] = [
     explanation:
       "Strong oxidation converts an alkyl side chain containing a benzylic hydrogen into a carboxylic acid, regardless of the original side-chain length.",
     trigger: {
-      anyFunctionalGroups: ["Alkylbenzene", "Toluene"],
       includeSmarts: ["[c][C;H1,H2,H3]"],
     },
     transform: {

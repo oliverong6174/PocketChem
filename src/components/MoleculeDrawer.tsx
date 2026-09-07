@@ -17,6 +17,10 @@ export type KetcherApi = {
   getMolfile: () => Promise<string>;
   getKet: () => Promise<string>;
   setMolecule: (structure: string) => Promise<void>;
+  editor?: {
+    subscribe?: (eventName: string, handler: () => void) => unknown;
+    unsubscribe?: (eventName: string, handler: () => void) => void;
+  };
 };
 
 declare global {
@@ -31,6 +35,7 @@ declare global {
 
 type MoleculeDrawerProps = {
   onReady?: (ketcher: KetcherApi) => void;
+  onChange?: () => void;
   /**
    * Optional debug/global handle. Synthesis can create dynamic additional
    * reactant editors, so this intentionally accepts a unique string key.
@@ -140,6 +145,7 @@ const installKetcherScrollLock = () => {
 
 function MoleculeDrawer({
   onReady,
+  onChange,
   globalKey = "ketcher",
 }: MoleculeDrawerProps) {
   const [ready, setReady] = useState(false);
@@ -194,6 +200,7 @@ function MoleculeDrawer({
         <Suspense fallback={<KetcherLoadingState />}>
           <KetcherEditor
             debugLabel={globalKey}
+            onChange={onChange}
             onError={handleError}
             onReady={handleReady}
           />

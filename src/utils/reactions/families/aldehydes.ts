@@ -1,4 +1,5 @@
 import type { ReactionRule } from "../reactionTypes";
+import { GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS } from "../organometallic";
 
 const aldehydeTrigger = {
   anyFunctionalGroups: [
@@ -38,7 +39,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
     family: "aldehydes",
     reactionType: "addition",
     title: "Organometallic Addition",
-    reagents: "1) RMgBr, RMgCl, or RLi  2) H₃O⁺",
+    reagents: "1) RMgCl, RMgBr, RMgI, or RLi  2) H₃O⁺",
     reagentNote: "Grignard and organolithium addition",
     productHint: "Secondary alcohol",
     explanation:
@@ -47,7 +48,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
     additionalReactants: [
       {
         label: "Grignard or organolithium reagent",
-        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+        trigger: { includeSmarts: [GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS] },
       },
     ],
     transform: {

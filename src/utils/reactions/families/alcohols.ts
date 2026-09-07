@@ -54,12 +54,15 @@ export const alcoholReactionRules: ReactionRule[] = [
     title: "E1 Dehydration of a Secondary/Tertiary Alcohol",
     reagents: "Concentrated H₂SO₄ or H₃PO₄, heat",
     reagentNote: "Acid-catalyzed E1 dehydration",
-    productHint: "Zaitsev alkene mixture",
+    productHint: "Major Zaitsev alkene",
     explanation:
       "Protonation converts hydroxyl into water, ionization forms a carbocation, and beta deprotonation gives an alkene. Secondary and tertiary alcohols commonly follow this E1 pathway.",
     trigger: {
       anyFunctionalGroups: ["Secondary alcohol", "Tertiary alcohol"],
       includeSmarts: ["[C;H1,H2,H3][C;H0,H1][OH]"],
+      // Vicinal diols under strong acid are handled by the higher-priority
+      // pinacol rearrangement rule rather than ordinary alcohol E1 dehydration.
+      excludeSmarts: ["[C;X4]([OH])-[C;X4]([OH])"],
     },
     transform: {
       type: "customHandler",
@@ -78,7 +81,8 @@ export const alcoholReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
-      mixture: "expected",
+      mixture: "possible",
+      majorProductOnly: true,
       allowsRearrangement: true,
     },
     selectivity: [
@@ -105,6 +109,7 @@ export const alcoholReactionRules: ReactionRule[] = [
     trigger: {
       ...primaryAlcoholTrigger,
       includeSmarts: ["[C;H1,H2,H3][CH2][OH]"],
+      excludeSmarts: ["[C;X4]([OH])-[C;X4]([OH])"],
     },
     transform: {
       type: "customHandler",
@@ -122,6 +127,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
+      majorProductOnly: true,
       allowsRearrangement: false,
     },
     selectivity: ["No free primary carbocation", "Usually the more stable accessible alkene"],
@@ -152,6 +158,40 @@ export const alcoholReactionRules: ReactionRule[] = [
     priority: 510,
   },
   {
+    id: "vicinal-diol-hbr-substitution",
+    family: "alcohols",
+    reactionType: "substitution",
+    title: "Vicinal Diol Conversion with HBr",
+    reagents: "excess HBr",
+    reagentNote: "Convert both vicinal OH groups to bromides",
+    productHint: "Vicinal dibromide",
+    explanation:
+      "With excess hydrobromic acid, both alcohol groups of a vicinal diol can be protonated and replaced by bromide. Secondary/tertiary centers react through carbocation-like ionization/capture, so stereochemical scrambling can occur at the reacting carbons.",
+    trigger: {
+      includeSmarts: ["[C;X4]([OH])-[C;X4]([OH])"],
+    },
+    transform: {
+      type: "customHandler",
+      handler: "substitution",
+      options: {
+        mode: "vicinalDiolToDihalide",
+        halide: "bromide",
+      },
+    },
+    productStatus: "representative",
+    mechanism: "Acid-promoted substitution",
+    selectivityProfile: {
+      stereochemistry: { mode: "racemization" },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "Both OH groups are consumed under excess HBr",
+      "Configuration at secondary/tertiary reacting centers is not retained as one enantiopure product",
+    ],
+    priority: 518,
+  },
+  {
     id: "alcohol-hbr-substitution-primary",
     family: "alcohols",
     reactionType: "substitution",
@@ -165,6 +205,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       anyFunctionalGroups: ["Primary alcohol"],
       excludedFunctionalGroups: ["Benzyl alcohol"],
       includeSmarts: ["[CH2][OH]"],
+      excludeSmarts: ["[C;X4]([OH])-[C;X4]([OH])"],
     },
     transform: {
       type: "customHandler",
@@ -197,6 +238,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Secondary, tertiary, and resonance-stabilized alcohols can lose water after protonation to form a carbocation; bromide then captures the planar cation.",
     trigger: {
       anyFunctionalGroups: ["Secondary alcohol", "Tertiary alcohol", "Benzyl alcohol"],
+      excludeSmarts: ["[C;X4]([OH])-[C;X4]([OH])"],
     },
     transform: {
       type: "customHandler",
@@ -234,7 +276,12 @@ export const alcoholReactionRules: ReactionRule[] = [
     explanation:
       "Zinc chloride activates the alcohol and chloride replaces water. The reaction is also used to distinguish alcohol classes by reaction rate.",
     trigger: {
-      anyFunctionalGroups: ["Secondary alcohol", "Tertiary alcohol", "Benzyl alcohol"],
+      // Structural SMARTS keeps Lucas reagent visible even when a secondary
+      // allylic/benzylic alcohol is labeled under a more specific functional
+      // group name by the hierarchy engine.
+      includeSmarts: [
+        "[$([C;X4;H0,H1][OH]),$([c][CH2][OH])]",
+      ],
     },
     transform: {
       type: "customHandler",
@@ -379,6 +426,14 @@ export const alcoholReactionRules: ReactionRule[] = [
       smarts: "[C:1][CH:2]([OH:3])[C:4]>>[C:1][C:2](=[O:3])[C:4]",
     },
     mechanism: "Oxidation",
+    selectivityProfile: {
+      stereochemistry: { mode: "retention", stereospecific: true },
+      mixture: "single",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "Only the secondary C-OH center is oxidized; unrelated stereocenters are retained",
+    ],
     priority: 580,
   },
   {
@@ -455,6 +510,32 @@ export const alcoholReactionRules: ReactionRule[] = [
     priority: 584,
   },
   {
+    id: "vicinal-diol-periodate-cleavage",
+    family: "alcohols",
+    reactionType: "cleavage",
+    title: "Periodic Acid Cleavage of a Vicinal Diol",
+    reagents: "HIO₄ or NaIO₄",
+    reagentNote: "Oxidative cleavage through a cyclic periodate ester",
+    productHint: "Aldehyde and/or ketone cleavage products",
+    explanation:
+      "Periodic acid (or periodate) cleaves the C-C bond of a vicinal 1,2-diol. Each carbon bearing OH becomes a carbonyl carbon; cyclic vicinal diols open to a single dicarbonyl chain when the cleaved C-C bond belongs to the ring.",
+    trigger: {
+      includeSmarts: ["[C;X4]([OH])-[C;X4]([OH])"],
+    },
+    transform: {
+      type: "customHandler",
+      handler: "oxidation",
+      options: { mode: "vicinalDiolCleavage" },
+    },
+    productStatus: "computed",
+    mechanism: "Periodate ester formation followed by C-C oxidative cleavage",
+    selectivity: [
+      "Requires vicinal oxygen substituents capable of forming the cyclic periodate intermediate",
+      "C-H-bearing diol carbons give aldehydes; fully substituted diol carbons give ketones",
+    ],
+    priority: 585,
+  },
+  {
     id: "benzylic-allylic-alcohol-oxidation",
     family: "alcohols",
     reactionType: "oxidation",
@@ -500,8 +581,49 @@ export const alcoholReactionRules: ReactionRule[] = [
       maxProducts: 8,
     },
     mechanism: "SN2",
+    selectivityProfile: {
+      stereochemistry: { mode: "retention", stereospecific: true },
+      mixture: "single",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "The C-O bond at the alcohol stereocenter is not broken, so configuration at that carbon is retained",
+      "SN2 inversion occurs at the alkyl-halide carbon only if that electrophilic carbon is stereogenic",
+    ],
     limitations: ["Secondary and tertiary alkyl halides favor elimination rather than Williamson substitution."],
     priority: 595,
+  },
+  {
+    id: "alcohol-methylation-methyl-iodide",
+    family: "alcohols",
+    reactionType: "substitution",
+    title: "Alcohol O-Methylation with Methyl Iodide",
+    reagents: "base, then CH₃I",
+    reagentNote: "Williamson methylation with a fixed methyl electrophile",
+    productHint: "Methyl ether",
+    explanation:
+      "Base forms an alkoxide, which attacks methyl iodide by SN2. Because the electrophile is specifically CH₃I, PocketChem can supply the methyl group without requiring the user to draw a second arbitrary alkyl halide.",
+    trigger: {
+      includeSmarts: ["[C;X4][O;H1]"],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C;X4:1][O;H1:2]>>[C:1][O:2]C",
+      maxProducts: 8,
+    },
+    productStatus: "computed",
+    mechanism: "Williamson ether synthesis / SN2 methylation",
+    selectivityProfile: {
+      stereochemistry: { mode: "retention", stereospecific: true },
+      mixture: "single",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "Methyl iodide reacts by SN2 at methyl; the C–O bond at the alcohol-bearing stereocenter is not broken.",
+      "Only aliphatic alcohol O–H groups are targeted by this rule; phenolic O–H is handled separately.",
+    ],
+    limitations: ["If several nonequivalent aliphatic alcohols are present, chemoselective methylation requires substrate-specific conditions or protection."],
+    priority: 596,
   },
   {
     id: "fischer-esterification",
@@ -643,22 +765,40 @@ export const alcoholReactionRules: ReactionRule[] = [
     family: "alcohols",
     reactionType: "rearrangement",
     title: "Pinacol Rearrangement",
-    reagents: "Strong acid, heat",
+    reagents: "Concentrated H₂SO₄ or H₃PO₄, heat",
     reagentNote: "Vicinal diol rearrangement",
     productHint: "Rearranged aldehyde or ketone",
     explanation:
-      "Protonation and loss of water create a carbocation, followed by a 1,2-shift and carbonyl formation.",
+      "A vicinal diol is protonated and loses water, then a stereoelectronically aligned 1,2-migration occurs while the neighboring OH forms a carbonyl. PocketChem ranks hydride first when available, then aryl/exocyclic alkyl migration, and uses ring C-C migration as a ring-contraction fallback rather than assuming every cyclic tertiary diol must contract.",
     trigger: {
       ...alcoholTrigger,
-      includeSmarts: ["[C]([OH])[C]([OH])"],
+      includeSmarts: ["[C;X4]([OH])-[C;X4]([OH])"],
     },
     transform: {
-      type: "conceptOnly",
-      reason:
-        "An exact product requires ranking migratory aptitude and mapping the migrating group during the 1,2-shift.",
+      type: "customHandler",
+      handler: "rearrangement",
+      options: {
+        mode: "pinacol",
+        maxProducts: 8,
+      },
     },
-    mechanism: "Carbocation rearrangement",
-    selectivity: ["Migratory aptitude and carbocation stability control the product"],
-    priority: 660,
+    productStatus: "computed",
+    mechanism: "Pinacol 1,2-migration",
+    selectivityProfile: {
+      regiochemistry: { mode: "directed", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: true,
+    },
+    selectivity: [
+      "Antiperiplanar/stereoelectronic alignment controls which group migrates",
+      "Hydride migration is prioritized for secondary vicinal diols when a migratable H is present",
+      "For cyclic tertiary vicinal diols lacking hydride, an eligible exocyclic alkyl migration is considered before ring contraction",
+      "Ring C-C migration is retained as a fallback when the higher-ranked migration classes are unavailable",
+    ],
+    limitations: [
+      "PocketChem reports the highest-priority migration class rather than mixing generic dehydration products into the same strong-acid/heat condition.",
+    ],
+    // Must outrank ordinary secondary/tertiary alcohol E1 dehydration (500).
+    priority: 480,
   },
 ];

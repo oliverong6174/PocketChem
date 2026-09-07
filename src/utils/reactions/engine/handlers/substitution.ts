@@ -12,7 +12,9 @@ type SubstitutionMode =
   | "alkylHalideSubstitution" // legacy alias for sn2
   | "alcoholToHalide"
   | "alcoholSn1ToHalide"
-  | "intermolecularAlcoholDehydration";
+  | "vicinalDiolToDihalide"
+  | "intermolecularAlcoholDehydration"
+  | "etherCleavage";
 
 type SubstitutionNucleophile =
   | "hydroxide"
@@ -21,10 +23,12 @@ type SubstitutionNucleophile =
   | "ammonia"
   | "alkoxide"
   | "acetylide"
+  | "iodide"
   | "water"
   | "alcohol";
 
 type IncomingHalide = "chloride" | "bromide" | "iodide";
+type EtherCleavageHalogen = "Br" | "I";
 
 const SUBSTITUTION_NUCLEOPHILES = [
   "hydroxide",
@@ -33,6 +37,7 @@ const SUBSTITUTION_NUCLEOPHILES = [
   "ammonia",
   "alkoxide",
   "acetylide",
+  "iodide",
   "water",
   "alcohol",
 ] as const satisfies readonly SubstitutionNucleophile[];
@@ -107,6 +112,45 @@ function uniqueProducts(products: string[]): string[] {
   return [...new Set(products.filter(Boolean))];
 }
 
+const vicinalDiolDihalideSmarts: Record<IncomingHalide, readonly string[]> = {
+  chloride: [
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@:1](Cl)-[C@:3](Cl)",
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@:1](Cl)-[C@@:3](Cl)",
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@@:1](Cl)-[C@:3](Cl)",
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@@:1](Cl)-[C@@:3](Cl)",
+  ],
+  bromide: [
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@:1](Br)-[C@:3](Br)",
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@:1](Br)-[C@@:3](Br)",
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@@:1](Br)-[C@:3](Br)",
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@@:1](Br)-[C@@:3](Br)",
+  ],
+  iodide: [
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@:1](I)-[C@:3](I)",
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@:1](I)-[C@@:3](I)",
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@@:1](I)-[C@:3](I)",
+    "[C;X4:1]([OH:2])-[C;X4:3]([OH:4])>>[C@@:1](I)-[C@@:3](I)",
+  ],
+};
+
+async function runVicinalDiolToDihalide(
+  substrate: string,
+  halide: IncomingHalide,
+): Promise<string[]> {
+  const products: string[] = [];
+
+  // Strong HX can replace both OH groups of a vicinal diol when reagent is in
+  // excess. For secondary/tertiary centers the ionization/capture sequence does
+  // not preserve a single starting configuration, so enumerate the allowed
+  // tetrahedral outcomes and let the mixture classifier collapse them into one
+  // stereoisomeric-mixture reaction card instead of four duplicate HBr cards.
+  for (const smarts of vicinalDiolDihalideSmarts[halide]) {
+    products.push(...await runReactionSmarts(substrate, smarts, 8));
+  }
+
+  return uniqueProducts(products);
+}
+
 type Sn2SmartsSet = {
   /** Secondary-center SN2 pattern that inverts tetrahedral chirality. */
   inversion: string;
@@ -153,6 +197,12 @@ const SN2_SMARTS: Record<
       "[C@H:1]([*:3])([*:4])[Cl,Br,I:2].[#6:5]#[C-:6]>>[C@@H:1]([*:3])([*:4])[C+0:6]#[#6:5]",
     generic:
       "[C;X4:1][Cl,Br,I:2].[#6:5]#[C-:6]>>[C:1][C+0:6]#[#6:5]",
+  },
+  iodide: {
+    inversion:
+      "[C@H:1]([*:3])([*:4])[Cl,Br:2].[I-:5]>>[C@@H:1]([*:3])([*:4])[I+0:5]",
+    generic:
+      "[C;X4:1][Cl,Br:2].[I-:5]>>[C:1][I+0:5]",
   },
 };
 
@@ -366,6 +416,53 @@ async function runSn1(
  * and favorable carbocation rearrangements so that those details are not
  * duplicated across individual reaction rules.
  */
+
+/**
+ * Rank acid cleavage of an unsymmetrical dialkyl ether instead of returning
+ * both atom-map orientations. A tertiary/benzylic/allylic side can ionize and
+ * is preferred for SN1-like cleavage; otherwise halide attacks the least
+ * hindered side by SN2 (methyl > primary > secondary). Exact ties remain.
+ */
+async function runRankedEtherCleavage(
+  substrate: string,
+  halogen: EtherCleavageHalogen,
+): Promise<string[]> {
+  const product = (attacked: string) =>
+    `[C;X4:3][O:2]${attacked}>>[C:1]${halogen}.[C:3][OH:2]`;
+
+  const tiers: string[][] = [
+    [
+      // Tertiary alkyl side: favorable C-O ionization (SN1-like).
+      product("[C;H0;X4:1]"),
+      // Recursive SMARTS tests benzylic/allylic adjacency without explicitly
+      // consuming those substituent atoms, so the carbon skeleton is retained
+      // in the product rather than being accidentally truncated.
+      product("[$([C;X4][c]):1]"),
+      product("[$([C;X4][C,c]=[C,c]):1]"),
+    ],
+    [product("[CH3:1]")],
+    [product("[CH2:1]")],
+    [product("[CH:1]")],
+  ];
+
+  for (const tier of tiers) {
+    const products: string[] = [];
+    for (const smarts of tier) {
+      products.push(...await runReactionSmarts(substrate, smarts, 8));
+    }
+    const uniqueTier = uniqueProducts(products);
+    if (uniqueTier.length > 0) return uniqueTier;
+  }
+
+  // Unusual saturated carbon environments fall back to the general cleavage
+  // rather than disappearing from the catalog.
+  return uniqueProducts(await runReactionSmarts(
+    substrate,
+    `[C;X4:3][O:2][C;X4:1]>>[C:1]${halogen}.[C:3][OH:2]`,
+    8,
+  ));
+}
+
 export async function substitution(
   reactantInput: string | string[],
   options?: Record<string, unknown>
@@ -373,6 +470,16 @@ export async function substitution(
   const reactants = asReactantList(reactantInput);
   const primaryReactant = reactants[0] ?? "";
   const mode = options?.mode as SubstitutionMode | undefined;
+
+  if (mode === "etherCleavage") {
+    const substrate = reactants[0];
+    const halogen = options?.halogen as EtherCleavageHalogen | undefined;
+    if (!substrate || (halogen !== "Br" && halogen !== "I")) {
+      console.warn("Ether cleavage requires Br or I.", options);
+      return [];
+    }
+    return runRankedEtherCleavage(substrate, halogen);
+  }
 
   if (mode === "sn2" || mode === "alkylHalideSubstitution") {
     const nucleophile = readStringOption(
@@ -417,6 +524,16 @@ export async function substitution(
       allowRearrangement,
       maxShiftDepth
     );
+  }
+
+  if (mode === "vicinalDiolToDihalide") {
+    const halide = readStringOption(options, "halide", INCOMING_HALIDES);
+    if (!halide) {
+      warnUnsupportedHandlerMode("Substitution", options);
+      return [];
+    }
+
+    return runVicinalDiolToDihalide(primaryReactant, halide);
   }
 
   if (mode === "alcoholSn1ToHalide") {

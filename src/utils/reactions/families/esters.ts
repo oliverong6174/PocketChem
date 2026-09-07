@@ -1,4 +1,5 @@
 import type { ReactionRule } from "../reactionTypes";
+import { GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS } from "../organometallic";
 
 const acyclicEsterTrigger = {
   anyFunctionalGroups: ["Ester", "Enoate"],
@@ -150,7 +151,7 @@ export const esterReactionRules: ReactionRule[] = [
     family: "esters",
     reactionType: "addition",
     title: "Organometallic Addition",
-    reagents: "1) excess RMgX or RLi  2) H₃O⁺",
+    reagents: "1) excess RMgCl, RMgBr, RMgI, or RLi  2) H₃O⁺",
     reagentNote: "Two carbon additions",
     productHint: "Tertiary alcohol",
     explanation:
@@ -159,7 +160,7 @@ export const esterReactionRules: ReactionRule[] = [
     additionalReactants: [
       {
         label: "Grignard or organolithium reagent (2 equivalents)",
-        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+        trigger: { includeSmarts: [GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS] },
         equivalents: 2,
       },
     ],

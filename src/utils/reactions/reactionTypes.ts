@@ -46,7 +46,8 @@ export type ReactionHandlerName =
   | "oxidation"
   | "reduction"
   | "ring"
-  | "rearrangement";
+  | "rearrangement"
+  | "pericyclic";
 
 export type ReactionPurpose = "protection" | "deprotection";
 
@@ -82,6 +83,10 @@ export type StereochemicalMode =
   | "e-preferred"
   | "z-preferred";
 
+export type ReactionSitePreference =
+  | "most-substituted-alkene"
+  | "least-substituted-alkene";
+
 export type RegiochemicalMode =
   | "none"
   | "markovnikov"
@@ -106,6 +111,10 @@ export type ReactionSelectivityProfile = {
     regioselective?: boolean;
   };
   mixture?: "single" | "possible" | "expected";
+  /** Prefer the alkene site consumed by the transformation when several C=C bonds are present. */
+  sitePreference?: ReactionSitePreference;
+  /** Keep the handler-ranked major constitutional product rather than every lower-probability regioisomer. */
+  majorProductOnly?: boolean;
   allowsRearrangement?: boolean;
 };
 
@@ -174,6 +183,14 @@ export type ReactionRule = {
    * other disconnected structures drawn in Ketcher.
    */
   additionalReactants?: ReactionReactantRequirement[];
+
+  /**
+   * Set to `unordered` only when exchanging structurally equivalent reactant
+   * roles describes the same chemical event (for example alkene + alkene in a
+   * photochemical [2+2]).  Crossed/role-specific reactions such as aldol and
+   * nucleophile/electrophile couplings remain ordered.
+   */
+  reactantRoleSymmetry?: "ordered" | "unordered";
 
   transform: ReactionTransform;
   priority: number;

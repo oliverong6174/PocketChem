@@ -26,6 +26,81 @@ const alkeneTrigger = {
 
 export const alkeneReactionRules: ReactionRule[] = [
   {
+    id: "alkene-photochemical-2plus2",
+    family: "alkenes",
+    reactionType: "pericyclic",
+    title: "Photochemical [2+2] Cycloaddition",
+    reagents: "hν (UV light)",
+    reagentNote: "Photochemical [2+2] cycloaddition of two alkenes",
+    productHint: "Cyclobutane formed from the two alkene π bonds",
+    explanation:
+      "Under photochemical excitation, two alkene π bonds can undergo a [2+2] cycloaddition. Each C=C becomes a single bond and two new C–C bonds form between the alkene termini, creating a four-membered cyclobutane ring.",
+    trigger: alkeneTrigger,
+    additionalReactants: [
+      {
+        label: "alkene reaction partner",
+        trigger: alkeneTrigger,
+      },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts:
+        "[C:1]=[C:2].[C:3]=[C:4]>>[C:1]1[C:2][C:3][C:4]1",
+      // RDKit can emit one product for every atom-map embedding when either
+      // reactant contains several C=C bonds.  Those are mapping/site
+      // alternatives, not separate reaction cards for the introductory
+      // photochemical [2+2] rule.  Generate enough candidates for the shared
+      // selectivity layer to canonicalize them, then keep one representative
+      // major connectivity below.
+      maxProducts: 12,
+    },
+    productStatus: "computed",
+    mechanism: "Photochemical pericyclic [2+2] cycloaddition",
+    selectivityProfile: {
+      mixture: "single",
+      majorProductOnly: true,
+    },
+    selectivity: [
+      "Consumes one alkene from each drawn reactant and forms a cyclobutane ring.",
+      "When several C=C atom-map embeddings are possible, PocketChem displays one representative major [2+2] product instead of enumerating every mapping-derived alternative.",
+    ],
+    limitations: [
+      "This rule models intermolecular [2+2] cycloaddition between two disconnected alkene-containing structures.",
+      "If a substrate is known experimentally to give a genuine regioisomeric mixture, a dedicated substrate-specific rule should declare that mixture explicitly rather than relying on generic atom-map enumeration.",
+      "Ordinary thermal alkene [2+2] cycloaddition is not represented by this rule; hν is required.",
+    ],
+    priority: 710,
+  },
+  {
+    id: "alkene-alkyne-photochemical-2plus2",
+    family: "alkenes",
+    reactionType: "pericyclic",
+    title: "Photochemical Alkene–Alkyne [2+2] Cycloaddition",
+    reagents: "hν (UV light)",
+    reagentNote: "Photochemical [2+2] between an alkene and an alkyne",
+    productHint: "Cyclobutene derivative",
+    explanation:
+      "An alkene and an alkyne can undergo a photochemical [2+2] cycloaddition. One alkyne π bond and the alkene π bond form two new C–C σ bonds, leaving a cyclobutene double bond.",
+    trigger: alkeneTrigger,
+    additionalReactants: [
+      {
+        label: "alkyne reaction partner",
+        trigger: { includeSmarts: ["[C]#[C]"] },
+      },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1]=[C:2].[C:3]#[C:4]>>[C:1]1[C:2][C:3]=[C:4]1",
+      maxProducts: 12,
+    },
+    productStatus: "computed",
+    mechanism: "Photochemical pericyclic [2+2] cycloaddition",
+    selectivityProfile: { mixture: "possible" },
+    selectivity: ["This is a photochemical [2+2], not a Diels–Alder [4+2] reaction."],
+    limitations: ["Unsymmetrical alkene/alkyne pairs can have genuine regioselectivity that depends on substituent electronics and is not universally captured by one generic rule."],
+    priority: 709,
+  },
+  {
     id: "alkene-hydrogenation",
     family: "alkenes",
     reactionType: "reduction",
@@ -90,6 +165,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
+      sitePreference: "most-substituted-alkene",
       regiochemistry: { mode: "markovnikov", regioselective: true },
       mixture: "possible",
       allowsRearrangement: true,
@@ -126,6 +202,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
+      sitePreference: "most-substituted-alkene",
       regiochemistry: { mode: "markovnikov", regioselective: true },
       mixture: "possible",
       allowsRearrangement: true,
@@ -162,6 +239,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
+      sitePreference: "most-substituted-alkene",
       regiochemistry: { mode: "markovnikov", regioselective: true },
       mixture: "possible",
       allowsRearrangement: true,
@@ -222,7 +300,13 @@ export const alkeneReactionRules: ReactionRule[] = [
       smarts: "[C:1]=[C:2]>>[C:1]([Br])[C:2]([Br])",
     },
     productStatus: "representative",
-    selectivity: ["Anti addition"],
+    selectivityProfile: {
+      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      sitePreference: "most-substituted-alkene",
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: ["Anti addition", "More substituted/electron-rich alkene sites are preferred when several nonequivalent C=C bonds are present."],
     priority: 120,
   },
 
@@ -247,6 +331,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
+      sitePreference: "most-substituted-alkene",
       stereochemistry: { mode: "anti-addition", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
       mixture: "possible",
@@ -291,6 +376,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
+      sitePreference: "most-substituted-alkene",
       stereochemistry: { mode: "anti-addition", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
       mixture: "possible",
@@ -327,6 +413,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
+      sitePreference: "most-substituted-alkene",
       regiochemistry: { mode: "markovnikov", regioselective: true },
       mixture: "possible",
       allowsRearrangement: true,
@@ -362,6 +449,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "representative",
     selectivityProfile: {
+      sitePreference: "least-substituted-alkene",
       stereochemistry: { mode: "syn-addition", stereospecific: true },
       regiochemistry: { mode: "anti-markovnikov", regioselective: true },
       mixture: "possible",
@@ -397,6 +485,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "representative",
     selectivityProfile: {
+      sitePreference: "most-substituted-alkene",
       regiochemistry: { mode: "markovnikov", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,
@@ -433,6 +522,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
+      sitePreference: "most-substituted-alkene",
       regiochemistry: { mode: "markovnikov", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,
@@ -535,8 +625,57 @@ export const alkeneReactionRules: ReactionRule[] = [
       smarts: "[C:1]=[C:2]>>[C:1]1[O][C:2]1",
     },
     productStatus: "representative",
-    selectivity: ["Stereospecific oxygen transfer"],
+    selectivityProfile: {
+      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      sitePreference: "most-substituted-alkene",
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "Stereospecific oxygen transfer",
+      "When several nonequivalent isolated alkenes are present, the more substituted/electron-rich alkene is preferred; exact ties remain as alternatives.",
+    ],
     priority: 170,
+  },
+
+  {
+    id: "alkene-epoxidation-organometallic-opening",
+    family: "alkenes",
+    reactionType: "ringOpening",
+    title: "Epoxidation Followed by Grignard/Organolithium Opening",
+    reagents: "1) 1 equiv mCPBA or RCO₃H  2) RMgX or RLi  3) H₃O⁺",
+    reagentNote: "Monoepoxidation, then nucleophilic epoxide opening",
+    productHint: "Alcohol with a new C–C bond",
+    explanation:
+      "One equivalent of peroxyacid converts one alkene into an epoxide. A drawn Grignard or organolithium reagent then opens that epoxide at the less substituted carbon; acidic workup gives the alcohol.",
+    trigger: alkeneTrigger,
+    additionalReactants: [
+      {
+        label: "Grignard or organolithium reagent",
+        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+      },
+    ],
+    transform: {
+      type: "customHandler",
+      handler: "addition",
+      options: { mode: "epoxidationOrganometallicOpening" },
+    },
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      sitePreference: "most-substituted-alkene",
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "One equivalent of mCPBA gives monoepoxidation rather than epoxidizing every C=C bond.",
+      "Among nonequivalent isolated alkenes, the more substituted/electron-rich alkene is preferred; exact site-selectivity ties are retained.",
+      "RMgX/RLi attacks the less substituted epoxide carbon by backside opening, so the new C–C bond and OH are anti; one wedge/dash representative is drawn rather than duplicating its mirror image as another regioisomer.",
+    ],
+    limitations: [
+      "When two alkene sites have indistinguishable substitution/electronic ranking, both genuinely competitive sites are retained instead of choosing one arbitrarily.",
+    ],
+    priority: 175,
   },
 
   {
@@ -558,6 +697,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     productStatus: "computed",
     mechanism: "Syn dihydroxylation",
     selectivityProfile: {
+      sitePreference: "most-substituted-alkene",
       stereochemistry: { mode: "syn-addition", stereospecific: true },
       mixture: "expected",
       allowsRearrangement: false,
@@ -584,6 +724,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
+      sitePreference: "most-substituted-alkene",
       stereochemistry: { mode: "anti-addition", stereospecific: true },
       mixture: "expected",
       allowsRearrangement: false,

@@ -226,7 +226,11 @@ export async function matchAllRuleReactants(
 
   async function assign(requirementIndex: number): Promise<void> {
     if (requirementIndex >= requirements.length) {
-      const key = assignment.map((component) => component.smiles).join("||");
+      const assignedSmiles = assignment.map((component) => component.smiles);
+      const key = (rule.reactantRoleSymmetry === "unordered"
+        ? [...assignedSmiles].sort()
+        : assignedSmiles
+      ).join("||");
       if (!seen.has(key)) {
         seen.add(key);
         results.push([...assignment]);

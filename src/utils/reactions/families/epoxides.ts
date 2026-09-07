@@ -1,8 +1,48 @@
 import type { ReactionRule } from "../reactionTypes";
+import { GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS } from "../organometallic";
 
 const epoxideTrigger = {
   anyFunctionalGroups: ["Epoxide"],
 };
+
+const epoxideHxRules: ReactionRule[] = ([
+  { suffix: "hcl", reagent: "HCl", halogen: "Cl" },
+  { suffix: "hbr", reagent: "HBr", halogen: "Br" },
+  { suffix: "hi", reagent: "HI", halogen: "I" },
+] as const).map(({ suffix, reagent, halogen }, index) => ({
+  id: `epoxide-hx-opening-${suffix}`,
+  family: "epoxides",
+  reactionType: "ringOpening",
+  title: `Epoxide Opening with ${reagent}`,
+  reagents: reagent,
+  reagentNote: "Acidic halohydrin formation",
+  productHint: `${halogen}-substituted alcohol`,
+  explanation:
+    `Under acidic conditions, ${reagent} protonates the epoxide and ${halogen}⁻ attacks the more substituted epoxide carbon. Ring opening is backside, so the halogen and the oxygen-derived OH are anti.`,
+  trigger: epoxideTrigger,
+  transform: {
+    type: "customHandler",
+    handler: "ring",
+    options: {
+      mode: "epoxideNucleophileOpening",
+      nucleophile: "halide",
+      attackPreference: "more-substituted",
+      halogen,
+    },
+  },
+  productStatus: "computed",
+  selectivityProfile: {
+    stereochemistry: { mode: "anti-addition", stereospecific: true },
+    regiochemistry: { mode: "directed", regioselective: true },
+    mixture: "possible",
+    allowsRearrangement: false,
+  },
+  selectivity: [
+    "Acidic opening favors attack at the more substituted epoxide carbon.",
+    "Attack is backside/anti relative to the epoxide oxygen bond being broken.",
+  ],
+  priority: 840 + index,
+}));
 
 export const epoxideReactionRules: ReactionRule[] = [
   {
@@ -11,10 +51,10 @@ export const epoxideReactionRules: ReactionRule[] = [
     reactionType: "ringOpening",
     title: "Acid-Catalyzed Epoxide Opening with Water",
     reagents: "H₃O⁺, H₂O",
-    reagentNote: "Anti opening; attacks more substituted carbon",
+    reagentNote: "Anti opening; attack is more substituted",
     productHint: "Trans diol",
     explanation:
-      "Under acidic conditions, water opens protonated epoxides to form trans diols. Nucleophilic attack favors the more substituted carbon.",
+      "Under acidic conditions, water opens a protonated epoxide by backside attack, with greater attack at the more substituted carbon. Both carbons become alcohols.",
     trigger: epoxideTrigger,
     transform: {
       type: "customHandler",
@@ -22,7 +62,15 @@ export const epoxideReactionRules: ReactionRule[] = [
       options: {
         mode: "epoxideOpening",
         nucleophile: "water",
+        attackPreference: "more-substituted",
       },
+    },
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      regiochemistry: { mode: "directed", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
     },
     priority: 800,
   },
@@ -32,10 +80,10 @@ export const epoxideReactionRules: ReactionRule[] = [
     reactionType: "ringOpening",
     title: "Base-Catalyzed Epoxide Opening with Hydroxide",
     reagents: "1) NaOH or KOH  2) H₂O",
-    reagentNote: "Anti opening; attacks less substituted carbon",
+    reagentNote: "SN2 opening; attack is less substituted",
     productHint: "Trans diol",
     explanation:
-      "Under basic conditions, hydroxide opens epoxides by attacking the less substituted carbon, followed by protonation.",
+      "Under basic conditions, hydroxide opens an epoxide by SN2 attack at the less substituted carbon, followed by protonation.",
     trigger: epoxideTrigger,
     transform: {
       type: "customHandler",
@@ -43,7 +91,15 @@ export const epoxideReactionRules: ReactionRule[] = [
       options: {
         mode: "epoxideOpening",
         nucleophile: "hydroxide",
+        attackPreference: "less-substituted",
       },
+    },
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      regiochemistry: { mode: "directed", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
     },
     priority: 810,
   },
@@ -53,21 +109,30 @@ export const epoxideReactionRules: ReactionRule[] = [
     reactionType: "ringOpening",
     title: "Acid-Catalyzed Epoxide Opening with Alcohol",
     reagents: "ROH, H⁺",
-    reagentNote: "Forms alkoxy alcohol",
+    reagentNote: "Anti opening; OR attacks more substituted carbon",
     productHint: "Alkoxy alcohol",
     explanation:
-      "Alcohols open protonated epoxides under acidic conditions to form alkoxy alcohols.",
+      "An alcohol opens a protonated epoxide. The supplied OR group attacks the more substituted epoxide carbon and the original epoxide oxygen becomes OH.",
     trigger: epoxideTrigger,
     additionalReactants: [
       { label: "alcohol", trigger: { includeSmarts: ["[O;H1][#6]"] } },
     ],
     transform: {
-      type: "reactionSmarts",
-      smarts: "[O:1]1[C:2][C:3]1.[O;H1:4][#6:5]>>[OH:1][C:2][C:3][O:4][#6:5]",
-      maxProducts: 8,
+      type: "customHandler",
+      handler: "ring",
+      options: {
+        mode: "epoxideNucleophileOpening",
+        nucleophile: "alcohol",
+        attackPreference: "more-substituted",
+      },
     },
-    productStatus: "representative",
-    limitations: ["The engine enumerates constitutional openings but does not yet rank the more-substituted acid-catalyzed attack site or assign anti stereochemistry."],
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      regiochemistry: { mode: "directed", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
     priority: 820,
   },
   {
@@ -76,64 +141,66 @@ export const epoxideReactionRules: ReactionRule[] = [
     reactionType: "ringOpening",
     title: "Base-Catalyzed Epoxide Opening with Alkoxide",
     reagents: "1) RO⁻  2) H₃O⁺",
-    reagentNote: "Forms alkoxy alcohol",
+    reagentNote: "SN2 opening; OR attacks less substituted carbon",
     productHint: "Alkoxy alcohol",
     explanation:
-      "Alkoxides open epoxides under basic conditions, usually attacking the less substituted carbon.",
+      "Alkoxide opens the epoxide by SN2 attack at the less substituted carbon. Acidic workup protonates the original epoxide oxygen.",
     trigger: epoxideTrigger,
     additionalReactants: [
       { label: "alkoxide ion", trigger: { includeSmarts: ["[O-][#6]"] } },
     ],
     transform: {
-      type: "reactionSmarts",
-      smarts: "[O:1]1[C:2][C:3]1.[O-:4][#6:5]>>[OH:1][C:2][C:3][O+0:4][#6:5]",
-      maxProducts: 8,
+      type: "customHandler",
+      handler: "ring",
+      options: {
+        mode: "epoxideNucleophileOpening",
+        nucleophile: "alkoxide",
+        attackPreference: "less-substituted",
+      },
     },
-    productStatus: "representative",
-    limitations: ["The engine enumerates constitutional openings but does not yet rank the less-substituted SN2 attack site or assign anti stereochemistry."],
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      regiochemistry: { mode: "directed", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
     priority: 830,
   },
-  {
-    id: "epoxide-hx-opening",
-    family: "epoxides",
-    reactionType: "ringOpening",
-    title: "Epoxide Opening with HX",
-    reagents: "HBr, HCl, or HI",
-    reagentNote: "Halohydrin formation",
-    productHint: "Halohydrin",
-    explanation:
-      "Hydrohalic acids open epoxides to form halohydrins.",
-    trigger: epoxideTrigger,
-    transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]1[O:2][C:3]1>>[C:1]([Br])[C:3][OH]",
-    },
-    priority: 840,
-  },
+  ...epoxideHxRules,
   {
     id: "epoxide-grignard-opening",
     family: "epoxides",
     reactionType: "ringOpening",
-    title: "Epoxide Opening with Grignard Reagent",
-    reagents: "1) RMgBr or RLi  2) H₃O⁺",
-    reagentNote: "C-C bond formation",
+    title: "Epoxide Opening with Grignard/Organolithium Reagent",
+    reagents: "1) RMgCl, RMgBr, RMgI, or RLi  2) H₃O⁺",
+    reagentNote: "C–C bond formation at less substituted carbon",
     productHint: "Alcohol",
     explanation:
-      "Grignard and organolithium reagents open epoxides to form alcohols with a new carbon-carbon bond.",
+      "Grignard and organolithium reagents open epoxides by SN2 attack at the less substituted carbon, then acidic workup gives the alcohol.",
     trigger: epoxideTrigger,
     additionalReactants: [
       {
         label: "Grignard or organolithium reagent",
-        trigger: { includeSmarts: ["[#6][Mg,Li]"] },
+        trigger: { includeSmarts: [GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS] },
       },
     ],
     transform: {
-      type: "reactionSmarts",
-      smarts: "[O:1]1[C:2][C:3]1.[#6:4][Mg,Li]>>[OH:1][C:2][C:3]-[#6:4]",
-      maxProducts: 8,
+      type: "customHandler",
+      handler: "ring",
+      options: { mode: "epoxideOrganometallicOpening" },
     },
-    productStatus: "representative",
-    limitations: ["The engine enumerates constitutional openings but does not yet rank the less-substituted attack site or assign anti stereochemistry."],
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      regiochemistry: { mode: "directed", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "Attack occurs at the less substituted epoxide carbon.",
+      "Opening is SN2-like and inverts the attacked carbon when its stereochemistry is defined.",
+    ],
     priority: 850,
   },
   {
@@ -142,21 +209,30 @@ export const epoxideReactionRules: ReactionRule[] = [
     reactionType: "ringOpening",
     title: "Epoxide Opening with an Amine",
     reagents: "primary or secondary amine; then proton transfer/workup",
-    reagentNote: "Draw the epoxide and amine as disconnected structures",
+    reagentNote: "SN2-like attack at less substituted carbon",
     productHint: "Beta-amino alcohol",
     explanation:
-      "Primary and secondary amines can open epoxides by nucleophilic attack to form beta-amino alcohols.",
+      "Primary and secondary amines open epoxides at the less hindered carbon to form beta-amino alcohols.",
     trigger: epoxideTrigger,
     additionalReactants: [
       { label: "primary or secondary amine", trigger: { includeSmarts: ["[N;H1,H2;+0;!$(N[C,S,P]=O)]"] } },
     ],
     transform: {
-      type: "reactionSmarts",
-      smarts: "[O:1]1[C:2][C:3]1.[N;H1,H2:4]>>[OH:1][C:2][C:3]-[N:4]",
-      maxProducts: 8,
+      type: "customHandler",
+      handler: "ring",
+      options: {
+        mode: "epoxideNucleophileOpening",
+        nucleophile: "amine",
+        attackPreference: "less-substituted",
+      },
     },
-    productStatus: "representative",
-    limitations: ["The engine enumerates constitutional openings but does not yet rank the less-hindered attack site or assign anti stereochemistry."],
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      regiochemistry: { mode: "directed", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
+    },
     priority: 855,
   },
   {
@@ -165,14 +241,26 @@ export const epoxideReactionRules: ReactionRule[] = [
     reactionType: "ringOpening",
     title: "Epoxide Opening with Ammonia",
     reagents: "NH₃",
-    reagentNote: "Amino alcohol formation",
+    reagentNote: "SN2-like attack at less substituted carbon",
     productHint: "Amino alcohol",
     explanation:
-      "Ammonia can open epoxides to form amino alcohols.",
+      "Ammonia opens an epoxide at the less substituted carbon to form an amino alcohol after proton transfer.",
     trigger: epoxideTrigger,
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]1[O:2][C:3]1>>[C:1]([NH2])[C:3][OH]",
+      type: "customHandler",
+      handler: "ring",
+      options: {
+        mode: "epoxideNucleophileOpening",
+        nucleophile: "ammonia",
+        attackPreference: "less-substituted",
+      },
+    },
+    productStatus: "computed",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      regiochemistry: { mode: "directed", regioselective: true },
+      mixture: "possible",
+      allowsRearrangement: false,
     },
     priority: 860,
   },

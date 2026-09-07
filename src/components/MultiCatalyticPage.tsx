@@ -17,7 +17,6 @@ import {
   type SequentialSynthesisStep,
 } from "../utils/reactionUtils";
 
-const MAX_SEARCH_RESULTS = 14;
 
 type SvgMap = Record<string, string | null>;
 
@@ -81,7 +80,7 @@ export default function MultiCatalyticPage() {
     const source = normalized
       ? allOptions.filter((option) => option.searchText.includes(normalized))
       : allOptions;
-    return source.slice(0, MAX_SEARCH_RESULTS);
+    return source;
   }, [allOptions, query]);
 
   useEffect(() => {
@@ -226,6 +225,11 @@ export default function MultiCatalyticPage() {
             placeholder="Search PCC, Lindlar, mCPBA, OsO4, HBr…"
             onChange={(event) => setQuery(event.target.value)}
           />
+          <small className="reaction-note">
+            {query.trim()
+              ? `Showing ${searchResults.length} of ${allOptions.length} available reaction conditions`
+              : `${allOptions.length} reaction conditions available from the full reaction registry`}
+          </small>
           <div className="multicatalytic-search-results" role="listbox" aria-label="Reaction conditions">
             {searchResults.map((option) => (
               <button
@@ -235,7 +239,15 @@ export default function MultiCatalyticPage() {
                 onClick={() => addCondition(option)}
               >
                 <span>{option.reagents}</span>
-                <small>{option.title} · {option.family}</small>
+                <small>
+                  {option.title} · {option.family}
+                  {option.autoSuppliedReactantLabels.length > 0
+                    ? ` · auto-supplies ${option.autoSuppliedReactantLabels.join(", ")}`
+                    : ""}
+                  {option.requiresStructuralReactantInput
+                    ? " · additional structural reactant required"
+                    : ""}
+                </small>
               </button>
             ))}
           </div>
@@ -255,7 +267,15 @@ export default function MultiCatalyticPage() {
                 <li key={`${condition.ruleId}-${index}`}>
                   <div>
                     <strong>{condition.reagents}</strong>
-                    <small>{condition.title}</small>
+                    <small>
+                      {condition.title}
+                      {condition.autoSuppliedReactantLabels.length > 0
+                        ? ` · ${condition.autoSuppliedReactantLabels.join(", ")} supplied automatically`
+                        : ""}
+                      {condition.requiresStructuralReactantInput
+                        ? " · needs an additional structural reactant"
+                        : ""}
+                    </small>
                   </div>
                   <div className="multicatalytic-step-actions">
                     <button type="button" disabled={index === 0} onClick={() => moveCondition(index, -1)} aria-label={`Move step ${index + 1} up`}>↑</button>

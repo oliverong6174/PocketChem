@@ -32,6 +32,7 @@ const VALID_CUSTOM_HANDLERS = new Set<ReactionHandlerName>([
   "reduction",
   "ring",
   "rearrangement",
+  "pericyclic",
 ]);
 
 export type ReactionRegistryIssue = {

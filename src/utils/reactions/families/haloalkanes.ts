@@ -18,6 +18,12 @@ const primaryOrMethylHalideTrigger = {
   includeSmarts: ["[C;X4;H2,H3][Cl,Br,I]"],
 };
 
+/** SN2 halide exchange with iodide; avoid an identity I-for-I substitution. */
+const sn2IodideEligibleHalideTrigger = {
+  ...alkylHalideTrigger,
+  includeSmarts: ["[C;X4;H1,H2,H3][Cl,Br]"],
+};
+
 /** Secondary or tertiary alkyl halide, the usual simple-substrate SN1/E1 domain. */
 const secondaryOrTertiaryHalideTrigger = {
   ...alkylHalideTrigger,
@@ -37,7 +43,7 @@ const resonanceStabilizedPrimaryHalideTrigger = {
   excludedFunctionalGroups: ["Aryl halide", "Vinyl halide"],
 };
 
-/** Alkyl halide that does not contain an obvious proton source that would quench RMgX. */
+/** Alkyl halide that does not contain an obvious proton source that would quench a Grignard reagent. */
 const grignardCompatibleHalideTrigger = {
   ...alkylHalideTrigger,
   excludeSmarts: [
@@ -60,6 +66,11 @@ const cyanideReactant = {
 const azideReactant = {
   label: "azide ion",
   trigger: { includeSmarts: ["[N-]~[N+]~[N]"] },
+};
+
+const iodideReactant = {
+  label: "iodide ion",
+  trigger: { includeSmarts: ["[I-]"] },
 };
 
 const ammoniaReactant = {
@@ -233,6 +244,37 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     ],
     productStatus: "representative",
     priority: 220,
+  },
+  {
+    id: "haloalkane-sn2-iodide",
+    family: "haloalkanes",
+    reactionType: "substitution",
+    reactionClass: "nucleophilic substitution",
+    title: "Bimolecular SN2 with Iodide Ion",
+    reagents: "NaI, acetone (or another polar aprotic solvent)",
+    reagentNote: "Iodide ion is supplied as the nucleophile; classic Finkelstein-type substitution",
+    productHint: "Alkyl iodide",
+    explanation:
+      "Iodide is a strong, polarizable nucleophile. It attacks an unhindered alkyl chloride or bromide from the backside in a concerted SN2 step, replacing the leaving group and inverting a stereogenic reacting center.",
+    trigger: sn2IodideEligibleHalideTrigger,
+    additionalReactants: [iodideReactant],
+    transform: {
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "sn2", nucleophile: "iodide", maxProducts: 8 },
+    },
+    mechanism: "SN2",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      mixture: "single",
+    },
+    selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
+    limitations: [
+      "Most effective for methyl and primary substrates; secondary substrates are slower and can compete with elimination.",
+      "Tertiary alkyl halides do not undergo clean SN2 substitution with iodide.",
+    ],
+    productStatus: "representative",
+    priority: 225,
   },
   {
     id: "haloalkane-sn2-ammonia",
@@ -522,6 +564,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
+      majorProductOnly: true,
     },
     selectivity: ["Anti-periplanar beta H / leaving-group geometry", "Usually Zaitsev"],
     limitations: [
@@ -559,6 +602,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
+      majorProductOnly: true,
     },
     selectivity: ["Anti-periplanar geometry", "Usually Zaitsev"],
     limitations: [
@@ -596,6 +640,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "hofmann", regioselective: true },
       mixture: "possible",
+      majorProductOnly: true,
     },
     selectivity: ["Anti-periplanar geometry", "Often Hofmann with a bulky base"],
     limitations: [
@@ -632,6 +677,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
+      majorProductOnly: true,
     },
     selectivity: ["Anti-periplanar geometry", "Often Zaitsev with a small strong base"],
     limitations: [
@@ -654,7 +700,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     title: "E1 Elimination in Water",
     reagents: "Heat",
     reagentNote: "Draw a secondary/tertiary alkyl halide and water",
-    productHint: "Alkene mixture",
+    productHint: "Major Zaitsev alkene",
     explanation:
       "The leaving group ionizes to a carbocation, then water removes a beta proton. Heating shifts the SN1/E1 competition toward elimination, and the more substituted alkene is usually favored.",
     trigger: secondaryOrTertiaryHalideTrigger,
@@ -675,7 +721,8 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
-      mixture: "expected",
+      mixture: "possible",
+      majorProductOnly: true,
       allowsRearrangement: true,
     },
     selectivity: ["Usually Zaitsev", "Carbocation rearrangements are possible"],
@@ -695,7 +742,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     title: "E1 Elimination in an Alcohol Solvent",
     reagents: "Heat",
     reagentNote: "Draw a secondary/tertiary alkyl halide and the alcohol solvent",
-    productHint: "Alkene mixture",
+    productHint: "Major Zaitsev alkene",
     explanation:
       "A polar protic alcohol can support carbocation formation; at elevated temperature, beta deprotonation competes with SN1 capture and produces an alkene, usually favoring the Zaitsev constitution.",
     trigger: secondaryOrTertiaryHalideTrigger,
@@ -716,7 +763,8 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
-      mixture: "expected",
+      mixture: "possible",
+      majorProductOnly: true,
       allowsRearrangement: true,
     },
     selectivity: ["Usually Zaitsev", "Carbocation rearrangements are possible"],

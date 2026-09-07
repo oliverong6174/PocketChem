@@ -1611,7 +1611,24 @@ body,
 }
 
 .multicatalytic-editor {
-  min-height: 420px;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: 520px;
+  min-height: 0;
+  background: white;
+  color: #020617;
+  border-radius: 16px;
+  overflow: hidden;
+  contain: layout paint;
+}
+
+.multicatalytic-editor .ketcher-shell,
+.multicatalytic-editor .ketcher-shell > div {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 .multicatalytic-builder {
@@ -1829,6 +1846,64 @@ body,
   }
 
   .multicatalytic-editor {
-    min-height: 360px;
+    height: clamp(360px, 58vh, 440px);
+    min-height: 0;
   }
 }
+
+/* A single reaction rule can produce several positional/regioisomeric products.
+   Keep those alternatives inside one product panel instead of repeating the
+   entire reagent card once per matching bond/site. */
+.reaction-product-variant-list {
+  /* Scrollable alternative products must start at the top. Centering a grid
+     whose contents are taller than its scrollport makes the first structure
+     render above the reachable scroll area and appear clipped. */
+  align-content: start;
+  justify-items: stretch;
+  gap: 12px;
+  width: 100%;
+  max-height: 520px;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 8px;
+  scroll-padding-block: 12px;
+  overscroll-behavior: contain;
+}
+
+.reaction-product-variant {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.reaction-component-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.reaction-component-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.reaction-component-plus,
+.reaction-product-or {
+  color: #475569;
+  font-weight: 800;
+}
+
+.reaction-product-or {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.78rem;
+}
+
