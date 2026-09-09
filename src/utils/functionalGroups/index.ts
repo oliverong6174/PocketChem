@@ -1,6 +1,6 @@
 export { analyzeFunctionalGroupHierarchy } from "./analyzer";
 export { getRDKit } from "../rdkit";
-export { getAntiDiolSvg, getCondensedSulfonateSvg, getGenericHalogenSvg, getMoleculeSvg, getSynDiolSvg } from "./svg";
+export { getAntiDiolSvg, getCondensedSulfonateSvg, getGenericHalogenSvg, getAlignedGenericHalogenSvg, getAlignedStereoSvg, getMoleculeSvg, getSynDiolSvg, getTetrahedralPerspectiveSvg, getExplicitAlcoholStereoSvg, getPreservedMolfileSvg, getHeavyAtomStereoSvg } from "./svg";
 export { getDisplayMatchesForGroup } from "./displayMatches";
 export { flattenFunctionalGroupOccurrences } from "./occurrences";
 export type { FunctionalGroupOccurrence } from "./occurrences";

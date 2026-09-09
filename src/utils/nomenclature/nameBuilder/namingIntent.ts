@@ -26,9 +26,10 @@ export function getNamingIntent(
     featureType,
     cleanSuffix,
     groupName,
-    parentStrategy: isAcylLike(cleanSuffix, groupName)
-      ? "acyl"
-      : "hydrocarbon",
+    parentStrategy:
+      featureType === "ketone" || isAcylLike(cleanSuffix, groupName)
+        ? "acyl"
+        : "hydrocarbon",
     terminalSuffix: isTerminalSuffix(cleanSuffix, groupName),
     aromaticRetainedParentAllowed: isAromaticRetainedParentCandidate(
       cleanSuffix,

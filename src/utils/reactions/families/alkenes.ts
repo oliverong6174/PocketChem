@@ -1,4 +1,5 @@
 import type { ReactionRule } from "../reactionTypes";
+import { HYDROHALOGENS, type HalogenProfile } from "../profiles/halogens";
 
 const alkeneTrigger = {
   anyFunctionalGroups: [
@@ -143,27 +144,35 @@ export const alkeneReactionRules: ReactionRule[] = [
     priority: 105,
   },
 
-  {
-    id: "alkene-hx-addition-hbr",
+  ...HYDROHALOGENS.map((halogen: HalogenProfile, index): ReactionRule => ({
+    id: `alkene-hx-addition-${halogen.acidSlug}`,
     family: "alkenes",
     reactionType: "addition",
-    title: "HX Addition: Hydrobromination",
-    reagents: "HBr",
+    title: `HX Addition: ${halogen.hydrohalogenationName}`,
+    reagents: halogen.acid,
     reagentNote: "Hydrohalogenation",
-    productHint: "Alkyl bromide",
+    productHint: `Alkyl ${halogen.anionName}`,
     explanation:
-      "Under ordinary ionic conditions, HBr protonates the alkene and bromide attacks the more stable carbocation. For an unsymmetrical alkene this normally places Br on the more substituted carbon.",
+      `Under ordinary ionic conditions, ${halogen.acid} protonates the alkene and ${halogen.anionName} attacks the more stable carbocation. For an unsymmetrical alkene this normally places ${halogen.symbol} on the more substituted carbon.`,
     trigger: alkeneTrigger,
     transform: {
       type: "customHandler",
       handler: "addition",
       options: {
         mode: "alkeneHydrohalogenation",
-        halogen: "Br",
+        halogen: halogen.symbol,
         regioselectivity: "markovnikov",
       },
     },
     productStatus: "computed",
+    display: {
+      renderer: "generic-halogen",
+      series: {
+        id: "alkene-hx-addition-markovnikov",
+        variable: "X",
+        value: halogen.symbol,
+      },
+    },
     selectivityProfile: {
       sitePreference: "most-substituted-alkene",
       regiochemistry: { mode: "markovnikov", regioselective: true },
@@ -171,88 +180,15 @@ export const alkeneReactionRules: ReactionRule[] = [
       allowsRearrangement: true,
     },
     selectivity: [
-      "For an unsymmetrical alkene, Br is normally placed on the more substituted carbon (Markovnikov orientation).",
+      `For an unsymmetrical alkene, ${halogen.symbol} is normally placed on the more substituted carbon (Markovnikov orientation).`,
       "Carbocation rearrangements can occur under the ionic mechanism.",
     ],
     limitations: [
       "The current hydrohalogenation handler enforces the unrearranged Markovnikov connectivity; carbocation rearrangements are not yet generated for this alkene rule.",
     ],
-    priority: 110,
-  },
-
-  {
-    id: "alkene-hx-addition-hcl",
-    family: "alkenes",
-    reactionType: "addition",
-    title: "HX Addition: Hydrochlorination",
-    reagents: "HCl",
-    reagentNote: "Hydrohalogenation",
-    productHint: "Alkyl chloride",
-    explanation:
-      "Under ordinary ionic conditions, HCl protonates the alkene and chloride attacks the more stable carbocation. For an unsymmetrical alkene this normally places Cl on the more substituted carbon.",
-    trigger: alkeneTrigger,
-    transform: {
-      type: "customHandler",
-      handler: "addition",
-      options: {
-        mode: "alkeneHydrohalogenation",
-        halogen: "Cl",
-        regioselectivity: "markovnikov",
-      },
-    },
-    productStatus: "computed",
-    selectivityProfile: {
-      sitePreference: "most-substituted-alkene",
-      regiochemistry: { mode: "markovnikov", regioselective: true },
-      mixture: "possible",
-      allowsRearrangement: true,
-    },
-    selectivity: [
-      "For an unsymmetrical alkene, Cl is normally placed on the more substituted carbon (Markovnikov orientation).",
-      "Carbocation rearrangements can occur under the ionic mechanism.",
-    ],
-    limitations: [
-      "The current hydrohalogenation handler enforces the unrearranged Markovnikov connectivity; carbocation rearrangements are not yet generated for this alkene rule.",
-    ],
-    priority: 111,
-  },
-
-  {
-    id: "alkene-hx-addition-hi",
-    family: "alkenes",
-    reactionType: "addition",
-    title: "HX Addition: Hydroiodination",
-    reagents: "HI",
-    reagentNote: "Hydrohalogenation",
-    productHint: "Alkyl iodide",
-    explanation:
-      "Under ordinary ionic conditions, HI protonates the alkene and iodide attacks the more stable carbocation. For an unsymmetrical alkene this normally places I on the more substituted carbon.",
-    trigger: alkeneTrigger,
-    transform: {
-      type: "customHandler",
-      handler: "addition",
-      options: {
-        mode: "alkeneHydrohalogenation",
-        halogen: "I",
-        regioselectivity: "markovnikov",
-      },
-    },
-    productStatus: "computed",
-    selectivityProfile: {
-      sitePreference: "most-substituted-alkene",
-      regiochemistry: { mode: "markovnikov", regioselective: true },
-      mixture: "possible",
-      allowsRearrangement: true,
-    },
-    selectivity: [
-      "For an unsymmetrical alkene, I is normally placed on the more substituted carbon (Markovnikov orientation).",
-      "Carbocation rearrangements can occur under the ionic mechanism.",
-    ],
-    limitations: [
-      "The current hydrohalogenation handler enforces the unrearranged Markovnikov connectivity; carbocation rearrangements are not yet generated for this alkene rule.",
-    ],
-    priority: 112,
-  },
+    competition: { group: "hx-addition-conjugation", specificity: 10 },
+    priority: 110 + index,
+  })),
 
   {
     id: "alkene-hbr-peroxide",
@@ -636,6 +572,52 @@ export const alkeneReactionRules: ReactionRule[] = [
       "When several nonequivalent isolated alkenes are present, the more substituted/electron-rich alkene is preferred; exact ties remain as alternatives.",
     ],
     priority: 170,
+  },
+
+  {
+    id: "alkene-epoxidation-acidic-alcohol-opening",
+    family: "alkenes",
+    reactionType: "ringOpening",
+    title: "Epoxidation Followed by Acidic Alcohol Opening",
+    reagents: "1) mCPBA or RCO₃H  2) ROH, H⁺",
+    reagentNote: "Draw the alkene and the alcohol nucleophile as disconnected structures",
+    productHint: "Anti β-alkoxy alcohol",
+    explanation:
+      "The alkene is first converted stereospecifically to an epoxide. Under acidic conditions a drawn alcohol opens the protonated epoxide by backside attack, installing that alcohol's OR group anti to the oxygen-derived OH. Tertiary epoxide carbons are favored electronically; otherwise steric accessibility becomes increasingly important.",
+    trigger: alkeneTrigger,
+    additionalReactants: [
+      {
+        id: "alcohol-nucleophile",
+        label: "alcohol nucleophile (ROH)",
+        trigger: {
+          includeSmarts: ["[#6][O;H1;+0]"],
+          excludeSmarts: ["[CX3](=O)[O;H1]"],
+        },
+        supplyMode: "user-structure",
+        contributesToProduct: true,
+        role: "nucleophile",
+      },
+    ],
+    transform: {
+      type: "customHandler",
+      handler: "addition",
+      options: { mode: "epoxidationAcidicAlcoholOpening" },
+    },
+    productStatus: "computed",
+    display: { renderer: "aligned-stereo" },
+    selectivityProfile: {
+      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      sitePreference: "most-substituted-alkene",
+      mixture: "expected",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "Epoxidation preserves the alkene's relative stereochemistry.",
+      "Acidic epoxide opening is backside/anti.",
+      "A tertiary epoxide carbon is attacked preferentially; for primary/secondary pairs steric accessibility can favor the less substituted carbon.",
+      "The OR group is taken from the alcohol actually drawn by the user; methanol therefore gives OMe, ethanol gives OEt, and so on.",
+    ],
+    priority: 173,
   },
 
   {

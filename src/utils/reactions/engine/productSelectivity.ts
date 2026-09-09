@@ -144,6 +144,38 @@ export async function selectProductsByAlkeneSitePreference(
   return preferred.length > 0 ? preferred : products;
 }
 
+
+type SitePreferenceSelector = (
+  reactantSmiles: string,
+  products: string[],
+  preference: ReactionSitePreference,
+) => Promise<string[]>;
+
+const SITE_PREFERENCE_SELECTORS: Partial<
+  Record<ReactionSitePreference, SitePreferenceSelector>
+> = {
+  "most-substituted-alkene": selectProductsByAlkeneSitePreference,
+  "least-substituted-alkene": selectProductsByAlkeneSitePreference,
+};
+
+/**
+ * Dispatch site ranking by structured strategy rather than adding reaction-ID
+ * branches to the engine. New site models can register here without changing
+ * the rule-execution pipeline. Unknown strategies are deliberately a no-op
+ * until their chemistry scorer exists; they must never be misinterpreted as
+ * an alkene preference.
+ */
+export async function selectProductsBySitePreference(
+  reactantSmiles: string,
+  products: string[],
+  preference: ReactionSitePreference,
+): Promise<string[]> {
+  const selector = SITE_PREFERENCE_SELECTORS[preference];
+  return selector
+    ? selector(reactantSmiles, products, preference)
+    : products;
+}
+
 export async function halogenBearingCarbonSubstitutionScore(
   smiles: string,
   halogen: "Cl" | "Br" | "I",
@@ -209,7 +241,7 @@ export async function applyRuleProductSelectivity(
   const profile = rule.selectivityProfile;
 
   if (profile?.sitePreference) {
-    selected = await selectProductsByAlkeneSitePreference(
+    selected = await selectProductsBySitePreference(
       reactantSmiles,
       selected,
       profile.sitePreference,

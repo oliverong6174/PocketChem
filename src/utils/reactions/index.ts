@@ -9,6 +9,7 @@ export type {
   ProductGenerationStatus,
   ReactionHandlerName,
   ReactionComponent,
+  ReactionDisplayMetadata,
   ReactionPathway,
   ReactionProductMixture,
   ReactionProductMixtureKind,

@@ -1,6 +1,12 @@
 import { analyzeFunctionalGroupHierarchy } from "../../functionalGroups";
 import { analyzeNomenclatureAndProperties } from "../../nomenclatureUtils";
 import { getRuleChapter, getRuleCourse } from "../reactionCurriculum";
+import {
+  SN1_NUCLEOPHILE_PROFILES,
+  SN2_NUCLEOPHILE_PROFILES,
+  isSn1NucleophileId,
+  isSn2NucleophileId,
+} from "../profiles/nucleophiles";
 import type {
   ReactionComponent,
   ReactionProductMixture,
@@ -306,8 +312,8 @@ function halideReverseProducts(
   productPattern: string,
   nucleophileProduct: string,
   chiral = false,
+  halides: readonly ("Cl" | "Br" | "I")[] = ["Cl", "Br", "I"],
 ): string[] {
-  const halides = ["Cl", "Br", "I"];
   const transforms: string[] = [];
 
   for (const halide of halides) {
@@ -327,79 +333,27 @@ function halideReverseProducts(
 }
 
 function sn2ReverseSmarts(nucleophile: string): string[] {
-  switch (nucleophile) {
-    case "hydroxide":
-      return halideReverseProducts("[O;H1;+0:5]", "[O-;H1:5]", true);
-    case "cyanide":
-      return halideReverseProducts("[C:5]#[N:6]", "[C-:5]#[N:6]", true);
-    case "azide":
-      return halideReverseProducts(
-        "[N+0:5]=[N+:6]=[N-:7]",
-        "[N-:5]~[N+:6]~[N:7]",
-        true,
-      );
-    case "iodide": {
-      const output: string[] = [];
-      for (const halide of ["Cl", "Br"]) {
-        output.push(
-          `[C@H:1]([*:3])([*:4])[I:5]>>[C@@H:1]([*:3])([*:4])${halide}.[I-:5]`,
-          `[C@@H:1]([*:3])([*:4])[I:5]>>[C@H:1]([*:3])([*:4])${halide}.[I-:5]`,
-          `[C;X4:1][I:5]>>[C:1]${halide}.[I-:5]`,
-        );
-      }
-      return output;
-    }
-    case "ammonia":
-      return halideReverseProducts("[N;H2;+0:5]", "[N;H3;+0:5]", true);
-    case "alkoxide": {
-      const output: string[] = [];
-      for (const halide of ["Cl", "Br", "I"]) {
-        output.push(
-          `[C@H:1]([*:3])([*:4])[O+0:5][#6:6]>>[C@@H:1]([*:3])([*:4])${halide}.[O-:5][#6:6]`,
-          `[C@@H:1]([*:3])([*:4])[O+0:5][#6:6]>>[C@H:1]([*:3])([*:4])${halide}.[O-:5][#6:6]`,
-          `[C;X4:1][O+0:5][#6:6]>>[C:1]${halide}.[O-:5][#6:6]`,
-        );
-      }
-      return output;
-    }
-    case "acetylide": {
-      const output: string[] = [];
-      for (const halide of ["Cl", "Br", "I"]) {
-        output.push(
-          `[C@H:1]([*:3])([*:4])[C:6]#[#6:5]>>[C@@H:1]([*:3])([*:4])${halide}.[C-:6]#[#6:5]`,
-          `[C@@H:1]([*:3])([*:4])[C:6]#[#6:5]>>[C@H:1]([*:3])([*:4])${halide}.[C-:6]#[#6:5]`,
-          `[C;X4:1][C:6]#[#6:5]>>[C:1]${halide}.[C-:6]#[#6:5]`,
-        );
-      }
-      return output;
-    }
-    default:
-      return [];
-  }
+  if (!isSn2NucleophileId(nucleophile)) return [];
+  const profile = SN2_NUCLEOPHILE_PROFILES[nucleophile].reverse;
+  return halideReverseProducts(
+    profile.productPattern,
+    profile.nucleophileProduct,
+    profile.chiral,
+    profile.leavingHalogens,
+  );
 }
 
 function sn1ReverseSmarts(nucleophile: string): string[] {
+  if (!isSn1NucleophileId(nucleophile)) return [];
+  const profile = SN1_NUCLEOPHILE_PROFILES[nucleophile].reverse;
   const output: string[] = [];
 
-  for (const halide of ["Cl", "Br", "I"]) {
-    if (nucleophile === "water") {
-      // SN1 loses the stereochemical memory of the ionizing substrate. Both
-      // precursor configurations are therefore legitimate retrosynthetic
-      // candidates when the carbon is stereogenic.
-      output.push(
-        `[C;H1;X4:1]([*:3])([*:4])[O;H1;+0:5]>>[C@H:1]([*:3])([*:4])${halide}.[O;H2;+0:5]`,
-        `[C;H1;X4:1]([*:3])([*:4])[O;H1;+0:5]>>[C@@H:1]([*:3])([*:4])${halide}.[O;H2;+0:5]`,
-        `[C;X4:1][O;H1;+0:5]>>[C:1]${halide}.[O;H2;+0:5]`,
-      );
-    }
-
-    if (nucleophile === "alcohol") {
-      output.push(
-        `[C;H1;X4:1]([*:3])([*:4])[O+0:5][#6:6]>>[C@H:1]([*:3])([*:4])${halide}.[O;H1;+0:5][#6:6]`,
-        `[C;H1;X4:1]([*:3])([*:4])[O+0:5][#6:6]>>[C@@H:1]([*:3])([*:4])${halide}.[O;H1;+0:5][#6:6]`,
-        `[C;X4:1][O+0:5][#6:6]>>[C:1]${halide}.[O;H1;+0:5][#6:6]`,
-      );
-    }
+  for (const halide of ["Cl", "Br", "I"] as const) {
+    output.push(
+      `[C;H1;X4:1]([*:3])([*:4])${profile.productPattern}>>[C@H:1]([*:3])([*:4])${halide}.${profile.nucleophileProduct}`,
+      `[C;H1;X4:1]([*:3])([*:4])${profile.productPattern}>>[C@@H:1]([*:3])([*:4])${halide}.${profile.nucleophileProduct}`,
+      `[C;X4:1]${profile.productPattern}>>[C:1]${halide}.${profile.nucleophileProduct}`,
+    );
   }
 
   return output;
@@ -595,25 +549,28 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
 
   if (handler === "reduction") {
     if (mode === "oneTwoAddition") {
-      switch (rule.family) {
-        case "aldehydes":
+      const substrateClass = String(options.substrateClass ?? "");
+      switch (substrateClass) {
+        case "aldehyde":
           output.push("[#6:3][CH2:1][OH:2]>>[#6:3][CH:1]=[O:2]");
           break;
-        case "ketones":
+        case "ketone":
           output.push(
             "[#6:3][CH:1]([OH:2])[#6:4]>>[#6:3][C:1](=[O:2])[#6:4]",
           );
           break;
-        case "carboxylic-acids":
+        case "carboxylic-acid":
           output.push("[CH2:1][OH:2]>>[C:1](=[O:2])O");
           break;
-        case "acid-chlorides":
+        case "acid-chloride":
           output.push("[CH2:1][OH:2]>>[C:1](=[O:2])Cl");
           break;
-        case "amides":
+        case "amide":
           output.push("[CH2:1][N:3]>>[C:1](=O)[N:3]");
           break;
         default:
+          // Generic fallback is intentionally limited to ordinary aldehyde/ketone
+          // reductions. Family/folder names never determine chemistry here.
           output.push(
             "[#6:3][CH2:1][OH:2]>>[#6:3][CH:1]=[O:2]",
             "[#6:3][CH:1]([OH:2])[#6:4]>>[#6:3][C:1](=[O:2])[#6:4]",
@@ -622,9 +579,10 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
     }
 
     if (mode === "carbonylToAlkane") {
-      if (rule.family === "aldehydes") {
+      const substrateClass = String(options.substrateClass ?? "");
+      if (substrateClass === "aldehyde") {
         output.push("[#6:3][CH3:1]>>[#6:3][CH:1]=O");
-      } else if (rule.family === "ketones") {
+      } else if (substrateClass === "ketone") {
         output.push("[#6:3][CH2:1][#6:4]>>[#6:3][C:1](=O)[#6:4]");
       }
     }
@@ -801,6 +759,8 @@ async function createRetrosynthesisPathway(
     reagentNote: rule.reagentNote,
     shortExplanation: rule.explanation,
     priority: rule.priority,
+    planningCost: rule.planningCost ?? rule.priority,
+    display: rule.display ?? null,
     course: getRuleCourse(rule),
     chapter: getRuleChapter(rule),
     mechanism: rule.mechanism ?? null,
@@ -897,6 +857,7 @@ async function dedupeAndRank(
       reactionClass: pathway.reactionClass,
       selectivity: pathway.selectivity,
       selectivityProfile: pathway.selectivityProfile,
+      display: pathway.display,
     });
   }
 

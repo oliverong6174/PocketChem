@@ -1,45 +1,175 @@
 import type { ReactionRule } from "../reactionTypes";
+import { HYDROHALOGENS } from "../profiles/halogens";
+import { CONJUGATED_DIENE_HX_TEMPERATURE_GUIDE } from "../profiles/conditions";
 
-const conjugatedDieneTrigger = {
-  // Structural matching is more reliable than depending on the nomenclature/FG
-  // label of a fused or substituted diene.
-  includeSmarts: ["[C;!a]=[C;!a]-[C;!a]=[C;!a]"],
+function conjugatedPolyeneSmarts(doubleBondCount: number): string {
+  if (!Number.isInteger(doubleBondCount) || doubleBondCount < 2) {
+    throw new Error("A conjugated polyene must contain at least two double bonds.");
+  }
+
+  let smarts = "[C;!a]=[C;!a]";
+  for (let bond = 2; bond <= doubleBondCount; bond += 1) {
+    smarts += "-[C;!a]=[C;!a]";
+  }
+  return smarts;
+}
+
+/**
+ * Broad conjugated-diene trigger for reactions such as Diels-Alder chemistry
+ * that genuinely can use a four-carbon segment embedded in a longer polyene.
+ */
+const anyConjugatedDieneTrigger = {
+  includeSmarts: [conjugatedPolyeneSmarts(2)],
 };
 
-type DieneHydrohalogen = {
-  suffix: "hcl" | "hbr" | "hi";
-  reagent: "HCl" | "HBr" | "HI";
-  halogen: "Cl" | "Br" | "I";
+/**
+ * HX addition must be classified by the MAXIMAL conjugated pi system.
+ * A triene/tetraene must never fall through to a local diene 1,4 rule because
+ * that changes the remote capture atom and produces the wrong constitution.
+ */
+const isolatedDieneHxTrigger = {
+  includeSmarts: [conjugatedPolyeneSmarts(2)],
+  excludeSmarts: [conjugatedPolyeneSmarts(3)],
 };
 
-const DIENE_HX: DieneHydrohalogen[] = [
-  // HBr is listed first because the 1 equiv / temperature-controlled case is
-  // the canonical O-Chem conjugated-diene example and should appear before
-  // the generic alkene peroxide card in the reaction results.
-  { suffix: "hbr", reagent: "HBr", halogen: "Br" },
-  { suffix: "hcl", reagent: "HCl", halogen: "Cl" },
-  { suffix: "hi", reagent: "HI", halogen: "I" },
-];
+function exactConjugatedPolyeneTrigger(doubleBondCount: number) {
+  const trigger: {
+    includeSmarts: string[];
+    excludeSmarts?: string[];
+  } = {
+    includeSmarts: [conjugatedPolyeneSmarts(doubleBondCount)],
+  };
+
+  // The current handler supports up to six conjugated double bonds. Excluding
+  // the next-longer pattern makes every rule describe one maximal pi system,
+  // rather than an arbitrary overlapping sub-window.
+  if (doubleBondCount < 6) {
+    trigger.excludeSmarts = [conjugatedPolyeneSmarts(doubleBondCount + 1)];
+  }
+
+  return trigger;
+}
+
+const DIENE_HX = HYDROHALOGENS;
+
+
+
+const POLYENE_NAMES: Record<number, string> = {
+  3: "Triene",
+  4: "Tetraene",
+  5: "Pentaene",
+  6: "Hexaene",
+};
+
+/**
+ * Extended conjugation is generated from one factory for 3-6 C=C systems.
+ * Remote capture is 1,(2n) addition: triene -> 1,6, tetraene -> 1,8, etc.
+ * This prevents future local-diene hotfixes as longer conjugated systems are
+ * introduced.
+ */
+const extendedPolyeneHydrohalogenationRules: ReactionRule[] = [3, 4, 5, 6].flatMap(
+  (doubleBondCount) =>
+    DIENE_HX.flatMap(({ acidSlug, acid, symbol }, index) => {
+      const remoteLocant = 2 * doubleBondCount;
+      const polyeneName = POLYENE_NAMES[doubleBondCount] ?? "Polyene";
+      const trigger = exactConjugatedPolyeneTrigger(doubleBondCount);
+      const specificity = 100 + doubleBondCount * 20;
+
+      return [
+        {
+          id: `polyene-${doubleBondCount}-hx-1-2-${acidSlug}`,
+          family: "dienes",
+          reactionType: "addition",
+          title: `Electrophilic Addition to a Conjugated ${polyeneName}: 1,2 Product`,
+          reagents: `1 equiv ${acid}, ${CONJUGATED_DIENE_HX_TEMPERATURE_GUIDE.kineticCondition}`,
+          reagentNote: "Kinetic adjacent capture",
+          productHint: "1,2-hydrohalogenation product",
+          explanation:
+            `Protonation of the maximal conjugated ${polyeneName.toLowerCase()} forms a delocalized carbocation. Fast adjacent halide capture gives the kinetic 1,2 product.`,
+          trigger,
+          transform: {
+            type: "customHandler",
+            handler: "addition",
+            options: {
+              mode: "polyeneHydrohalogenation",
+              halogen: symbol,
+              conjugatedDoubleBonds: doubleBondCount,
+              capture: "adjacent",
+            },
+          },
+          productStatus: "computed",
+          mechanism: "Electrophilic addition through a delocalized polyallylic carbocation",
+          selectivityProfile: {
+            regiochemistry: { mode: "directed", regioselective: true },
+            mixture: "single",
+            allowsRearrangement: false,
+          },
+          competition: { group: "hx-addition-conjugation", specificity },
+          selectivity: [
+            "The maximal conjugated pi system is selected before any local diene window.",
+            "Kinetic capture occurs adjacent to the initially favored carbocation center.",
+          ],
+          priority: 90 + doubleBondCount * 10 + index * 2,
+        },
+        {
+          id: `polyene-${doubleBondCount}-hx-1-${remoteLocant}-${acidSlug}`,
+          family: "dienes",
+          reactionType: "addition",
+          title: `Electrophilic Addition to a Conjugated ${polyeneName}: 1,${remoteLocant} Product`,
+          reagents: `1 equiv ${acid}, ${CONJUGATED_DIENE_HX_TEMPERATURE_GUIDE.thermodynamicCondition}`,
+          reagentNote: `Thermodynamic remote (1,${remoteLocant}) addition`,
+          productHint: `1,${remoteLocant}-hydrohalogenation product`,
+          explanation:
+            `The delocalized polyallylic carbocation can place positive charge at the remote terminus of the maximal conjugated ${polyeneName.toLowerCase()}. Under thermodynamic-control conditions, remote halide capture gives the 1,${remoteLocant} product while retaining the most stable remaining pi system.`,
+          trigger,
+          transform: {
+            type: "customHandler",
+            handler: "addition",
+            options: {
+              mode: "polyeneHydrohalogenation",
+              halogen: symbol,
+              conjugatedDoubleBonds: doubleBondCount,
+              capture: "remote",
+            },
+          },
+          productStatus: "computed",
+          mechanism: "Electrophilic addition through a delocalized polyallylic carbocation",
+          selectivityProfile: {
+            regiochemistry: { mode: "directed", regioselective: true },
+            mixture: "single",
+            allowsRearrangement: false,
+          },
+          competition: { group: "hx-addition-conjugation", specificity },
+          selectivity: [
+            `The full ${2 * doubleBondCount}-carbon conjugated path is treated as one pi system.`,
+            "Thermodynamic remote capture is ranked by retained conjugation and alkene stability.",
+            "A longer conjugated system cannot fall through to an overlapping local diene 1,4 rule.",
+          ],
+          priority: 91 + doubleBondCount * 10 + index * 2,
+        },
+      ] satisfies ReactionRule[];
+    }),
+);
 
 const dieneHydrohalogenationRules: ReactionRule[] = DIENE_HX.flatMap(
-  ({ suffix, reagent, halogen }, index) => [
+  ({ acidSlug, acid, symbol }, index) => [
     {
-      id: `diene-hx-1-2-${suffix}`,
+      id: `diene-hx-1-2-${acidSlug}`,
       family: "dienes",
       reactionType: "addition",
       title: "Electrophilic Addition to a Diene: 1,2 Product",
-      reagents: `1 equiv ${reagent}, low temperature`,
+      reagents: `1 equiv ${acid}, ${CONJUGATED_DIENE_HX_TEMPERATURE_GUIDE.kineticCondition}`,
       reagentNote: "Kinetic 1,2-addition",
       productHint: "1,2-hydrohalogenation product",
       explanation:
         "Protonation forms an allylic carbocation. Fast halide capture at the adjacent allylic position gives the kinetic 1,2-addition product.",
-      trigger: conjugatedDieneTrigger,
+      trigger: isolatedDieneHxTrigger,
       transform: {
         type: "customHandler",
         handler: "addition",
         options: {
           mode: "dieneHydrohalogenation",
-          halogen,
+          halogen: symbol,
           additionPattern: "1,2",
         },
       },
@@ -50,30 +180,31 @@ const dieneHydrohalogenationRules: ReactionRule[] = DIENE_HX.flatMap(
         mixture: "single",
         allowsRearrangement: false,
       },
+      competition: { group: "hx-addition-conjugation", specificity: 100 },
       selectivity: [
         "Kinetic 1,2 product",
-        "Favored at lower temperature",
-        "PocketChem ranks the allylic-cation orientations and keeps the favored regioisomer instead of displaying every formal atom-map match.",
+        CONJUGATED_DIENE_HX_TEMPERATURE_GUIDE.kineticNote,
+        "PocketChem ranks the allylic-cation orientations and then resolves overlapping diene embeddings by whole-system conjugation scoring, so extended or fused π systems are not decided by the first local SMARTS match.",
       ],
       priority: 106 + index * 2,
     },
     {
-      id: `diene-hx-1-4-${suffix}`,
+      id: `diene-hx-1-4-${acidSlug}`,
       family: "dienes",
       reactionType: "addition",
       title: "Electrophilic Addition to a Diene: 1,4 Product",
-      reagents: reagent === "HBr" ? "1 equiv HBr, 40 °C" : `1 equiv ${reagent}, higher temperature`,
+      reagents: `1 equiv ${acid}, ${CONJUGATED_DIENE_HX_TEMPERATURE_GUIDE.thermodynamicCondition}`,
       reagentNote: "Thermodynamic 1,4-addition",
       productHint: "1,4-hydrohalogenation product",
       explanation:
         "The allylic carbocation is resonance-delocalized. At higher temperature the reversible addition can equilibrate toward remote halide capture and the thermodynamically favored 1,4-addition alkene.",
-      trigger: conjugatedDieneTrigger,
+      trigger: isolatedDieneHxTrigger,
       transform: {
         type: "customHandler",
         handler: "addition",
         options: {
           mode: "dieneHydrohalogenation",
-          halogen,
+          halogen: symbol,
           additionPattern: "1,4",
         },
       },
@@ -84,10 +215,11 @@ const dieneHydrohalogenationRules: ReactionRule[] = DIENE_HX.flatMap(
         mixture: "single",
         allowsRearrangement: false,
       },
+      competition: { group: "hx-addition-conjugation", specificity: 100 },
       selectivity: [
         "Thermodynamic 1,4 product",
-        reagent === "HBr" ? "40 °C is a common higher-temperature/thermodynamic HBr condition" : "Favored at higher temperature",
-        "The major product is ranked by the stability of the resulting alkene and allylic-cation pathway; lower-ranked formal regioisomers are not displayed.",
+        CONJUGATED_DIENE_HX_TEMPERATURE_GUIDE.thermodynamicNote,
+        "The major product is ranked by the remaining conjugated π system, alkene stability, and the allylic-cation pathway; lower-ranked formal regioisomers from overlapping diene embeddings are not displayed.",
         "One equivalent adds one HX across the conjugated diene rather than saturating both double bonds.",
       ],
       priority: 107 + index * 2,
@@ -96,6 +228,7 @@ const dieneHydrohalogenationRules: ReactionRule[] = DIENE_HX.flatMap(
 );
 
 export const dieneReactionRules: ReactionRule[] = [
+  ...extendedPolyeneHydrohalogenationRules,
   ...dieneHydrohalogenationRules,
   {
     id: "diene-diels-alder",
@@ -107,7 +240,7 @@ export const dieneReactionRules: ReactionRule[] = [
     productHint: "Cyclohexene derivative",
     explanation:
       "A conjugated diene in the s-cis conformation reacts with a dienophile in one concerted step to form a six-membered ring.",
-    trigger: conjugatedDieneTrigger,
+    trigger: anyConjugatedDieneTrigger,
     additionalReactants: [
       {
         label: "dienophile",
@@ -126,6 +259,7 @@ export const dieneReactionRules: ReactionRule[] = [
       },
     },
     productStatus: "representative",
+    display: { renderer: "heavy-atom-stereo" },
     selectivityProfile: {
       // With achiral starting materials, attack on the two enantiotopic faces
       // gives a racemate. Both members remain stored for chemical identity,
@@ -141,8 +275,8 @@ export const dieneReactionRules: ReactionRule[] = [
     ],
     limitations: [
       "The diene must be able to adopt an s-cis conformation.",
-      "PocketChem propagates dienophile E/Z stereochemistry and, for supported substituted-diene halo-enal/halo-enone motifs, also assigns the new diene-terminal stereocenter. Other highly substituted patterns fall back to constitution rather than inventing R/S labels.",
-      "Full endo/exo facial ranking for every unsymmetrical substituted diene remains a separate selectivity problem.",
+      "PocketChem propagates dienophile E/Z stereochemistry and, when both terminal diene double bonds are stereodefined, assigns the diene-derived product centers for H1/H1 termini and the common H0 methyl/non-methyl carbon-substituted terminus class. Unsupported highly substituted patterns fall back to constitution rather than inventing R/S labels.",
+      "Full endo/exo facial ranking for every unsymmetrical or multiply substituted diene/dienophile remains a separate selectivity problem.",
     ],
     priority: 700,
   },
@@ -156,19 +290,34 @@ export const dieneReactionRules: ReactionRule[] = [
     productHint: "Cyclohexadiene derivative",
     explanation:
       "A conjugated diene can undergo a concerted [4+2] cycloaddition with an alkyne dienophile, leaving a second double bond in the six-membered product.",
-    trigger: conjugatedDieneTrigger,
+    trigger: anyConjugatedDieneTrigger,
     additionalReactants: [
       { label: "alkyne dienophile", trigger: { includeSmarts: ["[C]#[C]"] } },
     ],
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]=[C:2]-[C:3]=[C:4].[C:5]#[C:6]>>[C:1]1-[C:2]=[C:3]-[C:4]-[C:5]=[C:6]-1",
-      maxProducts: 12,
+      type: "customHandler",
+      handler: "pericyclic",
+      options: {
+        mode: "dielsAlder",
+        dienophileBond: "alkyne",
+        maxProducts: 12,
+      },
     },
     mechanism: "Pericyclic [4+2] cycloaddition",
-    selectivity: ["Stereospecific", "Endo approach is often kinetically favored when applicable"],
+    selectivityProfile: {
+      mixture: "expected",
+    },
+    selectivity: [
+      "Stereospecific and suprafacial on the diene: defined terminal-diene E/Z relationships are transferred to newly formed tetrahedral centers",
+      "An alkyne dienophile remains a C=C bond in the cyclohexadiene product",
+      "When facial attack gives an enantiomeric pair, PocketChem stores both members but displays one representative racemate member",
+    ],
     productStatus: "representative",
-    limitations: ["The diene must be able to adopt an s-cis conformation.", "Facial and endo/exo stereochemistry are not yet assigned."],
+    display: { renderer: "heavy-atom-stereo" },
+    limitations: [
+      "The diene must be able to adopt an s-cis conformation.",
+      "PocketChem assigns diene-derived stereochemistry for defined H1/H1 termini and for the common H0 methyl/non-methyl carbon-substituted terminus class; more exotic fully substituted termini fall back to constitution rather than inventing R/S.",
+    ],
     priority: 702,
   },
   {
@@ -181,7 +330,7 @@ export const dieneReactionRules: ReactionRule[] = [
     productHint: "Polyene polymer",
     explanation:
       "Conjugated dienes can polymerize by 1,2- or 1,4-addition pathways, producing polymers with different alkene placement and stereochemistry.",
-    trigger: conjugatedDieneTrigger,
+    trigger: anyConjugatedDieneTrigger,
     transform: {
       type: "conceptOnly",
       reason:

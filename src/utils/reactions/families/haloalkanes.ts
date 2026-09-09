@@ -1,4 +1,5 @@
 import type { ReactionRule } from "../reactionTypes";
+import { GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS } from "../organometallic";
 
 const alkylHalideTrigger = {
   anyFunctionalGroups: ["Haloalkane", "Allylic halide", "Benzyl halide"],
@@ -182,6 +183,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Secondary substrates may also undergo E2; tertiary substrates are excluded from this SN2 rule.",
     ],
     productStatus: "representative",
+    constraints: ["sn2-electrophile-accessible"],
     priority: 200,
   },
   {
@@ -213,7 +215,49 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Secondary substrates can compete with E2.",
     ],
     productStatus: "representative",
+    constraints: ["sn2-electrophile-accessible"],
     priority: 210,
+  },
+  {
+    id: "haloalkane-cyanide-then-organometallic-ketone",
+    family: "haloalkanes",
+    reactionType: "addition",
+    reactionClass: "multistep carbon–carbon bond formation",
+    title: "Nitrile Formation Followed by Grignard/Organolithium Addition",
+    reagents: "1) NaCN  2) RMgCl, RMgBr, RMgI, or RLi  3) H₃O⁺",
+    reagentNote: "Draw the alkyl halide and organometallic reagent as disconnected structures",
+    productHint: "Ketone",
+    explanation:
+      "Cyanide first replaces the leaving group by SN2, adding one carbon and forming a nitrile. A user-drawn Grignard or organolithium reagent then adds to that nitrile; acidic hydrolysis of the imine intermediate gives the ketone. This combines two general reactions without hard-coding either carbon skeleton.",
+    trigger: primaryOrMethylHalideTrigger,
+    additionalReactants: [
+      {
+        id: "organometallic-carbon-nucleophile",
+        label: "Grignard or organolithium reagent",
+        trigger: { includeSmarts: [GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS] },
+        supplyMode: "user-structure",
+        contributesToProduct: true,
+        role: "nucleophile",
+      },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts:
+        "[C;X4;H2,H3:1][Cl,Br,I:2].[#6:3][Mg,Li]>>[C:1][C](=O)[#6:3]",
+      maxProducts: 8,
+    },
+    productStatus: "computed",
+    mechanism: "SN2 cyanide substitution → organometallic addition to nitrile → imine hydrolysis",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      mixture: "single",
+    },
+    selectivity: [
+      "The first step requires an SN2-accessible methyl/primary alkyl halide.",
+      "The nitrile carbon becomes the ketone carbonyl carbon.",
+      "The carbon originally bonded to Mg/Li becomes the second carbon substituent on the ketone.",
+    ],
+    priority: 215,
   },
   {
     id: "haloalkane-sn2-azide",
@@ -243,6 +287,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "SN2 inversion is explicitly encoded at a stereogenic reacting carbon.",
     ],
     productStatus: "representative",
+    constraints: ["sn2-electrophile-accessible"],
     priority: 220,
   },
   {
@@ -274,6 +319,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Tertiary alkyl halides do not undergo clean SN2 substitution with iodide.",
     ],
     productStatus: "representative",
+    constraints: ["sn2-electrophile-accessible"],
     priority: 225,
   },
   {
@@ -304,6 +350,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Secondary substrates are more hindered and can show competing elimination.",
     ],
     productStatus: "representative",
+    constraints: ["sn2-electrophile-accessible"],
     priority: 230,
   },
   {
@@ -342,6 +389,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "SN2 inversion is explicitly encoded when the reacting carbon is stereogenic.",
     ],
     productStatus: "representative",
+    constraints: ["sn2-electrophile-accessible"],
     priority: 240,
   },
   {
@@ -374,6 +422,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "inversion", stereospecific: true },
       mixture: "single",
     },
+    constraints: ["sn2-electrophile-accessible"],
     priority: 250,
   },
 
@@ -572,6 +621,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Primary and secondary substrates can show competing SN2.",
     ],
     productStatus: "representative",
+    constraints: ["e2-needs-beta-carbon"],
     priority: 270,
   },
   {
@@ -610,6 +660,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Secondary substrates can show competing SN2.",
     ],
     productStatus: "representative",
+    constraints: ["e2-needs-beta-carbon"],
     priority: 272,
   },
   {
@@ -647,6 +698,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "The handler generates common disubstituted E/Z products but does not explicitly model steric approach trajectories, conformer populations, or general highly substituted alkene geometry.",
     ],
     productStatus: "representative",
+    constraints: ["e2-needs-beta-carbon"],
     priority: 274,
   },
   {
@@ -684,6 +736,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "The handler generates common acyclic disubstituted E/Z products but does not yet model anti-periplanar conformer populations or general highly substituted alkene geometry.",
     ],
     productStatus: "representative",
+    constraints: ["e2-needs-beta-carbon"],
     priority: 276,
   },
 
@@ -775,6 +828,33 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     ],
     productStatus: "representative",
     priority: 292,
+  },
+
+  {
+    id: "haloalkane-gabriel-primary-amine",
+    family: "haloalkanes",
+    reactionType: "substitution",
+    reactionClass: "nucleophilic substitution",
+    title: "Gabriel Synthesis of a Primary Amine",
+    reagents: "1) potassium phthalimide  2) NH₂NH₂ or hydrolysis",
+    reagentNote: "Clean primary-amine synthesis from a methyl/primary alkyl halide",
+    productHint: "Primary amine",
+    explanation:
+      "Phthalimide anion alkylates a methyl or primary alkyl halide by SN2. Cleavage of the imide then releases the primary amine without the over-alkylation common with direct ammonia alkylation.",
+    trigger: primaryOrMethylHalideTrigger,
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C;X4;H2,H3:1][Cl,Br,I:2]>>[C:1][NH2]",
+      maxProducts: 8,
+    },
+    productStatus: "computed",
+    mechanism: "SN2 alkylation followed by imide cleavage",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", stereospecific: true },
+      mixture: "single",
+    },
+    limitations: ["Best for methyl and primary alkyl halides; secondary/tertiary substrates favor competing elimination or fail SN2."],
+    priority: 675,
   },
 
   {

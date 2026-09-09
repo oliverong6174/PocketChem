@@ -1,11 +1,11 @@
+import { reagentBubbleLabels } from "../utils/reactions/reactionPresentation";
 import { useEffect, useRef, useState } from "react";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
+import { rendererForReactionDisplay } from "./reactionProductRenderer";
 import {
   analyzeFunctionalGroupHierarchy,
-  getAntiDiolSvg,
   getCondensedSulfonateSvg,
   getRDKit,
-  getSynDiolSvg,
 } from "../utils/functionalGroups";
 import { analyzeNomenclatureAndProperties } from "../utils/nomenclatureUtils";
 import {
@@ -111,29 +111,9 @@ function courseLabel(course: SynthesisStep["course"]) {
       : "Advanced";
 }
 
-function reagentBubbleLabels(label: string): string[] {
-  const parts = label
-    .split(";")
-    .map((part) => part.trim())
-    .filter(Boolean);
-
-  // Keep sequential reagent steps together, but render true alternatives as
-  // separate bubbles just like the Reactions page.
-  const isAlternativeList =
-    parts.length > 1 && /^or\s+/i.test(parts[parts.length - 1] ?? "");
-
-  if (!isAlternativeList) return [label];
-  return parts.map((part) => part.replace(/^or\s+/i, "").trim());
-}
 
 function synthesisStepProductRenderer(step: SynthesisStep) {
-  if (step.ruleId === "alkene-syn-dihydroxylation") return getSynDiolSvg;
-  if (step.ruleId === "alkene-anti-dihydroxylation") return getAntiDiolSvg;
-
-  // Other optically active products (SN1/SN2, E/Z products, etc.) keep using
-  // the normal renderer. Their isomeric SMILES already carries @/@@ or E/Z,
-  // so RDKit draws the appropriate wedge/dash or alkene geometry directly.
-  return getCondensedSulfonateSvg;
+  return rendererForReactionDisplay(step.display, { allowGenericHalogen: false });
 }
 
 function progressLabel(progress: MultistepSynthesisProgress): string {

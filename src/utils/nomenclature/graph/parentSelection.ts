@@ -1347,6 +1347,43 @@ function getBestExternalPreferredCarbonPath(
   return bestPath;
 }
 
+/** Return every carbon atom belonging to any benzene-like six-membered ring. */
+export function getAllBenzeneLikeCarbonAtoms(parsedMol: ParsedMol): Set<number> {
+  const aromaticAtoms = new Set<number>();
+  const seenCycles = new Set<string>();
+
+  const dfs = (start: number, current: number, path: number[]) => {
+    if (path.length === 6) {
+      const closes = (parsedMol.adjacency.get(current) ?? []).some(
+        (bond) => getOtherAtom(bond, current) === start,
+      );
+      if (!closes) return;
+      const key = [...path].sort((a, b) => a - b).join("-");
+      if (seenCycles.has(key)) return;
+      seenCycles.add(key);
+      const ringSet = new Set(path);
+      const ringBonds = parsedMol.bonds.filter(
+        (bond) => ringSet.has(bond.atomA) && ringSet.has(bond.atomB),
+      );
+      const ring: RingDescriptor = { ringAtoms: [...path], ringBonds };
+      if (!isBenzeneLikeRing(parsedMol, ring)) return;
+      path.forEach((atomIndex) => aromaticAtoms.add(atomIndex));
+      return;
+    }
+    for (const bond of parsedMol.adjacency.get(current) ?? []) {
+      const next = getOtherAtom(bond, current);
+      if (next === start || path.includes(next)) continue;
+      if (parsedMol.atoms[next]?.element !== "C") continue;
+      dfs(start, next, [...path, next]);
+    }
+  };
+
+  for (const atom of parsedMol.atoms) {
+    if (atom.element === "C") dfs(atom.atomIndex, atom.atomIndex, [atom.atomIndex]);
+  }
+  return aromaticAtoms;
+}
+
 export function getBestAcylParentDescriptor(
   parsedMol: ParsedMol,
   preferredAtoms: number[] = []
@@ -1360,69 +1397,53 @@ export function getBestAcylParentDescriptor(
   const preferredCarbonylCarbons = allCarbonylCarbons.filter((atomIndex) =>
     preferredSet.has(atomIndex)
   );
-
   const carbonylCarbons =
     preferredSet.size > 0 && preferredCarbonylCarbons.length > 0
       ? preferredCarbonylCarbons
       : allCarbonylCarbons;
-
-
-  const aromaticRing = getSimpleCarbonRing(parsedMol);
-  const aromaticRingSet =
-    aromaticRing && isBenzeneLikeRing(parsedMol, aromaticRing)
-      ? new Set(aromaticRing.ringAtoms)
-      : new Set<number>();
-
+  const carbonylSet = new Set(carbonylCarbons);
+  const aromaticRingSet = getAllBenzeneLikeCarbonAtoms(parsedMol);
   let bestPath: number[] = [];
 
+  const preferredCount = (path: number[]) =>
+    path.filter((atomIndex) => preferredSet.has(atomIndex)).length;
+
   const isBetterAcylPath = (path: number[]) => {
+    if (!path.some((atomIndex) => carbonylSet.has(atomIndex))) return false;
     if (bestPath.length === 0) return true;
 
-    // Acyl/aldehyde parent chain must start at the carbonyl carbon.
-    // Then choose the longest chain, then the most unsaturation.
-    if (path.length > bestPath.length) return true;
-    if (path.length < bestPath.length) return false;
+    const pathPreferred = preferredCount(path);
+    const bestPreferred = preferredCount(bestPath);
+    if (pathPreferred !== bestPreferred) return pathPreferred > bestPreferred;
+    if (path.length !== bestPath.length) return path.length > bestPath.length;
 
     const pathUnsaturation = getPathUnsaturationCount(parsedMol, path);
     const bestUnsaturation = getPathUnsaturationCount(parsedMol, bestPath);
-
-    if (pathUnsaturation > bestUnsaturation) return true;
-    if (pathUnsaturation < bestUnsaturation) return false;
-
-    return false;
+    return pathUnsaturation > bestUnsaturation;
   };
 
-  const dfs = (
-    current: number,
-    visited: Set<number>,
-    path: number[]
-  ) => {
-    if (isBetterAcylPath(path)) {
-      bestPath = [...path];
-    }
-
+  const dfs = (current: number, visited: Set<number>, path: number[]) => {
+    if (isBetterAcylPath(path)) bestPath = [...path];
     for (const bond of parsedMol.adjacency.get(current) ?? []) {
       const next = getOtherAtom(bond, current);
       const nextAtom = parsedMol.atoms[next];
-
       if (!nextAtom || nextAtom.element !== "C") continue;
-      if (visited.has(next)) continue;
-      if (aromaticRingSet.has(next)) continue;
-
+      if (visited.has(next) || aromaticRingSet.has(next)) continue;
       visited.add(next);
       dfs(next, visited, [...path, next]);
       visited.delete(next);
     }
   };
 
-  for (const carbonylCarbon of carbonylCarbons) {
-    dfs(carbonylCarbon, new Set([carbonylCarbon]), [carbonylCarbon]);
+  const eligibleCarbonStarts = parsedMol.atoms
+    .filter((atom) => atom.element === "C" && !aromaticRingSet.has(atom.atomIndex))
+    .map((atom) => atom.atomIndex);
+  for (const startAtom of eligibleCarbonStarts) {
+    dfs(startAtom, new Set([startAtom]), [startAtom]);
   }
 
   if (bestPath.length === 0) return null;
-
   const prefix = CHAIN_PREFIXES[bestPath.length];
-
   return {
     kind: "chain",
     path: bestPath,

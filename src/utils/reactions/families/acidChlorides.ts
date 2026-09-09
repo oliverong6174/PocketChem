@@ -96,20 +96,27 @@ export const acidChlorideReactionRules: ReactionRule[] = [
     family: "acid-chlorides",
     reactionType: "substitution",
     title: "Anhydride Formation from an Acid Chloride",
-    reagents: "Carboxylate salt",
-    reagentNote: "Draw the acid chloride and carboxylate as disconnected structures",
+    reagents: "RCO₂⁻, or RCO₂H with pyridine/Et₃N",
+    reagentNote: "Draw the acid chloride and carboxylic acid/carboxylate as disconnected structures",
     productHint: "Acid anhydride",
     explanation:
-      "A carboxylate nucleophile displaces chloride from an acid chloride to form an acid anhydride.",
+      "A carboxylate attacks an acid chloride and displaces chloride to form an acid anhydride. A drawn carboxylic acid is treated as the same general pathway when base is present to generate the carboxylate in situ.",
     trigger: acidChlorideTrigger,
     additionalReactants: [
-      { label: "carboxylate", trigger: { includeSmarts: ["[C](=O)[O-]"] } },
+      {
+        label: "carboxylic acid or carboxylate",
+        trigger: { includeSmarts: ["[C](=O)[O;H1,-1]"] },
+        contributesToProduct: true,
+        role: "nucleophile",
+        searchAliases: ["carboxylic acid", "carboxylate", "RCO2H", "RCO2-"],
+      },
     ],
     transform: {
       type: "reactionSmarts",
-      smarts: "[C:1](=[O:2])[Cl,Br,I].[C:3](=[O:4])[O-:5]>>[C:1](=[O:2])[O+0:5][C:3](=[O:4])",
+      smarts: "[C:1](=[O:2])[Cl,Br,I].[C:3](=[O:4])[O;H1,-1:5]>>[C:1](=[O:2])[O+0:5][C:3](=[O:4])",
       maxProducts: 8,
     },
+    mechanism: "Nucleophilic acyl substitution",
     priority: 1527,
   },
   {
@@ -128,6 +135,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
       handler: "reduction",
       options: {
         mode: "oneTwoAddition",
+        substrateClass: "acid-chloride",
         nucleophile: "hydride",
       },
     },

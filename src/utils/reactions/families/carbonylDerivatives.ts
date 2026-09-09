@@ -20,8 +20,8 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
     family: "carbonyl-derivatives",
     reactionType: "reduction",
     title: "Reductive Amination",
-    reagents: "1) NH₃, RNH₂, or R₂NH  2) NaBH₃CN or NaBH(OAc)₃",
-    reagentNote: "C=N formation followed by selective reduction",
+    reagents: "1) NH₃, RNH₂, or R₂NH  2) NaBH₃CN, NaBH(OAc)₃, H₂/Ni, or LiAlH₄ after C=N formation",
+    reagentNote: "Imine/iminium formation followed by reduction",
     productHint: "Amine",
     explanation:
       "An aldehyde or ketone condenses with an amine to form an imine or iminium ion, which is reduced to an amine without normally reducing the starting carbonyl directly.",
@@ -37,7 +37,11 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
       smarts: "[C:1]=[O:2].[N;H1,H2,H3:3]>>[C:1]-[N:3]",
       maxProducts: 8,
     },
-    mechanism: "Condensation followed by hydride reduction",
+    mechanism: "Condensation followed by reduction of the imine/iminium intermediate",
+    limitations: [
+      "NaBH₃CN and NaBH(OAc)₃ are preferred for one-pot chemoselective reductive amination. LiAlH₄ is represented as the stepwise variant after the imine/iminium intermediate has been formed, because LiAlH₄ would also reduce an unreacted carbonyl.",
+    ],
+    searchAliases: ["reductive amination", "secondary amine then LAH", "imine LiAlH4", "iminium reduction"],
     priority: 1260,
   },
   {
@@ -55,10 +59,13 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
       includeSmarts: ["[CX4]([OX2][#6])([OX2][#6])"],
     },
     transform: {
-      type: "conceptOnly",
-      reason: "The two alkoxy groups may belong to one cyclic diol or two separate alcohol fragments, so generic exact fragment reconstruction needs a multi-fragment atom-mapping model.",
+      type: "reactionSmarts",
+      smarts: "[C;X4:1]([O;X2:2][#6:3])([O;X2:4][#6:5])>>[C:1]=O",
+      maxProducts: 8,
     },
+    productStatus: "computed",
     mechanism: "Acid-catalyzed hydrolysis",
+    selectivity: ["PocketChem displays the regenerated aldehyde/ketone as the principal organic product; the alcohol/diol coproduct is implied by hydrolysis rather than duplicated on the product card."],
     priority: 1270,
   },
   {
@@ -76,10 +83,13 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
       includeSmarts: ["[CX4]([OX2H])([OX2][#6])"],
     },
     transform: {
-      type: "conceptOnly",
-      reason: "Cyclic hemiacetals require ring-aware fragment reconstruction when the C–O bond is cleaved.",
+      type: "reactionSmarts",
+      smarts: "[C;X4:1]([O;H1:2])([O;X2:3][#6:4])>>[C:1]=O",
+      maxProducts: 8,
     },
+    productStatus: "computed",
     mechanism: "Acid-catalyzed hydrolysis",
+    selectivity: ["The carbonyl compound is shown as the principal organic product; the corresponding alcohol coproduct is implied."],
     priority: 1280,
   },
   {

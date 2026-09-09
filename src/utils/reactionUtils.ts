@@ -15,6 +15,7 @@ export {
 
 export type {
   ReactionComponent,
+  ReactionDisplayMetadata,
   ReactionPathway,
   ReactionProductMixture,
   ReactionProductMixtureKind,

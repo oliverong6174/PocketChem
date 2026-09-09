@@ -1,7 +1,10 @@
 import { analyzeFunctionalGroupHierarchy } from "../../functionalGroups";
 import type { FunctionalGroupResult } from "../../functionalGroups";
 import type { ReactionComponent } from "../reactionTypes";
-import { GRIGNARD_HALOGENS } from "../organometallic";
+import {
+  GRIGNARD_HALOGENS,
+  ORGANOMETALLIC_ION_PAIR_PROFILES,
+} from "../organometallic";
 
 function nextRGroupMapFactory() {
   let next = 1;
@@ -132,45 +135,29 @@ function coalesceOrganometallicIonPairs(parts: string[]): string[] {
       }
     }
 
-    const isMg = isMetalFragment(part, "Mg");
-    const isZn = isMetalFragment(part, "Zn");
-    const isCu = isMetalFragment(part, "Cu");
-
-    if (isMg || isZn) {
-      const allowedCounterions = isMg
-        ? new Set<string>(GRIGNARD_HALOGENS)
-        : new Set<string>(["F", "Cl", "Br", "I"]);
-
-      const counterionIndex = parts.findIndex((candidate, candidateIndex) => {
+    let paired = false;
+    for (const profile of ORGANOMETALLIC_ION_PAIR_PROFILES) {
+      if (!isMetalFragment(part, profile.metal)) continue;
+      const allowedPartners = new Set(profile.partnerElements);
+      const partnerIndex = parts.findIndex((candidate, candidateIndex) => {
         if (candidateIndex === index || consumed.has(candidateIndex)) return false;
-        return allowedCounterions.has(standaloneElement(candidate) ?? "");
+        return allowedPartners.has(standaloneElement(candidate) ?? "");
       });
+      if (partnerIndex < 0) continue;
 
-      if (counterionIndex >= 0) {
-        consumed.add(counterionIndex);
-
-        if (isMg) {
-          const bonded = bondMagnesiumToHalide(part, parts[counterionIndex]);
-          grouped.push(bonded ?? `${part}.${parts[counterionIndex]}`);
-        } else {
-          grouped.push(`${part}.${parts[counterionIndex]}`);
-        }
-        continue;
+      consumed.add(partnerIndex);
+      const partner = parts[partnerIndex];
+      if (profile.representation === "bond-counterion") {
+        grouped.push(bondMagnesiumToHalide(part, partner) ?? `${part}.${partner}`);
+      } else if (profile.representation === "dot-cation-first") {
+        grouped.push(`${partner}.${part}`);
+      } else {
+        grouped.push(`${part}.${partner}`);
       }
+      paired = true;
+      break;
     }
-
-    if (isCu) {
-      const lithiumIndex = parts.findIndex((candidate, candidateIndex) => {
-        if (candidateIndex === index || consumed.has(candidateIndex)) return false;
-        return standaloneElement(candidate) === "Li";
-      });
-
-      if (lithiumIndex >= 0) {
-        consumed.add(lithiumIndex);
-        grouped.push(`${parts[lithiumIndex]}.${part}`);
-        continue;
-      }
-    }
+    if (paired) continue;
 
     grouped.push(part);
   }

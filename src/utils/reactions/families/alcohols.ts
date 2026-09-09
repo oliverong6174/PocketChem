@@ -28,6 +28,99 @@ const primaryOrSecondaryAlcoholTrigger = {
   ],
 };
 
+type SecondaryAlcoholOxidantProfile = {
+  id: string;
+  title: string;
+  reagents: string;
+  reagentNote: string;
+  explanation: string;
+  priority: number;
+  limitations?: string[];
+  includeRetentionMetadata?: boolean;
+};
+
+const SECONDARY_ALCOHOL_OXIDANTS: readonly SecondaryAlcoholOxidantProfile[] = [
+  {
+    id: "pcc",
+    title: "Secondary Alcohol Oxidation with PCC",
+    reagents: "PCC",
+    reagentNote: "Mild oxidation to a ketone",
+    explanation: "PCC oxidizes a secondary alcohol to a ketone without changing the carbon skeleton.",
+    priority: 580,
+    includeRetentionMetadata: true,
+  },
+  {
+    id: "dmp",
+    title: "Secondary Alcohol Oxidation with DMP",
+    reagents: "Dess–Martin periodinane (DMP)",
+    reagentNote: "Mild oxidation to a ketone",
+    explanation: "Dess–Martin periodinane oxidizes a secondary alcohol to a ketone under mild conditions.",
+    priority: 581,
+  },
+  {
+    id: "jones",
+    title: "Secondary Alcohol Oxidation with Jones Reagent",
+    reagents: "CrO₃, H₂SO₄, H₂O (Jones reagent)",
+    reagentNote: "Strong aqueous oxidation to a ketone",
+    explanation: "Jones reagent oxidizes a secondary alcohol to a ketone; unlike primary alcohols, ketones are not normally overoxidized under standard conditions.",
+    priority: 582,
+  },
+  {
+    id: "naocl",
+    title: "Secondary Alcohol Oxidation with Hypochlorite",
+    reagents: "NaOCl",
+    reagentNote: "Oxidation to a ketone",
+    explanation: "Sodium hypochlorite can oxidize a secondary alcohol to the corresponding ketone under suitable reaction conditions.",
+    priority: 583,
+  },
+  {
+    id: "kmno4",
+    title: "Secondary Alcohol Oxidation with Permanganate",
+    reagents: "KMnO₄",
+    reagentNote: "Strong oxidation to a ketone",
+    explanation: "Permanganate can oxidize a secondary alcohol to a ketone, although it is a harsher and less selective choice than PCC or DMP.",
+    limitations: ["A harsher oxidant; other oxidizable functional groups may reduce chemoselectivity."],
+    priority: 584,
+  },
+];
+
+function makeSecondaryAlcoholOxidationRule(
+  oxidant: SecondaryAlcoholOxidantProfile,
+): ReactionRule {
+  return {
+    id: `secondary-alcohol-oxidation-${oxidant.id}`,
+    family: "alcohols",
+    reactionType: "oxidation",
+    title: oxidant.title,
+    reagents: oxidant.reagents,
+    reagentNote: oxidant.reagentNote,
+    productHint: "Ketone",
+    explanation: oxidant.explanation,
+    trigger: secondaryAlcoholTrigger,
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1][CH:2]([OH:3])[C:4]>>[C:1][C:2](=[O:3])[C:4]",
+    },
+    mechanism: "Oxidation",
+    display: { renderer: "explicit-alcohol-stereo" },
+    ...(oxidant.includeRetentionMetadata
+      ? {
+          selectivityProfile: {
+            stereochemistry: { mode: "retention" as const, stereospecific: true },
+            mixture: "single" as const,
+            allowsRearrangement: false,
+          },
+          selectivity: [
+            "Only the secondary C-OH center is oxidized; unrelated stereocenters are retained",
+          ],
+        }
+      : {}),
+    ...(oxidant.limitations ? { limitations: oxidant.limitations } : {}),
+    constraints: ["oxidizable-alcohol-needs-carbon-h"],
+    priority: oxidant.priority,
+  };
+}
+
 export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-deprotonation",
@@ -94,6 +187,8 @@ export const alcoholReactionRules: ReactionRule[] = [
       "The shared carbocation engine now evaluates favorable hydride/alkyl shifts before alcohol E1 elimination.",
       "E/Z is explicit for common acyclic disubstituted alkenes; general highly substituted geometry is still in development.",
     ],
+    competition: { group: "acidic-alcohol-rearrangement", specificity: 10 },
+    constraints: ["generic-dehydration-not-vicinal-diol"],
     priority: 500,
   },
   {
@@ -134,6 +229,8 @@ export const alcoholReactionRules: ReactionRule[] = [
     limitations: [
       "Detailed acid-mediated transition-state and conformational effects are simplified.",
     ],
+    competition: { group: "acidic-alcohol-rearrangement", specificity: 10 },
+    constraints: ["generic-dehydration-not-vicinal-diol"],
     priority: 502,
   },
   {
@@ -189,6 +286,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Both OH groups are consumed under excess HBr",
       "Configuration at secondary/tertiary reacting centers is not retained as one enantiopure product",
     ],
+    competition: { group: "hbr-alcohol-substitution", specificity: 100 },
     priority: 518,
   },
   {
@@ -224,6 +322,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       allowsRearrangement: false,
     },
     selectivity: ["Backside displacement", "No carbocation rearrangement"],
+    competition: { group: "hbr-alcohol-substitution", specificity: 10 },
     priority: 520,
   },
   {
@@ -263,6 +362,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "Real ion-pair effects can make experimental racemization incomplete.",
       "Equal-stability rearrangements are not automatically promoted.",
     ],
+    competition: { group: "hbr-alcohol-substitution", specificity: 10 },
     priority: 522,
   },
   {
@@ -302,6 +402,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       allowsRearrangement: true,
     },
     selectivity: ["Rearrangements and racemization may occur"],
+    constraints: ["lucas-primary-room-temperature"],
     priority: 530,
   },
   {
@@ -332,6 +433,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       allowsRearrangement: false,
     },
     selectivity: ["Inversion at a reacting stereocenter"],
+    constraints: ["sn2-alcohol-center-accessible"],
     priority: 540,
   },
   {
@@ -362,6 +464,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       allowsRearrangement: false,
     },
     selectivity: ["Often inversion with pyridine"],
+    constraints: ["sn2-alcohol-center-accessible"],
     priority: 550,
   },
   {
@@ -385,6 +488,8 @@ export const alcoholReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     mechanism: "Oxidation",
+    display: { renderer: "explicit-alcohol-stereo" },
+    constraints: ["oxidizable-alcohol-needs-carbon-h"],
     priority: 560,
   },
   {
@@ -408,107 +513,12 @@ export const alcoholReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     mechanism: "Oxidation",
+    display: { renderer: "explicit-alcohol-stereo" },
+    constraints: ["oxidizable-alcohol-needs-carbon-h"],
     priority: 570,
   },
-  {
-    id: "secondary-alcohol-oxidation-pcc",
-    family: "alcohols",
-    reactionType: "oxidation",
-    title: "Secondary Alcohol Oxidation with PCC",
-    reagents: "PCC",
-    reagentNote: "Mild oxidation to a ketone",
-    productHint: "Ketone",
-    explanation:
-      "PCC oxidizes a secondary alcohol to a ketone without changing the carbon skeleton.",
-    trigger: secondaryAlcoholTrigger,
-    transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1][CH:2]([OH:3])[C:4]>>[C:1][C:2](=[O:3])[C:4]",
-    },
-    mechanism: "Oxidation",
-    selectivityProfile: {
-      stereochemistry: { mode: "retention", stereospecific: true },
-      mixture: "single",
-      allowsRearrangement: false,
-    },
-    selectivity: [
-      "Only the secondary C-OH center is oxidized; unrelated stereocenters are retained",
-    ],
-    priority: 580,
-  },
-  {
-    id: "secondary-alcohol-oxidation-dmp",
-    family: "alcohols",
-    reactionType: "oxidation",
-    title: "Secondary Alcohol Oxidation with DMP",
-    reagents: "Dess–Martin periodinane (DMP)",
-    reagentNote: "Mild oxidation to a ketone",
-    productHint: "Ketone",
-    explanation:
-      "Dess–Martin periodinane oxidizes a secondary alcohol to a ketone under mild conditions.",
-    trigger: secondaryAlcoholTrigger,
-    transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1][CH:2]([OH:3])[C:4]>>[C:1][C:2](=[O:3])[C:4]",
-    },
-    mechanism: "Oxidation",
-    priority: 581,
-  },
-  {
-    id: "secondary-alcohol-oxidation-jones",
-    family: "alcohols",
-    reactionType: "oxidation",
-    title: "Secondary Alcohol Oxidation with Jones Reagent",
-    reagents: "CrO₃, H₂SO₄, H₂O (Jones reagent)",
-    reagentNote: "Strong aqueous oxidation to a ketone",
-    productHint: "Ketone",
-    explanation:
-      "Jones reagent oxidizes a secondary alcohol to a ketone; unlike primary alcohols, ketones are not normally overoxidized under standard conditions.",
-    trigger: secondaryAlcoholTrigger,
-    transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1][CH:2]([OH:3])[C:4]>>[C:1][C:2](=[O:3])[C:4]",
-    },
-    mechanism: "Oxidation",
-    priority: 582,
-  },
-  {
-    id: "secondary-alcohol-oxidation-naocl",
-    family: "alcohols",
-    reactionType: "oxidation",
-    title: "Secondary Alcohol Oxidation with Hypochlorite",
-    reagents: "NaOCl",
-    reagentNote: "Oxidation to a ketone",
-    productHint: "Ketone",
-    explanation:
-      "Sodium hypochlorite can oxidize a secondary alcohol to the corresponding ketone under suitable reaction conditions.",
-    trigger: secondaryAlcoholTrigger,
-    transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1][CH:2]([OH:3])[C:4]>>[C:1][C:2](=[O:3])[C:4]",
-    },
-    mechanism: "Oxidation",
-    priority: 583,
-  },
-  {
-    id: "secondary-alcohol-oxidation-kmno4",
-    family: "alcohols",
-    reactionType: "oxidation",
-    title: "Secondary Alcohol Oxidation with Permanganate",
-    reagents: "KMnO₄",
-    reagentNote: "Strong oxidation to a ketone",
-    productHint: "Ketone",
-    explanation:
-      "Permanganate can oxidize a secondary alcohol to a ketone, although it is a harsher and less selective choice than PCC or DMP.",
-    trigger: secondaryAlcoholTrigger,
-    transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1][CH:2]([OH:3])[C:4]>>[C:1][C:2](=[O:3])[C:4]",
-    },
-    mechanism: "Oxidation",
-    limitations: ["A harsher oxidant; other oxidizable functional groups may reduce chemoselectivity."],
-    priority: 584,
-  },
+  ...SECONDARY_ALCOHOL_OXIDANTS.map(makeSecondaryAlcoholOxidationRule),
+
   {
     id: "vicinal-diol-periodate-cleavage",
     family: "alcohols",
@@ -557,6 +567,8 @@ export const alcoholReactionRules: ReactionRule[] = [
       maxProducts: 4,
     },
     mechanism: "Oxidation",
+    display: { renderer: "explicit-alcohol-stereo" },
+    constraints: ["oxidizable-alcohol-needs-carbon-h"],
     priority: 590,
   },
   {
@@ -783,6 +795,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       },
     },
     productStatus: "computed",
+    display: { renderer: "tetrahedral-perspective" },
     mechanism: "Pinacol 1,2-migration",
     selectivityProfile: {
       regiochemistry: { mode: "directed", regioselective: true },
@@ -799,6 +812,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       "PocketChem reports the highest-priority migration class rather than mixing generic dehydration products into the same strong-acid/heat condition.",
     ],
     // Must outrank ordinary secondary/tertiary alcohol E1 dehydration (500).
+    competition: { group: "acidic-alcohol-rearrangement", specificity: 100 },
     priority: 480,
   },
 ];

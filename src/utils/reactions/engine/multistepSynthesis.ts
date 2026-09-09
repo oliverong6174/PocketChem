@@ -77,15 +77,9 @@ async function canonicalizeSmiles(
 
 function pathwayPriority(
   ruleId: string,
-  priorityByRuleId: Map<string, number>,
+  planningCostByRuleId: Map<string, number>,
 ): number {
-  return priorityByRuleId.get(ruleId) ?? 100;
-}
-
-function containsCarbonAtom(smiles: string): boolean {
-  // Avoid treating chlorine's "Cl" token as carbon while catching normal
-  // aliphatic/aromatic carbon tokens in canonical SMILES.
-  return /[Cc]/.test(smiles.replace(/Cl/g, ""));
+  return planningCostByRuleId.get(ruleId) ?? 100;
 }
 
 function searchStateKey(node: SearchNode): string {
@@ -96,6 +90,66 @@ function searchStateKey(node: SearchNode): string {
 function usedStartingMaterialsOverlap(a: SearchNode, b: SearchNode): boolean {
   const used = new Set(a.usedStartingMaterialIndices);
   return b.usedStartingMaterialIndices.some((index) => used.has(index));
+}
+
+function indexCombinations(indices: number[], size: number): number[][] {
+  if (size <= 0) return [[]];
+  if (size > indices.length) return [];
+  const output: number[][] = [];
+  const chosen: number[] = [];
+
+  function visit(start: number): void {
+    if (chosen.length === size) {
+      output.push([...chosen]);
+      return;
+    }
+    for (let i = start; i < indices.length; i += 1) {
+      chosen.push(indices[i]);
+      visit(i + 1);
+      chosen.pop();
+    }
+  }
+
+  visit(0);
+  return output;
+}
+
+async function pathwayConsumesSuppliedMaterials(
+  pathway: ReactionPathway,
+  parent: SearchNode,
+  suppliedIndices: number[],
+  startingMaterials: StartingMaterial[],
+): Promise<boolean> {
+  if (suppliedIndices.length === 0) return true;
+
+  const remainingComponents = [...pathway.reactantComponents];
+  const parentIndex = await (async () => {
+    for (let i = 0; i < remainingComponents.length; i += 1) {
+      const structure = await canonicalizeSmiles(remainingComponents[i]);
+      if (structure?.isomeric === parent.canonical) return i;
+    }
+    return -1;
+  })();
+  if (parentIndex >= 0) remainingComponents.splice(parentIndex, 1);
+
+  for (const startingIndex of suppliedIndices) {
+    const wanted = startingMaterials[startingIndex]?.canonical;
+    if (!wanted) return false;
+
+    let matchedIndex = -1;
+    for (let i = 0; i < remainingComponents.length; i += 1) {
+      const structure = await canonicalizeSmiles(remainingComponents[i]);
+      if (structure?.isomeric === wanted) {
+        matchedIndex = i;
+        break;
+      }
+    }
+
+    if (matchedIndex < 0) return false;
+    remainingComponents.splice(matchedIndex, 1);
+  }
+
+  return true;
 }
 
 async function matchStartingMaterialSideReactants(
@@ -109,11 +163,10 @@ async function matchStartingMaterialSideReactants(
 
   for (const sideComponent of sideComponents) {
     if (searchCancelled(signal)) return null;
-    // Non-carbon structural partners can be ordinary reagents/conditions. The
-    // user only has to provide carbon-bearing co-reactants that contribute to
-    // the product skeleton.
-    if (!containsCarbonAtom(sideComponent)) continue;
 
+    // Retrosynthetic precursorComponents are structural precursors reconstructed
+    // from the target. Do not guess whether they matter from their elemental
+    // composition (for example CN-, CO2, or other small atom-donating partners).
     const structure = await canonicalizeSmiles(sideComponent);
     if (!structure) return null;
 
@@ -161,6 +214,7 @@ function forwardStepFromPathway(pathway: ReactionPathway): SynthesisStep | null 
     limitations: pathway.limitations,
     retrosynthesisConfidence: null,
     productMixture: pathway.productMixture,
+    display: pathway.display,
   };
 }
 
@@ -192,6 +246,7 @@ function retroStepFromPathway(pathway: RetrosynthesisPathway): SynthesisStep {
     limitations: pathway.limitations,
     retrosynthesisConfidence: pathway.confidence,
     productMixture: pathway.productMixture,
+    display: pathway.display,
   };
 }
 
@@ -291,7 +346,7 @@ function knownStructureKeys(layers: SearchNode[][]): Set<string> {
 async function expandForwardLayer(
   parents: SearchNode[],
   rules: ReactionRule[],
-  priorityByRuleId: Map<string, number>,
+  planningCostByRuleId: Map<string, number>,
   beamWidth: number,
   branchLimit: number,
   allowGeneric: boolean,
@@ -306,15 +361,27 @@ async function expandForwardLayer(
     if (!(await yieldToBrowser(signal))) return [];
     const reactionInputs: Array<{
       smiles: string;
-      startingMaterialIndex: number | null;
-    }> = [{ smiles: parent.smiles, startingMaterialIndex: null }];
+      startingMaterialIndices: number[];
+    }> = [{ smiles: parent.smiles, startingMaterialIndices: [] }];
 
-    for (let index = 0; index < startingMaterials.length; index += 1) {
-      if (parent.usedStartingMaterialIndices.includes(index)) continue;
-      reactionInputs.push({
-        smiles: `${parent.smiles}.${startingMaterials[index].smiles}`,
-        startingMaterialIndex: index,
-      });
+    const availableIndices = startingMaterials
+      .map((_material, index) => index)
+      .filter((index) => !parent.usedStartingMaterialIndices.includes(index));
+    const maxAdditionalStructures = Math.min(
+      availableIndices.length,
+      Math.max(
+        1,
+        ...rules.map((rule) => rule.additionalReactants?.length ?? 0),
+      ),
+    );
+
+    for (let count = 1; count <= maxAdditionalStructures; count += 1) {
+      for (const indices of indexCombinations(availableIndices, count)) {
+        reactionInputs.push({
+          smiles: [parent.smiles, ...indices.map((index) => startingMaterials[index].smiles)].join("."),
+          startingMaterialIndices: indices,
+        });
+      }
     }
 
     for (const input of reactionInputs) {
@@ -331,7 +398,15 @@ async function expandForwardLayer(
         // consumes both structures. This prevents a second disconnected
         // starting material from merely generating unrelated single-substrate
         // reactions.
-        if (input.startingMaterialIndex !== null && pathway.reactantComponents.length < 2) {
+        if (
+          input.startingMaterialIndices.length > 0 &&
+          !(await pathwayConsumesSuppliedMaterials(
+            pathway,
+            parent,
+            input.startingMaterialIndices,
+            startingMaterials,
+          ))
+        ) {
           continue;
         }
 
@@ -362,10 +437,11 @@ async function expandForwardLayer(
           const componentMixturePenalty = Math.max(0, productComponents.length - 1) * 4;
           const stereochemicalMixturePenalty = nextStereoMixture ? 24 : 0;
           const continuationPenalty = index * 2;
-          const suppliedReactantBonus = input.startingMaterialIndex === null ? 0 : -120;
-          const usedStartingMaterialIndices = input.startingMaterialIndex === null
-            ? parent.usedStartingMaterialIndices
-            : [...parent.usedStartingMaterialIndices, input.startingMaterialIndex];
+          const suppliedReactantBonus = input.startingMaterialIndices.length * -120;
+          const usedStartingMaterialIndices = [
+            ...parent.usedStartingMaterialIndices,
+            ...input.startingMaterialIndices,
+          ];
 
           candidates.push({
             smiles: continuation,
@@ -376,7 +452,7 @@ async function expandForwardLayer(
             depth: parent.depth + 1,
             rank:
               parent.rank +
-              pathwayPriority(pathway.ruleId, priorityByRuleId) +
+              pathwayPriority(pathway.ruleId, planningCostByRuleId) +
               representationPenalty +
               componentMixturePenalty +
               stereochemicalMixturePenalty +
@@ -666,8 +742,8 @@ export async function findMultistepSynthesisRoutesFromRules(
   const allowGeneric =
     startComponents.some((component) => isGenericReactionSmiles(component)) ||
     isGenericReactionSmiles(normalizedTarget);
-  const priorityByRuleId = new Map(
-    rules.map((rule) => [rule.id, rule.priority] as const),
+  const planningCostByRuleId = new Map(
+    rules.map((rule) => [rule.id, rule.planningCost ?? rule.priority] as const),
   );
 
   const forwardLayers: SearchNode[][] = [
@@ -709,7 +785,7 @@ export async function findMultistepSynthesisRoutesFromRules(
       const nextLayer = await expandForwardLayer(
         forwardLayers[nextDepth - 1],
         rules,
-        priorityByRuleId,
+        planningCostByRuleId,
         beamWidth,
         branchLimit,
         allowGeneric,

@@ -1,24 +1,22 @@
 import type { ReactionRule } from "../reactionTypes";
 import { GRIGNARD_OR_ORGANOLITHIUM_TRIGGER_SMARTS } from "../organometallic";
+import { HYDROHALOGENS } from "../profiles/halogens";
 
 const epoxideTrigger = {
   anyFunctionalGroups: ["Epoxide"],
 };
 
-const epoxideHxRules: ReactionRule[] = ([
-  { suffix: "hcl", reagent: "HCl", halogen: "Cl" },
-  { suffix: "hbr", reagent: "HBr", halogen: "Br" },
-  { suffix: "hi", reagent: "HI", halogen: "I" },
-] as const).map(({ suffix, reagent, halogen }, index) => ({
-  id: `epoxide-hx-opening-${suffix}`,
+const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
+  ({ acidSlug, acid, symbol, anionName }, index) => ({
+  id: `epoxide-hx-opening-${acidSlug}`,
   family: "epoxides",
   reactionType: "ringOpening",
-  title: `Epoxide Opening with ${reagent}`,
-  reagents: reagent,
+  title: `Epoxide Opening with ${acid}`,
+  reagents: acid,
   reagentNote: "Acidic halohydrin formation",
-  productHint: `${halogen}-substituted alcohol`,
+  productHint: `${symbol}-substituted alcohol`,
   explanation:
-    `Under acidic conditions, ${reagent} protonates the epoxide and ${halogen}⁻ attacks the more substituted epoxide carbon. Ring opening is backside, so the halogen and the oxygen-derived OH are anti.`,
+    `Under acidic conditions, ${acid} protonates the epoxide and ${anionName} attacks the more substituted epoxide carbon. Ring opening is backside, so the halogen and the oxygen-derived OH are anti.`,
   trigger: epoxideTrigger,
   transform: {
     type: "customHandler",
@@ -27,7 +25,7 @@ const epoxideHxRules: ReactionRule[] = ([
       mode: "epoxideNucleophileOpening",
       nucleophile: "halide",
       attackPreference: "more-substituted",
-      halogen,
+      halogen: symbol,
     },
   },
   productStatus: "computed",

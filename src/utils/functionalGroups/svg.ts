@@ -192,6 +192,51 @@ const STEREO_PRESENTATION_DRAW_OPTIONS = JSON.stringify({
   useMolBlockWedging: true,
 });
 
+function looksLikeMolBlock(source: string): boolean {
+  return /(?:V2000|V3000|M\s+END)/.test(source);
+}
+
+/**
+ * Render a user-authored structure without regenerating its 2-D coordinates.
+ * This preserves Ketcher's scaffold orientation and the specific bond that the
+ * student used for wedge/dash depiction. The chemical stereochemistry is still
+ * verified by RDKit when the molfile is parsed; this function changes only
+ * presentation, not molecular identity.
+ */
+export async function getPreservedMolfileSvg(
+  molfile: string | null | undefined,
+): Promise<string | null> {
+  const source = molfile?.trim() ?? "";
+  if (!source) return null;
+
+  const cacheKey = `preserved-molfile::${source}`;
+  if (moleculeSvgCache.has(cacheKey)) {
+    return moleculeSvgCache.get(cacheKey) ?? null;
+  }
+
+  let mol: any = null;
+  try {
+    const RDKit = await getRDKit();
+    mol = RDKit.get_mol(source);
+    if (!mol) {
+      rememberSvg(cacheKey, null);
+      return null;
+    }
+
+    // Do NOT call set_new_coords(): the coordinates and wedging in this molfile
+    // are the user's Ketcher drawing and are intentionally the source of truth
+    // for presentation.
+    const svg = mol.get_svg_with_highlights(STEREO_PRESENTATION_DRAW_OPTIONS);
+    rememberSvg(cacheKey, svg);
+    return svg;
+  } catch (error) {
+    console.warn("Failed to render preserved Ketcher molfile.", error);
+    return null;
+  } finally {
+    mol?.delete?.();
+  }
+}
+
 async function getVicinalDiolStereoSvg(
   smiles: string,
   mode: VicinalDiolFaceMode,
@@ -273,6 +318,683 @@ export async function getAntiDiolSvg(smiles: string): Promise<string | null> {
 }
 
 
+/**
+ * Presentation-only wedge/dash helper for a tetrahedral carbon next to a
+ * carbonyl that bears at least two exocyclic carbon substituents.  This is
+ * useful for rearrangement products where the 2-D perspective is chemically
+ * informative even when identical substituents mean the atom is not a true
+ * stereocenter (for example a gem-dialkyl pinacol product).
+ *
+ * No chirality is added to the stored SMILES.  The altered molblock is used
+ * only if reparsing it preserves the exact canonical isomeric structure.
+ */
+function tetrahedralPerspectiveMolBlock(
+  molBlock: string,
+  stereoCodes: readonly [1 | 6, 1 | 6],
+): string | null {
+  if (!molBlock || molBlock.includes("V3000")) return null;
+
+  const lines = molBlock.split(/\r?\n/);
+  if (lines.length < 5) return null;
+
+  const atomCount = Number.parseInt(lines[3]?.slice(0, 3).trim() ?? "", 10);
+  const bondCount = Number.parseInt(lines[3]?.slice(3, 6).trim() ?? "", 10);
+  if (!Number.isInteger(atomCount) || !Number.isInteger(bondCount)) return null;
+
+  const atomStart = 4;
+  const bondStart = atomStart + atomCount;
+  if (lines.length < bondStart + bondCount) return null;
+
+  const symbols = Array.from({ length: atomCount }, (_, index) =>
+    parseV2000AtomSymbol(lines[atomStart + index] ?? ""),
+  );
+  const adjacency: number[][] = Array.from({ length: atomCount }, () => []);
+  const bonds: V2000Bond[] = [];
+
+  for (let index = 0; index < bondCount; index += 1) {
+    const lineIndex = bondStart + index;
+    const line = lines[lineIndex] ?? "";
+    const atom1 = Number.parseInt(line.slice(0, 3).trim(), 10) - 1;
+    const atom2 = Number.parseInt(line.slice(3, 6).trim(), 10) - 1;
+    const bondType = Number.parseInt(line.slice(6, 9).trim(), 10);
+    if (
+      !Number.isInteger(atom1) ||
+      !Number.isInteger(atom2) ||
+      atom1 < 0 || atom2 < 0 || atom1 >= atomCount || atom2 >= atomCount
+    ) continue;
+    adjacency[atom1].push(atom2);
+    adjacency[atom2].push(atom1);
+    bonds.push({ lineIndex, atom1, atom2, bondType });
+  }
+
+  const bondBetween = (a: number, b: number) =>
+    bonds.find(
+      (bond) =>
+        (bond.atom1 === a && bond.atom2 === b) ||
+        (bond.atom1 === b && bond.atom2 === a),
+    );
+
+  const edgeIsInCycle = (a: number, b: number): boolean => {
+    const seen = new Set<number>([a]);
+    const queue = [a];
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      for (const next of adjacency[current]) {
+        if ((current === a && next === b) || (current === b && next === a)) continue;
+        if (seen.has(next)) continue;
+        if (next === b) return true;
+        seen.add(next);
+        queue.push(next);
+      }
+    }
+    return false;
+  };
+
+  for (let center = 0; center < atomCount; center += 1) {
+    if (symbols[center] !== "C" || adjacency[center].length !== 4) continue;
+
+    const carbonylNeighbor = adjacency[center].find((neighbor) => {
+      if (symbols[neighbor] !== "C") return false;
+      const connecting = bondBetween(center, neighbor);
+      if (!connecting || connecting.bondType !== 1) return false;
+      return adjacency[neighbor].some((other) => {
+        const bond = bondBetween(neighbor, other);
+        return symbols[other] === "O" && bond?.bondType === 2;
+      });
+    });
+    if (carbonylNeighbor === undefined) continue;
+
+    const exocyclicCarbonBonds = bonds.filter((bond) => {
+      if (bond.bondType !== 1) return false;
+      if (bond.atom1 !== center && bond.atom2 !== center) return false;
+      const other = bond.atom1 === center ? bond.atom2 : bond.atom1;
+      if (other === carbonylNeighbor || symbols[other] !== "C") return false;
+      return !edgeIsInCycle(center, other);
+    });
+    if (exocyclicCarbonBonds.length < 2) continue;
+
+    // Clear any existing presentation stereo around this center, then place
+    // the first two exocyclic substituent bonds on opposite faces.
+    for (const bond of bonds) {
+      if (bond.atom1 !== center && bond.atom2 !== center) continue;
+      const line = lines[bond.lineIndex] ?? "";
+      lines[bond.lineIndex] = rewriteV2000BondLine(
+        line,
+        bond.atom1 + 1,
+        bond.atom2 + 1,
+        bond.bondType,
+        0,
+      );
+    }
+
+    exocyclicCarbonBonds.slice(0, 2).forEach((bond, index) => {
+      const other = bond.atom1 === center ? bond.atom2 : bond.atom1;
+      const line = lines[bond.lineIndex] ?? "";
+      lines[bond.lineIndex] = rewriteV2000BondLine(
+        line,
+        center + 1,
+        other + 1,
+        bond.bondType,
+        stereoCodes[index],
+      );
+    });
+
+    return lines.join("\n");
+  }
+
+  return null;
+}
+
+export async function getTetrahedralPerspectiveSvg(
+  smiles: string,
+): Promise<string | null> {
+  const trimmed = smiles.trim();
+  const cacheKey = `tetrahedral-perspective::${trimmed}`;
+  if (!trimmed) return null;
+  if (moleculeSvgCache.has(cacheKey)) {
+    return moleculeSvgCache.get(cacheKey) ?? null;
+  }
+
+  let sourceMol: any = null;
+  try {
+    const RDKit = await getRDKit();
+    sourceMol = RDKit.get_mol(trimmed);
+    if (!sourceMol) return null;
+
+    const sourceCanonical = sourceMol.get_smiles?.();
+    const molBlock = sourceMol.get_molblock?.();
+    if (typeof molBlock !== "string") return getMoleculeSvg(smiles);
+
+    let representativeSvg: string | null = null;
+    for (const codes of [[1, 6], [6, 1]] as const) {
+      const presentationBlock = tetrahedralPerspectiveMolBlock(molBlock, codes);
+      if (!presentationBlock) break;
+
+      let presentationMol: any = null;
+      try {
+        presentationMol = RDKit.get_mol(presentationBlock);
+        if (!presentationMol) continue;
+
+        const svg = presentationMol.get_svg_with_highlights(
+          STEREO_PRESENTATION_DRAW_OPTIONS,
+        );
+        representativeSvg ??= svg;
+
+        const presentationCanonical = presentationMol.get_smiles?.();
+        if (
+          typeof sourceCanonical === "string" &&
+          typeof presentationCanonical === "string" &&
+          presentationCanonical === sourceCanonical
+        ) {
+          rememberSvg(cacheKey, svg);
+          return svg;
+        }
+      } finally {
+        presentationMol?.delete?.();
+      }
+    }
+
+    if (representativeSvg) {
+      rememberSvg(cacheKey, representativeSvg);
+      return representativeSvg;
+    }
+
+    const fallback = sourceMol.get_svg_with_highlights(MOLECULE_DRAW_OPTIONS);
+    rememberSvg(cacheKey, fallback);
+    return fallback;
+  } catch (error) {
+    console.error("Failed to generate tetrahedral-perspective SVG:", error);
+    return getMoleculeSvg(smiles);
+  } finally {
+    sourceMol?.delete?.();
+  }
+}
+
+
+/**
+ * Makes an untouched chiral alcohol center visually explicit after a reaction
+ * without changing the molecular stereochemistry.  This is a presentation-only
+ * helper: it tries opposite wedge/dash assignments on the C-OH bond and one
+ * exocyclic carbon substituent, reparses the mol block, and accepts the drawing
+ * only when RDKit reports the exact same canonical isomeric SMILES as the source.
+ *
+ * This is useful for transformations such as oxidation at another alcohol site,
+ * where the spectator stereocenter is chemically retained but RDKit's fresh 2D
+ * layout may choose a different bond for the wedge and make the product look
+ * inverted even though its absolute configuration is unchanged.
+ */
+function explicitAlcoholStereoMolBlock(
+  molBlock: string,
+  stereoCodes: readonly [1 | 6, 1 | 6],
+): string | null {
+  if (!molBlock || molBlock.includes("V3000")) return null;
+
+  const lines = molBlock.split(/\r?\n/);
+  if (lines.length < 5) return null;
+
+  const atomCount = Number.parseInt(lines[3]?.slice(0, 3).trim() ?? "", 10);
+  const bondCount = Number.parseInt(lines[3]?.slice(3, 6).trim() ?? "", 10);
+  if (!Number.isInteger(atomCount) || !Number.isInteger(bondCount)) return null;
+
+  const atomStart = 4;
+  const bondStart = atomStart + atomCount;
+  if (lines.length < bondStart + bondCount) return null;
+
+  const symbols = Array.from({ length: atomCount }, (_, index) =>
+    parseV2000AtomSymbol(lines[atomStart + index] ?? ""),
+  );
+  const adjacency: number[][] = Array.from({ length: atomCount }, () => []);
+  const bonds: V2000Bond[] = [];
+
+  for (let index = 0; index < bondCount; index += 1) {
+    const lineIndex = bondStart + index;
+    const line = lines[lineIndex] ?? "";
+    const atom1 = Number.parseInt(line.slice(0, 3).trim(), 10) - 1;
+    const atom2 = Number.parseInt(line.slice(3, 6).trim(), 10) - 1;
+    const bondType = Number.parseInt(line.slice(6, 9).trim(), 10);
+    if (
+      !Number.isInteger(atom1) ||
+      !Number.isInteger(atom2) ||
+      atom1 < 0 || atom2 < 0 || atom1 >= atomCount || atom2 >= atomCount
+    ) continue;
+    adjacency[atom1].push(atom2);
+    adjacency[atom2].push(atom1);
+    bonds.push({ lineIndex, atom1, atom2, bondType });
+  }
+
+  const bondBetween = (a: number, b: number) =>
+    bonds.find(
+      (bond) =>
+        (bond.atom1 === a && bond.atom2 === b) ||
+        (bond.atom1 === b && bond.atom2 === a),
+    );
+
+  const edgeIsInCycle = (a: number, b: number): boolean => {
+    const seen = new Set<number>([a]);
+    const queue = [a];
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      for (const next of adjacency[current]) {
+        if ((current === a && next === b) || (current === b && next === a)) continue;
+        if (seen.has(next)) continue;
+        if (next === b) return true;
+        seen.add(next);
+        queue.push(next);
+      }
+    }
+    return false;
+  };
+
+  for (let center = 0; center < atomCount; center += 1) {
+    if (symbols[center] !== "C" || adjacency[center].length !== 4) continue;
+
+    const hydroxylOxygen = adjacency[center].find((neighbor) => {
+      if (symbols[neighbor] !== "O" || adjacency[neighbor].length !== 1) return false;
+      return bondBetween(center, neighbor)?.bondType === 1;
+    });
+    if (hydroxylOxygen === undefined) continue;
+
+    // Prefer an exocyclic carbon substituent (typically methyl/alkyl) so the
+    // visual convention is chemically intuitive: OH and that substituent are
+    // shown on opposite faces while the ring skeleton remains in the plane.
+    const exocyclicCarbon = adjacency[center].find((neighbor) => {
+      if (symbols[neighbor] !== "C") return false;
+      const bond = bondBetween(center, neighbor);
+      return bond?.bondType === 1 && !edgeIsInCycle(center, neighbor);
+    });
+    if (exocyclicCarbon === undefined) continue;
+
+    for (const bond of bonds) {
+      if (bond.atom1 !== center && bond.atom2 !== center) continue;
+      const line = lines[bond.lineIndex] ?? "";
+      lines[bond.lineIndex] = rewriteV2000BondLine(
+        line,
+        bond.atom1 + 1,
+        bond.atom2 + 1,
+        bond.bondType,
+        0,
+      );
+    }
+
+    const hydroxylBond = bondBetween(center, hydroxylOxygen);
+    const carbonBond = bondBetween(center, exocyclicCarbon);
+    if (!hydroxylBond || !carbonBond) continue;
+
+    const hydroxylLine = lines[hydroxylBond.lineIndex] ?? "";
+    lines[hydroxylBond.lineIndex] = rewriteV2000BondLine(
+      hydroxylLine,
+      center + 1,
+      hydroxylOxygen + 1,
+      hydroxylBond.bondType,
+      stereoCodes[0],
+    );
+
+    const carbonLine = lines[carbonBond.lineIndex] ?? "";
+    lines[carbonBond.lineIndex] = rewriteV2000BondLine(
+      carbonLine,
+      center + 1,
+      exocyclicCarbon + 1,
+      carbonBond.bondType,
+      stereoCodes[1],
+    );
+
+    return lines.join("\n");
+  }
+
+  return null;
+}
+
+export async function getExplicitAlcoholStereoSvg(
+  smiles: string,
+): Promise<string | null> {
+  const trimmed = smiles.trim();
+  if (!trimmed) return null;
+
+  const cacheKey = `explicit-alcohol-stereo::${trimmed}`;
+  if (moleculeSvgCache.has(cacheKey)) {
+    return moleculeSvgCache.get(cacheKey) ?? null;
+  }
+
+  let sourceMol: any = null;
+  try {
+    const RDKit = await getRDKit();
+    sourceMol = RDKit.get_mol(trimmed);
+    if (!sourceMol) return null;
+
+    const sourceCanonical = sourceMol.get_smiles?.();
+    const molBlock = sourceMol.get_molblock?.();
+    if (typeof molBlock !== "string") return getMoleculeSvg(smiles);
+
+    for (const codes of [[1, 6], [6, 1]] as const) {
+      const presentationBlock = explicitAlcoholStereoMolBlock(molBlock, codes);
+      if (!presentationBlock) break;
+
+      let presentationMol: any = null;
+      try {
+        presentationMol = RDKit.get_mol(presentationBlock);
+        if (!presentationMol) continue;
+
+        const presentationCanonical = presentationMol.get_smiles?.();
+        if (
+          typeof sourceCanonical === "string" &&
+          typeof presentationCanonical === "string" &&
+          presentationCanonical === sourceCanonical
+        ) {
+          const svg = presentationMol.get_svg_with_highlights(
+            STEREO_PRESENTATION_DRAW_OPTIONS,
+          );
+          rememberSvg(cacheKey, svg);
+          return svg;
+        }
+      } finally {
+        presentationMol?.delete?.();
+      }
+    }
+
+    const fallback = sourceMol.get_svg_with_highlights(MOLECULE_DRAW_OPTIONS);
+    rememberSvg(cacheKey, fallback);
+    return fallback;
+  } catch (error) {
+    console.error("Failed to generate explicit alcohol stereo SVG:", error);
+    return getMoleculeSvg(smiles);
+  } finally {
+    sourceMol?.delete?.();
+  }
+}
+
+
+
+
+type ReferenceStereoBond = {
+  begin: number;
+  end: number;
+  stereo: 1 | 6;
+};
+
+function parseSingleSubstructureAtomMap(raw: string): number[] {
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed.map(Number).filter(Number.isInteger);
+    }
+    if (parsed && typeof parsed === "object") {
+      const atoms = (parsed as { atoms?: unknown }).atoms;
+      if (Array.isArray(atoms)) return atoms.map(Number).filter(Number.isInteger);
+    }
+  } catch {
+    // fall through
+  }
+  return [];
+}
+
+/**
+ * Extract the exact wedge/hash bond chosen by the user from either Ketcher's
+ * V3000 snapshot or a conventional V2000 molfile.  Atom order is retained:
+ * molfile wedge direction is defined from the first atom toward the second.
+ */
+function referenceStereoBonds(molBlock: string): ReferenceStereoBond[] {
+  const source = molBlock.trim();
+  if (!source) return [];
+
+  if (source.includes("V3000")) {
+    const bonds: ReferenceStereoBond[] = [];
+    for (const line of source.split(/\r?\n/)) {
+      const match = line.match(
+        /^M\s+V30\s+\d+\s+\d+\s+(\d+)\s+(\d+)(?:\s+.*)?\sCFG=(1|3)(?:\s|$)/,
+      );
+      if (!match) continue;
+      const begin = Number(match[1]) - 1;
+      const end = Number(match[2]) - 1;
+      const cfg = Number(match[3]);
+      if (begin < 0 || end < 0) continue;
+      bonds.push({ begin, end, stereo: cfg === 1 ? 1 : 6 });
+    }
+    return bonds;
+  }
+
+  const lines = source.split(/\r?\n/);
+  if (lines.length < 5) return [];
+  const atomCount = Number.parseInt(lines[3]?.slice(0, 3).trim() ?? "", 10);
+  const bondCount = Number.parseInt(lines[3]?.slice(3, 6).trim() ?? "", 10);
+  if (!Number.isInteger(atomCount) || !Number.isInteger(bondCount)) return [];
+  const bondStart = 4 + atomCount;
+  const bonds: ReferenceStereoBond[] = [];
+  for (let index = 0; index < bondCount; index += 1) {
+    const line = lines[bondStart + index] ?? "";
+    const begin = Number.parseInt(line.slice(0, 3).trim(), 10) - 1;
+    const end = Number.parseInt(line.slice(3, 6).trim(), 10) - 1;
+    const stereo = Number.parseInt(line.slice(9, 12).trim() || "0", 10);
+    if ((stereo === 1 || stereo === 6) && begin >= 0 && end >= 0) {
+      bonds.push({ begin, end, stereo });
+    }
+  }
+  return bonds;
+}
+
+/**
+ * After RDKit aligns product coordinates to the user's reactant, explicitly
+ * transfer every surviving user-selected wedge/hash bond onto the same mapped
+ * atom pair in the product.  This preserves *depiction continuity* as well as
+ * absolute stereochemistry.  It is generic: any unchanged stereobond that is
+ * part of the product's substructure is transferred, not just alcohol C-O.
+ */
+function transferReferenceStereoBondsToProduct(
+  productMol: any,
+  referenceMol: any,
+  referenceMolBlock: string,
+): string | null {
+  const stereoBonds = referenceStereoBonds(referenceMolBlock);
+  if (stereoBonds.length === 0) return null;
+  if (typeof productMol.get_substruct_match !== "function") return null;
+
+  const atomMap = parseSingleSubstructureAtomMap(
+    productMol.get_substruct_match(referenceMol) ?? "{}",
+  );
+  if (atomMap.length === 0) return null;
+
+  const molBlock = productMol.get_molblock?.();
+  if (typeof molBlock !== "string" || molBlock.includes("V3000")) return null;
+  const lines = molBlock.split(/\r?\n/);
+  if (lines.length < 5) return null;
+
+  const atomCount = Number.parseInt(lines[3]?.slice(0, 3).trim() ?? "", 10);
+  const bondCount = Number.parseInt(lines[3]?.slice(3, 6).trim() ?? "", 10);
+  if (!Number.isInteger(atomCount) || !Number.isInteger(bondCount)) return null;
+  const bondStart = 4 + atomCount;
+
+  type ProductBond = V2000Bond & { stereo: number };
+  const productBonds: ProductBond[] = [];
+  for (let index = 0; index < bondCount; index += 1) {
+    const lineIndex = bondStart + index;
+    const line = lines[lineIndex] ?? "";
+    const atom1 = Number.parseInt(line.slice(0, 3).trim(), 10) - 1;
+    const atom2 = Number.parseInt(line.slice(3, 6).trim(), 10) - 1;
+    const bondType = Number.parseInt(line.slice(6, 9).trim(), 10);
+    const stereo = Number.parseInt(line.slice(9, 12).trim() || "0", 10);
+    if (
+      !Number.isInteger(atom1) ||
+      !Number.isInteger(atom2) ||
+      atom1 < 0 ||
+      atom2 < 0 ||
+      atom1 >= atomCount ||
+      atom2 >= atomCount
+    ) continue;
+    productBonds.push({ lineIndex, atom1, atom2, bondType, stereo });
+  }
+
+  let transferred = 0;
+  for (const referenceBond of stereoBonds) {
+    const mappedBegin = atomMap[referenceBond.begin];
+    const mappedEnd = atomMap[referenceBond.end];
+    if (!Number.isInteger(mappedBegin) || !Number.isInteger(mappedEnd)) continue;
+
+    const targetBond = productBonds.find(
+      (bond) =>
+        (bond.atom1 === mappedBegin && bond.atom2 === mappedEnd) ||
+        (bond.atom1 === mappedEnd && bond.atom2 === mappedBegin),
+    );
+    if (!targetBond || targetBond.bondType !== 1) continue;
+
+    // A tetrahedral center should have one presentation wedge/hash. Remove
+    // RDKit's automatically chosen one around this mapped center first.
+    for (const bond of productBonds) {
+      if (bond.atom1 !== mappedBegin && bond.atom2 !== mappedBegin) continue;
+      const line = lines[bond.lineIndex] ?? "";
+      lines[bond.lineIndex] = rewriteV2000BondLine(
+        line,
+        bond.atom1 + 1,
+        bond.atom2 + 1,
+        bond.bondType,
+        0,
+      );
+    }
+
+    const line = lines[targetBond.lineIndex] ?? "";
+    lines[targetBond.lineIndex] = rewriteV2000BondLine(
+      line,
+      mappedBegin + 1,
+      mappedEnd + 1,
+      targetBond.bondType,
+      referenceBond.stereo,
+    );
+    transferred += 1;
+  }
+
+  return transferred > 0 ? lines.join("\n") : null;
+}
+
+
+/**
+ * Draw a stereochemical product through an explicit 2-D molblock before SVG
+ * rendering. RDKit then assigns wedge/hash bonds to ordinary heavy-atom bonds
+ * wherever possible instead of displaying an explicit H wedge merely to encode
+ * the same tetrahedral configuration. This is especially useful for bicyclic
+ * Diels-Alder products, where the carbon substituent/bridge bond is the
+ * pedagogically meaningful stereobond. Chemical identity is accepted only if
+ * the molblock reparses to the same isomeric SMILES.
+ */
+export async function getHeavyAtomStereoSvg(
+  smiles: string,
+): Promise<string | null> {
+  const trimmed = smiles.trim();
+  if (!trimmed) return null;
+  const cacheKey = `heavy-atom-stereo::${trimmed}`;
+  if (moleculeSvgCache.has(cacheKey)) {
+    return moleculeSvgCache.get(cacheKey) ?? null;
+  }
+
+  let sourceMol: any = null;
+  let presentationMol: any = null;
+  try {
+    const RDKit = await getRDKit();
+    sourceMol = RDKit.get_mol(trimmed);
+    if (!sourceMol) return getMoleculeSvg(trimmed);
+    const canonical = sourceMol.get_smiles?.();
+    sourceMol.set_new_coords?.();
+    const block = sourceMol.get_molblock?.();
+    if (typeof block !== "string") return getMoleculeSvg(trimmed);
+
+    presentationMol = RDKit.get_mol(block);
+    if (!presentationMol) return getMoleculeSvg(trimmed);
+    const reparsed = presentationMol.get_smiles?.();
+    if (typeof canonical === "string" && typeof reparsed === "string" && canonical !== reparsed) {
+      return getMoleculeSvg(trimmed);
+    }
+
+    const result = presentationMol.get_svg_with_highlights(STEREO_PRESENTATION_DRAW_OPTIONS);
+    rememberSvg(cacheKey, result);
+    return result;
+  } catch (error) {
+    console.warn("Heavy-atom stereochemical depiction failed; using standard drawing.", error);
+    return getMoleculeSvg(trimmed);
+  } finally {
+    sourceMol?.delete?.();
+    presentationMol?.delete?.();
+  }
+}
+export async function getAlignedStereoSvg(
+  smiles: string,
+  referenceSmiles: string | null | undefined,
+): Promise<string | null> {
+  const product = smiles.trim();
+  const reference = referenceSmiles?.trim() ?? "";
+  if (!product) return null;
+  if (!reference) return getMoleculeSvg(product);
+
+  const cacheKey = `aligned-stereo::${product}::${reference}`;
+  if (moleculeSvgCache.has(cacheKey)) {
+    return moleculeSvgCache.get(cacheKey) ?? null;
+  }
+
+  let productMol: any = null;
+  let referenceMol: any = null;
+  try {
+    const RDKit = await getRDKit();
+    productMol = RDKit.get_mol(product);
+    referenceMol = RDKit.get_mol(reference);
+    if (!productMol || !referenceMol) return getMoleculeSvg(product);
+
+    const canonicalBefore = productMol.get_smiles?.();
+    // A Ketcher molfile already contains the student's 2-D coordinates. Only
+    // synthesize coordinates when the reference is merely SMILES.
+    if (!looksLikeMolBlock(reference)) referenceMol.set_new_coords?.();
+    if (typeof productMol.generate_aligned_coords !== "function") {
+      return getMoleculeSvg(product);
+    }
+    productMol.generate_aligned_coords(referenceMol, JSON.stringify({}));
+
+    const canonicalAfter = productMol.get_smiles?.();
+    if (
+      typeof canonicalBefore === "string" &&
+      typeof canonicalAfter === "string" &&
+      canonicalBefore !== canonicalAfter
+    ) {
+      return getMoleculeSvg(product);
+    }
+
+    // If the reference is the original Ketcher molfile, preserve the exact
+    // user-selected wedge/hash bond whenever that bond survives the reaction.
+    // This is especially important for Williamson ether formation: C-O is not
+    // broken, so a dashed C-O bond should remain the dashed bond in the product.
+    if (looksLikeMolBlock(reference)) {
+      const presentationBlock = transferReferenceStereoBondsToProduct(
+        productMol,
+        referenceMol,
+        reference,
+      );
+      if (presentationBlock) {
+        let presentationMol: any = null;
+        try {
+          presentationMol = RDKit.get_mol(presentationBlock);
+          const presentationCanonical = presentationMol?.get_smiles?.();
+          if (
+            presentationMol &&
+            (typeof canonicalBefore !== "string" || presentationCanonical === canonicalBefore)
+          ) {
+            const svg = presentationMol.get_svg_with_highlights(
+              STEREO_PRESENTATION_DRAW_OPTIONS,
+            );
+            rememberSvg(cacheKey, svg);
+            return svg;
+          }
+        } finally {
+          presentationMol?.delete?.();
+        }
+      }
+    }
+
+    const svg = productMol.get_svg_with_highlights(STEREO_PRESENTATION_DRAW_OPTIONS);
+    rememberSvg(cacheKey, svg);
+    return svg;
+  } catch (error) {
+    console.warn("Aligned stereochemical depiction failed; using standard drawing.", error);
+    return getMoleculeSvg(product);
+  } finally {
+    productMol?.delete?.();
+    referenceMol?.delete?.();
+  }
+}
+
 function halogenAtomLabelOverridesFromMolBlock(molBlock: string): Record<string, string> {
   if (!molBlock || molBlock.includes("V3000")) return {};
 
@@ -341,6 +1063,69 @@ export async function getGenericHalogenSvg(smiles: string): Promise<string | nul
     return getMoleculeSvg(smiles);
   } finally {
     mol?.delete?.();
+  }
+}
+
+
+export async function getAlignedGenericHalogenSvg(
+  smiles: string,
+  referenceSmiles: string | null | undefined,
+): Promise<string | null> {
+  const product = smiles.trim();
+  const reference = referenceSmiles?.trim() ?? "";
+  if (!product) return null;
+  if (!reference) return getGenericHalogenSvg(product);
+
+  const cacheKey = `aligned-generic-halogen::${product}::${reference}`;
+  if (moleculeSvgCache.has(cacheKey)) {
+    return moleculeSvgCache.get(cacheKey) ?? null;
+  }
+
+  let productMol: any = null;
+  let referenceMol: any = null;
+  try {
+    const RDKit = await getRDKit();
+    productMol = RDKit.get_mol(product);
+    referenceMol = RDKit.get_mol(reference);
+    if (!productMol || !referenceMol) return getGenericHalogenSvg(product);
+
+    const canonicalBefore = productMol.get_smiles?.();
+    if (!looksLikeMolBlock(reference)) referenceMol.set_new_coords?.();
+    if (typeof productMol.generate_aligned_coords !== "function") {
+      return getGenericHalogenSvg(product);
+    }
+    productMol.generate_aligned_coords(referenceMol, JSON.stringify({}));
+
+    const canonicalAfter = productMol.get_smiles?.();
+    if (
+      typeof canonicalBefore === "string" &&
+      typeof canonicalAfter === "string" &&
+      canonicalBefore !== canonicalAfter
+    ) {
+      return getGenericHalogenSvg(product);
+    }
+
+    const molBlock = productMol.get_molblock?.();
+    if (typeof molBlock !== "string") return getGenericHalogenSvg(product);
+    const atomLabels = halogenAtomLabelOverridesFromMolBlock(molBlock);
+    if (Object.keys(atomLabels).length === 0) {
+      return productMol.get_svg_with_highlights(MOLECULE_DRAW_OPTIONS);
+    }
+
+    const svg = productMol.get_svg_with_highlights(
+      JSON.stringify({ atomLabelDeuteriumTritium: true, atomLabels }),
+    );
+    rememberSvg(cacheKey, svg);
+    return svg;
+  } catch (error) {
+    console.warn(
+      "Aligned generic-halogen depiction failed; using standard generic-halogen drawing.",
+      error,
+    );
+    return getGenericHalogenSvg(product);
+  } finally {
+    productMol?.delete?.();
+    referenceMol?.delete?.();
   }
 }
 

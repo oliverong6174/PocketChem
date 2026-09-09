@@ -146,6 +146,33 @@ export const amineReactionRules: ReactionRule[] = [
   },
 
   {
+    id: "primary-aliphatic-amine-reductive-deamination",
+    family: "amines",
+    reactionType: "reduction",
+    title: "Reductive Deamination of a Primary Aliphatic Amine",
+    reagents: "1) NaNO₂, HCl  2) H₃PO₂",
+    reagentNote: "Replace an aliphatic NH₂ group by H",
+    productHint: "Alkane",
+    explanation:
+      "A primary aliphatic amine is nitrosated to an unstable aliphatic diazonium intermediate. Under the course-level reductive workup with hypophosphorous acid, the C–N bond is replaced by C–H, giving the deaminated hydrocarbon.",
+    trigger: {
+      anyFunctionalGroups: ["Primary amine", "Benzyl amine"],
+      includeSmarts: ["[C;X4][NH2]"],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C;X4:1][NH2:2]>>[C:1]",
+      maxProducts: 8,
+    },
+    productStatus: "computed",
+    mechanism: "Nitrosative deamination followed by reductive replacement of the diazonium-derived leaving group by hydrogen",
+    limitations: [
+      "Ordinary treatment of aliphatic primary amines with nitrous acid alone often gives alcohols/rearranged mixtures; this rule specifically represents the NaNO₂/HCl followed by H₃PO₂ reductive-deamination sequence.",
+    ],
+    searchAliases: ["NaNO2 HCl H3PO2", "HNO2 H3PO2", "deamination to alkane", "replace NH2 with H"],
+    priority: 1745,
+  },
+  {
     id: "amine-hinsberg",
     family: "amines",
     reactionType: "substitution",

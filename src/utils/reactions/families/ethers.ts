@@ -31,6 +31,7 @@ const chromanTrigger = {
 export const etherReactionRules: ReactionRule[] = [
   {
     id: "dihydrobenzofuran-cleavage-hbr",
+    display: { renderer: "generic-halogen", series: { id: "dihydrobenzofuran-cleavage-hx", variable: "X", value: "Br" } },
     family: "ethers",
     reactionType: "cleavage",
     title: "2,3-Dihydrobenzofuran Cleavage with HBr",
@@ -56,6 +57,7 @@ export const etherReactionRules: ReactionRule[] = [
   },
   {
     id: "dihydrobenzofuran-cleavage-hi",
+    display: { renderer: "generic-halogen", series: { id: "dihydrobenzofuran-cleavage-hx", variable: "X", value: "I" } },
     family: "ethers",
     reactionType: "cleavage",
     title: "2,3-Dihydrobenzofuran Cleavage with HI",
@@ -78,6 +80,7 @@ export const etherReactionRules: ReactionRule[] = [
   },
   {
     id: "chroman-cleavage-hbr",
+    display: { renderer: "generic-halogen", series: { id: "chroman-cleavage-hx", variable: "X", value: "Br" } },
     family: "ethers",
     reactionType: "cleavage",
     title: "Chroman Cleavage with HBr",
@@ -100,6 +103,7 @@ export const etherReactionRules: ReactionRule[] = [
   },
   {
     id: "chroman-cleavage-hi",
+    display: { renderer: "generic-halogen", series: { id: "chroman-cleavage-hx", variable: "X", value: "I" } },
     family: "ethers",
     reactionType: "cleavage",
     title: "Chroman Cleavage with HI",
@@ -144,7 +148,48 @@ export const etherReactionRules: ReactionRule[] = [
     priority: 684,
   },
   {
+    id: "chroman-hi-hydroxide-williamson-sequence",
+    family: "ethers",
+    reactionType: "cleavage",
+    title: "Chroman Cleavage → Hydrolysis → Williamson O-Alkylation",
+    reagents: "1) excess HI, heat  2) NaOH  3) methyl or primary R–X",
+    reagentNote: "Draw chroman and the final methyl/primary alkyl halide as disconnected structures",
+    productHint: "2-(3-alkoxypropyl)phenol",
+    explanation:
+      "HI opens the saturated C–O bond of chroman while retaining the aryl oxygen as phenol. Hydroxide converts the primary iodide to the terminal alcohol, which can then undergo Williamson SN2 O-alkylation with a user-drawn methyl or primary alkyl halide. The R group therefore comes from the actual electrophile rather than being hard-coded as methyl.",
+    trigger: chromanTrigger,
+    additionalReactants: [
+      {
+        id: "williamson-electrophile",
+        label: "methyl or primary alkyl halide (R–X)",
+        trigger: {
+          includeSmarts: ["[C;X4;H2,H3][Cl,Br,I]"],
+          excludeSmarts: ["[c][Cl,Br,I]", "[C;X3][Cl,Br,I]"],
+        },
+        supplyMode: "user-structure",
+        contributesToProduct: true,
+        role: "electrophile",
+      },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts:
+        "[cH:1]1[cH:2][cH:3][c:4]2[c:5]([cH:6]1)[CH2:7][CH2:8][CH2:9][O:10]2.[C;X4;H2,H3:20][Cl,Br,I:21]>>[cH:1]1[cH:2][cH:3][c:4]([OH:10])[c:5]([CH2:7][CH2:8][CH2:9][O][C:20])[cH:6]1",
+      maxProducts: 8,
+    },
+    productStatus: "computed",
+    mechanism: "Acidic aryl–alkyl ether cleavage → SN2 hydrolysis → Williamson SN2",
+    selectivityProfile: { mixture: "single", majorProductOnly: true },
+    selectivity: [
+      "The aryl–O bond is retained during HX cleavage; cleavage occurs at the saturated carbon.",
+      "Williamson O-alkylation is restricted to methyl/primary electrophiles to avoid forcing SN2 at a tertiary center.",
+      "The user-drawn R group is preserved in the terminal ether product.",
+    ],
+    priority: 685,
+  },
+  {
     id: "aryl-alkyl-ether-cleavage-hbr",
+    display: { renderer: "generic-halogen", series: { id: "aryl-alkyl-ether-cleavage-hx", variable: "X", value: "Br" } },
     family: "ethers",
     reactionType: "cleavage",
     title: "Aryl Ether Cleavage with HBr",
@@ -166,6 +211,7 @@ export const etherReactionRules: ReactionRule[] = [
   },
   {
     id: "aryl-alkyl-ether-cleavage-hi",
+    display: { renderer: "generic-halogen", series: { id: "aryl-alkyl-ether-cleavage-hx", variable: "X", value: "I" } },
     family: "ethers",
     reactionType: "cleavage",
     title: "Aryl Ether Cleavage with HI",
@@ -187,6 +233,7 @@ export const etherReactionRules: ReactionRule[] = [
   },
   {
     id: "ether-cleavage-hbr",
+    display: { renderer: "generic-halogen", series: { id: "dialkyl-ether-cleavage-hx", variable: "X", value: "Br" } },
     family: "ethers",
     reactionType: "cleavage",
     title: "Dialkyl Ether Cleavage with HBr",
@@ -212,6 +259,7 @@ export const etherReactionRules: ReactionRule[] = [
   },
   {
     id: "ether-cleavage-hi",
+    display: { renderer: "generic-halogen", series: { id: "dialkyl-ether-cleavage-hx", variable: "X", value: "I" } },
     family: "ethers",
     reactionType: "cleavage",
     title: "Dialkyl Ether Cleavage with HI",

@@ -111,6 +111,20 @@ export function validateReactionRegistry(
         });
       }
 
+      if (!requirement.id?.trim()) {
+        issues.push({
+          ruleId,
+          message: `Additional reactant ${requirement.label || "(unnamed)"} is missing a stable id after registry normalization.`,
+        });
+      }
+
+      if (requirement.supplyMode === "auto" && !requirement.presetSmiles?.trim()) {
+        issues.push({
+          ruleId,
+          message: `Auto-supplied reactant ${requirement.label} must define presetSmiles.`,
+        });
+      }
+
       if (
         requirement.equivalents !== undefined &&
         (!Number.isInteger(requirement.equivalents) ||
@@ -121,6 +135,31 @@ export function validateReactionRegistry(
           message: "Additional reactant equivalents must be a positive integer.",
         });
       }
+    }
+
+    if (rule.competition) {
+      if (!rule.competition.group.trim()) {
+        issues.push({ ruleId, message: "Competition group is empty." });
+      }
+      if (!Number.isFinite(rule.competition.specificity)) {
+        issues.push({ ruleId, message: "Competition specificity must be finite." });
+      }
+    }
+
+    if (rule.display?.series) {
+      if (!rule.display.series.id.trim()) {
+        issues.push({ ruleId, message: "Display series id is empty." });
+      }
+      if (rule.display.series.variable && !rule.display.series.value) {
+        issues.push({
+          ruleId,
+          message: "Display series with a variable must define this rule's concrete value.",
+        });
+      }
+    }
+
+    if (rule.planningCost !== undefined && !Number.isFinite(rule.planningCost)) {
+      issues.push({ ruleId, message: "planningCost must be finite." });
     }
 
     if (rule.transform.type === "reactionSmarts") {

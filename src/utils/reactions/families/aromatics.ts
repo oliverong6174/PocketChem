@@ -18,9 +18,14 @@ const aromaticTrigger = {
 };
 
 const easModelNotes = {
-  productStatus: "representative" as const,
+  productStatus: "computed" as const,
+  selectivityProfile: {
+    mixture: "single" as const,
+    majorProductOnly: true,
+    sitePreference: "most-activated-aromatic-site" as const,
+  },
   limitations: [
-    "The engine enumerates available aromatic C–H sites but does not yet rank activating/deactivating substituents or ortho/para/meta directing effects.",
+    "Simple benzene rings are ranked by ring activation/deactivation plus ortho/meta/para directing effects. Fused polycyclic aromatics intentionally fall back to unranked enumeration rather than applying simple-benzene directing constants outside their domain.",
   ],
 };
 
@@ -36,12 +41,13 @@ export const aromaticReactionRules: ReactionRule[] = [
     explanation:
       "The aromatic ring attacks NO₂⁺ and then loses a proton to restore aromaticity.",
     trigger: aromaticTrigger,
-    transform: {
-      type: "reactionSmarts",
-      smarts: "[cH:1]>>[c:1][N+](=O)[O-]",
-      maxProducts: 12,
-    },
+    transform: { type: "customHandler", handler: "substitution", options: { mode: "aromaticEas", electrophile: "nitro", maxProducts: 12 } },
     mechanism: "Electrophilic aromatic substitution",
+    selectivity: [
+      "Directing groups are classified from the atom directly bonded to the ring: resonance donors and alkyl/benzylic groups direct ortho/para; directly attached carbonyl, nitro, cyano, and sulfonyl groups direct meta; halogens are deactivating but ortho/para directing.",
+      "When several benzene rings are present, ring activation/deactivation is ranked before positional preference; Ar–CH₂–C(=O)R is therefore not misclassified as a directly attached acyl meta director.",
+      "For a monosubstituted alkyl/benzylic ring, para is preferred over ortho when steric effects distinguish them.",
+    ],
     ...easModelNotes,
     priority: 1800,
   },
@@ -56,11 +62,7 @@ export const aromaticReactionRules: ReactionRule[] = [
     explanation:
       "Sulfur trioxide electrophilically substitutes for an aromatic hydrogen. Hot dilute acid can reverse the reaction (desulfonation).",
     trigger: aromaticTrigger,
-    transform: {
-      type: "reactionSmarts",
-      smarts: "[cH:1]>>[c:1]S(=O)(=O)O",
-      maxProducts: 12,
-    },
+    transform: { type: "customHandler", handler: "substitution", options: { mode: "aromaticEas", electrophile: "sulfonic-acid", maxProducts: 12 } },
     mechanism: "Electrophilic aromatic substitution",
     selectivity: ["Reversible; temperature and acid concentration can control sulfonation versus desulfonation."],
     ...easModelNotes,
@@ -77,11 +79,7 @@ export const aromaticReactionRules: ReactionRule[] = [
     explanation:
       "FeBr₃ activates bromine, and the ring substitutes bromine for an aromatic hydrogen.",
     trigger: aromaticTrigger,
-    transform: {
-      type: "reactionSmarts",
-      smarts: "[cH:1]>>[c:1]Br",
-      maxProducts: 12,
-    },
+    transform: { type: "customHandler", handler: "substitution", options: { mode: "aromaticEas", electrophile: "bromo", maxProducts: 12 } },
     mechanism: "Electrophilic aromatic substitution",
     ...easModelNotes,
     priority: 1820,
@@ -174,14 +172,58 @@ export const aromaticReactionRules: ReactionRule[] = [
     explanation:
       "FeCl₃ activates chlorine, and the ring substitutes chlorine for an aromatic hydrogen.",
     trigger: aromaticTrigger,
-    transform: {
-      type: "reactionSmarts",
-      smarts: "[cH:1]>>[c:1]Cl",
-      maxProducts: 12,
-    },
+    transform: { type: "customHandler", handler: "substitution", options: { mode: "aromaticEas", electrophile: "chloro", maxProducts: 12 } },
     mechanism: "Electrophilic aromatic substitution",
     ...easModelNotes,
     priority: 1830,
+  },
+  {
+    id: "aromatic-halogenation-iodination",
+    family: "aromatics",
+    reactionType: "substitution",
+    title: "Aromatic Iodination",
+    reagents: "I₂, oxidizing agent (for example HNO₃ or H₂O₂)",
+    reagentNote: "Oxidative generation of an electrophilic iodine species",
+    productHint: "Iodoarene",
+    explanation:
+      "Iodination is an electrophilic aromatic substitution, but I₂ normally needs an oxidizing agent to generate a sufficiently reactive iodine electrophile.",
+    trigger: aromaticTrigger,
+    transform: { type: "customHandler", handler: "substitution", options: { mode: "aromaticEas", electrophile: "iodo", maxProducts: 12 } },
+    mechanism: "Electrophilic aromatic substitution",
+    ...easModelNotes,
+    priority: 1831,
+  },
+  {
+    id: "aromatic-halogenation-fluorination",
+    family: "aromatics",
+    reactionType: "substitution",
+    title: "Controlled Aromatic Fluorination",
+    reagents: "F-TEDA-BF₄ (Selectfluor) or another controlled electrophilic fluorinating reagent",
+    reagentNote: "Direct F₂ is too reactive for ordinary selective EAS",
+    productHint: "Fluoroarene",
+    explanation:
+      "Controlled electrophilic fluorinating reagents can install fluorine by aromatic substitution without the uncontrolled reactivity of elemental fluorine.",
+    trigger: aromaticTrigger,
+    transform: { type: "customHandler", handler: "substitution", options: { mode: "aromaticEas", electrophile: "fluoro", maxProducts: 12 } },
+    mechanism: "Electrophilic aromatic substitution",
+    ...easModelNotes,
+    priority: 1832,
+  },
+  {
+    id: "aromatic-desulfonation",
+    family: "aromatics",
+    reactionType: "substitution",
+    title: "Aromatic Desulfonation",
+    reagents: "dilute H₂SO₄/H₂O, heat (steam)",
+    reagentNote: "Reverse of aromatic sulfonation",
+    productHint: "Arene",
+    explanation:
+      "Arenesulfonation is reversible. Heating an arenesulfonic acid in aqueous acid removes SO₃H and restores the aromatic C–H bond.",
+    trigger: { includeSmarts: ["[c][S](=O)(=O)O"] },
+    transform: { type: "reactionSmarts", smarts: "[c:1][S:2](=[O:3])(=[O:4])[O:5]>>[cH:1]" },
+    productStatus: "computed",
+    mechanism: "Reverse electrophilic aromatic substitution",
+    priority: 1833,
   },
   {
     id: "aromatic-gattermann-koch-benzene",
@@ -263,6 +305,10 @@ export const aromaticReactionRules: ReactionRule[] = [
       "Amino groups complex strongly with AlCl₃ unless protected.",
       "Carbocation rearrangement and polyalkylation may occur; the generated structure represents direct attachment of the drawn alkyl group.",
     ],
+    constraints: [
+      "friedel-crafts-ring-not-strongly-deactivated",
+      "friedel-crafts-amine-compatible",
+    ],
     priority: 1840,
   },
   {
@@ -290,6 +336,10 @@ export const aromaticReactionRules: ReactionRule[] = [
     productStatus: "representative",
     mechanism: "Electrophilic aromatic substitution",
     limitations: ["The engine enumerates available aromatic C-H sites but does not rank ortho/para/meta directing effects.", "Fails on strongly deactivated rings and often on unprotected amino-substituted rings."],
+    constraints: [
+      "friedel-crafts-ring-not-strongly-deactivated",
+      "friedel-crafts-amine-compatible",
+    ],
     priority: 1850,
   },
   {
@@ -304,10 +354,13 @@ export const aromaticReactionRules: ReactionRule[] = [
       "Under forcing conditions, an aromatic ring can be fully hydrogenated to the corresponding saturated ring.",
     trigger: aromaticTrigger,
     transform: {
-      type: "conceptOnly",
-      reason: "A generic exact transformation must preserve every substituent and fused-ring connection while changing the complete aromatic bond network.",
+      type: "reactionSmarts",
+      smarts: "[c:1]1[c:2][c:3][c:4][c:5][c:6]1>>[C:1]1-[C:2]-[C:3]-[C:4]-[C:5]-[C:6]-1",
+      maxProducts: 8,
     },
+    productStatus: "computed",
     mechanism: "Heterogeneous catalytic hydrogenation",
+    limitations: ["For fused polycyclic aromatic systems, multiple rings may require repeated/forcing hydrogenation and are not collapsed into one assumed global product."],
     priority: 1860,
   },
   {
@@ -322,11 +375,18 @@ export const aromaticReactionRules: ReactionRule[] = [
       "A Birch reduction converts an aromatic ring into a nonconjugated 1,4-cyclohexadiene. Substituents control which ring carbons are reduced.",
     trigger: aromaticTrigger,
     transform: {
-      type: "conceptOnly",
-      reason: "The exact diene regiochemistry depends on the electronic character and positions of the aromatic substituents.",
+      type: "customHandler",
+      handler: "reduction",
+      options: { mode: "birchReduction" },
     },
+    productStatus: "computed",
     mechanism: "Stepwise electron–proton transfer",
-    selectivity: ["Electron-donating and electron-withdrawing substituents give different protonation patterns."],
+    selectivity: [
+      "The ring is reduced to a nonconjugated 1,4-cyclohexadiene.",
+      "A directly attached pi-accepting EWG (for example C=O or CN) favors an ipso-saturated product; an alkyl, alkoxy, or amino donor favors a product with the substituted ipso carbon remaining vinylic.",
+      "Na/NH₃/ROH is Birch reduction; NaNH₂/NH₃ is a different benzyne-forming condition.",
+    ],
+    limitations: ["Highly fused polycyclic aromatics and rings with several strongly competing substituents may require a more detailed electronic model."],
     priority: 1865,
   },
   {
@@ -354,6 +414,7 @@ export const aromaticReactionRules: ReactionRule[] = [
     selectivity: ["Occurs at a benzylic carbon bearing at least one hydrogen."],
     productStatus: "representative",
     limitations: ["Multiple nonequivalent benzylic sites can give multiple products; stereochemical outcomes are not ranked."],
+    constraints: ["benzylic-radical-halogenation-needs-h"],
     priority: 1870,
   },
   {
@@ -370,10 +431,13 @@ export const aromaticReactionRules: ReactionRule[] = [
       includeSmarts: ["[c][C;H1,H2,H3]"],
     },
     transform: {
-      type: "conceptOnly",
-      reason: "Oxidation removes the remainder of an arbitrarily long side chain, which requires explicit fragment-deletion logic rather than a local SMARTS replacement.",
+      type: "customHandler",
+      handler: "oxidation",
+      options: { mode: "benzylicSideChainOxidation" },
     },
+    productStatus: "computed",
     mechanism: "Strong benzylic oxidation",
+    constraints: ["benzylic-oxidation-needs-h"],
     priority: 1880,
   },
   {
@@ -397,26 +461,84 @@ export const aromaticReactionRules: ReactionRule[] = [
     mechanism: "Multi-step reduction",
     priority: 1890,
   },
-  {
-    id: "aryl-halide-snar",
-    family: "aromatics",
-    reactionType: "substitution",
-    title: "Nucleophilic Aromatic Substitution",
-    reagents: "Nu⁻, heat",
-    reagentNote: "Addition–elimination on an activated aryl halide",
-    productHint: "Substituted arene",
+  ...([
+    {
+      slug: "azide",
+      title: "Nucleophilic Aromatic Substitution with Azide",
+      reagents: "1 equiv NaN₃, heat as needed",
+      product: "Aryl azide",
+    },
+    {
+      slug: "cyanide",
+      title: "Nucleophilic Aromatic Substitution with Cyanide",
+      reagents: "NaCN or KCN, heat as needed",
+      product: "Aryl nitrile",
+    },
+    {
+      slug: "hydroxide",
+      title: "Nucleophilic Aromatic Substitution with Hydroxide",
+      reagents: "NaOH, heat",
+      product: "Phenol",
+    },
+    {
+      slug: "amino",
+      title: "Nucleophilic Aromatic Substitution with Amide/Ammonia",
+      reagents: "NH₂⁻ or NH₃ under suitable SNAr conditions",
+      product: "Aryl amine",
+    },
+    {
+      slug: "methoxide",
+      title: "Nucleophilic Aromatic Substitution with Methoxide",
+      reagents: "NaOCH₃, CH₃OH",
+      product: "Aryl methyl ether",
+    },
+  ] as const).map(({ slug, title, reagents, product }, index) => ({
+    id: `aryl-halide-snar-${slug}`,
+    family: "aromatics" as const,
+    reactionType: "substitution" as const,
+    title,
+    reagents,
+    reagentNote: "Addition–elimination requires a strong EWG ortho or para to the leaving group",
+    productHint: product,
     explanation:
-      "An aryl halide bearing strong electron-withdrawing groups ortho or para to the leaving group can undergo addition–elimination substitution.",
+      "A strong electron-withdrawing group such as NO₂, a carbonyl group, CN, or SO₂R ortho or para to an aryl halide stabilizes the Meisenheimer intermediate, allowing nucleophilic aromatic substitution.",
     trigger: {
       anyFunctionalGroups: ["Aryl halide"],
       includeSmarts: ["[c][F,Cl,Br,I]"],
     },
     transform: {
-      type: "conceptOnly",
-      reason: "The nucleophile and the relative position of activating electron-withdrawing groups must be specified to generate and validate an exact product.",
+      type: "customHandler" as const,
+      handler: "substitution" as const,
+      options: { mode: "aromaticSnAr", nucleophile: slug },
     },
+    productStatus: "computed" as const,
     mechanism: "SNAr addition–elimination",
-    limitations: ["Usually requires a strong electron-withdrawing group ortho or para to the leaving group."],
-    priority: 1900,
+    selectivity: [
+      "Activation is positional: the EWG must be ortho or para to the leaving group; a meta-only EWG does not provide the same resonance stabilization.",
+      "If several aryl halides are present, only structurally activated leaving-group sites are transformed.",
+    ],
+    priority: 1900 + index,
+  })),
+  {
+    id: "aryl-halide-benzyne-amination",
+    family: "aromatics",
+    reactionType: "substitution",
+    title: "Benzyne Amination of an Aryl Halide",
+    reagents: "NaNH₂, NH₃(l)",
+    reagentNote: "Elimination–addition through a benzyne intermediate",
+    productHint: "Aryl amine (regioisomer mixture possible)",
+    explanation:
+      "Strong base removes an ortho hydrogen while halide leaves to form benzyne. Amide then adds to either carbon of the benzyne, so substituted substrates can give ipso and cine products.",
+    trigger: { includeSmarts: ["[c]([F,Cl,Br,I])[cH]"] },
+    transform: {
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "aromaticBenzyneAmination" },
+    },
+    productStatus: "computed",
+    mechanism: "Benzyne elimination–addition",
+    selectivityProfile: { mixture: "possible" },
+    selectivity: ["Requires an ortho hydrogen next to the aryl halide.", "Do not confuse NaNH₂/NH₃ with Na/NH₃/ROH Birch reduction."],
+    priority: 1910,
   },
 ];

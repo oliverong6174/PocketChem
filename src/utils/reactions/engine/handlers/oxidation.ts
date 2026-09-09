@@ -7,7 +7,8 @@ type OxidationMode =
   | "alkeneOxidativeCleavage"
   | "alkyneOxidativeCleavage"
   | "vicinalDiolCleavage"
-  | "baeyerVilliger";
+  | "baeyerVilliger"
+  | "benzylicSideChainOxidation";
 type OxidationLevel = "mild" | "strong";
 type AlcoholType = "primary" | "secondary" | "tertiary" | "unknown";
 
@@ -130,6 +131,20 @@ async function baeyerVilligerOxidation(reactantSmiles: string): Promise<string[]
   );
 }
 
+async function benzylicSideChainOxidation(reactantSmiles: string): Promise<string[]> {
+  /*
+   * Strong permanganate/chromate oxidation collapses ANY benzylic side chain
+   * that has at least one benzylic H to Ar-CO2H. The distal side-chain atoms
+   * are intentionally deleted by the reaction templates; the aromatic carbon
+   * and benzylic carbon are retained so substitution elsewhere is untouched.
+   */
+  return runUniqueReactionSet(reactantSmiles, [
+    "[c:1][CH3:2]>>[c:1][C:2](=O)O",
+    "[c:1][CH2:2]([#6:3])>>[c:1][C:2](=O)O",
+    "[c:1][CH:2]([#6:3])([#6:4])>>[c:1][C:2](=O)O",
+  ]);
+}
+
 async function classifyAlcohol(
   rdkit: any,
   smiles: string
@@ -169,6 +184,10 @@ export async function oxidation(
 
   if (mode === "baeyerVilliger") {
     return baeyerVilligerOxidation(reactantSmiles);
+  }
+
+  if (mode === "benzylicSideChainOxidation") {
+    return benzylicSideChainOxidation(reactantSmiles);
   }
 
   if (mode === "alkeneOxidativeCleavage") {

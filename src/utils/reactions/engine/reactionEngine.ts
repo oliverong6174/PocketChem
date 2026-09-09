@@ -167,6 +167,11 @@ function createPathwayBase(rule: ReactionRule) {
     selectivity: rule.selectivity ?? [],
     selectivityProfile: rule.selectivityProfile ?? null,
     limitations: rule.limitations ?? [],
+    display: rule.display ?? null,
+    missingReactants: [],
+    competition: rule.competition ?? null,
+    planningCost: rule.planningCost ?? rule.priority,
+    reactantRequirements: rule.additionalReactants ?? [],
   };
 }
 
@@ -385,6 +390,7 @@ async function createMissingReactantPathway(
     reactantComponents: [primary.smiles],
     hasGenericReactant: primary.isGeneric,
     productMixture: null,
+    missingReactants: rule.additionalReactants ?? [],
     limitations: [
       ...(rule.limitations ?? []),
       `Draw the additional reactant${missingLabels.length === 1 ? "" : "s"} in the same Ketcher canvas: ${missingLabels.join(", ")}.`,
@@ -392,39 +398,28 @@ async function createMissingReactantPathway(
   };
 }
 
+/**
+ * Resolve same-event competition entirely from rule metadata. Adding a more
+ * specific reaction therefore does not require another reaction-engine if/else.
+ */
 function suppressCompetingSameConditionRules(rules: ReactionRule[]): ReactionRule[] {
-  const ids = new Set(rules.map((rule) => rule.id));
-  const suppressed = new Set<string>();
+  const strongestByGroup = new Map<string, number>();
 
-  // A vicinal diol under concentrated strong acid + heat is a pinacol
-  // substrate. Do not simultaneously show the ordinary isolated-alcohol E1
-  // cards for the exact same condition; that was the source of duplicate
-  // alkenol products on cyclic 1,2-diols.
-  if (ids.has("pinacol-rearrangement")) {
-    suppressed.add("alcohol-dehydration-alkene");
-    suppressed.add("alcohol-dehydration-primary");
+  for (const rule of rules) {
+    if (!rule.competition) continue;
+    const current = strongestByGroup.get(rule.competition.group);
+    if (current === undefined || rule.competition.specificity > current) {
+      strongestByGroup.set(rule.competition.group, rule.competition.specificity);
+    }
   }
 
-  // Likewise, when the substrate-specific excess-HBr vicinal-diol rule is
-  // available, suppress the one-OH-at-a-time HBr rules. The dedicated rule
-  // consumes both adjacent hydroxyls and reports any stereoisomeric outcome as
-  // one mixture card rather than repeated identical HBr reaction lines.
-  if (ids.has("vicinal-diol-hbr-substitution")) {
-    suppressed.add("alcohol-hbr-substitution-primary");
-    suppressed.add("alcohol-hbr-substitution-sn1");
-  }
-
-  // A conjugated diene has allylic-cation 1,2/1,4 chemistry.  Once the diene
-  // rules are available, do not also run the ordinary isolated-alkene HX rule
-  // once for every C=C in the diene.  That produced duplicate HBr/HCl/HI cards
-  // and chemically hid the temperature-dependent 1,2 versus 1,4 outcome.
-  if ([...ids].some((id) => id.startsWith("diene-hx-"))) {
-    suppressed.add("alkene-hx-addition-hcl");
-    suppressed.add("alkene-hx-addition-hbr");
-    suppressed.add("alkene-hx-addition-hi");
-  }
-
-  return rules.filter((rule) => !suppressed.has(rule.id));
+  return rules.filter((rule) => {
+    if (!rule.competition) return true;
+    return (
+      rule.competition.specificity >=
+      (strongestByGroup.get(rule.competition.group) ?? rule.competition.specificity)
+    );
+  });
 }
 
 export async function predictReactionPathwaysFromRules(

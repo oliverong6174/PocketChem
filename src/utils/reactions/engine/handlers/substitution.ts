@@ -1,5 +1,19 @@
 import { runReactionSmarts } from "../rdkitReaction";
+import {
+  SN1_NUCLEOPHILE_PROFILES,
+  SN2_NUCLEOPHILE_PROFILES,
+  SUBSTITUTION_NUCLEOPHILE_IDS,
+  isSn1NucleophileId,
+  isSn2NucleophileId,
+  type Sn1NucleophileId,
+  type Sn2NucleophileId,
+} from "../../profiles/nucleophiles";
 import { enumerateCarbocationPrecursors } from "./carbocationUtils";
+import { selectMajorAromaticEasProducts } from "../aromaticSiteSelection";
+import {
+  AROMATIC_EAS_ELECTROPHILES,
+  isAromaticEasElectrophileId,
+} from "../../profiles/aromaticEas";
 import {
   readPositiveIntegerOption,
   readStringOption,
@@ -14,33 +28,13 @@ type SubstitutionMode =
   | "alcoholSn1ToHalide"
   | "vicinalDiolToDihalide"
   | "intermolecularAlcoholDehydration"
-  | "etherCleavage";
-
-type SubstitutionNucleophile =
-  | "hydroxide"
-  | "cyanide"
-  | "azide"
-  | "ammonia"
-  | "alkoxide"
-  | "acetylide"
-  | "iodide"
-  | "water"
-  | "alcohol";
+  | "etherCleavage"
+  | "aromaticEas"
+  | "aromaticSnAr"
+  | "aromaticBenzyneAmination";
 
 type IncomingHalide = "chloride" | "bromide" | "iodide";
 type EtherCleavageHalogen = "Br" | "I";
-
-const SUBSTITUTION_NUCLEOPHILES = [
-  "hydroxide",
-  "cyanide",
-  "azide",
-  "ammonia",
-  "alkoxide",
-  "acetylide",
-  "iodide",
-  "water",
-  "alcohol",
-] as const satisfies readonly SubstitutionNucleophile[];
 
 const INCOMING_HALIDES = [
   "chloride",
@@ -151,88 +145,6 @@ async function runVicinalDiolToDihalide(
   return uniqueProducts(products);
 }
 
-type Sn2SmartsSet = {
-  /** Secondary-center SN2 pattern that inverts tetrahedral chirality. */
-  inversion: string;
-  /** Primary/methyl fallback; also works when the reacting center has no stereo. */
-  generic: string;
-};
-
-const SN2_SMARTS: Record<
-  Exclude<SubstitutionNucleophile, "water" | "alcohol">,
-  Sn2SmartsSet
-> = {
-  hydroxide: {
-    inversion:
-      "[C@H:1]([*:3])([*:4])[Cl,Br,I:2].[O-;H1:5]>>[C@@H:1]([*:3])([*:4])[O+0:5]",
-    generic:
-      "[C;X4:1][Cl,Br,I:2].[O-;H1:5]>>[C:1][O+0:5]",
-  },
-  cyanide: {
-    inversion:
-      "[C@H:1]([*:3])([*:4])[Cl,Br,I:2].[C-:5]#[N:6]>>[C@@H:1]([*:3])([*:4])[C+0:5]#[N:6]",
-    generic:
-      "[C;X4:1][Cl,Br,I:2].[C-:5]#[N:6]>>[C:1][C+0:5]#[N:6]",
-  },
-  azide: {
-    inversion:
-      "[C@H:1]([*:3])([*:4])[Cl,Br,I:2].[N-:5]~[N+:6]~[N:7]>>[C@@H:1]([*:3])([*:4])[N+0:5]=[N+:6]=[N-:7]",
-    generic:
-      "[C;X4:1][Cl,Br,I:2].[N-:5]~[N+:6]~[N:7]>>[C:1][N+0:5]=[N+:6]=[N-:7]",
-  },
-  ammonia: {
-    inversion:
-      "[C@H:1]([*:3])([*:4])[Cl,Br,I:2].[N;H3;+0:5]>>[C@@H:1]([*:3])([*:4])[N;H2;+0:5]",
-    generic:
-      "[C;X4:1][Cl,Br,I:2].[N;H3;+0:5]>>[C:1][N;H2;+0:5]",
-  },
-  alkoxide: {
-    inversion:
-      "[C@H:1]([*:3])([*:4])[Cl,Br,I:2].[#6:6][O-:5]>>[C@@H:1]([*:3])([*:4])[O+0:5][#6:6]",
-    generic:
-      "[C;X4:1][Cl,Br,I:2].[#6:6][O-:5]>>[C:1][O+0:5][#6:6]",
-  },
-  acetylide: {
-    inversion:
-      "[C@H:1]([*:3])([*:4])[Cl,Br,I:2].[#6:5]#[C-:6]>>[C@@H:1]([*:3])([*:4])[C+0:6]#[#6:5]",
-    generic:
-      "[C;X4:1][Cl,Br,I:2].[#6:5]#[C-:6]>>[C:1][C+0:6]#[#6:5]",
-  },
-  iodide: {
-    inversion:
-      "[C@H:1]([*:3])([*:4])[Cl,Br:2].[I-:5]>>[C@@H:1]([*:3])([*:4])[I+0:5]",
-    generic:
-      "[C;X4:1][Cl,Br:2].[I-:5]>>[C:1][I+0:5]",
-  },
-};
-
-type Sn1SmartsSet = {
-  /** Secondary carbocation capture; product @ plus match permutations enumerates both faces. */
-  secondaryRacemization: string;
-  /** Tertiary carbocation capture; product @ plus match permutations enumerates both faces. */
-  tertiaryRacemization: string;
-  generic: string;
-};
-
-const SN1_SMARTS: Record<"water" | "alcohol", Sn1SmartsSet> = {
-  water: {
-    secondaryRacemization:
-      "[C;H1;X4:1]([*:3])([*:4])[Cl,Br,I:2].[O;H2;+0:5]>>[C@H:1]([*:3])([*:4])[O;H1;+0:5]",
-    tertiaryRacemization:
-      "[C;H0;X4:1]([*:3])([*:4])([*:7])[Cl,Br,I:2].[O;H2;+0:5]>>[C@:1]([*:3])([*:4])([*:7])[O;H1;+0:5]",
-    generic:
-      "[C;X4:1][Cl,Br,I:2].[O;H2;+0:5]>>[C:1][O;H1;+0:5]",
-  },
-  alcohol: {
-    secondaryRacemization:
-      "[C;H1;X4:1]([*:3])([*:4])[Cl,Br,I:2].[#6:6][O;H1;+0:5]>>[C@H:1]([*:3])([*:4])[O+0:5][#6:6]",
-    tertiaryRacemization:
-      "[C;H0;X4:1]([*:3])([*:4])([*:7])[Cl,Br,I:2].[#6:6][O;H1;+0:5]>>[C@:1]([*:3])([*:4])([*:7])[O+0:5][#6:6]",
-    generic:
-      "[C;X4:1][Cl,Br,I:2].[#6:6][O;H1;+0:5]>>[C:1][O+0:5][#6:6]",
-  },
-};
-
 async function runAlcoholToHalide(
   substrate: string,
   halide: IncomingHalide,
@@ -308,12 +220,12 @@ async function runAlcoholSn1ToHalide(
 
 async function runSn2(
   reactants: string[],
-  nucleophile: Exclude<SubstitutionNucleophile, "water" | "alcohol">,
+  nucleophile: Sn2NucleophileId,
   maxProducts: number
 ): Promise<string[]> {
   if (reactants.length < 2) return [];
 
-  const smarts = SN2_SMARTS[nucleophile];
+  const smarts = SN2_NUCLEOPHILE_PROFILES[nucleophile].forward;
 
   // The stereochemical template applies to secondary centers and tells RDKit
   // to invert tetrahedral configuration. If it matches, do not also run the
@@ -337,10 +249,10 @@ async function runSn2(
 async function runSn1Capture(
   virtualHalide: string,
   partner: string,
-  nucleophile: "water" | "alcohol",
+  nucleophile: Sn1NucleophileId,
   maxProducts: number
 ): Promise<string[]> {
-  const smarts = SN1_SMARTS[nucleophile];
+  const smarts = SN1_NUCLEOPHILE_PROFILES[nucleophile].forward;
   const reactants = [virtualHalide, partner];
   const products: string[] = [];
 
@@ -368,7 +280,7 @@ async function runSn1Capture(
 
 async function runSn1(
   reactants: string[],
-  nucleophile: "water" | "alcohol",
+  nucleophile: Sn1NucleophileId,
   maxProducts: number,
   allowRearrangement: boolean,
   maxShiftDepth: number
@@ -416,6 +328,126 @@ async function runSn1(
  * and favorable carbocation rearrangements so that those details are not
  * duplicated across individual reaction rules.
  */
+
+async function runAromaticEas(
+  substrate: string,
+  options?: Record<string, unknown>,
+): Promise<string[]> {
+  const electrophile = options?.electrophile;
+  if (!isAromaticEasElectrophileId(electrophile)) {
+    console.warn("Aromatic EAS requires a registered electrophile profile.", options);
+    return [];
+  }
+
+  const profile = AROMATIC_EAS_ELECTROPHILES[electrophile];
+  const maxProducts = readPositiveIntegerOption(options, "maxProducts", profile.maxProducts);
+  const products = uniqueProducts(
+    await runReactionSmarts(
+      substrate,
+      profile.reactionSmarts,
+      Math.max(maxProducts, profile.maxProducts),
+    ),
+  );
+  if (products.length <= 1) return products;
+  const selected = await selectMajorAromaticEasProducts(substrate, products, electrophile);
+  return selected.slice(0, maxProducts);
+}
+
+type AromaticSnArNucleophile = "azide" | "cyanide" | "hydroxide" | "amino" | "methoxide";
+
+function snarInstalledBranch(nucleophile: AromaticSnArNucleophile): string {
+  switch (nucleophile) {
+    case "azide": return "[N]=[N+]=[N-]";
+    case "cyanide": return "[C]#[N]";
+    case "hydroxide": return "[OH]";
+    case "amino": return "[NH2]";
+    case "methoxide": return "O[CH3]";
+  }
+}
+
+type AromaticSnArLeavingGroup = "F" | "Cl" | "Br" | "I";
+
+function activatedSnArTemplates(
+  nucleophile: AromaticSnArNucleophile,
+  leavingGroup: AromaticSnArLeavingGroup,
+): string[] {
+  const nu = snarInstalledBranch(nucleophile);
+  const ewgBranches = [
+    { reactant: "[N+:7](=[O:8])[O-:9]", product: "[N+:7](=[O:8])[O-:9]" },
+    { reactant: "[C:7]#[N:8]", product: "[C:7]#[N:8]" },
+    { reactant: "[C:7](=[O:8])[*:9]", product: "[C:7](=[O:8])[*:9]" },
+    { reactant: "[S:7](=[O:8])(=[O:9])[*:10]", product: "[S:7](=[O:8])(=[O:9])[*:10]" },
+  ];
+
+  const templates: string[] = [];
+  for (const ewg of ewgBranches) {
+    // Ortho activation. Reversing the ring match covers either ortho side.
+    templates.push(
+      `[c:1]1([${leavingGroup}:20])[c:2](${ewg.reactant})[c:3][c:4][c:5][c:6]1` +
+      `>>[c:1]1(${nu})[c:2](${ewg.product})[c:3][c:4][c:5][c:6]1`,
+    );
+    // Para activation.
+    templates.push(
+      `[c:1]1([${leavingGroup}:20])[c:2][c:3][c:4](${ewg.reactant})[c:5][c:6]1` +
+      `>>[c:1]1(${nu})[c:2][c:3][c:4](${ewg.product})[c:5][c:6]1`,
+    );
+  }
+  return templates;
+}
+
+async function runAromaticSnAr(
+  substrate: string,
+  options?: Record<string, unknown>,
+): Promise<string[]> {
+  const nucleophile = options?.nucleophile as AromaticSnArNucleophile | undefined;
+  if (!nucleophile || !["azide", "cyanide", "hydroxide", "amino", "methoxide"].includes(nucleophile)) {
+    console.warn("Aromatic SNAr requires a registered nucleophile.", options);
+    return [];
+  }
+
+  /*
+   * Addition-elimination SNAr has the characteristic leaving-group order
+   * F > Cl > Br > I because the rate-determining addition step is accelerated
+   * by the strongly inductive C-X bond; this is the reverse of ordinary SN1/
+   * SN2 intuition.  Evaluate one leaving-group class at a time and stop at the
+   * highest-reactivity class that actually has an ortho/para EWG-activated
+   * site.  Multiple equivalent sites with the SAME leaving group remain as
+   * legitimate alternatives.
+   *
+   * This one ranking rule is shared by azide, cyanide, hydroxide, amide and
+   * methoxide SNAr, so NaN3 and NaCN cannot disagree about Cl vs Br selectivity.
+   */
+  const leavingGroupOrder: readonly AromaticSnArLeavingGroup[] = ["F", "Cl", "Br", "I"];
+  for (const leavingGroup of leavingGroupOrder) {
+    const products: string[] = [];
+    for (const smarts of activatedSnArTemplates(nucleophile, leavingGroup)) {
+      products.push(...await runReactionSmarts(substrate, smarts, 16));
+    }
+    const unique = uniqueProducts(products);
+    if (unique.length > 0) return unique;
+  }
+  return [];
+}
+
+async function runAromaticBenzyneAmination(substrate: string): Promise<string[]> {
+  /*
+   * NaNH2/NH3 eliminates HX from an aryl halide only when an ortho H exists,
+   * forming benzyne. Amide can add to either benzyne carbon, so substituted
+   * substrates can give both ipso and cine amination products.
+   */
+  return uniqueProducts([
+    ...await runReactionSmarts(
+      substrate,
+      "[c:1]([F,Cl,Br,I:3])[cH:2]>>[c:1]([NH2])[cH:2]",
+      16,
+    ),
+    ...await runReactionSmarts(
+      substrate,
+      "[c:1]([F,Cl,Br,I:3])[cH:2]>>[cH:1][c:2]([NH2])",
+      16,
+    ),
+  ]);
+}
 
 /**
  * Rank acid cleavage of an unsymmetrical dialkyl ether instead of returning
@@ -471,6 +503,21 @@ export async function substitution(
   const primaryReactant = reactants[0] ?? "";
   const mode = options?.mode as SubstitutionMode | undefined;
 
+  if (mode === "aromaticEas") {
+    if (!primaryReactant) return [];
+    return runAromaticEas(primaryReactant, options);
+  }
+
+  if (mode === "aromaticSnAr") {
+    if (!primaryReactant) return [];
+    return runAromaticSnAr(primaryReactant, options);
+  }
+
+  if (mode === "aromaticBenzyneAmination") {
+    if (!primaryReactant) return [];
+    return runAromaticBenzyneAmination(primaryReactant);
+  }
+
   if (mode === "etherCleavage") {
     const substrate = reactants[0];
     const halogen = options?.halogen as EtherCleavageHalogen | undefined;
@@ -485,14 +532,10 @@ export async function substitution(
     const nucleophile = readStringOption(
       options,
       "nucleophile",
-      SUBSTITUTION_NUCLEOPHILES
+      SUBSTITUTION_NUCLEOPHILE_IDS
     );
 
-    if (
-      !nucleophile ||
-      nucleophile === "water" ||
-      nucleophile === "alcohol"
-    ) {
+    if (!nucleophile || !isSn2NucleophileId(nucleophile)) {
       warnUnsupportedHandlerMode("Substitution", options);
       return [];
     }
@@ -508,7 +551,7 @@ export async function substitution(
       ["water", "alcohol"] as const
     );
 
-    if (!nucleophile) {
+    if (!nucleophile || !isSn1NucleophileId(nucleophile)) {
       warnUnsupportedHandlerMode("Substitution", options);
       return [];
     }

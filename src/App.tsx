@@ -15,6 +15,7 @@
     useState,
     type KeyboardEvent as ReactKeyboardEvent,
   } from "react";
+import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import MoleculeDrawer from "./components/MoleculeDrawer";
   import {
     analyzeFunctionalGroupHierarchy,
@@ -326,10 +327,9 @@
       setStatus("Reading the structure…");
 
       try {
-        const [result, currentMolfile] = await Promise.all([
-          editor.getSmiles(),
-          editor.getMolfile(),
-        ]);
+        const editorSnapshot = await readKetcherStructureSnapshot(editor);
+        const result = editorSnapshot?.smiles ?? "";
+        const currentMolfile = editorSnapshot?.molfile ?? null;
         const safeSmiles = sanitizeDisplayedSmiles(result);
 
         if (!safeSmiles) {
@@ -347,7 +347,7 @@
         const [annotation, resonance, chirality, hierarchy] = await Promise.all([
           getMoleculeAnnotation(moleculeSource),
           analyzeResonance(moleculeSource),
-          analyzeChirality(safeSmiles, currentMolfile),
+          analyzeChirality(safeSmiles, currentMolfile ?? undefined),
           analyzeFunctionalGroupHierarchy(moleculeSource),
         ]);
 
@@ -1846,7 +1846,10 @@
             {activePage === "acidBase" ? (
               <AcidBasePage />
             ) : activePage === "reactions" ? (
-              <ReactionsPage initialPathways={reactionPathways} />
+              <ReactionsPage
+                initialPathways={reactionPathways}
+                initialReactantMolfile={molfile}
+              />
             ) : activePage === "multiStep" ? (
               <SynthesisPage />
             ) : (

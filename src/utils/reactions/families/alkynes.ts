@@ -1,4 +1,5 @@
 import type { ReactionRule } from "../reactionTypes";
+import { HYDROHALOGENS, type HalogenProfile } from "../profiles/halogens";
 
 const alkyneTrigger = {
   anyFunctionalGroups: [
@@ -35,37 +36,16 @@ const geminalDihalideTrigger = {
 const hydroborationAlternativeReagents =
   "1) BH₃·THF  2) H₂O₂, OH⁻; 1) (Sia)₂BH  2) H₂O₂, OH⁻; or 1) 9-BBN  2) H₂O₂, OH⁻";
 
-type Hydrohalogen = {
-  symbol: "Cl" | "Br" | "I";
-  acid: "HCl" | "HBr" | "HI";
-  name: "Hydrochlorination" | "Hydrobromination" | "Hydroiodination";
+type Hydrohalogen = HalogenProfile & {
   vinylHint: string;
   geminalHint: string;
 };
 
-const hydrohalogens: Hydrohalogen[] = [
-  {
-    symbol: "Cl",
-    acid: "HCl",
-    name: "Hydrochlorination",
-    vinylHint: "Vinyl chloride",
-    geminalHint: "Geminal dichloride",
-  },
-  {
-    symbol: "Br",
-    acid: "HBr",
-    name: "Hydrobromination",
-    vinylHint: "Vinyl bromide",
-    geminalHint: "Geminal dibromide",
-  },
-  {
-    symbol: "I",
-    acid: "HI",
-    name: "Hydroiodination",
-    vinylHint: "Vinyl iodide",
-    geminalHint: "Geminal diiodide",
-  },
-];
+const hydrohalogens: Hydrohalogen[] = HYDROHALOGENS.map((halogen) => ({
+  ...halogen,
+  vinylHint: `Vinyl ${halogen.anionName}`,
+  geminalHint: `Geminal di${halogen.prefix.replace(/o$/, "")}ide`,
+}));
 
 function terminalHydrohalogenationRules(
   halogen: Hydrohalogen,
@@ -76,13 +56,21 @@ function terminalHydrohalogenationRules(
       id: `alkyne-${halogen.acid.toLowerCase()}-addition-one-equivalent-terminal`,
       family: "alkynes",
       reactionType: "addition",
-      title: `Hydrohalogenation: ${halogen.name} (1 equiv)`,
+      title: `Hydrohalogenation: ${halogen.hydrohalogenationName} (1 equiv)`,
       reagents: `1 equiv ${halogen.acid}`,
       reagentNote: "Markovnikov addition to a terminal alkyne",
       productHint: halogen.vinylHint,
       explanation:
         `One equivalent of ${halogen.acid} adds to a terminal alkyne with Markovnikov orientation, placing ${halogen.symbol} on the substituted alkyne carbon and H on the terminal carbon.`,
       trigger: terminalAlkyneTrigger,
+      display: {
+        renderer: "generic-halogen",
+        series: {
+          id: "alkyne-hx-one-equivalent-terminal",
+          variable: "X",
+          value: halogen.symbol,
+        },
+      },
       transform: {
         type: "reactionSmarts",
         smarts: `[C:1]#[CH:2]>>[C:1]([${halogen.symbol}])=[CH2:2]`,
@@ -110,6 +98,14 @@ function terminalHydrohalogenationRules(
       explanation:
         `Excess ${halogen.acid} adds twice to a terminal alkyne, giving the Markovnikov geminal dihalide with both ${halogen.symbol} atoms on the substituted carbon.`,
       trigger: terminalAlkyneTrigger,
+      display: {
+        renderer: "generic-halogen",
+        series: {
+          id: "alkyne-hx-excess-terminal",
+          variable: "X",
+          value: halogen.symbol,
+        },
+      },
       transform: {
         type: "reactionSmarts",
         smarts: `[C:1]#[CH:2]>>[C:1]([${halogen.symbol}])([${halogen.symbol}])[CH3:2]`,
@@ -136,13 +132,21 @@ function internalHydrohalogenationRules(
       id: `alkyne-${halogen.acid.toLowerCase()}-addition-one-equivalent-internal`,
       family: "alkynes",
       reactionType: "addition",
-      title: `Hydrohalogenation: ${halogen.name} (1 equiv)`,
+      title: `Hydrohalogenation: ${halogen.hydrohalogenationName} (1 equiv)`,
       reagents: `1 equiv ${halogen.acid}`,
       reagentNote: "Addition to an internal alkyne",
       productHint: halogen.vinylHint,
       explanation:
         `One equivalent of ${halogen.acid} converts an internal alkyne into a vinyl halide. Unsymmetrical internal alkynes can give constitutional and E/Z mixtures.`,
       trigger: internalAlkyneTrigger,
+      display: {
+        renderer: "generic-halogen",
+        series: {
+          id: "alkyne-hx-one-equivalent-internal",
+          variable: "X",
+          value: halogen.symbol,
+        },
+      },
       transform: {
         type: "reactionSmarts",
         smarts: `[C:1]#[C:2]>>[C:1]([${halogen.symbol}])=[C:2]`,
@@ -168,6 +172,14 @@ function internalHydrohalogenationRules(
       explanation:
         `Excess ${halogen.acid} adds twice to an internal alkyne to form a geminal dihalide. Unsymmetrical alkynes can give regioisomeric products.`,
       trigger: internalAlkyneTrigger,
+      display: {
+        renderer: "generic-halogen",
+        series: {
+          id: "alkyne-hx-excess-internal",
+          variable: "X",
+          value: halogen.symbol,
+        },
+      },
       transform: {
         type: "reactionSmarts",
         smarts: `[C:1]#[C:2]>>[C:1]([${halogen.symbol}])([${halogen.symbol}])[C:2]`,
@@ -505,6 +517,10 @@ export const alkyneReactionRules: ReactionRule[] = [
     explanation:
       "One equivalent of bromine adds across one pi bond to form a vicinal dibromoalkene, commonly favoring trans geometry.",
     trigger: alkyneTrigger,
+    display: {
+      renderer: "generic-halogen",
+      series: { id: "alkyne-x2-one-equivalent", variable: "X", value: "Br" },
+    },
     transform: {
       type: "reactionSmarts",
       smarts: "[C:1]#[C:2]>>[C:1]([Br])=[C:2]([Br])",
@@ -531,6 +547,10 @@ export const alkyneReactionRules: ReactionRule[] = [
     explanation:
       "One equivalent of chlorine adds across one pi bond to form a vicinal dichloroalkene, commonly favoring trans geometry.",
     trigger: alkyneTrigger,
+    display: {
+      renderer: "generic-halogen",
+      series: { id: "alkyne-x2-one-equivalent", variable: "X", value: "Cl" },
+    },
     transform: {
       type: "reactionSmarts",
       smarts: "[C:1]#[C:2]>>[C:1]([Cl])=[C:2]([Cl])",
@@ -557,6 +577,10 @@ export const alkyneReactionRules: ReactionRule[] = [
     explanation:
       "Two equivalents of bromine add across the triple bond to form a tetrabromide.",
     trigger: alkyneTrigger,
+    display: {
+      renderer: "generic-halogen",
+      series: { id: "alkyne-x2-excess", variable: "X", value: "Br" },
+    },
     transform: {
       type: "reactionSmarts",
       smarts: "[C:1]#[C:2]>>[C:1]([Br])([Br])[C:2]([Br])([Br])",
@@ -576,6 +600,10 @@ export const alkyneReactionRules: ReactionRule[] = [
     explanation:
       "Two equivalents of chlorine add across the triple bond to form a tetrachloride.",
     trigger: alkyneTrigger,
+    display: {
+      renderer: "generic-halogen",
+      series: { id: "alkyne-x2-excess", variable: "X", value: "Cl" },
+    },
     transform: {
       type: "reactionSmarts",
       smarts: "[C:1]#[C:2]>>[C:1]([Cl])([Cl])[C:2]([Cl])([Cl])",
@@ -769,6 +797,7 @@ export const alkyneReactionRules: ReactionRule[] = [
       smarts: "[C:1]#[CH:2]>>[C:1]#[C-:2]",
     },
     mechanism: "Proton transfer",
+    constraints: ["terminal-alkyne-needs-sp-h"],
     priority: 480,
   },
   {
@@ -789,6 +818,7 @@ export const alkyneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     mechanism: "Acid-base isotope exchange",
+    constraints: ["terminal-alkyne-needs-sp-h"],
     priority: 485,
   },
   {

@@ -6,6 +6,472 @@ export type PolycyclicHydrocarbonName = {
   reason: string;
 };
 
+
+const BICYCLIC_CHAIN_ROOTS: Record<number, string> = {
+  3: "prop", 4: "but", 5: "pent", 6: "hex", 7: "hept", 8: "oct",
+  9: "non", 10: "dec", 11: "undec", 12: "dodec", 13: "tridec",
+  14: "tetradec", 15: "pentadec", 16: "hexadec",
+};
+
+const HALOGEN_PREFIX_BY_ELEMENT: Record<string, string> = {
+  F: "fluoro", Cl: "chloro", Br: "bromo", I: "iodo",
+};
+
+type SimpleBicycloNumbering = {
+  locantByAtom: Map<number, number>;
+  doubleLocants: number[];
+  tripleLocants: number[];
+  substituents: Array<{ locant: number; prefix: string }>;
+};
+
+function simpleCarbonAdjacency(parsedMol: ParsedMol) {
+  const carbonAtoms = parsedMol.atoms
+    .filter((atom) => atom.element === "C" && atom.charge === 0)
+    .map((atom) => atom.atomIndex);
+  const carbonSet = new Set(carbonAtoms);
+  const adjacency = new Map<number, Set<number>>();
+  for (const atomIndex of carbonAtoms) adjacency.set(atomIndex, new Set());
+  let carbonEdgeCount = 0;
+  for (const bond of parsedMol.bonds) {
+    if (!carbonSet.has(bond.atomA) || !carbonSet.has(bond.atomB)) continue;
+    adjacency.get(bond.atomA)?.add(bond.atomB);
+    adjacency.get(bond.atomB)?.add(bond.atomA);
+    carbonEdgeCount += 1;
+  }
+  return { carbonAtoms, carbonSet, adjacency, carbonEdgeCount };
+}
+
+function traceFusedBridgePath(
+  adjacency: Map<number, Set<number>>,
+  startBridgehead: number,
+  endBridgehead: number,
+  firstAtom: number,
+): number[] | null {
+  const path = [startBridgehead, firstAtom];
+  let previous = startBridgehead;
+  let current = firstAtom;
+  const seen = new Set(path);
+  while (current !== endBridgehead) {
+    const nextCandidates = [...(adjacency.get(current) ?? [])].filter(
+      (neighbor) => neighbor !== previous,
+    );
+    if (nextCandidates.length !== 1) return null;
+    const next = nextCandidates[0];
+    if (next !== endBridgehead && seen.has(next)) return null;
+    path.push(next);
+    seen.add(next);
+    previous = current;
+    current = next;
+  }
+  return path;
+}
+
+function enumerateSimpleFusedBicycloNumberings(parsedMol: ParsedMol): {
+  descriptor: [number, number, 0]; carbonCount: number; numberings: Map<number, number>[];
+} | null {
+  const { carbonAtoms, carbonSet, adjacency, carbonEdgeCount } = simpleCarbonAdjacency(parsedMol);
+  if (carbonAtoms.length < 5 || !BICYCLIC_CHAIN_ROOTS[carbonAtoms.length]) return null;
+  if (carbonEdgeCount !== carbonAtoms.length + 1) return null;
+
+  for (const atom of parsedMol.atoms) {
+    if (carbonSet.has(atom.atomIndex)) continue;
+    if (!(atom.element in HALOGEN_PREFIX_BY_ELEMENT) || atom.charge !== 0) return null;
+    const bonds = parsedMol.adjacency.get(atom.atomIndex) ?? [];
+    if (bonds.length !== 1 || bonds[0].bondOrder !== 1) return null;
+    const attached = bonds[0].atomA === atom.atomIndex ? bonds[0].atomB : bonds[0].atomA;
+    if (!carbonSet.has(attached)) return null;
+  }
+
+  const bridgeheads = carbonAtoms.filter((atomIndex) => (adjacency.get(atomIndex)?.size ?? 0) === 3);
+  if (bridgeheads.length !== 2) return null;
+  if (carbonAtoms.some((atomIndex) => {
+    const degree = adjacency.get(atomIndex)?.size ?? 0;
+    return bridgeheads.includes(atomIndex) ? degree !== 3 : degree !== 2;
+  })) return null;
+
+  const [a, b] = bridgeheads;
+  if (!adjacency.get(a)?.has(b)) return null;
+  const starts = [...(adjacency.get(a) ?? [])].filter((neighbor) => neighbor !== b);
+  if (starts.length !== 2) return null;
+  const paths = starts
+    .map((start) => traceFusedBridgePath(adjacency, a, b, start))
+    .filter((path): path is number[] => Boolean(path));
+  if (paths.length !== 2) return null;
+
+  const covered = new Set<number>([a, b]);
+  paths.forEach((path) => path.forEach((atom) => covered.add(atom)));
+  if (covered.size !== carbonAtoms.length) return null;
+
+  const sizes = paths.map((path) => path.length - 2);
+  const descriptor = [Math.max(...sizes), Math.min(...sizes), 0] as [number, number, 0];
+  const numberings: Map<number, number>[] = [];
+
+  for (const startBridgehead of [a, b]) {
+    const endBridgehead = startBridgehead === a ? b : a;
+    const oriented = paths.map((path) => path[0] === startBridgehead ? path : [...path].reverse());
+    const orders = sizes[0] === sizes[1]
+      ? [oriented, [oriented[1], oriented[0]]]
+      : [oriented[0].length >= oriented[1].length ? oriented : [oriented[1], oriented[0]]];
+    for (const [firstPath, secondPath] of orders) {
+      const locantByAtom = new Map<number, number>();
+      let locant = 1;
+      locantByAtom.set(startBridgehead, locant++);
+      firstPath.slice(1, -1).forEach((atom) => locantByAtom.set(atom, locant++));
+      locantByAtom.set(endBridgehead, locant++);
+      const secondFromEnd = secondPath[0] === endBridgehead ? secondPath : [...secondPath].reverse();
+      secondFromEnd.slice(1, -1).forEach((atom) => locantByAtom.set(atom, locant++));
+      if (locantByAtom.size === carbonAtoms.length) numberings.push(locantByAtom);
+    }
+  }
+  return { descriptor, carbonCount: carbonAtoms.length, numberings };
+}
+
+function simpleBicycloNumberingDetails(parsedMol: ParsedMol, locantByAtom: Map<number, number>): SimpleBicycloNumbering {
+  const doubleLocants: number[] = [];
+  const tripleLocants: number[] = [];
+  for (const bond of parsedMol.bonds) {
+    const a = locantByAtom.get(bond.atomA);
+    const b = locantByAtom.get(bond.atomB);
+    if (a === undefined || b === undefined) continue;
+    const locant = Math.min(a, b);
+    if (bond.bondOrder === 2) doubleLocants.push(locant);
+    if (bond.bondOrder === 3) tripleLocants.push(locant);
+  }
+  doubleLocants.sort((a, b) => a - b);
+  tripleLocants.sort((a, b) => a - b);
+  const substituents: Array<{ locant: number; prefix: string }> = [];
+  for (const atom of parsedMol.atoms) {
+    const prefix = HALOGEN_PREFIX_BY_ELEMENT[atom.element];
+    if (!prefix) continue;
+    const bond = (parsedMol.adjacency.get(atom.atomIndex) ?? [])[0];
+    if (!bond) continue;
+    const carbon = bond.atomA === atom.atomIndex ? bond.atomB : bond.atomA;
+    const locant = locantByAtom.get(carbon);
+    if (locant !== undefined) substituents.push({ locant, prefix });
+  }
+  substituents.sort((l, r) => l.locant - r.locant || l.prefix.localeCompare(r.prefix));
+  return { locantByAtom, doubleLocants, tripleLocants, substituents };
+}
+
+function compareSimpleBicycloNumberings(left: SimpleBicycloNumbering, right: SimpleBicycloNumbering): number {
+  const leftUnsat = [...left.doubleLocants, ...left.tripleLocants].sort((a,b)=>a-b);
+  const rightUnsat = [...right.doubleLocants, ...right.tripleLocants].sort((a,b)=>a-b);
+  return compareLocantLists(leftUnsat, rightUnsat)
+    || compareLocantLists(left.doubleLocants, right.doubleLocants)
+    || compareLocantLists(left.substituents.map(x=>x.locant), right.substituents.map(x=>x.locant))
+    || left.substituents.map(x=>x.prefix).join(",").localeCompare(right.substituents.map(x=>x.prefix).join(","));
+}
+
+function simpleMultiplier(count: number): string {
+  return count === 2 ? "di" : count === 3 ? "tri" : count === 4 ? "tetra" : `${count}-`;
+}
+
+function buildSimpleBicycloUnsaturationName(carbonCount: number, doubles: number[], triples: number[]): string | null {
+  const root = BICYCLIC_CHAIN_ROOTS[carbonCount];
+  if (!root || (doubles.length && triples.length)) return null;
+  if (!doubles.length && !triples.length) return `${root}ane`;
+  if (doubles.length === 1) return `${root}-${doubles[0]}-ene`;
+  if (doubles.length > 1) return `${root}a-${doubles.join(",")}-${simpleMultiplier(doubles.length)}ene`;
+  if (triples.length === 1) return `${root}-${triples[0]}-yne`;
+  return `${root}a-${triples.join(",")}-${simpleMultiplier(triples.length)}yne`;
+}
+
+function buildSimpleHalogenPrefix(substituents: Array<{locant:number;prefix:string}>): string {
+  if (!substituents.length) return "";
+  const grouped = new Map<string, number[]>();
+  for (const item of substituents) grouped.set(item.prefix, [...(grouped.get(item.prefix) ?? []), item.locant]);
+  return [...grouped.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([prefix, locants]) => {
+    locants.sort((a,b)=>a-b);
+    return `${locants.join(",")}-${locants.length > 1 ? simpleMultiplier(locants.length) : ""}${prefix}`;
+  }).join("-");
+}
+
+
+function carbonTwoCore(parsedMol: ParsedMol): {
+  coreAtoms: number[];
+  coreSet: Set<number>;
+  adjacency: Map<number, Set<number>>;
+  carbonAdjacency: Map<number, Set<number>>;
+} | null {
+  const carbonAtoms = parsedMol.atoms
+    .filter((atom) => atom.element === "C" && atom.charge === 0)
+    .map((atom) => atom.atomIndex);
+  if (carbonAtoms.length < 5) return null;
+  const carbonSet = new Set(carbonAtoms);
+  const carbonAdjacency = new Map<number, Set<number>>();
+  for (const atomIndex of carbonAtoms) carbonAdjacency.set(atomIndex, new Set());
+  for (const bond of parsedMol.bonds) {
+    if (!carbonSet.has(bond.atomA) || !carbonSet.has(bond.atomB)) continue;
+    carbonAdjacency.get(bond.atomA)?.add(bond.atomB);
+    carbonAdjacency.get(bond.atomB)?.add(bond.atomA);
+  }
+
+  // Iteratively peel acyclic carbon substituents.  The remaining 2-core is the
+  // cyclic carbon framework, so methyl/ethyl substituents do not get mistaken
+  // for part of the bicyclic parent skeleton.
+  const coreSet = new Set(carbonAtoms);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const atom of [...coreSet]) {
+      const degree = [...(carbonAdjacency.get(atom) ?? [])].filter((n) => coreSet.has(n)).length;
+      if (degree <= 1) {
+        coreSet.delete(atom);
+        changed = true;
+      }
+    }
+  }
+  const coreAtoms = [...coreSet];
+  if (coreAtoms.length < 5 || !BICYCLIC_CHAIN_ROOTS[coreAtoms.length]) return null;
+
+  const adjacency = new Map<number, Set<number>>();
+  for (const atom of coreAtoms) {
+    adjacency.set(
+      atom,
+      new Set([...(carbonAdjacency.get(atom) ?? [])].filter((n) => coreSet.has(n))),
+    );
+  }
+  return { coreAtoms, coreSet, adjacency, carbonAdjacency };
+}
+
+function traceBicycloBridgePath(
+  adjacency: Map<number, Set<number>>,
+  startBridgehead: number,
+  endBridgehead: number,
+  firstAtom: number,
+): number[] | null {
+  const path = [startBridgehead, firstAtom];
+  let previous = startBridgehead;
+  let current = firstAtom;
+  const seen = new Set(path);
+  while (current !== endBridgehead) {
+    const nextCandidates = [...(adjacency.get(current) ?? [])].filter(
+      (neighbor) => neighbor !== previous,
+    );
+    if (nextCandidates.length !== 1) return null;
+    const next = nextCandidates[0];
+    if (next !== endBridgehead && seen.has(next)) return null;
+    path.push(next);
+    seen.add(next);
+    previous = current;
+    current = next;
+  }
+  return path;
+}
+
+function pathPermutationsByLength(paths: number[][]): number[][][] {
+  const permutations: number[][][] = [];
+  const visit = (prefix: number[][], rest: number[][]) => {
+    if (rest.length === 0) {
+      const sizes = prefix.map((path) => path.length - 2);
+      if (sizes.every((size, index) => index === 0 || sizes[index - 1] >= size)) {
+        permutations.push(prefix);
+      }
+      return;
+    }
+    for (let index = 0; index < rest.length; index += 1) {
+      visit(
+        [...prefix, rest[index]],
+        [...rest.slice(0, index), ...rest.slice(index + 1)],
+      );
+    }
+  };
+  visit([], paths);
+  return permutations;
+}
+
+/**
+ * Recognize the general simple bicyclo[a.b.c] carbon framework used throughout
+ * O-Chem, including fused (c = 0), bridged, and Diels-Alder-derived systems.
+ *
+ * The graph criterion is intentionally general: after acyclic carbon branches
+ * are peeled away, the core must have cyclomatic number 2, exactly two degree-3
+ * bridgeheads, and three internally disjoint paths connecting them.  No exact
+ * substrate or SMILES is hard-coded.
+ */
+function enumerateSimpleBicycloNumberings(parsedMol: ParsedMol): {
+  descriptor: [number, number, number];
+  carbonCount: number;
+  coreSet: Set<number>;
+  carbonAdjacency: Map<number, Set<number>>;
+  numberings: Map<number, number>[];
+} | null {
+  const core = carbonTwoCore(parsedMol);
+  if (!core) return null;
+  const { coreAtoms, coreSet, adjacency, carbonAdjacency } = core;
+
+  let coreEdgeCount = 0;
+  for (const atom of coreAtoms) coreEdgeCount += adjacency.get(atom)?.size ?? 0;
+  coreEdgeCount /= 2;
+  if (coreEdgeCount !== coreAtoms.length + 1) return null;
+
+  const bridgeheads = coreAtoms.filter((atom) => (adjacency.get(atom)?.size ?? 0) === 3);
+  if (bridgeheads.length !== 2) return null;
+  if (
+    coreAtoms.some((atom) => {
+      const degree = adjacency.get(atom)?.size ?? 0;
+      return bridgeheads.includes(atom) ? degree !== 3 : degree !== 2;
+    })
+  ) return null;
+
+  const [bridgeA, bridgeB] = bridgeheads;
+  const starts = [...(adjacency.get(bridgeA) ?? [])];
+  if (starts.length !== 3) return null;
+  const paths = starts
+    .map((start) => traceBicycloBridgePath(adjacency, bridgeA, bridgeB, start))
+    .filter((path): path is number[] => Boolean(path));
+  if (paths.length !== 3) return null;
+
+  // Every non-bridgehead core atom must belong to exactly one of the three
+  // bridges.  This excludes more complex polycycles that need a different
+  // nomenclature model.
+  const covered = new Set<number>([bridgeA, bridgeB]);
+  let internalCount = 0;
+  for (const path of paths) {
+    internalCount += Math.max(0, path.length - 2);
+    path.forEach((atom) => covered.add(atom));
+  }
+  if (covered.size !== coreAtoms.length || internalCount !== coreAtoms.length - 2) return null;
+
+  const sizes = paths.map((path) => path.length - 2).sort((a, b) => b - a);
+  const descriptor = [sizes[0], sizes[1], sizes[2]] as [number, number, number];
+  const numberings: Map<number, number>[] = [];
+
+  for (const startBridgehead of [bridgeA, bridgeB]) {
+    const endBridgehead = startBridgehead === bridgeA ? bridgeB : bridgeA;
+    const oriented = paths.map((path) =>
+      path[0] === startBridgehead ? path : [...path].reverse(),
+    );
+
+    for (const [longest, middle, shortest] of pathPermutationsByLength(oriented)) {
+      const locantByAtom = new Map<number, number>();
+      let locant = 1;
+      locantByAtom.set(startBridgehead, locant++);
+
+      // IUPAC bicyclic numbering: first bridgehead -> longest bridge -> second
+      // bridgehead -> second-longest bridge back -> shortest bridge last.
+      longest.slice(1, -1).forEach((atom) => locantByAtom.set(atom, locant++));
+      locantByAtom.set(endBridgehead, locant++);
+
+      const middleFromEnd = middle[0] === endBridgehead ? middle : [...middle].reverse();
+      middleFromEnd.slice(1, -1).forEach((atom) => locantByAtom.set(atom, locant++));
+
+      const shortestFromStart = shortest[0] === startBridgehead ? shortest : [...shortest].reverse();
+      shortestFromStart.slice(1, -1).forEach((atom) => locantByAtom.set(atom, locant++));
+
+      if (locantByAtom.size === coreAtoms.length) numberings.push(locantByAtom);
+    }
+  }
+
+  return {
+    descriptor,
+    carbonCount: coreAtoms.length,
+    coreSet,
+    carbonAdjacency,
+    numberings,
+  };
+}
+
+function simpleExternalCarbonPrefix(
+  atomIndex: number,
+  coreSet: Set<number>,
+  carbonAdjacency: Map<number, Set<number>>,
+): string | null {
+  const outsideNeighbors = [...(carbonAdjacency.get(atomIndex) ?? [])].filter(
+    (neighbor) => !coreSet.has(neighbor),
+  );
+  if (outsideNeighbors.length === 0) return null;
+
+  // Build the attached acyclic carbon component.  Straight-chain C1-C4 groups
+  // are common on Diels-Alder products and can be named reliably here. More
+  // complicated branches deliberately fall through to the general namer.
+  const visited = new Set<number>();
+  const queue = [...outsideNeighbors];
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    if (visited.has(current) || coreSet.has(current)) continue;
+    visited.add(current);
+    for (const neighbor of carbonAdjacency.get(current) ?? []) {
+      if (!coreSet.has(neighbor) && !visited.has(neighbor)) queue.push(neighbor);
+    }
+  }
+  if (visited.size < 1 || visited.size > 4) return null;
+
+  const attachmentCount = outsideNeighbors.filter((neighbor) => visited.has(neighbor)).length;
+  if (attachmentCount !== 1) return null;
+  const componentDegrees = [...visited].map((atom) =>
+    [...(carbonAdjacency.get(atom) ?? [])].filter((neighbor) => visited.has(neighbor)).length,
+  );
+  if (componentDegrees.some((degree) => degree > 2)) return null;
+
+  return ({ 1: "methyl", 2: "ethyl", 3: "propyl", 4: "butyl" } as Record<number, string>)[visited.size] ?? null;
+}
+
+function generalBicycloNumberingDetails(
+  parsedMol: ParsedMol,
+  locantByAtom: Map<number, number>,
+  coreSet: Set<number>,
+  carbonAdjacency: Map<number, Set<number>>,
+): SimpleBicycloNumbering {
+  const details = simpleBicycloNumberingDetails(parsedMol, locantByAtom);
+  const substituents = [...details.substituents];
+
+  for (const coreAtom of coreSet) {
+    const prefix = simpleExternalCarbonPrefix(coreAtom, coreSet, carbonAdjacency);
+    if (!prefix) continue;
+    const locant = locantByAtom.get(coreAtom);
+    if (locant !== undefined) substituents.push({ locant, prefix });
+  }
+
+  substituents.sort((left, right) => left.locant - right.locant || left.prefix.localeCompare(right.prefix));
+  return { ...details, substituents };
+}
+
+function getSimpleGeneralBicycloName(parsedMol: ParsedMol): PolycyclicHydrocarbonName | null {
+  const scaffold = enumerateSimpleBicycloNumberings(parsedMol);
+  if (!scaffold?.numberings.length) return null;
+
+  const best = scaffold.numberings
+    .map((numbering) =>
+      generalBicycloNumberingDetails(
+        parsedMol,
+        numbering,
+        scaffold.coreSet,
+        scaffold.carbonAdjacency,
+      ),
+    )
+    .sort(compareSimpleBicycloNumberings)[0];
+
+  const hydrocarbon = buildSimpleBicycloUnsaturationName(
+    scaffold.carbonCount,
+    best.doubleLocants,
+    best.tripleLocants,
+  );
+  if (!hydrocarbon) return null;
+
+  return {
+    name: `${buildSimpleHalogenPrefix(best.substituents)}bicyclo[${scaffold.descriptor.join(".")}]${hydrocarbon}`,
+    confidence: "high",
+    reason:
+      "Recognized a simple bicyclo[a.b.c] carbon framework from the molecular graph and selected the lowest multiple-bond and substituent locants.",
+  };
+}
+
+function getSimpleFusedBicycloName(parsedMol: ParsedMol): PolycyclicHydrocarbonName | null {
+  const scaffold = enumerateSimpleFusedBicycloNumberings(parsedMol);
+  if (!scaffold?.numberings.length) return null;
+  const best = scaffold.numberings
+    .map((numbering) => simpleBicycloNumberingDetails(parsedMol, numbering))
+    .sort(compareSimpleBicycloNumberings)[0];
+  const hydrocarbon = buildSimpleBicycloUnsaturationName(scaffold.carbonCount, best.doubleLocants, best.tripleLocants);
+  if (!hydrocarbon) return null;
+  return {
+    name: `${buildSimpleHalogenPrefix(best.substituents)}bicyclo[${scaffold.descriptor.join(".")}]${hydrocarbon}`,
+    confidence: "high",
+    reason: "Recognized a simple fused bicyclo[a.b.0] carbon framework and selected the lowest multiple-bond and substituent locants.",
+  };
+}
+
 /**
  * Numbered graph for tricyclo[6.4.0.0²,⁷]dodecane (dodecahydrobiphenylene).
  *
@@ -231,6 +697,14 @@ function unsaturationSuffix(doubleLocants: number[], tripleLocants: number[]): s
 export function getPolycyclicHydrocarbonName(
   parsedMol: ParsedMol,
 ): PolycyclicHydrocarbonName | null {
+  const generalBicyclo = getSimpleGeneralBicycloName(parsedMol);
+  if (generalBicyclo) return generalBicyclo;
+
+  // Legacy fused recognizer remains as a conservative fallback for unusual
+  // atom-ordering cases that the general 2-core recognizer intentionally skips.
+  const simpleBicyclo = getSimpleFusedBicycloName(parsedMol);
+  if (simpleBicyclo) return simpleBicyclo;
+
   const locants = bestUnsaturationLocants(parsedMol);
   if (!locants) return null;
 

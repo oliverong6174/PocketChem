@@ -1,13 +1,13 @@
 
 
-import type { OrganicChemCourse, ReactionRule } from "./reactionTypes";
+import type { OrganicChemCourse, ReactionFamily, ReactionRule } from "./reactionTypes";
 
 type FamilyCurriculum = {
   course: OrganicChemCourse;
   chapter: string;
 };
 
-const FAMILY_CURRICULUM: Record<string, FamilyCurriculum> = {
+const FAMILY_CURRICULUM: Record<ReactionFamily, FamilyCurriculum> = {
   alkanes: { course: "ochem-1", chapter: "Radical reactions" },
   haloalkanes: { course: "ochem-1", chapter: "Substitution and elimination" },
   alcohols: { course: "ochem-1", chapter: "Alcohols" },

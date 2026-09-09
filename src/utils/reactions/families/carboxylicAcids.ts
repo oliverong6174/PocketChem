@@ -48,6 +48,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
       handler: "reduction",
       options: {
         mode: "oneTwoAddition",
+        substrateClass: "carboxylic-acid",
         nucleophile: "hydride",
         reagents: ["LiAlH4"],
       },
@@ -112,6 +113,42 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
     priority: 1320,
   },
   {
+    id: "carboxylic-acid-thermal-amidation-ammonia",
+    family: "carboxylic-acids",
+    reactionType: "substitution",
+    title: "Thermal Amide Formation with Ammonia",
+    reagents: "NH₃, heat",
+    reagentNote: "Ammonium carboxylate formation followed by dehydration",
+    productHint: "Primary amide",
+    explanation:
+      "A carboxylic acid reacts with ammonia to form an ammonium carboxylate; sufficiently strong heating removes water to give the corresponding primary amide. This provides the standard first step of a carboxylic-acid → amide → nitrile sequence.",
+    trigger: carboxylicAcidTrigger,
+    additionalReactants: [
+      {
+        id: "ammonia",
+        label: "ammonia",
+        trigger: { includeSmarts: ["[NH3]"] },
+        supplyMode: "auto",
+        presetSmiles: "N",
+        contributesToProduct: true,
+        role: "nucleophile",
+        searchAliases: ["NH3", "NH₃", "ammonia"],
+      },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[OH:3].[NH3:4]>>[C:1](=[O:2])[NH2:4]",
+      maxProducts: 8,
+    },
+    productStatus: "computed",
+    mechanism: "Ammonium carboxylate formation followed by thermal dehydration",
+    limitations: [
+      "Direct amidation generally requires substantial heating; activated-acid methods are preferred for many sensitive or substituted amines.",
+    ],
+    searchAliases: ["NH3 heat amide", "ammonia heat", "carboxylic acid to primary amide"],
+    priority: 1328,
+  },
+  {
     id: "carboxylic-acid-amide-formation",
     family: "carboxylic-acids",
     reactionType: "substitution",
@@ -161,6 +198,26 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
     course: "advanced",
     mechanism: "Activated acyl substitution",
     priority: 1335,
+  },
+  {
+    id: "carboxylic-acid-curtius-rearrangement",
+    family: "carboxylic-acids",
+    reactionType: "rearrangement",
+    title: "Curtius Rearrangement to a Primary Amine",
+    reagents: "1) convert acid to acyl azide (for example DPPA or SOCl₂/NaN₃)  2) heat  3) H₂O",
+    reagentNote: "Acyl azide → isocyanate → amine",
+    productHint: "Primary amine with one fewer carbon",
+    explanation:
+      "An acyl azide loses N₂ and rearranges to an isocyanate. Hydrolysis and decarboxylation give a primary amine in which the original carbonyl carbon has been removed.",
+    trigger: { ...carboxylicAcidTrigger, includeSmarts: ["[#6][CX3](=O)[OX2H1]"] },
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[#6:1][C:2](=[O:3])[OH:4]>>[#6:1][NH2]",
+      maxProducts: 8,
+    },
+    productStatus: "computed",
+    mechanism: "1,2-migration in an acyl nitrene equivalent followed by isocyanate hydrolysis",
+    priority: 1338,
   },
   {
     id: "beta-keto-acid-decarboxylation",

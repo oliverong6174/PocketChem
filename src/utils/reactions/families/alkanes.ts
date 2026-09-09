@@ -14,43 +14,27 @@ const alkaneTrigger = {
 
 export const alkaneReactionRules: ReactionRule[] = [
   {
-    id: "alkane-radical-chlorination",
+    id: "alkane-radical-halogenation",
     family: "alkanes",
     reactionType: "radical",
-    title: "Free-Radical Chlorination",
-    reagents: "Cl₂, hν or heat",
-    reagentNote: "Radical chain substitution",
-    productHint: "Mixture of alkyl chlorides",
+    title: "Free-Radical Halogenation",
+    reagents: "Cl₂ or Br₂, hν or heat",
+    reagentNote: "Radical-chain substitution; choose Cl₂ or Br₂",
+    productHint: "Alkyl halide product(s)",
     explanation:
-      "Chlorine radicals replace an alkane hydrogen. Chlorination is reactive and usually gives a regioisomer mixture when different hydrogens are present.",
+      "Light or heat homolyzes Cl₂ or Br₂ and starts a radical-chain substitution. Chlorination is comparatively reactive and often gives a broader regioisomer mixture; bromination is slower but much more selective for the hydrogen that forms the most stable carbon radical.",
     trigger: alkaneTrigger,
     transform: {
       type: "conceptOnly",
       reason:
-        "The major product depends on every distinct hydrogen environment, so a regioselective radical-site enumerator is required.",
+        "An exact product distribution requires enumerating symmetry-distinct C-H sites, ranking the corresponding radicals, and applying halogen-specific selectivity rather than assuming one universal major product.",
     },
     mechanism: "Free-radical substitution",
-    selectivity: ["3° H > 2° H > 1° H", "Low selectivity"],
+    selectivity: [
+      "Cl₂: 3° H > 2° H > 1° H, but chlorination is relatively unselective and mixtures are common",
+      "Br₂: 3° H ≫ 2° H > 1° H; bromination is much more selective",
+      "F₂ is generally too vigorous for the standard selective teaching reaction; radical iodination with I₂ is thermodynamically unfavorable under ordinary conditions",
+    ],
     priority: 100,
-  },
-  {
-    id: "alkane-radical-bromination",
-    family: "alkanes",
-    reactionType: "radical",
-    title: "Free-Radical Bromination",
-    reagents: "Br₂, hν or heat",
-    reagentNote: "Selective radical chain substitution",
-    productHint: "Major alkyl bromide",
-    explanation:
-      "Bromine radicals replace the hydrogen that forms the most stable carbon radical, making bromination much more selective than chlorination.",
-    trigger: alkaneTrigger,
-    transform: {
-      type: "conceptOnly",
-      reason:
-        "An exact product requires ranking all distinct radical intermediates and preserving symmetry-equivalent sites.",
-    },
-    mechanism: "Free-radical substitution",
-    selectivity: ["3° H ≫ 2° H > 1° H", "High selectivity"],
-    priority: 110,
   },
 ];

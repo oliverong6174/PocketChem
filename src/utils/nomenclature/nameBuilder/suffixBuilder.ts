@@ -412,6 +412,15 @@ export function buildPrimarySuffixName(
   const count = locants.length;
   const multiplier = getSuffixMultiplier(count, feature.suffix);
 
+  // Multiple aldehydes on the same parent require explicit suffix locants.
+  // A single terminal aldehyde remains locant-free (butanal), while dialdehydes
+  // are named as e.g. pentane-1,5-dial.
+  if (feature.type === "aldehyde" && count > 1) {
+    const orderedLocants = [...locants].sort((a, b) => a - b);
+    const aldehydeMultiplier = getSuffixMultiplier(count, "al");
+    return `${parent.parentHydrocarbon}-${orderedLocants.join(",")}-${aldehydeMultiplier}al`;
+  }
+
   // Terminal/acyl-like suffixes do not get parent-chain locants.
   // Correct:
   // ethanamide, ethanoic acid, ethanal, ethanenitrile

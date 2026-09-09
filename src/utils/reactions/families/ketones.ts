@@ -22,6 +22,7 @@ export const ketoneReactionRules: ReactionRule[] = [
       handler: "reduction",
       options: {
         mode: "oneTwoAddition",
+        substrateClass: "ketone",
         nucleophile: "hydride",
       },
     },
@@ -193,25 +194,23 @@ export const ketoneReactionRules: ReactionRule[] = [
     family: "ketones",
     reactionType: "condensation",
     title: "Hydrazone Formation",
-    reagents: "NH₂NH₂ or substituted hydrazine",
-    reagentNote: "Condensation with hydrazine",
-    productHint: "Hydrazone",
+    reagents: "NH₂NH₂, catalytic H⁺",
+    reagentNote: "Acid-catalyzed condensation with hydrazine",
+    productHint: "Hydrazone (C=N–NH₂)",
     explanation:
-      "Ketones react with hydrazines to form hydrazones.",
+      "Ketones condense with hydrazine under mild acid catalysis to form a hydrazone. Without the strongly basic, heated second stage of a Wolff–Kishner reduction, the reaction stops at C=N–NH₂ rather than reducing the carbonyl carbon to CH₂.",
     trigger: ketoneTrigger,
-    additionalReactants: [
-      {
-        label: "hydrazine or substituted hydrazine",
-        trigger: { includeSmarts: ["[N;H1,H2][N]"] },
-      },
-    ],
     transform: {
       type: "reactionSmarts",
-      smarts: "[C:1]=[O:2].[N;H1,H2:3][N:4]>>[C:1]=[N:3][N:4]",
+      smarts: "[C:1]=[O:2]>>[C:1]=[N][NH2]",
       maxProducts: 8,
     },
+    productStatus: "computed",
+    mechanism: "Acid-catalyzed nucleophilic addition–elimination (hydrazone formation)",
+    selectivityProfile: { mixture: "possible" },
     priority: 1190,
   },
+
   {
     id: "ketone-wolff-kishner",
     family: "ketones",
@@ -228,8 +227,10 @@ export const ketoneReactionRules: ReactionRule[] = [
       handler: "reduction",
       options: {
         mode: "carbonylToAlkane",
+        substrateClass: "ketone",
       },
     },
+    limitations: ["Hydrazine under acidic condensation conditions alone gives the hydrazone; Wolff–Kishner requires strong base and heat to continue to the alkane."],
     priority: 1200,
   },
   {
@@ -248,6 +249,7 @@ export const ketoneReactionRules: ReactionRule[] = [
       handler: "reduction",
       options: {
         mode: "carbonylToAlkane",
+        substrateClass: "ketone",
       },
     },
     priority: 1210,

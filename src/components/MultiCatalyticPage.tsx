@@ -2,10 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
-  getAntiDiolSvg,
   getCondensedSulfonateSvg,
-  getGenericHalogenSvg,
-  getSynDiolSvg,
 } from "../utils/functionalGroups";
 import { analyzeNomenclatureAndProperties } from "../utils/nomenclatureUtils";
 import {
@@ -17,26 +14,12 @@ import {
   type SequentialSynthesisStep,
 } from "../utils/reactionUtils";
 
+import { rendererForReactionDisplay } from "./reactionProductRenderer";
 
 type SvgMap = Record<string, string | null>;
 
-function isGenericHalogenRuleId(ruleId: string): boolean {
-  return (
-    /^alkene-hx-addition-/.test(ruleId) ||
-    /^alkyne-(hcl|hbr|hi)-addition-/.test(ruleId) ||
-    /^alkyne-(bromination|chlorination)-/.test(ruleId) ||
-    ruleId === "alkene-halogenation-bromine" ||
-    ruleId === "alkene-halohydrin-formation" ||
-    ruleId === "alkene-haloether-formation" ||
-    ruleId === "alkene-allylic-bromination"
-  );
-}
-
 function rendererForStep(step: SequentialSynthesisStep) {
-  if (step.ruleId === "alkene-syn-dihydroxylation") return getSynDiolSvg;
-  if (step.ruleId === "alkene-anti-dihydroxylation") return getAntiDiolSvg;
-  if (isGenericHalogenRuleId(step.ruleId)) return getGenericHalogenSvg;
-  return getCondensedSulfonateSvg;
+  return rendererForReactionDisplay(step.display, { allowGenericHalogen: true });
 }
 
 async function moleculeDisplayName(smiles: string): Promise<string> {
@@ -94,7 +77,7 @@ export default function MultiCatalyticPage() {
 
       for (const branch of branches) {
         for (const step of branch.steps) {
-          if (step.status === "no-reaction") continue;
+          if (step.status !== "reaction") continue;
           const renderer = rendererForStep(step);
           next[`${branch.id}-${step.stepNumber}`] = await renderer(step.productSmiles);
         }
@@ -223,7 +206,7 @@ export default function MultiCatalyticPage() {
             type="search"
             value={query}
             placeholder="Search PCC, Lindlar, mCPBA, OsO4, HBr…"
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event: { target: { value: string } }) => setQuery(event.target.value)}
           />
           <small className="reaction-note">
             {query.trim()
@@ -325,18 +308,34 @@ export default function MultiCatalyticPage() {
                   <div className="multicatalytic-result-step" key={`${branch.id}-${step.stepNumber}`}>
                     <div className="multicatalytic-result-step-heading">
                       <strong>Step {step.stepNumber}: {step.title}</strong>
-                      <span className={step.status === "no-reaction" ? "no-reaction-chip" : "reaction-status reaction-status-computed"}>
-                        {step.status === "no-reaction" ? "NO REACTION" : "Reaction"}
+                      <span className={step.status === "reaction" ? "reaction-status reaction-status-computed" : "no-reaction-chip"}>
+                        {step.status === "reaction"
+                          ? "Reaction"
+                          : step.status === "no-reaction"
+                            ? "NO REACTION"
+                            : step.status === "needs-input"
+                              ? "NEEDS INPUT"
+                              : "UNSUPPORTED"}
                       </span>
                     </div>
                     <div className="reagent-pill">{step.reagentLabel}</div>
 
-                    {step.status === "no-reaction" ? (
+                    {step.status !== "reaction" ? (
                       <div className="no-reaction-result">
-                        <strong>NO REACTION</strong>
+                        <strong>
+                          {step.status === "no-reaction"
+                            ? "NO REACTION"
+                            : step.status === "needs-input"
+                              ? "ADDITIONAL STRUCTURE REQUIRED"
+                              : "STRUCTURAL PRODUCT NOT SUPPORTED"}
+                        </strong>
                         <p>{step.explanation}</p>
                         {step.noReaction?.suggestion && <p><strong>Instead:</strong> {step.noReaction.suggestion}</p>}
-                        <small>Starting material carries forward unchanged to the next step.</small>
+                        <small>
+                          {step.status === "no-reaction"
+                            ? "Starting material carries forward unchanged to the next step."
+                            : "The sequence stops here until this step can be supplied or represented."}
+                        </small>
                       </div>
                     ) : (
                       <>

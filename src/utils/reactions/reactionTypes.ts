@@ -2,6 +2,35 @@ import type { FunctionalGroupResult } from "../functionalGroups";
 
 export type OrganicChemCourse = "ochem-1" | "ochem-2" | "advanced";
 
+export const REACTION_FAMILIES = [
+  "alkanes",
+  "haloalkanes",
+  "alkenes",
+  "alkynes",
+  "alcohols",
+  "ethers",
+  "epoxides",
+  "dienes",
+  "aromatics",
+  "phenols",
+  "aldehydes",
+  "ketones",
+  "carbonyl-derivatives",
+  "couplings",
+  "enolates",
+  "carboxylic-acids",
+  "acid-chlorides",
+  "anhydrides",
+  "esters",
+  "amides",
+  "nitriles",
+  "amines",
+  "diazonium",
+  "sulfur",
+] as const;
+
+export type ReactionFamily = (typeof REACTION_FAMILIES)[number];
+
 export type ProductGenerationStatus =
   | "computed"
   | "representative"
@@ -51,6 +80,81 @@ export type ReactionHandlerName =
 
 export type ReactionPurpose = "protection" | "deprotection";
 
+export type RetrosynthesisTier =
+  | "preferred"
+  | "standard"
+  | "secondary"
+  | "disabled";
+
+/**
+ * Controls whether/how a forward reaction is exposed as a retrosynthetic step.
+ * This keeps destructive or pedagogically one-way reactions from flooding the
+ * retrosynthesis page while still allowing strategic bond-forming reactions to
+ * rank ahead of routine functional-group interconversions.
+ */
+export type RetrosynthesisPolicy = {
+  tier?: RetrosynthesisTier;
+  /** Optional stable grouping label for closely related reverse strategies. */
+  group?: string;
+  /**
+   * Some stereospecific forward handlers cannot reconstruct precursor E/Z from
+   * a tetrahedral product uniquely. In that case the reverse disconnection may
+   * still be shown after exact connectivity replay, clearly labeled as such.
+   */
+  allowConnectivityOnlyStereo?: boolean;
+};
+
+export type AdditionHandlerMode =
+  | "oneTwoAddition"
+  | "alkeneHydration"
+  | "alkeneHydrohalogenation"
+  | "dieneHydrohalogenation"
+  | "polyeneHydrohalogenation"
+  | "halohydrin"
+  | "haloether"
+  | "alkoxymercuration"
+  | "synDihydroxylation"
+  | "antiDihydroxylation"
+  | "epoxidationOrganometallicOpening"
+  | "epoxidationAcidicAlcoholOpening";
+
+export type SubstitutionHandlerMode =
+  | "sn1"
+  | "sn2"
+  | "alkylHalideSubstitution"
+  | "alcoholToHalide"
+  | "alcoholSn1ToHalide"
+  | "vicinalDiolToDihalide"
+  | "intermolecularAlcoholDehydration"
+  | "etherCleavage"
+  | "aromaticEas"
+  | "aromaticSnAr"
+  | "aromaticBenzyneAmination";
+
+export type EliminationHandlerMode = "betaElimination" | "e1" | "e2";
+export type CarbonylHandlerMode = "oximeFormation";
+export type OxidationHandlerMode =
+  | "alcoholOxidation"
+  | "aldehydeOxidation"
+  | "alkeneOxidativeCleavage"
+  | "alkyneOxidativeCleavage"
+  | "vicinalDiolCleavage"
+  | "baeyerVilliger"
+  | "benzylicSideChainOxidation";
+export type ReductionHandlerMode = "oneTwoAddition" | "carbonylToAlkane" | "birchReduction";
+export type RingHandlerMode =
+  | "epoxideOpening"
+  | "epoxideOrganometallicOpening"
+  | "epoxideNucleophileOpening";
+export type RearrangementHandlerMode = "pinacol";
+export type PericyclicHandlerMode = "dielsAlder";
+
+type HandlerOptions<Mode extends string> = {
+  mode: Mode;
+  [key: string]: unknown;
+};
+
+
 export type ReactionProductMixtureKind =
   | "racemic"
   | "diastereomeric"
@@ -85,7 +189,80 @@ export type StereochemicalMode =
 
 export type ReactionSitePreference =
   | "most-substituted-alkene"
-  | "least-substituted-alkene";
+  | "least-substituted-alkene"
+  | "most-accessible-site"
+  | "least-accessible-site"
+  | "most-stable-carbocation-site"
+  | "most-stable-radical-site"
+  | "most-substituted-epoxide-carbon"
+  | "least-substituted-epoxide-carbon"
+  | "most-acidic-alpha-carbon"
+  | "most-activated-aromatic-site";
+
+export type ReactionDisplayRenderer =
+  | "default"
+  | "generic-halogen"
+  | "syn-diol"
+  | "anti-diol"
+  | "tetrahedral-perspective"
+  | "explicit-alcohol-stereo"
+  | "aligned-stereo"
+  | "aligned-generic-halogen"
+  | "heavy-atom-stereo";
+
+export type ReactionSeriesMetadata = {
+  /** Stable chemistry-series identifier; UI grouping must use this, not text/IDs. */
+  id: string;
+  /** Symbol shown when a series is condensed (for example X in HX). */
+  variable?: string;
+  /** Concrete member represented by this rule (for example Br). */
+  value?: string;
+};
+
+export type ReactionDisplayMetadata = {
+  renderer?: ReactionDisplayRenderer;
+  series?: ReactionSeriesMetadata;
+};
+
+export type ReactionCompetitionMetadata = {
+  /** Matching rules in the same group compete for the same chemical event. */
+  group: string;
+  /** Higher specificity wins within a competition group. */
+  specificity: number;
+};
+
+export type ReactionFailureCategory =
+  | "steric"
+  | "missing-site"
+  | "electronic"
+  | "mechanistic";
+
+export type ReactionConstraintId =
+  | "generic-dehydration-not-vicinal-diol"
+  | "oxidizable-alcohol-needs-carbon-h"
+  | "sn2-alcohol-center-accessible"
+  | "lucas-primary-room-temperature"
+  | "terminal-alkyne-needs-sp-h"
+  | "benzylic-oxidation-needs-h"
+  | "benzylic-radical-halogenation-needs-h"
+  | "e2-needs-beta-carbon"
+  | "sn2-electrophile-accessible"
+  | "friedel-crafts-ring-not-strongly-deactivated"
+  | "friedel-crafts-amine-compatible";
+
+export type ReactantSupplyMode = "auto" | "user-structure" | "condition-only";
+
+export type ReactionReactantRole =
+  | "nucleophile"
+  | "electrophile"
+  | "diene"
+  | "dienophile"
+  | "base"
+  | "oxidant"
+  | "reducing-agent"
+  | "structural-partner"
+  | "catalyst"
+  | "other";
 
 export type RegiochemicalMode =
   | "none"
@@ -125,11 +302,15 @@ export type ReactionTransform =
       smarts: string;
       maxProducts?: number;
     }
-  | {
-      type: "customHandler";
-      handler: ReactionHandlerName;
-      options?: Record<string, unknown>;
-    }
+  | { type: "customHandler"; handler: "addition"; options: HandlerOptions<AdditionHandlerMode> }
+  | { type: "customHandler"; handler: "substitution"; options: HandlerOptions<SubstitutionHandlerMode> }
+  | { type: "customHandler"; handler: "elimination"; options: HandlerOptions<EliminationHandlerMode> }
+  | { type: "customHandler"; handler: "carbonyl"; options: HandlerOptions<CarbonylHandlerMode> }
+  | { type: "customHandler"; handler: "oxidation"; options: HandlerOptions<OxidationHandlerMode> }
+  | { type: "customHandler"; handler: "reduction"; options: HandlerOptions<ReductionHandlerMode> }
+  | { type: "customHandler"; handler: "ring"; options: HandlerOptions<RingHandlerMode> }
+  | { type: "customHandler"; handler: "rearrangement"; options: HandlerOptions<RearrangementHandlerMode> }
+  | { type: "customHandler"; handler: "pericyclic"; options: HandlerOptions<PericyclicHandlerMode> }
   | {
       type: "conceptOnly";
       reason: string;
@@ -151,6 +332,8 @@ export type ReactionTrigger = {
 };
 
 export type ReactionReactantRequirement = {
+  /** Stable machine identifier. Display text may change without changing behavior. */
+  id?: string;
   /** Human-readable role shown when this reactant is missing. */
   label: string;
   /** Structural requirements for this additional reactant. */
@@ -161,11 +344,20 @@ export type ReactionReactantRequirement = {
    * internally for reaction SMARTS that require multiple equivalents.
    */
   equivalents?: number;
+  /** Whether the sequence engine may provide a fixed structure automatically. */
+  supplyMode?: ReactantSupplyMode;
+  /** Fixed structure for small ions/reagents; never infer this from the label. */
+  presetSmiles?: string;
+  /** Search-only synonyms; changing them must never change reaction chemistry. */
+  searchAliases?: string[];
+  /** Whether atoms from this reactant become part of the product skeleton. */
+  contributesToProduct?: boolean;
+  role?: ReactionReactantRole;
 };
 
 export type ReactionRule = {
   id: string;
-  family: string;
+  family: ReactionFamily;
 
   /** Chemical classification. This does not select executable code. */
   reactionType: ReactionType;
@@ -195,6 +387,21 @@ export type ReactionRule = {
   transform: ReactionTransform;
   priority: number;
 
+  /** Structured rendering/grouping metadata consumed by every reaction UI. */
+  display?: ReactionDisplayMetadata;
+  /** Structured substrate scope used only for NO REACTION relevance. */
+  diagnosticTrigger?: ReactionTrigger;
+  /** Reusable mechanistic constraints. No engine/UI module should key on rule IDs. */
+  constraints?: ReactionConstraintId[];
+  /** Declarative same-condition competition; higher specificity wins. */
+  competition?: ReactionCompetitionMetadata;
+  /** Optional planning cost distinct from educational/UI priority. Lower is better. */
+  planningCost?: number;
+  /** Extra search terms independent of display wording. */
+  searchAliases?: string[];
+  /** Retrosynthetic visibility/ranking independent of forward reaction display. */
+  retrosynthesis?: RetrosynthesisPolicy;
+
   course?: OrganicChemCourse;
   chapter?: string;
   mechanism?: string;
@@ -209,7 +416,7 @@ export type ReactionRule = {
 export type ReactionPathway = {
   id: string;
   ruleId: string;
-  family: string;
+  family: ReactionFamily;
   reactionType: ReactionType;
   title: string;
   reactantSmiles: string;
@@ -232,6 +439,11 @@ export type ReactionPathway = {
   reactantComponents: string[];
   hasGenericReactant: boolean;
   productMixture: ReactionProductMixture | null;
+  display: ReactionDisplayMetadata | null;
+  missingReactants: ReactionReactantRequirement[];
+  competition: ReactionCompetitionMetadata | null;
+  planningCost: number;
+  reactantRequirements: ReactionReactantRequirement[];
 };
 
 export type ReactionComponent = {
@@ -261,6 +473,7 @@ export type RetrosynthesisAlternativeRoute = {
   reactionClass: string | null;
   selectivity: string[];
   selectivityProfile: ReactionSelectivityProfile | null;
+  display: ReactionDisplayMetadata | null;
 };
 
 /**
@@ -274,7 +487,7 @@ export type RetrosynthesisAlternativeRoute = {
 export type RetrosynthesisPathway = {
   id: string;
   ruleId: string;
-  family: string;
+  family: ReactionFamily;
   reactionType: ReactionType;
   title: string;
 
@@ -307,6 +520,10 @@ export type RetrosynthesisPathway = {
   alternativeRoutes: RetrosynthesisAlternativeRoute[];
   /** Mixture produced when these precursors are replayed through the forward rule. */
   productMixture: ReactionProductMixture | null;
+  display: ReactionDisplayMetadata | null;
+  planningCost: number;
+  retrosynthesisTier: Exclude<RetrosynthesisTier, "disabled">;
+  retrosynthesisGroup: string | null;
 };
 
 
@@ -317,7 +534,7 @@ export type SynthesisStep = {
   stepNumber: number;
   source: SynthesisStepSource;
   ruleId: string;
-  family: string;
+  family: ReactionFamily;
   reactionType: ReactionType;
   title: string;
 
@@ -344,6 +561,7 @@ export type SynthesisStep = {
 
   retrosynthesisConfidence: RetrosynthesisConfidence | null;
   productMixture: ReactionProductMixture | null;
+  display: ReactionDisplayMetadata | null;
 };
 
 export type SynthesisRouteConfidence = "verified" | "connectivity-verified";

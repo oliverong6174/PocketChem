@@ -71,6 +71,7 @@ export const amideReactionRules: ReactionRule[] = [
       handler: "reduction",
       options: {
         mode: "oneTwoAddition",
+        substrateClass: "amide",
         nucleophile: "hydride",
       },
     },
@@ -81,7 +82,7 @@ export const amideReactionRules: ReactionRule[] = [
     family: "amides",
     reactionType: "elimination",
     title: "Amide Dehydration",
-    reagents: "SOCl₂, POCl₃, or P₂O₅",
+    reagents: "SOCl₂, POCl₃, PCl₅, or P₂O₅",
     reagentNote: "Dehydration",
     productHint: "Nitrile",
     explanation:
@@ -91,6 +92,7 @@ export const amideReactionRules: ReactionRule[] = [
       type: "reactionSmarts",
       smarts: "[C:1](=[O:2])[NH2:3]>>[C:1]#[N:3]",
     },
+    searchAliases: ["POCl3 dehydration", "amide to nitrile", "primary amide dehydration", "carboxylic acid to nitrile second step"],
     priority: 1630,
   },
   {
@@ -105,9 +107,13 @@ export const amideReactionRules: ReactionRule[] = [
       "Primary amides undergo Hofmann rearrangement to form amines with one fewer carbon.",
     trigger: { anyFunctionalGroups: ["Primary amide", "Benzamide"], includeSmarts: ["[CX3](=O)[NH2]"] },
     transform: {
-      type: "conceptOnly",
-      reason: "The migrating carbon group must be remapped from the carbonyl carbon to nitrogen while the carbonyl carbon is lost as carbon dioxide.",
+      type: "reactionSmarts",
+      smarts: "[#6:1][C:2](=[O:3])[NH2:4]>>[#6:1][NH2:4]",
+      maxProducts: 8,
     },
+    productStatus: "computed",
+    mechanism: "Hofmann rearrangement through an isocyanate followed by hydrolysis",
+    selectivity: ["The carbonyl carbon is lost; the R group migrates from the carbonyl carbon to nitrogen with retention at the migrating carbon."],
     priority: 1640,
   },
 ];
