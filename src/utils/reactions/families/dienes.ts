@@ -259,19 +259,36 @@ export const dieneReactionRules: ReactionRule[] = [
       },
     },
     productStatus: "representative",
-    display: { renderer: "heavy-atom-stereo" },
+    display: { renderer: "diels-alder-bicyclic", preserveReactantOrientation: true },
     selectivityProfile: {
       // With achiral starting materials, attack on the two enantiotopic faces
       // gives a racemate. Both members remain stored for chemical identity,
       // while ReactionsPage draws one representative enantiomer and labels the
       // outcome racemic instead of presenting the mirror image as an "OR".
+      stereochemistry: {
+        mode: "suprafacial",
+        stereospecific: true,
+        attackMode: "concerted",
+      },
       mixture: "expected",
     },
     mechanism: "Pericyclic [4+2] cycloaddition",
+    mechanismProfile: {
+      family: "pericyclic-4+2",
+      steps: [
+        {
+          type: "cycloaddition",
+          label: "Concerted suprafacial [4+2] bond reorganization",
+          concerted: true,
+          stereochemicalConsequence: "suprafacial",
+        },
+      ],
+    },
     selectivity: [
       "Stereospecific: a Z dienophile retains a cis substituent relationship and an E dienophile retains a trans relationship",
       "When facial attack gives an enantiomeric pair, PocketChem stores both members but displays one representative structure labeled as a racemate",
       "Endo approach is often favored kinetically for electron-withdrawing dienophile substituents",
+      "A cyclic diene keeps its pre-existing ring path. For cyclohexa-1,3-diene this creates a bicyclo[2.2.2] framework; the Diels–Alder ring does not replace or open the original ring.",
     ],
     limitations: [
       "The diene must be able to adopt an s-cis conformation.",
@@ -304,7 +321,23 @@ export const dieneReactionRules: ReactionRule[] = [
       },
     },
     mechanism: "Pericyclic [4+2] cycloaddition",
+    mechanismProfile: {
+      family: "pericyclic-4+2",
+      steps: [
+        {
+          type: "cycloaddition",
+          label: "Concerted suprafacial [4+2] bond reorganization",
+          concerted: true,
+          stereochemicalConsequence: "suprafacial",
+        },
+      ],
+    },
     selectivityProfile: {
+      stereochemistry: {
+        mode: "suprafacial",
+        stereospecific: true,
+        attackMode: "concerted",
+      },
       mixture: "expected",
     },
     selectivity: [
@@ -313,7 +346,7 @@ export const dieneReactionRules: ReactionRule[] = [
       "When facial attack gives an enantiomeric pair, PocketChem stores both members but displays one representative racemate member",
     ],
     productStatus: "representative",
-    display: { renderer: "heavy-atom-stereo" },
+    display: { renderer: "diels-alder-bicyclic", preserveReactantOrientation: true },
     limitations: [
       "The diene must be able to adopt an s-cis conformation.",
       "PocketChem assigns diene-derived stereochemistry for defined H1/H1 termini and for the common H0 methyl/non-methyl carbon-substituted terminus class; more exotic fully substituted termini fall back to constitution rather than inventing R/S.",

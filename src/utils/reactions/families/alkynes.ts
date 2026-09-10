@@ -287,7 +287,7 @@ export const alkyneReactionRules: ReactionRule[] = [
     productStatus: "computed",
     mechanism: "Catalytic deuteration",
     selectivityProfile: {
-      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
       mixture: "possible",
       allowsRearrangement: false,
     },
@@ -338,7 +338,7 @@ export const alkyneReactionRules: ReactionRule[] = [
     productStatus: "computed",
     mechanism: "Catalytic hydrogenation",
     selectivityProfile: {
-      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
       mixture: "single",
       allowsRearrangement: false,
     },
@@ -391,7 +391,7 @@ export const alkyneReactionRules: ReactionRule[] = [
     productStatus: "computed",
     mechanism: "Catalytic deuteration",
     selectivityProfile: {
-      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
       mixture: "single",
       allowsRearrangement: false,
     },
@@ -529,7 +529,7 @@ export const alkyneReactionRules: ReactionRule[] = [
     productStatus: "representative",
     mechanism: "Electrophilic addition",
     selectivityProfile: {
-      stereochemistry: { mode: "anti-addition", stereoselective: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", stereoselective: true },
       mixture: "possible",
     },
     selectivity: ["Predominantly anti addition"],
@@ -559,7 +559,7 @@ export const alkyneReactionRules: ReactionRule[] = [
     productStatus: "representative",
     mechanism: "Electrophilic addition",
     selectivityProfile: {
-      stereochemistry: { mode: "anti-addition", stereoselective: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", stereoselective: true },
       mixture: "possible",
     },
     selectivity: ["Predominantly anti addition"],

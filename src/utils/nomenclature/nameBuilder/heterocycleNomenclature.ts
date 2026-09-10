@@ -259,6 +259,8 @@ const HETEROCYCLE_TEMPLATES: HeterocycleTemplate[] = [
   { name: "oxolane", stem: "oxolan", smarts: "[#8]1-[#6]-[#6]-[#6]-[#6]1", locants: [1, 2, 3, 4, 5], maxUnsaturatedBonds: 0 },
   { name: "pyrrolidine", stem: "pyrrolidin", smarts: "[#7]1-[#6]-[#6]-[#6]-[#6]1", locants: [1, 2, 3, 4, 5], maxUnsaturatedBonds: 0 },
   { name: "thiolane", stem: "thiolan", smarts: "[#16]1-[#6]-[#6]-[#6]-[#6]1", locants: [1, 2, 3, 4, 5], maxUnsaturatedBonds: 0 },
+  { name: "1-pyrroline", stem: "1-pyrrolin", smarts: "[N]1=[C]-[C]-[C]-[C]1", locants: [1, 2, 3, 4, 5], minUnsaturatedBonds: 1, maxUnsaturatedBonds: 1 },
+  { name: "1-piperideine", stem: "1-piperidein", smarts: "[N]1=[C]-[C]-[C]-[C]-[C]1", locants: [1, 2, 3, 4, 5, 6], minUnsaturatedBonds: 1, maxUnsaturatedBonds: 1 },
   { name: "1,3-dioxolane", stem: "1,3-dioxolan", smarts: "[#8]1-[#6]-[#8]-[#6]-[#6]1", locants: [1, 2, 3, 4, 5], maxUnsaturatedBonds: 0 },
   { name: "oxane", stem: "oxan", smarts: "[#8]1-[#6]-[#6]-[#6]-[#6]-[#6]1", locants: [1, 2, 3, 4, 5, 6], maxUnsaturatedBonds: 0 },
   { name: "piperidine", stem: "piperidin", smarts: "[#7]1-[#6]-[#6]-[#6]-[#6]-[#6]1", locants: [1, 2, 3, 4, 5, 6], maxUnsaturatedBonds: 0 },

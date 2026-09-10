@@ -272,6 +272,10 @@ async function singleDefinedAlkeneGeometry(smiles: string): Promise<AlkeneGeomet
   }
 }
 
+// Keep the diene's pre-existing nonreacting bonds intact. In particular, a
+// cyclic diene contributes its original alternate path between C1 and C4; the
+// new six-membered Diels-Alder ring is added on top of that path. Thus
+// cyclohexa-1,3-diene + an alkene correctly gives a bicyclo[2.2.2] framework.
 const DIELS_ALDER_CONSTITUTIONAL_SMARTS =
   "[C:1]=[C:2]-[C:3]=[C:4].[C:5]=[C:6]>>[C:1]1-[C:2]=[C:3]-[C:4]-[C:5]-[C:6]-1";
 
@@ -500,31 +504,40 @@ function h1H1DienophileStereoSmarts(
 /**
  * Endo stereochemistry for the common cyclic-diene Diels-Alder class.
  *
- * A five-membered cyclic diene fixes the two diene faces.  With a terminal,
- * monosubstituted electron-poor dienophile, the kinetic endo approach places
- * the activating group under the developing bridge.  The SMARTS below map
- * the activating group explicitly so the result generalizes across acrylates,
- * enals/enones/acrylic-acid derivatives and nitriles rather than keying on a
- * reaction ID or one handwritten substrate.
+ * A cyclic diene fixes the two diene faces. With a terminal, monosubstituted
+ * electron-poor dienophile, the kinetic endo approach places the activating
+ * group under the developing bridge. The templates are structural rather than
+ * substrate-specific and cover the common 5-8 member cyclic-diene range.
+ * Carbonyl derivatives, aldehydes and nitriles are mapped explicitly.
  *
- * Each pair contains the two mirror-related facial approaches.  The caller
+ * Each pair contains the two mirror-related facial approaches. The caller
  * filters them back to the already-selected constitutional regioisomer; the
  * product-mixture layer can then recognize a racemate and draw one member.
  */
 function cyclicDieneEndoStereoSmarts(): string[] {
-  const carbonylActivated =
-    "[C;r5:1]=[C;r5:2]-[C;r5:3]=[C;r5:4]." +
-    "[C;H2:5]=[C;H1:6]([C:7](=[O:8])[*:9])";
-  const nitrileActivated =
-    "[C;r5:1]=[C;r5:2]-[C;r5:3]=[C;r5:4]." +
-    "[C;H2:5]=[C;H1:6]([C:7]#[N:8])";
+  const templates: string[] = [];
 
-  return [
-    `${carbonylActivated}>>[C@:1]1-[C:2]=[C:3]-[C@:4]-[C:5]-[C@@:6]([C:7](=[O:8])[*:9])-1`,
-    `${carbonylActivated}>>[C@@:1]1-[C:2]=[C:3]-[C@@:4]-[C:5]-[C@:6]([C:7](=[O:8])[*:9])-1`,
-    `${nitrileActivated}>>[C@:1]1-[C:2]=[C:3]-[C@:4]-[C:5]-[C@@:6]([C:7]#[N:8])-1`,
-    `${nitrileActivated}>>[C@@:1]1-[C:2]=[C:3]-[C@@:4]-[C:5]-[C@:6]([C:7]#[N:8])-1`,
-  ];
+  for (const ringSize of [5, 6, 7, 8]) {
+    const cyclicDiene =
+      `[C;r${ringSize}:1]=[C;r${ringSize}:2]-[C;r${ringSize}:3]=[C;r${ringSize}:4].`;
+    const carbonylActivated =
+      `${cyclicDiene}[C;H2:5]=[C;H1:6]([C:7](=[O:8])[*:9])`;
+    const aldehydeActivated =
+      `${cyclicDiene}[C;H2:5]=[C;H1:6]([C;H1:7]=[O:8])`;
+    const nitrileActivated =
+      `${cyclicDiene}[C;H2:5]=[C;H1:6]([C:7]#[N:8])`;
+
+    templates.push(
+      `${carbonylActivated}>>[C@:1]1-[C:2]=[C:3]-[C@:4]-[C:5]-[C@@:6]([C:7](=[O:8])[*:9])-1`,
+      `${carbonylActivated}>>[C@@:1]1-[C:2]=[C:3]-[C@@:4]-[C:5]-[C@:6]([C:7](=[O:8])[*:9])-1`,
+      `${aldehydeActivated}>>[C@:1]1-[C:2]=[C:3]-[C@:4]-[C:5]-[C@@:6]([C;H1:7]=[O:8])-1`,
+      `${aldehydeActivated}>>[C@@:1]1-[C:2]=[C:3]-[C@@:4]-[C:5]-[C@:6]([C;H1:7]=[O:8])-1`,
+      `${nitrileActivated}>>[C@:1]1-[C:2]=[C:3]-[C@:4]-[C:5]-[C@@:6]([C:7]#[N:8])-1`,
+      `${nitrileActivated}>>[C@@:1]1-[C:2]=[C:3]-[C@@:4]-[C:5]-[C@:6]([C:7]#[N:8])-1`,
+    );
+  }
+
+  return templates;
 }
 
 /**
@@ -548,9 +561,14 @@ function cyclicDieneTerminalDienophileStereoSmarts(): string[] {
       `[C;r${ringSize}:1]=[C;r${ringSize}:2]-[C;r${ringSize}:3]=[C;r${ringSize}:4].` +
       `[C;H2:5]=[C;H1:6]([*:7])`;
 
+    // Keep the three newly defined facial relationships coupled. With the
+    // product-ring branch order used here, matching tags on C1/C4/C6 give the
+    // textbook same-face representative; its complete mirror is emitted as the
+    // second member. Mixing the C6 tag independently created the recurring
+    // dash/dash/wedge diastereomer bug.
     templates.push(
-      `${reactant}>>[C@:1]1-[C:2]=[C:3]-[C@:4]-[C:5]-[C@@:6]([*:7])-1`,
-      `${reactant}>>[C@@:1]1-[C:2]=[C:3]-[C@@:4]-[C:5]-[C@:6]([*:7])-1`,
+      `${reactant}>>[C@@:1]1-[C:2]=[C:3]-[C@@:4]-[C:5]-[C@@:6]([*:7])-1`,
+      `${reactant}>>[C@:1]1-[C:2]=[C:3]-[C@:4]-[C:5]-[C@:6]([*:7])-1`,
     );
   }
 

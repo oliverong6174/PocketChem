@@ -3,6 +3,7 @@ import { runReactionSmarts } from "../rdkitReaction";
 import { classifyCarbonyl } from "./carbonylUtils";
 import { epoxideOrganometallicOpening } from "./ring";
 import { totalAlkeneSubstitutionScore } from "../productSelectivity";
+import { filterProductsByRelativeSubstituentFace } from "../stereochemistry";
 
 export type OneTwoAdditionNucleophile = "water" | "cyanide";
 export type AlkeneAdditionRegioselectivity =
@@ -249,9 +250,9 @@ async function epoxidationThenAcidicAlcoholOpening(
    *
    * Epoxidation is stereospecific. Opening of the protonated epoxide is
    * backside/anti. A tertiary epoxide carbon is strongly favored
-   * electronically; for primary/secondary pairs steric accessibility becomes
-   * increasingly important. Equal substitution is retained rather than
-   * inventing selectivity.
+   * electronically. For ordinary unsymmetrical epoxides this is the standard
+   * textbook acidic-opening rule: attack the more substituted carbon. Equal
+   * substitution is retained rather than inventing selectivity.
    */
   const alcoholPattern = ".[O;H1;+0:3][C;X4:4]";
   const alkoxyBranch = "[O:3][C:4]";
@@ -268,11 +269,14 @@ async function epoxidationThenAcidicAlcoholOpening(
     `[C;!R;H1,H2:1]=[C;!R;H0:2]${alcoholPattern}>>[C@@:1]([OH])[C@:2](${alkoxyBranch})`,
     `[C;!R;H1,H2:1]=[C;!R;H0:2]${alcoholPattern}>>[C@:1]([OH])[C@@:2](${alkoxyBranch})`,
 
-    // Primary/secondary pair: attack the less substituted carbon.
-    `[C;H1:1]=[C;H2:2]${alcoholPattern}>>[C@@:1]([OH])[C@:2](${alkoxyBranch})`,
-    `[C;H1:1]=[C;H2:2]${alcoholPattern}>>[C@:1]([OH])[C@@:2](${alkoxyBranch})`,
-    `[C;H2:1]=[C;H1:2]${alcoholPattern}>>[C@@:1](${alkoxyBranch})[C@:2]([OH])`,
-    `[C;H2:1]=[C;H1:2]${alcoholPattern}>>[C@:1](${alkoxyBranch})[C@@:2]([OH])`,
+    // Acidic opening: primary/secondary pair -> RO attacks the MORE
+    // substituted (H1) epoxide carbon; the epoxide oxygen remains on the H2
+    // carbon and becomes OH. The attacked secondary carbon can be formed from
+    // either face when the starting alkene is achiral, so retain the mirror pair.
+    `[C;H1:1]=[C;H2:2]${alcoholPattern}>>[C@:1](${alkoxyBranch})[C:2]([OH])`,
+    `[C;H1:1]=[C;H2:2]${alcoholPattern}>>[C@@:1](${alkoxyBranch})[C:2]([OH])`,
+    `[C;H2:1]=[C;H1:2]${alcoholPattern}>>[C:1]([OH])[C@:2](${alkoxyBranch})`,
+    `[C;H2:1]=[C;H1:2]${alcoholPattern}>>[C:1]([OH])[C@@:2](${alkoxyBranch})`,
   ];
 
   for (const hydrogenCount of [1, 2] as const) {
@@ -290,7 +294,24 @@ async function epoxidationThenAcidicAlcoholOpening(
       products.add(product);
     }
   }
-  return [...products];
+
+  // Do not trust @/@@ enumeration by itself for cyclic/fused systems. The same
+  // reaction SMARTS can match a ring alkene in both atom-map directions, which
+  // can turn the intended anti opening into all four formal R/S combinations.
+  // For adjacent ring centers only, inspect the actual OH/OR wedge relationship
+  // and remove an unambiguously syn leak. Acyclic products are deliberately not
+  // filtered here: their syn/anti history cannot be inferred safely from an
+  // arbitrary 2-D depiction after free bond rotation. If RDKit cannot expose a
+  // decisive ring-face relationship, the shared guard leaves the set untouched.
+  return filterProductsByRelativeSubstituentFace(
+    [...products],
+    {
+      smarts: "[C;R;X4:1]([O;H1;+0:2])-[C;R;X4:3]([O;H0;+0:4][#6:5])",
+      firstBond: [0, 1],
+      secondBond: [2, 3],
+    },
+    "opposite",
+  );
 }
 
 async function epoxidationThenOrganometallicOpening(

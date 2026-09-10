@@ -5,6 +5,7 @@ import type {
   ReactionRule,
 } from "../reactionTypes";
 import {
+  areCanonicalEnantiomers,
   canonicalizeStereoStructure,
   type CanonicalStereoStructure,
 } from "./stereochemistry";
@@ -106,28 +107,6 @@ function sameKeySet<K>(left: Map<K, unknown>, right: Map<K, unknown>): boolean {
   return true;
 }
 
-function areEnantiomericPair(
-  left: StereoSignature,
-  right: StereoSignature,
-): boolean {
-  if (left.atoms.size === 0 || !sameKeySet(left.atoms, right.atoms)) {
-    return false;
-  }
-  if (!sameKeySet(left.bonds, right.bonds)) return false;
-
-  for (const [index, descriptor] of left.atoms) {
-    const opposite = descriptor === "R" ? "S" : "R";
-    if (right.atoms.get(index) !== opposite) return false;
-  }
-
-  // E/Z geometry is not inverted by taking a molecular mirror image.
-  for (const [key, descriptor] of left.bonds) {
-    if (right.bonds.get(key) !== descriptor) return false;
-  }
-
-  return true;
-}
-
 function differsAtSomeButNotAllTetrahedralCenters(
   left: StereoSignature,
   right: StereoSignature,
@@ -155,20 +134,21 @@ async function mixtureKindForGroup(
   const expectedMixture = rule.selectivityProfile?.mixture === "expected";
   if (stereoMode !== "racemization" && !expectedMixture) return null;
 
+  if (
+    members.length === 2 &&
+    (await areCanonicalEnantiomers(
+      members[0].structure,
+      members[1].structure,
+    ))
+  ) {
+    return "racemic";
+  }
+
   const signatures = await Promise.all(
     members.map((member) => stereoSignature(member.structure.isomeric)),
   );
 
   if (
-    members.length === 2 &&
-    areEnantiomericPair(signatures[0], signatures[1]) &&
-    (stereoMode === "racemization" || expectedMixture)
-  ) {
-    return "racemic";
-  }
-
-  if (
-    stereoMode === "racemization" &&
     signatures.some((signature, index) =>
       signatures.some(
         (other, otherIndex) =>

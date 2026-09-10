@@ -1,6 +1,9 @@
 import { getRDKit } from "../../rdkit";
 import type { ReactionRule, ReactionSitePreference } from "../reactionTypes";
-import { canonicalizeStereoStructure } from "./stereochemistry";
+import {
+  canonicalizeStereoStructure,
+  filterProductsByRelativeSubstituentFace,
+} from "./stereochemistry";
 
 type Histogram = Map<number, number>;
 
@@ -225,6 +228,28 @@ async function sameConnectivityProducts(products: string[]): Promise<string[]> {
     .map((item) => item.product);
 }
 
+async function applyMechanismProductPostconditions(
+  rule: ReactionRule,
+  products: string[],
+): Promise<string[]> {
+  let selected = [...products];
+  const relativeStereo = rule.mechanismProfile?.productPostconditions?.relativeStereo ?? [];
+
+  for (const condition of relativeStereo) {
+    selected = await filterProductsByRelativeSubstituentFace(
+      selected,
+      {
+        smarts: condition.smarts,
+        firstBond: condition.firstBond,
+        secondBond: condition.secondBond,
+      },
+      condition.relationship === "syn" ? "same" : "opposite",
+    );
+  }
+
+  return selected;
+}
+
 /**
  * Final rule-level selectivity pass. This is intentionally conservative:
  * genuine expected mixtures are never collapsed. `majorProductOnly` is used
@@ -247,6 +272,10 @@ export async function applyRuleProductSelectivity(
       profile.sitePreference,
     );
   }
+
+  // Mechanistic postconditions are applied before mixture handling so a rule
+  // can never label an invalid stereoisomer as an "expected mixture" member.
+  selected = await applyMechanismProductPostconditions(rule, selected);
 
   if (profile?.mixture === "expected") return selected;
 

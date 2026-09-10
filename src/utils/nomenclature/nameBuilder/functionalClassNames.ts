@@ -627,6 +627,66 @@ function buildNitrateEsterName(
 }
 
 
+
+const SIMPLE_CARBON_RING_BASES: Record<number, string> = {
+  3: "cyclopropanone",
+  4: "cyclobutanone",
+  5: "cyclopentanone",
+  6: "cyclohexanone",
+  7: "cycloheptanone",
+  8: "cyclooctanone",
+};
+
+function carbonSingleBondNeighbors(parsedMol: ParsedMol, carbonIndex: number) {
+  return (parsedMol.adjacency.get(carbonIndex) ?? [])
+    .filter((bond) => bond.bondOrder === 1)
+    .map((bond) => getOtherAtom(bond, carbonIndex))
+    .filter((atomIndex) => parsedMol.atoms[atomIndex]?.element === "C");
+}
+
+function simplePathBetweenCarbonsExcluding(
+  parsedMol: ParsedMol,
+  start: number,
+  goal: number,
+  excluded: number,
+) {
+  const queue: Array<{ atom: number; path: number[] }> = [{ atom: start, path: [start] }];
+  const visited = new Set<number>([start, excluded]);
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (!current) continue;
+    if (current.atom === goal) return current.path;
+
+    for (const bond of parsedMol.adjacency.get(current.atom) ?? []) {
+      if (bond.bondOrder !== 1) continue;
+      const next = getOtherAtom(bond, current.atom);
+      if (visited.has(next)) continue;
+      if (parsedMol.atoms[next]?.element !== "C") continue;
+      visited.add(next);
+      queue.push({ atom: next, path: [...current.path, next] });
+    }
+  }
+
+  return null;
+}
+
+function simpleCyclicKetoneBaseName(parsedMol: ParsedMol, carbonIndex: number) {
+  const neighbors = carbonSingleBondNeighbors(parsedMol, carbonIndex);
+  if (neighbors.length !== 2) return null;
+
+  const path = simplePathBetweenCarbonsExcluding(
+    parsedMol,
+    neighbors[0],
+    neighbors[1],
+    carbonIndex,
+  );
+  if (!path || path.length < 2) return null;
+
+  const ringSize = path.length + 1;
+  return SIMPLE_CARBON_RING_BASES[ringSize] ?? null;
+}
+
 function centralCarbonBranchNames(parsedMol: ParsedMol, carbonIndex: number) {
   return (parsedMol.adjacency.get(carbonIndex) ?? [])
     .filter((bond) => {
@@ -786,7 +846,8 @@ function buildNitrogenClassName(
 
       const carbonNames = centralCarbonBranchNames(parsedMol, carbon.atomIndex);
       const aldehydeLike = carbonNames.length <= 1;
-      const base = carbonylClassBaseFromSubstituents(carbonNames, aldehydeLike);
+      const base = simpleCyclicKetoneBaseName(parsedMol, carbon.atomIndex) ??
+        carbonylClassBaseFromSubstituents(carbonNames, aldehydeLike);
 
       if (groupName === "hydrazone" && hasNitrogen) {
         return {

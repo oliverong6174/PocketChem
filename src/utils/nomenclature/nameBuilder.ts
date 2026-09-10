@@ -53,6 +53,51 @@ import { getFunctionalClassName } from "./nameBuilder/functionalClassNames";
 import { getNamingGuardResult } from "./nameBuilder/namingGuard";
 import { getOrganometallicName } from "./nameBuilder/organometallicNames";
 import { getPolycyclicHydrocarbonName } from "./nameBuilder/polycyclicHydrocarbonNames";
+import { getAlphabetizationKey } from "./nameBuilder/prefixAlphabetization";
+
+
+function canUseStandalonePolycyclicHydrocarbonName(
+  parsedMol: ParsedMol,
+  functionalGroups: FunctionalGroupResult[],
+  mainGroup: FunctionalGroupResult | null,
+) {
+  const allowedElements = new Set(["C", "F", "Cl", "Br", "I"]);
+  if (parsedMol.atoms.some((atom) => !allowedElements.has(atom.element))) {
+    return false;
+  }
+
+  const informativeGroups = functionalGroups
+    .map((group) => group.name.trim().toLowerCase())
+    .filter(Boolean);
+  const informativeMainGroup = mainGroup?.name.trim().toLowerCase() ?? null;
+  const disallowedGroups = new Set([
+    "alcohol",
+    "thiol",
+    "amine",
+    "imine",
+    "ketone",
+    "aldehyde",
+    "nitrile",
+    "amide",
+    "ester",
+    "carboxylic acid",
+    "epoxide",
+    "ether",
+    "hydrazone",
+    "aldoxime",
+    "ketoxime",
+    "aminoxime",
+    "amide anion",
+    "alkoxide",
+    "phenoxide",
+  ]);
+
+  if (informativeMainGroup && disallowedGroups.has(informativeMainGroup)) {
+    return false;
+  }
+
+  return !informativeGroups.some((group) => disallowedGroups.has(group));
+}
 
 type EstimatedIupacResult = {
   estimatedName: string;
@@ -101,7 +146,13 @@ export function buildEstimatedIupacName(
     };
   }
 
-  const polycyclicHydrocarbonName = getPolycyclicHydrocarbonName(parsedMol);
+  const polycyclicHydrocarbonName = canUseStandalonePolycyclicHydrocarbonName(
+    parsedMol,
+    functionalGroups,
+    mainGroup,
+  )
+    ? getPolycyclicHydrocarbonName(parsedMol)
+    : null;
 
   if (polycyclicHydrocarbonName) {
     return {
@@ -280,7 +331,7 @@ const parentBeforeAromaticOrientation =
         primaryGroup
       );
 
-const parent =
+let parent =
   initialRingSuffixContext && !shouldUseExoticParent
     ? orientRingParentForSuffix(
         parsedMol,
@@ -288,6 +339,21 @@ const parent =
         initialRingSuffixContext
       )
     : parentBeforeAromaticOrientation;
+
+  // Prefix-only benzenes use the lowest set of substituent locants. The old
+  // ring-orientation heuristic ranked the *element* of a substituent (N > C,
+  // etc.) before locants, which could turn a 1,2,3-substituted benzene into a
+  // 1,2,6 name. Principal suffix numbering is handled separately above and is
+  // intentionally untouched.
+  if (
+    !initialRingSuffixContext &&
+    !namingIntent.featureType &&
+    parent.kind === "ring" &&
+    parent.aromaticRing &&
+    parent.parentHydrocarbon === "benzene"
+  ) {
+    parent = orientPrefixOnlyBenzeneParent(parsedMol, parent, primaryGroup);
+  }
 
   const finalRingSuffixContext = initialRingSuffixContext
     ? getRingSuffixContext(parsedMol, parent, primaryGroup) ??
@@ -361,6 +427,96 @@ const parent =
       primaryFeature,
       substituents,
     };
+}
+
+
+function compareNumericLocantLists(left: number[], right: number[]) {
+  const length = Math.max(left.length, right.length);
+  for (let index = 0; index < length; index += 1) {
+    const leftValue = left[index] ?? Number.POSITIVE_INFINITY;
+    const rightValue = right[index] ?? Number.POSITIVE_INFINITY;
+    if (leftValue !== rightValue) return leftValue - rightValue;
+  }
+  return 0;
+}
+
+function ringPathOrientations(path: number[]) {
+  const candidates: number[][] = [];
+  const seen = new Set<string>();
+  for (let index = 0; index < path.length; index += 1) {
+    const rotated = [...path.slice(index), ...path.slice(0, index)];
+    const reversed = [rotated[0], ...rotated.slice(1).reverse()];
+    for (const candidate of [rotated, reversed]) {
+      const key = candidate.join(",");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      candidates.push(candidate);
+    }
+  }
+  return candidates;
+}
+
+function substituentLocantSet(substituents: Substituent[]) {
+  return substituents
+    .map((substituent) => substituent.locant)
+    .filter((locant): locant is number => typeof locant === "number")
+    .sort((a, b) => a - b);
+}
+
+function alphabeticSubstituentLocantVector(substituents: Substituent[]) {
+  const groups = new Map<string, { name: string; locants: number[] }>();
+  for (const substituent of substituents) {
+    if (typeof substituent.locant !== "number") continue;
+    const key = getAlphabetizationKey(substituent.name);
+    const existing = groups.get(key) ?? { name: substituent.name, locants: [] };
+    existing.locants.push(substituent.locant);
+    groups.set(key, existing);
+  }
+
+  return [...groups.entries()]
+    .sort(([leftKey, left], [rightKey, right]) => {
+      const alpha = leftKey.localeCompare(rightKey);
+      return alpha !== 0 ? alpha : left.name.localeCompare(right.name);
+    })
+    .flatMap(([, group]) => [...group.locants].sort((a, b) => a - b));
+}
+
+function orientPrefixOnlyBenzeneParent(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor,
+  primaryGroup: FunctionalGroupResult | null,
+): ParentDescriptor {
+  const candidates = ringPathOrientations(parent.path).map((path) => {
+    const candidateParent: ParentDescriptor = { ...parent, path };
+    const substituents = detectSubstituents(
+      parsedMol,
+      candidateParent,
+      [],
+      new Set(),
+      primaryGroup,
+    );
+    return {
+      parent: candidateParent,
+      locants: substituentLocantSet(substituents),
+      alphaLocants: alphabeticSubstituentLocantVector(substituents),
+    };
+  });
+
+  candidates.sort((left, right) => {
+    const lowestSet = compareNumericLocantLists(left.locants, right.locants);
+    if (lowestSet !== 0) return lowestSet;
+
+    // If the numeric locant sets are identical, give the lower locant to the
+    // substituent cited first alphabetically (e.g. bromo before chloro).
+    const alphabetic = compareNumericLocantLists(left.alphaLocants, right.alphaLocants);
+    if (alphabetic !== 0) return alphabetic;
+
+    // Chemically equivalent alternatives need a deterministic final ordering
+    // so canonical atom order cannot randomly flip a displayed name.
+    return left.parent.path.join(",").localeCompare(right.parent.path.join(","));
+  });
+
+  return candidates[0]?.parent ?? parent;
 }
 
 function constructFinalName(

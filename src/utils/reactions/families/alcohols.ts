@@ -278,7 +278,7 @@ export const alcoholReactionRules: ReactionRule[] = [
     productStatus: "representative",
     mechanism: "Acid-promoted substitution",
     selectivityProfile: {
-      stereochemistry: { mode: "racemization" },
+      stereochemistry: { mode: "racemization", attackMode: "either" },
       mixture: "possible",
       allowsRearrangement: false,
     },
@@ -317,7 +317,7 @@ export const alcoholReactionRules: ReactionRule[] = [
     productStatus: "representative",
     mechanism: "SN2",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
       allowsRearrangement: false,
     },
@@ -353,7 +353,7 @@ export const alcoholReactionRules: ReactionRule[] = [
     productStatus: "representative",
     mechanism: "SN1",
     selectivityProfile: {
-      stereochemistry: { mode: "racemization" },
+      stereochemistry: { mode: "racemization", attackMode: "either" },
       mixture: "possible",
       allowsRearrangement: true,
     },
@@ -397,7 +397,7 @@ export const alcoholReactionRules: ReactionRule[] = [
     productStatus: "representative",
     mechanism: "SN1 for tertiary and many secondary alcohols",
     selectivityProfile: {
-      stereochemistry: { mode: "racemization" },
+      stereochemistry: { mode: "racemization", attackMode: "either" },
       mixture: "possible",
       allowsRearrangement: true,
     },
@@ -428,7 +428,7 @@ export const alcoholReactionRules: ReactionRule[] = [
     productStatus: "representative",
     mechanism: "SN2 substitution",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
       allowsRearrangement: false,
     },
@@ -459,7 +459,7 @@ export const alcoholReactionRules: ReactionRule[] = [
     productStatus: "representative",
     mechanism: "Substitution through a chlorosulfite intermediate",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
       allowsRearrangement: false,
     },

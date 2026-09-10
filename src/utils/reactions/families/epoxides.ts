@@ -30,7 +30,7 @@ const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
   },
   productStatus: "computed",
   selectivityProfile: {
-    stereochemistry: { mode: "anti-addition", stereospecific: true },
+    stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
     regiochemistry: { mode: "directed", regioselective: true },
     mixture: "possible",
     allowsRearrangement: false,
@@ -65,7 +65,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
-      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,
@@ -94,7 +94,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
-      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,
@@ -126,7 +126,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
-      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,
@@ -158,7 +158,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
-      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,
@@ -190,7 +190,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,
@@ -226,7 +226,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,
@@ -255,7 +255,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,

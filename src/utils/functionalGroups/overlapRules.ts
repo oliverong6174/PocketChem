@@ -98,7 +98,9 @@ const SUPPRESSION_RULES: Record<string, string[]> = {
   "N-oxide": ["Amine"],
   "Nitrate ester": ["Nitro", "N-oxide"],
   "Nitro": ["N-oxide", "Nitroso", "Amine"],
-  Azide: [],
+  // Azides contain a formal N−/N+ resonance pair but are not amide anions.
+  Azide: ["Amide anion", "Azide anion"],
+  "Azide anion": ["Amide anion"],
 
   "Acyl azide": [
   "Azide",

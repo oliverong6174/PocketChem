@@ -20,7 +20,7 @@ function rememberSvg(key: string, svg: string | null) {
 }
 
 export async function getMoleculeSvg(smiles: string): Promise<string | null> {
-  const cacheKey = smiles.trim();
+  const cacheKey = normalizeMoleculeSource(smiles);
   if (!cacheKey) return null;
 
   if (moleculeSvgCache.has(cacheKey)) {
@@ -197,6 +197,1114 @@ function looksLikeMolBlock(source: string): boolean {
 }
 
 /**
+ * RDKit.js is stricter than desktop RDKit about molfile termination: a V2000
+ * block with its final newline removed can fail to parse. SMILES should still
+ * be trimmed normally, while molfiles are normalized to exactly one trailing
+ * newline. This is critical because aligned products are passed between SVG
+ * renderers as molfiles rather than SMILES.
+ */
+function normalizeMoleculeSource(source: string | null | undefined): string {
+  const raw = source ?? "";
+  if (!raw.trim()) return "";
+
+  if (looksLikeMolBlock(raw)) {
+    // Molfile header lines are positional. In particular, RDKit often emits an
+    // intentionally blank first title line; String.trim() deletes that line and
+    // shifts the V2000 counts record out of line 4, making RDKit.js reject an
+    // otherwise valid molfile. Preserve the leading bytes exactly and normalize
+    // only trailing whitespace.
+    return `${raw.replace(/\s+$/, "")}\n`;
+  }
+
+  return raw.trim();
+}
+
+
+type DepictionAtom = {
+  index: number;
+  element: string;
+  x: number;
+  y: number;
+};
+
+type DepictionBond = {
+  atom1: number;
+  atom2: number;
+  bondType: number;
+};
+
+type ParsedDepiction = {
+  atoms: DepictionAtom[];
+  bonds: DepictionBond[];
+  adjacency: number[][];
+};
+
+type DepictionMapping = Map<number, number>;
+
+type SimilarityTransform = {
+  reflected: boolean;
+  aReal: number;
+  aImag: number;
+  sourceCx: number;
+  sourceCy: number;
+  targetCx: number;
+  targetCy: number;
+  rmsd: number;
+};
+
+type AlignmentCandidate = {
+  reference: string;
+  mapping: DepictionMapping;
+  transform: SimilarityTransform;
+  anchorCount: number;
+};
+
+const alignedProductStructureCache = new Map<string, string | null>();
+const MAX_ALIGNMENT_CACHE_ENTRIES = 160;
+const MAX_ALIGNMENT_MAPPINGS = 128;
+const MAX_ALIGNMENT_PRUNE_STATES = 240;
+const MAX_ALIGNMENT_REMOVALS = 6;
+
+function rememberAlignedStructure(key: string, value: string | null) {
+  alignedProductStructureCache.delete(key);
+  alignedProductStructureCache.set(key, value);
+  if (alignedProductStructureCache.size > MAX_ALIGNMENT_CACHE_ENTRIES) {
+    const oldest = alignedProductStructureCache.keys().next().value;
+    if (oldest !== undefined) alignedProductStructureCache.delete(oldest);
+  }
+}
+
+function normalizeDepictionElement(symbol: string) {
+  const trimmed = symbol.trim();
+  if (!trimmed) return "";
+  // Ketcher/RDKit may use dummy/query atoms in teaching structures. Keep those
+  // labels literal so they never get accidentally mapped onto a carbon atom.
+  return trimmed[0].toUpperCase() + trimmed.slice(1).toLowerCase();
+}
+
+function parseV2000Depiction(source: string): ParsedDepiction | null {
+  const lines = source.split(/\r?\n/);
+  if (lines.length < 5 || !lines[3]?.includes("V2000")) return null;
+  const atomCount = Number.parseInt(lines[3].slice(0, 3).trim(), 10);
+  const bondCount = Number.parseInt(lines[3].slice(3, 6).trim(), 10);
+  if (!Number.isInteger(atomCount) || !Number.isInteger(bondCount)) return null;
+
+  const atoms: DepictionAtom[] = [];
+  for (let index = 0; index < atomCount; index += 1) {
+    const line = lines[4 + index] ?? "";
+    const x = Number.parseFloat(line.slice(0, 10).trim());
+    const y = Number.parseFloat(line.slice(10, 20).trim());
+    const element = normalizeDepictionElement(parseV2000AtomSymbol(line));
+    if (!Number.isFinite(x) || !Number.isFinite(y) || !element) return null;
+    atoms.push({ index, element, x, y });
+  }
+
+  const bonds: DepictionBond[] = [];
+  const adjacency = Array.from({ length: atomCount }, () => [] as number[]);
+  const bondStart = 4 + atomCount;
+  for (let index = 0; index < bondCount; index += 1) {
+    const line = lines[bondStart + index] ?? "";
+    const atom1 = Number.parseInt(line.slice(0, 3).trim(), 10) - 1;
+    const atom2 = Number.parseInt(line.slice(3, 6).trim(), 10) - 1;
+    const bondType = Number.parseInt(line.slice(6, 9).trim(), 10);
+    if (
+      !Number.isInteger(atom1) || !Number.isInteger(atom2) ||
+      atom1 < 0 || atom2 < 0 || atom1 >= atomCount || atom2 >= atomCount
+    ) continue;
+    bonds.push({ atom1, atom2, bondType });
+    adjacency[atom1].push(atom2);
+    adjacency[atom2].push(atom1);
+  }
+
+  return { atoms, bonds, adjacency };
+}
+
+function parseV3000Depiction(source: string): ParsedDepiction | null {
+  if (!source.includes("V3000")) return null;
+  const atoms: DepictionAtom[] = [];
+  const rawBonds: Array<{ atom1: number; atom2: number; bondType: number }> = [];
+  let inAtoms = false;
+  let inBonds = false;
+
+  for (const rawLine of source.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (/^M\s+V30\s+BEGIN\s+ATOM\b/.test(line)) {
+      inAtoms = true;
+      continue;
+    }
+    if (/^M\s+V30\s+END\s+ATOM\b/.test(line)) {
+      inAtoms = false;
+      continue;
+    }
+    if (/^M\s+V30\s+BEGIN\s+BOND\b/.test(line)) {
+      inBonds = true;
+      continue;
+    }
+    if (/^M\s+V30\s+END\s+BOND\b/.test(line)) {
+      inBonds = false;
+      continue;
+    }
+    if (!line.startsWith("M  V30 ")) continue;
+    const fields = line.replace(/^M\s+V30\s+/, "").split(/\s+/);
+    if (inAtoms && fields.length >= 5) {
+      const index = Number.parseInt(fields[0], 10) - 1;
+      const element = normalizeDepictionElement(fields[1]);
+      const x = Number.parseFloat(fields[2]);
+      const y = Number.parseFloat(fields[3]);
+      if (Number.isInteger(index) && index >= 0 && element && Number.isFinite(x) && Number.isFinite(y)) {
+        atoms[index] = { index, element, x, y };
+      }
+    } else if (inBonds && fields.length >= 4) {
+      const bondType = Number.parseInt(fields[1], 10);
+      const atom1 = Number.parseInt(fields[2], 10) - 1;
+      const atom2 = Number.parseInt(fields[3], 10) - 1;
+      if (Number.isInteger(atom1) && Number.isInteger(atom2) && atom1 >= 0 && atom2 >= 0) {
+        rawBonds.push({ atom1, atom2, bondType });
+      }
+    }
+  }
+
+  if (atoms.length === 0 || atoms.some((atom) => !atom)) return null;
+  const adjacency = Array.from({ length: atoms.length }, () => [] as number[]);
+  const bonds = rawBonds.filter(
+    (bond) => bond.atom1 < atoms.length && bond.atom2 < atoms.length,
+  );
+  for (const bond of bonds) {
+    adjacency[bond.atom1].push(bond.atom2);
+    adjacency[bond.atom2].push(bond.atom1);
+  }
+  return { atoms, bonds, adjacency };
+}
+
+function parseDepiction(source: string): ParsedDepiction | null {
+  return source.includes("V3000")
+    ? parseV3000Depiction(source)
+    : parseV2000Depiction(source);
+}
+
+function hasDepictionBond(depiction: ParsedDepiction, atom1: number, atom2: number) {
+  return depiction.adjacency[atom1]?.includes(atom2) ?? false;
+}
+
+/**
+ * Find atom correspondences using the preserved molecular graph rather than
+ * bond orders. Bond order is intentionally ignored: reaction products commonly
+ * change C=C to C-C, C-O to C=O, etc., but those atoms should stay in exactly
+ * the same place on screen. Element identity and connectivity are still strict.
+ */
+function findDepictionMappings(
+  reference: ParsedDepiction,
+  product: ParsedDepiction,
+  selectedReferenceAtoms: readonly number[],
+): DepictionMapping[] {
+  const selected = new Set(selectedReferenceAtoms);
+  const selectedDegree = new Map<number, number>();
+  for (const atom of selectedReferenceAtoms) {
+    selectedDegree.set(
+      atom,
+      (reference.adjacency[atom] ?? []).filter((neighbor) => selected.has(neighbor)).length,
+    );
+  }
+
+  const productByElement = new Map<string, number[]>();
+  for (const atom of product.atoms) {
+    const bucket = productByElement.get(atom.element) ?? [];
+    bucket.push(atom.index);
+    productByElement.set(atom.element, bucket);
+  }
+
+  const ordered = [...selectedReferenceAtoms].sort((left, right) => {
+    const leftCandidates = productByElement.get(reference.atoms[left].element)?.length ?? 0;
+    const rightCandidates = productByElement.get(reference.atoms[right].element)?.length ?? 0;
+    if (leftCandidates !== rightCandidates) return leftCandidates - rightCandidates;
+    return (selectedDegree.get(right) ?? 0) - (selectedDegree.get(left) ?? 0);
+  });
+
+  const mapping = new Map<number, number>();
+  const usedProduct = new Set<number>();
+  const results: DepictionMapping[] = [];
+
+  const visit = (position: number) => {
+    if (results.length >= MAX_ALIGNMENT_MAPPINGS) return;
+    if (position >= ordered.length) {
+      results.push(new Map(mapping));
+      return;
+    }
+
+    const referenceAtom = ordered[position];
+    const candidates = productByElement.get(reference.atoms[referenceAtom].element) ?? [];
+    for (const productAtom of candidates) {
+      if (usedProduct.has(productAtom)) continue;
+      if ((product.adjacency[productAtom]?.length ?? 0) < (selectedDegree.get(referenceAtom) ?? 0)) continue;
+
+      let compatible = true;
+      for (const referenceNeighbor of reference.adjacency[referenceAtom] ?? []) {
+        if (!selected.has(referenceNeighbor)) continue;
+        const mappedNeighbor = mapping.get(referenceNeighbor);
+        if (mappedNeighbor === undefined) continue;
+        if (!hasDepictionBond(product, productAtom, mappedNeighbor)) {
+          compatible = false;
+          break;
+        }
+      }
+      if (!compatible) continue;
+
+      mapping.set(referenceAtom, productAtom);
+      usedProduct.add(productAtom);
+      visit(position + 1);
+      usedProduct.delete(productAtom);
+      mapping.delete(referenceAtom);
+    }
+  };
+
+  visit(0);
+  return results;
+}
+
+function heavyReferenceAtoms(depiction: ParsedDepiction) {
+  return depiction.atoms
+    .filter((atom) => atom.element !== "H")
+    .map((atom) => atom.index);
+}
+
+function mappingCandidatesWithBoundaryPruning(
+  reference: ParsedDepiction,
+  product: ParsedDepiction,
+): DepictionMapping[] {
+  const initial = heavyReferenceAtoms(reference);
+  if (initial.length === 0) return [];
+  const minimumAnchors = Math.min(3, initial.length);
+  const queue: Array<{ atoms: number[]; removed: number }> = [{ atoms: initial, removed: 0 }];
+  const seen = new Set<string>();
+  let explored = 0;
+
+  while (queue.length > 0 && explored < MAX_ALIGNMENT_PRUNE_STATES) {
+    const levelRemoved = queue[0].removed;
+    const level: Array<{ atoms: number[]; removed: number }> = [];
+    while (queue.length > 0 && queue[0].removed === levelRemoved) level.push(queue.shift()!);
+
+    const levelMappings: DepictionMapping[] = [];
+    for (const state of level) {
+      explored += 1;
+      const key = state.atoms.join(",");
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      const mappings = findDepictionMappings(reference, product, state.atoms);
+      if (mappings.length > 0) levelMappings.push(...mappings);
+      if (explored >= MAX_ALIGNMENT_PRUNE_STATES) break;
+    }
+    if (levelMappings.length > 0) return levelMappings.slice(0, MAX_ALIGNMENT_MAPPINGS);
+    if (levelRemoved >= MAX_ALIGNMENT_REMOVALS) continue;
+
+    for (const state of level) {
+      if (state.atoms.length <= minimumAnchors) continue;
+      const selected = new Set(state.atoms);
+      const removable = state.atoms.filter((atomIndex) => {
+        const degree = (reference.adjacency[atomIndex] ?? []).filter((neighbor) => selected.has(neighbor)).length;
+        return degree <= 1;
+      });
+      // Prefer pruning terminal heteroatoms/leaving groups before carbon atoms.
+      removable.sort((left, right) => {
+        const leftCarbon = reference.atoms[left].element === "C" ? 1 : 0;
+        const rightCarbon = reference.atoms[right].element === "C" ? 1 : 0;
+        return leftCarbon - rightCarbon;
+      });
+      for (const atomIndex of removable) {
+        const next = state.atoms.filter((candidate) => candidate !== atomIndex);
+        if (next.length >= minimumAnchors) queue.push({ atoms: next, removed: state.removed + 1 });
+      }
+    }
+  }
+
+  return [];
+}
+
+function fitSimilarityTransform(
+  reference: ParsedDepiction,
+  product: ParsedDepiction,
+  mapping: DepictionMapping,
+  reflected: boolean,
+): SimilarityTransform | null {
+  const pairs = [...mapping.entries()];
+  if (pairs.length < 2) return null;
+  const sourceCx = pairs.reduce((sum, [, productIndex]) => sum + product.atoms[productIndex].x, 0) / pairs.length;
+  const sourceCy = pairs.reduce((sum, [, productIndex]) => sum + product.atoms[productIndex].y, 0) / pairs.length;
+  const targetCx = pairs.reduce((sum, [referenceIndex]) => sum + reference.atoms[referenceIndex].x, 0) / pairs.length;
+  const targetCy = pairs.reduce((sum, [referenceIndex]) => sum + reference.atoms[referenceIndex].y, 0) / pairs.length;
+
+  let denominator = 0;
+  let numeratorReal = 0;
+  let numeratorImag = 0;
+  for (const [referenceIndex, productIndex] of pairs) {
+    const px = product.atoms[productIndex].x - sourceCx;
+    const py = product.atoms[productIndex].y - sourceCy;
+    const qx = reference.atoms[referenceIndex].x - targetCx;
+    const qy = reference.atoms[referenceIndex].y - targetCy;
+    denominator += px * px + py * py;
+    if (reflected) {
+      // q ~= a * conjugate(p)
+      numeratorReal += qx * px - qy * py;
+      numeratorImag += qx * py + qy * px;
+    } else {
+      // q ~= a * p
+      numeratorReal += qx * px + qy * py;
+      numeratorImag += qy * px - qx * py;
+    }
+  }
+  if (denominator <= 1e-10) return null;
+  const aReal = numeratorReal / denominator;
+  const aImag = numeratorImag / denominator;
+
+  let squaredError = 0;
+  for (const [referenceIndex, productIndex] of pairs) {
+    const px = product.atoms[productIndex].x - sourceCx;
+    const py = product.atoms[productIndex].y - sourceCy;
+    let tx: number;
+    let ty: number;
+    if (reflected) {
+      tx = aReal * px + aImag * py + targetCx;
+      ty = aImag * px - aReal * py + targetCy;
+    } else {
+      tx = aReal * px - aImag * py + targetCx;
+      ty = aImag * px + aReal * py + targetCy;
+    }
+    const dx = tx - reference.atoms[referenceIndex].x;
+    const dy = ty - reference.atoms[referenceIndex].y;
+    squaredError += dx * dx + dy * dy;
+  }
+
+  return {
+    reflected,
+    aReal,
+    aImag,
+    sourceCx,
+    sourceCy,
+    targetCx,
+    targetCy,
+    rmsd: Math.sqrt(squaredError / pairs.length),
+  };
+}
+
+function applySimilarity(transform: SimilarityTransform, x: number, y: number) {
+  const px = x - transform.sourceCx;
+  const py = y - transform.sourceCy;
+  if (transform.reflected) {
+    return {
+      x: transform.aReal * px + transform.aImag * py + transform.targetCx,
+      y: transform.aImag * px - transform.aReal * py + transform.targetCy,
+    };
+  }
+  return {
+    x: transform.aReal * px - transform.aImag * py + transform.targetCx,
+    y: transform.aImag * px + transform.aReal * py + transform.targetCy,
+  };
+}
+
+function formatMolCoordinate(value: number) {
+  const normalized = Math.abs(value) < 0.00005 ? 0 : value;
+  return normalized.toFixed(4).padStart(10);
+}
+
+function rewriteV2000Coordinates(
+  molBlock: string,
+  product: ParsedDepiction,
+  reference: ParsedDepiction,
+  mapping: DepictionMapping,
+  transform: SimilarityTransform,
+  swapWedgesForReflection: boolean,
+) {
+  const lines = molBlock.split(/\r?\n/);
+  if (!lines[3]?.includes("V2000")) return null;
+  const atomCount = Number.parseInt(lines[3].slice(0, 3).trim(), 10);
+  const bondCount = Number.parseInt(lines[3].slice(3, 6).trim(), 10);
+  if (!Number.isInteger(atomCount) || !Number.isInteger(bondCount)) return null;
+
+  const reverseMapping = new Map<number, number>();
+  for (const [referenceIndex, productIndex] of mapping) reverseMapping.set(productIndex, referenceIndex);
+
+  for (let index = 0; index < atomCount; index += 1) {
+    const lineIndex = 4 + index;
+    const line = lines[lineIndex] ?? "";
+    const mappedReference = reverseMapping.get(index);
+    const point = mappedReference === undefined
+      ? applySimilarity(transform, product.atoms[index].x, product.atoms[index].y)
+      : { x: reference.atoms[mappedReference].x, y: reference.atoms[mappedReference].y };
+    lines[lineIndex] = `${formatMolCoordinate(point.x)}${formatMolCoordinate(point.y)}${line.slice(20)}`;
+  }
+
+  if (swapWedgesForReflection && transform.reflected) {
+    const bondStart = 4 + atomCount;
+    for (let index = 0; index < bondCount; index += 1) {
+      const lineIndex = bondStart + index;
+      const line = lines[lineIndex] ?? "";
+      const stereo = Number.parseInt(line.slice(9, 12).trim() || "0", 10);
+      if (stereo !== 1 && stereo !== 6) continue;
+      const atom1 = Number.parseInt(line.slice(0, 3).trim(), 10);
+      const atom2 = Number.parseInt(line.slice(3, 6).trim(), 10);
+      const bondType = Number.parseInt(line.slice(6, 9).trim(), 10);
+      lines[lineIndex] = rewriteV2000BondLine(
+        line,
+        atom1,
+        atom2,
+        bondType,
+        stereo === 1 ? 6 : 1,
+      );
+    }
+  }
+
+  return lines.join("\n");
+}
+
+function transferMappedReferenceStereoBonds(
+  productMolBlock: string,
+  referenceMolBlock: string,
+  mapping: DepictionMapping,
+): string | null {
+  const stereoBonds = referenceStereoBonds(referenceMolBlock);
+  if (stereoBonds.length === 0 || productMolBlock.includes("V3000")) return productMolBlock;
+
+  const lines = productMolBlock.split(/\r?\n/);
+  const atomCount = Number.parseInt(lines[3]?.slice(0, 3).trim() ?? "", 10);
+  const bondCount = Number.parseInt(lines[3]?.slice(3, 6).trim() ?? "", 10);
+  if (!Number.isInteger(atomCount) || !Number.isInteger(bondCount)) return productMolBlock;
+  const bondStart = 4 + atomCount;
+  const productBonds: Array<V2000Bond & { stereo: number }> = [];
+  for (let index = 0; index < bondCount; index += 1) {
+    const lineIndex = bondStart + index;
+    const line = lines[lineIndex] ?? "";
+    const atom1 = Number.parseInt(line.slice(0, 3).trim(), 10) - 1;
+    const atom2 = Number.parseInt(line.slice(3, 6).trim(), 10) - 1;
+    const bondType = Number.parseInt(line.slice(6, 9).trim(), 10);
+    const stereo = Number.parseInt(line.slice(9, 12).trim() || "0", 10);
+    if (atom1 >= 0 && atom2 >= 0) productBonds.push({ lineIndex, atom1, atom2, bondType, stereo });
+  }
+
+  for (const referenceBond of stereoBonds) {
+    const mappedBegin = mapping.get(referenceBond.begin);
+    const mappedEnd = mapping.get(referenceBond.end);
+    if (mappedBegin === undefined || mappedEnd === undefined) continue;
+    const target = productBonds.find(
+      (bond) =>
+        (bond.atom1 === mappedBegin && bond.atom2 === mappedEnd) ||
+        (bond.atom1 === mappedEnd && bond.atom2 === mappedBegin),
+    );
+    if (!target || target.bondType !== 1) continue;
+
+    for (const bond of productBonds) {
+      if (bond.atom1 !== mappedBegin && bond.atom2 !== mappedBegin) continue;
+      const line = lines[bond.lineIndex] ?? "";
+      lines[bond.lineIndex] = rewriteV2000BondLine(
+        line,
+        bond.atom1 + 1,
+        bond.atom2 + 1,
+        bond.bondType,
+        0,
+      );
+    }
+    const line = lines[target.lineIndex] ?? "";
+    lines[target.lineIndex] = rewriteV2000BondLine(
+      line,
+      mappedBegin + 1,
+      mappedEnd + 1,
+      target.bondType,
+      referenceBond.stereo,
+    );
+  }
+  return lines.join("\n");
+}
+
+function bondTypeBetweenDepictions(
+  depiction: ParsedDepiction,
+  atom1: number,
+  atom2: number,
+): number | null {
+  const bond = depiction.bonds.find(
+    (candidate) =>
+      (candidate.atom1 === atom1 && candidate.atom2 === atom2) ||
+      (candidate.atom1 === atom2 && candidate.atom2 === atom1),
+  );
+  return bond?.bondType ?? null;
+}
+
+function conjugatedDienePaths(depiction: ParsedDepiction): number[][] {
+  const paths: number[][] = [];
+  const seen = new Set<string>();
+  for (const a of depiction.atoms) {
+    if (a.element !== "C") continue;
+    for (const b of depiction.adjacency[a.index] ?? []) {
+      if (bondTypeBetweenDepictions(depiction, a.index, b) !== 2) continue;
+      for (const c of depiction.adjacency[b] ?? []) {
+        if (c === a.index || bondTypeBetweenDepictions(depiction, b, c) !== 1) continue;
+        for (const d of depiction.adjacency[c] ?? []) {
+          if (d === b || d === a.index) continue;
+          if (bondTypeBetweenDepictions(depiction, c, d) !== 2) continue;
+          if (depiction.atoms[b]?.element !== "C" || depiction.atoms[c]?.element !== "C" || depiction.atoms[d]?.element !== "C") continue;
+          const forward = [a.index, b, c, d];
+          const reverse = [...forward].reverse();
+          const key = [forward.join("-"), reverse.join("-")].sort()[0];
+          if (seen.has(key)) continue;
+          seen.add(key);
+          paths.push(forward);
+        }
+      }
+    }
+  }
+  return paths;
+}
+
+/**
+ * Score a reactant->product mapping by the actual [4+2] bond-order migration:
+ * C1=C2-C3=C4 becomes C1-C2=C3-C4. This prevents a symmetry-equivalent
+ * cyclohexadiene mapping from rotating the new product double bond to a
+ * different side of the ring merely because its RMSD is numerically similar.
+ */
+function dielsAlderMappingScore(
+  reference: ParsedDepiction,
+  product: ParsedDepiction,
+  mapping: DepictionMapping,
+): number {
+  let best = 0;
+  for (const path of conjugatedDienePaths(reference)) {
+    const mapped = path.map((atom) => mapping.get(atom));
+    if (mapped.some((atom) => atom === undefined)) continue;
+    const [a, b, c, d] = mapped as number[];
+    if (
+      bondTypeBetweenDepictions(product, a, b) === 1 &&
+      bondTypeBetweenDepictions(product, b, c) === 2 &&
+      bondTypeBetweenDepictions(product, c, d) === 1
+    ) {
+      best = Math.max(best, 100);
+    }
+  }
+  return best;
+}
+
+function compareAlignmentCandidates(left: AlignmentCandidate, right: AlignmentCandidate) {
+  if (left.anchorCount !== right.anchorCount) return right.anchorCount - left.anchorCount;
+  if (left.transform.reflected !== right.transform.reflected) {
+    return Number(left.transform.reflected) - Number(right.transform.reflected);
+  }
+  return left.transform.rmsd - right.transform.rmsd;
+}
+
+type DielsAlderBicycloScaffold = {
+  bridgeheadA: number;
+  bridgeheadD: number;
+  dienePath: [number, number, number, number];
+  preservedBridge: [number, number, number, number];
+  dienophileBridge: [number, number, number, number];
+  substituentCenter: number | null;
+  substituentAtom: number | null;
+};
+
+function canonicalPathKey(path: readonly number[]) {
+  const forward = path.join("-");
+  const reverse = [...path].reverse().join("-");
+  return forward < reverse ? forward : reverse;
+}
+
+function sameUndirectedPath(left: readonly number[], right: readonly number[]) {
+  return canonicalPathKey(left) === canonicalPathKey(right);
+}
+
+function findSimplePathExcluding(
+  depiction: ParsedDepiction,
+  start: number,
+  end: number,
+  blocked: ReadonlySet<number>,
+  requiredNodes: number,
+): number[] | null {
+  const queue: Array<{ atom: number; path: number[] }> = [{ atom: start, path: [start] }];
+  const seen = new Set<string>([`${start}`]);
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    if (current.path.length > requiredNodes) continue;
+    if (current.atom === end) {
+      return current.path.length === requiredNodes ? current.path : null;
+    }
+
+    for (const next of depiction.adjacency[current.atom] ?? []) {
+      if (next !== end && blocked.has(next)) continue;
+      if (current.path.includes(next)) continue;
+      const nextPath = [...current.path, next];
+      const key = nextPath.join("-");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      queue.push({ atom: next, path: nextPath });
+    }
+  }
+
+  return null;
+}
+
+function enumerateTwoAtomBridgePaths(
+  depiction: ParsedDepiction,
+  start: number,
+  end: number,
+): number[][] {
+  const paths: number[][] = [];
+  const seen = new Set<string>();
+  for (const mid1 of depiction.adjacency[start] ?? []) {
+    if (mid1 === end) continue;
+    for (const mid2 of depiction.adjacency[mid1] ?? []) {
+      if (mid2 === start || mid2 === end) continue;
+      if (!hasDepictionBond(depiction, mid2, end)) continue;
+      const path = [start, mid1, mid2, end];
+      const key = canonicalPathKey(path);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      paths.push(path);
+    }
+  }
+  return paths;
+}
+
+function findDielsAlderBicycloScaffold(
+  reference: ParsedDepiction,
+  product: ParsedDepiction,
+  mapping: DepictionMapping,
+): DielsAlderBicycloScaffold | null {
+  for (const referenceDienePath of conjugatedDienePaths(reference)) {
+    const mapped = referenceDienePath.map((atom) => mapping.get(atom));
+    if (mapped.some((atom) => atom === undefined)) continue;
+    const dienePath = mapped as [number, number, number, number];
+    const [a, b, c, d] = dienePath;
+    if (
+      bondTypeBetweenDepictions(product, a, b) !== 1 ||
+      bondTypeBetweenDepictions(product, b, c) !== 2 ||
+      bondTypeBetweenDepictions(product, c, d) !== 1
+    ) {
+      continue;
+    }
+
+    const blocked = new Set<number>([referenceDienePath[1], referenceDienePath[2]]);
+    const referenceBridgePath = findSimplePathExcluding(
+      reference,
+      referenceDienePath[0],
+      referenceDienePath[3],
+      blocked,
+      4,
+    );
+    if (!referenceBridgePath) continue;
+    const mappedBridge = referenceBridgePath.map((atom) => mapping.get(atom));
+    if (mappedBridge.some((atom) => atom === undefined)) continue;
+    const preservedBridge = mappedBridge as [number, number, number, number];
+
+    const candidatePaths = enumerateTwoAtomBridgePaths(product, a, d);
+    const dienophileBridge = candidatePaths.find(
+      (candidate) =>
+        !sameUndirectedPath(candidate, dienePath) &&
+        !sameUndirectedPath(candidate, preservedBridge),
+    ) as [number, number, number, number] | undefined;
+    if (!dienophileBridge) continue;
+
+    const pathAtoms = new Set<number>([
+      ...dienePath,
+      ...preservedBridge,
+      ...dienophileBridge,
+    ]);
+    let substituentCenter: number | null = null;
+    let substituentAtom: number | null = null;
+    for (const center of [dienophileBridge[1], dienophileBridge[2]]) {
+      const extra = (product.adjacency[center] ?? []).find((neighbor) => !pathAtoms.has(neighbor));
+      if (extra !== undefined) {
+        substituentCenter = center;
+        substituentAtom = extra;
+        break;
+      }
+    }
+
+    return {
+      bridgeheadA: a,
+      bridgeheadD: d,
+      dienePath,
+      preservedBridge,
+      dienophileBridge,
+      substituentCenter,
+      substituentAtom,
+    };
+  }
+  return null;
+}
+
+function rewriteV2000AtomCoordinate(line: string, x: number, y: number) {
+  return `${formatMolCoordinate(x)}${formatMolCoordinate(y)}${line.slice(20)}`;
+}
+
+function repositionDielsAlderInternalBridge(
+  molBlock: string,
+  depiction: ParsedDepiction,
+  scaffold: DielsAlderBicycloScaffold,
+) {
+  if (molBlock.includes("V3000")) return null;
+  const lines = molBlock.split(/\r?\n/);
+  if (!lines[3]?.includes("V2000")) return null;
+
+  const atomCount = Number.parseInt(lines[3].slice(0, 3).trim(), 10);
+  if (!Number.isInteger(atomCount)) return null;
+
+  const atom = (index: number) => depiction.atoms[index];
+  const average = (points: Array<{ x: number; y: number }>) => ({
+    x: points.reduce((sum, point) => sum + point.x, 0) / points.length,
+    y: points.reduce((sum, point) => sum + point.y, 0) / points.length,
+  });
+  const mix = (left: { x: number; y: number }, right: { x: number; y: number }, t: number) => ({
+    x: left.x * (1 - t) + right.x * t,
+    y: left.y * (1 - t) + right.y * t,
+  });
+
+  const a = atom(scaffold.bridgeheadA);
+  const d = atom(scaffold.bridgeheadD);
+  const outerCenter = average([
+    atom(scaffold.dienePath[1]),
+    atom(scaffold.dienePath[2]),
+    atom(scaffold.dienophileBridge[1]),
+    atom(scaffold.dienophileBridge[2]),
+  ]);
+
+  const gBase = mix(a, d, 0.33);
+  const hBase = mix(a, d, 0.67);
+  const pull = 0.55;
+  const g = {
+    x: gBase.x + (outerCenter.x - gBase.x) * pull,
+    y: gBase.y + (outerCenter.y - gBase.y) * pull,
+  };
+  const h = {
+    x: hBase.x + (outerCenter.x - hBase.x) * pull,
+    y: hBase.y + (outerCenter.y - hBase.y) * pull,
+  };
+
+  const gIndex = scaffold.preservedBridge[1];
+  const hIndex = scaffold.preservedBridge[2];
+  lines[4 + gIndex] = rewriteV2000AtomCoordinate(lines[4 + gIndex] ?? "", g.x, g.y);
+  lines[4 + hIndex] = rewriteV2000AtomCoordinate(lines[4 + hIndex] ?? "", h.x, h.y);
+  return lines.join("\n");
+}
+
+function setSpecificWedgeBonds(
+  molBlock: string,
+  wedgeBonds: Array<{ center: number; neighbor: number; stereo: 1 | 6 }>,
+) {
+  if (molBlock.includes("V3000")) return null;
+  const lines = molBlock.split(/\r?\n/);
+  if (!lines[3]?.includes("V2000")) return null;
+  const atomCount = Number.parseInt(lines[3].slice(0, 3).trim(), 10);
+  const bondCount = Number.parseInt(lines[3].slice(3, 6).trim(), 10);
+  if (!Number.isInteger(atomCount) || !Number.isInteger(bondCount)) return null;
+  const bondStart = 4 + atomCount;
+
+  const targets = new Map<string, { center: number; neighbor: number; stereo: 1 | 6 }>();
+  for (const bond of wedgeBonds) {
+    targets.set(canonicalPathKey([bond.center, bond.neighbor]), bond);
+  }
+
+  for (let index = 0; index < bondCount; index += 1) {
+    const lineIndex = bondStart + index;
+    const line = lines[lineIndex] ?? "";
+    const atom1 = Number.parseInt(line.slice(0, 3).trim(), 10) - 1;
+    const atom2 = Number.parseInt(line.slice(3, 6).trim(), 10) - 1;
+    const bondType = Number.parseInt(line.slice(6, 9).trim(), 10);
+    if (!Number.isInteger(atom1) || !Number.isInteger(atom2) || atom1 < 0 || atom2 < 0) continue;
+    const target = targets.get(canonicalPathKey([atom1, atom2]));
+    if (!target) {
+      lines[lineIndex] = rewriteV2000BondLine(line, atom1 + 1, atom2 + 1, bondType, 0);
+      continue;
+    }
+    lines[lineIndex] = rewriteV2000BondLine(
+      line,
+      target.center + 1,
+      target.neighbor + 1,
+      bondType,
+      target.stereo,
+    );
+  }
+
+  return lines.join("\n");
+}
+
+function countStereoBondsInMolBlock(molBlock: string) {
+  let wedges = 0;
+  let hashes = 0;
+  for (const line of molBlock.split(/\r?\n/)) {
+    const stereo = Number.parseInt(line.slice(9, 12).trim() || "0", 10);
+    if (stereo === 1) wedges += 1;
+    else if (stereo === 6) hashes += 1;
+  }
+  return { wedges, hashes };
+}
+
+/**
+ * Preserve reaction-map depiction continuity globally.
+ *
+ * Product SMILES deliberately contain chemistry, not drawing coordinates. A
+ * direct SMILES -> SVG round trip therefore lets RDKit rotate or reflect the
+ * product on every reaction. This function instead finds the largest unchanged
+ * heavy-atom scaffold in the user's Ketcher molfile(s), aligns the product's
+ * coordinates to it, and snaps all matched atoms back to the exact user-drawn
+ * coordinates. The transformed molblock is accepted only if reparsing proves
+ * that its canonical isomeric SMILES is unchanged.
+ */
+export async function getReferenceAlignedProductStructure(
+  productSource: string,
+  referenceSources: readonly (string | null | undefined)[],
+): Promise<string | null> {
+  const product = normalizeMoleculeSource(productSource);
+  const references = referenceSources
+    .map((reference) => normalizeMoleculeSource(reference))
+    .filter(Boolean);
+  if (!product || references.length === 0) return null;
+
+  const cacheKey = `aligned-product-structure::${product}::${references.join("||")}`;
+  if (alignedProductStructureCache.has(cacheKey)) {
+    return alignedProductStructureCache.get(cacheKey) ?? null;
+  }
+
+  let productMol: any = null;
+  const temporaryMols: any[] = [];
+  try {
+    const RDKit = await getRDKit();
+    productMol = RDKit.get_mol(product);
+    if (!productMol) return null;
+    const canonicalProduct = productMol.get_smiles?.();
+    if (!looksLikeMolBlock(product)) productMol.set_new_coords?.();
+    const productMolBlock = productMol.get_molblock?.();
+    if (typeof productMolBlock !== "string" || productMolBlock.includes("V3000")) {
+      rememberAlignedStructure(cacheKey, null);
+      return null;
+    }
+    const productDepiction = parseDepiction(productMolBlock);
+    if (!productDepiction) return null;
+
+    const candidates: AlignmentCandidate[] = [];
+    for (const rawReference of references) {
+      let referenceBlock = rawReference;
+      if (!looksLikeMolBlock(referenceBlock)) {
+        const referenceMol = RDKit.get_mol(referenceBlock);
+        if (!referenceMol) continue;
+        temporaryMols.push(referenceMol);
+        referenceMol.set_new_coords?.();
+        const generated = referenceMol.get_molblock?.();
+        if (typeof generated !== "string") continue;
+        referenceBlock = generated;
+      }
+      const referenceDepiction = parseDepiction(referenceBlock);
+      if (!referenceDepiction) continue;
+      const mappings = mappingCandidatesWithBoundaryPruning(referenceDepiction, productDepiction);
+      for (const mapping of mappings) {
+        for (const reflected of [false, true]) {
+          const transform = fitSimilarityTransform(referenceDepiction, productDepiction, mapping, reflected);
+          if (!transform) continue;
+          candidates.push({ reference: referenceBlock, mapping, transform, anchorCount: mapping.size });
+        }
+      }
+    }
+
+    candidates.sort(compareAlignmentCandidates);
+    for (const candidate of candidates) {
+      const referenceDepiction = parseDepiction(candidate.reference);
+      if (!referenceDepiction) continue;
+
+      // Reflection changes the handedness of a 2-D depiction. Swap wedge/hash
+      // codes first, then verify molecular identity. If RDKit encodes a center
+      // in a way that does not require this swap, the second attempt covers it.
+      const reflectionAttempts = candidate.transform.reflected ? [true, false] : [false];
+      for (const swapWedges of reflectionAttempts) {
+        let aligned = rewriteV2000Coordinates(
+          productMolBlock,
+          productDepiction,
+          referenceDepiction,
+          candidate.mapping,
+          candidate.transform,
+          swapWedges,
+        );
+        if (!aligned) continue;
+        if (looksLikeMolBlock(candidate.reference)) {
+          aligned = transferMappedReferenceStereoBonds(
+            aligned,
+            candidate.reference,
+            candidate.mapping,
+          ) ?? aligned;
+        }
+
+        const verificationMol = RDKit.get_mol(aligned);
+        if (!verificationMol) continue;
+        try {
+          const canonicalAligned = verificationMol.get_smiles?.();
+          if (
+            typeof canonicalProduct === "string" &&
+            typeof canonicalAligned === "string" &&
+            canonicalProduct !== canonicalAligned
+          ) {
+            continue;
+          }
+          rememberAlignedStructure(cacheKey, aligned);
+          return aligned;
+        } finally {
+          verificationMol.delete?.();
+        }
+      }
+    }
+
+    rememberAlignedStructure(cacheKey, null);
+    return null;
+  } catch (error) {
+    console.warn("Reference-preserving product alignment failed; using standard depiction.", error);
+    rememberAlignedStructure(cacheKey, null);
+    return null;
+  } finally {
+    productMol?.delete?.();
+    for (const mol of temporaryMols) mol?.delete?.();
+  }
+}
+
+/**
+ * Diels-Alder depiction is reaction-aware rather than a generic SMILES redraw.
+ * It preserves the cyclic diene coordinates and specifically maps the diene's
+ * original C=C-C=C path onto the product C-C=C-C path. This locks the migrated
+ * double bond to the chemically corresponding side of the student's drawing.
+ *
+ * The selected stereoisomer is generated upstream; this renderer only preserves
+ * its molblock wedge choices and coordinates. It never invents chirality.
+ */
+export async function getDielsAlderBicyclicSvg(
+  productSource: string,
+  referenceSources: readonly (string | null | undefined)[],
+): Promise<string | null> {
+  const product = normalizeMoleculeSource(productSource);
+  const references = referenceSources
+    .map((reference) => normalizeMoleculeSource(reference))
+    .filter(Boolean);
+  if (!product) return null;
+  if (references.length === 0) return getHeavyAtomStereoSvg(product);
+
+  let productMol: any = null;
+  const temporaryMols: any[] = [];
+  try {
+    const RDKit = await getRDKit();
+    productMol = RDKit.get_mol(product);
+    if (!productMol) return getHeavyAtomStereoSvg(product);
+    const canonicalProduct = productMol.get_smiles?.();
+    if (!looksLikeMolBlock(product)) productMol.set_new_coords?.();
+    const productMolBlock = productMol.get_molblock?.();
+    if (typeof productMolBlock !== "string" || productMolBlock.includes("V3000")) {
+      return getHeavyAtomStereoSvg(product);
+    }
+    const productDepiction = parseDepiction(productMolBlock);
+    if (!productDepiction) return getHeavyAtomStereoSvg(product);
+
+    const candidates: Array<AlignmentCandidate & { reactionScore: number }> = [];
+    for (const rawReference of references) {
+      let referenceBlock = rawReference;
+      if (!looksLikeMolBlock(referenceBlock)) {
+        const referenceMol = RDKit.get_mol(referenceBlock);
+        if (!referenceMol) continue;
+        temporaryMols.push(referenceMol);
+        referenceMol.set_new_coords?.();
+        const generated = referenceMol.get_molblock?.();
+        if (typeof generated !== "string") continue;
+        referenceBlock = generated;
+      }
+      const referenceDepiction = parseDepiction(referenceBlock);
+      if (!referenceDepiction || conjugatedDienePaths(referenceDepiction).length === 0) continue;
+      for (const mapping of mappingCandidatesWithBoundaryPruning(referenceDepiction, productDepiction)) {
+        const reactionScore = dielsAlderMappingScore(referenceDepiction, productDepiction, mapping);
+        if (reactionScore <= 0) continue;
+        // Never mirror the diene depiction for the representative card. The
+        // mirror enantiomer remains a chemical mixture member upstream.
+        const transform = fitSimilarityTransform(referenceDepiction, productDepiction, mapping, false);
+        if (!transform) continue;
+        candidates.push({ reference: referenceBlock, mapping, transform, anchorCount: mapping.size, reactionScore });
+      }
+    }
+
+    candidates.sort((left, right) =>
+      right.reactionScore - left.reactionScore || compareAlignmentCandidates(left, right),
+    );
+
+    for (const candidate of candidates) {
+      const referenceDepiction = parseDepiction(candidate.reference);
+      if (!referenceDepiction) continue;
+      const scaffold = findDielsAlderBicycloScaffold(
+        referenceDepiction,
+        productDepiction,
+        candidate.mapping,
+      );
+      if (!scaffold) continue;
+
+      let aligned = rewriteV2000Coordinates(
+        productMolBlock,
+        productDepiction,
+        referenceDepiction,
+        candidate.mapping,
+        candidate.transform,
+        false,
+      );
+      if (!aligned) continue;
+      aligned = repositionDielsAlderInternalBridge(aligned, productDepiction, scaffold) ?? aligned;
+
+      const wedgeSpecs = [
+        { center: scaffold.bridgeheadA, neighbor: scaffold.preservedBridge[1], stereo: 1 as const },
+        { center: scaffold.bridgeheadD, neighbor: scaffold.preservedBridge[2], stereo: 1 as const },
+      ];
+      if (scaffold.substituentCenter !== null && scaffold.substituentAtom !== null) {
+        wedgeSpecs.push({
+          center: scaffold.substituentCenter,
+          neighbor: scaffold.substituentAtom,
+          stereo: 1 as const,
+        });
+      }
+
+      const wedgeTrials: Array<Array<1 | 6>> = [
+        wedgeSpecs.map(() => 1 as const),
+        wedgeSpecs.map(() => 6 as const),
+      ];
+
+      for (const stereos of wedgeTrials) {
+        const presentation = setSpecificWedgeBonds(
+          aligned,
+          wedgeSpecs.map((bond, index) => ({ ...bond, stereo: stereos[index] })),
+        );
+        if (!presentation) continue;
+        const verificationMol = RDKit.get_mol(presentation);
+        if (!verificationMol) continue;
+        try {
+          const canonicalAligned = verificationMol.get_smiles?.();
+          if (
+            typeof canonicalProduct === "string" &&
+            typeof canonicalAligned === "string" &&
+            canonicalProduct !== canonicalAligned
+          ) {
+            continue;
+          }
+          const counts = countStereoBondsInMolBlock(presentation);
+          if (stereos.every((stereo) => stereo === 1) && counts.wedges < wedgeSpecs.length) {
+            continue;
+          }
+          return getHeavyAtomStereoSvg(presentation);
+        } finally {
+          verificationMol.delete?.();
+        }
+      }
+    }
+
+    // If the reaction-specific map cannot be proven, fall back to the global
+    // scaffold-preserving layer instead of inventing a projection.
+    const genericAligned = await getReferenceAlignedProductStructure(product, references);
+    return genericAligned
+      ? getHeavyAtomStereoSvg(genericAligned)
+      : getHeavyAtomStereoSvg(product);
+  } catch (error) {
+    console.warn("Diels-Alder reaction-aware depiction failed; using verified fallback.", error);
+    return getHeavyAtomStereoSvg(product);
+  } finally {
+    productMol?.delete?.();
+    for (const mol of temporaryMols) mol?.delete?.();
+  }
+}
+
+/**
  * Render a user-authored structure without regenerating its 2-D coordinates.
  * This preserves Ketcher's scaffold orientation and the specific bond that the
  * student used for wedge/dash depiction. The chemical stereochemistry is still
@@ -206,7 +1314,7 @@ function looksLikeMolBlock(source: string): boolean {
 export async function getPreservedMolfileSvg(
   molfile: string | null | undefined,
 ): Promise<string | null> {
-  const source = molfile?.trim() ?? "";
+  const source = normalizeMoleculeSource(molfile);
   if (!source) return null;
 
   const cacheKey = `preserved-molfile::${source}`;
@@ -241,7 +1349,7 @@ async function getVicinalDiolStereoSvg(
   smiles: string,
   mode: VicinalDiolFaceMode,
 ): Promise<string | null> {
-  const trimmed = smiles.trim();
+  const trimmed = normalizeMoleculeSource(smiles);
   const cacheKey = `${mode}-diol::${trimmed}`;
   if (!trimmed) return null;
   if (moleculeSvgCache.has(cacheKey)) {
@@ -448,7 +1556,7 @@ function tetrahedralPerspectiveMolBlock(
 export async function getTetrahedralPerspectiveSvg(
   smiles: string,
 ): Promise<string | null> {
-  const trimmed = smiles.trim();
+  const trimmed = normalizeMoleculeSource(smiles);
   const cacheKey = `tetrahedral-perspective::${trimmed}`;
   if (!trimmed) return null;
   if (moleculeSvgCache.has(cacheKey)) {
@@ -647,7 +1755,7 @@ function explicitAlcoholStereoMolBlock(
 export async function getExplicitAlcoholStereoSvg(
   smiles: string,
 ): Promise<string | null> {
-  const trimmed = smiles.trim();
+  const trimmed = normalizeMoleculeSource(smiles);
   if (!trimmed) return null;
 
   const cacheKey = `explicit-alcohol-stereo::${trimmed}`;
@@ -876,7 +1984,7 @@ function transferReferenceStereoBondsToProduct(
 export async function getHeavyAtomStereoSvg(
   smiles: string,
 ): Promise<string | null> {
-  const trimmed = smiles.trim();
+  const trimmed = normalizeMoleculeSource(smiles);
   if (!trimmed) return null;
   const cacheKey = `heavy-atom-stereo::${trimmed}`;
   if (moleculeSvgCache.has(cacheKey)) {
@@ -890,7 +1998,10 @@ export async function getHeavyAtomStereoSvg(
     sourceMol = RDKit.get_mol(trimmed);
     if (!sourceMol) return getMoleculeSvg(trimmed);
     const canonical = sourceMol.get_smiles?.();
-    sourceMol.set_new_coords?.();
+    // A pre-aligned molblock already contains the product coordinates chosen
+    // to preserve the user's reactant depiction. Regenerate coordinates only
+    // for a raw SMILES input.
+    if (!looksLikeMolBlock(trimmed)) sourceMol.set_new_coords?.();
     const block = sourceMol.get_molblock?.();
     if (typeof block !== "string") return getMoleculeSvg(trimmed);
 
@@ -916,8 +2027,8 @@ export async function getAlignedStereoSvg(
   smiles: string,
   referenceSmiles: string | null | undefined,
 ): Promise<string | null> {
-  const product = smiles.trim();
-  const reference = referenceSmiles?.trim() ?? "";
+  const product = normalizeMoleculeSource(smiles);
+  const reference = normalizeMoleculeSource(referenceSmiles);
   if (!product) return null;
   if (!reference) return getMoleculeSvg(product);
 
@@ -1019,7 +2130,7 @@ function halogenAtomLabelOverridesFromMolBlock(molBlock: string): Record<string,
 }
 
 export async function getGenericHalogenSvg(smiles: string): Promise<string | null> {
-  const trimmed = smiles.trim();
+  const trimmed = normalizeMoleculeSource(smiles);
   if (!trimmed) return null;
 
   const cacheKey = `generic-halogen::${trimmed}`;
@@ -1071,8 +2182,8 @@ export async function getAlignedGenericHalogenSvg(
   smiles: string,
   referenceSmiles: string | null | undefined,
 ): Promise<string | null> {
-  const product = smiles.trim();
-  const reference = referenceSmiles?.trim() ?? "";
+  const product = normalizeMoleculeSource(smiles);
+  const reference = normalizeMoleculeSource(referenceSmiles);
   if (!product) return null;
   if (!reference) return getGenericHalogenSvg(product);
 
@@ -1446,7 +2557,7 @@ function condensedSulfonateMolBlock(
 export async function getCondensedSulfonateSvg(
   smiles: string,
 ): Promise<string | null> {
-  const trimmed = smiles.trim();
+  const trimmed = normalizeMoleculeSource(smiles);
   if (!trimmed) return null;
 
   const cacheKey = `condensed-sulfonate::${trimmed}`;

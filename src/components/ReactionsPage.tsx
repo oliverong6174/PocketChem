@@ -15,6 +15,7 @@ import {
   type HalogenSymbol,
 } from "../utils/reactions/profiles/halogens";
 import { rendererForReactionDisplay } from "./reactionProductRenderer";
+import { getTextbookBicyclo222DielsAlderSvg } from "../utils/stereochemistry/dielsAlderTextbookSvg";
 
 import {
   predictReactionPathways,
@@ -411,23 +412,43 @@ export default function ReactionsPage({
         }
 
         if (pathway.productVariants.length > 0) {
+          const preservedReferenceStructures =
+            reactantComponents.length === 1 && reactionMolfile
+              ? [reactionMolfile]
+              : reactionComponentMolfiles.length > 0
+                ? reactionComponentMolfiles
+                : [];
+
           const productSvg = rendererForReactionDisplay(pathway.display, {
             allowGenericHalogen: shouldRenderGenericHalogen(pathway),
             referenceSmiles:
               pathway.reactantComponents[0] ??
               pathway.reactantSmiles.split(".").find(Boolean) ??
               null,
-            referenceStructure:
-              reactionMolfile && reactantComponents.length === 1
-                ? reactionMolfile
-                : reactionComponentMolfiles[0] ?? null,
+            referenceStructure: preservedReferenceStructures[0] ?? null,
+            // Do not assume component 0 is the scaffold that survives into a
+            // product. Multi-reactant reactions can preserve any component.
+            referenceStructures: preservedReferenceStructures,
+            referenceSmilesList: reactantComponents,
           });
 
           nextProducts[pathway.id] = await Promise.all(
             pathway.productVariants
               .map(async (variant) => (
                 await Promise.all(
-                  variant.componentSmiles.map((component) => productSvg(component)),
+                  variant.componentSmiles.map(async (component) => {
+                    // Cyclic-diene Diels-Alder products with a bicyclo[2.2.2]
+                    // core use a deterministic graph-built textbook projection.
+                    // This intentionally bypasses both the legacy alignment
+                    // renderer and the newer generic mechanistic boundary,
+                    // because both can preserve a chemically valid but visually
+                    // collapsed RDKit bicyclic depiction.
+                    if (pathway.ruleId === "diene-diels-alder") {
+                      const textbook = await getTextbookBicyclo222DielsAlderSvg(component);
+                      if (textbook) return textbook;
+                    }
+                    return productSvg(component);
+                  }),
                 )
               ).filter((svg): svg is string => Boolean(svg))),
           );
@@ -506,7 +527,16 @@ export default function ReactionsPage({
       // it directly to V3000 + canonical SMILES without changing depiction.
       const snapshot = await readKetcherStructureSnapshot(ketcher);
       if (!snapshot) throw new Error("Ketcher returned an empty/unsupported KET structure.");
-      return { smiles: snapshot.smiles, molfile: snapshot.molfile, componentMolfiles: snapshot.componentMolfiles, svg: snapshot.svg };
+      // The shared KET snapshot intentionally stores molecular coordinates,
+      // not a renderer-specific SVG string. Re-rendering that preserved V3000
+      // molfile keeps the exact Ketcher geometry while avoiding a stale/undefined
+      // SVG field on the snapshot type.
+      return {
+        smiles: snapshot.smiles,
+        molfile: snapshot.molfile,
+        componentMolfiles: snapshot.componentMolfiles,
+        svg: null,
+      };
     } catch (error) {
       console.error("Ketcher could not export reaction structure:", error);
       setReactionError(

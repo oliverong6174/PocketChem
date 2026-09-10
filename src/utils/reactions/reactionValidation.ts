@@ -137,6 +137,87 @@ export function validateReactionRegistry(
       }
     }
 
+    const mechanismProfile = rule.mechanismProfile;
+    if (mechanismProfile) {
+      if (mechanismProfile.steps.length === 0) {
+        issues.push({ ruleId, message: "Mechanism profile must contain at least one step." });
+      }
+
+      if (mechanismProfile.family === "pericyclic-4+2") {
+        const cycloaddition = mechanismProfile.steps.find((step) => step.type === "cycloaddition");
+        if (!cycloaddition?.concerted || cycloaddition.stereochemicalConsequence !== "suprafacial") {
+          issues.push({
+            ruleId,
+            message: "A pericyclic-4+2 mechanism must contain a concerted suprafacial cycloaddition step.",
+          });
+        }
+      }
+
+      if (mechanismProfile.family === "epoxidation-opening-sequence") {
+        const epoxidation = mechanismProfile.steps.some((step) => step.type === "epoxide-formation");
+        const opening = mechanismProfile.steps.find((step) => step.type === "epoxide-opening");
+        if (!epoxidation || opening?.stereochemicalConsequence !== "anti") {
+          issues.push({
+            ruleId,
+            message: "Epoxidation/opening sequences must encode epoxide formation followed by anti opening.",
+          });
+        }
+      }
+    }
+
+    const stereochemistry = rule.selectivityProfile?.stereochemistry;
+    if (stereochemistry) {
+      if (
+        stereochemistry.mode === "syn-addition" &&
+        stereochemistry.relativeRelationship !== "syn"
+      ) {
+        issues.push({
+          ruleId,
+          message: "syn-addition must declare a syn relative stereochemical relationship.",
+        });
+      }
+
+      if (
+        stereochemistry.mode === "anti-addition" &&
+        stereochemistry.relativeRelationship !== "anti"
+      ) {
+        issues.push({
+          ruleId,
+          message: "anti-addition must declare an anti relative stereochemical relationship.",
+        });
+      }
+
+      if (
+        stereochemistry.mode === "inversion" &&
+        stereochemistry.attackMode !== "backside"
+      ) {
+        issues.push({
+          ruleId,
+          message: "Inversion metadata must declare backside attack.",
+        });
+      }
+
+      if (
+        stereochemistry.mode === "suprafacial" &&
+        stereochemistry.attackMode !== "concerted"
+      ) {
+        issues.push({
+          ruleId,
+          message: "Suprafacial pericyclic metadata must declare a concerted attack mode.",
+        });
+      }
+
+      if (
+        stereochemistry.mode === "racemization" &&
+        rule.selectivityProfile?.mixture === "single"
+      ) {
+        issues.push({
+          ruleId,
+          message: "A racemization rule cannot declare a single stereochemical product.",
+        });
+      }
+    }
+
     if (rule.competition) {
       if (!rule.competition.group.trim()) {
         issues.push({ ruleId, message: "Competition group is empty." });

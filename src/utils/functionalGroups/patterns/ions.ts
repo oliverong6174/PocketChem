@@ -162,7 +162,10 @@ export const chargedGroups: FunctionalGroupPattern[] = [
     confidence: "High",
     suffix: "amide anion",
     prefix: "amido",
-    smarts: "[#7-]",
+    // Exclude azide resonance nitrogens (N− directly bonded to N+). The old
+    // [#7-] pattern classified every organic azide product as an "amide anion",
+    // which then hijacked nomenclature and produced the label "amide".
+    smarts: "[#7-;!$([#7-]~[#7+])]",
     displaySmarts: "[N-]",
     mcatNote:
       "Amide anions are extremely strong bases and strong nucleophiles.",

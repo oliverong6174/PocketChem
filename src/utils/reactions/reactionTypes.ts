@@ -132,7 +132,7 @@ export type SubstitutionHandlerMode =
   | "aromaticBenzyneAmination";
 
 export type EliminationHandlerMode = "betaElimination" | "e1" | "e2";
-export type CarbonylHandlerMode = "oximeFormation";
+export type CarbonylHandlerMode = "oximeFormation" | "imineHydrolysis";
 export type OxidationHandlerMode =
   | "alcoholOxidation"
   | "aldehydeOxidation"
@@ -184,8 +184,23 @@ export type StereochemicalMode =
   | "racemization"
   | "syn-addition"
   | "anti-addition"
+  | "suprafacial"
   | "e-preferred"
   | "z-preferred";
+
+export type RelativeStereochemicalRelationship = "syn" | "anti";
+
+export type StereochemicalAttackMode =
+  | "frontside"
+  | "backside"
+  | "either"
+  | "concerted";
+
+export type StereochemicalFaceSelection =
+  | "both-equivalent"
+  | "substrate-controlled"
+  | "less-hindered"
+  | "single-mechanistic-face";
 
 export type ReactionSitePreference =
   | "most-substituted-alkene"
@@ -208,7 +223,8 @@ export type ReactionDisplayRenderer =
   | "explicit-alcohol-stereo"
   | "aligned-stereo"
   | "aligned-generic-halogen"
-  | "heavy-atom-stereo";
+  | "heavy-atom-stereo"
+  | "diels-alder-bicyclic";
 
 export type ReactionSeriesMetadata = {
   /** Stable chemistry-series identifier; UI grouping must use this, not text/IDs. */
@@ -221,6 +237,8 @@ export type ReactionSeriesMetadata = {
 
 export type ReactionDisplayMetadata = {
   renderer?: ReactionDisplayRenderer;
+  /** Keep unchanged reactant geometry as the source of truth for product depiction. */
+  preserveReactantOrientation?: boolean;
   series?: ReactionSeriesMetadata;
 };
 
@@ -277,11 +295,77 @@ export type RegiochemicalMode =
  * field remains the human-facing explanation; this profile is what the
  * reaction and synthesis engines should use for chemistry decisions.
  */
+export type MechanismStepType =
+  | "protonation"
+  | "deprotonation"
+  | "nucleophilic-attack"
+  | "leaving-group-departure"
+  | "bond-formation"
+  | "bond-cleavage"
+  | "pi-bond-shift"
+  | "epoxide-formation"
+  | "epoxide-opening"
+  | "cycloaddition"
+  | "rearrangement"
+  | "oxidation"
+  | "reduction";
+
+export type MechanismStep = {
+  type: MechanismStepType;
+  label: string;
+  concerted?: boolean;
+  reversible?: boolean;
+  stereochemicalConsequence?:
+    | "retention"
+    | "inversion"
+    | "syn"
+    | "anti"
+    | "suprafacial"
+    | "racemization"
+    | "none";
+};
+
+export type RelativeStereoPostcondition = {
+  /** Product SMARTS containing the two substituent bonds to compare. */
+  smarts: string;
+  /** Match-array positions for the first substituent bond. */
+  firstBond: readonly [number, number];
+  /** Match-array positions for the second substituent bond. */
+  secondBond: readonly [number, number];
+  relationship: "syn" | "anti";
+};
+
+export type ReactionMechanismProfile = {
+  /** Stable mechanistic family used by validators and future mechanism UI. */
+  family:
+    | "sn1"
+    | "sn2"
+    | "e1"
+    | "e2"
+    | "electrophilic-addition"
+    | "epoxide-opening"
+    | "epoxidation-opening-sequence"
+    | "pericyclic-4+2"
+    | "carbonyl-addition-elimination"
+    | "other";
+  steps: MechanismStep[];
+  /** Generic graph-level checks applied to every generated product. */
+  productPostconditions?: {
+    relativeStereo?: RelativeStereoPostcondition[];
+  };
+};
+
 export type ReactionSelectivityProfile = {
   stereochemistry?: {
     mode: StereochemicalMode;
     stereospecific?: boolean;
     stereoselective?: boolean;
+    /** Mechanistic relationship between the groups installed/compared. */
+    relativeRelationship?: RelativeStereochemicalRelationship;
+    /** How the stereochemistry is created at the reaction center. */
+    attackMode?: StereochemicalAttackMode;
+    /** Whether both faces are equivalent or the substrate/framework controls approach. */
+    faceSelection?: StereochemicalFaceSelection;
   };
   regiochemistry?: {
     mode: RegiochemicalMode;
@@ -405,6 +489,8 @@ export type ReactionRule = {
   course?: OrganicChemCourse;
   chapter?: string;
   mechanism?: string;
+  /** Machine-readable mechanism used to enforce cross-substrate chemistry invariants. */
+  mechanismProfile?: ReactionMechanismProfile;
   reactionClass?: string;
   purpose?: ReactionPurpose;
   selectivity?: string[];

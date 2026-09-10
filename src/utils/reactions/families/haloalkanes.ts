@@ -138,7 +138,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "Intramolecular SN2",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
     selectivity: [
@@ -174,7 +174,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
     selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
@@ -206,7 +206,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
     selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
@@ -249,7 +249,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     productStatus: "computed",
     mechanism: "SN2 cyanide substitution → organometallic addition to nitrile → imine hydrolysis",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
     selectivity: [
@@ -279,7 +279,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
     selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
@@ -310,7 +310,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
     selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
@@ -342,7 +342,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
     limitations: [
@@ -380,7 +380,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
     selectivity: ["Backside attack", "Inversion at a reacting stereocenter"],
@@ -419,7 +419,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
     constraints: ["sn2-electrophile-accessible"],
@@ -455,7 +455,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN1",
     selectivityProfile: {
-      stereochemistry: { mode: "racemization" },
+      stereochemistry: { mode: "racemization", attackMode: "either" },
       mixture: "possible",
       allowsRearrangement: true,
     },
@@ -494,7 +494,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN1",
     selectivityProfile: {
-      stereochemistry: { mode: "racemization" },
+      stereochemistry: { mode: "racemization", attackMode: "either" },
       mixture: "possible",
       allowsRearrangement: true,
     },
@@ -537,7 +537,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN1",
     selectivityProfile: {
-      stereochemistry: { mode: "racemization" },
+      stereochemistry: { mode: "racemization", attackMode: "either" },
       mixture: "possible",
       allowsRearrangement: false,
     },
@@ -573,7 +573,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN1",
     selectivityProfile: {
-      stereochemistry: { mode: "racemization" },
+      stereochemistry: { mode: "racemization", attackMode: "either" },
       mixture: "possible",
       allowsRearrangement: false,
     },
@@ -850,7 +850,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     productStatus: "computed",
     mechanism: "SN2 alkylation followed by imide cleavage",
     selectivityProfile: {
-      stereochemistry: { mode: "inversion", stereospecific: true },
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
     limitations: ["Best for methyl and primary alkyl halides; secondary/tertiary substrates favor competing elimination or fail SN2."],

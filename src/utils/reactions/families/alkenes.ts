@@ -136,7 +136,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
-      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
       mixture: "possible",
       allowsRearrangement: false,
     },
@@ -237,7 +237,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "representative",
     selectivityProfile: {
-      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", stereospecific: true },
       sitePreference: "most-substituted-alkene",
       mixture: "possible",
       allowsRearrangement: false,
@@ -268,7 +268,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     productStatus: "computed",
     selectivityProfile: {
       sitePreference: "most-substituted-alkene",
-      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,
@@ -313,7 +313,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     productStatus: "computed",
     selectivityProfile: {
       sitePreference: "most-substituted-alkene",
-      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,
@@ -386,7 +386,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     productStatus: "representative",
     selectivityProfile: {
       sitePreference: "least-substituted-alkene",
-      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
       regiochemistry: { mode: "anti-markovnikov", regioselective: true },
       mixture: "possible",
       allowsRearrangement: false,
@@ -487,7 +487,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "representative",
     selectivityProfile: {
-      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
       mixture: "possible",
       allowsRearrangement: false,
     },
@@ -512,7 +512,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
-      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
       mixture: "possible",
       allowsRearrangement: false,
     },
@@ -537,7 +537,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
-      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
       mixture: "possible",
       allowsRearrangement: false,
     },
@@ -562,7 +562,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "representative",
     selectivityProfile: {
-      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
       sitePreference: "most-substituted-alkene",
       mixture: "possible",
       allowsRearrangement: false,
@@ -583,7 +583,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     reagentNote: "Draw the alkene and the alcohol nucleophile as disconnected structures",
     productHint: "Anti β-alkoxy alcohol",
     explanation:
-      "The alkene is first converted stereospecifically to an epoxide. Under acidic conditions a drawn alcohol opens the protonated epoxide by backside attack, installing that alcohol's OR group anti to the oxygen-derived OH. Tertiary epoxide carbons are favored electronically; otherwise steric accessibility becomes increasingly important.",
+      "The alkene is first converted stereospecifically to an epoxide. Under acidic conditions a drawn alcohol opens the protonated epoxide by backside attack at the more substituted epoxide carbon, installing that alcohol's OR group anti to the oxygen-derived OH.",
     trigger: alkeneTrigger,
     additionalReactants: [
       {
@@ -604,9 +604,41 @@ export const alkeneReactionRules: ReactionRule[] = [
       options: { mode: "epoxidationAcidicAlcoholOpening" },
     },
     productStatus: "computed",
-    display: { renderer: "aligned-stereo" },
+    display: { renderer: "aligned-stereo", preserveReactantOrientation: true },
+    mechanismProfile: {
+      family: "epoxidation-opening-sequence",
+      steps: [
+        {
+          type: "epoxide-formation",
+          label: "Concerted peracid oxygen transfer to the alkene",
+          concerted: true,
+          stereochemicalConsequence: "retention",
+        },
+        {
+          type: "protonation",
+          label: "Protonation of the epoxide oxygen",
+          reversible: true,
+          stereochemicalConsequence: "none",
+        },
+        {
+          type: "epoxide-opening",
+          label: "Backside ROH attack at the more substituted epoxide carbon",
+          stereochemicalConsequence: "anti",
+        },
+      ],
+      productPostconditions: {
+        relativeStereo: [
+          {
+            smarts: "[C;R;X4:1]([O;H1;+0:2])-[C;R;X4:3]([O;H0;+0:4][#6:5])",
+            firstBond: [0, 1],
+            secondBond: [2, 3],
+            relationship: "anti",
+          },
+        ],
+      },
+    },
     selectivityProfile: {
-      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       sitePreference: "most-substituted-alkene",
       mixture: "expected",
       allowsRearrangement: false,
@@ -614,7 +646,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     selectivity: [
       "Epoxidation preserves the alkene's relative stereochemistry.",
       "Acidic epoxide opening is backside/anti.",
-      "A tertiary epoxide carbon is attacked preferentially; for primary/secondary pairs steric accessibility can favor the less substituted carbon.",
+      "Acidic opening favors attack at the more substituted epoxide carbon; equal-substitution cases remain genuine alternatives.",
       "The OR group is taken from the alcohol actually drawn by the user; methanol therefore gives OMe, ethanol gives OEt, and so on.",
     ],
     priority: 173,
@@ -644,7 +676,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     },
     productStatus: "computed",
     selectivityProfile: {
-      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", stereospecific: true },
       sitePreference: "most-substituted-alkene",
       mixture: "possible",
       allowsRearrangement: false,
@@ -680,7 +712,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     mechanism: "Syn dihydroxylation",
     selectivityProfile: {
       sitePreference: "most-substituted-alkene",
-      stereochemistry: { mode: "syn-addition", stereospecific: true },
+      stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
       mixture: "expected",
       allowsRearrangement: false,
     },
@@ -707,7 +739,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     productStatus: "computed",
     selectivityProfile: {
       sitePreference: "most-substituted-alkene",
-      stereochemistry: { mode: "anti-addition", stereospecific: true },
+      stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", stereospecific: true },
       mixture: "expected",
       allowsRearrangement: false,
     },

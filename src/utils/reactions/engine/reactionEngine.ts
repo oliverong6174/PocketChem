@@ -202,10 +202,11 @@ function sharedMixtureDisplayName(
   const bases = uniqueNames.map(stripLeadingStereoDescriptor);
   const sameBase = Boolean(bases[0]) && bases.every((base) => base === bases[0]);
 
-  // A pair of enantiomers is cleanly represented by the conventional rac-
-  // prefix. The individual R/S structures remain stored in memberSmiles.
+  // The reaction card already carries an explicit racemate badge, so the
+  // product name itself stays as the neutral base name instead of duplicating
+  // that information with a leading rac- prefix.
   if (kind === "racemic" && sameBase) {
-    return `rac-${bases[0]}`;
+    return bases[0];
   }
 
   // Diastereomers are NOT interchangeable. If PocketChem knows their exact

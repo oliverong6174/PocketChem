@@ -145,6 +145,20 @@ export const NOMENCLATURE_REGRESSION_CASES: NomenclatureRegressionCase[] = [
   { id: "methoxymethane", smiles: "COC", expectedNames: ["methoxymethane", "dimethyl ether"] },
   { id: "nitroethane", smiles: "CC[N+](=O)[O-]", expectedNames: ["nitroethane"] },
   {
+    id: "adjacent-bromo-chloro-nitrobenzene-lowest-locants",
+    smiles: "Clc1c([N+](=O)[O-])c(Br)ccc1",
+    expectedNames: ["1-bromo-3-chloro-2-nitrobenzene"],
+    forbiddenNames: ["6-bromo-2-chloro-4-nitrobenzene", "2-bromo-6-chloro-1-nitrobenzene"],
+    note: "Prefix-only benzene numbering must use the lowest set of locants before element-based heuristics.",
+  },
+  {
+    id: "aryl-azide-not-amide-or-diazo",
+    smiles: "[N-]=[N+]=Nc1c([N+](=O)[O-])c(Br)ccc1",
+    expectedNames: ["1-azido-3-bromo-2-nitrobenzene"],
+    forbiddenNames: ["amide", "2-diazo-6-bromo-1-nitrobenzene"],
+    note: "Organic azide resonance charges must not be classified as an amide anion, and N-N-N must be recognized before diazo.",
+  },
+  {
     id: "prefix-alphabetization",
     smiles: "CC(C)(C)C(CC)CC",
     expectedNames: ["3-ethyl-2,2-dimethylpentane"],

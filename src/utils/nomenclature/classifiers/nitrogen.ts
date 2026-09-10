@@ -95,6 +95,29 @@ export function getNitrogenSubstituentPrefix(
   });
   if (isocyanideBond) return "isocyano";
 
+  // Detect an N-N-N chain before the generic N=N azo/diazo branch. Organic
+  // azides are commonly represented as R-N=N+=N−, so checking the multiple
+  // N-N bond first incorrectly called an azido substituent "diazo".
+  const nextNitrogen = bonds
+    .map((bond) => getOtherAtom(bond, nitrogenIndex))
+    .find(
+      (attached) =>
+        attached !== parentAtom && parsedMol.atoms[attached]?.element === "N"
+    );
+
+  if (
+    nextNitrogen !== undefined &&
+    (parsedMol.atoms[nextNitrogen]?.charge ?? 0) > 0
+  ) {
+    const hasThirdNitrogen = (parsedMol.adjacency.get(nextNitrogen) ?? []).some(
+      (bond) => {
+        const attached = getOtherAtom(bond, nextNitrogen);
+        return attached !== nitrogenIndex && parsedMol.atoms[attached]?.element === "N";
+      }
+    );
+    if (hasThirdNitrogen) return "azido";
+  }
+
   const nnMultipleBond = bonds.find((bond) => {
     const attached = getOtherAtom(bond, nitrogenIndex);
     return (
@@ -113,23 +136,6 @@ export function getNitrogenSubstituentPrefix(
       }
     );
     return continuesToCarbon ? "azo" : "diazo";
-  }
-
-  const nextNitrogen = bonds
-    .map((bond) => getOtherAtom(bond, nitrogenIndex))
-    .find(
-      (attached) =>
-        attached !== parentAtom && parsedMol.atoms[attached]?.element === "N"
-    );
-
-  if (nextNitrogen !== undefined) {
-    const hasThirdNitrogen = (parsedMol.adjacency.get(nextNitrogen) ?? []).some(
-      (bond) => {
-        const attached = getOtherAtom(bond, nextNitrogen);
-        return attached !== nitrogenIndex && parsedMol.atoms[attached]?.element === "N";
-      }
-    );
-    if (hasThirdNitrogen) return "azido";
   }
 
   return isSimpleAmineNitrogen(parsedMol, nitrogenIndex) ? "amino" : "amino";

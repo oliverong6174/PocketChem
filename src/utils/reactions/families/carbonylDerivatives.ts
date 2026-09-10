@@ -108,10 +108,20 @@ export const carbonylDerivativeReactionRules: ReactionRule[] = [
       excludedFunctionalGroups: ["Hydrazone", "Aldoxime", "Ketoxime", "Aminoxime"],
     },
     transform: {
-      type: "reactionSmarts",
-      smarts: "[C:1]=[N:2]>>[C:1]=O.[N:2]",
+      type: "customHandler",
+      handler: "carbonyl",
+      options: { mode: "imineHydrolysis" },
     },
     mechanism: "Acid-catalyzed addition–elimination",
+    mechanismProfile: {
+      family: "carbonyl-addition-elimination",
+      steps: [
+        { type: "protonation", label: "Protonate the imine nitrogen", reversible: true },
+        { type: "nucleophilic-attack", label: "Water adds to the iminium carbon" },
+        { type: "bond-cleavage", label: "C-N cleavage regenerates the carbonyl and amine" },
+        { type: "deprotonation", label: "Proton transfers furnish neutral products", reversible: true },
+      ],
+    },
     priority: 1285,
   },
   {

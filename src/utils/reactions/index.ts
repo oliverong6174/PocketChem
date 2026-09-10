@@ -18,6 +18,9 @@ export type {
   ReactionPurpose,
   ReactionSelectivityProfile,
   StereochemicalMode,
+  RelativeStereochemicalRelationship,
+  StereochemicalAttackMode,
+  StereochemicalFaceSelection,
   RegiochemicalMode,
   ReactionTransform,
   ReactionTrigger,
@@ -93,3 +96,6 @@ export async function findMultistepSynthesisRoutes(
     onProgress,
   );
 }
+
+export { runReactionRegressionSuite } from "./regression/reactionRegression";
+export type { ReactionRegressionResult } from "./regression/reactionRegression";
