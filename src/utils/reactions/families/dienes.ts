@@ -18,9 +18,83 @@ function conjugatedPolyeneSmarts(doubleBondCount: number): string {
  * Broad conjugated-diene trigger for reactions such as Diels-Alder chemistry
  * that genuinely can use a four-carbon segment embedded in a longer polyene.
  */
+const DIELS_ALDER_DIENE_TRIGGER_SMARTS =
+  "[$([C;!a]=[C;!a]-[C;!a]=[C;!a]),$([O]=[c]1[o][c][c][c][c]1)]";
+
 const anyConjugatedDieneTrigger = {
-  includeSmarts: [conjugatedPolyeneSmarts(2)],
+  // ReactionTrigger.includeSmarts is AND-semantics, so ordinary carbon dienes
+  // and alpha-pyrones must be expressed as alternatives inside ONE SMARTS.
+  // RDKit aromaticizes 2-pyrone as O=c1occcc1; the second recursive branch
+  // therefore uses aromatic c/o atoms rather than a Kekule-only pattern.
+  includeSmarts: [DIELS_ALDER_DIENE_TRIGGER_SMARTS],
 };
+
+
+function intramolecularDielsAlderTrigger(tetherAtoms: number) {
+  const tether = Array.from({ length: tetherAtoms }, () => "-[*]").join("");
+  return {
+    includeSmarts: [
+      `[C;!a]=[C;!a]-[C;!a]=[C;!a]${tether}-[C;!a]=[C;!a]`,
+    ],
+  };
+}
+
+const intramolecularDielsAlderRules: ReactionRule[] = [1, 2, 3, 4, 5].map(
+  (tetherAtoms) => ({
+    id: `diene-intramolecular-diels-alder-${tetherAtoms}`,
+    family: "dienes",
+    reactionType: "pericyclic",
+    title: "Intramolecular Diels–Alder Cyclization",
+    reagents: "heat",
+    reagentNote: "The tethered diene and dienophile react within the same molecule",
+    productHint: "Bicyclic cyclohexene derivative",
+    explanation:
+      "A substrate containing both a conjugated diene and a tethered alkene can close on itself in a concerted intramolecular [4+2] cycloaddition; no second reactant is required.",
+    trigger: intramolecularDielsAlderTrigger(tetherAtoms),
+    transform: {
+      // IMDA now uses the same canonical pericyclic engine as every other
+      // Diels-Alder reaction. The handler receives explicit intramolecular
+      // topology metadata, so there is only one implementation of the bond
+      // reorganization to keep in sync.
+      type: "customHandler",
+      handler: "pericyclic",
+      options: {
+        mode: "dielsAlder",
+        intramolecular: true,
+        tetherAtoms,
+        maxProducts: 8,
+      },
+    },
+    productStatus: "representative",
+    display: { renderer: "heavy-atom-stereo" },
+    mechanism: "Pericyclic intramolecular [4+2] cycloaddition",
+    mechanismProfile: {
+      family: "pericyclic-4+2",
+      steps: [
+        {
+          type: "cycloaddition",
+          label: "Concerted intramolecular suprafacial [4+2] bond reorganization",
+          concerted: true,
+          stereochemicalConsequence: "suprafacial",
+        },
+      ],
+    },
+    selectivityProfile: {
+      stereochemistry: {
+        mode: "suprafacial",
+        stereospecific: true,
+        attackMode: "concerted",
+      },
+      mixture: "expected",
+    },
+    competition: { group: "diels-alder-topology", specificity: 200 },
+    selectivity: [
+      "The reacting diene and dienophile are part of the same connected molecule.",
+      "The tether length determines the bicyclic framework; this rule family covers one- through five-atom tethers without substrate-specific cases.",
+    ],
+    priority: 690 + tetherAtoms,
+  }),
+);
 
 /**
  * HX addition must be classified by the MAXIMAL conjugated pi system.
@@ -230,6 +304,7 @@ const dieneHydrohalogenationRules: ReactionRule[] = DIENE_HX.flatMap(
 export const dieneReactionRules: ReactionRule[] = [
   ...extendedPolyeneHydrohalogenationRules,
   ...dieneHydrohalogenationRules,
+  ...intramolecularDielsAlderRules,
   {
     id: "diene-diels-alder",
     family: "dienes",
@@ -295,6 +370,7 @@ export const dieneReactionRules: ReactionRule[] = [
       "PocketChem propagates dienophile E/Z stereochemistry and, when both terminal diene double bonds are stereodefined, assigns the diene-derived product centers for H1/H1 termini and the common H0 methyl/non-methyl carbon-substituted terminus class. Unsupported highly substituted patterns fall back to constitution rather than inventing R/S labels.",
       "Full endo/exo facial ranking for every unsymmetrical or multiply substituted diene/dienophile remains a separate selectivity problem.",
     ],
+    competition: { group: "diels-alder-topology", specificity: 100 },
     priority: 700,
   },
   {
@@ -351,6 +427,7 @@ export const dieneReactionRules: ReactionRule[] = [
       "The diene must be able to adopt an s-cis conformation.",
       "PocketChem assigns diene-derived stereochemistry for defined H1/H1 termini and for the common H0 methyl/non-methyl carbon-substituted terminus class; more exotic fully substituted termini fall back to constitution rather than inventing R/S.",
     ],
+    competition: { group: "diels-alder-topology", specificity: 100 },
     priority: 702,
   },
   {

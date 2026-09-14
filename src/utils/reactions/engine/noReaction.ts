@@ -63,7 +63,9 @@ async function nonConjugatedDieneDielsAlderOutcome(
   try {
     alkeneQuery = rdkit.get_qmol("[C;!a]=[C;!a]");
     alkyneQuery = rdkit.get_qmol("[C]#[C]");
-    conjugatedDieneQuery = rdkit.get_qmol("[C;!a]=[C;!a]-[C;!a]=[C;!a]");
+    conjugatedDieneQuery = rdkit.get_qmol(
+      "[$([C;!a]=[C;!a]-[C;!a]=[C;!a]),$([O]=[c]1[o][c][c][c][c]1)]",
+    );
 
     const componentInfo: Array<{
       alkeneCount: number;

@@ -7,6 +7,8 @@ export type DielsAlderRegioAnalysis = {
   dieneDirectorPosition: "terminal" | "internal" | null;
   dieneDonorStrength: number;
   dienophileAcceptorStrength: number;
+  /** How the constitutional preference was established. */
+  basis: "donor-acceptor" | "single-substituent" | null;
   confidence: "strong" | "moderate" | "ambiguous";
   reason: string;
 };
@@ -191,6 +193,8 @@ function acceptorStrength(graph: Graph, center: number, root: number): number {
 type DieneDirector = {
   position: "terminal" | "internal";
   strength: number;
+  /** True only when the reacting diene path has one external heavy-atom substituent. */
+  singleSubstituent: boolean;
 };
 
 function branchReconnectsDienePath(
@@ -223,6 +227,8 @@ function analyzeDieneDirector(rdkit: any, rawGetMol: RawGetMol, smiles: string):
 
     for (const path of uniqueDienePaths(rdkit, mol)) {
       const pathSet = new Set(path);
+      const externalBranches: Array<{ center: number; root: number; positionIndex: number }> = [];
+
       for (let positionIndex = 0; positionIndex < 4; positionIndex += 1) {
         const center = path[positionIndex];
         for (const root of graph.adjacency[center] ?? []) {
@@ -230,17 +236,26 @@ function analyzeDieneDirector(rdkit: any, rawGetMol: RawGetMol, smiles: string):
           // In a cyclic diene, the carbon path that closes the pre-existing
           // ring is scaffold, not an alkyl directing substituent.
           if (branchReconnectsDienePath(graph, center, root, pathSet)) continue;
-          const strength = donorStrength(graph, center, root);
-          if (strength <= 0) continue;
-          const position: "terminal" | "internal" =
-            positionIndex === 0 || positionIndex === 3 ? "terminal" : "internal";
+          externalBranches.push({ center, root, positionIndex });
+        }
+      }
 
-          if (
-            !best || strength > best.strength ||
-            (strength === best.strength && position === "terminal" && best.position === "internal")
-          ) {
-            best = { position, strength };
-          }
+      for (const branch of externalBranches) {
+        const strength = donorStrength(graph, branch.center, branch.root);
+        if (strength <= 0) continue;
+        const position: "terminal" | "internal" =
+          branch.positionIndex === 0 || branch.positionIndex === 3 ? "terminal" : "internal";
+        const candidate: DieneDirector = {
+          position,
+          strength,
+          singleSubstituent: externalBranches.length === 1,
+        };
+
+        if (
+          !best || candidate.strength > best.strength ||
+          (candidate.strength === best.strength && candidate.position === "terminal" && best.position === "internal")
+        ) {
+          best = candidate;
         }
       }
     }
@@ -292,6 +307,30 @@ function analyzeDienophileAcceptor(
   }
 }
 
+function isMonosubstitutedDienophile(
+  rdkit: any,
+  rawGetMol: RawGetMol,
+  smiles: string,
+): boolean {
+  const mol = rawGetMol(smiles) as any;
+  if (!mol) return false;
+  try {
+    const graph = parseGraph(mol.get_molblock?.() ?? "");
+    if (!graph) return false;
+    const alkenePairs = uniqueAlkenePairs(rdkit, mol);
+    if (alkenePairs.length !== 1) return false;
+
+    const [left, right] = alkenePairs[0];
+    const pair = new Set([left, right]);
+    const externalBranches = [left, right].flatMap((center) =>
+      (graph.adjacency[center] ?? []).filter((neighbor) => !pair.has(neighbor)),
+    );
+    return externalBranches.length === 1;
+  } finally {
+    mol.delete?.();
+  }
+}
+
 export function analyzeDielsAlderRegiochemistry(
   rdkit: any,
   rawGetMol: RawGetMol,
@@ -300,36 +339,74 @@ export function analyzeDielsAlderRegiochemistry(
 ): DielsAlderRegioAnalysis {
   const director = analyzeDieneDirector(rdkit, rawGetMol, dieneSmiles);
   const acceptor = analyzeDienophileAcceptor(rdkit, rawGetMol, dienophileSmiles);
+  const monosubstitutedDienophile = isMonosubstitutedDienophile(
+    rdkit,
+    rawGetMol,
+    dienophileSmiles,
+  );
 
-  if (!director || !acceptor || !acceptor.polarized) {
+  if (!director) {
     return {
       preferredRelationship: null,
-      dieneDirectorPosition: director?.position ?? null,
-      dieneDonorStrength: director?.strength ?? 0,
+      dieneDirectorPosition: null,
+      dieneDonorStrength: 0,
       dienophileAcceptorStrength: acceptor?.strength ?? 0,
+      basis: null,
       confidence: "ambiguous",
       reason:
-        "No single normal-electron-demand donor/acceptor polarization was strong enough to select one regioisomer; retain alternatives.",
+        "No single donating substituent on the reacting diene path was strong enough to select one constitutional orientation; retain alternatives.",
     };
   }
 
-  // Course/FMO rule: a 1-substituted (terminally directed) diene favors the
-  // ortho-like 1,2 cycloadduct; a 2-substituted (internally directed) diene
-  // favors the para-like 1,4 cycloadduct. When both positions are substituted
-  // at equal donor strength, terminal/1-substitution is the stronger director.
   const preferredRelationship: Exclude<DielsAlderRegioRelationship, null> =
     director.position === "terminal" ? "1,2" : "1,4";
 
+  if (acceptor?.polarized) {
+    return {
+      preferredRelationship,
+      dieneDirectorPosition: director.position,
+      dieneDonorStrength: director.strength,
+      dienophileAcceptorStrength: acceptor.strength,
+      basis: "donor-acceptor",
+      confidence: director.strength >= 4 && acceptor.strength >= 5 ? "strong" : "moderate",
+      reason:
+        director.position === "terminal"
+          ? "A terminal (1-substituted) electron-rich diene paired with a polarized electron-poor dienophile favors the ortho-like 1,2 cycloadduct."
+          : "An internal (2-substituted) electron-rich diene paired with a polarized electron-poor dienophile favors the para-like 1,4 cycloadduct.",
+    };
+  }
+
+  // Course-level fallback for the common single-substituent / single-substituent
+  // Diels-Alder pattern. The old code refused to rank this case unless the
+  // dienophile substituent was recognized as a strong EWG, which allowed the
+  // arbitrary first RDKit orientation (often the meta-like connectivity) to
+  // leak through. Restrict the fallback to a genuinely monosubstituted diene
+  // and monosubstituted alkene so it cannot overrule more complex substitution
+  // patterns or invent selectivity where several directing groups compete.
+  if (director.singleSubstituent && monosubstitutedDienophile) {
+    return {
+      preferredRelationship,
+      dieneDirectorPosition: director.position,
+      dieneDonorStrength: director.strength,
+      dienophileAcceptorStrength: 0,
+      basis: "single-substituent",
+      confidence: "moderate",
+      reason:
+        director.position === "terminal"
+          ? "For a singly substituted terminal diene reacting with a singly substituted dienophile, select the adjacent 1,2 constitutional orientation rather than the arbitrary meta-like enumeration."
+          : "For a singly substituted internal diene reacting with a singly substituted dienophile, select the 1,4 constitutional orientation rather than the arbitrary meta-like enumeration.",
+    };
+  }
+
   return {
-    preferredRelationship,
+    preferredRelationship: null,
     dieneDirectorPosition: director.position,
     dieneDonorStrength: director.strength,
-    dienophileAcceptorStrength: acceptor.strength,
-    confidence: director.strength >= 4 && acceptor.strength >= 5 ? "strong" : "moderate",
+    dienophileAcceptorStrength: acceptor?.strength ?? 0,
+    basis: null,
+    confidence: "ambiguous",
     reason:
-      director.position === "terminal"
-        ? "A terminal (1-substituted) electron-rich diene paired with a polarized electron-poor dienophile favors the ortho-like 1,2 cycloadduct."
-        : "An internal (2-substituted) electron-rich diene paired with a polarized electron-poor dienophile favors the para-like 1,4 cycloadduct.",
+      "No single normal-electron-demand donor/acceptor polarization or unambiguous single-substituent pattern was strong enough to select one regioisomer; retain alternatives.",
   };
 }
 
@@ -474,6 +551,32 @@ export function identifyDielsAlderProductRegioRelationship(rawGetMol: RawGetMol,
   }
 }
 
+function identifySingleSubstituentProductRelationship(
+  rawGetMol: RawGetMol,
+  smiles: string,
+): DielsAlderRegioRelationship {
+  const mol = rawGetMol(smiles) as any;
+  if (!mol) return null;
+  try {
+    const graph = parseGraph(mol.get_molblock?.() ?? "");
+    if (!graph) return null;
+    const cycle = carbonCycleOfSix(graph);
+    if (!cycle) return null;
+    const core = new Set(cycle);
+    const substitutedCenters = cycle.filter((center) =>
+      (graph.adjacency[center] ?? []).some((neighbor) => !core.has(neighbor)),
+    );
+    if (substitutedCenters.length !== 2) return null;
+
+    const distance = ringDistance(cycle, substitutedCenters[0], substitutedCenters[1]);
+    if (distance === 1) return "1,2";
+    if (distance === 3) return "1,4";
+    return null;
+  } finally {
+    mol.delete?.();
+  }
+}
+
 export function generateMechanisticDielsAlderCandidates(
   rdkit: any,
   rawGetMol: RawGetMol,
@@ -496,9 +599,12 @@ export function generateMechanisticDielsAlderCandidates(
     return { products, regio };
   }
 
-  const preferred = products.filter(
-    (product) => identifyDielsAlderProductRegioRelationship(rawGetMol, product) === regio.preferredRelationship,
-  );
+  const preferred = products.filter((product) => {
+    const relationship = regio.basis === "single-substituent"
+      ? identifySingleSubstituentProductRelationship(rawGetMol, product)
+      : identifyDielsAlderProductRegioRelationship(rawGetMol, product);
+    return relationship === regio.preferredRelationship;
+  });
   return {
     products: preferred.length > 0 ? preferred : products,
     regio,

@@ -1,4 +1,6 @@
+import { analyzeFunctionalGroupHierarchy } from "../../functionalGroups";
 import { getRDKit } from "../../rdkit";
+import { predictReactionPathways } from "../../reactionUtils";
 import { addition } from "../engine/handlers/addition";
 import { carbonyl } from "../engine/handlers/carbonyl";
 import { pericyclic } from "../engine/handlers/pericyclic";
@@ -142,11 +144,109 @@ async function epoxidationAlcoholAntiOpening(): Promise<ReactionRegressionResult
   };
 }
 
+async function hofmannAmineEliminationRegression(): Promise<ReactionRegressionResult> {
+  const hierarchy = await analyzeFunctionalGroupHierarchy("CCCCNC");
+  const pathways = await predictReactionPathways("CCCCNC", hierarchy.primaryGroups);
+  const pathway = pathways.find((candidate) => candidate.ruleId === "amine-hofmann-elimination");
+  if (!pathway?.productSmiles) {
+    return {
+      id: "amine-hofmann-elimination",
+      passed: false,
+      message: "N-methylbutan-1-amine did not generate a computed Hofmann-elimination product.",
+    };
+  }
+
+  const rdkit = await getRDKit();
+  const observed = rdkit.get_mol(pathway.productSmiles);
+  const observedCanonical = observed?.get_smiles?.() ?? "";
+  observed?.delete?.();
+  const expected = rdkit.get_mol("C=CCC");
+  const expectedCanonical = expected?.get_smiles?.() ?? "";
+  expected?.delete?.();
+
+  if (observedCanonical !== expectedCanonical) {
+    return {
+      id: "amine-hofmann-elimination",
+      passed: false,
+      message: `Expected 1-butene connectivity from Hofmann elimination; received ${pathway.productSmiles}.`,
+    };
+  }
+
+  return {
+    id: "amine-hofmann-elimination",
+    passed: true,
+    message: "Exhaustive methylation / Ag2O, heat now produces the Hofmann alkene from an aliphatic amine substrate.",
+  };
+}
+
+async function haloalkaneCyanideAutosupply(): Promise<ReactionRegressionResult> {
+  const hierarchy = await analyzeFunctionalGroupHierarchy("CCBr");
+  const pathways = await predictReactionPathways("CCBr", hierarchy.primaryGroups);
+  const rdkit = await getRDKit();
+
+  const nitrilePathway = pathways.find((pathway) => pathway.ruleId === "haloalkane-sn2-cyanide");
+  const acidPathway = pathways.find((pathway) => pathway.ruleId === "haloalkane-cyanide-then-acidic-hydrolysis");
+
+  if (!nitrilePathway?.productSmiles) {
+    return {
+      id: "haloalkane-cyanide-autosupply",
+      passed: false,
+      message: "Single-substrate NaCN substitution did not execute without a user-drawn cyanide reactant.",
+    };
+  }
+
+  const nitrileMol = rdkit.get_mol(nitrilePathway.productSmiles);
+  const nitrileCanonical = nitrileMol?.get_smiles?.() ?? "";
+  nitrileMol?.delete?.();
+  const expectedNitrile = rdkit.get_mol("CCC#N");
+  const expectedNitrileCanonical = expectedNitrile?.get_smiles?.() ?? "";
+  expectedNitrile?.delete?.();
+
+  if (nitrileCanonical !== expectedNitrileCanonical) {
+    return {
+      id: "haloalkane-cyanide-autosupply",
+      passed: false,
+      message: `Expected propanenitrile from bromoethane + NaCN; received ${nitrilePathway.productSmiles}.`,
+    };
+  }
+
+  if (!acidPathway?.productSmiles) {
+    return {
+      id: "haloalkane-cyanide-autosupply",
+      passed: false,
+      message: "The combined NaCN then H₃O⁺, heat sequence did not produce a carboxylic-acid pathway.",
+    };
+  }
+
+  const acidMol = rdkit.get_mol(acidPathway.productSmiles);
+  const acidCanonical = acidMol?.get_smiles?.() ?? "";
+  acidMol?.delete?.();
+  const expectedAcid = rdkit.get_mol("CCC(=O)O");
+  const expectedAcidCanonical = expectedAcid?.get_smiles?.() ?? "";
+  expectedAcid?.delete?.();
+
+  if (acidCanonical !== expectedAcidCanonical) {
+    return {
+      id: "haloalkane-cyanide-autosupply",
+      passed: false,
+      message: `Expected propanoic acid from bromoethane under 1) NaCN 2) H₃O⁺, heat; received ${acidPathway.productSmiles}.`,
+    };
+  }
+
+  return {
+    id: "haloalkane-cyanide-autosupply",
+    passed: true,
+    message: "NaCN now executes from a single alkyl halide input and the follow-up acidic hydrolysis sequence gives the expected carboxylic acid.",
+  };
+}
+
 export async function runReactionRegressionSuite(): Promise<ReactionRegressionResult[]> {
   const tests = [
     dielsAlderCyclohexadienePropene,
     cyclicImineHydrolysis,
     epoxidationAlcoholAntiOpening,
+    haloalkaneCyanideAutosupply,
+    hofmannAmineEliminationRegression,
   ];
 
   const results: ReactionRegressionResult[] = [];

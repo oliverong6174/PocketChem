@@ -17,6 +17,21 @@ const aromaticTrigger = {
   includeSmarts: ["[cH]"],
 };
 
+// Birch reduction has a wider aromatic-substrate domain than the shared
+// electrophilic-aromatic-substitution trigger. In particular, aromatic
+// carbonyl derivatives such as benzoic acid remain valid Birch substrates
+// even when the functional-group hierarchy suppresses the generic "Benzene"
+// label in favor of the more specific group name.
+const birchTrigger = {
+  ...aromaticTrigger,
+  anyFunctionalGroups: [
+    ...aromaticTrigger.anyFunctionalGroups,
+    "Benzaldehyde",
+    "Benzoic acid",
+    "Benzamide",
+  ],
+};
+
 const easModelNotes = {
   productStatus: "computed" as const,
   selectivityProfile: {
@@ -373,12 +388,13 @@ export const aromaticReactionRules: ReactionRule[] = [
     productHint: "1,4-Cyclohexadiene derivative",
     explanation:
       "A Birch reduction converts an aromatic ring into a nonconjugated 1,4-cyclohexadiene. Substituents control which ring carbons are reduced.",
-    trigger: aromaticTrigger,
+    trigger: birchTrigger,
     transform: {
       type: "customHandler",
       handler: "reduction",
       options: { mode: "birchReduction" },
     },
+    display: { renderer: "default", preserveReactantOrientation: true },
     productStatus: "computed",
     mechanism: "Stepwise electron–proton transfer",
     selectivity: [
@@ -511,6 +527,10 @@ export const aromaticReactionRules: ReactionRule[] = [
       handler: "substitution" as const,
       options: { mode: "aromaticSnAr", nucleophile: slug },
     },
+    // SNAr changes one exocyclic substituent while leaving the aryl scaffold
+    // intact. Keep the student's ring orientation instead of accepting an
+    // arbitrary symmetry-equivalent redraw from RDKit.
+    display: { renderer: "default" as const, preserveReactantOrientation: true },
     productStatus: "computed" as const,
     mechanism: "SNAr addition–elimination",
     selectivity: [

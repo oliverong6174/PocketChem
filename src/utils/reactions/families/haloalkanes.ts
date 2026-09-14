@@ -62,6 +62,8 @@ const hydroxideReactant = {
 const cyanideReactant = {
   label: "cyanide ion",
   trigger: { includeSmarts: ["[C-]#N"] },
+  supplyMode: "auto" as const,
+  presetSmiles: "[C-]#N",
 };
 
 const azideReactant = {
@@ -258,6 +260,36 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "The carbon originally bonded to Mg/Li becomes the second carbon substituent on the ketone.",
     ],
     priority: 215,
+  },
+
+  {
+    id: "haloalkane-cyanide-then-acidic-hydrolysis",
+    family: "haloalkanes",
+    reactionType: "cleavage",
+    reactionClass: "multistep nitrile formation and hydrolysis",
+    title: "Nitrile Formation Followed by Acidic Hydrolysis",
+    reagents: "1) NaCN  2) H₃O⁺, heat",
+    reagentNote: "SN2 substitution to a nitrile, then hydrolysis to a carboxylic acid",
+    productHint: "Carboxylic acid",
+    explanation:
+      "Cyanide first displaces the alkyl halide by SN2, extending the skeleton by one carbon to form a nitrile. Acidic aqueous hydrolysis then converts that nitrile into the corresponding carboxylic acid. This is generated from the general carbon-skeleton change rather than hard-coding any substrate.",
+    trigger: primaryOrMethylHalideTrigger,
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C;X4;H2,H3:1][Cl,Br,I:2]>>[C:1][C](=O)[O;H1]",
+      maxProducts: 8,
+    },
+    productStatus: "computed",
+    mechanism: "SN2 cyanide substitution → nitrile hydrolysis",
+    selectivityProfile: {
+      stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
+      mixture: "single",
+    },
+    selectivity: [
+      "The first step requires an SN2-accessible methyl/primary alkyl halide.",
+      "The nitrile adds one carbon before hydrolysis, so the product acid contains one more carbon than the starting alkyl halide skeleton.",
+    ],
+    priority: 220,
   },
   {
     id: "haloalkane-sn2-azide",

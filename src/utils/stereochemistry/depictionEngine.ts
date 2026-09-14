@@ -48,6 +48,34 @@ type RawMol = {
 
 export type RawGetMol = (source: string, ...args: unknown[]) => RawMol | null;
 
+const DEFAULT_MECHANISTIC_DRAW_OPTIONS = {
+  atomLabelDeuteriumTritium: true,
+  useMolBlockWedging: true,
+};
+
+function mechanisticDrawOptions(drawOptions?: string): string {
+  if (!drawOptions) return JSON.stringify(DEFAULT_MECHANISTIC_DRAW_OPTIONS);
+
+  try {
+    const parsed = JSON.parse(drawOptions);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return JSON.stringify({
+        ...parsed,
+        atomLabelDeuteriumTritium:
+          (parsed as { atomLabelDeuteriumTritium?: boolean }).atomLabelDeuteriumTritium ?? true,
+        // The molblock has already been verified and intentionally contains the
+        // mechanistic wedge/hash presentation. Do not let RDKit discard those
+        // bond codes and regenerate wedging from the canonical SMILES.
+        useMolBlockWedging: true,
+      });
+    }
+  } catch {
+    // Invalid caller options must not disable the verified stereo depiction.
+  }
+
+  return JSON.stringify(DEFAULT_MECHANISTIC_DRAW_OPTIONS);
+}
+
 function looksLikeMolBlock(source: string) {
   return /(?:V2000|V3000|M\s+END)/.test(source);
 }
@@ -397,26 +425,6 @@ function layoutDielsAlderBicyclic(graph: MolGraph, bicyclo: DielsAlderBicyclic):
   return lines.join("\n");
 }
 
-function layoutCyclohexene(graph: MolGraph, cycle: number[]): string {
-  const targetPoints = [
-    { x: -1.15, y: 0.72 },
-    { x: 0.0, y: 1.45 },
-    { x: 1.25, y: 0.72 },
-    { x: 1.25, y: -0.72 },
-    { x: 0.0, y: -1.45 },
-    { x: -1.15, y: -0.72 },
-  ];
-  const core = new Set(cycle);
-  const target = new Map<number, { x: number; y: number }>();
-  cycle.forEach((atom, index) => target.set(atom, targetPoints[index]));
-  translateExternalComponents(graph, core, target);
-  const lines = [...graph.lines];
-  for (const [atom, point] of target) {
-    lines[4 + atom] = rewriteAtomLine(lines[4 + atom] ?? "", point.x, point.y);
-  }
-  return lines.join("\n");
-}
-
 function isElectronWithdrawingBranch(graph: MolGraph, root: number, center: number) {
   if (graph.atoms[root]?.element !== "C") return false;
   for (const neighbor of graph.adjacency[root] ?? []) {
@@ -523,12 +531,15 @@ function dielsAlderTargets(
   const dieneCenters = [cycle[1], cycle[4]];
   const dienophileCenters = [cycle[2], cycle[3]];
 
+  // Solid wedge is the default representative projection for diene-derived
+  // substituents. The stored same/opposite face relationship below is what may
+  // flip the second target; presentation preference must not default to hashes.
   const dieneTargets = dieneCenters
     .map((center, index) => pickExternalStereoTarget(
       graph,
       core,
       center,
-      index === 0 ? 6 : 6,
+      index === 0 ? 1 : 1,
       `diene-terminal-${index + 1}`,
     ))
     .filter((target): target is StereoTarget => target !== null);
@@ -780,11 +791,10 @@ function prepareFromMol(
         dielsBicyclo = findDielsAlderBicyclic(graph) ?? dielsBicyclo;
         targets = dielsAlderTargets(graph, dielsBicyclo, stereoCenters, directive);
       } else {
-        const cycle = orderedSixMemberCycle(graph);
-        if (cycle) {
-          molBlock = layoutCyclohexene(graph, cycle);
-          graph = parseV2000(molBlock) ?? graph;
-        }
+        // Ordinary monocyclic Diels-Alder products keep RDKit's clean 2-D
+        // coordinates. Only stereobond codes are changed here. The removed
+        // fixed-hexagon/radial-branch pass was the source of crossed bonds and
+        // abrupt substituent rotations on ester-rich products.
         targets = dielsAlderTargets(graph, null, stereoCenters, directive);
       }
     } else if (directive.kind === "epoxide-alcohol-opening") {
@@ -865,11 +875,8 @@ export function completeStereoRepresentative(
         const remapped = findDielsAlderBicyclic(graph) ?? bicyclo;
         targets = dielsAlderTargets(graph, remapped, new Set(), directive, true);
       } else {
-        const cycle = orderedSixMemberCycle(graph);
-        if (cycle) {
-          molBlock = layoutCyclohexene(graph, cycle);
-          graph = parseV2000(molBlock) ?? graph;
-        }
+        // Completion assigns stereo to the existing RDKit layout; it must not
+        // perform a second coordinate rewrite.
         targets = dielsAlderTargets(graph, null, new Set(), directive, true);
       }
     } else if (directive.kind === "epoxide-alcohol-opening") {
@@ -930,7 +937,9 @@ export function renderWithMechanisticStereoDirective(
   const presentationMol = rawGetMol(prepared.molBlock);
   if (!presentationMol) return null;
   try {
-    return presentationMol.get_svg_with_highlights?.(drawOptions) ?? null;
+    return presentationMol.get_svg_with_highlights?.(
+      mechanisticDrawOptions(drawOptions),
+    ) ?? null;
   } finally {
     presentationMol.delete?.();
   }

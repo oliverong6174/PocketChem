@@ -45,7 +45,11 @@ export function deriveReactionDisplayMetadata(
   if (mode === "dieneHydrohalogenation") {
     const pattern = String(options.additionPattern ?? "unspecified");
     return {
-      renderer: "aligned-generic-halogen",
+      // The old aligned-generic-halogen path overpreserved reference geometry.
+      // Larger halogen labels (especially Br and I) looked bent or misplaced on
+      // flexible allylic products, so diene HX cards should use a fresh generic
+      // depiction instead of coordinate forcing.
+      renderer: "generic-halogen",
       series: {
         id: `diene-hx-${pattern}`,
         variable: "X",
@@ -59,7 +63,7 @@ export function deriveReactionDisplayMetadata(
     const capture = String(options.capture ?? "unspecified");
     const span = Number.isInteger(count) && count >= 2 ? 2 * count : "polyene";
     return {
-      renderer: "aligned-generic-halogen",
+      renderer: "generic-halogen",
       series: {
         id: `polyene-hx-1-${span}-${capture}`,
         variable: "X",

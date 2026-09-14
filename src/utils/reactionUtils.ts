@@ -18,6 +18,7 @@ import {
   type RawGetMol,
 } from "./stereochemistry/depictionEngine";
 import { generateMechanisticDielsAlderCandidates } from "./stereochemistry/dielsAlderMechanism";
+import { pericyclic } from "./reactions/engine/handlers/pericyclic";
 
 export {
   predictRetrosynthesisPathways,
@@ -240,12 +241,38 @@ async function applyMechanisticStereoRuntime(
     ];
     const candidateSet = new Set<string>();
 
-    // Diels-Alder gets an independent mechanism-first constitutional pass.
-    // This is intentionally separate from the legacy pericyclic handler: the
-    // runtime re-enumerates both constitutional orientations from the actual
-    // diene/dienophile, then applies the donor/acceptor directing rule before
-    // stereochemical presentation. Thus a stale one-off regio rule upstream
-    // cannot lock the reaction card into the wrong constitutional product.
+    // Intramolecular Diels-Alder gets the same mechanism-first protection as
+    // the two-reactant reaction. Earlier versions skipped this because they
+    // required reactantComponents.length >= 2, so a stale one-bond closure
+    // could survive all the way to the UI as cyclodecene even after the IMDA
+    // SMARTS was corrected upstream.
+    if (
+      directive.kind === "diels-alder" &&
+      pathway.reactantComponents.length === 1 &&
+      rule.transform.type === "customHandler" &&
+      rule.transform.handler === "pericyclic" &&
+      rule.transform.options?.intramolecular === true
+    ) {
+      const tetherAtoms = Number(rule.transform.options?.tetherAtoms ?? 0);
+      const regenerated = await pericyclic(
+        pathway.reactantComponents,
+        {
+          mode: "dielsAlder",
+          intramolecular: true,
+          tetherAtoms,
+          maxProducts: 16,
+        },
+      );
+
+      // If the mechanism-first pass succeeds, deliberately do NOT preserve the
+      // legacy connectivity. This is the crucial difference from the ordinary
+      // stereo enrichment path: a monocyclic partial closure is constitutionally
+      // wrong, not merely an alternate depiction.
+      for (const product of regenerated) candidateSet.add(product);
+    }
+
+    // Intermolecular Diels-Alder gets an independent mechanism-first
+    // constitutional pass as before.
     if (directive.kind === "diels-alder" && pathway.reactantComponents.length >= 2) {
       const [diene, dienophile] = pathway.reactantComponents;
       const mechanistic = generateMechanisticDielsAlderCandidates(
@@ -254,12 +281,27 @@ async function applyMechanisticStereoRuntime(
         diene,
         dienophile,
       );
+      const existingDielsAlder = directive.dielsAlder ?? {
+        dieneTerminalRelationship: null,
+        dienophileGeometry: null,
+        activatedDienophile: false,
+      };
+
       directive.dielsAlder = {
-        ...directive.dielsAlder,
-        preferredRegioRelationship: mechanistic.regio.preferredRelationship,
-        dieneDirectorPosition: mechanistic.regio.dieneDirectorPosition,
-        regioConfidence: mechanistic.regio.confidence,
-        regioReason: mechanistic.regio.reason,
+        dieneTerminalRelationship:
+          existingDielsAlder.dieneTerminalRelationship,
+        dienophileGeometry:
+          existingDielsAlder.dienophileGeometry,
+        activatedDienophile:
+          existingDielsAlder.activatedDienophile,
+        preferredRegioRelationship:
+          mechanistic.regio.preferredRelationship,
+        dieneDirectorPosition:
+          mechanistic.regio.dieneDirectorPosition,
+        regioConfidence:
+          mechanistic.regio.confidence,
+        regioReason:
+          mechanistic.regio.reason,
       };
 
       if (mechanistic.products.length > 0) {

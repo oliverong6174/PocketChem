@@ -8,16 +8,17 @@ import {
   warnUnsupportedHandlerMode,
 } from "./handlerUtils";
 
-type EliminationMode = "betaElimination" | "e1" | "e2";
-type LeavingGroup = "halide" | "alcohol";
+type EliminationMode = "betaElimination" | "e1" | "e2" | "hofmannAmine";
+type LeavingGroup = "halide" | "alcohol" | "amine";
 type AlkenePreference = "all" | "zaitsev" | "hofmann";
 
-const LEAVING_GROUPS = ["halide", "alcohol"] as const satisfies readonly LeavingGroup[];
+const LEAVING_GROUPS = ["halide", "alcohol", "amine"] as const satisfies readonly LeavingGroup[];
 const ALKENE_PREFERENCES = ["all", "zaitsev", "hofmann"] as const satisfies readonly AlkenePreference[];
 
 const betaEliminationSmarts: Record<LeavingGroup, string> = {
   halide: "[C;H1,H2,H3:1][C;X4:2][Cl,Br,I:3]>>[C:1]=[C:2]",
   alcohol: "[C;H1,H2,H3:1][C:2][OH:3]>>[C:1]=[C:2]",
+  amine: "[C;H1,H2,H3:1][C;X4:2][N;X3,X4;+0,+1:3]>>[C:1]=[C:2]",
 };
 
 /**
@@ -203,7 +204,8 @@ export async function elimination(
   if (
     mode !== "betaElimination" &&
     mode !== "e1" &&
-    mode !== "e2"
+    mode !== "e2" &&
+    mode !== "hofmannAmine"
   ) {
     warnUnsupportedHandlerMode("Elimination", options);
     return [];
@@ -218,6 +220,15 @@ export async function elimination(
   const preference =
     readStringOption(options, "preference", ALKENE_PREFERENCES) ?? "all";
   const maxProducts = readPositiveIntegerOption(options, "maxProducts", 8);
+
+  if (mode === "hofmannAmine") {
+    return eliminateFromPrecursors(
+      [reactantSmiles],
+      "amine",
+      preference === "all" ? "hofmann" : preference,
+      maxProducts,
+    );
+  }
 
   if (mode === "e1") {
     const maxShiftDepth = readPositiveIntegerOption(options, "maxShiftDepth", 2);

@@ -149,6 +149,37 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
     priority: 1328,
   },
   {
+    id: "carboxylic-acid-to-nitrile-via-amide",
+    family: "carboxylic-acids",
+    reactionType: "elimination",
+    title: "Carboxylic Acid to Nitrile",
+    reagents: "1) NH₃, heat  2) POCl₃",
+    reagentNote: "Primary amide formation followed by dehydration",
+    productHint: "Nitrile",
+    explanation:
+      "Ammonia and heat first convert the carboxylic acid into the corresponding primary amide. POCl₃ then dehydrates that amide to a nitrile, retaining the original carboxyl carbon as the nitrile carbon.",
+    trigger: carboxylicAcidTrigger,
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1](=[O:2])[OH:3]>>[C:1]#N",
+      maxProducts: 8,
+    },
+    productStatus: "computed",
+    mechanism: "Thermal amidation followed by dehydrative conversion of the primary amide to a nitrile",
+    selectivity: [
+      "The carboxyl carbon is retained and becomes the nitrile carbon.",
+      "The NH₃/heat step forms the primary amide intermediate; POCl₃ performs the dehydration.",
+    ],
+    searchAliases: [
+      "NH3 heat POCl3",
+      "NH₃ heat POCl₃",
+      "carboxylic acid to nitrile",
+      "acid to nitrile via amide",
+      "primary amide dehydration sequence",
+    ],
+    priority: 1329,
+  },
+  {
     id: "carboxylic-acid-amide-formation",
     family: "carboxylic-acids",
     reactionType: "substitution",

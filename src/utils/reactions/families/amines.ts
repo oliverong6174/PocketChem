@@ -15,6 +15,17 @@ const amineTrigger = {
   ],
 };
 
+
+const hofmannAmineTrigger = {
+  anyFunctionalGroups: [
+    "Primary amine",
+    "Secondary amine",
+    "Tertiary amine",
+    "Benzyl amine",
+  ],
+  includeSmarts: ["[N;!$(N[C,S,P]=O)]-[C;X4;H1,H2,H3]-[C;H1,H2,H3]"],
+};
+
 export const amineReactionRules: ReactionRule[] = [
   {
     id: "amine-acylation",
@@ -115,15 +126,22 @@ export const amineReactionRules: ReactionRule[] = [
     reactionType: "elimination",
     title: "Hofmann Elimination",
     reagents: "1) Excess CH₃I  2) Ag₂O, heat",
-    reagentNote: "Elimination",
+    reagentNote: "Exhaustive methylation to a quaternary ammonium salt, then elimination to the least substituted alkene",
     productHint: "Alkene",
     explanation:
-      "Quaternary ammonium hydroxides undergo Hofmann elimination to form the least substituted alkene.",
-    trigger: amineTrigger,
+      "Excess methyl iodide converts an aliphatic amine into a quaternary ammonium salt. After Ag₂O generates the corresponding ammonium hydroxide, heating promotes Hofmann elimination to the least substituted accessible alkene.",
+    trigger: hofmannAmineTrigger,
     transform: {
-      type: "conceptOnly",
-      reason: "The elimination site and least-substituted alkene depend on the substrate and require a dedicated regioselective handler.",
+      type: "customHandler",
+      handler: "elimination",
+      options: { mode: "hofmannAmine", leavingGroup: "amine", preference: "hofmann", maxProducts: 8 },
     },
+    productStatus: "computed",
+    mechanism: "Exhaustive methylation → quaternary ammonium hydroxide formation → Hofmann E2 elimination",
+    selectivity: [
+      "The least substituted accessible alkene is favored (Hofmann orientation).",
+      "At least one alkyl group attached to nitrogen must contain a beta hydrogen.",
+    ],
     priority: 1730,
   },
 

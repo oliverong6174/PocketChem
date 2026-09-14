@@ -69,6 +69,31 @@ async function getReactantLabel(components: ReactionComponent[]): Promise<string
   return names.join(" + ");
 }
 
+async function buildAutoSuppliedReactants(
+  rule: ReactionRule,
+): Promise<ReactionComponent[] | null> {
+  const requirements = rule.additionalReactants ?? [];
+  if (requirements.length === 0) return [];
+
+  const supplied: ReactionComponent[] = [];
+  for (const requirement of requirements) {
+    const supplyMode = requirement.supplyMode ?? "user-structure";
+    if (supplyMode === "condition-only") continue;
+    if (supplyMode !== "auto" || !requirement.presetSmiles?.trim()) {
+      return null;
+    }
+
+    const hierarchy = await analyzeFunctionalGroupHierarchy(requirement.presetSmiles);
+    supplied.push({
+      smiles: requirement.presetSmiles,
+      functionalGroups: hierarchy.primaryGroups,
+      isGeneric: false,
+    });
+  }
+
+  return supplied;
+}
+
 async function getProductName(
   productSmiles: string,
   fallback: string,
@@ -462,7 +487,7 @@ export async function predictReactionPathwaysFromRules(
     }
   }
 
-  const matchingSingles: Array<{ rule: ReactionRule; reactant: ReactionComponent }> = [];
+  const matchingSingles: Array<{ rule: ReactionRule; reactants: ReactionComponent[] }> = [];
   const missingMulti: Array<{ rule: ReactionRule; reactant: ReactionComponent }> = [];
 
   for (const component of components) {
@@ -475,13 +500,20 @@ export async function predictReactionPathwaysFromRules(
     );
 
     for (const rule of componentRules) {
-
       if ((rule.additionalReactants?.length ?? 0) > 0) {
-        if (components.length === 1) missingMulti.push({ rule, reactant: component });
+        const autoSuppliedReactants = await buildAutoSuppliedReactants(rule);
+        if (autoSuppliedReactants && components.length === 1) {
+          matchingSingles.push({
+            rule,
+            reactants: [component, ...autoSuppliedReactants],
+          });
+        } else if (components.length === 1) {
+          missingMulti.push({ rule, reactant: component });
+        }
         continue;
       }
 
-      matchingSingles.push({ rule, reactant: component });
+      matchingSingles.push({ rule, reactants: [component] });
     }
   }
 
@@ -495,7 +527,7 @@ export async function predictReactionPathwaysFromRules(
   const pathways: ReactionPathway[] = [];
 
   for (const match of matchingSingles) {
-    pathways.push(...await createExecutedPathways(match.rule, [match.reactant]));
+    pathways.push(...await createExecutedPathways(match.rule, match.reactants));
   }
 
   for (const match of missingMulti) {

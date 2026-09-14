@@ -38,6 +38,19 @@ export async function getMoleculeSvg(smiles: string): Promise<string | null> {
       return null;
     }
 
+    // For a raw SMILES product, generate a fresh 2-D layout on this molecule
+    // and draw it directly. Do NOT round-trip the generated V2000 molblock back
+    // through RDKit before drawing: RDKit writes stereo code 3 on an
+    // unspecified C=C in that molblock, and reparsing it turns an ordinary
+    // alkene into the crossed/either-bond depiction seen in Wittig products.
+    //
+    // For an incoming molblock, keep its supplied coordinates/stereo exactly as
+    // they are; specialized renderers are responsible for any intentional
+    // wedge/hash preservation.
+    if (!looksLikeMolBlock(cacheKey)) {
+      mol.set_new_coords?.();
+    }
+
     const svg = mol.get_svg_with_highlights(MOLECULE_DRAW_OPTIONS);
     rememberSvg(cacheKey, svg);
     return svg;
@@ -386,6 +399,86 @@ function hasDepictionBond(depiction: ParsedDepiction, atom1: number, atom2: numb
   return depiction.adjacency[atom1]?.includes(atom2) ?? false;
 }
 
+
+type DepictionGeometryQuality = {
+  medianBondLength: number;
+  minimumNonbondedDistance: number;
+  shortBondCount: number;
+  longBondCount: number;
+};
+
+function depictionGeometryQuality(depiction: ParsedDepiction): DepictionGeometryQuality | null {
+  const bondLengths = depiction.bonds
+    .map((bond) => {
+      const atom1 = depiction.atoms[bond.atom1];
+      const atom2 = depiction.atoms[bond.atom2];
+      if (!atom1 || !atom2) return Number.NaN;
+      return Math.hypot(atom1.x - atom2.x, atom1.y - atom2.y);
+    })
+    .filter((length) => Number.isFinite(length) && length > 1e-6)
+    .sort((left, right) => left - right);
+
+  if (bondLengths.length === 0) return null;
+  const middle = Math.floor(bondLengths.length / 2);
+  const medianBondLength = bondLengths.length % 2 === 0
+    ? (bondLengths[middle - 1] + bondLengths[middle]) / 2
+    : bondLengths[middle];
+  if (!Number.isFinite(medianBondLength) || medianBondLength <= 1e-6) return null;
+
+  let minimumNonbondedDistance = Number.POSITIVE_INFINITY;
+  for (let left = 0; left < depiction.atoms.length; left += 1) {
+    for (let right = left + 1; right < depiction.atoms.length; right += 1) {
+      if (hasDepictionBond(depiction, left, right)) continue;
+      const distance = Math.hypot(
+        depiction.atoms[left].x - depiction.atoms[right].x,
+        depiction.atoms[left].y - depiction.atoms[right].y,
+      );
+      minimumNonbondedDistance = Math.min(minimumNonbondedDistance, distance);
+    }
+  }
+
+  return {
+    medianBondLength,
+    minimumNonbondedDistance,
+    shortBondCount: bondLengths.filter((length) => length < medianBondLength * 0.45).length,
+    longBondCount: bondLengths.filter((length) => length > medianBondLength * 2.2).length,
+  };
+}
+
+/**
+ * Coordinate preservation is allowed to rotate/reflect a clean depiction, but
+ * it must never make the molecular drawing geometrically worse. In particular,
+ * a mapped substituent must not collapse onto a nonbonded atom or create wildly
+ * inconsistent bond lengths. If an alignment candidate fails this guard, the
+ * caller falls back to RDKit's clean 2-D coordinates instead of forcing the
+ * student's reference orientation at the expense of legibility.
+ */
+function alignmentIntroducesSevereGeometryDistortion(
+  baseline: ParsedDepiction,
+  candidateMolBlock: string,
+): boolean {
+  const candidate = parseDepiction(candidateMolBlock);
+  if (!candidate) return true;
+
+  const baselineQuality = depictionGeometryQuality(baseline);
+  const candidateQuality = depictionGeometryQuality(candidate);
+  if (!baselineQuality || !candidateQuality) return false;
+
+  if (candidateQuality.shortBondCount > baselineQuality.shortBondCount) return true;
+  if (candidateQuality.longBondCount > baselineQuality.longBondCount) return true;
+
+  const candidateCollisionRatio =
+    candidateQuality.minimumNonbondedDistance / candidateQuality.medianBondLength;
+  const baselineCollisionRatio =
+    baselineQuality.minimumNonbondedDistance / baselineQuality.medianBondLength;
+
+  if (candidateCollisionRatio < 0.32 && candidateCollisionRatio < baselineCollisionRatio * 0.7) {
+    return true;
+  }
+
+  return false;
+}
+
 /**
  * Find atom correspondences using the preserved molecular graph rather than
  * bond orders. Bond order is intentionally ignored: reaction products commonly
@@ -654,6 +747,126 @@ function rewriteV2000Coordinates(
   }
 
   return lines.join("\n");
+}
+
+type CoordinateAssignment = {
+  productIndex: number;
+  x: number;
+  y: number;
+};
+
+function rewriteAssignedV2000Coordinates(
+  molBlock: string,
+  assignments: readonly CoordinateAssignment[],
+): string | null {
+  if (assignments.length === 0) return molBlock;
+  const lines = molBlock.split(/\r?\n/);
+  if (!lines[3]?.includes("V2000")) return null;
+  const atomCount = Number.parseInt(lines[3].slice(0, 3).trim(), 10);
+  if (!Number.isInteger(atomCount)) return null;
+
+  for (const assignment of assignments) {
+    if (assignment.productIndex < 0 || assignment.productIndex >= atomCount) continue;
+    const lineIndex = 4 + assignment.productIndex;
+    const line = lines[lineIndex] ?? "";
+    lines[lineIndex] = `${formatMolCoordinate(assignment.x)}${formatMolCoordinate(assignment.y)}${line.slice(20)}`;
+  }
+
+  return lines.join("\n");
+}
+
+function enrichWithSupplementalReferenceCoordinates(
+  alignedMolBlock: string,
+  productDepiction: ParsedDepiction,
+  primaryCandidate: AlignmentCandidate,
+  allReferenceBlocks: readonly string[],
+): string | null {
+  if (!alignedMolBlock || allReferenceBlocks.length <= 1) return alignedMolBlock;
+
+  let enriched = alignedMolBlock;
+  let alignedDepiction = parseDepiction(alignedMolBlock);
+  if (!alignedDepiction) return alignedMolBlock;
+  const claimedProductAtoms = new Set<number>(primaryCandidate.mapping.values());
+
+  for (const referenceBlock of allReferenceBlocks) {
+    if (referenceBlock === primaryCandidate.reference) continue;
+    const referenceDepiction = parseDepiction(referenceBlock);
+    if (!referenceDepiction) continue;
+
+    const mappings = mappingCandidatesWithBoundaryPruning(referenceDepiction, productDepiction);
+    let bestMapping: DepictionMapping | null = null;
+    let bestFreshAtomCount = 0;
+    let bestAnchorCount = 0;
+
+    for (const mapping of mappings) {
+      let freshAtomCount = 0;
+      let anchorCount = 0;
+      for (const [, productIndex] of mapping) {
+        if (claimedProductAtoms.has(productIndex)) {
+          anchorCount += 1;
+        } else {
+          freshAtomCount += 1;
+        }
+      }
+      if (anchorCount < 2 || freshAtomCount === 0) continue;
+      if (
+        freshAtomCount > bestFreshAtomCount ||
+        (freshAtomCount === bestFreshAtomCount && anchorCount > bestAnchorCount)
+      ) {
+        bestFreshAtomCount = freshAtomCount;
+        bestAnchorCount = anchorCount;
+        bestMapping = mapping;
+      }
+    }
+
+    if (!bestMapping) continue;
+
+    const anchorMapping = new Map<number, number>();
+    for (const [referenceIndex, productIndex] of bestMapping) {
+      if (claimedProductAtoms.has(productIndex)) {
+        anchorMapping.set(productIndex, referenceIndex);
+      }
+    }
+    if (anchorMapping.size < 2) continue;
+
+    const directTransform = fitSimilarityTransform(
+      alignedDepiction,
+      referenceDepiction,
+      anchorMapping,
+      false,
+    );
+    const reflectedTransform = fitSimilarityTransform(
+      alignedDepiction,
+      referenceDepiction,
+      anchorMapping,
+      true,
+    );
+    const chosenTransform = [directTransform, reflectedTransform]
+      .filter((candidate): candidate is SimilarityTransform => Boolean(candidate))
+      .sort((left, right) => left.rmsd - right.rmsd)[0] ?? null;
+    if (!chosenTransform) continue;
+
+    const assignments: CoordinateAssignment[] = [];
+    for (const [referenceIndex, productIndex] of bestMapping) {
+      if (claimedProductAtoms.has(productIndex)) continue;
+      const point = applySimilarity(
+        chosenTransform,
+        referenceDepiction.atoms[referenceIndex].x,
+        referenceDepiction.atoms[referenceIndex].y,
+      );
+      assignments.push({
+        productIndex,
+        x: point.x,
+        y: point.y,
+      });
+      claimedProductAtoms.add(productIndex);
+    }
+
+    enriched = rewriteAssignedV2000Coordinates(enriched, assignments) ?? enriched;
+    alignedDepiction = parseDepiction(enriched) ?? alignedDepiction;
+  }
+
+  return enriched;
 }
 
 function transferMappedReferenceStereoBonds(
@@ -1128,6 +1341,17 @@ export async function getReferenceAlignedProductStructure(
           ) ?? aligned;
         }
 
+        aligned = enrichWithSupplementalReferenceCoordinates(
+          aligned,
+          productDepiction,
+          candidate,
+          references,
+        ) ?? aligned;
+
+        if (alignmentIntroducesSevereGeometryDistortion(productDepiction, aligned)) {
+          continue;
+        }
+
         const verificationMol = RDKit.get_mol(aligned);
         if (!verificationMol) continue;
         try {
@@ -1168,6 +1392,34 @@ export async function getReferenceAlignedProductStructure(
  * The selected stereoisomer is generated upstream; this renderer only preserves
  * its molblock wedge choices and coordinates. It never invents chirality.
  */
+const ALPHA_PYRONE_REFERENCE_SMARTS =
+  "[$([O]=[c]1[o][c][c][c][c]1),$([O]=[C]1O[C]=[C][C]=[C]1)]";
+
+async function sourceMatchesSmarts(
+  RDKit: any,
+  source: string,
+  smarts: string,
+): Promise<boolean> {
+  let mol: any = null;
+  let query: any = null;
+  try {
+    mol = RDKit.get_mol(source);
+    if (!mol) return false;
+    query = RDKit.get_qmol(smarts);
+    if (!query) return false;
+    // get_substruct_match() is the reliable embind path here. On some RDKit
+    // builds, has_substruct_match is absent or returns a non-boolean wrapper,
+    // which made the alpha-pyrone bypass silently fail and let the mangling
+    // bicyclic projection run anyway.
+    return mol.get_substruct_match?.(query) !== "{}";
+  } catch {
+    return false;
+  } finally {
+    query?.delete?.();
+    mol?.delete?.();
+  }
+}
+
 export async function getDielsAlderBicyclicSvg(
   productSource: string,
   referenceSources: readonly (string | null | undefined)[],
@@ -1183,6 +1435,22 @@ export async function getDielsAlderBicyclicSvg(
   const temporaryMols: any[] = [];
   try {
     const RDKit = await getRDKit();
+    if (
+      await Promise.all(
+        references.map((reference) =>
+          sourceMatchesSmarts(RDKit, reference, ALPHA_PYRONE_REFERENCE_SMARTS),
+        ),
+      ).then((hits) => hits.some(Boolean))
+    ) {
+      // The bicyclic-preservation code is tuned for hydrocarbon bridged systems.
+      // Alpha-pyrone adducts already have a rigid, heteroatom-rich bicyclic
+      // core; forcing the preserved-orientation bridge projection bends the
+      // lactone portion and mangles the SVG. Use a completely fresh generic
+      // redraw here (not the heavy-atom stereo projection), so RDKit can lay
+      // out the bicyclic lactone without inherited bridge wedges/labels.
+      return getMoleculeSvg(product);
+    }
+
     productMol = RDKit.get_mol(product);
     if (!productMol) return getHeavyAtomStereoSvg(product);
     const canonicalProduct = productMol.get_smiles?.();
@@ -1243,6 +1511,9 @@ export async function getDielsAlderBicyclicSvg(
       );
       if (!aligned) continue;
       aligned = repositionDielsAlderInternalBridge(aligned, productDepiction, scaffold) ?? aligned;
+      if (alignmentIntroducesSevereGeometryDistortion(productDepiction, aligned)) {
+        continue;
+      }
 
       const wedgeSpecs = [
         { center: scaffold.bridgeheadA, neighbor: scaffold.preservedBridge[1], stereo: 1 as const },

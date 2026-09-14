@@ -15,7 +15,6 @@ import {
   type HalogenSymbol,
 } from "../utils/reactions/profiles/halogens";
 import { rendererForReactionDisplay } from "./reactionProductRenderer";
-import { getTextbookBicyclo222DielsAlderSvg } from "../utils/stereochemistry/dielsAlderTextbookSvg";
 
 import {
   predictReactionPathways,
@@ -436,19 +435,7 @@ export default function ReactionsPage({
             pathway.productVariants
               .map(async (variant) => (
                 await Promise.all(
-                  variant.componentSmiles.map(async (component) => {
-                    // Cyclic-diene Diels-Alder products with a bicyclo[2.2.2]
-                    // core use a deterministic graph-built textbook projection.
-                    // This intentionally bypasses both the legacy alignment
-                    // renderer and the newer generic mechanistic boundary,
-                    // because both can preserve a chemically valid but visually
-                    // collapsed RDKit bicyclic depiction.
-                    if (pathway.ruleId === "diene-diels-alder") {
-                      const textbook = await getTextbookBicyclo222DielsAlderSvg(component);
-                      if (textbook) return textbook;
-                    }
-                    return productSvg(component);
-                  }),
+                  variant.componentSmiles.map((component) => productSvg(component)),
                 )
               ).filter((svg): svg is string => Boolean(svg))),
           );

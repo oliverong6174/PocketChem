@@ -131,7 +131,7 @@ export type SubstitutionHandlerMode =
   | "aromaticSnAr"
   | "aromaticBenzyneAmination";
 
-export type EliminationHandlerMode = "betaElimination" | "e1" | "e2";
+export type EliminationHandlerMode = "betaElimination" | "e1" | "e2" | "hofmannAmine";
 export type CarbonylHandlerMode = "oximeFormation" | "imineHydrolysis";
 export type OxidationHandlerMode =
   | "alcoholOxidation"
@@ -147,7 +147,9 @@ export type RingHandlerMode =
   | "epoxideOrganometallicOpening"
   | "epoxideNucleophileOpening";
 export type RearrangementHandlerMode = "pinacol";
-export type PericyclicHandlerMode = "dielsAlder";
+export type PericyclicHandlerMode =
+  | "dielsAlder"
+  | "intramolecularDielsAlder";
 
 type HandlerOptions<Mode extends string> = {
   mode: Mode;

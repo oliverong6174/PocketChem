@@ -19,9 +19,13 @@ async function imineHydrolysis(reactantSmiles: string): Promise<string[]> {
     }
   }
 
+  // The generic imine-cleavage transform is valid only when C=N is not a
+  // ring bond. Applying it to a cyclic imine deletes the ring nitrogen as a
+  // separate fragment and creates a second, chemically wrong carbonyl product.
+  // Cyclic imines are handled by the ring-opening templates above.
   for (const product of await runReactionSmarts(
     reactantSmiles,
-    "[C:1]=[N:2]>>[C:1]=O.[N:2]",
+    "[C:1]=!@[N:2]>>[C:1]=O.[N:2]",
     16,
   )) {
     products.add(product);

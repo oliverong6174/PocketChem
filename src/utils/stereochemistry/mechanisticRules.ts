@@ -56,6 +56,11 @@ export function deriveMechanisticStereoDirective(
       representativeFace: "back",
       relationship: "syn",
       referenceIds: ["openstax-da-14.4", "openstax-da-14.5", "openstax-da-30.6", "moc-da-regio"],
+      dielsAlder: {
+        dieneTerminalRelationship: null,
+        dienophileGeometry: null,
+        activatedDienophile: false,
+      },
     };
   }
 

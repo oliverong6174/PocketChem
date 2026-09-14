@@ -282,6 +282,52 @@ const DIELS_ALDER_CONSTITUTIONAL_SMARTS =
 const DIELS_ALDER_ALKYNE_CONSTITUTIONAL_SMARTS =
   "[C:1]=[C:2]-[C:3]=[C:4].[C:5]#[C:6]>>[C:1]1-[C:2]=[C:3]-[C:4]-[C:5]=[C:6]-1";
 
+function intramolecularDielsAlderSmarts(tetherAtoms: number): string | null {
+  if (!Number.isInteger(tetherAtoms) || tetherAtoms < 1 || tetherAtoms > 5) return null;
+
+  const tetherMaps = Array.from({ length: tetherAtoms }, (_, index) => index + 7);
+  const reactantTether = tetherMaps.map((map) => `-[*:${map}]`).join("");
+  const productTether = tetherMaps.map((map) => `-[*:${map}]`).join("");
+
+  return (
+    `[C:1]=[C:2]-[C:3]=[C:4]${reactantTether}-[C:5]=[C:6]>>` +
+    // Intramolecular Diels-Alder must create TWO new sigma bonds while the
+    // original tether remains intact. Ring digit 2 explicitly adds C4-C5;
+    // ring digit 1 adds C6-C1. Without the C4-C5 closure the result is merely
+    // a large monocyclic alkene (the cyclodecene bug seen in the UI).
+    `[C:1]1-[C:2]=[C:3]-[C:4]2${productTether}-[C:5]2-[C:6]-1`
+  );
+}
+
+// Alpha-pyrones (2-pyrones) are a standard heterodiene class in Diels-Alder
+// chemistry. RDKit often aromaticizes them, so the plain carbon-only diene
+// SMARTS never fires even though the substrate is a valid 4π partner.
+// Treat the pre-existing lactone ring path exactly like the cyclic-diene path:
+// preserve it, then add the new [4+2] bond pair on top of that scaffold.
+const ALPHA_PYRONE_ALKYNE_DIELS_ALDER_SMARTS =
+  "[O:7]=[c:8]1[o:9][c:1][c:2][c:3][c:4]1.[C:5]#[C:6]>>[O:7]=[C:8]1[O:9][C:1]2-[C:2]=[C:3]-[C:4]1-[C:5]=[C:6]-2";
+
+const ALPHA_PYRONE_DIELS_ALDER_QUERY =
+  "[$([O]=[c]1[o][c][c][c][c]1),$([O]=[C]1O[C]=[C][C]=[C]1)]";
+
+async function isAlphaPyroneDiene(smiles: string): Promise<boolean> {
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(smiles);
+  if (!mol) return false;
+
+  let query: any = null;
+  try {
+    query = rdkit.get_qmol(ALPHA_PYRONE_DIELS_ALDER_QUERY);
+    if (!query) return false;
+    return mol.get_substruct_match?.(query) !== "{}";
+  } catch {
+    return false;
+  } finally {
+    query?.delete?.();
+    mol.delete?.();
+  }
+}
+
 function mirrorTags(tags: readonly ("@" | "@@")[]): ("@" | "@@")[] {
   return tags.map(invertTetrahedralTag);
 }
@@ -641,14 +687,33 @@ async function dielsAlderAlkyne(
 ): Promise<string[]> {
   if (reactants.length < 2) return [];
   const [diene, alkyne] = reactants;
+  const alphaPyroneDiene = await isAlphaPyroneDiene(diene);
 
-  const constitutionalProducts = await selectMajorDielsAlderConstitutionalProducts(
-    await runReactionSmarts(
-      [diene, alkyne],
-      DIELS_ALDER_ALKYNE_CONSTITUTIONAL_SMARTS,
-      Math.max(maxProducts, 8),
-    ),
+  const constitutionalCandidates = await runReactionSmarts(
+    [diene, alkyne],
+    DIELS_ALDER_ALKYNE_CONSTITUTIONAL_SMARTS,
+    Math.max(maxProducts, 8),
   );
+  const constitutionalProducts = await selectMajorDielsAlderConstitutionalProducts(
+    constitutionalCandidates.length > 0
+      ? constitutionalCandidates
+      : await runReactionSmarts(
+          [diene, alkyne],
+          ALPHA_PYRONE_ALKYNE_DIELS_ALDER_SMARTS,
+          Math.max(maxProducts, 8),
+        ),
+  );
+
+  // Alpha-pyrone cycloadditions should be shown as a single representative
+  // constitutional adduct here. The generic terminal-diene stereochemical
+  // expansion was designed for carbon dienes and can add an artificial OR pair
+  // plus bad wedge/dash annotations inside the rigid bicyclic lactone.
+  if (alphaPyroneDiene) {
+    return constitutionalProducts.length > 0
+      ? [constitutionalProducts[0]]
+      : [];
+  }
+
   const representative = constitutionalProducts[0] ?? null;
   const relationship = await dieneTerminalGeometryRelationship(diene);
 
@@ -847,6 +912,60 @@ async function dielsAlder(
   return constitutionalProducts.slice(0, maxProducts);
 }
 
+function v2000CyclomaticNumber(molBlock: string): number | null {
+  if (!molBlock || molBlock.includes("V3000")) return null;
+  const lines = molBlock.split(/\r?\n/);
+  const counts = lines[3] ?? "";
+  const atomCount = Number.parseInt(counts.slice(0, 3).trim(), 10);
+  const bondCount = Number.parseInt(counts.slice(3, 6).trim(), 10);
+  if (!Number.isInteger(atomCount) || !Number.isInteger(bondCount)) return null;
+  // IMDA products are connected. E - V + 1 is therefore the cycle rank.
+  return bondCount - atomCount + 1;
+}
+
+async function keepBicyclicProducts(products: string[]): Promise<string[]> {
+  if (products.length === 0) return [];
+  const rdkit = await getRDKit();
+  const kept: string[] = [];
+  for (const product of products) {
+    const mol = rdkit.get_mol(product);
+    if (!mol) continue;
+    try {
+      const molBlock = mol.get_molblock?.();
+      const cycleRank = typeof molBlock === "string" ? v2000CyclomaticNumber(molBlock) : null;
+      if (cycleRank !== null && cycleRank >= 2) kept.push(product);
+    } finally {
+      mol.delete?.();
+    }
+  }
+  return kept;
+}
+
+async function intramolecularDielsAlder(
+  reactants: string[],
+  maxProducts: number,
+  tetherAtoms: number,
+): Promise<string[]> {
+  if (reactants.length < 1) return [];
+  const smarts = intramolecularDielsAlderSmarts(tetherAtoms);
+  if (!smarts) return [];
+
+  const products = await runReactionSmarts(
+    [reactants[0]],
+    smarts,
+    Math.max(maxProducts * 2, 8),
+  );
+
+  // A valid intramolecular [4+2] product must contain two independent rings.
+  // This postcondition prevents the historical partial-closure product
+  // (cyclodecene) from ever escaping the handler if a stale/incorrect SMARTS
+  // or an unexpected atom-map orientation is encountered.
+  const bicyclicProducts = await keepBicyclicProducts(products);
+  return (
+    await selectMajorDielsAlderConstitutionalProducts(bicyclicProducts)
+  ).slice(0, maxProducts);
+}
+
 export async function pericyclic(
   reactantInput: string | string[],
   options?: Record<string, unknown>,
@@ -864,6 +983,11 @@ export async function pericyclic(
   const maxProducts = readPositiveIntegerOption(options, "maxProducts", 8);
 
   if (mode === "dielsAlder") {
+    if (options?.intramolecular === true) {
+      const tetherAtoms = Number(options?.tetherAtoms ?? 0);
+      return intramolecularDielsAlder(reactants, maxProducts, tetherAtoms);
+    }
+
     const dienophileBond = String(options?.dienophileBond ?? "alkene");
     return dienophileBond === "alkyne"
       ? dielsAlderAlkyne(reactants, maxProducts)

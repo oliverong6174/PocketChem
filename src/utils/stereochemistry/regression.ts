@@ -18,7 +18,7 @@ export type MechanisticStereoRegressionResult = {
 };
 
 function rawGetMolFromRDKit(rdkit: any): RawGetMol {
-  return (rdkit.__pocketchem_raw_get_mol ?? rdkit.get_mol.bind(rdkit)) as RawGetMol;
+  return rdkit.get_mol.bind(rdkit) as RawGetMol;
 }
 
 function stereoBondCounts(molBlock: string | null) {

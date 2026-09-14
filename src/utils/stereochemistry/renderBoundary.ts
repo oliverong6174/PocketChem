@@ -5,6 +5,29 @@ import {
   type RawGetMol,
 } from "./depictionEngine";
 
+const ALPHA_PYRONE_DIELS_ALDER_SMARTS =
+  "[$([O]=[c]1[o][c][c][c][c]1),$([O]=[C]1O[C]=[C][C]=[C]1)]";
+
+function isAlphaPyroneDielsAlder(rdkit: any, directive: any): boolean {
+  if (directive?.kind !== "diels-alder") return false;
+  const diene = directive.reactantSmiles?.[0];
+  if (typeof diene !== "string" || !diene.trim()) return false;
+
+  let mol: any = null;
+  let query: any = null;
+  try {
+    mol = rdkit.get_mol(diene);
+    if (!mol) return false;
+    query = rdkit.get_qmol(ALPHA_PYRONE_DIELS_ALDER_SMARTS);
+    return Boolean(query && mol.get_substruct_match?.(query) !== "{}");
+  } catch {
+    return false;
+  } finally {
+    query?.delete?.();
+    mol?.delete?.();
+  }
+}
+
 /**
  * Apply reaction-aware stereochemical presentation only at the reaction SVG
  * boundary. Never monkey-patch RDKit's embind module methods: get_mol is an
@@ -35,6 +58,14 @@ export async function renderMechanisticReactionProductSvg(
 
     const directive = getMechanisticStereoDirective(canonical.trim());
     if (!directive) return null;
+
+    // The generic mechanistic Diels-Alder projection is deliberately bypassed
+    // for alpha-pyrone heterodienes. Its bridge-layout logic was developed for
+    // hydrocarbon cycloadducts and overconstrains the lactone-containing
+    // bicyclic framework, producing the crossed/mangled SVG seen for pyrone +
+    // propiolate. Returning null here lets the dedicated reaction renderer use
+    // a fresh, chemically identical RDKit layout instead.
+    if (isAlphaPyroneDielsAlder(rdkit, directive)) return null;
 
     // Binding the original embind function is safe; replacing it is not.
     const rawGetMol: RawGetMol = rdkit.get_mol.bind(rdkit);

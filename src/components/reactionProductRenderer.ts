@@ -27,19 +27,57 @@ type ReactionRendererOptions = {
 };
 
 function uniqueReferences(options: ReactionRendererOptions) {
-  const references = [
-    ...(options.referenceStructures ?? []),
-    options.referenceStructure,
-    ...(options.referenceSmilesList ?? []),
-    options.referenceSmiles,
-  ]
-    // Do not trim preserved molfiles here. RDKit V2000 header lines are
-    // positional, and removing an intentionally blank first line corrupts the
-    // molfile. The alignment layer normalizes SMILES vs molfile inputs safely.
-    .map((reference) => reference ?? "")
-    .filter((reference) => Boolean(reference.trim()));
+  const references: string[] = [];
 
+  const structures = options.referenceStructures ?? [];
+  const smilesList = options.referenceSmilesList ?? [];
+  const pairedCount = Math.max(structures.length, smilesList.length);
+
+  if (pairedCount > 0) {
+    for (let index = 0; index < pairedCount; index += 1) {
+      const preservedStructure = structures[index] ?? "";
+      const fallbackSmiles = smilesList[index] ?? "";
+      const preferredReference = preservedStructure.trim()
+        ? preservedStructure
+        : fallbackSmiles.trim()
+          ? fallbackSmiles
+          : "";
+      if (preferredReference) references.push(preferredReference);
+    }
+  } else {
+    const fallbackReference = (options.referenceStructure ?? "").trim()
+      ? options.referenceStructure ?? ""
+      : (options.referenceSmiles ?? "").trim()
+        ? options.referenceSmiles ?? ""
+        : "";
+    if (fallbackReference) references.push(fallbackReference);
+  }
+
+  // A preserved molfile and the corresponding SMILES for the same logical
+  // reactant are different strings, so Set-based deduplication alone is not
+  // enough. Pair structure/smiles inputs by component and keep the preserved
+  // molfile whenever it exists; only fall back to SMILES when no coordinate-
+  // bearing molfile is available for that component.
   return [...new Set(references)];
+}
+
+
+function shouldAlignProductToReferences(
+  display: ReactionDisplayMetadata | null | undefined,
+) {
+  // Reference alignment is now opt-in only. Automatically aligning every
+  // multi-reactant product was over-correcting reactions such as Wittig:
+  // independently drawn reactants supplied incompatible coordinate frames,
+  // and the merged product could fold, cross bonds, or expose stray carbon
+  // labels even though its connectivity was correct.
+  //
+  // Reactions that genuinely need depiction preservation already have an
+  // explicit display contract. Everything else gets a fresh RDKit 2-D layout.
+  return Boolean(
+    display?.preserveReactantOrientation ||
+    display?.renderer === "aligned-stereo" ||
+    display?.renderer === "aligned-generic-halogen"
+  );
 }
 
 function baseRendererForReactionDisplay(
@@ -104,7 +142,7 @@ export function rendererForReactionDisplay(
       return getDielsAlderBicyclicSvg(productSource, references);
     }
 
-    if (references.length > 0) {
+    if (references.length > 0 && shouldAlignProductToReferences(display)) {
       const aligned = await getReferenceAlignedProductStructure(
         productSource,
         references,
