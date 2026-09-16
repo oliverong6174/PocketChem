@@ -1907,3 +1907,372 @@ body,
   font-size: 0.78rem;
 }
 
+
+/* Spectroscopy */
+.spectroscopy-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.55fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.spectroscopy-input-card {
+  position: sticky;
+  top: 18px;
+  display: flex;
+  flex-direction: column;
+  /* Keep Ketcher at its normal geometry. On shorter desktop viewports, scroll
+     only the spectroscopy input card instead of squeezing Ketcher's canvas and
+     toolbars. This keeps the results column stationary while the ring palette
+     remains reachable from the left panel. */
+  max-height: calc(100vh - 36px);
+  max-height: calc(100dvh - 36px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+
+.spectroscopy-drawer {
+  height: 500px;
+  min-height: 500px;
+  max-height: none;
+}
+
+/* Do not impose independent dimensions/scrolling on Ketcher's internal toolbars.
+   Ketcher is allowed to lay out its own top, side, and ring toolbars normally. */
+.spectroscopy-drawer .ketcher-shell,
+.spectroscopy-drawer .ketcher-shell > div {
+  min-height: 0;
+}
+
+.spectroscopy-results-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.spectroscopy-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.spectroscopy-summary > div,
+.mass-summary-grid > div {
+  background: #020617;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+.spectroscopy-summary strong,
+.spectroscopy-summary code {
+  display: block;
+  color: #e2e8f0;
+  overflow-wrap: anywhere;
+}
+
+.spectroscopy-summary code {
+  color: #93c5fd;
+  font-family: "Courier New", monospace;
+}
+
+.spectroscopy-structure-preview {
+  min-height: 150px;
+  max-height: 230px;
+  background: white;
+  border-radius: 14px;
+  padding: 10px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.spectroscopy-structure-preview svg {
+  max-width: 100%;
+  max-height: 210px;
+  height: auto;
+}
+
+.spectroscopy-tab-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 18px;
+}
+
+.spectroscopy-tab {
+  background: #0f172a;
+  color: #cbd5e1;
+  border: 1px solid #334155;
+  padding: 10px 8px;
+}
+
+.spectroscopy-tab:hover {
+  background: #1e293b;
+}
+
+.spectroscopy-tab.active {
+  background: #2563eb;
+  border-color: #60a5fa;
+  color: white;
+}
+
+.spectroscopy-tab-short {
+  display: none;
+}
+
+.spectroscopy-empty-state {
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+  border: 1px dashed #475569;
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.spectroscopy-empty-state h3 {
+  margin: 0 0 4px;
+}
+
+.spectroscopy-empty-state p {
+  max-width: 560px;
+}
+
+.spectroscopy-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.spectroscopy-panel-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.spectroscopy-panel-heading h3 {
+  margin: 0 0 4px;
+  font-size: 21px;
+}
+
+.spectroscopy-panel-heading p {
+  margin: 0;
+}
+
+.spectroscopy-panel-heading > span {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #334155;
+  color: #93c5fd;
+  background: #020617;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.spectrum-plot-shell {
+  width: 100%;
+  overflow-x: auto;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid #334155;
+}
+
+.spectrum-plot {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+
+.spectrum-axis {
+  stroke: #334155;
+  stroke-width: 1.4;
+}
+
+.spectrum-stick {
+  stroke: #0f172a;
+  stroke-width: 3;
+}
+
+.spectrum-stick-down {
+  stroke-width: 5;
+}
+
+.spectrum-tick-label,
+.spectrum-axis-label,
+.spectrum-peak-label {
+  fill: #334155;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+}
+
+.spectrum-tick-label {
+  font-size: 12px;
+}
+
+.spectrum-axis-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.spectrum-peak-label {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.spectroscopy-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #334155;
+  border-radius: 14px;
+}
+
+.spectroscopy-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 690px;
+  font-size: 13px;
+}
+
+.spectroscopy-table th,
+.spectroscopy-table td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #1e293b;
+}
+
+.spectroscopy-table th {
+  background: #020617;
+  color: #93c5fd;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.spectroscopy-table td {
+  color: #cbd5e1;
+}
+
+.spectroscopy-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.mass-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mass-summary-grid span {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.mass-summary-grid strong {
+  font-size: 18px;
+  color: #e2e8f0;
+}
+
+.spectroscopy-method-note,
+.spectroscopy-notes p {
+  margin: 0;
+  border-left: 3px solid #38bdf8;
+  padding: 8px 10px;
+  background: rgba(14, 165, 233, 0.08);
+  color: #cbd5e1;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+}
+
+.spectroscopy-notes {
+  display: grid;
+  gap: 8px;
+}
+
+@media (max-width: 980px) {
+  .spectroscopy-page {
+    grid-template-columns: 1fr;
+  }
+
+  .spectroscopy-input-card {
+    position: static;
+    max-height: none;
+  }
+
+  .spectroscopy-drawer {
+    height: 440px;
+    min-height: 0;
+    max-height: 88vh;
+  }
+}
+
+@media (max-width: 620px) {
+  .spectroscopy-summary,
+  .mass-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spectroscopy-tab-full {
+    display: none;
+  }
+
+  .spectroscopy-tab-short {
+    display: inline;
+  }
+
+  .spectroscopy-tab {
+    min-height: 42px;
+    padding: 8px 4px;
+  }
+
+  .spectroscopy-panel-heading {
+    flex-direction: column;
+  }
+}
+
+/* Spectroscopy: keep editor actions inside the sticky input card on short viewports.
+   Do not shrink Ketcher itself; pin only the action row to the card's scrollport. */
+@media (min-width: 981px) {
+  .spectroscopy-input-card {
+    padding-bottom: 18px;
+    scroll-padding-bottom: 110px;
+    isolation: isolate;
+  }
+
+  .spectroscopy-input-card > .button-row {
+    position: sticky;
+    bottom: 0;
+    z-index: 12;
+    flex: 0 0 auto;
+    margin-top: 18px;
+    margin-bottom: 0;
+    padding: 14px 4px 2px;
+    background: linear-gradient(
+      to bottom,
+      rgba(15, 23, 42, 0),
+      rgba(15, 23, 42, 0.96) 26%,
+      rgba(15, 23, 42, 0.96) 100%
+    );
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+  }
+
+  .spectroscopy-input-card > .button-row > button {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}

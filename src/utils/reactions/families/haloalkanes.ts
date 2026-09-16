@@ -226,7 +226,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     reactionType: "addition",
     reactionClass: "multistep carbon–carbon bond formation",
     title: "Nitrile Formation Followed by Grignard/Organolithium Addition",
-    reagents: "1) NaCN  2) RMgCl, RMgBr, RMgI, or RLi  3) H₃O⁺",
+    reagents: "1) NaCN  2) RMgX or RLi  3) H₃O⁺",
     reagentNote: "Draw the alkyl halide and organometallic reagent as disconnected structures",
     productHint: "Ketone",
     explanation:

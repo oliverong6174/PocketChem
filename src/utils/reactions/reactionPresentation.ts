@@ -98,7 +98,21 @@ function splitStepAlternatives(stepLabel: string): string[] {
   ));
 }
 
-export function reagentBubbleLabels(label: string): string[] {
+export function reagentBubbleLabels(
+  label: string,
+  mode: "auto" | "single" = "auto",
+): string[] {
+  const compact = normalizeBubbleWhitespace(label);
+  if (mode === "single") return compact ? [compact] : [];
+  const numberedSteps = compact.match(/(?:^|\s)\d+\)\s*/g) ?? [];
+
+  // A numbered sequence is one experimental protocol, not a set of alternative
+  // reagents. Keep the whole sequence in one bubble so internal "or" choices
+  // (for example RMgX or RLi) stay attached to the correct step.
+  if (numberedSteps.length >= 2) {
+    return [compact];
+  }
+
   const normalized = label.replace(/\s{2,}/g, '; ');
   const stepLikeParts = normalized
     .split(';')

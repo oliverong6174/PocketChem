@@ -503,6 +503,12 @@ const bonds: BondAnnotation[] = parsedMol.bonds.map((bond) => {
   }
 }
 
+export type MoleculeHighlightRenderOptions = {
+  softAtomRadius?: number;
+  selectedAtomRadius?: number;
+  bondWidthMultiplier?: number;
+};
+
 export async function getHighlightedMoleculeSvg(
   smiles: string,
   atomIndices: number[],
@@ -510,7 +516,8 @@ export async function getHighlightedMoleculeSvg(
   selectedAtomIndex: number | null,
   selectedBondIndex: number | null,
   selectedSystemAtomIndices: number[] = [],
-  selectedSystemBondIndices: number[] = []
+  selectedSystemBondIndices: number[] = [],
+  renderOptions: MoleculeHighlightRenderOptions = {},
 ): Promise<string | null> {
   const RDKit = await getRDKit();
   const mol = RDKit.get_mol(smiles);
@@ -573,10 +580,12 @@ export async function getHighlightedMoleculeSvg(
     highlightAtomRadii: Object.fromEntries(
       allHighlightedAtoms.map((atomIndex) => [
         atomIndex,
-        strongAtomIndices.includes(atomIndex) ? 0.45 : 0.28,
+        strongAtomIndices.includes(atomIndex)
+          ? (renderOptions.selectedAtomRadius ?? 0.45)
+          : (renderOptions.softAtomRadius ?? 0.28),
       ])
     ),
-    highlightBondWidthMultiplier: 6,
+    highlightBondWidthMultiplier: renderOptions.bondWidthMultiplier ?? 6,
     ...DEUTERIUM_DRAW_OPTION,
   };
 

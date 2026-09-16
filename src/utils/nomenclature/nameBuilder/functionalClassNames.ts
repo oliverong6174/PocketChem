@@ -287,6 +287,77 @@ function simpleAcidNameFromAcylCarbon(parsedMol: ParsedMol, carbonIndex: number)
   return map[alkylName] ?? `${alkylName}carboxylic acid`;
 }
 
+export function getCarbonicAcidMonoesterName(
+  parsedMol: ParsedMol,
+): FunctionalClassNameResult | null {
+  for (const carbon of parsedMol.atoms.filter((atom) => atom.element === "C")) {
+    if (countDoubleBondedElement(parsedMol, carbon.atomIndex, "O") !== 1) continue;
+
+    const singleOxygenBonds = (parsedMol.adjacency.get(carbon.atomIndex) ?? [])
+      .filter((bond) =>
+        bond.bondOrder === 1 &&
+        parsedMol.atoms[getOtherAtom(bond, carbon.atomIndex)]?.element === "O"
+      );
+
+    // Carbonic-acid monoesters have O=C(OH)(OR): one carbonyl oxygen plus
+    // exactly two singly bonded oxygens, one hydroxyl and one O-bound carbon group.
+    if (singleOxygenBonds.length !== 2) continue;
+
+    const organicOxygenSides: Array<{ oxygen: number; carbon: number }> = [];
+    let hydroxylOxygenCount = 0;
+
+    for (const oxygenBond of singleOxygenBonds) {
+      const oxygen = getOtherAtom(oxygenBond, carbon.atomIndex);
+      const carbonBond = getSingleBondedNeighbor(
+        parsedMol,
+        oxygen,
+        "C",
+        carbon.atomIndex,
+      );
+
+      if (carbonBond) {
+        organicOxygenSides.push({
+          oxygen,
+          carbon: getOtherAtom(carbonBond, oxygen),
+        });
+        continue;
+      }
+
+      const oxygenAtom = parsedMol.atoms[oxygen];
+      const nonCarbonylNeighbors = (parsedMol.adjacency.get(oxygen) ?? [])
+        .map((bond) => getOtherAtom(bond, oxygen))
+        .filter((atomIndex) => atomIndex !== carbon.atomIndex);
+      const hasNonHydrogenSubstituent = nonCarbonylNeighbors.some(
+        (atomIndex) => parsedMol.atoms[atomIndex]?.element !== "H",
+      );
+
+      // A neutral singly bound O with no other heavy-atom substituent is an OH
+      // site whether its hydrogen is implicit or explicitly present in the mol block.
+      if ((oxygenAtom?.charge ?? 0) === 0 && !hasNonHydrogenSubstituent) {
+        hydroxylOxygenCount += 1;
+      }
+    }
+
+    if (organicOxygenSides.length !== 1 || hydroxylOxygenCount !== 1) continue;
+
+    const organicSide = organicOxygenSides[0];
+    const substituentName = buildBranchName(
+      parsedMol,
+      organicSide.carbon,
+      organicSide.oxygen,
+    ).name;
+
+    return {
+      name: `${substituentName} hydrogen carbonate`,
+      confidence: "high",
+      reason:
+        "Recognized a carbonic-acid monoester, O=C(OH)(OR), and named the O-bound organic group as a hydrogen carbonate.",
+    };
+  }
+
+  return null;
+}
+
 function buildAcidDerivativeClassName(
   parsedMol: ParsedMol,
   groupName: string
@@ -320,6 +391,9 @@ function buildAcidDerivativeClassName(
   }
 
   if (groupName === "carbonate ester") {
+    const monoesterName = getCarbonicAcidMonoesterName(parsedMol);
+    if (monoesterName) return monoesterName;
+
     for (const carbon of parsedMol.atoms.filter((atom) => atom.element === "C")) {
       if (!isCarbonylCarbon(parsedMol, carbon.atomIndex)) continue;
 

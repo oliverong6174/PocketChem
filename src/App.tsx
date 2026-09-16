@@ -37,15 +37,24 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     analyzeNomenclatureAndProperties,
     type MoleculeIdentityResult,
   } from "./utils/nomenclatureUtils";
+  import {
+    analyzeAcidity,
+    type AcidityResult,
+  } from "./utils/ranking/analyzeAcidity";
+  import {
+    analyzeBasicity,
+    type BasicityResult,
+  } from "./utils/ranking/analyzeBasicity";
 
   import type { ReactionPathway } from "./utils/reactionUtils";
 
   import { initializeFunctionalGroups } from "./utils/functionalGroups/bootstrap";
 
   const ReactionsPage = lazy(() => import("./components/ReactionsPage"));
-  const AcidBasePage = lazy(() => import("./components/AcidBasePage"));
+  const AcidBasePage = lazy(() => import("./components/RankingPage"));
   const SynthesisPage = lazy(() => import("./components/SynthesisPage"));
   const MultiCatalyticPage = lazy(() => import("./components/MultiCatalyticPage"));
+  const SpectroscopyPage = lazy(() => import("./components/SpectroscopyPage"));
 
 
   type AnnotationCarouselItem =
@@ -71,20 +80,21 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
       };
     
 
-  type AnalysisPanel = "overview" | "groups" | "concepts" | "properties";
-  type AppPage = "analysis" | "acidBase" | "reactions" | "multiStep" | "multiCatalytic";
+  type AnalysisPanel = "overview" | "acidBase" | "concepts" | "properties";
+  type AppPage = "analysis" | "acidBase" | "reactions" | "spectroscopy" | "multiStep" | "multiCatalytic";
 
   const APP_PAGES: Array<{ id: AppPage; label: string }> = [
-    { id: "analysis", label: "Analysis" },
-    { id: "acidBase", label: "Acid/Base" },
+    { id: "analysis", label: "Properties" },
+    { id: "acidBase", label: "Ranking" },
     { id: "reactions", label: "Reactions" },
+    { id: "spectroscopy", label: "Spectroscopy" },
     { id: "multiStep", label: "Multi-Step" },
     { id: "multiCatalytic", label: "Multi-Catalytic" },
   ];
 
   const ANALYSIS_PANELS: Array<{ id: AnalysisPanel; label: string }> = [
     { id: "overview", label: "Overview" },
-    { id: "groups", label: "Groups" },
+    { id: "acidBase", label: "Acid/Base" },
     { id: "concepts", label: "Concepts" },
     { id: "properties", label: "Properties" },
   ];
@@ -127,12 +137,17 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     );
   }
 
+  function formatPkaRange(range: readonly [number, number]) {
+    return `${range[0]}–${range[1]}`;
+  }
+
   function App() {
     //useState calls
     const analyzeInFlightRef = useRef(false);
     const latestAnalyzeRunRef = useRef(0);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [isMainEditorReady, setIsMainEditorReady] = useState(false);
+    const [mainEditorResetVersion, setMainEditorResetVersion] = useState(0);
     const [smiles, setSmiles] = useState("Not analyzed yet");
     const [status, setStatus] = useState("Draw a molecule first");
     const [, setMainGroup] = useState<FunctionalGroupResult | null>(
@@ -141,6 +156,8 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     const [functionalGroups, setFunctionalGroups] = useState<
       FunctionalGroupResult[]
     >([]);
+    const [acidityResults, setAcidityResults] = useState<AcidityResult[]>([]);
+    const [basicityResults, setBasicityResults] = useState<BasicityResult[]>([]);
     const [resonanceResults, setResonanceResults] = useState<ResonanceResult[]>([]);
     const [moleculeAnnotation, setMoleculeAnnotation] =
       useState<MoleculeAnnotation | null>(null);
@@ -361,7 +378,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
         setFunctionalGroups(detectedFunctionalGroups);
         setStatus("Calculating properties and supported reactions…");
 
-        const [pathways, identity] = await Promise.all([
+        const [pathways, identity, acidity, basicity] = await Promise.all([
           import("./utils/reactionUtils").then(({ predictReactionPathways }) =>
             predictReactionPathways(safeSmiles, detectedFunctionalGroups),
           ),
@@ -376,12 +393,22 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
             );
             return null;
           }),
+          analyzeAcidity(safeSmiles, hierarchy.primaryGroups).catch((acidError) => {
+            console.error("Acidity analysis failed:", acidError);
+            return [] as AcidityResult[];
+          }),
+          analyzeBasicity(safeSmiles, hierarchy.primaryGroups).catch((baseError) => {
+            console.error("Basicity analysis failed:", baseError);
+            return [] as BasicityResult[];
+          }),
         ]);
 
         if (latestAnalyzeRunRef.current !== runId) return;
 
         setReactionPathways(pathways);
         setMoleculeIdentity(identity);
+        setAcidityResults(acidity);
+        setBasicityResults(basicity);
         setStatus("Analysis complete");
       } catch (error) {
         console.error("Analyze error:", error);
@@ -1191,6 +1218,8 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     setStatus("Draw a molecule first");
     setMainGroup(null);
     setFunctionalGroups([]);
+    setAcidityResults([]);
+    setBasicityResults([]);
     setResonanceResults([]);
     setChiralityResults([]);
     setReactionPathways([]);
@@ -1199,8 +1228,16 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     setMoleculeAnnotation(null);
     setSelectedAtomIndex(null);
     setSelectedBondIndex(null);
+    setAnnotationCardIndex(0);
+    setHighlightedMoleculeSvg(null);
     setMolfile(null);
     setMoleculeIdentity(null);
+
+    // Ketcher's setMolecule("") is an import operation rather than a true clear.
+    // Remounting gives the main drawer a fresh editor canvas and also clears any
+    // active selection/rotate/tool state without disturbing the rest of the page.
+    setIsMainEditorReady(false);
+    setMainEditorResetVersion((version) => version + 1);
   };
 
   {/*RETURN STATEMENT*/}
@@ -1253,7 +1290,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
             <div className="card-header">
               <div>
                 <h2>Molecule Drawer</h2>
-                <p>Draw a molecule, then click Analyze Molecule.</p>
+                <p>Properties — draw a molecule to review its overview, acid/base sites, concepts, and molecular properties.</p>
               </div>
               <span className={`status ${isMainEditorReady ? "ready" : "loading"}`}>
                 {isMainEditorReady ? "Editor ready" : "Loading editor"}
@@ -1261,7 +1298,10 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
             </div>
 
             <div className="drawer-placeholder drawer-placeholder-compact">
-              <MoleculeDrawer onReady={handleMainEditorReady} />
+              <MoleculeDrawer
+                key={`main-editor-${mainEditorResetVersion}`}
+                onReady={handleMainEditorReady}
+              />
             </div>
 
             <div className="button-row">
@@ -1288,7 +1328,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
           <div className="card analysis-card analysis-dashboard-card">
             <div className="dashboard-header">
               <div>
-                <h2>Analysis Dashboard</h2>
+                <h2>Properties Dashboard</h2>
                 <p>
                   {moleculeIdentity
                     ? moleculeIdentity.nomenclature.displayName ||
@@ -1431,43 +1471,100 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
                 </div>
               )}
 
-              {analysisPanel === "groups" && (
+              {analysisPanel === "acidBase" && (
                 <div className="dashboard-panel">
                   <div className="analysis-section compact-section">
-                    <p className="label">Functional Groups</p>
+                    <p className="label">Acid/Base Sites & Estimates</p>
 
-                    {functionalGroupOccurrences.length === 0 ? (
-                      <p className="empty">
-                        No functional groups detected yet. Analyze a molecule
-                        first.
-                      </p>
+                    <div className="acid-base-summary-grid">
+                      <div className="acid-base-summary-card">
+                        <span>Strongest acidic site</span>
+                        <strong>
+                          {acidityResults[0]
+                            ? `${acidityResults[0].acidicSite} (atom ${acidityResults[0].siteAtomIndex + 1})`
+                            : "None detected"}
+                        </strong>
+                        <p>
+                          {acidityResults[0]
+                            ? `Estimated pKa ${acidityResults[0].estimatedPka} · typical range ${formatPkaRange(acidityResults[0].estimatedPkaRange)} · ${acidityResults[0].confidence.toLowerCase()} confidence`
+                            : "Analyze a molecule first."}
+                        </p>
+                      </div>
+
+                      <div className="acid-base-summary-card">
+                        <span>Strongest basic site</span>
+                        <strong>
+                          {basicityResults[0]
+                            ? `${basicityResults[0].basicSite} (atom ${basicityResults[0].siteAtomIndex + 1})`
+                            : "None detected"}
+                        </strong>
+                        <p>
+                          {basicityResults[0]
+                            ? `Conjugate acid pKa ${basicityResults[0].conjugateAcidPka} · ${basicityResults[0].confidence.toLowerCase()} confidence`
+                            : "Analyze a molecule first."}
+                        </p>
+                      </div>
+
+                      <div className="acid-base-summary-card">
+                        <span>Detected groups</span>
+                        <strong>{functionalGroups.length}</strong>
+                        <p>
+                          {functionalGroups.length > 0
+                            ? functionalGroups.map((group) => group.name).join(", ")
+                            : "No groups loaded yet."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="analysis-section compact-section">
+                    <p className="label">Acidity Estimate</p>
+                    {acidityResults.length === 0 ? (
+                      <p className="empty">No acidic sites estimated yet.</p>
                     ) : (
                       <div className="group-list compact-group-list">
-                        {functionalGroupOccurrences.map((occurrence) => (
-                          <div
-                            className="group-card"
-                            key={`${occurrence.groupName}-${occurrence.occurrence}`}
-                          >
+                        {acidityResults.map((result, index) => (
+                          <div className="group-card" key={`${result.relatedGroup}-${result.acidicSite}-${index}`}>
                             <div className="group-card-header">
-                              <h3>{occurrence.groupName}</h3>
-                              <span>{occurrence.group.confidence}</span>
+                              <h3>{index === 0 ? "Strongest acidic site" : "Weaker acidic site"}: {result.acidicSite}</h3>
+                              <span>pKa {result.estimatedPka}</span>
                             </div>
+                            <p><strong>Related group:</strong> {result.relatedGroup}</p>
+                            <p><strong>Detected atom:</strong> Atom {result.siteAtomIndex + 1} · {result.confidence.toLowerCase()} confidence</p>
+                            <p><strong>Typical pKa range:</strong> {formatPkaRange(result.estimatedPkaRange)}</p>
+                            <p><strong>A — Atom:</strong> {result.atom}</p>
+                            <p><strong>R — Resonance:</strong> {result.resonance}</p>
+                            <p><strong>I — Induction:</strong> {result.induction}</p>
+                            <p><strong>O — Orbital:</strong> {result.orbital}</p>
+                            <p>{result.explanation}</p>
+                            {result.modifiers.length > 0 && (
+                              <p><strong>pKa modifier:</strong> {result.modifiers.join(" ")}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
-                            <p>
-                              <strong>Occurrence:</strong> {" "}
-                              {occurrence.occurrence} / {" "}
-                              {occurrence.totalOccurrences}
-                            </p>
-
-                            <p>
-                              <strong>Suffix:</strong> {occurrence.group.suffix}
-                            </p>
-
-                            <p>
-                              <strong>Prefix:</strong> {occurrence.group.prefix}
-                            </p>
-
-                            <p>{occurrence.group.mcatNote}</p>
+                  <div className="analysis-section compact-section">
+                    <p className="label">Basicity Estimate</p>
+                    {basicityResults.length === 0 ? (
+                      <p className="empty">No basic sites estimated yet.</p>
+                    ) : (
+                      <div className="group-list compact-group-list">
+                        {basicityResults.map((result, index) => (
+                          <div className="group-card" key={`${result.relatedGroup}-${result.basicSite}-${index}`}>
+                            <div className="group-card-header">
+                              <h3>{index === 0 ? "Strongest basic site" : "Weaker basic site"}: {result.basicSite}</h3>
+                              <span>conj. acid pKa {result.conjugateAcidPka}</span>
+                            </div>
+                            <p><strong>Related group:</strong> {result.relatedGroup}</p>
+                            <p><strong>Detected atom:</strong> Atom {result.siteAtomIndex + 1} · {result.confidence.toLowerCase()} confidence</p>
+                            <p><strong>Typical conjugate-acid pKa range:</strong> {formatPkaRange(result.conjugateAcidPkaRange)}</p>
+                            <p>{result.explanation}</p>
+                            {result.modifiers.length > 0 && (
+                              <p><strong>Basicity modifier:</strong> {result.modifiers.join(" ")}</p>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -1850,6 +1947,8 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
                 initialPathways={reactionPathways}
                 initialReactantMolfile={molfile}
               />
+            ) : activePage === "spectroscopy" ? (
+              <SpectroscopyPage />
             ) : activePage === "multiStep" ? (
               <SynthesisPage />
             ) : (

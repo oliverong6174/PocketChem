@@ -427,6 +427,48 @@ function generalBicycloNumberingDetails(
   return { ...details, substituents };
 }
 
+
+function getTetralinDerivativeName(parsedMol: ParsedMol): PolycyclicHydrocarbonName | null {
+  const scaffold = enumerateSimpleBicycloNumberings(parsedMol);
+  if (!scaffold?.numberings.length) return null;
+  if (scaffold.carbonCount !== 10 || scaffold.descriptor.join(".") !== "4.4.0") return null;
+
+  const best = scaffold.numberings
+    .map((numbering) =>
+      generalBicycloNumberingDetails(
+        parsedMol,
+        numbering,
+        scaffold.coreSet,
+        scaffold.carbonAdjacency,
+      ),
+    )
+    .sort(compareSimpleBicycloNumberings)[0];
+
+  if (best.tripleLocants.length > 0) return null;
+  if (best.doubleLocants.join(",") !== "1,3,5") return null;
+
+  // A bicyclo[4.4.0]deca-1,3,5-triene core is the tetralin / 1,2,3,4-
+  // tetrahydronaphthalene framework. For substituents on the saturated bridge,
+  // the bicyclic locants 7-10 correspond to tetralin positions 1-4 once the
+  // orientation giving the lowest substituent locants is selected.
+  if (best.substituents.some((substituent) => substituent.locant < 7 || substituent.locant > 10)) {
+    return null;
+  }
+
+  const tetralinSubstituents = best.substituents.map((substituent) => ({
+    locant: substituent.locant - 6,
+    prefix: substituent.prefix,
+  }));
+  const prefix = buildSimpleHalogenPrefix(tetralinSubstituents);
+
+  return {
+    name: `${prefix ? `${prefix}-` : ""}1,2,3,4-tetrahydronaphthalene`,
+    confidence: "high",
+    reason:
+      "Recognized the tetralin (1,2,3,4-tetrahydronaphthalene) fused aromatic/saturated-ring framework and used its conventional fused-ring numbering instead of a less readable generic bicyclo[4.4.0] name.",
+  };
+}
+
 function getSimpleGeneralBicycloName(parsedMol: ParsedMol): PolycyclicHydrocarbonName | null {
   const scaffold = enumerateSimpleBicycloNumberings(parsedMol);
   if (!scaffold?.numberings.length) return null;
@@ -697,6 +739,9 @@ function unsaturationSuffix(doubleLocants: number[], tripleLocants: number[]): s
 export function getPolycyclicHydrocarbonName(
   parsedMol: ParsedMol,
 ): PolycyclicHydrocarbonName | null {
+  const tetralinDerivative = getTetralinDerivativeName(parsedMol);
+  if (tetralinDerivative) return tetralinDerivative;
+
   const generalBicyclo = getSimpleGeneralBicycloName(parsedMol);
   if (generalBicyclo) return generalBicyclo;
 

@@ -17,6 +17,25 @@ const aromaticTrigger = {
   includeSmarts: ["[cH]"],
 };
 
+// A haloalkyl side chain already attached to the arene is a structural partner
+// within the same molecule, not a missing second Friedel-Crafts reactant. These
+// patterns cover the common 5-, 6-, and 7-member fused-ring closures obtained
+// from three-, four-, and five-carbon primary haloalkyl tethers, respectively.
+const intramolecularFriedelCraftsTetherSmarts = [
+  "[cH]1[c]([CH2][CH2][CH2][Cl,Br,I])[cH][cH][cH][cH]1",
+  "[cH]1[c]([CH2][CH2][CH2][CH2][Cl,Br,I])[cH][cH][cH][cH]1",
+  "[cH]1[c]([CH2][CH2][CH2][CH2][CH2][Cl,Br,I])[cH][cH][cH][cH]1",
+] as const;
+
+// More permissive side-chain queries are used only to suppress the ordinary
+// intermolecular Friedel-Crafts alkylation card. The cyclization rules above
+// retain the stricter ring SMARTS needed to compute the correct fused product.
+const intramolecularFriedelCraftsSideChainSmarts = [
+  "[c]-[CH2]-[CH2]-[CH2]-[Cl,Br,I]",
+  "[c]-[CH2]-[CH2]-[CH2]-[CH2]-[Cl,Br,I]",
+  "[c]-[CH2]-[CH2]-[CH2]-[CH2]-[CH2]-[Cl,Br,I]",
+] as const;
+
 // Birch reduction has a wider aromatic-substrate domain than the shared
 // electrophilic-aromatic-substitution trigger. In particular, aromatic
 // carbonyl derivatives such as benzoic acid remain valid Birch substrates
@@ -43,6 +62,70 @@ const easModelNotes = {
     "Simple benzene rings are ranked by ring activation/deactivation plus ortho/meta/para directing effects. Fused polycyclic aromatics intentionally fall back to unranked enumeration rather than applying simple-benzene directing constants outside their domain.",
   ],
 };
+
+const arylSnArConfigs = [
+  {
+    slug: "azide",
+    title: "Nucleophilic Aromatic Substitution with Azide",
+    reagents: "1 equiv NaN₃, heat as needed",
+    product: "Aryl azide",
+  },
+  {
+    slug: "cyanide",
+    title: "Nucleophilic Aromatic Substitution with Cyanide",
+    reagents: "NaCN or KCN, heat as needed",
+    product: "Aryl nitrile",
+  },
+  {
+    slug: "hydroxide",
+    title: "Nucleophilic Aromatic Substitution with Hydroxide",
+    reagents: "NaOH, heat",
+    product: "Phenol",
+  },
+  {
+    slug: "amino",
+    title: "Nucleophilic Aromatic Substitution with Amide/Ammonia",
+    reagents: "NH₂⁻ or NH₃ under suitable SNAr conditions",
+    product: "Aryl amine",
+  },
+  {
+    slug: "methoxide",
+    title: "Nucleophilic Aromatic Substitution with Methoxide",
+    reagents: "NaOCH₃, CH₃OH",
+    product: "Aryl methyl ether",
+  },
+] as const;
+
+const arylSnArRules: ReactionRule[] = arylSnArConfigs.map(
+  ({ slug, title, reagents, product }, index): ReactionRule => ({
+    id: `aryl-halide-snar-${slug}`,
+    family: "aromatics",
+    reactionType: "substitution",
+    title,
+    reagents,
+    reagentNote: "Addition–elimination requires a strong EWG ortho or para to the leaving group",
+    productHint: product,
+    explanation:
+      "A strong electron-withdrawing group such as NO₂, a carbonyl group, CN, or SO₂R ortho or para to an aryl halide stabilizes the Meisenheimer intermediate, allowing nucleophilic aromatic substitution.",
+    trigger: {
+      anyFunctionalGroups: ["Aryl halide"],
+      includeSmarts: ["[c][F,Cl,Br,I]"],
+    },
+    transform: {
+      type: "customHandler",
+      handler: "substitution",
+      options: { mode: "aromaticSnAr", nucleophile: slug },
+    },
+    display: { renderer: "default", preserveReactantOrientation: true },
+    productStatus: "computed",
+    mechanism: "SNAr addition–elimination",
+    selectivity: [
+      "Activation is positional: the EWG must be ortho or para to the leaving group; a meta-only EWG does not provide the same resonance stabilization.",
+      "If several aryl halides are present, only structurally activated leaving-group sites are transformed.",
+    ],
+    priority: 1900 + index,
+  }),
+);
 
 export const aromaticReactionRules: ReactionRule[] = [
   {
@@ -291,19 +374,137 @@ export const aromaticReactionRules: ReactionRule[] = [
     priority: 1836,
   },
   {
+    id: "aromatic-intramolecular-friedel-crafts-alkylation-5",
+    family: "aromatics",
+    reactionType: "cyclization",
+    reactionClass: "intramolecular Friedel-Crafts alkylation",
+    title: "Intramolecular Friedel–Crafts Alkylation",
+    reagents: "AlCl₃",
+    reagentNote: "5-membered fused-ring closure; no second reactant needed",
+    productHint: "Indane derivative",
+    explanation:
+      "AlCl₃ activates the tethered alkyl halide within the same molecule. Ortho attack by the aromatic ring closes a five-membered fused ring, and deprotonation restores aromaticity.",
+    trigger: {
+      includeSmarts: [intramolecularFriedelCraftsTetherSmarts[0]],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts:
+        "[cH:1]1[c:2]([CH2:3][CH2:4][CH2:5][Cl,Br,I:6])[cH:7][cH:8][cH:9][cH:10]1>>[c:1]12[c:2]([CH2:3][CH2:4][CH2:5]-2)[cH:7][cH:8][cH:9][cH:10]1",
+      maxProducts: 4,
+    },
+    productStatus: "computed",
+    mechanism: "Intramolecular electrophilic aromatic substitution",
+    selectivityProfile: { mixture: "single", majorProductOnly: true },
+    competition: { group: "friedel-crafts-alkylation", specificity: 100 },
+    selectivity: [
+      "Cyclization occurs at an ortho aromatic C-H adjacent to the tether attachment point.",
+      "Five-membered ring closure is strongly favored when the tether geometry permits it.",
+    ],
+    limitations: [
+      "This exact transform currently covers an unbranched primary haloalkyl tether on a monosubstituted benzene ring.",
+      "Strongly deactivated rings and unprotected anilines remain incompatible with ordinary AlCl₃ Friedel-Crafts conditions.",
+    ],
+    constraints: [
+      "friedel-crafts-ring-not-strongly-deactivated",
+      "friedel-crafts-amine-compatible",
+    ],
+    priority: 1837,
+  },
+  {
+    id: "aromatic-intramolecular-friedel-crafts-alkylation-6",
+    family: "aromatics",
+    reactionType: "cyclization",
+    reactionClass: "intramolecular Friedel-Crafts alkylation",
+    title: "Intramolecular Friedel–Crafts Alkylation",
+    reagents: "AlCl₃",
+    reagentNote: "6-membered fused-ring closure; no second reactant needed",
+    productHint: "Tetralin derivative",
+    explanation:
+      "AlCl₃ activates the tethered alkyl halide within the same molecule. Ortho attack by the aromatic ring closes a six-membered fused ring, and deprotonation restores aromaticity.",
+    trigger: {
+      includeSmarts: [intramolecularFriedelCraftsTetherSmarts[1]],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts:
+        "[cH:1]1[c:2]([CH2:3][CH2:4][CH2:5][CH2:6][Cl,Br,I:7])[cH:8][cH:9][cH:10][cH:11]1>>[c:1]12[c:2]([CH2:3][CH2:4][CH2:5][CH2:6]-2)[cH:8][cH:9][cH:10][cH:11]1",
+      maxProducts: 4,
+    },
+    productStatus: "computed",
+    mechanism: "Intramolecular electrophilic aromatic substitution",
+    selectivityProfile: { mixture: "single", majorProductOnly: true },
+    competition: { group: "friedel-crafts-alkylation", specificity: 100 },
+    selectivity: [
+      "Cyclization occurs at an ortho aromatic C-H adjacent to the tether attachment point.",
+      "Six-membered ring closure is strongly favored when the tether geometry permits it.",
+    ],
+    limitations: [
+      "This exact transform currently covers an unbranched primary haloalkyl tether on a monosubstituted benzene ring.",
+      "Strongly deactivated rings and unprotected anilines remain incompatible with ordinary AlCl₃ Friedel-Crafts conditions.",
+    ],
+    constraints: [
+      "friedel-crafts-ring-not-strongly-deactivated",
+      "friedel-crafts-amine-compatible",
+    ],
+    priority: 1838,
+  },
+  {
+    id: "aromatic-intramolecular-friedel-crafts-alkylation-6-methyl",
+    family: "aromatics",
+    reactionType: "cyclization",
+    reactionClass: "intramolecular Friedel-Crafts alkylation",
+    title: "Intramolecular Friedel–Crafts Alkylation",
+    reagents: "AlCl₃",
+    reagentNote: "6-membered fused-ring closure with rearrangement; no second reactant needed",
+    productHint: "Methyltetralin derivative",
+    explanation:
+      "AlCl₃ activates the tethered primary alkyl halide within the same molecule. For a five-carbon tether, intramolecular Friedel–Crafts alkylation proceeds through rearrangement to the more favorable six-membered fused-ring closure, giving a methyltetralin framework rather than a simple seven-membered benzocycloheptane.",
+    trigger: {
+      includeSmarts: [intramolecularFriedelCraftsTetherSmarts[2]],
+    },
+    transform: {
+      type: "reactionSmarts",
+      smarts:
+        "[cH:1]1[c:2]([CH2:3][CH2:4][CH2:5][CH2:6][CH2:7][Cl,Br,I:8])[cH:9][cH:10][cH:11][cH:12]1>>[c:1]12[c:2]([CH2:3][CH2:4][CH2:5][CH:6]([CH3:7])-2)[cH:9][cH:10][cH:11][cH:12]1",
+      maxProducts: 4,
+    },
+    productStatus: "computed",
+    mechanism: "Intramolecular electrophilic aromatic substitution",
+    selectivityProfile: { mixture: "single", majorProductOnly: true },
+    competition: { group: "friedel-crafts-alkylation", specificity: 100 },
+    selectivity: [
+      "Cyclization occurs at an ortho aromatic C-H adjacent to the tether attachment point.",
+      "For a five-carbon tether, rearrangement to a six-membered fused ring is preferred over direct seven-membered closure.",
+    ],
+    limitations: [
+      "This exact transform currently covers an unbranched primary haloalkyl tether on a monosubstituted benzene ring.",
+      "The returned product represents the commonly favored rearranged six-membered fused-ring outcome rather than a less favored unrearranged seven-membered closure.",
+      "Strongly deactivated rings and unprotected anilines remain incompatible with ordinary AlCl₃ Friedel-Crafts conditions.",
+    ],
+    constraints: [
+      "friedel-crafts-ring-not-strongly-deactivated",
+      "friedel-crafts-amine-compatible",
+    ],
+    priority: 1839,
+  },
+  {
     id: "aromatic-friedel-crafts-alkylation",
     family: "aromatics",
     reactionType: "substitution",
     title: "Friedel–Crafts Alkylation",
     reagents: "AlCl₃",
-    reagentNote: "Draw the arene and alkyl halide as disconnected structures",
+    reagentNote: "Draw the arene and RX as disconnected structures",
     productHint: "Alkylbenzene",
     explanation:
       "An alkyl electrophile substitutes onto an activated aromatic ring. Carbocation rearrangement and polyalkylation are common complications.",
-    trigger: aromaticTrigger,
+    trigger: {
+      ...aromaticTrigger,
+      excludeSmarts: [...intramolecularFriedelCraftsTetherSmarts, ...intramolecularFriedelCraftsSideChainSmarts],
+    },
     additionalReactants: [
       {
-        label: "alkyl chloride, bromide, or iodide",
+        label: "RX",
         trigger: { includeSmarts: ["[C;X4][Cl,Br,I]"] },
       },
     ],
@@ -314,6 +515,7 @@ export const aromaticReactionRules: ReactionRule[] = [
     },
     productStatus: "representative",
     mechanism: "Electrophilic aromatic substitution",
+    competition: { group: "friedel-crafts-alkylation", specificity: 10 },
     limitations: [
       "The engine enumerates available aromatic C-H sites but does not rank ortho/para/meta directing effects.",
       "Fails on strongly deactivated rings.",
@@ -394,7 +596,11 @@ export const aromaticReactionRules: ReactionRule[] = [
       handler: "reduction",
       options: { mode: "birchReduction" },
     },
-    display: { renderer: "default", preserveReactantOrientation: true },
+    display: {
+      renderer: "default",
+      preserveReactantOrientation: true,
+      reagentBubbleMode: "single",
+    },
     productStatus: "computed",
     mechanism: "Stepwise electron–proton transfer",
     selectivity: [
@@ -477,68 +683,7 @@ export const aromaticReactionRules: ReactionRule[] = [
     mechanism: "Multi-step reduction",
     priority: 1890,
   },
-  ...([
-    {
-      slug: "azide",
-      title: "Nucleophilic Aromatic Substitution with Azide",
-      reagents: "1 equiv NaN₃, heat as needed",
-      product: "Aryl azide",
-    },
-    {
-      slug: "cyanide",
-      title: "Nucleophilic Aromatic Substitution with Cyanide",
-      reagents: "NaCN or KCN, heat as needed",
-      product: "Aryl nitrile",
-    },
-    {
-      slug: "hydroxide",
-      title: "Nucleophilic Aromatic Substitution with Hydroxide",
-      reagents: "NaOH, heat",
-      product: "Phenol",
-    },
-    {
-      slug: "amino",
-      title: "Nucleophilic Aromatic Substitution with Amide/Ammonia",
-      reagents: "NH₂⁻ or NH₃ under suitable SNAr conditions",
-      product: "Aryl amine",
-    },
-    {
-      slug: "methoxide",
-      title: "Nucleophilic Aromatic Substitution with Methoxide",
-      reagents: "NaOCH₃, CH₃OH",
-      product: "Aryl methyl ether",
-    },
-  ] as const).map(({ slug, title, reagents, product }, index) => ({
-    id: `aryl-halide-snar-${slug}`,
-    family: "aromatics" as const,
-    reactionType: "substitution" as const,
-    title,
-    reagents,
-    reagentNote: "Addition–elimination requires a strong EWG ortho or para to the leaving group",
-    productHint: product,
-    explanation:
-      "A strong electron-withdrawing group such as NO₂, a carbonyl group, CN, or SO₂R ortho or para to an aryl halide stabilizes the Meisenheimer intermediate, allowing nucleophilic aromatic substitution.",
-    trigger: {
-      anyFunctionalGroups: ["Aryl halide"],
-      includeSmarts: ["[c][F,Cl,Br,I]"],
-    },
-    transform: {
-      type: "customHandler" as const,
-      handler: "substitution" as const,
-      options: { mode: "aromaticSnAr", nucleophile: slug },
-    },
-    // SNAr changes one exocyclic substituent while leaving the aryl scaffold
-    // intact. Keep the student's ring orientation instead of accepting an
-    // arbitrary symmetry-equivalent redraw from RDKit.
-    display: { renderer: "default" as const, preserveReactantOrientation: true },
-    productStatus: "computed" as const,
-    mechanism: "SNAr addition–elimination",
-    selectivity: [
-      "Activation is positional: the EWG must be ortho or para to the leaving group; a meta-only EWG does not provide the same resonance stabilization.",
-      "If several aryl halides are present, only structurally activated leaving-group sites are transformed.",
-    ],
-    priority: 1900 + index,
-  })),
+  ...arylSnArRules,
   {
     id: "aryl-halide-benzyne-amination",
     family: "aromatics",

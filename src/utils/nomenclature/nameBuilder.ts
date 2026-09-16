@@ -49,12 +49,126 @@ import {
   getRetainedHeterocycleSpecsFromGroups,
 } from "./nameBuilder/functionalGroupNaming";
 import { getWholeMoleculeRetainedName } from "./nameBuilder/retainedNames";
-import { getFunctionalClassName } from "./nameBuilder/functionalClassNames";
+import {
+  getCarbonicAcidMonoesterName,
+  getFunctionalClassName,
+} from "./nameBuilder/functionalClassNames";
 import { getNamingGuardResult } from "./nameBuilder/namingGuard";
 import { getOrganometallicName } from "./nameBuilder/organometallicNames";
 import { getPolycyclicHydrocarbonName } from "./nameBuilder/polycyclicHydrocarbonNames";
 import { getAlphabetizationKey } from "./nameBuilder/prefixAlphabetization";
+import { getOtherAtom } from "./molParser";
 
+
+function getSimpleBenzenePolycarboxylicAcidName(
+  parsedMol: ParsedMol,
+  parent: ParentDescriptor,
+) {
+  if (
+    parent.kind !== "ring" ||
+    !parent.aromaticRing ||
+    parent.parentHydrocarbon !== "benzene" ||
+    parent.path.length !== 6
+  ) {
+    return null;
+  }
+
+  const ringSet = new Set(parent.path);
+  const acidAnchors: number[] = [];
+  const representedExternalAtoms = new Set<number>();
+
+  const isCarboxylicAcidCarbon = (carbonIndex: number) => {
+    const carbon = parsedMol.atoms[carbonIndex];
+    if (!carbon || carbon.element !== "C") return false;
+    let carbonylOxygen = 0;
+    let hydroxyOxygen = 0;
+    for (const bond of parsedMol.adjacency.get(carbonIndex) ?? []) {
+      const otherIndex = getOtherAtom(bond, carbonIndex);
+      const other = parsedMol.atoms[otherIndex];
+      if (other?.element !== "O") continue;
+      if (bond.bondOrder === 2) carbonylOxygen += 1;
+      if (
+        bond.bondOrder === 1 &&
+        other.charge === 0 &&
+        (parsedMol.adjacency.get(otherIndex) ?? []).length === 1
+      ) {
+        hydroxyOxygen += 1;
+      }
+    }
+    return carbonylOxygen === 1 && hydroxyOxygen === 1;
+  };
+
+  const collectExternalBranch = (start: number) => {
+    const visited = new Set<number>();
+    const queue = [start];
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      if (ringSet.has(current) || visited.has(current)) continue;
+      visited.add(current);
+      for (const bond of parsedMol.adjacency.get(current) ?? []) {
+        const next = getOtherAtom(bond, current);
+        if (!ringSet.has(next) && !visited.has(next)) queue.push(next);
+      }
+    }
+    return visited;
+  };
+
+  for (const ringAtom of parent.path) {
+    for (const bond of parsedMol.adjacency.get(ringAtom) ?? []) {
+      if (bond.bondOrder !== 1) continue;
+      const other = getOtherAtom(bond, ringAtom);
+      if (ringSet.has(other) || !isCarboxylicAcidCarbon(other)) continue;
+      acidAnchors.push(ringAtom);
+      collectExternalBranch(other).forEach((atom) => representedExternalAtoms.add(atom));
+    }
+  }
+
+  if (acidAnchors.length < 2) return null;
+
+  // This shortcut is restricted to otherwise-unsubstituted benzene polyacids.
+  // Substituted rings continue through the general prefix/suffix engine so no
+  // substituent information can be lost.
+  const allExternalAtoms = parsedMol.atoms
+    .map((atom) => atom.atomIndex)
+    .filter((atomIndex) => !ringSet.has(atomIndex));
+  if (allExternalAtoms.some((atomIndex) => !representedExternalAtoms.has(atomIndex))) {
+    return null;
+  }
+
+  const orientations: number[][] = [];
+  for (const direction of [parent.path, [...parent.path].reverse()]) {
+    for (let offset = 0; offset < direction.length; offset += 1) {
+      orientations.push([...direction.slice(offset), ...direction.slice(0, offset)]);
+    }
+  }
+
+  const locantsFor = (path: number[]) => acidAnchors
+    .map((anchor) => path.indexOf(anchor) + 1)
+    .sort((a, b) => a - b);
+  const compareLocants = (left: number[], right: number[]) => {
+    for (let index = 0; index < Math.max(left.length, right.length); index += 1) {
+      const delta = (left[index] ?? 99) - (right[index] ?? 99);
+      if (delta !== 0) return delta;
+    }
+    return 0;
+  };
+
+  const bestLocants = orientations.map(locantsFor).sort(compareLocants)[0];
+  if (!bestLocants) return null;
+
+  const multiplier = acidAnchors.length === 2 ? "di"
+    : acidAnchors.length === 3 ? "tri"
+    : acidAnchors.length === 4 ? "tetra"
+    : acidAnchors.length === 5 ? "penta"
+    : acidAnchors.length === 6 ? "hexa"
+    : null;
+  if (!multiplier) return null;
+
+  return {
+    name: `benzene-${bestLocants.join(",")}-${multiplier}carboxylic acid`,
+    locants: bestLocants,
+  };
+}
 
 function canUseStandalonePolycyclicHydrocarbonName(
   parsedMol: ParsedMol,
@@ -188,6 +302,25 @@ export function buildEstimatedIupacName(
     };
   }
 
+  // O=C(OH)(OR) is a carbonic-acid monoester, not an ordinary carboxylic acid.
+  // Detect the structural class before generic suffix selection so the carbonyl
+  // carbon is not incorrectly forced into a hydrocarbon parent such as
+  // "alkoxycarbonyl-hydroxymethane".
+  const carbonicAcidMonoesterName = getCarbonicAcidMonoesterName(parsedMol);
+  if (carbonicAcidMonoesterName) {
+    return {
+      estimatedName: carbonicAcidMonoesterName.name,
+      confidence: carbonicAcidMonoesterName.confidence,
+      status: "functional-class",
+      reason: carbonicAcidMonoesterName.reason,
+      parent: null,
+      features: [],
+      primaryFeature: null,
+      substituents: [],
+      parentIndependent: true,
+    };
+  }
+
   const rawPrimaryGroup = getPrimaryFunctionalGroup(functionalGroups, mainGroup);
 
   // Charged intermediates need to be named before suffix intent is inferred.
@@ -303,6 +436,26 @@ const preferredParentAtoms = getParentCandidateAtomsForPrimaryGroup(
   const defaultParent = shouldUseExoticParent
     ? exoticParent
     : carbonDefaultParent;
+
+  const benzenePolyacidName = getSimpleBenzenePolycarboxylicAcidName(parsedMol, defaultParent);
+  if (benzenePolyacidName) {
+    return {
+      estimatedName: benzenePolyacidName.name,
+      confidence: "high",
+      status: "systematic",
+      reason: "Recognized multiple carboxylic-acid groups directly attached to an otherwise unsubstituted benzene ring and assigned the lowest ring locants.",
+      parent: defaultParent,
+      features: neutralFeatures,
+      primaryFeature: {
+        type: "carboxylicAcid",
+        locants: benzenePolyacidName.locants,
+        suffix: "carboxylic acid",
+        prefix: "carboxy",
+        priority: 1,
+      },
+      substituents: [],
+    };
+  }
 
   const initialRingSuffixContext = getRingSuffixContext(
   parsedMol,

@@ -675,7 +675,10 @@ export default function SynthesisPage() {
 
                       <div className="reaction-column reagent-column">
                         <div className="reagent-pill-group">
-                          {reagentBubbleLabels(step.reagentLabel).map((reagent, index) => (
+                          {reagentBubbleLabels(
+                            step.reagentLabel,
+                            step.display?.reagentBubbleMode,
+                          ).map((reagent, index) => (
                             <div
                               className="reagent-pill"
                               key={`${step.id}-reagent-${index}`}

@@ -183,9 +183,6 @@ export default function AcidBasePage() {
   const [status, setStatus] = useState("Draw a molecule first");
   const [smiles, setSmiles] = useState("Not analyzed yet");
   const [structureSvg, setStructureSvg] = useState<string | null>(null);
-  const [functionalGroups, setFunctionalGroups] = useState<FunctionalGroupResult[]>([]);
-  const [acidityResults, setAcidityResults] = useState<AcidityResult[]>([]);
-  const [basicityResults, setBasicityResults] = useState<BasicityResult[]>([]);
   const [anionStabilityResults, setAnionStabilityResults] = useState<
     CarbanionStabilityResult[]
   >([]);
@@ -384,7 +381,7 @@ export default function AcidBasePage() {
     }
 
     setIsAnalyzing(true);
-    setStatus("Analyzing acid/base behavior...");
+    setStatus("Analyzing ranking-relevant stability features...");
 
     try {
       const rawSmiles = await ketcher.getSmiles();
@@ -393,9 +390,6 @@ export default function AcidBasePage() {
       if (!safeSmiles) {
         setSmiles("No molecule detected");
         setStructureSvg(null);
-        setFunctionalGroups([]);
-        setAcidityResults([]);
-        setBasicityResults([]);
         setAnionStabilityResults([]);
         setCationStabilityResults([]);
         setRadicalStabilityResults([]);
@@ -406,27 +400,14 @@ export default function AcidBasePage() {
       if (safeSmiles.includes(".")) {
         setSmiles(safeSmiles);
         setStructureSvg(null);
-        setFunctionalGroups([]);
-        setAcidityResults([]);
-        setBasicityResults([]);
         setAnionStabilityResults([]);
         setCationStabilityResults([]);
         setRadicalStabilityResults([]);
-        setStatus("Please draw only one molecule at a time for acid/base analysis.");
+        setStatus("Please draw only one molecule at a time for ranking analysis.");
         return;
       }
 
-      const hierarchy = await analyzeFunctionalGroupHierarchy(safeSmiles);
-      const [
-        acidity,
-        basicity,
-        anionStability,
-        cationStability,
-        radicalStability,
-        svg,
-      ] = await Promise.all([
-        analyzeAcidity(safeSmiles, hierarchy.primaryGroups),
-        analyzeBasicity(safeSmiles, hierarchy.primaryGroups),
+      const [anionStability, cationStability, radicalStability, svg] = await Promise.all([
         analyzeCarbanionStability(safeSmiles),
         analyzeCarbocationStability(safeSmiles),
         analyzeCarbonRadicalStability(safeSmiles),
@@ -435,16 +416,13 @@ export default function AcidBasePage() {
 
       setSmiles(safeSmiles);
       setStructureSvg(svg);
-      setFunctionalGroups(hierarchy.functionalGroups);
-      setAcidityResults(acidity);
-      setBasicityResults(basicity);
       setAnionStabilityResults(anionStability);
       setCationStabilityResults(cationStability);
       setRadicalStabilityResults(radicalStability);
-      setStatus("Acid/base and stability analysis complete.");
+      setStatus("Ranking preview analysis complete. Add the molecule to the comparison set to rank it.");
     } catch (error) {
-      console.error("Acid/base analysis error:", error);
-      setStatus("Something went wrong while analyzing acid/base behavior.");
+      console.error("Ranking analysis error:", error);
+      setStatus("Something went wrong while analyzing ranking features.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -529,9 +507,6 @@ export default function AcidBasePage() {
       setComparisonMolecules((prev) => [...prev, newMolecule]);
       setSmiles(safeSmiles);
       setStructureSvg(svg);
-      setFunctionalGroups(hierarchy.functionalGroups);
-      setAcidityResults(acidity);
-      setBasicityResults(basicity);
       setAnionStabilityResults(anionStability);
       setCationStabilityResults(cationStability);
       setRadicalStabilityResults(radicalStability);
@@ -554,9 +529,6 @@ export default function AcidBasePage() {
     setStatus("Draw a molecule first");
     setSmiles("Not analyzed yet");
     setStructureSvg(null);
-    setFunctionalGroups([]);
-    setAcidityResults([]);
-    setBasicityResults([]);
     setAnionStabilityResults([]);
     setCationStabilityResults([]);
     setRadicalStabilityResults([]);
@@ -567,8 +539,6 @@ export default function AcidBasePage() {
     setStatus("All comparison molecules deleted.");
   }
 
-  const strongestAcid = acidityResults[0];
-  const strongestBase = basicityResults[0];
   const strongestAnion = getBestCarbanionStabilityResult(anionStabilityResults);
   const strongestCation = getBestCarbocationStabilityResult(
     cationStabilityResults
@@ -585,7 +555,7 @@ export default function AcidBasePage() {
           <div className="card-header">
             <div>
               <h2>Molecule Drawer</h2>
-              <p>Draw one molecule, then analyze or add it to the comparison set.</p>
+              <p>Draw molecules to compare acidity, basicity, intermediate stability, and more.</p>
             </div>
             <span className={`status ${ketcher ? "ready" : "loading"}`}>
               {ketcher ? "Editor ready" : "Loading editor"}
@@ -605,7 +575,7 @@ export default function AcidBasePage() {
               onClick={analyzeAcidBaseMolecule}
               disabled={isAnalyzing || !ketcher}
             >
-              {isAnalyzing ? "Analyzing..." : "Analyze Acid/Base"}
+              {isAnalyzing ? "Analyzing..." : "Analyze Molecule"}
             </button>
 
             <button
@@ -655,138 +625,6 @@ export default function AcidBasePage() {
         </div>
 
         <div className="acid-base-results-column">
-          <div className="acid-base-summary-grid">
-            <div className="acid-base-summary-card">
-              <span>Strongest acidic site</span>
-              <strong>
-                {strongestAcid
-                  ? `${strongestAcid.acidicSite} (atom ${strongestAcid.siteAtomIndex + 1})`
-                  : "None detected"}
-              </strong>
-              <p>
-                {strongestAcid
-                  ? `Estimated pKa ${strongestAcid.estimatedPka} · typical range ${formatPkaRange(
-                      strongestAcid.estimatedPkaRange
-                    )} · ${strongestAcid.confidence.toLowerCase()} confidence`
-                  : "Analyze a molecule first."}
-              </p>
-            </div>
-
-            <div className="acid-base-summary-card">
-              <span>Strongest basic site</span>
-              <strong>
-                {strongestBase
-                  ? `${strongestBase.basicSite} (atom ${strongestBase.siteAtomIndex + 1})`
-                  : "None detected"}
-              </strong>
-              <p>
-                {strongestBase
-                  ? `Conjugate acid pKa ${strongestBase.conjugateAcidPka} · ${strongestBase.confidence.toLowerCase()} confidence`
-                  : "Analyze a molecule first."}
-              </p>
-            </div>
-
-            <div className="acid-base-summary-card">
-              <span>Detected groups</span>
-              <strong>{functionalGroups.length}</strong>
-              <p>
-                {functionalGroups.length > 0
-                  ? functionalGroups.map((group) => group.name).join(", ")
-                  : "No groups loaded yet."}
-              </p>
-            </div>
-          </div>
-
-          <div className="card acid-base-result-card">
-            <p className="label">Acidity Estimate</p>
-
-            {acidityResults.length === 0 ? (
-              <p className="empty">No acidic sites estimated yet.</p>
-            ) : (
-              <div className="group-list">
-                {acidityResults.map((result, index) => (
-                  <div
-                    className="group-card"
-                    key={`${result.relatedGroup}-${result.acidicSite}-${index}`}
-                  >
-                    <div className="group-card-header">
-                      <h3>
-                        {index === 0 ? "Strongest acidic site" : "Weaker acidic site"}: {result.acidicSite}
-                      </h3>
-                      <span>pKa {result.estimatedPka}</span>
-                    </div>
-
-                    <p>
-                      <strong>Related group:</strong> {result.relatedGroup}
-                    </p>
-                    <p>
-                      <strong>Detected atom:</strong> Atom {result.siteAtomIndex + 1} · {result.confidence.toLowerCase()} confidence
-                    </p>
-                    <p>
-                      <strong>Typical pKa range:</strong>{" "}
-                      {formatPkaRange(result.estimatedPkaRange)}
-                    </p>
-                    <p>
-                      <strong>A — Atom:</strong> {result.atom}
-                    </p>
-                    <p>
-                      <strong>R — Resonance:</strong> {result.resonance}
-                    </p>
-                    <p>
-                      <strong>I — Induction:</strong> {result.induction}
-                    </p>
-                    <p>
-                      <strong>O — Orbital:</strong> {result.orbital}
-                    </p>
-                    <p>{result.explanation}</p>
-
-                    {result.modifiers.length > 0 && (
-                      <p>
-                        <strong>pKa modifier:</strong> {result.modifiers.join(" ")}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="card acid-base-result-card">
-            <p className="label">Basicity Estimate</p>
-
-            {basicityResults.length === 0 ? (
-              <p className="empty">No basic sites estimated yet.</p>
-            ) : (
-              <div className="group-list">
-                {basicityResults.map((result, index) => (
-                  <div
-                    className="group-card"
-                    key={`${result.relatedGroup}-${result.basicSite}-${index}`}
-                  >
-                    <div className="group-card-header">
-                      <h3>{result.basicSite}</h3>
-                      <span>conj. acid pKa {result.conjugateAcidPka}</span>
-                    </div>
-
-                    <p>
-                      <strong>Related group:</strong> {result.relatedGroup}
-                    </p>
-                    <p>
-                      <strong>Detected atom:</strong> Atom {result.siteAtomIndex + 1} · {result.confidence.toLowerCase()} confidence
-                    </p>
-                    <p>{result.explanation}</p>
-
-                    {result.modifiers.length > 0 && (
-                      <p>
-                        <strong>Basicity modifier:</strong> {result.modifiers.join(" ")}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
           {(anionStabilityResults.length > 0 ||
             cationStabilityResults.length > 0 ||
             radicalStabilityResults.length > 0) && (

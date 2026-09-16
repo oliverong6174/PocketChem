@@ -241,6 +241,8 @@ export type ReactionDisplayMetadata = {
   renderer?: ReactionDisplayRenderer;
   /** Keep unchanged reactant geometry as the source of truth for product depiction. */
   preserveReactantOrientation?: boolean;
+  /** Controls reagent-condition pill grouping without changing reaction chemistry. */
+  reagentBubbleMode?: "auto" | "single";
   series?: ReactionSeriesMetadata;
 };
 

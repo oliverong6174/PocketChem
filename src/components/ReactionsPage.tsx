@@ -810,7 +810,10 @@ export default function ReactionsPage({
 
                     <div className="reaction-column reagent-column">
                       <div className="reagent-pill-group">
-                        {reagentBubbleLabels(displayReagentLabel(pathway)).map((reagent, index) => (
+                        {reagentBubbleLabels(
+                          displayReagentLabel(pathway),
+                          pathway.display?.reagentBubbleMode,
+                        ).map((reagent, index) => (
                           <div
                             className="reagent-pill"
                             key={`${pathway.id}-reagent-${index}`}
@@ -1013,7 +1016,10 @@ export default function ReactionsPage({
 
                   <div className="reaction-column reagent-column">
                     <div className="reagent-pill-group">
-                      {reagentBubbleLabels(displayReagentLabel(pathway)).map((reagent, index) => (
+                      {reagentBubbleLabels(
+                          displayReagentLabel(pathway),
+                          pathway.display?.reagentBubbleMode,
+                        ).map((reagent, index) => (
                         <div
                           className="reagent-pill"
                           key={`${pathway.id}-retro-reagent-${index}`}
