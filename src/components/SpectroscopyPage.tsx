@@ -16,6 +16,10 @@ import {
   type MassSpectrumPeak,
   type SpectroscopyResult,
 } from "../utils/spectroscopy";
+import {
+  generateIrCurve,
+  renderIrWidth,
+} from "../utils/spectroscopy/irCurveModel";
 
 type SpectroscopyTab = "proton" | "carbon" | "ir" | "mass";
 
@@ -26,17 +30,6 @@ type Stick = {
   id?: string;
   signal?: HNMRSignal | CNMRSignal;
   massPeak?: MassSpectrumPeak;
-};
-
-type IrCurvePoint = {
-  wavenumber: number;
-  transmittance: number;
-};
-
-type IrTexturePeak = {
-  center: number;
-  width: number;
-  absorbance: number;
 };
 
 type ResolvedIrHighlight = {
@@ -56,24 +49,24 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-function hashString(value: string) {
-  let hash = 2166136261;
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
+function buildLinearTicks(min: number, max: number, step: number) {
+  if (!(max > min) || !(step > 0)) return [min, max];
+  const first = Math.ceil((min - 1e-9) / step) * step;
+  const ticks: number[] = [];
+  for (let value = first; value <= max + 1e-9; value += step) {
+    ticks.push(Number(value.toFixed(4)));
   }
-  return hash >>> 0;
+  return ticks;
 }
 
-function createSeededRandom(seedText: string) {
-  let seed = hashString(seedText) || 1;
-  return () => {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+function protonAxisTicks(min: number, max: number) {
+  const span = max - min;
+  const step = span > 8 ? 1
+    : span > 4 ? 0.5
+    : span > 2 ? 0.25
+    : span > 1 ? 0.2
+    : 0.1;
+  return buildLinearTicks(min, max, step);
 }
 
 function parseWavenumberCenter(range: string) {
@@ -275,280 +268,6 @@ function irPeakIsSelected(peak: IRPeak, selectedPeak: IRPeak | null) {
   return selectedPeak !== null && irPeakIdentity(peak) === irPeakIdentity(selectedPeak);
 }
 
-const IR_TARGET_TRANSMITTANCE: Record<IRPeak["intensity"], number> = {
-  veryWeak: 0.88,
-  weak: 0.68,
-  medium: 0.42,
-  strong: 0.20,
-  veryStrong: 0.07,
-  variable: 0.50,
-};
-
-function opticalDepthForTransmittance(targetTransmittance: number) {
-  return -Math.log(clamp(targetTransmittance, 0.01, 0.99));
-}
-
-function irOpticalDepth(peak: IRPeak) {
-  // Alkyl C-H stretches use their own family-overlap model below. Keep their
-  // per-line optical depths moderate so CH3/CH2 bands merge into a realistic
-  // envelope instead of each independently reaching the global intensity target.
-  if (peak.overlapRole === "alkyl-ch") {
-    if (peak.intensity === "strong" || peak.intensity === "veryStrong") return 0.82;
-    if (peak.intensity === "medium" || peak.intensity === "variable") return 0.34;
-    if (peak.intensity === "weak") return 0.22;
-    return 0.14;
-  }
-
-  // Map the qualitative chemistry label to the approximate minimum transmittance
-  // of an isolated band. Peak kind (diagnostic/supporting/fingerprint) no longer
-  // silently weakens the band: intensity controls depth; kind controls semantics.
-  const baseOpticalDepth = opticalDepthForTransmittance(IR_TARGET_TRANSMITTANCE[peak.intensity]);
-
-  // Broad bands spread the same qualitative strength over a much wider region, so
-  // slightly reduce their central optical depth to avoid unrealistically black floors.
-  const shapeScale = peak.shape === "extremelyBroad" ? 0.78 : peak.shape === "broad" ? 0.90 : 1;
-  return baseOpticalDepth * shapeScale;
-}
-
-function irWidth(peak: IRPeak) {
-  if (peak.widthCm1) return peak.widthCm1;
-  if (peak.shape === "veryNarrow") return 9;
-  if (peak.shape === "narrow" || peak.shape === "sharp") return 18;
-  if (peak.shape === "broad") return 110;
-  if (peak.shape === "extremelyBroad") return 280;
-  if (peak.shape === "variable") return 45;
-  return 32;
-}
-
-function irProfile(distance: number, peak: IRPeak) {
-  const gaussian = Math.exp(-0.5 * distance * distance);
-  const lorentzian = 1 / (1 + distance * distance);
-
-  if (peak.shape === "veryNarrow") return 0.82 * lorentzian + 0.18 * gaussian;
-  if (peak.shape === "narrow" || peak.shape === "sharp") return 0.62 * lorentzian + 0.38 * gaussian;
-  if (peak.shape === "broad") {
-    const shoulder = Math.exp(-0.5 * ((distance + 0.45) / 1.45) ** 2);
-    return 0.72 * gaussian + 0.28 * shoulder;
-  }
-  if (peak.shape === "extremelyBroad") {
-    const isCarboxylicAcidOH = peak.overlapRole === "acidic-oh-envelope";
-    if (isCarboxylicAcidOH) {
-      // Carboxylic-acid O-H envelopes are strongly hydrogen-bonded, asymmetric, and
-      // often lumpy rather than a single symmetric bell. The three overlapping
-      // components below create a broad 2500-3300 cm^-1 envelope without a flat floor.
-      const lowWing = Math.exp(-0.5 * ((distance + 0.95) / 0.95) ** 2);
-      const central = Math.exp(-0.5 * ((distance + 0.08) / 1.08) ** 2);
-      const highWing = Math.exp(-0.5 * ((distance - 0.72) / 0.78) ** 2);
-      const texture = 0.97 + 0.035 * Math.sin(distance * 8.4) + 0.02 * Math.sin(distance * 15.7);
-      return Math.min(1, (0.34 * lowWing + 0.48 * central + 0.18 * highWing) * texture);
-    }
-    const leftShoulder = Math.exp(-0.5 * ((distance + 0.9) / 1.65) ** 2);
-    const rightShoulder = Math.exp(-0.5 * ((distance - 0.55) / 1.95) ** 2);
-    return Math.min(1, 0.44 * gaussian + 0.33 * leftShoulder + 0.23 * rightShoulder);
-  }
-  return gaussian;
-}
-
-function buildIrTexturePeaks(peaks: IRPeak[]) {
-  const seedText = peaks.map((peak) => irPeakIdentity(peak)).join("|") || "ir";
-  const random = createSeededRandom(seedText);
-  const strongCenters = peaks
-    .filter((peak) => peak.center !== undefined && (peak.intensity === "veryStrong" || peak.intensity === "strong"))
-    .map((peak) => peak.center as number);
-  const fingerprintCount = peaks.filter((peak) => peak.kind === "fingerprint").length;
-  const assignedFingerprintCount = peaks.filter((peak) => {
-    const center = peak.center ?? parseWavenumberCenter(peak.range);
-    return center !== null && center <= 1500;
-  }).length;
-  const diagnosticCount = peaks.length - fingerprintCount;
-  const alkylChPeaks = peaks
-    .map((peak) => ({ peak, center: peak.center ?? parseWavenumberCenter(peak.range) }))
-    .filter((item): item is { peak: IRPeak; center: number } =>
-      item.center !== null
-      && item.center >= 2800
-      && item.center <= 3050
-      && item.peak.overlapRole === "alkyl-ch",
-    );
-
-  // The rule engine already contributes chemically meaningful fingerprint bands.
-  // This renderer layer should only add sparse fine texture, not a second full
-  // fingerprint spectrum on top of those assignments.
-  const microPeakCount = Math.min(
-    18,
-    Math.max(5, Math.round(4 + fingerprintCount * 0.24 + assignedFingerprintCount * 0.18 + diagnosticCount * 0.06)),
-  );
-  const deepFingerprintProbability = clamp(0.008 + assignedFingerprintCount * 0.002, 0.008, 0.035);
-  const mediumFingerprintProbability = clamp(deepFingerprintProbability + 0.07 + assignedFingerprintCount * 0.003, 0.08, 0.15);
-  const microPeaks: IrTexturePeak[] = [];
-
-  for (let index = 0; index < microPeakCount; index += 1) {
-    const bucket = random();
-    const isFingerprint = bucket < 0.72;
-    const isMidRegion = !isFingerprint && bucket < 0.94;
-    const center = isFingerprint
-      ? 560 + random() * 850
-      : isMidRegion
-        ? 1400 + random() * 320
-        : 3150 + random() * 700;
-    const nearStrong = strongCenters.some((value) => Math.abs(value - center) < 24);
-
-    let opticalDepth: number;
-    let width: number;
-    if (isFingerprint) {
-      const strengthRoll = random();
-      opticalDepth = strengthRoll < deepFingerprintProbability
-        ? 0.55 + random() * 0.28
-        : strengthRoll < mediumFingerprintProbability
-          ? 0.13 + random() * 0.20
-          : 0.018 + random() * 0.065;
-      width = 5.5 + random() * (strengthRoll < mediumFingerprintProbability ? 6 : 10);
-    } else if (isMidRegion) {
-      opticalDepth = 0.025 + random() * 0.085;
-      width = 5 + random() * 8;
-    } else {
-      opticalDepth = 0.003 + random() * 0.012;
-      width = 8 + random() * 12;
-    }
-
-    microPeaks.push({
-      center,
-      width,
-      absorbance: opticalDepth * (nearStrong ? 0.28 : 1),
-    });
-  }
-
-  // Give the alkyl C-H stretch envelope the closely spaced, sharp fine structure
-  // commonly seen around 2850–3000 cm^-1. These are visualization subfeatures of
-  // the assigned CH2/CH3 modes, not additional functional-group assignments.
-  if (alkylChPeaks.length > 0) {
-    const fineStructureCount = Math.min(6, Math.max(3, alkylChPeaks.length + 1));
-    for (let index = 0; index < fineStructureCount; index += 1) {
-      const anchor = alkylChPeaks[index % alkylChPeaks.length];
-      const direction = index % 2 === 0 ? -1 : 1;
-      const offset = direction * (5 + random() * 13) + (random() - 0.5) * 4;
-      microPeaks.push({
-        center: clamp(anchor.center + offset, 2820, 3010),
-        width: 3.2 + random() * 3.8,
-        absorbance: 0.075 + random() * 0.13,
-      });
-    }
-  }
-
-  // Narrow unsaturated diagnostic bands can have subtle shoulders, but keep them
-  // weak enough that they do not masquerade as extra assigned peaks.
-  peaks
-    .filter((peak) => {
-      const center = peak.center ?? parseWavenumberCenter(peak.range);
-      return center !== null
-        && center >= 1800
-        && center <= 3400
-        && peak.overlapRole !== "alkyl-ch"
-        && (peak.shape === "veryNarrow" || peak.shape === "narrow");
-    })
-    .forEach((peak, peakIndex) => {
-      const center = peak.center ?? parseWavenumberCenter(peak.range);
-      if (center === null) return;
-      const baseOffset = 18 + (peakIndex % 3) * 7;
-      [-baseOffset, baseOffset + 5].forEach((offset, offsetIndex) => {
-        microPeaks.push({
-          center: center + offset,
-          width: 4.5 + ((peakIndex + offsetIndex) % 2) * 1.4,
-          absorbance: 0.025 + 0.012 * ((peakIndex + offsetIndex) % 2),
-        });
-      });
-    });
-
-  return {
-    microPeaks,
-    noisePhases: [random() * Math.PI * 2, random() * Math.PI * 2, random() * Math.PI * 2, random() * Math.PI * 2] as const,
-  };
-}
-
-function renderInstrumentRipple(wavenumber: number, phases: readonly number[]) {
-  const fingerprintWeight = wavenumber <= 1500 ? 0.48 : wavenumber <= 2200 ? 0.42 : 0.30;
-  const chFineWeight = wavenumber >= 2820 && wavenumber <= 3010 ? 0.9 : 0;
-  return fingerprintWeight * (
-    0.052 * Math.sin(wavenumber / 41 + phases[0])
-    + 0.036 * Math.sin(wavenumber / 18.5 + phases[1])
-    + 0.020 * Math.sin(wavenumber / 9.8 + phases[2])
-  ) + chFineWeight * (
-    0.055 * Math.sin(wavenumber / 7.2 + phases[2])
-    + 0.030 * Math.sin(wavenumber / 4.6 + phases[3])
-  );
-}
-
-function generateIrCurve(peaks: IRPeak[]) {
-  const prepared = peaks
-    .map((peak) => {
-      const center = peak.center ?? parseWavenumberCenter(peak.range);
-      return center === null ? null : {
-        peak,
-        center,
-        width: irWidth(peak),
-        opticalDepth: irOpticalDepth(peak),
-      };
-    })
-    .filter((item): item is NonNullable<typeof item> => Boolean(item));
-
-  const alkylChBandCount = prepared.filter((item) => item.peak.overlapRole === "alkyl-ch").length;
-  // Treat the C-H stretch region as an overlapping family rather than multiplying
-  // every member equally. The strongest local component sets the main trough while
-  // neighboring modes deepen it only where they genuinely overlap. This preserves
-  // a ~20-30% asymmetric envelope without forcing the symmetric bands equally deep.
-  const alkylChDominantScale = alkylChBandCount >= 4 ? 2.5 : alkylChBandCount >= 2 ? 2.2 : 1.9;
-  const alkylChOverlapScale = alkylChBandCount >= 4 ? 2.8 : alkylChBandCount >= 2 ? 2.4 : 2.0;
-  const alkylChSoftCap = 2.2;
-  const { microPeaks, noisePhases } = buildIrTexturePeaks(peaks);
-
-  const points: IrCurvePoint[] = [];
-  for (let wavenumber = 4000; wavenumber >= 400; wavenumber -= 4) {
-    const baseline = 98.2
-      + 0.18 * Math.sin(wavenumber / 47)
-      + 0.09 * Math.sin(wavenumber / 19)
-      + 0.05 * Math.sin(wavenumber / 7.7)
-      + renderInstrumentRipple(wavenumber, noisePhases);
-
-    let ordinaryAbsorbance = 0;
-    const alkylChContributions: number[] = [];
-
-    for (const item of prepared) {
-      const distance = (wavenumber - item.center) / item.width;
-      const contribution = item.opticalDepth * irProfile(distance, item.peak);
-      if (item.peak.overlapRole === "alkyl-ch") {
-        alkylChContributions.push(contribution);
-      } else {
-        ordinaryAbsorbance += contribution;
-      }
-    }
-
-    const strongestAlkylCh = alkylChContributions.length > 0
-      ? Math.max(...alkylChContributions)
-      : 0;
-    const overlappingAlkylCh = Math.max(
-      0,
-      alkylChContributions.reduce((sum, contribution) => sum + contribution, 0) - strongestAlkylCh,
-    );
-    const scaledAlkylCh = strongestAlkylCh * alkylChDominantScale
-      + overlappingAlkylCh * alkylChOverlapScale;
-    const combinedAlkylCh = alkylChSoftCap * (1 - Math.exp(-scaledAlkylCh / alkylChSoftCap));
-
-    let textureAbsorbance = 0;
-    for (const microPeak of microPeaks) {
-      const distance = (wavenumber - microPeak.center) / microPeak.width;
-      textureAbsorbance += microPeak.absorbance * Math.exp(-0.5 * distance * distance);
-    }
-
-    const totalAbsorbance = ordinaryAbsorbance + combinedAlkylCh + textureAbsorbance;
-    const transmittance = baseline * Math.exp(-totalAbsorbance);
-
-    points.push({
-      wavenumber,
-      transmittance: clamp(transmittance, 3, 100),
-    });
-  }
-  return points;
-}
-
 function formatIrShape(shape: IRPeak["shape"]) {
   if (!shape) return "moderate";
   if (shape === "veryNarrow") return "very narrow";
@@ -606,7 +325,7 @@ function IrSpectrumPlot({
     .filter((peak): peak is NonNullable<typeof peak> => Boolean(peak));
   const clickablePeaks = peaks
     .filter((peak) => peak.kind !== "fingerprint" && (peak.center ?? parseWavenumberCenter(peak.range)) !== null)
-    .sort((a, b) => irWidth(b) - irWidth(a));
+    .sort((a, b) => renderIrWidth(b) - renderIrWidth(a));
 
   return (
     <div className="spectrum-plot-shell" aria-label={`${xLabel} predicted spectrum`}>
@@ -650,7 +369,7 @@ function IrSpectrumPlot({
         {clickablePeaks.map((peak) => {
           const center = peak.center ?? parseWavenumberCenter(peak.range);
           if (center === null) return null;
-          const halfSpan = Math.max(18, Math.min(420, irWidth(peak) * 1.15));
+          const halfSpan = Math.max(18, Math.min(420, renderIrWidth(peak) * 1.15));
           const xA = toX(clamp(center + halfSpan, minX, maxX));
           const xB = toX(clamp(center - halfSpan, minX, maxX));
           const x = Math.min(xA, xB);
@@ -728,6 +447,7 @@ function SpectrumPlot({
   mode = "up",
   selectedStickId = null,
   onSelectStick,
+  tickValues,
 }: {
   sticks: Stick[];
   minX: number;
@@ -737,6 +457,7 @@ function SpectrumPlot({
   mode?: "up" | "down";
   selectedStickId?: string | null;
   onSelectStick?: (stick: Stick) => void;
+  tickValues?: number[];
 }) {
   const width = 900;
   const height = 280;
@@ -754,28 +475,35 @@ function SpectrumPlot({
     return left + adjusted * plotWidth;
   };
 
-  const ticks = Array.from({ length: 7 }, (_, index) => {
-    const value = minX + ((maxX - minX) * index) / 6;
-    return reversed ? maxX - ((maxX - minX) * index) / 6 : value;
-  });
+  const ticks = tickValues && tickValues.length > 0
+    ? [...tickValues]
+        .filter((value) => value >= minX && value <= maxX)
+        .sort((a, b) => (reversed ? b - a : a - b))
+    : Array.from({ length: 7 }, (_, index) => {
+        const value = minX + ((maxX - minX) * index) / 6;
+        return reversed ? maxX - ((maxX - minX) * index) / 6 : value;
+      });
+
+  // Never clamp off-screen peaks onto a zoomed viewport edge; omit them.
+  const visibleSticks = sticks.filter((stick) => stick.x >= minX && stick.x <= maxX);
 
   return (
     <div className="spectrum-plot-shell" aria-label={`${xLabel} predicted spectrum`}>
       <svg className="spectrum-plot" viewBox={`0 0 ${width} ${height}`} role="img">
         <line x1={left} y1={baseline} x2={width - right} y2={baseline} className="spectrum-axis" />
         {ticks.map((value, index) => {
-          const x = left + (plotWidth * index) / 6;
+          const x = toX(value);
           return (
             <g key={`${value}-${index}`}>
               <line x1={x} y1={baseline - 4} x2={x} y2={baseline + 4} className="spectrum-axis" />
               <text x={x} y={height - 22} textAnchor="middle" className="spectrum-tick-label">
-                {Math.abs(value) >= 100 ? Math.round(value) : Number(value.toFixed(1))}
+                {Number.isInteger(value) ? value : Number(value.toFixed(1))}
               </text>
             </g>
           );
         })}
 
-        {sticks.map((stick, index) => {
+        {visibleSticks.map((stick, index) => {
           const x = toX(stick.x);
           const normalizedHeight = clamp(stick.height, 4, 100) / 100;
           const components = nmrLineComponents(stick);
@@ -790,17 +518,30 @@ function SpectrumPlot({
             ? baseline + normalizedHeight * (plotHeight - 24) + 14
             : baseline - normalizedHeight * (plotHeight - 12) - 7;
 
+          const signalClusterWidth = Math.max(4, maxComponentX - minComponentX + 4);
           return (
             <g key={stick.id ?? `${stick.x}-${index}`}>
+              {selected && !stick.massPeak && (
+                <rect
+                  x={minComponentX - 2}
+                  y={top + 2}
+                  width={signalClusterWidth}
+                  height={plotHeight - 4}
+                  fill="rgba(250, 204, 21, 0.09)"
+                  stroke="rgba(202, 138, 4, 0.58)"
+                  strokeWidth={0.9}
+                  pointerEvents="none"
+                />
+              )}
               {interactive && (
                 <rect
                   x={stick.massPeak ? x - (massPeakHitWidth ?? 8) / 2 : minComponentX - 10}
                   y={top}
                   width={stick.massPeak ? (massPeakHitWidth ?? 8) : Math.max(22, maxComponentX - minComponentX + 20)}
                   height={plotHeight}
-                  fill={selected && !stick.massPeak ? "rgba(250, 204, 21, 0.12)" : "transparent"}
-                  stroke={selected && !stick.massPeak ? "rgba(202, 138, 4, 0.62)" : "transparent"}
-                  strokeWidth={selected && !stick.massPeak ? 1.5 : 0}
+                  fill="transparent"
+                  stroke="transparent"
+                  strokeWidth={0}
                   style={{ cursor: "pointer" }}
                   onClick={() => onSelectStick?.(stick)}
                 >
@@ -834,7 +575,7 @@ function SpectrumPlot({
                     y2={componentY}
                     className={`spectrum-stick spectrum-stick-${mode}`}
                     stroke={selected ? "#ca8a04" : undefined}
-                    strokeWidth={selected ? 3.6 : undefined}
+                    strokeWidth={selected ? (mode === "down" ? 5 : 3) : undefined}
                     pointerEvents={interactive ? "none" : undefined}
                   />
                 );
@@ -1060,6 +801,7 @@ export default function SpectroscopyPage() {
   const [resolvedIrHighlight, setResolvedIrHighlight] = useState<ResolvedIrHighlight | null>(null);
   const [irHighlightedSvg, setIrHighlightedSvg] = useState<string | null>(null);
   const [selectedNmrSignal, setSelectedNmrSignal] = useState<HNMRSignal | CNMRSignal | null>(null);
+  const [protonWindow, setProtonWindow] = useState<{ min: number; max: number } | null>(null);
   const [nmrHighlightedSvg, setNmrHighlightedSvg] = useState<string | null>(null);
   const [selectedMassPeak, setSelectedMassPeak] = useState<MassSpectrumPeak | null>(null);
   const [massFragmentSvg, setMassFragmentSvg] = useState<string | null>(null);
@@ -1089,6 +831,42 @@ export default function SpectroscopyPage() {
     return maxShift > 11.5 ? 14 : 12;
   }, [result]);
 
+  const protonView = useMemo(() => {
+    if (!protonWindow) return { min: 0, max: protonMax };
+    const min = clamp(protonWindow.min, 0, protonMax);
+    const max = clamp(protonWindow.max, 0, protonMax);
+    return max - min >= 0.35 ? { min, max } : { min: 0, max: protonMax };
+  }, [protonWindow, protonMax]);
+
+  const protonTicks = useMemo(
+    () => protonAxisTicks(protonView.min, protonView.max),
+    [protonView.min, protonView.max],
+  );
+
+  const adjustProtonZoom = (factor: number) => {
+    const currentSpan = protonView.max - protonView.min;
+    const selectedCenter = activeTab === "proton" && selectedNmrSignal?.shiftCenter !== undefined
+      ? selectedNmrSignal.shiftCenter
+      : (protonView.min + protonView.max) / 2;
+    const nextSpan = clamp(currentSpan * factor, 0.5, protonMax);
+    let min = selectedCenter - nextSpan / 2;
+    let max = selectedCenter + nextSpan / 2;
+    if (min < 0) { max -= min; min = 0; }
+    if (max > protonMax) { min -= max - protonMax; max = protonMax; }
+    setProtonWindow({ min: Math.max(0, min), max: Math.min(protonMax, max) });
+  };
+
+  const zoomToSelectedProton = () => {
+    if (activeTab !== "proton" || selectedNmrSignal?.shiftCenter === undefined) return;
+    const center = selectedNmrSignal.shiftCenter;
+    const span = 1.6;
+    let min = center - span / 2;
+    let max = center + span / 2;
+    if (min < 0) { max -= min; min = 0; }
+    if (max > protonMax) { min -= max - protonMax; max = protonMax; }
+    setProtonWindow({ min: Math.max(0, min), max: Math.min(protonMax, max) });
+  };
+
   const carbonSticks = useMemo<Stick[]>(() =>
     (result?.carbonNMR ?? []).map((signal) => ({
       x: signal.shiftCenter ?? 0,
@@ -1110,8 +888,13 @@ export default function SpectroscopyPage() {
 
   const massMax = useMemo(() => {
     const values = result?.massSpec?.peaks.map((peak) => peak.mz) ?? [];
-    return Math.max(100, Math.ceil((Math.max(...values, 100) + 10) / 25) * 25);
+    return Math.max(100, Math.ceil((Math.max(...values, 100) + 10) / 50) * 50);
   }, [result]);
+
+  const massTicks = useMemo(() => {
+    const step = massMax <= 500 ? 50 : massMax <= 1000 ? 100 : 200;
+    return buildLinearTicks(0, massMax, step);
+  }, [massMax]);
 
   const revealSelectedAssignment = () => {
     window.setTimeout(() => {
@@ -1414,6 +1197,7 @@ export default function SpectroscopyPage() {
       setResolvedIrHighlight(null);
       setIrHighlightedSvg(null);
       setSelectedNmrSignal(null);
+      setProtonWindow(null);
       setNmrHighlightedSvg(null);
       setSelectedMassPeak(null);
       setMassFragmentSvg(null);
@@ -1464,6 +1248,7 @@ export default function SpectroscopyPage() {
     setResolvedIrHighlight(null);
     setIrHighlightedSvg(null);
     setSelectedNmrSignal(null);
+    setProtonWindow(null);
     setNmrHighlightedSvg(null);
     setSelectedMassPeak(null);
     setMassFragmentSvg(null);
@@ -1592,11 +1377,31 @@ export default function SpectroscopyPage() {
                   <div><h3>Predicted ¹H NMR</h3><p>Estimated chemical-shift regions, integrations, and first-order splitting.</p></div>
                   <span>{result.protonNMR.length} signal{result.protonNMR.length === 1 ? "" : "s"}</span>
                 </div>
+                <div
+                  aria-label="¹H NMR zoom controls"
+                  style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center", marginBottom: "10px" }}
+                >
+                  <button type="button" className="secondary-button" onClick={() => adjustProtonZoom(0.55)}>Zoom in</button>
+                  <button type="button" className="secondary-button" onClick={() => adjustProtonZoom(1.8)} disabled={protonView.min <= 0 && protonView.max >= protonMax}>Zoom out</button>
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={zoomToSelectedProton}
+                    disabled={activeTab !== "proton" || selectedNmrSignal?.shiftCenter === undefined}
+                  >
+                    Zoom selected
+                  </button>
+                  <button type="button" className="secondary-button" onClick={() => setProtonWindow(null)} disabled={!protonWindow}>Reset view</button>
+                  <span style={{ fontSize: "0.86rem", opacity: 0.78 }}>
+                    Viewing {protonView.max.toFixed(protonView.max - protonView.min < 2 ? 2 : 1)}–{protonView.min.toFixed(protonView.max - protonView.min < 2 ? 2 : 1)} ppm
+                  </span>
+                </div>
                 <SpectrumPlot
                   sticks={protonSticks}
-                  minX={0}
-                  maxX={protonMax}
+                  minX={protonView.min}
+                  maxX={protonView.max}
                   reversed
+                  tickValues={protonTicks}
                   xLabel="δ (ppm)"
                   selectedStickId={selectedNmrSignal ? nmrSignalIdentity(selectedNmrSignal, false) : null}
                   onSelectStick={(stick) => stick.signal && handleNmrSignalSelect(stick.signal)}
@@ -1630,6 +1435,7 @@ export default function SpectroscopyPage() {
                   minX={0}
                   maxX={220}
                   reversed
+                  tickValues={[0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220]}
                   xLabel="δ (ppm)"
                   selectedStickId={selectedNmrSignal ? nmrSignalIdentity(selectedNmrSignal, true) : null}
                   onSelectStick={(stick) => stick.signal && handleNmrSignalSelect(stick.signal)}
@@ -1718,6 +1524,7 @@ export default function SpectroscopyPage() {
                   sticks={massSticks}
                   minX={0}
                   maxX={massMax}
+                  tickValues={massTicks}
                   xLabel="m/z"
                   selectedStickId={selectedMassPeak ? massPeakIdentity(selectedMassPeak) : null}
                   onSelectStick={(stick) => {

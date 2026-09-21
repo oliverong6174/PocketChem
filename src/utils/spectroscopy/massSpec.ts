@@ -91,6 +91,19 @@ const FRAGMENT_REACTIONS = {
     "[C;X4:1]([O;H1:2])-[C;H0:3]>>[C+:1]([O;H1:2]).[C:3]",
     "[C;X4:1]([O;H1:2])-[c:3]>>[C+:1]([O;H1:2]).[cH0:3]",
   ],
+
+  // Generic EI ester cleavages.  These are graph transformations rather than
+  // molecule-name lookups: acyl-O cleavage gives the resonance-stabilized
+  // acylium ion, while O-alkyl cleavage can retain charge on an alkyl/benzyl
+  // group.  The latter is especially important for benzyl esters.
+  esterAcylium: "[C:1](=[O:2])-[O:3]-[C:4]>>[C+:1]=[O:2]",
+  esterAlcoholSideCation: "[C:1](=[O:2])-[O:3]-[C:4]>>[C+:4]",
+
+  // Cleavage of an aryl-halogen bond gives a useful secondary EI channel.
+  // Keep Br/Cl separate so the surviving carbon skeleton has no fake isotope
+  // label attached to it.
+  arylBromineLoss: "[c:1]-[Br:2]>>[c+:1]",
+  arylChlorineLoss: "[c:1]-[Cl:2]>>[c+:1]",
 } as const;
 
 export function parseMolecularFormula(formula: string) {
@@ -597,6 +610,76 @@ async function alcoholAlphaCleavagePeaks(
   return [...peaksByMass.values()].sort((a, b) => a.mz - b.mz);
 }
 
+function countToken(smiles: string, token: string) {
+  return smiles.split(token).length - 1;
+}
+
+function fragmentHalogenCompanions(
+  peak: MassSpectrumPeak,
+  fragmentSmiles: string,
+): MassSpectrumPeak[] {
+  const companions: MassSpectrumPeak[] = [];
+  const bromines = countToken(fragmentSmiles, "Br");
+  const chlorines = countToken(fragmentSmiles, "Cl");
+
+  // For one halogen, expose the characteristic fragment-isotope partner too.
+  // Multi-halogen envelopes are intentionally left to a future full fragment
+  // isotope convolution rather than pretending a two-line pattern is complete.
+  if (bromines === 1) {
+    companions.push({
+      ...peak,
+      mz: peak.mz + 2,
+      relativeIntensity: Number((peak.relativeIntensity * (0.4931 / 0.5069)).toFixed(1)),
+      label: `${peak.label} · M+2 (⁸¹Br)`,
+      explanation: `${peak.explanation} The bromine-containing fragment also gives the expected nearly 1:1 ⁷⁹Br/⁸¹Br isotope partner.`,
+    });
+  } else if (chlorines === 1) {
+    companions.push({
+      ...peak,
+      mz: peak.mz + 2,
+      relativeIntensity: Number((peak.relativeIntensity * (0.2424 / 0.7576)).toFixed(1)),
+      label: `${peak.label} · M+2 (³⁷Cl)`,
+      explanation: `${peak.explanation} The chlorine-containing fragment also gives the expected ~3:1 ³⁵Cl/³⁷Cl isotope partner.`,
+    });
+  }
+
+  return companions;
+}
+
+async function reactionFragmentPeaks(
+  parentSmiles: string | null,
+  reactionSmarts: string,
+  label: string,
+  explanation: string,
+  intensity: number,
+  minimumMz = 20,
+): Promise<MassSpectrumPeak[]> {
+  const products = await runFragmentReactions(parentSmiles, reactionSmarts);
+  const peaks: MassSpectrumPeak[] = [];
+  const seen = new Set<number>();
+
+  for (const fragmentSmiles of products) {
+    const mz = await nominalMzForFragment(fragmentSmiles);
+    if (mz === null || mz < minimumMz || seen.has(mz)) continue;
+    seen.add(mz);
+
+    const peak: MassSpectrumPeak = {
+      mz,
+      relativeIntensity: intensity,
+      label: `m/z ${mz} · ${label}`,
+      kind: "fragment",
+      explanation,
+      fragmentSmiles,
+      previewStructure: fragmentSmiles,
+      previewLabel: `m/z ${mz} · ${label}`,
+    };
+
+    peaks.push(peak, ...fragmentHalogenCompanions(peak, fragmentSmiles));
+  }
+
+  return peaks;
+}
+
 export async function predictMassSpectrum(
   formula: string,
   exactMass: number | null,
@@ -610,7 +693,7 @@ export async function predictMassSpectrum(
   const notes: string[] = [
     "Mass-spectrum intensities are educational EI-style estimates, not instrument-calibrated predictions.",
     "Displayed fragment structures are representative ion skeletons; radical/charge localization may be resonance-delocalized in the actual EI fragment.",
-    "Alcohol spectra include generic alpha-cleavage of C-C bonds next to the carbinol carbon, retaining the oxygen-containing oxonium ion when that pathway is available.",
+    "Fragment peaks are generated from structure-level EI cleavage rules (including alcohol alpha cleavage, ester cleavage, carbonyl neutral losses, and selected aryl-halogen channels) and remain educational estimates.",
   ];
 
   const parentSmiles = structure ? await sourceToSmiles(structure) : null;
@@ -709,6 +792,45 @@ export async function predictMassSpectrum(
       ));
     }
 
+    if (hasGroup(functionalGroups, ["Ester", "Enoate", "Lactone"])) {
+      peaks.push(...await reactionFragmentPeaks(
+        parentSmiles,
+        FRAGMENT_REACTIONS.esterAcylium,
+        "ester acyl cleavage",
+        "EI cleavage of the ester C(O)–O bond can retain charge on the acyl side, producing a resonance-stabilized acylium-type ion.",
+        68,
+      ));
+
+      peaks.push(...await reactionFragmentPeaks(
+        parentSmiles,
+        FRAGMENT_REACTIONS.esterAlcoholSideCation,
+        "ester O–alkyl cleavage",
+        "Cleavage on the alcohol side of an ester can retain charge on an alkyl or benzyl group; benzyl ions are additionally resonance stabilized.",
+        58,
+        25,
+      ));
+    }
+
+    if ((counts.Br ?? 0) > 0) {
+      peaks.push(...await reactionFragmentPeaks(
+        parentSmiles,
+        FRAGMENT_REACTIONS.arylBromineLoss,
+        "M − Br•",
+        "Aryl bromides can fragment by C–Br homolysis, leaving a resonance-stabilized aryl-derived cation.",
+        34,
+      ));
+    }
+
+    if ((counts.Cl ?? 0) > 0) {
+      peaks.push(...await reactionFragmentPeaks(
+        parentSmiles,
+        FRAGMENT_REACTIONS.arylChlorineLoss,
+        "M − Cl•",
+        "Aryl chlorides can fragment by C–Cl homolysis, leaving an aryl-derived cation.",
+        22,
+      ));
+    }
+
     if (hasGroup(functionalGroups, ["Alkylbenzene", "Toluene", "Benzyl alcohol", "Benzyl amine", "Benzyl halide"])) {
       peaks.push({
         mz: 91,
@@ -720,10 +842,12 @@ export async function predictMassSpectrum(
         previewStructure: "[CH2+]c1ccccc1",
         previewLabel: "m/z 91",
       });
-    } else if (hasGroup(functionalGroups, ["Benzene", "Phenol", "Aniline", "Aryl ether", "Aryl halide", "Nitrobenzene"])) {
+    }
+
+    if (hasGroup(functionalGroups, ["Benzene", "Phenol", "Aniline", "Aryl ether", "Aryl halide", "Nitrobenzene"])) {
       peaks.push({
         mz: 77,
-        relativeIntensity: 45,
+        relativeIntensity: 32,
         label: "m/z 77",
         kind: "diagnostic",
         explanation: "A phenyl-type fragment is common for many aromatic compounds.",

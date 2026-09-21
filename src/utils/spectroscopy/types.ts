@@ -17,6 +17,67 @@ export type IRPeakShape =
 
 export type IRPeakKind = "diagnostic" | "supporting" | "fingerprint";
 
+export type IRBandFamily =
+  | "carbonyl"
+  | "xh"
+  | "aromatic-ch"
+  | "vinylic-ch"
+  | "alkyl-ch"
+  | "aldehyde-ch"
+  | "nitrile"
+  | "alkyne"
+  | "alkene"
+  | "aromatic-ring"
+  | "amide-ii"
+  | "fingerprint"
+  | "other";
+
+export type IRVibrationMode =
+  | "aldehyde-carbonyl"
+  | "ketone-carbonyl"
+  | "ester-carbonyl"
+  | "acid-carbonyl"
+  | "amide-carbonyl"
+  | "lactone-carbonyl"
+  | "anhydride-carbonyl-low"
+  | "anhydride-carbonyl-high"
+  | "carbamate-carbonyl"
+  | "acyl-halide-carbonyl"
+  | "generic-carbonyl"
+  | "aromatic-ch"
+  | "vinylic-ch"
+  | "ch2-asymmetric"
+  | "ch2-symmetric"
+  | "ch3-asymmetric"
+  | "ch3-symmetric"
+  | "aldehyde-fermi-low"
+  | "aldehyde-fermi-high"
+  | "terminal-alkyne-ch"
+  | "alcohol-oh"
+  | "phenol-oh"
+  | "acid-oh"
+  | "primary-amide-nh-asymmetric"
+  | "primary-amide-nh-symmetric"
+  | "secondary-amide-nh"
+  | "amine-nh"
+  | "thiol-sh"
+  | "nitrile-stretch"
+  | "alkyne-stretch"
+  | "alkene-stretch"
+  | "aromatic-ring-1600"
+  | "aromatic-ring-1580"
+  | "aromatic-ring-1500"
+  | "amide-ii"
+  | "ester-co-low"
+  | "ester-co-high"
+  | "alcohol-co"
+  | "phenol-co"
+  | "amine-cn"
+  | "aromatic-oop"
+  | "alkyl-bend"
+  | "generic-fingerprint"
+  | "generic";
+
 export type IRBondQuery = {
   /** Element pair for the vibrating bond; order is orientation-independent. */
   elements: readonly [string, string];
@@ -58,6 +119,10 @@ export type IRPeak = {
   kind?: IRPeakKind;
   sourceGroup: string;
   explanation: string;
+  /** Explicit chemical band family assigned by the rule engine. */
+  family?: IRBandFamily;
+  /** Explicit physical vibration mode; renderers must not infer chemistry from labels. */
+  mode?: IRVibrationMode;
   modifiers?: string[];
   /** Machine-readable structural query for the exact bond(s) responsible for this vibration. */
   vibrationTarget?: IRVibrationTarget;

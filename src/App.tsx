@@ -1290,7 +1290,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
             <div className="card-header">
               <div>
                 <h2>Molecule Drawer</h2>
-                <p>Properties — draw a molecule to review its overview, acid/base sites, concepts, and molecular properties.</p>
+                <p>Draw a molecule to review its functional groups, acid/base sites, chiraliy, and molecular properties.</p>
               </div>
               <span className={`status ${isMainEditorReady ? "ready" : "loading"}`}>
                 {isMainEditorReady ? "Editor ready" : "Loading editor"}

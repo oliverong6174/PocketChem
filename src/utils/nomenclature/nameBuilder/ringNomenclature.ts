@@ -11,6 +11,7 @@ import type {
 import { COMMON_VALENCES } from "../constants";
 import { getOtherAtom } from "../molParser";
 import { buildBranchName } from "../branch/branchConstructor";
+import { buildAromaticBranchName } from "../branch/branchAromatics";
 import { getNamingIntent } from "./namingIntent";
 
 export type RingSuffixContext = {
@@ -164,12 +165,16 @@ function getStructuralNonAromaticRingSuffixContext(
 
   const amide = findRingAttachedAcylGroup(parsedMol, parent, isAmideCarbon);
   if (amide) {
-    return makeContext(amide, `${ringName}carboxamide`, {
-      type: "amide",
-      suffix: "amide",
-      prefix: "carbamoyl",
-      priority: 1.5,
-    });
+    return makeContext(
+      amide,
+      renderAmideNameWithNitrogenSubstituents(parsedMol, amide.externalAtom, `${ringName}carboxamide`),
+      {
+        type: "amide",
+        suffix: "amide",
+        prefix: "carbamoyl",
+        priority: 1.5,
+      },
+    );
   }
 
   const acidHalide = findRingAttachedAcylGroup(
@@ -280,12 +285,16 @@ function getNonAromaticRingSuffixContext(
   if (intent.featureType === "amide") {
     const match = findRingAttachedAcylGroup(parsedMol, parent, isAmideCarbon);
     if (match) {
-      return makeContext(match, `${ringName}carboxamide`, {
-        type: "amide",
-        suffix: "amide",
-        prefix: "carbamoyl",
-        priority: 1.5,
-      });
+      return makeContext(
+        match,
+        renderAmideNameWithNitrogenSubstituents(parsedMol, match.externalAtom, `${ringName}carboxamide`),
+        {
+          type: "amide",
+          suffix: "amide",
+          prefix: "carbamoyl",
+          priority: 1.5,
+        },
+      );
     }
   }
 
@@ -335,12 +344,16 @@ export function getAromaticSuffixContext(
     const match = findRingAttachedAcylGroup(parsedMol, parent, isAmideCarbon);
 
     if (match) {
-      return makeContext(match, "benzamide", {
-        type: "amide",
-        suffix: "amide",
-        prefix: "carbamoyl",
-        priority: 1.5,
-      });
+      return makeContext(
+        match,
+        renderAmideNameWithNitrogenSubstituents(parsedMol, match.externalAtom, "benzamide"),
+        {
+          type: "amide",
+          suffix: "amide",
+          prefix: "carbamoyl",
+          priority: 1.5,
+        },
+      );
     }
   }
 
@@ -587,6 +600,51 @@ export function orientAromaticParentForSuffix(
   context: AromaticSuffixContext
 ): ParentDescriptor {
   return orientRingParentForSuffix(parsedMol, parent, context);
+}
+
+function getAmideNitrogenSubstituentNames(
+  parsedMol: ParsedMol,
+  carbonylCarbon: number,
+) {
+  const nitrogenBond = (parsedMol.adjacency.get(carbonylCarbon) ?? []).find((bond) => {
+    if (bond.bondOrder !== 1) return false;
+    const attached = getOtherAtom(bond, carbonylCarbon);
+    return parsedMol.atoms[attached]?.element === "N";
+  });
+
+  if (!nitrogenBond) return [];
+  const nitrogen = getOtherAtom(nitrogenBond, carbonylCarbon);
+  const names: string[] = [];
+
+  for (const bond of parsedMol.adjacency.get(nitrogen) ?? []) {
+    if (bond.bondOrder !== 1) continue;
+    const attached = getOtherAtom(bond, nitrogen);
+    if (attached === carbonylCarbon) continue;
+    if (parsedMol.atoms[attached]?.element !== "C") continue;
+    names.push(buildBranchName(parsedMol, attached, nitrogen).name);
+  }
+
+  return names.sort((left, right) => left.localeCompare(right));
+}
+
+function renderAmideNameWithNitrogenSubstituents(
+  parsedMol: ParsedMol,
+  carbonylCarbon: number,
+  baseName: string,
+) {
+  const substituents = getAmideNitrogenSubstituentNames(parsedMol, carbonylCarbon);
+  if (substituents.length === 0) return baseName;
+  if (substituents.length === 1) return `N-${substituents[0]}${baseName}`;
+
+  if (substituents.length === 2 && substituents[0] === substituents[1]) {
+    const substituent = substituents[0];
+    const simple = /^[a-z]+yl$/.test(substituent);
+    return simple
+      ? `N,N-di${substituent}${baseName}`
+      : `N,N-bis(${substituent})${baseName}`;
+  }
+
+  return `${substituents.map((name) => `N-${name}`).join("-")}${baseName}`;
 }
 
 function makeContext(
@@ -931,6 +989,25 @@ function getEsterAlkylName(parsedMol: ParsedMol, carbonIndex: number) {
   if (!alkylBond) return null;
 
   const alkylCarbon = getOtherAtom(alkylBond, oxygenIndex);
+  const alkylAtom = parsedMol.atoms[alkylCarbon];
+
+  // Recognize benzyl esters as benzyl esters instead of flattening the
+  // benzene ring into an artificial unsaturated seven-carbon chain.
+  // This also preserves substituents on the benzyl ring:
+  //   O-CH2-C6H4-Br  ->  3-bromobenzyl (or the appropriate ring locant).
+  if (alkylAtom?.element === "C" && countImplicitHydrogens(alkylAtom, parsedMol.adjacency) >= 2) {
+    for (const bond of parsedMol.adjacency.get(alkylCarbon) ?? []) {
+      const neighbor = getOtherAtom(bond, alkylCarbon);
+      if (neighbor === oxygenIndex || parsedMol.atoms[neighbor]?.element !== "C") continue;
+
+      const aromatic = buildAromaticBranchName(parsedMol, neighbor, alkylCarbon);
+      if (!aromatic) continue;
+
+      return aromatic.name === "phenyl"
+        ? "benzyl"
+        : aromatic.name.replace(/phenyl$/, "benzyl");
+    }
+  }
 
   return buildBranchName(parsedMol, alkylCarbon, oxygenIndex).name;
 }

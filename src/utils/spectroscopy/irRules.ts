@@ -3,10 +3,12 @@ import { getOtherAtom, parseMolBlock } from "../nomenclature/molParser";
 import type { ParsedMol } from "../nomenclature/types";
 import type { FunctionalGroupResult } from "../functionalGroups";
 import type {
+  IRBandFamily,
   IRPeak,
   IRPeakIntensity,
   IRPeakKind,
   IRPeakShape,
+  IRVibrationMode,
   IROverlapRole,
   IRSuppressionClass,
   IRVibrationTarget,
@@ -16,6 +18,8 @@ type Range = readonly [number, number];
 
 type PeakOptions = {
   center?: number;
+  family?: IRBandFamily;
+  mode?: IRVibrationMode;
   intensity?: IRPeakIntensity;
   shape?: IRPeakShape;
   widthCm1?: number;
@@ -104,6 +108,91 @@ const VIBRATION_TARGETS = {
   carbonIodine: vibrationBonds([{ elements: ["C", "I"], bondOrders: [1] }]),
 } as const satisfies Record<string, IRVibrationTarget>;
 
+type BandMetadata = { family: IRBandFamily; mode: IRVibrationMode };
+
+/**
+ * Assign machine-readable chemistry at rule creation time. The renderer never
+ * guesses chemistry from human-facing labels. Stable rule ids/targets are used
+ * here only as a compatibility bridge for the existing rule catalog. New rules
+ * should pass `family` and `mode` explicitly.
+ */
+function inferBandMetadata(
+  sourceGroup: string,
+  id: string,
+  options: PeakOptions,
+): BandMetadata {
+  if (options.family && options.mode) return { family: options.family, mode: options.mode };
+
+  const key = id.toLowerCase();
+  const group = sourceGroup.toLowerCase();
+  const target = options.vibrationTarget;
+
+  if (options.overlapRole === "alkyl-ch") {
+    if (key.includes("ch2-asym")) return { family: "alkyl-ch", mode: "ch2-asymmetric" };
+    if (key.includes("ch2-sym")) return { family: "alkyl-ch", mode: "ch2-symmetric" };
+    if (key.includes("ch3-asym")) return { family: "alkyl-ch", mode: "ch3-asymmetric" };
+    if (key.includes("ch3-sym")) return { family: "alkyl-ch", mode: "ch3-symmetric" };
+    return { family: "alkyl-ch", mode: "generic" };
+  }
+  if (options.overlapRole === "alkyl-bend") return { family: "fingerprint", mode: "alkyl-bend" };
+
+  if (target === VIBRATION_TARGETS.carbonyl) {
+    if (key.includes("aldehyde") || group.includes("aldehyde") || group.includes("enal")) return { family: "carbonyl", mode: "aldehyde-carbonyl" };
+    if (key.includes("ketone") || group.includes("ketone") || group.includes("enone")) return { family: "carbonyl", mode: "ketone-carbonyl" };
+    if (key.includes("ester") || group.includes("ester") || group.includes("enoate")) return { family: "carbonyl", mode: "ester-carbonyl" };
+    if (key.includes("acid") || group.includes("carboxylic acid") || group.includes("enoic acid")) return { family: "carbonyl", mode: "acid-carbonyl" };
+    if (key.includes("lactone")) return { family: "carbonyl", mode: "lactone-carbonyl" };
+    if (key.includes("anhydride") || group.includes("anhydride")) {
+      return { family: "carbonyl", mode: key.includes("high") ? "anhydride-carbonyl-high" : "anhydride-carbonyl-low" };
+    }
+    if (key.includes("carbamate") || group.includes("carbamate")) return { family: "carbonyl", mode: "carbamate-carbonyl" };
+    if (key.includes("acyl-halide") || group.includes("acyl halide")) return { family: "carbonyl", mode: "acyl-halide-carbonyl" };
+    if (key.includes("amide") || group.includes("amide") || group.includes("lactam")) return { family: "carbonyl", mode: "amide-carbonyl" };
+    return { family: "carbonyl", mode: "generic-carbonyl" };
+  }
+
+  if (key.includes("aldehyde-ch-low")) return { family: "aldehyde-ch", mode: "aldehyde-fermi-low" };
+  if (key.includes("aldehyde-ch-high")) return { family: "aldehyde-ch", mode: "aldehyde-fermi-high" };
+  if (key.includes("aromatic-ch-stretch")) return { family: "aromatic-ch", mode: "aromatic-ch" };
+  if (key.includes("vinylic-ch-stretch")) return { family: "vinylic-ch", mode: "vinylic-ch" };
+  if (key.includes("terminal-alkyne-ch")) return { family: "xh", mode: "terminal-alkyne-ch" };
+
+  if (options.suppressionClass === "oh-site") {
+    if (options.overlapRole === "acidic-oh-envelope" || group.includes("carboxylic acid")) return { family: "xh", mode: "acid-oh" };
+    if (group.includes("phenol")) return { family: "xh", mode: "phenol-oh" };
+    return { family: "xh", mode: "alcohol-oh" };
+  }
+  if (options.suppressionClass === "nh-site") {
+    if (group.includes("primary amide")) return { family: "xh", mode: key.includes("sym") && !key.includes("asym") ? "primary-amide-nh-symmetric" : "primary-amide-nh-asymmetric" };
+    if (group.includes("secondary amide")) return { family: "xh", mode: "secondary-amide-nh" };
+    return { family: "xh", mode: "amine-nh" };
+  }
+  if (key.includes("thiol") && key.includes("sh")) return { family: "xh", mode: "thiol-sh" };
+
+  if (target === VIBRATION_TARGETS.nitrile) return { family: "nitrile", mode: "nitrile-stretch" };
+  if (target === VIBRATION_TARGETS.alkyne) return { family: "alkyne", mode: "alkyne-stretch" };
+  if (target === VIBRATION_TARGETS.alkene) return { family: "alkene", mode: "alkene-stretch" };
+  if (target === VIBRATION_TARGETS.aromaticPi) {
+    if (key.includes("1600")) return { family: "aromatic-ring", mode: "aromatic-ring-1600" };
+    if (key.includes("1580")) return { family: "aromatic-ring", mode: "aromatic-ring-1580" };
+    if (key.includes("1500")) return { family: "aromatic-ring", mode: "aromatic-ring-1500" };
+    return { family: "aromatic-ring", mode: "generic" };
+  }
+  if (key.includes("amide-ii")) return { family: "amide-ii", mode: "amide-ii" };
+
+  if (target === VIBRATION_TARGETS.carbonOxygenSingle) {
+    if (key.includes("ester") && (key.endsWith("-1") || key.includes("low"))) return { family: "fingerprint", mode: "ester-co-low" };
+    if (key.includes("ester")) return { family: "fingerprint", mode: "ester-co-high" };
+    if (group.includes("phenol")) return { family: "fingerprint", mode: "phenol-co" };
+    if (group.includes("alcohol")) return { family: "fingerprint", mode: "alcohol-co" };
+    return { family: "fingerprint", mode: "generic-fingerprint" };
+  }
+  if (target === VIBRATION_TARGETS.carbonNitrogenSingle) return { family: "fingerprint", mode: "amine-cn" };
+  if (key.includes("aryl-oop")) return { family: "fingerprint", mode: "aromatic-oop" };
+  if (options.kind === "fingerprint") return { family: "fingerprint", mode: "generic-fingerprint" };
+  return { family: "other", mode: "generic" };
+}
+
 function formatRange(range: Range) {
   return range[0] === range[1]
     ? `${Math.round(range[0])} cm⁻¹`
@@ -118,6 +207,7 @@ function irPeak(
   options: PeakOptions = {},
 ): IRPeak {
   const shape = options.shape ?? "moderate";
+  const metadata = inferBandMetadata(sourceGroup, id, options);
   return {
     id,
     sourceGroup,
@@ -129,6 +219,8 @@ function irPeak(
     widthCm1: options.widthCm1 ?? WIDTH_BY_SHAPE[shape],
     kind: options.kind ?? "diagnostic",
     explanation: options.explanation ?? `${label} predicted from the detected ${sourceGroup.toLowerCase()} functionality.`,
+    family: options.family ?? metadata.family,
+    mode: options.mode ?? metadata.mode,
     modifiers: options.modifiers,
     vibrationTarget: options.vibrationTarget,
     suppressionClass: options.suppressionClass,
@@ -235,12 +327,14 @@ function aldehydePeaks(group: string): IRPeak[] {
       center: 2720,
       intensity: "weak",
       shape: "narrow",
+      widthCm1: 8,
       explanation: "Lower member of the characteristic aldehydic C–H Fermi doublet.",
     }),
     irPeak(group, `${group}-aldehyde-ch-high`, "Aldehyde C–H Fermi band", [2805, 2835], {
       center: 2820,
       intensity: "weak",
       shape: "narrow",
+      widthCm1: 8,
       explanation: "Upper member of the characteristic aldehydic C–H Fermi doublet.",
     }),
   ];
@@ -252,13 +346,15 @@ function esterPeaks(group: string): IRPeak[] {
       center: 1740,
       intensity: "veryStrong",
       shape: "narrow",
+      widthCm1: 18,
       explanation: "Saturated ester carbonyl absorption before conjugation or ring-strain modifiers.",
       vibrationTarget: VIBRATION_TARGETS.carbonyl,
     }),
     irPeak(group, `${group}-ester-co-1`, "Ester C–O stretch", [1050, 1180], {
       center: 1120,
       intensity: "strong",
-      shape: "moderate",
+      shape: "narrow",
+      widthCm1: 13,
       explanation: "One of the strong ester C–O stretching modes in the fingerprint region.",
       vibrationTarget: VIBRATION_TARGETS.carbonOxygenSingle,
       suppressionClass: "co-site",
@@ -267,7 +363,8 @@ function esterPeaks(group: string): IRPeak[] {
     irPeak(group, `${group}-ester-co-2`, "Ester C–O stretch", [1180, 1300], {
       center: 1240,
       intensity: "strong",
-      shape: "moderate",
+      shape: "narrow",
+      widthCm1: 13,
       explanation: "A second strong ester C–O stretching mode; esters commonly give multiple C–O bands.",
       vibrationTarget: VIBRATION_TARGETS.carbonOxygenSingle,
       suppressionClass: "co-site",
@@ -291,9 +388,10 @@ function amideIIPeak(group: string): IRPeak {
   return irPeak(group, `${group}-amide-ii`, "Amide II band", [1510, 1580], {
     center: 1545,
     intensity: "medium",
-    shape: "moderate",
+    shape: "narrow",
+    widthCm1: 10,
     kind: "supporting",
-    explanation: "The amide II region is commonly observed around 1510–1580 cm⁻¹.",
+    explanation: "Amide II is primarily N–H bending coupled with C–N stretching and is normally a distinct band around 1510–1580 cm⁻¹ rather than one broad unresolved basin.",
   });
 }
 
@@ -301,18 +399,20 @@ function primaryAmidePeaks(group: string, carbonyl = amideCarbonyl(group)): IRPe
   return [
     carbonyl,
     irPeak(group, `${group}-nh-asym`, "N–H stretch", [3300, 3500], {
-      center: 3420,
+      center: 3350,
       intensity: "medium",
-      shape: "moderate",
-      explanation: "Primary amides usually give two N–H stretching bands.",
+      shape: "narrow",
+      widthCm1: 28,
+      explanation: "Primary amides normally show two N–H stretching components from symmetric/asymmetric NH₂ motion.",
       suppressionClass: "nh-site",
       suppressionPriority: 30,
     }),
     irPeak(group, `${group}-nh-sym`, "N–H stretch", [3180, 3400], {
-      center: 3250,
+      center: 3180,
       intensity: "medium",
-      shape: "moderate",
-      explanation: "Second N–H stretching band of a primary amide.",
+      shape: "narrow",
+      widthCm1: 30,
+      explanation: "Lower-frequency component of the primary-amide NH₂ stretching pair.",
       suppressionClass: "nh-site",
       suppressionPriority: 30,
     }),
@@ -326,8 +426,9 @@ function secondaryAmidePeaks(group: string, carbonyl = amideCarbonyl(group)): IR
     irPeak(group, `${group}-nh`, "N–H stretch", [3200, 3400], {
       center: 3300,
       intensity: "medium",
-      shape: "moderate",
-      explanation: "Secondary amides normally show one N–H stretching band.",
+      shape: "broad",
+      widthCm1: 42,
+      explanation: "Secondary amides normally show one N–H stretching family near 3300 cm⁻¹, broadened and skewed by hydrogen bonding but much narrower than an alcohol O–H envelope.",
       suppressionClass: "nh-site",
       suppressionPriority: 30,
     }),
@@ -336,10 +437,9 @@ function secondaryAmidePeaks(group: string, carbonyl = amideCarbonyl(group)): IR
 }
 
 function tertiaryAmidePeaks(group: string, carbonyl = amideCarbonyl(group)): IRPeak[] {
-  return [
-    carbonyl,
-    amideIIPeak(group),
-  ];
+  // Classical amide II requires an N–H bend, so a tertiary amide (no N–H)
+  // should not receive the primary/secondary-amide II assignment.
+  return [carbonyl];
 }
 
 function aminePeaks(group: string, substitution: "primary" | "secondary" | "tertiary" | "unknown"): IRPeak[] {
@@ -446,28 +546,32 @@ function aromaticPeaks(group: string): IRPeak[] {
     irPeak(group, `${group}-ring-1600`, "Aromatic ring C=C stretch", [1585, 1610], {
       center: 1600,
       intensity: "medium",
-      shape: "moderate",
+      shape: "narrow",
+      widthCm1: 9,
       explanation: "One of the characteristic aromatic ring stretching bands.",
       vibrationTarget: VIBRATION_TARGETS.aromaticPi,
     }),
     irPeak(group, `${group}-ring-1580`, "Aromatic ring C=C stretch", [1565, 1590], {
       center: 1580,
       intensity: "weak",
-      shape: "moderate",
+      shape: "narrow",
+      widthCm1: 8,
       explanation: "Aromatic ring stretching band; not every ring mode is equally intense.",
       vibrationTarget: VIBRATION_TARGETS.aromaticPi,
     }),
     irPeak(group, `${group}-ring-1500`, "Aromatic ring C=C stretch", [1485, 1515], {
       center: 1500,
       intensity: "medium",
-      shape: "moderate",
+      shape: "narrow",
+      widthCm1: 9,
       explanation: "Characteristic aromatic ring stretching band near 1500 cm⁻¹.",
       vibrationTarget: VIBRATION_TARGETS.aromaticPi,
     }),
     irPeak(group, `${group}-ring-1450`, "Aromatic ring vibration", [1435, 1465], {
       center: 1450,
       intensity: "medium",
-      shape: "moderate",
+      shape: "narrow",
+      widthCm1: 9,
       kind: "supporting",
       explanation: "Lower-frequency aromatic ring vibration near 1450 cm⁻¹.",
       vibrationTarget: VIBRATION_TARGETS.aromaticPi,
@@ -619,7 +723,8 @@ function isAromaticAtom(graph: ParsedMol, atomIndex: number) {
 function structuralCHPeaks(graph: ParsedMol): IRPeak[] {
   const ch3Atoms: number[] = [];
   const ch2Atoms: number[] = [];
-  const sp2CHAtoms: number[] = [];
+  const aromaticCHAtoms: number[] = [];
+  const vinylicCHAtoms: number[] = [];
   const terminalAlkyneAtoms: number[] = [];
 
   for (const atom of graph.atoms) {
@@ -641,8 +746,10 @@ function structuralCHPeaks(graph: ParsedMol): IRPeak[] {
         return neighbor?.element === "C" || neighbor?.element === "N";
       });
 
-      if (isAromaticAtom(graph, atom.atomIndex) || (hasOrdinarySp2Bond && !hasCarbonylLikeDoubleBond)) {
-        sp2CHAtoms.push(atom.atomIndex);
+      if (isAromaticAtom(graph, atom.atomIndex)) {
+        aromaticCHAtoms.push(atom.atomIndex);
+      } else if (hasOrdinarySp2Bond && !hasCarbonylLikeDoubleBond) {
+        vinylicCHAtoms.push(atom.atomIndex);
       } else if (hydrogens >= 3) {
         ch3Atoms.push(atom.atomIndex);
       } else if (hydrogens === 2) {
@@ -699,7 +806,7 @@ function structuralCHPeaks(graph: ParsedMol): IRPeak[] {
   if (ch2Atoms.length > 0) {
     peaks.push(
       irPeak("C–H framework", "ch2-asym", "CH₂ asymmetric C–H stretch", [2910, 2940], {
-        center: 2925,
+        center: 2927,
         intensity: "strong",
         shape: "moderate",
         widthCm1: 16,
@@ -709,7 +816,7 @@ function structuralCHPeaks(graph: ParsedMol): IRPeak[] {
         explanation: "sp³ CH₂ asymmetric C–H stretch below 3000 cm⁻¹.",
       }),
       irPeak("C–H framework", "ch2-sym", "CH₂ symmetric C–H stretch", [2835, 2865], {
-        center: 2850,
+        center: 2854,
         intensity: "medium",
         shape: "moderate",
         widthCm1: 14,
@@ -742,16 +849,29 @@ function structuralCHPeaks(graph: ParsedMol): IRPeak[] {
       );
     }
   }
-  if (sp2CHAtoms.length > 0) {
+  if (aromaticCHAtoms.length > 0) {
     peaks.push(
-      irPeak("sp² C–H", "sp2-ch", "sp² C–H stretch", [3000, 3100], {
+      irPeak("Aromatic C–H", "aromatic-ch-stretch", "Aromatic sp² C–H stretch", [3000, 3100], {
         center: 3030,
-        intensity: "medium",
-        shape: "moderate",
-        widthCm1: 12,
+        intensity: "veryWeak",
+        shape: "narrow",
+        widthCm1: 10,
         kind: "supporting",
-        atomIndices: sp2CHAtoms,
-        explanation: "sp² C–H absorption is placed above 3000 cm⁻¹, distinguishing it from ordinary sp³ C–H stretching below 3000 cm⁻¹.",
+        atomIndices: aromaticCHAtoms,
+        explanation: "Aromatic sp² C–H stretching appears just above 3000 cm⁻¹, typically near 3030 cm⁻¹, and is usually much weaker than a strongly hydrogen-bonded N–H or O–H band.",
+      }),
+    );
+  }
+  if (vinylicCHAtoms.length > 0) {
+    peaks.push(
+      irPeak("Vinylic C–H", "vinylic-ch-stretch", "Vinylic sp² C–H stretch", [3000, 3100], {
+        center: 3070,
+        intensity: "weak",
+        shape: "narrow",
+        widthCm1: 11,
+        kind: "supporting",
+        atomIndices: vinylicCHAtoms,
+        explanation: "Vinylic sp² C–H stretching also appears above 3000 cm⁻¹, but is kept separate from the typically weaker aromatic C–H band.",
       }),
     );
   }
@@ -1245,18 +1365,10 @@ function fingerprintPeaks(graph: ParsedMol, seedText: string, majorPeaks: IRPeak
     const width = 4 + random() * 8;
     const intensityRoll = random();
     const intensity: IRPeakIntensity = simpleAcyclicHydrocarbon
-      ? intensityRoll > 0.88
-        ? "weak"
-        : "veryWeak"
+      ? intensityRoll > 0.90 ? "weak" : "veryWeak"
       : ringCount > 0
-        ? intensityRoll > 0.88
-          ? "medium"
-          : intensityRoll > 0.34
-            ? "weak"
-            : "veryWeak"
-        : intensityRoll > 0.55
-          ? "weak"
-          : "veryWeak";
+        ? intensityRoll > 0.72 ? "weak" : "veryWeak"
+        : intensityRoll > 0.68 ? "weak" : "veryWeak";
 
     peaks.push(
       irPeak("Fingerprint region", `fingerprint-${index}`, "Skeletal / bending mode", [Math.max(500, center - 14), Math.min(1500, center + 14)], {
@@ -1581,17 +1693,11 @@ function applyPeakSuppressionRules(peaks: IRPeak[]) {
   });
 }
 
-function jitterPeakCenters(peaks: IRPeak[], seedText: string) {
-  return peaks.map((item, index) => {
-    if (item.center === undefined || item.kind === "fingerprint") return item;
-    const random = seededRandom(`${seedText}|${item.id ?? item.label}|${index}`);
-    const scale = item.shape === "extremelyBroad" ? 18 : item.shape === "broad" ? 10 : item.shape === "veryNarrow" ? 2 : 4;
-    const jitter = (random() - 0.5) * 2 * scale;
-    return {
-      ...item,
-      center: item.center + jitter,
-    };
-  });
+function jitterPeakCenters(peaks: IRPeak[], _seedText: string) {
+  // Deliberately deterministic: environment-specific chemistry rules (conjugation,
+  // ring strain, symmetry) own frequency shifts. Rendering no longer adds random
+  // center jitter that can move a correct diagnostic band for cosmetic variation.
+  return peaks;
 }
 
 function suppressImpossibleNH(peaks: IRPeak[], names: Set<string>) {

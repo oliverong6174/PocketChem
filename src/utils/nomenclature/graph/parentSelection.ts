@@ -1384,6 +1384,44 @@ export function getAllBenzeneLikeCarbonAtoms(parsedMol: ParsedMol): Set<number> 
   return aromaticAtoms;
 }
 
+function findBenzeneLikeRingContainingAtom(
+  parsedMol: ParsedMol,
+  startAtom: number
+): RingDescriptor | null {
+  if (parsedMol.atoms[startAtom]?.element !== "C") return null;
+
+  let found: RingDescriptor | null = null;
+
+  const dfs = (current: number, path: number[]) => {
+    if (found) return;
+
+    if (path.length === 6) {
+      const closes = (parsedMol.adjacency.get(current) ?? []).some(
+        (bond) => getOtherAtom(bond, current) === startAtom
+      );
+      if (!closes) return;
+
+      const ringSet = new Set(path);
+      const ringBonds = parsedMol.bonds.filter(
+        (bond) => ringSet.has(bond.atomA) && ringSet.has(bond.atomB)
+      );
+      const ring: RingDescriptor = { ringAtoms: [...path], ringBonds };
+      if (isBenzeneLikeRing(parsedMol, ring)) found = ring;
+      return;
+    }
+
+    for (const bond of parsedMol.adjacency.get(current) ?? []) {
+      const next = getOtherAtom(bond, current);
+      if (next === startAtom || path.includes(next)) continue;
+      if (parsedMol.atoms[next]?.element !== "C") continue;
+      dfs(next, [...path, next]);
+    }
+  };
+
+  dfs(startAtom, [startAtom]);
+  return found;
+}
+
 export function getBestAcylParentDescriptor(
   parsedMol: ParsedMol,
   preferredAtoms: number[] = []
@@ -1402,6 +1440,25 @@ export function getBestAcylParentDescriptor(
       ? preferredCarbonylCarbons
       : allCarbonylCarbons;
   const carbonylSet = new Set(carbonylCarbons);
+
+  // A retained aromatic acyl parent outranks an acyclic one even when the
+  // molecule contains another, unrelated aromatic ring on the alcohol side
+  // of an ester.  The old single-ring shortcut could inspect the wrong ring
+  // first and fall back to names such as "...methanoate" for benzoates.
+  for (const carbonylIndex of carbonylCarbons) {
+    for (const bond of parsedMol.adjacency.get(carbonylIndex) ?? []) {
+      if (bond.bondOrder !== 1) continue;
+      const neighbor = getOtherAtom(bond, carbonylIndex);
+      if (parsedMol.atoms[neighbor]?.element !== "C") continue;
+
+      const aromaticRing = findBenzeneLikeRingContainingAtom(parsedMol, neighbor);
+      if (!aromaticRing) continue;
+
+      const aromaticParent = buildRingParentDescriptor(parsedMol, aromaticRing);
+      if (aromaticParent?.aromaticRing) return aromaticParent;
+    }
+  }
+
   const aromaticRingSet = getAllBenzeneLikeCarbonAtoms(parsedMol);
   let bestPath: number[] = [];
 
@@ -1544,6 +1601,27 @@ export function getParentDescriptor(
   parsedMol: ParsedMol,
   preferredAtoms: number[] = []
 ): ParentDescriptor {
+  // In multi-ring molecules, getSimpleCarbonRing() can encounter an unrelated
+  // benzene ring before the one that actually bears the principal acyl group.
+  // Resolve that case first so benzoates/benzamides/etc. keep the correct
+  // retained aromatic parent even when the alcohol/substituent side also has
+  // an aromatic ring.
+  for (const preferredAtom of preferredAtoms) {
+    if (!isRetainedAromaticAcylCarbon(parsedMol, preferredAtom)) continue;
+
+    for (const bond of parsedMol.adjacency.get(preferredAtom) ?? []) {
+      if (bond.bondOrder !== 1) continue;
+      const neighbor = getOtherAtom(bond, preferredAtom);
+      if (parsedMol.atoms[neighbor]?.element !== "C") continue;
+
+      const aromaticRing = findBenzeneLikeRingContainingAtom(parsedMol, neighbor);
+      if (!aromaticRing) continue;
+
+      const aromaticParent = buildRingParentDescriptor(parsedMol, aromaticRing);
+      if (aromaticParent?.aromaticRing) return aromaticParent;
+    }
+  }
+
   const ring = getSimpleCarbonRing(parsedMol);
 
   if (ring) {

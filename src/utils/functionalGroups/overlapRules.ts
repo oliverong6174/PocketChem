@@ -250,9 +250,6 @@ Aminoxime: [
   Benzamide: [
     "Benzene",
     "Amide",
-    "Primary amide",
-    "Secondary amide",
-    "Tertiary amide",
     "Amine",
   ],
 
