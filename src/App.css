@@ -2276,3 +2276,119 @@ body,
     min-width: 0;
   }
 }
+
+/* Shared name-to-structure loader shown beneath every MoleculeDrawer. */
+.molecule-drawer-stack {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  background: white;
+}
+
+.molecule-drawer-stack > .ketcher-shell {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.molecule-name-input-panel {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  background: #f8fafc;
+  border-top: 1px solid #cbd5e1;
+  color: #0f172a;
+}
+
+.molecule-name-input-copy {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.molecule-name-input-copy label {
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.molecule-name-input-copy span {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.molecule-name-input-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+}
+
+.molecule-name-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 40px;
+  border: 1px solid #94a3b8;
+  border-radius: 10px;
+  background: white;
+  color: #0f172a;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.molecule-name-input:focus {
+  outline: 2px solid #38bdf8;
+  outline-offset: 1px;
+  border-color: #0284c7;
+}
+
+.molecule-name-action {
+  flex: 0 0 auto !important;
+  min-width: 82px;
+  margin: 0;
+  padding: 8px 12px;
+}
+
+.molecule-name-message {
+  min-height: 16px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.molecule-name-message.success {
+  color: #166534;
+}
+
+.molecule-name-message.error {
+  color: #b91c1c;
+}
+
+.molecule-name-message.info {
+  color: #475569;
+}
+
+@media (max-width: 640px) {
+  .molecule-name-input-copy {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .molecule-name-input-row {
+    flex-wrap: wrap;
+  }
+
+  .molecule-name-input {
+    flex-basis: 100%;
+  }
+
+  .molecule-name-action {
+    flex: 1 1 120px !important;
+  }
+}

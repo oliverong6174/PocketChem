@@ -44,8 +44,11 @@ const RAW_COMMON_NAME_MAP: Record<string, string> = {
   "octadec-9-enoic acid": "oleic acid",
   "octadeca-9,12-dienoic acid": "linoleic acid",
   "octadeca-9,12,15-trienoic acid": "linolenic acid",
-  "eicosanoic acid": "arachidic acid",
-  "eicosa-5,8,11,14-tetraenoic acid": "arachidonic acid",
+  "icosanoic acid": "arachidic acid",
+  "eicosanoic acid": "arachidic acid", // legacy spelling accepted
+  "icosa-5,8,11,14-tetraenoic acid": "arachidonic acid",
+  "eicosa-5,8,11,14-tetraenoic acid": "arachidonic acid", // legacy spelling accepted
+  "(5Z,8Z,11Z,14Z)-icosa-5,8,11,14-tetraenoic acid": "arachidonic acid",
   "ethanedioic acid": "oxalic acid",
   "propanedioic acid": "malonic acid",
   "butanedioic acid": "succinic acid",
@@ -885,6 +888,11 @@ const EXACT_STEREO_COMMON_NAME_MAP: Readonly<Record<string, string>> = Object.fr
 
   // isomaltose: alpha-D-glucopyranosyl-(1->6)-D-glucose
   "OC[C@H]1O[C@H](OC[C@H]2OC(O)[C@H](O)[C@@H](O)[C@@H]2O)[C@H](O)[C@@H](O)[C@@H]1O": "isomaltose",
+
+  // Polyunsaturated fatty acids whose common identity depends on exact alkene
+  // stereochemistry.  This lets a hand-drawn all-cis structure resolve to its
+  // common identity without relying only on a name alias.
+  "CCCCC/C=C\\C/C=C\\C/C=C\\C/C=C\\CCCC(=O)O": "arachidonic acid",
 
   // Steroids / vitamins / stereospecific drugs. These are also stored in the
   // exact RDKit-canonical form expected from mol.get_smiles().

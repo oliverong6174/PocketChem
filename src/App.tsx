@@ -18,6 +18,10 @@
 import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import MoleculeDrawer from "./components/MoleculeDrawer";
   import {
+    applyResolvedNameToIdentity,
+    type MoleculeNameResolution,
+  } from "./utils/moleculeNameResolver";
+  import {
     analyzeFunctionalGroupHierarchy,
     flattenFunctionalGroupOccurrences,
     getRDKit,
@@ -145,6 +149,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     //useState calls
     const analyzeInFlightRef = useRef(false);
     const latestAnalyzeRunRef = useRef(0);
+    const importedNameResolutionRef = useRef<MoleculeNameResolution | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [isMainEditorReady, setIsMainEditorReady] = useState(false);
     const [mainEditorResetVersion, setMainEditorResetVersion] = useState(0);
@@ -194,6 +199,19 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
           console.warn("RDKit warm-up was deferred after a load failure.", error);
         });
       }, 800);
+    }, []);
+
+    const handleMainEditorChange = useCallback(() => {
+      // Any manual edit means the previously resolved name is no longer
+      // guaranteed to describe the current graph.
+      importedNameResolutionRef.current = null;
+    }, []);
+
+    const handleMainNameApplied = useCallback((
+      resolution: MoleculeNameResolution,
+      action: "add" | "replace",
+    ) => {
+      importedNameResolutionRef.current = action === "replace" ? resolution : null;
     }, []);
 
     const scrollToAppTop = () => {
@@ -406,7 +424,11 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
         if (latestAnalyzeRunRef.current !== runId) return;
 
         setReactionPathways(pathways);
-        setMoleculeIdentity(identity);
+        setMoleculeIdentity(
+          identity
+            ? applyResolvedNameToIdentity(identity, importedNameResolutionRef.current)
+            : null,
+        );
         setAcidityResults(acidity);
         setBasicityResults(basicity);
         setStatus("Analysis complete");
@@ -1210,6 +1232,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   };
 
   const clearAnalysis = () => {
+    importedNameResolutionRef.current = null;
     analyzeInFlightRef.current = false;
     latestAnalyzeRunRef.current += 1;
     setIsAnalyzing(false);
@@ -1290,7 +1313,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
             <div className="card-header">
               <div>
                 <h2>Molecule Drawer</h2>
-                <p>Draw a molecule to review its functional groups, acid/base sites, chiraliy, and molecular properties.</p>
+                <p>Properties — draw a molecule to review its overview, acid/base sites, concepts, and molecular properties.</p>
               </div>
               <span className={`status ${isMainEditorReady ? "ready" : "loading"}`}>
                 {isMainEditorReady ? "Editor ready" : "Loading editor"}
@@ -1301,6 +1324,9 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
               <MoleculeDrawer
                 key={`main-editor-${mainEditorResetVersion}`}
                 onReady={handleMainEditorReady}
+                onChange={handleMainEditorChange}
+                onNameStructureApplied={handleMainNameApplied}
+                onNameSubmitProcess={analyzeMolecule}
               />
             </div>
 

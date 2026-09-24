@@ -6,6 +6,10 @@ import {
   getMoleculeSvg,
 } from "../utils/functionalGroups";
 import { analyzeNomenclatureAndProperties } from "../utils/nomenclatureUtils";
+import {
+  applyResolvedNameToIdentity,
+  type MoleculeNameResolution,
+} from "../utils/moleculeNameResolver";
 import { getHighlightedMoleculeSvg } from "../utils/moleculeAnnotation";
 import {
   analyzeMolecularSpectroscopy,
@@ -789,6 +793,7 @@ function MassTable({
 }
 
 export default function SpectroscopyPage() {
+  const importedNameResolutionRef = useRef<MoleculeNameResolution | null>(null);
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [editorResetVersion, setEditorResetVersion] = useState(0);
   const [activeTab, setActiveTab] = useState<SpectroscopyTab>("proton");
@@ -1204,10 +1209,14 @@ export default function SpectroscopyPage() {
       setMassPreviewSvgs([]);
       setStatus("Detecting functional groups and molecular properties…");
       const hierarchy = await analyzeFunctionalGroupHierarchy(spectroscopyStructure);
-      const identity = await analyzeNomenclatureAndProperties(
+      const localIdentity = await analyzeNomenclatureAndProperties(
         currentSmiles,
         hierarchy.primaryGroups,
         hierarchy.mainGroup,
+      );
+      const identity = applyResolvedNameToIdentity(
+        localIdentity,
+        importedNameResolutionRef.current,
       );
       const svgPromise = getMoleculeSvg(currentSmiles);
       const exactMassValue = Number.parseFloat(identity.properties.exactMass ?? "");
@@ -1234,6 +1243,7 @@ export default function SpectroscopyPage() {
   };
 
   const clear = () => {
+    importedNameResolutionRef.current = null;
     // Reset both the spectroscopy state and the editor itself. Importing an empty
     // structure into Ketcher can leave stale selection/tool/zoom state, so remount
     // the drawer to guarantee a genuinely blank canvas.
@@ -1273,7 +1283,14 @@ export default function SpectroscopyPage() {
           <MoleculeDrawer
             key={`spectroscopy-ketcher-${editorResetVersion}`}
             onReady={setKetcher}
+            onChange={() => {
+              importedNameResolutionRef.current = null;
+            }}
+            onNameStructureApplied={(resolution, action) => {
+              importedNameResolutionRef.current = action === "replace" ? resolution : null;
+            }}
             globalKey="spectroscopyKetcher"
+            onNameSubmitProcess={analyze}
           />
         </div>
 

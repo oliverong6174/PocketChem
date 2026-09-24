@@ -31,7 +31,7 @@ export const CHAIN_PREFIXES: Record<number, string> = {
   17: "heptadec",
   18: "octadec",
   19: "nonadec",
-  20: "eicos",
+  20: "icos",
 };
 
 export const COMMON_VALENCES: Record<string, number> = {

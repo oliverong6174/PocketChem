@@ -695,6 +695,7 @@ export default function ReactionsPage({
         <div className="reaction-ketcher-box">
           <MoleculeDrawer
             globalKey="reactionKetcher"
+            nameInputMode="add-or-replace"
             onChange={handleReactionCanvasChange}
             onReady={setKetcher}
           />

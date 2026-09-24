@@ -58,10 +58,12 @@ export function orientParentForPrimaryGroup(
 ): ParentDescriptor {
   if (parent.kind !== "chain") return parent;
 
-  if (getNamingIntent(primaryGroup).terminalSuffix) {
-    return parent;
-  }
-
+  // Terminal suffix parents still need explicit orientation. In particular,
+  // carboxylic acids, aldehydes, nitriles, amides, etc. must number the
+  // suffix-bearing carbon from the lowest possible end of the parent chain.
+  // Returning early here made long-chain acids depend on DFS atom order and
+  // could reverse every unsaturation locant (e.g. arachidonic acid
+  // 5,8,11,14 -> 6,9,12,15).
   const forwardPath = parent.path;
   const reversePath = [...parent.path].reverse();
 

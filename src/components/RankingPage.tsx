@@ -566,6 +566,7 @@ export default function AcidBasePage() {
             <MoleculeDrawer
               globalKey="acidBaseKetcher"
               onReady={setKetcher}
+              onNameSubmitProcess={analyzeAcidBaseMolecule}
             />
           </div>
 
