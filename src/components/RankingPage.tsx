@@ -3,73 +3,26 @@ import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
   getMoleculeSvg,
-  type FunctionalGroupResult,
 } from "../utils/functionalGroups";
 import {
-  analyzeAcidity,
-  type AcidityResult,
-} from "../utils/ranking/analyzeAcidity";
-import {
-  analyzeBasicity,
-  type BasicityResult,
-} from "../utils/ranking/analyzeBasicity";
-import {
-  analyzeCarbanionStability,
-  getBestCarbanionStabilityResult,
-  type CarbanionStabilityResult,
-} from "../utils/ranking/anionStability";
-import {
-  analyzeCarbocationStability,
-  getBestCarbocationStabilityResult,
-  type CarbocationStabilityResult,
-} from "../utils/ranking/cationStability";
-import {
-  analyzeCarbonRadicalStability,
-  getBestCarbonRadicalStabilityResult,
-  type CarbonRadicalStabilityResult,
-} from "../utils/ranking/radicalStability";
-import {
-  analyzeBoilingPointRanking,
-  compareBoilingPointResults,
-  type BoilingPointRankingResult,
-} from "../utils/ranking/boilingPoint";
-import {
-  analyzeSolubilityRanking,
-  compareSolubilityResults,
-  type SolubilityRankingResult,
-} from "../utils/ranking/solubility";
-import {
-  analyzeCipSubstituentPriority,
-  compareCipSubstituentResults,
-  type CipSubstituentPriorityResult,
-} from "../utils/ranking/cipPriority";
-
-type RankingMode =
-  | "acidity"
-  | "basicity"
-  | "anionStability"
-  | "cationStability"
-  | "radicalStability"
-  | "boilingPoint"
-  | "solubility"
-  | "cipPriority";
+  analyzeComparisonMolecule,
+  COMPARISON_CATEGORIES,
+  COMPARISON_MODES,
+  getComparisonMode,
+  rankComparisonEntries,
+  type ComparisonCategory,
+  type ComparisonMetric,
+  type ComparisonModeId,
+  type ComparisonProfile,
+} from "../utils/ranking/comparisonAnalysis";
 
 type ComparisonMolecule = {
   id: number;
   label: string;
   smiles: string;
   structureSvg: string | null;
-  functionalGroups: FunctionalGroupResult[];
-  acidityResults: AcidityResult[];
-  basicityResults: BasicityResult[];
-  anionStabilityResults: CarbanionStabilityResult[];
-  cationStabilityResults: CarbocationStabilityResult[];
-  radicalStabilityResults: CarbonRadicalStabilityResult[];
-  boilingPointResult: BoilingPointRankingResult | null;
-  solubilityResult: SolubilityRankingResult | null;
-  cipPriorityResult: CipSubstituentPriorityResult | null;
+  profile: ComparisonProfile;
 };
-
 
 const COMPARISON_LABELS = [
   "Molecule A",
@@ -79,14 +32,13 @@ const COMPARISON_LABELS = [
   "Molecule E",
 ] as const;
 
-function getNextComparisonLabel(molecules: ComparisonMolecule[]): string {
+function getNextComparisonLabel(molecules: ComparisonMolecule[]) {
   const usedLabels = new Set(molecules.map((molecule) => molecule.label));
   return COMPARISON_LABELS.find((label) => !usedLabels.has(label)) ?? "Molecule";
 }
 
 function isMolBlockLike(value: unknown) {
   if (typeof value !== "string") return false;
-
   return (
     value.includes("M  END") ||
     value.includes("V2000") ||
@@ -98,363 +50,99 @@ function isMolBlockLike(value: unknown) {
 
 function sanitizeDisplayedSmiles(value: unknown) {
   if (typeof value !== "string") return "";
-
   const trimmed = value.trim();
-
-  if (!trimmed) return "";
-  if (isMolBlockLike(trimmed)) return "";
-
+  if (!trimmed || isMolBlockLike(trimmed)) return "";
   return trimmed;
 }
 
-function getAnionStabilityScore(molecule: ComparisonMolecule) {
-  const directResult = getBestCarbanionStabilityResult(
-    molecule.anionStabilityResults
-  );
-
-  if (directResult) return directResult.stabilityScore;
-
-  const bestBase = molecule.basicityResults[0];
-
-  if (!bestBase) return 999;
-
-  const group = bestBase.relatedGroup.toLowerCase();
-  const site = bestBase.basicSite.toLowerCase();
-  const explanation = bestBase.explanation.toLowerCase();
-
-  if (group.includes("carboxylate")) return 0;
-
-  if (
-    group.includes("alpha resonance-stabilized") ||
-    site.includes("alpha resonance-stabilized") ||
-    explanation.includes("resonance-stabilized")
-  ) {
-    return 1;
+function metricsTie(
+  first: ComparisonMetric,
+  second: ComparisonMetric,
+  tolerance = 1e-9,
+) {
+  if (first.sortVector || second.sortVector) {
+    if (!first.sortVector || !second.sortVector) return false;
+    if (first.sortVector.length !== second.sortVector.length) return false;
+    return first.sortVector.every(
+      (value, index) => value === second.sortVector?.[index],
+    );
   }
 
-  if (group.includes("methyl localized carbanion")) return 2;
-  if (group.includes("primary localized carbanion")) return 3;
-  if (group.includes("secondary localized carbanion")) return 4;
-  if (group.includes("tertiary localized carbanion")) return 5;
-
-  if (group.includes("carbanion")) return 6;
-
-  return 999;
+  if (first.score === null || second.score === null) return false;
+  return Math.abs(first.score - second.score) <= tolerance;
 }
 
-function getCationStabilityScore(molecule: ComparisonMolecule) {
-  return (
-    getBestCarbocationStabilityResult(molecule.cationStabilityResults)
-      ?.stabilityScore ?? 999
-  );
-}
-
-function getRadicalStabilityScore(molecule: ComparisonMolecule) {
-  return (
-    getBestCarbonRadicalStabilityResult(molecule.radicalStabilityResults)
-      ?.stabilityScore ?? 999
-  );
-}
-
-const ACID_BASE_TIE_TOLERANCE = 0.15;
-
-function getAcidBaseRankingScore(
-  molecule: ComparisonMolecule,
-  rankingMode: RankingMode
-): number | null {
-  if (rankingMode === "acidity") {
-    return molecule.acidityResults[0]?.estimatedPkaNumber ?? null;
-  }
-
-  if (rankingMode === "basicity") {
-    return molecule.basicityResults[0]?.conjugateAcidPkaNumber ?? null;
-  }
-
-  return null;
-}
-
-function formatPkaRange(range: readonly [number, number]): string {
-  return `${range[0]}–${range[1]}`;
-}
-
-export default function AcidBasePage() {
+export default function RankingPage() {
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [status, setStatus] = useState("Draw a molecule first");
-  const [smiles, setSmiles] = useState("Not analyzed yet");
-  const [structureSvg, setStructureSvg] = useState<string | null>(null);
-  const [anionStabilityResults, setAnionStabilityResults] = useState<
-    CarbanionStabilityResult[]
-  >([]);
-  const [cationStabilityResults, setCationStabilityResults] = useState<
-    CarbocationStabilityResult[]
-  >([]);
-  const [radicalStabilityResults, setRadicalStabilityResults] = useState<
-    CarbonRadicalStabilityResult[]
-  >([]);
+  const [status, setStatus] = useState("Add a molecule to begin comparing.");
   const [comparisonMolecules, setComparisonMolecules] = useState<ComparisonMolecule[]>([]);
-  const [rankingMode, setRankingMode] = useState<RankingMode>("acidity");
+  const [activeCategory, setActiveCategory] = useState<ComparisonCategory>("Electronic effects");
+  const [rankingMode, setRankingMode] = useState<ComparisonModeId>("ewgStrength");
 
-  const rankedComparison = useMemo(() => {
-    return [...comparisonMolecules].sort((a, b) => {
-      if (rankingMode === "anionStability") {
-        const aStabilityScore = getAnionStabilityScore(a);
-        const bStabilityScore = getAnionStabilityScore(b);
+  const activeMode = getComparisonMode(rankingMode);
+  const visibleModes = useMemo(
+    () => COMPARISON_MODES.filter((mode) => mode.category === activeCategory),
+    [activeCategory],
+  );
 
-        if (aStabilityScore !== bStabilityScore) {
-          return aStabilityScore - bStabilityScore;
-        }
+  const rankedRows = useMemo(() => {
+    const rows = comparisonMolecules.map((molecule) => ({
+      molecule,
+      metric: molecule.profile.metrics[rankingMode],
+    }));
+    return rankComparisonEntries(rows, activeMode);
+  }, [activeMode, comparisonMolecules, rankingMode]);
 
-        const aAcidScore = a.acidityResults[0]?.estimatedPkaNumber;
-        const bAcidScore = b.acidityResults[0]?.estimatedPkaNumber;
+  const rankById = useMemo(() => {
+    const map = new Map<number, number>();
+    if (activeMode.direction === "none") return map;
 
-        if (aAcidScore === undefined && bAcidScore === undefined) return 0;
-        if (aAcidScore === undefined) return 1;
-        if (bAcidScore === undefined) return -1;
-
-        return aAcidScore - bAcidScore;
-      }
-
-      if (rankingMode === "cationStability") {
-        const aStabilityScore = getCationStabilityScore(a);
-        const bStabilityScore = getCationStabilityScore(b);
-
-        if (aStabilityScore !== bStabilityScore) {
-          return aStabilityScore - bStabilityScore;
-        }
-
-        const aResult = getBestCarbocationStabilityResult(
-          a.cationStabilityResults
-        );
-        const bResult = getBestCarbocationStabilityResult(
-          b.cationStabilityResults
-        );
-
-        if (!aResult && !bResult) return 0;
-        if (!aResult) return 1;
-        if (!bResult) return -1;
-
-        return aResult.stabilityShift - bResult.stabilityShift;
-      }
-
-      if (rankingMode === "radicalStability") {
-        const aStabilityScore = getRadicalStabilityScore(a);
-        const bStabilityScore = getRadicalStabilityScore(b);
-
-        if (aStabilityScore !== bStabilityScore) {
-          return aStabilityScore - bStabilityScore;
-        }
-
-        const aResult = getBestCarbonRadicalStabilityResult(
-          a.radicalStabilityResults
-        );
-        const bResult = getBestCarbonRadicalStabilityResult(
-          b.radicalStabilityResults
-        );
-
-        if (!aResult && !bResult) return 0;
-        if (!aResult) return 1;
-        if (!bResult) return -1;
-
-        if (aResult.stabilityShift !== bResult.stabilityShift) {
-          return aResult.stabilityShift - bResult.stabilityShift;
-        }
-
-        return bResult.stabilizerCount - aResult.stabilizerCount;
-      }
-
-      if (rankingMode === "boilingPoint") {
-        if (!a.boilingPointResult && !b.boilingPointResult) return 0;
-        if (!a.boilingPointResult) return 1;
-        if (!b.boilingPointResult) return -1;
-
-        return compareBoilingPointResults(
-          a.boilingPointResult,
-          b.boilingPointResult
-        );
-      }
-
-      if (rankingMode === "solubility") {
-        if (!a.solubilityResult && !b.solubilityResult) return 0;
-        if (!a.solubilityResult) return 1;
-        if (!b.solubilityResult) return -1;
-
-        return compareSolubilityResults(
-          a.solubilityResult,
-          b.solubilityResult
-        );
-      }
-
-      if (rankingMode === "cipPriority") {
-        if (!a.cipPriorityResult && !b.cipPriorityResult) return 0;
-        if (!a.cipPriorityResult) return 1;
-        if (!b.cipPriorityResult) return -1;
-
-        return compareCipSubstituentResults(
-          a.cipPriorityResult,
-          b.cipPriorityResult
-        );
-      }
-
-      const aScore =
-        rankingMode === "acidity"
-          ? a.acidityResults[0]?.estimatedPkaNumber
-          : a.basicityResults[0]?.conjugateAcidPkaNumber;
-
-      const bScore =
-        rankingMode === "acidity"
-          ? b.acidityResults[0]?.estimatedPkaNumber
-          : b.basicityResults[0]?.conjugateAcidPkaNumber;
-
-      if (aScore === undefined && bScore === undefined) return 0;
-      if (aScore === undefined) return 1;
-      if (bScore === undefined) return -1;
-
-      if (rankingMode === "acidity") {
-        return aScore - bScore;
-      }
-
-      return bScore - aScore;
-    });
-  }, [comparisonMolecules, rankingMode]);
-
-  const comparisonRankById = useMemo(() => {
-    const rankById = new Map<number, number>();
-    let previousAcidBaseScore: number | null = null;
+    let previousMetric: ComparisonMetric | null = null;
     let previousRank = 0;
     let rankablePosition = 0;
 
-    for (const molecule of rankedComparison) {
-      const hasRankableResult =
-        rankingMode === "acidity"
-          ? Boolean(molecule.acidityResults[0])
-          : rankingMode === "basicity"
-          ? Boolean(molecule.basicityResults[0])
-          : rankingMode === "anionStability"
-          ? getAnionStabilityScore(molecule) < 999
-          : rankingMode === "cationStability"
-          ? getCationStabilityScore(molecule) < 999
-          : rankingMode === "radicalStability"
-          ? getRadicalStabilityScore(molecule) < 999
-          : rankingMode === "boilingPoint"
-          ? Boolean(molecule.boilingPointResult)
-          : rankingMode === "solubility"
-          ? Boolean(molecule.solubilityResult)
-          : Boolean(molecule.cipPriorityResult);
-
-      if (!hasRankableResult) continue;
-
+    for (const row of rankedRows) {
+      if (row.metric.score === null && !row.metric.sortVector) continue;
       rankablePosition += 1;
-      const currentAcidBaseScore = getAcidBaseRankingScore(
-        molecule,
-        rankingMode
-      );
-      const sharesApproximateRank =
-        currentAcidBaseScore !== null &&
-        previousAcidBaseScore !== null &&
-        Math.abs(currentAcidBaseScore - previousAcidBaseScore) <=
-          ACID_BASE_TIE_TOLERANCE;
-
-      const rank = sharesApproximateRank ? previousRank : rankablePosition;
-      rankById.set(molecule.id, rank);
+      const tied =
+        previousMetric !== null &&
+        metricsTie(row.metric, previousMetric, activeMode.tieTolerance ?? 1e-9);
+      const rank = tied ? previousRank : rankablePosition;
+      map.set(row.molecule.id, rank);
+      previousMetric = row.metric;
       previousRank = rank;
-      previousAcidBaseScore = currentAcidBaseScore;
     }
 
-    return rankById;
-  }, [rankedComparison, rankingMode]);
+    return map;
+  }, [activeMode, rankedRows]);
 
-  const comparisonRankCounts = useMemo(() => {
-    const counts = new Map<number, number>();
-
-    for (const rank of comparisonRankById.values()) {
-      counts.set(rank, (counts.get(rank) ?? 0) + 1);
-    }
-
-    return counts;
-  }, [comparisonRankById]);
-
-  async function analyzeAcidBaseMolecule() {
-    if (!ketcher) {
-      setStatus("Molecule editor is still loading. Try again in a second.");
-      return;
-    }
-
-    setIsAnalyzing(true);
-    setStatus("Analyzing ranking-relevant stability features...");
-
-    try {
-      const rawSmiles = await ketcher.getSmiles();
-      const safeSmiles = sanitizeDisplayedSmiles(rawSmiles);
-
-      if (!safeSmiles) {
-        setSmiles("No molecule detected");
-        setStructureSvg(null);
-        setAnionStabilityResults([]);
-        setCationStabilityResults([]);
-        setRadicalStabilityResults([]);
-        setStatus("Draw a molecule before analyzing.");
-        return;
-      }
-
-      if (safeSmiles.includes(".")) {
-        setSmiles(safeSmiles);
-        setStructureSvg(null);
-        setAnionStabilityResults([]);
-        setCationStabilityResults([]);
-        setRadicalStabilityResults([]);
-        setStatus("Please draw only one molecule at a time for ranking analysis.");
-        return;
-      }
-
-      const [anionStability, cationStability, radicalStability, svg] = await Promise.all([
-        analyzeCarbanionStability(safeSmiles),
-        analyzeCarbocationStability(safeSmiles),
-        analyzeCarbonRadicalStability(safeSmiles),
-        getMoleculeSvg(safeSmiles),
-      ]);
-
-      setSmiles(safeSmiles);
-      setStructureSvg(svg);
-      setAnionStabilityResults(anionStability);
-      setCationStabilityResults(cationStability);
-      setRadicalStabilityResults(radicalStability);
-      setStatus("Ranking preview analysis complete. Add the molecule to the comparison set to rank it.");
-    } catch (error) {
-      console.error("Ranking analysis error:", error);
-      setStatus("Something went wrong while analyzing ranking features.");
-    } finally {
-      setIsAnalyzing(false);
-    }
-  }
-
-  async function addCurrentMoleculeToComparison() {
+  async function addCurrentMoleculeToComparison(throwOnError = false) {
     if (!ketcher) {
       setStatus("Molecule editor is still loading. Try again in a second.");
       return;
     }
 
     if (isAnalyzing) return;
-
     if (comparisonMolecules.length >= 5) {
       setStatus("Comparison list is full. You can compare up to 5 molecules.");
       return;
     }
 
     setIsAnalyzing(true);
-    setStatus("Analyzing molecule for comparison...");
+    setStatus("Calculating all comparison modes for this molecule…");
 
     try {
       const rawSmiles = await ketcher.getSmiles();
       const safeSmiles = sanitizeDisplayedSmiles(rawSmiles);
 
       if (!safeSmiles) {
-        setStatus("Draw a molecule before adding it to comparison.");
+        setStatus("Draw or enter a molecule before adding it to comparison.");
         return;
       }
 
       if (safeSmiles.includes(".")) {
-        setStatus("Please draw only one molecule at a time before adding it to comparison.");
+        setStatus("Please use one molecule at a time on the Ranking page.");
         return;
       }
 
@@ -464,614 +152,273 @@ export default function AcidBasePage() {
       }
 
       const hierarchy = await analyzeFunctionalGroupHierarchy(safeSmiles);
-      const [
-        acidity,
-        basicity,
-        anionStability,
-        cationStability,
-        radicalStability,
-        boilingPoint,
-        solubility,
-        cipPriority,
-        svg,
-      ] = await Promise.all([
-        analyzeAcidity(safeSmiles, hierarchy.primaryGroups),
-        analyzeBasicity(safeSmiles, hierarchy.primaryGroups),
-        analyzeCarbanionStability(safeSmiles),
-        analyzeCarbocationStability(safeSmiles),
-        analyzeCarbonRadicalStability(safeSmiles),
-        analyzeBoilingPointRanking(safeSmiles, hierarchy.functionalGroups),
-        analyzeSolubilityRanking(safeSmiles, hierarchy.functionalGroups),
-        analyzeCipSubstituentPriority(safeSmiles),
+      const [profile, svg] = await Promise.all([
+        analyzeComparisonMolecule(safeSmiles, hierarchy),
         getMoleculeSvg(safeSmiles),
       ]);
 
       const nextLabel = getNextComparisonLabel(comparisonMolecules);
-
       const newMolecule: ComparisonMolecule = {
         id: Date.now() + Math.random(),
         label: nextLabel,
         smiles: safeSmiles,
         structureSvg: svg,
-        functionalGroups: hierarchy.functionalGroups,
-        acidityResults: acidity,
-        basicityResults: basicity,
-        anionStabilityResults: anionStability,
-        cationStabilityResults: cationStability,
-        radicalStabilityResults: radicalStability,
-        boilingPointResult: boilingPoint,
-        solubilityResult: solubility,
-        cipPriorityResult: cipPriority,
+        profile,
       };
 
-      setComparisonMolecules((prev) => [...prev, newMolecule]);
-      setSmiles(safeSmiles);
-      setStructureSvg(svg);
-      setAnionStabilityResults(anionStability);
-      setCationStabilityResults(cationStability);
-      setRadicalStabilityResults(radicalStability);
-      setStatus(`${nextLabel} added to comparison.`);
+      setComparisonMolecules((previous) => [...previous, newMolecule]);
+      setStatus(`${nextLabel} added. All comparison categories are ready.`);
     } catch (error) {
-      console.error("Add to acid/base comparison error:", error);
-      setStatus("Something went wrong while adding the molecule to comparison.");
+      console.error("Ranking comparison analysis error:", error);
+      setStatus("Something went wrong while calculating comparison modes.");
+      if (throwOnError) throw error;
     } finally {
       setIsAnalyzing(false);
     }
   }
 
   function deleteComparisonMolecule(id: number) {
-    setComparisonMolecules((prev) => prev.filter((molecule) => molecule.id !== id));
+    setComparisonMolecules((previous) => previous.filter((molecule) => molecule.id !== id));
     setStatus("Molecule removed from comparison.");
   }
 
-  async function clearAcidBaseWorkspace() {
+  async function clearCurrentMolecule() {
     await ketcher?.setMolecule("");
-    setStatus("Draw a molecule first");
-    setSmiles("Not analyzed yet");
-    setStructureSvg(null);
-    setAnionStabilityResults([]);
-    setCationStabilityResults([]);
-    setRadicalStabilityResults([]);
+    setStatus("Editor cleared. Your comparison set is unchanged.");
   }
 
   function clearComparison() {
     setComparisonMolecules([]);
-    setStatus("All comparison molecules deleted.");
+    setStatus("Comparison set cleared.");
   }
 
-  const strongestAnion = getBestCarbanionStabilityResult(anionStabilityResults);
-  const strongestCation = getBestCarbocationStabilityResult(
-    cationStabilityResults
-  );
-  const strongestRadical = getBestCarbonRadicalStabilityResult(
-    radicalStabilityResults
-  );
+  function selectCategory(category: ComparisonCategory) {
+    setActiveCategory(category);
+    const firstMode = COMPARISON_MODES.find((mode) => mode.category === category);
+    if (firstMode) setRankingMode(firstMode.id);
+  }
 
   return (
-    <section className="acid-base-page">
+    <section className="ranking-page">
+      <div className="ranking-hero">
+        <div>
+          <p className="ranking-eyebrow">Organic chemistry comparison workspace</p>
+          <h1>Ranking</h1>
+          <p>
+            Add up to five molecules once, then compare electronic effects,
+            stability, mechanisms, spectroscopy, physical properties, and more.
+          </p>
+        </div>
+        <div className="ranking-count-card" aria-label={`${comparisonMolecules.length} comparison molecules`}>
+          <strong>{comparisonMolecules.length}</strong>
+          <span>/ 5 molecules</span>
+        </div>
+      </div>
 
-      <section className="acid-base-workspace">
-        <div className="card acid-base-drawer-card">
+      <div className="ranking-workspace">
+        <aside className="card ranking-editor-card">
           <div className="card-header">
             <div>
-              <h2>Molecule Drawer</h2>
-              <p>Draw molecules to compare acidity, basicity, intermediate stability, and more.</p>
+              <h2>Add molecule</h2>
+              <p>Draw a structure or type a common/IUPAC name below the editor.</p>
             </div>
             <span className={`status ${ketcher ? "ready" : "loading"}`}>
               {ketcher ? "Editor ready" : "Loading editor"}
             </span>
           </div>
 
-          <div className="acid-base-ketcher-box">
+          <div className="ranking-ketcher-box">
             <MoleculeDrawer
-              globalKey="acidBaseKetcher"
+              globalKey="rankingKetcher"
               onReady={setKetcher}
-              onNameSubmitProcess={analyzeAcidBaseMolecule}
+              onNameSubmitProcess={() => addCurrentMoleculeToComparison(true)}
             />
           </div>
 
-          <div className="button-row">
+          <div className="ranking-editor-actions">
             <button
               className="primary-button"
-              onClick={analyzeAcidBaseMolecule}
-              disabled={isAnalyzing || !ketcher}
-            >
-              {isAnalyzing ? "Analyzing..." : "Analyze Molecule"}
-            </button>
-
-            <button
-              className="secondary-button"
-              onClick={addCurrentMoleculeToComparison}
+              onClick={() => void addCurrentMoleculeToComparison()}
               disabled={isAnalyzing || !ketcher || comparisonMolecules.length >= 5}
             >
-              Add to Comparison
+              {isAnalyzing ? "Analyzing…" : "Add to comparison"}
             </button>
-
             <button
               className="secondary-button"
-              onClick={clearAcidBaseWorkspace}
+              onClick={clearCurrentMolecule}
               disabled={isAnalyzing || !ketcher}
             >
-              Clear Molecule
+              Clear editor
             </button>
-
             <button
               className="secondary-button"
               onClick={clearComparison}
               disabled={isAnalyzing || comparisonMolecules.length === 0}
             >
-              Clear Comparison
+              Clear all
             </button>
           </div>
 
-          <p className="reaction-progress" aria-live="polite">
+          <p className="reaction-progress ranking-status" aria-live="polite">
             {isAnalyzing && <span className="loading-spinner" aria-hidden="true" />}
             {status}
           </p>
 
-          <div className="analysis-section">
-            <p className="label">SMILES</p>
-            <p className="smiles-output">{smiles}</p>
+          <div className="ranking-editor-note">
+            <strong>One analysis, every mode.</strong>
+            <span>
+              PocketChem calculates the comparison profile when a molecule is added,
+              so switching categories does not re-run the molecule.
+            </span>
           </div>
+        </aside>
 
-          {structureSvg && (
-            <div className="analysis-section">
-              <p className="label">Current Molecule</p>
-              <div
-                className="acid-base-current-preview"
-                dangerouslySetInnerHTML={{ __html: structureSvg }}
-              />
-            </div>
-          )}
-        </div>
-
-        <div className="acid-base-results-column">
-          {(anionStabilityResults.length > 0 ||
-            cationStabilityResults.length > 0 ||
-            radicalStabilityResults.length > 0) && (
-            <div className="card acid-base-result-card">
-              <p className="label">Carbon Intermediate Stability</p>
-
-              <div className="group-list">
-                {strongestAnion && (
-                  <div className="group-card">
-                    <div className="group-card-header">
-                      <h3>
-                        Carbanion at atom {strongestAnion.chargedAtomIndex + 1}
-                      </h3>
-                      <span>score {strongestAnion.stabilityScore}</span>
-                    </div>
-                    <p>
-                      <strong>Substitution:</strong> {strongestAnion.substitution}
-                    </p>
-                    <p>
-                      <strong>Nearest stabilizer:</strong>{" "}
-                      {strongestAnion.nearestStabilizer ?? "None detected"}
-                    </p>
-                    <p>{strongestAnion.explanation}</p>
-                  </div>
-                )}
-
-                {strongestCation && (
-                  <div className="group-card">
-                    <div className="group-card-header">
-                      <h3>
-                        Carbocation at atom {strongestCation.chargedAtomIndex + 1}
-                      </h3>
-                      <span>score {strongestCation.stabilityScore}</span>
-                    </div>
-                    <p>
-                      <strong>Substitution:</strong> {strongestCation.substitution}
-                    </p>
-                    <p>
-                      <strong>Nearest stabilizer:</strong>{" "}
-                      {strongestCation.nearestStabilizer ?? "None detected"}
-                    </p>
-                    <p>{strongestCation.explanation}</p>
-                  </div>
-                )}
-
-                {strongestRadical && (
-                  <div className="group-card">
-                    <div className="group-card-header">
-                      <h3>
-                        Carbon radical at atom {strongestRadical.radicalAtomIndex + 1}
-                      </h3>
-                      <span>score {strongestRadical.stabilityScore}</span>
-                    </div>
-                    <p>
-                      <strong>Type:</strong> {strongestRadical.centerType}
-                    </p>
-                    <p>
-                      <strong>Substitution:</strong> {strongestRadical.substitution}
-                    </p>
-                    <p>
-                      <strong>Nearest stabilizer:</strong>{" "}
-                      {strongestRadical.nearestStabilizer ?? "None detected"}
-                    </p>
-                    <p>{strongestRadical.explanation}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className="card acid-base-result-card">
-            <div className="group-card-header">
+        <main className="ranking-main-column">
+          <section className="card ranking-selector-card">
+            <div className="ranking-selector-heading">
               <div>
-                <p className="label">Compare Molecules</p>
-                <p className="empty">Add up to five molecules, then choose the ranking mode.</p>
+                <p className="label">Comparison category</p>
+                <h2>{activeCategory}</h2>
               </div>
-
+              <span className="ranking-mode-count">
+                {visibleModes.length} mode{visibleModes.length === 1 ? "" : "s"}
+              </span>
             </div>
 
-            <div className="acid-base-ranking-row">
-              <label>
-                <input
-                  type="radio"
-                  name="acidBaseRankingMode"
-                  value="acidity"
-                  checked={rankingMode === "acidity"}
-                  onChange={() => setRankingMode("acidity")}
-                />
-                Rank by acidity
+            <div className="ranking-select-grid">
+              <label className="ranking-select-field">
+                <span>Category</span>
+                <select
+                  value={activeCategory}
+                  onChange={(event) =>
+                    selectCategory(event.target.value as ComparisonCategory)
+                  }
+                  aria-label="Comparison category"
+                >
+                  {COMPARISON_CATEGORIES.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
               </label>
 
-              <label>
-                <input
-                  type="radio"
-                  name="acidBaseRankingMode"
-                  value="basicity"
-                  checked={rankingMode === "basicity"}
-                  onChange={() => setRankingMode("basicity")}
-                />
-                Rank by basicity
-              </label>
-
-              <label>
-                <input
-                  type="radio"
-                  name="acidBaseRankingMode"
-                  value="anionStability"
-                  checked={rankingMode === "anionStability"}
-                  onChange={() => setRankingMode("anionStability")}
-                />
-                Rank by anion stability
-              </label>
-
-              <label>
-                <input
-                  type="radio"
-                  name="acidBaseRankingMode"
-                  value="cationStability"
-                  checked={rankingMode === "cationStability"}
-                  onChange={() => setRankingMode("cationStability")}
-                />
-                Rank by cation stability
-              </label>
-
-              <label>
-                <input
-                  type="radio"
-                  name="acidBaseRankingMode"
-                  value="radicalStability"
-                  checked={rankingMode === "radicalStability"}
-                  onChange={() => setRankingMode("radicalStability")}
-                />
-                Rank by radical stability
-              </label>
-
-
-              <label>
-                <input
-                  type="radio"
-                  name="acidBaseRankingMode"
-                  value="boilingPoint"
-                  checked={rankingMode === "boilingPoint"}
-                  onChange={() => setRankingMode("boilingPoint")}
-                />
-                Rank by boiling point
-              </label>
-
-              <label>
-                <input
-                  type="radio"
-                  name="acidBaseRankingMode"
-                  value="solubility"
-                  checked={rankingMode === "solubility"}
-                  onChange={() => setRankingMode("solubility")}
-                />
-                Rank by water solubility
-              </label>
-
-              <label>
-                <input
-                  type="radio"
-                  name="acidBaseRankingMode"
-                  value="cipPriority"
-                  checked={rankingMode === "cipPriority"}
-                  onChange={() => setRankingMode("cipPriority")}
-                />
-                Rank by CIP priority
+              <label className="ranking-select-field">
+                <span>Comparison</span>
+                <select
+                  value={rankingMode}
+                  onChange={(event) =>
+                    setRankingMode(event.target.value as ComparisonModeId)
+                  }
+                  aria-label="Comparison mode"
+                >
+                  {visibleModes.map((mode) => (
+                    <option key={mode.id} value={mode.id}>
+                      {mode.label}
+                    </option>
+                  ))}
+                </select>
               </label>
             </div>
+          </section>
 
-            {comparisonMolecules.length === 0 ? (
-              <p className="empty">Draw molecules and click Add to Comparison.</p>
-            ) : (
-              <div className="group-list acid-base-comparison-list">
-                {rankedComparison.map((molecule) => {
-                  const bestAcid = molecule.acidityResults[0];
-                  const bestBase = molecule.basicityResults[0];
-                  const bestAnion = getBestCarbanionStabilityResult(
-                    molecule.anionStabilityResults
-                  );
-                  const bestCation = getBestCarbocationStabilityResult(
-                    molecule.cationStabilityResults
-                  );
-                  const bestRadical = getBestCarbonRadicalStabilityResult(
-                    molecule.radicalStabilityResults
-                  );
-                  const displayRank = comparisonRankById.get(molecule.id);
-                  const hasApproximateTie =
-                    displayRank !== undefined &&
-                    (comparisonRankCounts.get(displayRank) ?? 0) > 1 &&
-                    (rankingMode === "acidity" || rankingMode === "basicity");
-                  const hasRankableSite =
-                    rankingMode === "acidity"
-                      ? Boolean(bestAcid)
-                      : rankingMode === "basicity"
-                      ? Boolean(bestBase)
-                      : rankingMode === "anionStability"
-                      ? getAnionStabilityScore(molecule) < 999
-                      : rankingMode === "cationStability"
-                      ? Boolean(bestCation)
-                      : rankingMode === "radicalStability"
-                      ? Boolean(bestRadical)
-                      : rankingMode === "boilingPoint"
-                      ? Boolean(molecule.boilingPointResult)
-                      : rankingMode === "solubility"
-                      ? Boolean(molecule.solubilityResult)
-                      : Boolean(molecule.cipPriorityResult);
+          <section className="card ranking-active-mode-card">
+            <div className="ranking-active-mode-copy">
+              <div>
+                <p className="label">Current comparison</p>
+                <h2>{activeMode.label}</h2>
+                <p>{activeMode.description}</p>
+              </div>
+              <span className={`ranking-kind-badge ${activeMode.direction === "none" ? "compare" : "rank"}`}>
+                {activeMode.direction === "none" ? "Compare" : "Rank"}
+              </span>
+            </div>
+            {activeMode.assumption && (
+              <p className="ranking-assumption"><strong>Assumption:</strong> {activeMode.assumption}</p>
+            )}
+          </section>
 
-                  return (
-                    <div className="group-card comparison-card" key={molecule.id}>
-                      <div className="group-card-header">
-                        <h3>
-                          {hasRankableSite && displayRank !== undefined
-                            ? `#${displayRank}: ${molecule.label}`
-                            : `Unranked: ${molecule.label}`}
-                        </h3>
+          {comparisonMolecules.length === 0 ? (
+            <section className="card ranking-empty-state">
+              <div className="ranking-empty-number">01</div>
+              <h2>Add your first molecule</h2>
+              <p>
+                Use the editor or type a molecule name. Once it is added, the same
+                molecule can be compared across every category without redrawing it.
+              </p>
+            </section>
+          ) : (
+            <section className="ranking-results-list" aria-label={`${activeMode.label} results`}>
+              {rankedRows.map(({ molecule, metric }) => {
+                const displayRank = rankById.get(molecule.id);
+                const isRankable = metric.score !== null || Boolean(metric.sortVector);
+                return (
+                  <article className="card ranking-result-card" key={molecule.id}>
+                    <div className="ranking-result-rank">
+                      {activeMode.direction === "none" ? (
+                        <span>{molecule.label.replace("Molecule ", "")}</span>
+                      ) : isRankable && displayRank !== undefined ? (
+                        <>
+                          <small>Rank</small>
+                          <strong>#{displayRank}</strong>
+                        </>
+                      ) : (
+                        <span>—</span>
+                      )}
+                    </div>
 
+                    <div className="ranking-result-structure">
+                      {molecule.structureSvg ? (
+                        <div
+                          className="molecule-preview ranking-molecule-preview"
+                          dangerouslySetInnerHTML={{ __html: molecule.structureSvg }}
+                        />
+                      ) : (
+                        <div className="ranking-no-structure">No preview</div>
+                      )}
+                    </div>
+
+                    <div className="ranking-result-copy">
+                      <div className="ranking-result-title-row">
+                        <div>
+                          <p className="ranking-result-label">{molecule.label}</p>
+                          <h3>{metric.headline}</h3>
+                        </div>
                         <button
-                          className="secondary-button"
+                          className="ranking-delete-button"
                           type="button"
                           onClick={() => deleteComparisonMolecule(molecule.id)}
+                          aria-label={`Delete ${molecule.label}`}
                         >
                           Delete
                         </button>
                       </div>
 
-                      <div className="comparison-content">
-                        {molecule.structureSvg && (
-                          <div
-                            className="molecule-preview"
-                            dangerouslySetInnerHTML={{ __html: molecule.structureSvg }}
-                          />
-                        )}
+                      <p className="ranking-result-detail">{metric.detail}</p>
 
-                        <div className="comparison-details">
-                          {hasRankableSite ? (
-                            rankingMode === "anionStability" ? (
-                              <p>
-                                <strong>Stability basis:</strong>{" "}
-                                {bestAnion
-                                  ? bestAnion.nearestStabilizer ??
-                                    `${bestAnion.substitution} substitution`
-                                  : bestBase?.relatedGroup ?? "Detected anion"}
-                              </p>
-                            ) : rankingMode === "cationStability" ? (
-                              <p>
-                                <strong>Stability basis:</strong>{" "}
-                                {bestCation?.nearestStabilizer ??
-                                  `${bestCation?.substitution ?? "unknown"} substitution`}
-                              </p>
-                            ) : rankingMode === "radicalStability" ? (
-                              <p>
-                                <strong>Stability basis:</strong>{" "}
-                                {bestRadical?.nearestStabilizer ??
-                                  `${bestRadical?.substitution ?? "unknown"} substitution`}
-                              </p>
-                            ) : rankingMode === "boilingPoint" ? (
-                              <p>
-                                <strong>Boiling-point tendency:</strong>{" "}
-                                {molecule.boilingPointResult?.tendency} (score{" "}
-                                {molecule.boilingPointResult?.boilingPointScore})
-                              </p>
-                            ) : rankingMode === "solubility" ? (
-                              <p>
-                                <strong>Water-solubility tendency:</strong>{" "}
-                                {molecule.solubilityResult?.tendency} (score{" "}
-                                {molecule.solubilityResult?.waterSolubilityScore})
-                              </p>
-                            ) : rankingMode === "cipPriority" ? (
-                              <p>
-                                <strong>CIP attachment atom:</strong>{" "}
-                                {molecule.cipPriorityResult?.rootElement} at atom{" "}
-                                {(molecule.cipPriorityResult?.rootAtomIndex ?? 0) + 1}
-                              </p>
-                            ) : (
-                              <p>
-                                <strong>
-                                  {rankingMode === "acidity"
-                                    ? "Estimated pKa:"
-                                    : "Conjugate acid pKa:"}
-                                </strong>{" "}
-                                {rankingMode === "acidity"
-                                  ? bestAcid?.estimatedPka
-                                  : bestBase?.conjugateAcidPka}
-                              </p>
-                            )
-                          ) : (
-                            <p className="empty">
-                              No {
-                                rankingMode === "acidity"
-                                  ? "acidic"
-                                  : rankingMode === "basicity"
-                                  ? "basic"
-                                  : rankingMode === "anionStability"
-                                  ? "anionic carbon"
-                                  : rankingMode === "cationStability"
-                                  ? "cationic carbon"
-                                  : rankingMode === "radicalStability"
-                                  ? "carbon radical"
-                                  : rankingMode === "boilingPoint"
-                                  ? "boiling-point result"
-                                  : rankingMode === "solubility"
-                                  ? "water-solubility result"
-                                  : "CIP attachment atom"
-                              } detected for ranking.
-                            </p>
-                          )}
+                      {metric.factors && metric.factors.length > 0 && (
+                        <details className="ranking-factors">
+                          <summary>Why this result?</summary>
+                          <ul>
+                            {metric.factors.slice(0, 6).map((factor, index) => (
+                              <li key={`${molecule.id}-${index}`}>{factor}</li>
+                            ))}
+                          </ul>
+                        </details>
+                      )}
 
-                          {hasRankableSite &&
-                            rankingMode === "acidity" &&
-                            bestAcid && (
-                              <p>
-                                <strong>Typical pKa range:</strong>{" "}
-                                {formatPkaRange(bestAcid.estimatedPkaRange)}
-                              </p>
-                            )}
-
-                          {hasApproximateTie && (
-                            <p className="empty">
-                              Approximate tie: the estimated pKa centers differ by 0.15 or less.
-                            </p>
-                          )}
-
-                          <p className="comparison-smiles">
-                            <strong>SMILES:</strong> <code>{molecule.smiles}</code>
-                          </p>
-
-                          {hasRankableSite &&
-                            rankingMode === "acidity" &&
-                            bestAcid && (
-                              <>
-                                <p>
-                                  <strong>Strongest acidic site:</strong>{" "}
-                                  {bestAcid.acidicSite} at atom {bestAcid.siteAtomIndex + 1}
-                                </p>
-                                <p>{bestAcid.explanation}</p>
-                              </>
-                            )}
-
-                          {hasRankableSite &&
-                            rankingMode === "basicity" &&
-                            bestBase && (
-                              <>
-                                <p>
-                                  <strong>Strongest basic site:</strong>{" "}
-                                  {bestBase.basicSite} at atom {bestBase.siteAtomIndex + 1}
-                                </p>
-                                <p>{bestBase.explanation}</p>
-                              </>
-                            )}
-
-                          {hasRankableSite &&
-                            rankingMode === "anionStability" &&
-                            bestAnion && (
-                              <>
-                                <p>
-                                  <strong>Charged carbon:</strong> Atom{" "}
-                                  {bestAnion.chargedAtomIndex + 1}
-                                </p>
-                                <p>{bestAnion.explanation}</p>
-                              </>
-                            )}
-
-                          {hasRankableSite &&
-                            rankingMode === "cationStability" &&
-                            bestCation && (
-                              <>
-                                <p>
-                                  <strong>Charged carbon:</strong> Atom{" "}
-                                  {bestCation.chargedAtomIndex + 1}
-                                </p>
-                                <p>{bestCation.explanation}</p>
-                              </>
-                            )}
-
-                          {hasRankableSite &&
-                            rankingMode === "radicalStability" &&
-                            bestRadical && (
-                              <>
-                                <p>
-                                  <strong>Radical carbon:</strong> Atom{" "}
-                                  {bestRadical.radicalAtomIndex + 1}
-                                </p>
-                                <p>
-                                  <strong>Radical type:</strong>{" "}
-                                  {bestRadical.centerType}
-                                </p>
-                                <p>{bestRadical.explanation}</p>
-                              </>
-                            )}
-
-
-                          {hasRankableSite &&
-                            rankingMode === "boilingPoint" &&
-                            molecule.boilingPointResult && (
-                              <>
-                                <p>
-                                  <strong>Molecular weight:</strong>{" "}
-                                  {molecule.boilingPointResult.molecularWeight?.toFixed(2) ??
-                                    "Unavailable"}
-                                </p>
-                                <p>{molecule.boilingPointResult.explanation}</p>
-                              </>
-                            )}
-
-                          {hasRankableSite &&
-                            rankingMode === "solubility" &&
-                            molecule.solubilityResult && (
-                              <>
-                                <p>
-                                  <strong>logP:</strong>{" "}
-                                  {molecule.solubilityResult.logP?.toFixed(2) ??
-                                    "Unavailable"}
-                                </p>
-                                <p>{molecule.solubilityResult.explanation}</p>
-                              </>
-                            )}
-
-                          {hasRankableSite &&
-                            rankingMode === "cipPriority" &&
-                            molecule.cipPriorityResult && (
-                              <>
-                                <p>
-                                  <strong>Direct atomic number:</strong>{" "}
-                                  {molecule.cipPriorityResult.directAtomicNumber}
-                                </p>
-                                <p>{molecule.cipPriorityResult.explanation}</p>
-                                {molecule.cipPriorityResult.attachmentSource ===
-                                  "firstAtomFallback" && (
-                                  <p className="empty">
-                                    Draw * bonded to the substituent for an explicit
-                                    CIP attachment point.
-                                  </p>
-                                )}
-                              </>
-                            )}
-                        </div>
+                      <div className="ranking-molecule-meta">
+                        <span>{molecule.profile.formula || "Formula unavailable"}</span>
+                        <code>{molecule.smiles}</code>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
+                  </article>
+                );
+              })}
+            </section>
+          )}
+        </main>
+      </div>
     </section>
   );
 }

@@ -180,7 +180,6 @@ function getRecord(accession) {
       preferredName: null,
       iupacName: null,
       smiles: null,
-      inchiKey: null,
       formula: null,
       aliases: new Set(),
       structureIsDefault: false,
@@ -296,7 +295,6 @@ if (records.size === 0) {
   let compoundCol = -1;
   let idCol = -1;
   let smilesCol = -1;
-  let inchiKeyCol = -1;
   let defaultCol = -1;
   let joined = 0;
   let skipped = 0;
@@ -310,11 +308,6 @@ if (records.size === 0) {
       smilesCol = findColumn(
         headers,
         ['smiles', 'canonical_smiles', 'standard_smiles'],
-        false,
-      );
-      inchiKeyCol = findColumn(
-        headers,
-        ['standard_inchi_key', 'standard_inchikey', 'inchi_key', 'inchikey'],
         false,
       );
       defaultCol = findColumn(
@@ -353,8 +346,6 @@ if (records.size === 0) {
       if (!smiles) return;
 
       const record = getRecord(accession);
-      const inchiKey =
-        inchiKeyCol >= 0 ? String(row[inchiKeyCol] ?? '').trim() : '';
       const isDefault =
         defaultCol < 0 || /^(1|true|t|yes|y)$/i.test(String(row[defaultCol] ?? '').trim());
 
@@ -362,7 +353,6 @@ if (records.size === 0) {
       // marker, retain the first usable structure.
       if (!record.smiles || (isDefault && !record.structureIsDefault)) {
         record.smiles = smiles;
-        record.inchiKey = inchiKey || record.inchiKey;
         record.structureIsDefault = isDefault;
       }
       joined += 1;
@@ -418,84 +408,74 @@ const browserRecords = new Map(
   [...records.entries()].filter(([, record]) => Boolean(record.smiles)),
 );
 
-const aliasCandidates = Object.create(null);
-for (const [id, record] of browserRecords) {
+// Lean schema v3 keeps every usable structure and every lookup key that the
+// previous database exposed, but it avoids serializing the same CHEBI id on
+// hundreds of thousands of aliases. Preferred and IUPAC names live on the
+// compact record itself; only additional normalized aliases are stored beside
+// that record and the browser rebuilds the alias map once at load time.
+const compactRecords = [];
+const uniqueLookupKeys = new Set();
+let extraAliasCount = 0;
+
+for (const [accession, record] of browserRecords) {
+  const numericMatch = accession.match(/^CHEBI:(\d+)$/);
+  if (!numericMatch) continue;
+
+  const preferredKey = normalize(record.preferredName);
+  const iupacKey = normalize(record.iupacName);
+  if (preferredKey) uniqueLookupKeys.add(preferredKey);
+  if (iupacKey) uniqueLookupKeys.add(iupacKey);
+
+  const extraAliases = new Set();
   for (const alias of record.aliases) {
     const key = normalize(alias);
     if (!key || key.length > 240) continue;
-    const ids = aliasCandidates[key] ?? (aliasCandidates[key] = []);
-    if (!ids.includes(id)) ids.push(id);
+    uniqueLookupKeys.add(key);
+    if (key === preferredKey || key === iupacKey) continue;
+    extraAliases.add(key);
   }
+
+  extraAliasCount += extraAliases.size;
+  const row = [
+    Number(numericMatch[1]),
+    record.smiles,
+    record.preferredName || null,
+    record.iupacName || null,
+    record.formula || null,
+  ];
+  if (extraAliases.size > 0) row.push([...extraAliases]);
+  compactRecords.push(row);
 }
 
-function chooseAliasTarget(key, ids) {
-  if (ids.length <= 1) return ids[0] ?? null;
-
-  const preferredMatches = ids.filter(
-    (id) => normalize(browserRecords.get(id)?.preferredName) === key,
-  );
-  if (preferredMatches.length === 1) return preferredMatches[0];
-
-  const iupacMatches = ids.filter(
-    (id) => normalize(browserRecords.get(id)?.iupacName) === key,
-  );
-  if (iupacMatches.length === 1) return iupacMatches[0];
-
-  const structureKeys = ids.map((id) => {
-    const record = browserRecords.get(id);
-    return record?.inchiKey || record?.smiles || null;
-  });
-  const first = structureKeys[0];
-  if (first && structureKeys.every((value) => value === first)) return ids[0];
-
-  // Preserve genuinely ambiguous aliases as arrays. Runtime code can reject
-  // those safely instead of guessing a constitutional/stereochemical isomer.
-  return ids;
-}
-
-const aliases = Object.create(null);
-for (const [key, ids] of Object.entries(aliasCandidates)) {
-  const target = chooseAliasTarget(key, ids);
-  if (target) aliases[key] = target;
-}
-
-const compactRecords = Object.create(null);
-for (const [id, record] of browserRecords) {
-  compactRecords[id] = {
-    s: record.smiles,
-    k: record.inchiKey,
-    p: record.preferredName,
-    i: record.iupacName,
-    f: record.formula,
-  };
-}
-
-// Integrity checks: a 20+ MB database with zero aliases is corrupt for
-// PocketChem's purposes. Fail loudly rather than publishing another unusable
-// index.
-const recordCount = Object.keys(compactRecords).length;
-const aliasCount = Object.keys(aliases).length;
+// Integrity checks: all usable structures remain represented, and the name
+// coverage count is measured after the same normalization used by the runtime.
+const recordCount = compactRecords.length;
+const aliasCount = uniqueLookupKeys.size;
 if (recordCount === 0) {
   throw new Error('Build failed: no usable structures were joined to ChEBI compounds.');
 }
 if (aliasCount === 0) {
   throw new Error(
-    'Build failed: zero aliases were generated. The ChEBI names-to-structures join is broken.',
+    'Build failed: zero lookup names were generated. The ChEBI names-to-structures join is broken.',
   );
 }
 
-const arachidonic = aliases[normalize('arachidonic acid')];
-if (records.has('CHEBI:15843')) {
-  const aaRecord = compactRecords['CHEBI:15843'];
-  if (!aaRecord?.s) {
+const aaRecord = browserRecords.get('CHEBI:15843');
+if (aaRecord) {
+  if (!aaRecord.smiles) {
     throw new Error(
       'Build integrity check failed: CHEBI:15843 exists but has no joined SMILES structure.',
     );
   }
-  const aaTargets = Array.isArray(arachidonic) ? arachidonic : [arachidonic];
-  if (!aaTargets.includes('CHEBI:15843')) {
+  const aaKey = normalize('arachidonic acid');
+  const aaKeys = new Set([
+    normalize(aaRecord.preferredName),
+    normalize(aaRecord.iupacName),
+    ...[...aaRecord.aliases].map(normalize),
+  ]);
+  if (!aaKeys.has(aaKey)) {
     throw new Error(
-      'Build integrity check failed: "arachidonic acid" does not resolve to CHEBI:15843.',
+      'Build integrity check failed: "arachidonic acid" is not attached to CHEBI:15843.',
     );
   }
 }
@@ -509,29 +489,31 @@ try {
 }
 
 const payload = {
-  v: 1,
-  generatedAt: new Date().toISOString(),
-  source: {
-    name: 'ChEBI',
-    release,
-    url: 'https://www.ebi.ac.uk/chebi',
+  v: 3,
+  g: new Date().toISOString(),
+  s: {
+    n: 'ChEBI',
+    r: release,
+    u: 'https://www.ebi.ac.uk/chebi',
   },
-  records: compactRecords,
-  aliases,
+  r: compactRecords,
 };
 
 await mkdir(outputDir, { recursive: true });
 const json = JSON.stringify(payload);
-const jsonPath = join(outputDir, 'chemical-names.index.json');
-const gzipPath = `${jsonPath}.gz`;
-await writeFile(jsonPath, json);
+const gzipPath = join(outputDir, 'chemical-names.index.json.gz');
 await writeFile(gzipPath, gzipSync(json, { level: 9 }));
 
-console.log(`Wrote ${jsonPath}`);
 console.log(`Wrote ${gzipPath}`);
 console.log(`Records: ${recordCount.toLocaleString()}`);
-console.log(`Aliases: ${aliasCount.toLocaleString()}`);
+console.log(`Lookup names: ${aliasCount.toLocaleString()}`);
+console.log(`Stored extra aliases: ${extraAliasCount.toLocaleString()}`);
 console.log(
-  `Arachidonic acid: ${JSON.stringify(aliases[normalize('arachidonic acid')] ?? null)}`,
+  `Arachidonic acid: ${
+    aaRecord && normalize(aaRecord.preferredName) === normalize('arachidonic acid')
+      ? '"CHEBI:15843"'
+      : 'present as synonym of CHEBI:15843'
+  }`,
 );
-console.log('\nKeep ChEBI attribution visible in PocketChem documentation/about UI.');
+console.log('\nLean schema preserves all current English/no-language name coverage while omitting redundant alias targets and unused InChIKeys.');
+console.log('Keep ChEBI attribution visible in PocketChem documentation/about UI.');

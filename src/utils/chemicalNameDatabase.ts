@@ -1,6 +1,7 @@
 export type LocalChemicalNameRecord = {
   chebiId: string;
   smiles: string;
+  /** Lean runtime indexes intentionally omit InChIKey to reduce bundle size. */
   inchiKey: string | null;
   preferredName: string | null;
   iupacName: string | null;
@@ -8,30 +9,44 @@ export type LocalChemicalNameRecord = {
   source: "chebi";
 };
 
-type CompactRecord = {
-  s: string;
-  k: string | null;
-  p: string | null;
-  i: string | null;
-  f: string | null;
+type SerializedLeanRecord = [
+  chebiNumericId: number,
+  smiles: string,
+  preferredName: string | null,
+  iupacName: string | null,
+  molecularFormula: string | null,
+  extraAliases?: string[],
+];
+
+type LeanChemicalNameIndex = {
+  v: 3;
+  g: string;
+  s: {
+    n: string;
+    r: string | null;
+    u?: string;
+  };
+  r: SerializedLeanRecord[];
 };
 
-type ChemicalNameIndex = {
-  v: number;
-  generatedAt: string;
-  source: {
-    name: string;
-    release: string | null;
-    url?: string;
-  };
-  records: Record<string, CompactRecord>;
-  aliases: Record<string, string | string[]>;
+type RuntimeRecord = [
+  chebiNumericId: number,
+  smiles: string,
+  preferredName: string | null,
+  iupacName: string | null,
+  molecularFormula: string | null,
+];
+
+type AliasTarget = number | number[];
+
+type RuntimeChemicalNameIndex = {
+  records: RuntimeRecord[];
+  aliases: Map<string, AliasTarget>;
 };
 
 const GZIP_INDEX_ASSET = "data/chemical-names.index.json.gz";
-const JSON_INDEX_ASSET = "data/chemical-names.index.json";
 
-let indexPromise: Promise<ChemicalNameIndex> | null = null;
+let indexPromise: Promise<RuntimeChemicalNameIndex> | null = null;
 
 export function normalizeChemicalName(value: string) {
   return value
@@ -46,23 +61,6 @@ export function normalizeChemicalName(value: string) {
     .replace(/″/g, '"')
     .replace(/\s+/g, " ")
     .replace(/\s*,\s*/g, ",");
-}
-
-function validateIndex(index: ChemicalNameIndex): ChemicalNameIndex {
-  if (!index || typeof index !== "object") {
-    throw new Error("The local chemical-name database is not valid JSON.");
-  }
-  if (index.v !== 1) {
-    throw new Error(
-      `Unsupported local chemical-name database version: ${String(index.v)}.`,
-    );
-  }
-  if (!index.records || !index.aliases) {
-    throw new Error(
-      "The local chemical-name database is missing its records or aliases table.",
-    );
-  }
-  return index;
 }
 
 function getViteBaseUrl(): string | null {
@@ -113,20 +111,17 @@ function candidateAssetUrls(relativePath: string): string[] {
 
 async function responseToJsonText(response: Response): Promise<string> {
   const bytes = new Uint8Array(await response.arrayBuffer());
-
-  // Some dev/static servers serve ".gz" as application/gzip, while others
-  // transparently decode it before Fetch receives the body. Detect the actual
-  // gzip magic bytes instead of assuming one behavior.
   const isActuallyGzipped =
     bytes.length >= 2 && bytes[0] === 0x1f && bytes[1] === 0x8b;
 
+  // Some static hosts transparently decode a .gz response before Fetch sees it.
   if (!isActuallyGzipped) {
     return new TextDecoder("utf-8").decode(bytes);
   }
 
   if (typeof DecompressionStream === "undefined") {
     throw new Error(
-      "This browser cannot decompress the bundled .gz database. Keep the uncompressed chemical-names.index.json file in public/data as a fallback.",
+      "This browser cannot decompress PocketChem's bundled offline chemical-name database.",
     );
   }
 
@@ -135,90 +130,121 @@ async function responseToJsonText(response: Response): Promise<string> {
   return await new Response(decompressed).text();
 }
 
-async function fetchIndexFrom(
-  relativePath: string,
-  compressed: boolean,
-): Promise<ChemicalNameIndex> {
+function validateLeanIndex(value: unknown): LeanChemicalNameIndex {
+  if (!value || typeof value !== "object") {
+    throw new Error("The local chemical-name database is not valid JSON.");
+  }
+
+  const index = value as Partial<LeanChemicalNameIndex>;
+  if (index.v !== 3) {
+    throw new Error(
+      `Unsupported local chemical-name database version: ${String(index.v)}. Rebuild it with the current scripts/buildChemicalNameIndex.mjs.`,
+    );
+  }
+  if (!Array.isArray(index.r)) {
+    throw new Error("The local chemical-name database is missing its compact records table.");
+  }
+
+  return index as LeanChemicalNameIndex;
+}
+
+function addAliasCandidate(
+  aliases: Map<string, AliasTarget>,
+  rawKey: string | null | undefined,
+  recordIndex: number,
+) {
+  const key = normalizeChemicalName(rawKey ?? "");
+  if (!key || key.length > 240) return;
+
+  const existing = aliases.get(key);
+  if (existing === undefined) {
+    aliases.set(key, recordIndex);
+    return;
+  }
+
+  if (typeof existing === "number") {
+    if (existing !== recordIndex) aliases.set(key, [existing, recordIndex]);
+    return;
+  }
+
+  if (!existing.includes(recordIndex)) existing.push(recordIndex);
+}
+
+function compileRuntimeIndex(serialized: LeanChemicalNameIndex): RuntimeChemicalNameIndex {
+  const records: RuntimeRecord[] = [];
+  const aliases = new Map<string, AliasTarget>();
+
+  for (const row of serialized.r) {
+    if (!Array.isArray(row) || row.length < 5) continue;
+
+    const [chebiNumericId, smiles, preferredName, iupacName, molecularFormula, extraAliases] = row;
+    if (!Number.isInteger(chebiNumericId) || !smiles) continue;
+
+    const recordIndex = records.length;
+    records.push([
+      chebiNumericId,
+      smiles,
+      preferredName || null,
+      iupacName || null,
+      molecularFormula || null,
+    ]);
+
+    // Preferred and IUPAC names are not repeated in the serialized alias table;
+    // rebuilding them here preserves the exact same lookup coverage.
+    addAliasCandidate(aliases, preferredName, recordIndex);
+    addAliasCandidate(aliases, iupacName, recordIndex);
+    if (Array.isArray(extraAliases)) {
+      for (const alias of extraAliases) addAliasCandidate(aliases, alias, recordIndex);
+    }
+  }
+
+  if (records.length === 0 || aliases.size === 0) {
+    throw new Error("The bundled chemical-name database contains no usable records or lookup names.");
+  }
+
+  return { records, aliases };
+}
+
+async function fetchLeanIndex(): Promise<RuntimeChemicalNameIndex> {
   const attempts: string[] = [];
 
-  for (const url of candidateAssetUrls(relativePath)) {
+  for (const url of candidateAssetUrls(GZIP_INDEX_ASSET)) {
     try {
-      const response = await fetch(url, {
-        method: "GET",
-        cache: "no-cache",
-        headers: compressed ? undefined : { Accept: "application/json" },
-      });
-
+      const response = await fetch(url, { method: "GET", cache: "no-cache" });
       if (!response.ok) {
         attempts.push(`${url} -> HTTP ${response.status}`);
         continue;
       }
 
-      const text = compressed
-        ? await responseToJsonText(response)
-        : await response.text();
-
+      const text = await responseToJsonText(response);
       try {
-        return validateIndex(JSON.parse(text) as ChemicalNameIndex);
+        return compileRuntimeIndex(validateLeanIndex(JSON.parse(text) as unknown));
       } catch (error) {
         attempts.push(
-          `${url} -> file was found, but could not be parsed: ${
+          `${url} -> file was found, but could not be loaded: ${
             error instanceof Error ? error.message : String(error)
           }`,
         );
       }
     } catch (error) {
-      attempts.push(
-        `${url} -> ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
+      attempts.push(`${url} -> ${error instanceof Error ? error.message : String(error)}`);
     }
-  }
-
-  throw new Error(attempts.join("\n"));
-}
-
-async function loadIndex(): Promise<ChemicalNameIndex> {
-  const failures: string[] = [];
-
-  try {
-    return await fetchIndexFrom(GZIP_INDEX_ASSET, true);
-  } catch (error) {
-    failures.push(
-      `Compressed database failed:\n${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
-  }
-
-  try {
-    return await fetchIndexFrom(JSON_INDEX_ASSET, false);
-  } catch (error) {
-    failures.push(
-      `Uncompressed database failed:\n${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
   }
 
   throw new Error(
     [
-      "PocketChem could not load its local chemical-name database.",
+      "PocketChem could not load its bundled offline chemical-name database.",
       "",
-      "Required build output:",
+      "Required runtime file:",
       "public/data/chemical-names.index.json.gz",
-      "public/data/chemical-names.index.json",
       "",
-      ...failures,
+      ...attempts,
     ].join("\n"),
   );
 }
 
 async function getIndex() {
-  indexPromise ??= loadIndex().catch((error) => {
-    // Allow a retry after a failed dev-server load instead of permanently
-    // caching the rejected promise for the rest of the session.
+  indexPromise ??= fetchLeanIndex().catch((error) => {
     indexPromise = null;
     throw error;
   });
@@ -226,56 +252,51 @@ async function getIndex() {
 }
 
 function materializeRecord(
-  chebiId: string,
-  compact: CompactRecord | undefined,
+  compact: RuntimeRecord | undefined,
 ): LocalChemicalNameRecord | null {
-  if (!compact?.s) return null;
+  if (!compact) return null;
+  const [chebiNumericId, smiles, preferredName, iupacName, molecularFormula] = compact;
+  if (!smiles) return null;
+
   return {
-    chebiId,
-    smiles: compact.s,
-    inchiKey: compact.k || null,
-    preferredName: compact.p || null,
-    iupacName: compact.i || null,
-    molecularFormula: compact.f || null,
+    chebiId: `CHEBI:${chebiNumericId}`,
+    smiles,
+    inchiKey: null,
+    preferredName,
+    iupacName,
+    molecularFormula,
     source: "chebi",
   };
 }
 
 function resolveAliasTarget(
-  index: ChemicalNameIndex,
+  index: RuntimeChemicalNameIndex,
   key: string,
-  match: string | string[],
-): string | null {
-  if (typeof match === "string") return match;
+  match: AliasTarget,
+): number | null {
+  if (typeof match === "number") return match;
 
-  const candidates = [...new Set(match)].filter((id) => Boolean(index.records[id]));
+  const candidates = [...new Set(match)].filter((recordIndex) => Boolean(index.records[recordIndex]));
   if (candidates.length === 0) return null;
   if (candidates.length === 1) return candidates[0];
 
-  // Prefer the record whose official/preferred ChEBI name exactly matches
-  // what the user typed. This distinguishes names such as "arachidonic acid"
-  // from broader records that merely list that text as an external synonym.
   const preferredMatches = candidates.filter(
-    (id) => normalizeChemicalName(index.records[id]?.p ?? "") === key,
+    (recordIndex) => normalizeChemicalName(index.records[recordIndex]?.[2] ?? "") === key,
   );
   if (preferredMatches.length === 1) return preferredMatches[0];
 
-  // An exact IUPAC-name match has the same precedence over synonym-only hits.
   const iupacMatches = candidates.filter(
-    (id) => normalizeChemicalName(index.records[id]?.i ?? "") === key,
+    (recordIndex) => normalizeChemicalName(index.records[recordIndex]?.[3] ?? "") === key,
   );
   if (iupacMatches.length === 1) return iupacMatches[0];
 
-  // Legacy/merged records may be different ChEBI IDs for the exact same
-  // structure. Treat that as one chemical rather than a user-facing ambiguity.
-  const structureKeys = candidates.map((id) => {
-    const record = index.records[id];
-    return record?.k || record?.s || null;
-  });
-  const firstStructureKey = structureKeys[0];
+  // Different ChEBI records can be legacy/merged aliases for exactly the same
+  // structure. Without storing InChIKeys, exact SMILES identity is sufficient
+  // for this ambiguity collapse because these are ChEBI's selected structures.
+  const firstSmiles = index.records[candidates[0]]?.[1] ?? null;
   if (
-    firstStructureKey &&
-    structureKeys.every((value) => value === firstStructureKey)
+    firstSmiles &&
+    candidates.every((recordIndex) => index.records[recordIndex]?.[1] === firstSmiles)
   ) {
     return candidates[0];
   }
@@ -288,26 +309,22 @@ export async function lookupLocalChemicalName(
 ): Promise<LocalChemicalNameRecord | null> {
   const index = await getIndex();
   const key = normalizeChemicalName(rawName);
-  const match = index.aliases[key];
-  if (!match) return null;
+  const match = index.aliases.get(key);
+  if (match === undefined) return null;
 
-  const targetId = resolveAliasTarget(index, key, match);
-  if (!targetId) return null;
-  return materializeRecord(targetId, index.records[targetId]);
+  const targetIndex = resolveAliasTarget(index, key, match);
+  if (targetIndex === null) return null;
+  return materializeRecord(index.records[targetIndex]);
 }
 
+/**
+ * Retained as an API-compatible no-op. The lean runtime pack intentionally
+ * omits InChIKeys because PocketChem currently performs name -> structure
+ * lookup only. Add a separate structure-identity pack if this becomes needed.
+ */
 export async function lookupLocalChemicalByInchiKey(
-  rawInchiKey: string,
+  _rawInchiKey: string,
 ): Promise<LocalChemicalNameRecord | null> {
-  const index = await getIndex();
-  const key = rawInchiKey.trim().toUpperCase();
-  if (!key) return null;
-
-  for (const [chebiId, compact] of Object.entries(index.records)) {
-    if ((compact.k ?? "").toUpperCase() === key) {
-      return materializeRecord(chebiId, compact);
-    }
-  }
   return null;
 }
 

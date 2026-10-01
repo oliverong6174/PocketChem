@@ -186,6 +186,14 @@ export type MassSpectrumPeak = {
     structure: string;
     label: string;
   }>;
+  /** Number of independent/equivalent predicted pathways merged into this m/z. */
+  pathwayCount?: number;
+  /** Individual predicted mechanisms/ions contributing to this m/z. */
+  contributors?: Array<{
+    label: string;
+    explanation: string;
+    fragmentSmiles?: string;
+  }>;
 };
 
 export type MassSpectrumResult = {

@@ -1,9 +1,9 @@
-import type { FunctionalGroupResult } from "../functionalGroups/types";
-import { ACID_SITE_RULES } from "./acidBase/acidSiteRegistry";
-import { matchAcidBaseSites } from "./acidBase/matchSites";
-import { getAcidSiteEnvironmentAdjustments } from "./acidBase/siteEnvironment";
-import type { AcidBaseFactor } from "./acidBase/environmentTypes";
-import type { AcidBaseConfidence } from "./acidBase/types";
+import type { FunctionalGroupResult } from "../../functionalGroups/types";
+import { ACID_SITE_RULES } from "./acidSiteRegistry";
+import { matchAcidBaseSites } from "./matchSites";
+import { getAcidSiteEnvironmentAdjustments } from "./siteEnvironment";
+import type { AcidBaseFactor } from "./environmentTypes";
+import type { AcidBaseConfidence } from "./types";
 
 export type AcidityResult = {
   relatedGroup: string;

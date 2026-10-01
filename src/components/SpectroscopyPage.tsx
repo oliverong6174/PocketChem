@@ -452,6 +452,8 @@ function SpectrumPlot({
   selectedStickId = null,
   onSelectStick,
   tickValues,
+  yLabel,
+  yTickValues,
 }: {
   sticks: Stick[];
   minX: number;
@@ -462,10 +464,12 @@ function SpectrumPlot({
   selectedStickId?: string | null;
   onSelectStick?: (stick: Stick) => void;
   tickValues?: number[];
+  yLabel?: string;
+  yTickValues?: number[];
 }) {
   const width = 900;
   const height = 280;
-  const left = 52;
+  const left = yLabel ? 76 : 52;
   const right = 22;
   const top = 22;
   const bottom = 48;
@@ -495,6 +499,30 @@ function SpectrumPlot({
     <div className="spectrum-plot-shell" aria-label={`${xLabel} predicted spectrum`}>
       <svg className="spectrum-plot" viewBox={`0 0 ${width} ${height}`} role="img">
         <line x1={left} y1={baseline} x2={width - right} y2={baseline} className="spectrum-axis" />
+        {yTickValues && yTickValues.length > 0 && yTickValues.map((value) => {
+          const normalized = clamp(value, 0, 100) / 100;
+          const y = mode === "down"
+            ? baseline + normalized * (plotHeight - 24)
+            : baseline - normalized * (plotHeight - 12);
+          return (
+            <g key={`y-${value}`}>
+              <line x1={left - 4} y1={y} x2={left} y2={y} className="spectrum-axis" />
+              {value > 0 && <line x1={left} y1={y} x2={width - right} y2={y} stroke="rgba(100, 116, 139, 0.22)" strokeWidth={0.8} strokeDasharray="3 4" />}
+              <text x={left - 8} y={y + 4} textAnchor="end" className="spectrum-tick-label">{value}</text>
+            </g>
+          );
+        })}
+        {yLabel && (
+          <text
+            x={18}
+            y={top + plotHeight / 2}
+            textAnchor="middle"
+            className="spectrum-axis-label"
+            transform={`rotate(-90 18 ${top + plotHeight / 2})`}
+          >
+            {yLabel}
+          </text>
+        )}
         {ticks.map((value, index) => {
           const x = toX(value);
           return (
@@ -757,7 +785,7 @@ function MassTable({
   return (
     <div className="spectroscopy-table-wrap">
       <table className="spectroscopy-table">
-        <thead><tr><th>m/z</th><th>Relative intensity</th><th>Assignment</th><th>Interpretation</th></tr></thead>
+        <thead><tr><th>m/z</th><th>Relative abundance</th><th>Pathways</th><th>Assignment</th><th>Interpretation</th></tr></thead>
         <tbody>
           {[...peaks].sort((a, b) => b.relativeIntensity - a.relativeIntensity).map((peak, index) => {
             const selected = selectedPeak ? massPeakIdentity(selectedPeak) === massPeakIdentity(peak) : false;
@@ -781,6 +809,7 @@ function MassTable({
               >
                 <td><strong>{peak.mz}</strong></td>
                 <td>{peak.relativeIntensity.toFixed(1)}%</td>
+                <td>{peak.kind === "fragment" || peak.kind === "diagnostic" ? (peak.pathwayCount ?? 1) : "—"}</td>
                 <td>{peak.label}</td>
                 <td>{peak.explanation}</td>
               </tr>
@@ -886,7 +915,13 @@ export default function SpectroscopyPage() {
     (result?.massSpec?.peaks ?? []).map((peak) => ({
       x: peak.mz,
       height: peak.relativeIntensity,
-      label: peak.kind === "molecular-ion" || peak.kind === "diagnostic" ? peak.label : undefined,
+      label: peak.kind === "molecular-ion" || peak.kind === "diagnostic"
+        ? peak.label
+        : peak.kind === "isotope" && peak.relativeIntensity >= 15
+          ? peak.label
+          : peak.kind === "fragment" && peak.relativeIntensity >= 15
+            ? `m/z ${Number.isInteger(peak.mz) ? peak.mz : Number(peak.mz.toFixed(1))}`
+            : undefined,
       id: massPeakIdentity(peak),
       massPeak: peak,
     })), [result]);
@@ -1534,7 +1569,7 @@ export default function SpectroscopyPage() {
             {activeTab === "mass" && result.massSpec && (
               <>
                 <div className="spectroscopy-panel-heading">
-                  <div><h3>Predicted Mass Spectrum</h3><p>Molecular ion, natural-isotope envelope, and selected common fragments.</p></div>
+                  <div><h3>Predicted Mass Spectrum</h3><p>General EI fragmentation with predicted relative abundance normalized to a 100% base peak.</p></div>
                   <span>M = {result.massSpec.molecularIonMz ?? "—"}</span>
                 </div>
                 <SpectrumPlot
@@ -1543,6 +1578,8 @@ export default function SpectroscopyPage() {
                   maxX={massMax}
                   tickValues={massTicks}
                   xLabel="m/z"
+                  yLabel="Relative abundance (%)"
+                  yTickValues={[0, 25, 50, 75, 100]}
                   selectedStickId={selectedMassPeak ? massPeakIdentity(selectedMassPeak) : null}
                   onSelectStick={(stick) => {
                     if (stick.massPeak) handleMassPeakSelect(stick.massPeak);
@@ -1557,7 +1594,10 @@ export default function SpectroscopyPage() {
                   <div id="spectroscopy-selected-assignment" className="selected-assignment-card">
                     <p className="selected-tag">Selected mass-spectral assignment</p>
                     <h4>{selectedMassPeak.label}</h4>
-                    <p><strong>m/z {selectedMassPeak.mz}</strong> · {selectedMassPeak.relativeIntensity.toFixed(1)}% relative intensity</p>
+                    <p><strong>m/z {selectedMassPeak.mz}</strong> · {selectedMassPeak.relativeIntensity.toFixed(1)}% predicted relative abundance</p>
+                    {(selectedMassPeak.pathwayCount ?? 0) > 1 && (
+                      <p><strong>{selectedMassPeak.pathwayCount} contributing fragmentation pathways</strong> merge at this m/z.</p>
+                    )}
                     <p>{selectedMassPeak.explanation}</p>
                     {selectedMassPeak.kind === "molecular-ion" && selectedMassPeak.previewStructure ? (
                       <p className="selected-note">The intact molecular radical-cation skeleton is shown above. Its charge/radical is labeled at the species level rather than assigned to an arbitrary atom.</p>

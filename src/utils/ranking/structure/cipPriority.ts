@@ -1,4 +1,4 @@
-import { getRDKit } from "../rdkit";
+import { getRDKit } from "../../rdkit";
 
 const ELEMENT_SYMBOLS = [
   "*",

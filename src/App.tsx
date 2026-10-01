@@ -44,11 +44,11 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import {
     analyzeAcidity,
     type AcidityResult,
-  } from "./utils/ranking/analyzeAcidity";
+  } from "./utils/ranking/acidBase/analyzeAcidity";
   import {
     analyzeBasicity,
     type BasicityResult,
-  } from "./utils/ranking/analyzeBasicity";
+  } from "./utils/ranking/acidBase/analyzeBasicity";
 
   import type { ReactionPathway } from "./utils/reactionUtils";
 

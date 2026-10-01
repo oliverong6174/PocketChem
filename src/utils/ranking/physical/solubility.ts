@@ -1,24 +1,23 @@
-import { getRDKit } from "../rdkit";
-import type { FunctionalGroupResult } from "../functionalGroups/types";
-import { getLongestCarbonPath } from "../nomenclature/graph/parentSelection";
-import { parseMolBlock } from "../nomenclature/molParser";
-import type { PropertyTendencyLevel } from "../nomenclature/types";
+import { getRDKit } from "../../rdkit";
+import type { FunctionalGroupResult } from "../../functionalGroups/types";
+import { parseMolBlock } from "../../nomenclature/molParser";
+import type { PropertyTendencyLevel } from "../../nomenclature/types";
 import {
   countCarboxylicAcidGroups,
-  estimateBoilingPointTendency,
+  estimateWaterSolubilityTendency,
   getNumberDescriptor,
   safeParseDescriptors,
-} from "../nomenclature/properties";
+} from "../../nomenclature/properties";
 
-export type BoilingPointRankingResult = {
-  boilingPointScore: number;
+export type SolubilityRankingResult = {
+  waterSolubilityScore: number;
   tendency: PropertyTendencyLevel;
   molecularWeight: number | null;
   formalCharge: number;
   hydrogenBondDonors: number | null;
   hydrogenBondAcceptors: number | null;
-  carbonCount: number;
-  branchingEstimate: number;
+  topologicalPolarSurfaceArea: number | null;
+  logP: number | null;
   factors: string[];
   explanation: string;
 };
@@ -42,13 +41,13 @@ function getAdjustedHydrogenBondAcceptors(
 }
 
 /**
- * Estimates relative boiling-point tendency rather than an experimental
- * temperature. A larger score means a higher predicted boiling point.
+ * Estimates relative water-solubility tendency. A larger score means greater
+ * predicted water solubility; it is not an experimental solubility value.
  */
-export async function analyzeBoilingPointRanking(
+export async function analyzeSolubilityRanking(
   smiles: string,
   functionalGroups: FunctionalGroupResult[]
-): Promise<BoilingPointRankingResult | null> {
+): Promise<SolubilityRankingResult | null> {
   const RDKit = await getRDKit();
   const mol = RDKit.get_mol(smiles);
 
@@ -76,55 +75,57 @@ export async function analyzeBoilingPointRanking(
       descriptors
     );
 
+    const topologicalPolarSurfaceArea = getNumberDescriptor(descriptors, [
+      "tpsa",
+      "TPSA",
+    ]);
+
+    const logP = getNumberDescriptor(descriptors, [
+      "CrippenClogP",
+      "MolLogP",
+      "logp",
+    ]);
+
     const formalCharge = parsedMol.atoms.reduce(
       (sum, atom) => sum + atom.charge,
       0
     );
 
-    const tendency = estimateBoilingPointTendency(
-      parsedMol,
-      functionalGroups,
+    const tendency = estimateWaterSolubilityTendency(
       molecularWeight,
       formalCharge,
       hydrogenBondDonors,
-      hydrogenBondAcceptors
-    );
-
-    const carbonCount = parsedMol.atoms.filter(
-      (atom) => atom.element === "C"
-    ).length;
-
-    const longestCarbonPath = getLongestCarbonPath(parsedMol);
-    const branchingEstimate = Math.max(
-      0,
-      carbonCount - longestCarbonPath.length
+      hydrogenBondAcceptors,
+      topologicalPolarSurfaceArea,
+      logP,
+      functionalGroups
     );
 
     return {
-      boilingPointScore: tendency.score,
+      waterSolubilityScore: tendency.score,
       tendency: tendency.level,
       molecularWeight,
       formalCharge,
       hydrogenBondDonors,
       hydrogenBondAcceptors,
-      carbonCount,
-      branchingEstimate,
+      topologicalPolarSurfaceArea,
+      logP,
       factors: tendency.factors,
       explanation:
-        "Higher molecular mass and stronger intermolecular forces raise boiling point, while branching usually lowers it.",
+        "Charge, polarity, and hydrogen bonding increase water solubility, while large hydrophobic structures and high logP decrease it.",
     };
   } finally {
     mol.delete?.();
   }
 }
 
-/** Array.sort comparator: highest predicted boiling point first. */
-export function compareBoilingPointResults(
-  a: BoilingPointRankingResult,
-  b: BoilingPointRankingResult
+/** Array.sort comparator: greatest predicted water solubility first. */
+export function compareSolubilityResults(
+  a: SolubilityRankingResult,
+  b: SolubilityRankingResult
 ) {
-  if (a.boilingPointScore !== b.boilingPointScore) {
-    return b.boilingPointScore - a.boilingPointScore;
+  if (a.waterSolubilityScore !== b.waterSolubilityScore) {
+    return b.waterSolubilityScore - a.waterSolubilityScore;
   }
 
   const aCharge = Math.abs(a.formalCharge);
@@ -134,13 +135,21 @@ export function compareBoilingPointResults(
     return bCharge - aCharge;
   }
 
+  if (
+    a.topologicalPolarSurfaceArea !== null &&
+    b.topologicalPolarSurfaceArea !== null &&
+    a.topologicalPolarSurfaceArea !== b.topologicalPolarSurfaceArea
+  ) {
+    return b.topologicalPolarSurfaceArea - a.topologicalPolarSurfaceArea;
+  }
+
+  if (a.logP !== null && b.logP !== null && a.logP !== b.logP) {
+    return a.logP - b.logP;
+  }
+
   if (a.molecularWeight === null && b.molecularWeight === null) return 0;
   if (a.molecularWeight === null) return 1;
   if (b.molecularWeight === null) return -1;
 
-  if (a.molecularWeight !== b.molecularWeight) {
-    return b.molecularWeight - a.molecularWeight;
-  }
-
-  return a.branchingEstimate - b.branchingEstimate;
+  return a.molecularWeight - b.molecularWeight;
 }

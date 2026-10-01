@@ -1,9 +1,9 @@
-import type { FunctionalGroupResult } from "../functionalGroups/types";
-import { BASE_SITE_RULES } from "./acidBase/baseSiteRegistry";
-import { matchAcidBaseSites } from "./acidBase/matchSites";
-import { getBaseSiteEnvironmentAdjustments } from "./acidBase/siteEnvironment";
-import type { AcidBaseFactor } from "./acidBase/environmentTypes";
-import type { AcidBaseConfidence } from "./acidBase/types";
+import type { FunctionalGroupResult } from "../../functionalGroups/types";
+import { BASE_SITE_RULES } from "./baseSiteRegistry";
+import { matchAcidBaseSites } from "./matchSites";
+import { getBaseSiteEnvironmentAdjustments } from "./siteEnvironment";
+import type { AcidBaseFactor } from "./environmentTypes";
+import type { AcidBaseConfidence } from "./types";
 
 export type BasicityResult = {
   relatedGroup: string;

@@ -1,7 +1,7 @@
 import {
   analyzeCarbocationStability,
   getBestCarbocationStabilityResult,
-} from "../../../ranking/cationStability";
+} from "../../../ranking/stability/cationStability";
 import { runReactionSmarts } from "../rdkitReaction";
 
 export type CarbocationShiftType = "none" | "hydride" | "alkyl";
