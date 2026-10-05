@@ -1,5 +1,6 @@
 import { analyzeFunctionalGroupHierarchy } from "../../functionalGroups";
 import { analyzeNomenclatureAndProperties } from "../../nomenclatureUtils";
+import { getRDKit } from "../../rdkit";
 import { getRuleChapter, getRuleCourse } from "../reactionCurriculum";
 import {
   SN1_NUCLEOPHILE_PROFILES,
@@ -11,6 +12,7 @@ import type {
   ReactionComponent,
   ReactionProductMixture,
   ReactionRule,
+  ReactionSelectivityAssessment,
   RetrosynthesisConfidence,
   RetrosynthesisPathway,
 } from "../reactionTypes";
@@ -28,11 +30,13 @@ import {
   splitReactionComponents,
 } from "./reactionInput";
 import { runReactionSmarts } from "./rdkitReaction";
+import { getCompiledQuerySync } from "./rdkitCaches";
+import { alkeneReductiveCleavageReactionSmarts } from "./cleavageSmarts";
 import { classifyReactionProducts } from "./productMixtures";
+import { assessReactionProductSelectivity } from "./productSelectivity";
 import {
   canonicalizeStereoStructure,
   compareProductStructureToTarget,
-  stereochemicalMixtureCanSatisfyTarget,
   type CanonicalStereoStructure,
 } from "./stereochemistry";
 import { matchAllRuleReactants, ruleMatchesReactant } from "./ruleMatcher";
@@ -46,13 +50,171 @@ type ValidationResult = {
   confidence: RetrosynthesisConfidence;
   orderedReactants: string[];
   productMixture: ReactionProductMixture | null;
+  selectivityAssessment: ReactionSelectivityAssessment | null;
+};
+
+type RetrosynthesisPredictionOptions = {
+  /** Skip expensive nomenclature generation during multistep planning. */
+  planning?: boolean;
+  /** Cooperative cancellation for bounded multistep searches. */
+  signal?: AbortSignal;
+  /** Cap verified reverse candidates retained during planner expansion. */
+  maxResults?: number;
+  /** Optional fast-pass cap on how many interleaved catalog rules are scanned. */
+  maxRulesScanned?: number;
+  /** Cap expensive reverse executions after cheap product-side screening/sorting. */
+  maxTransformsExecuted?: number;
 };
 
 const MAX_RESULTS_PER_RULE = 12;
 const MAX_TOTAL_RESULTS = 80;
 
+function searchCancelled(signal?: AbortSignal): boolean {
+  return Boolean(signal?.aborted);
+}
+
+async function yieldToBrowser(signal?: AbortSignal): Promise<boolean> {
+  if (searchCancelled(signal)) return false;
+  await new Promise<void>((resolve) => setTimeout(resolve, 0));
+  return !searchCancelled(signal);
+}
+
+function reverseInputTemplates(reactionSmarts: string): string[] {
+  const splitIndex = reactionSmarts.indexOf(">>");
+  if (splitIndex < 0) return [];
+  return reactionSmarts
+    .slice(0, splitIndex)
+    .split(".")
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Cheap product-side gate before running a reverse reaction. Returns a rough
+ * specificity score for matching transforms (larger product-side patterns are
+ * tried first) and null when the reverse transform cannot match the target.
+ *
+ * If RDKit cannot safely parse/use a query we return 0 rather than excluding
+ * it. The gate is an optimization only; authoritative chemistry still comes
+ * from reverse execution followed by exact forward replay.
+ */
+function reverseTransformMatchSpecificity(
+  rdkit: any,
+  targetMolecules: any[],
+  transform: ReverseTransform,
+): number | null {
+  const templates = reverseInputTemplates(transform.smarts);
+  if (templates.length === 0) return 0;
+  if (templates.length !== targetMolecules.length) return null;
+
+  const queries: any[] = [];
+  try {
+    for (const template of templates) {
+      const query = getCompiledQuerySync(rdkit, template);
+      if (!query) return 0;
+      queries.push(query);
+    }
+
+    const usedTargets = new Set<number>();
+    const matchTemplate = (templateIndex: number): boolean => {
+      if (templateIndex >= queries.length) return true;
+      const query = queries[templateIndex];
+
+      for (let targetIndex = 0; targetIndex < targetMolecules.length; targetIndex += 1) {
+        if (usedTargets.has(targetIndex)) continue;
+        const molecule = targetMolecules[targetIndex];
+        let matched = false;
+        try {
+          matched = molecule.get_substruct_match(query) !== "{}";
+        } catch {
+          // Conservative fallback: do not filter a transform merely because a
+          // query feature is unsupported by the substructure screening API.
+          return true;
+        }
+        if (!matched) continue;
+
+        usedTargets.add(targetIndex);
+        if (matchTemplate(templateIndex + 1)) return true;
+        usedTargets.delete(targetIndex);
+      }
+
+      return false;
+    };
+
+    if (!matchTemplate(0)) return null;
+
+    return queries.reduce((score, query) => {
+      try {
+        return score + Number(query.get_num_atoms?.() ?? 0);
+      } catch {
+        return score;
+      }
+    }, 0);
+  } catch {
+    return 0;
+  }
+}
+
 function unique<T>(items: T[]): T[] {
   return [...new Set(items)];
+}
+
+function interleaveRulesByFamily(rules: ReactionRule[]): ReactionRule[] {
+  // The registry is grouped by family, so a hard result cap can otherwise
+  // starve late families (notably diazonium chemistry) before they are even
+  // considered. Round-robin the families while preserving each family's own
+  // order so every chemistry family gets an early chance to match the target.
+  const byFamily = new Map<ReactionRule["family"], ReactionRule[]>();
+  const familyOrder: ReactionRule["family"][] = [];
+
+  for (const rule of rules) {
+    if (rule.retrosynthesis?.tier === "disabled") continue;
+    const existing = byFamily.get(rule.family);
+    if (existing) {
+      existing.push(rule);
+    } else {
+      byFamily.set(rule.family, [rule]);
+      familyOrder.push(rule.family);
+    }
+  }
+
+  const output: ReactionRule[] = [];
+  let index = 0;
+  while (output.length < rules.length) {
+    let added = false;
+    for (const family of familyOrder) {
+      const rule = byFamily.get(family)?.[index];
+      if (!rule) continue;
+      output.push(rule);
+      added = true;
+    }
+    if (!added) break;
+    index += 1;
+  }
+
+  return output;
+}
+
+type ReverseRuleIndexEntry = {
+  rule: ReactionRule;
+  transforms: ReverseTransform[];
+  ruleOrder: number;
+};
+
+const reverseRuleIndexCache = new WeakMap<ReactionRule[], ReverseRuleIndexEntry[]>();
+
+function getReverseRuleIndex(rules: ReactionRule[]): ReverseRuleIndexEntry[] {
+  const cached = reverseRuleIndexCache.get(rules);
+  if (cached) return cached;
+
+  const ordered = interleaveRulesByFamily(rules);
+  const index = ordered.map((rule, ruleOrder) => ({
+    rule,
+    transforms: reverseTransformsForRule(rule),
+    ruleOrder,
+  }));
+  reverseRuleIndexCache.set(rules, index);
+  return index;
 }
 
 function reverseReactionSmarts(smarts: string): string | null {
@@ -157,25 +319,28 @@ async function compareProductToTarget(
   const productStructure = await canonicalizeReactionSmiles(productSmiles);
   if (!productStructure) return null;
 
-  if (
-    !stereochemicalMixtureCanSatisfyTarget(
-      productMixture?.kind ?? null,
-      targetStructure,
-    )
-  ) {
-    return null;
-  }
-
   const stereoMatch = compareProductStructureToTarget(
     productStructure,
     targetStructure,
   );
 
-  if (stereoMatch === "exact") return "confirmed";
-  if (stereoMatch === "connectivity-only") return "connectivity-confirmed";
+  if (stereoMatch === "exact") {
+    // A racemic/stereoisomeric product set can still contain the exact
+    // stereoisomer drawn by the user. Accept that route for synthesis
+    // discovery, but downgrade confidence so it is never presented as an
+    // enantiopure synthesis.
+    if (productMixture && targetStructure.hasSpecifiedStereo) {
+      return "connectivity-confirmed";
+    }
+    return "confirmed";
+  }
 
-  // If the target explicitly requests R/S or E/Z, an unspecified or opposite
-  // stereoisomer is not a verified retrosynthetic replay.
+  if (stereoMatch === "connectivity-only" && !targetStructure.hasSpecifiedStereo) {
+    return "connectivity-confirmed";
+  }
+
+  // An unspecified or opposite stereoisomer cannot stand in for a specifically
+  // drawn R/S or E/Z target.
   return null;
 }
 
@@ -250,11 +415,203 @@ async function executeForwardRule(
   }
 }
 
+async function validateProductsAgainstTarget(
+  rule: ReactionRule,
+  products: string[],
+  targetStructure: CanonicalStereoStructure,
+  orderedReactants: string[],
+): Promise<ValidationResult | null> {
+  const stereoSensitive = Boolean(
+    targetStructure.hasSpecifiedStereo ||
+    rule.selectivityProfile?.stereochemistry ||
+    rule.selectivityProfile?.mixture === "expected"
+  );
+
+  // Most multistep O-Chem searches are achiral. Avoid mixture grouping and CIP
+  // analysis in that common path; exact connectivity is still canonicalized
+  // and checked against the target.
+  if (!stereoSensitive) {
+    for (const product of products) {
+      const confidence = await compareProductToTarget(product, targetStructure, null);
+      if (confidence) {
+        return {
+          confidence,
+          orderedReactants,
+          productMixture: null,
+          selectivityAssessment: await assessReactionProductSelectivity(
+            rule,
+            orderedReactants[0] ?? "",
+            product,
+          ),
+        };
+      }
+    }
+    return null;
+  }
+
+  const classifiedProducts = await classifyReactionProducts(rule, products);
+  for (const product of classifiedProducts) {
+    const confidence = await compareProductToTarget(
+      product.smiles,
+      targetStructure,
+      product.mixture,
+    );
+    if (confidence) {
+      return {
+        confidence,
+        orderedReactants,
+        productMixture: product.mixture,
+        selectivityAssessment: await assessReactionProductSelectivity(
+          rule,
+          orderedReactants[0] ?? "",
+          product.smiles,
+        ),
+      };
+    }
+  }
+  return null;
+}
+
+function primaryTriggerHasNameScope(rule: ReactionRule): boolean {
+  return Boolean(
+    rule.trigger.functionalGroups?.length ||
+      rule.trigger.anyFunctionalGroups?.length ||
+      rule.trigger.allFunctionalGroups?.length ||
+      rule.trigger.excludedFunctionalGroups?.length,
+  );
+}
+
+function reactantAssignmentKey(
+  smiles: string[],
+  unordered: boolean,
+): string {
+  const values = unordered ? [...smiles].sort() : smiles;
+  return values.join("||");
+}
+
+/**
+ * Reverse SMARTS can reconstruct a structure that is algebraically compatible
+ * with a forward transform but outside that reaction's actual substrate scope.
+ * Planning must therefore re-check the ORIGINAL rule trigger and any blocking
+ * mechanistic constraints before accepting the replay. This prevents false
+ * routes such as Gattermann-Koch formylation of benzonitrile.
+ */
+async function planningReactantsAreEligible(
+  rule: ReactionRule,
+  precursorSmiles: string,
+  orderedReactants: string[],
+): Promise<boolean> {
+  const precursorComponents = splitReactionComponents(precursorSmiles);
+  if (precursorComponents.length === 0) return false;
+
+  if (
+    precursorComponents.length === 1 &&
+    (rule.additionalReactants?.length ?? 0) === 0
+  ) {
+    // Structural-only triggers (the common planner path) avoid functional-group
+    // analysis entirely. Named triggers fall back to the cached component
+    // analysis so the check remains chemically authoritative.
+    if (!primaryTriggerHasNameScope(rule)) {
+      return ruleMatchesReactant(rule, precursorComponents[0], []);
+    }
+
+    const components = await componentsFromSmiles(precursorSmiles);
+    const component = components[0];
+    return Boolean(
+      component &&
+        (await ruleMatchesReactant(
+          rule,
+          component.smiles,
+          component.functionalGroups,
+        )),
+    );
+  }
+
+  const components = await componentsFromSmiles(precursorSmiles);
+  if (components.length === 0) return false;
+  const assignments = await matchAllRuleReactants(rule, components);
+  const wanted = reactantAssignmentKey(
+    orderedReactants,
+    rule.reactantRoleSymmetry === "unordered",
+  );
+  if (assignments.some((assignment) =>
+    reactantAssignmentKey(
+      assignment.map((component) => component.smiles),
+      rule.reactantRoleSymmetry === "unordered",
+    ) === wanted
+  )) {
+    return true;
+  }
+
+  // Some custom handlers model a reagent as a condition rather than as a
+  // consumed structural partner. In that case the primary substrate still has
+  // to satisfy the full forward rule.
+  if (rule.transform.type === "customHandler" && orderedReactants.length === 1) {
+    const component = components.find(
+      (item) => item.smiles === orderedReactants[0],
+    );
+    return Boolean(
+      component &&
+        (await ruleMatchesReactant(
+          rule,
+          component.smiles,
+          component.functionalGroups,
+        )),
+    );
+  }
+
+  return false;
+}
+
 async function validateForward(
   rule: ReactionRule,
   precursorSmiles: string,
   targetStructure: CanonicalStereoStructure,
+  planning = false,
 ): Promise<ValidationResult | null> {
+  // Reverse transforms reconstruct structural precursor candidates, but an
+  // algebraically reversible SMARTS does not prove that the precursor lies
+  // inside the forward reaction's chemical scope. During planning we keep the
+  // fast direct replay, but only after the original trigger and executable
+  // constraints approve that exact precursor set.
+  if (planning) {
+    const precursorComponents = splitReactionComponents(precursorSmiles);
+    let expectedReactants = precursorComponents.length;
+    if (rule.transform.type === "reactionSmarts") {
+      const lhs = rule.transform.smarts.split(">>", 1)[0] ?? "";
+      expectedReactants = templateCount(lhs);
+    }
+
+    if (
+      precursorComponents.length > 0 &&
+      (rule.transform.type === "customHandler" ||
+        precursorComponents.length === expectedReactants)
+    ) {
+      const orders = precursorComponents.length > 1
+        ? permutations(precursorComponents)
+        : [precursorComponents];
+
+      for (const orderedReactants of orders) {
+        if (!(await planningReactantsAreEligible(
+          rule,
+          precursorSmiles,
+          orderedReactants,
+        ))) {
+          continue;
+        }
+
+        const products = await executeForwardRule(rule, orderedReactants);
+        const verified = await validateProductsAgainstTarget(
+          rule,
+          products,
+          targetStructure,
+          orderedReactants,
+        );
+        if (verified) return verified;
+      }
+    }
+  }
+
   const components = await componentsFromSmiles(precursorSmiles);
   if (components.length === 0) return null;
 
@@ -287,22 +644,13 @@ async function validateForward(
 
   for (const orderedReactants of orderedAssignments) {
     const products = await executeForwardRule(rule, orderedReactants);
-    const classifiedProducts = await classifyReactionProducts(rule, products);
-
-    for (const product of classifiedProducts) {
-      const confidence = await compareProductToTarget(
-        product.smiles,
-        targetStructure,
-        product.mixture,
-      );
-      if (confidence) {
-        return {
-          confidence,
-          orderedReactants,
-          productMixture: product.mixture,
-        };
-      }
-    }
+    const verified = await validateProductsAgainstTarget(
+      rule,
+      products,
+      targetStructure,
+      orderedReactants,
+    );
+    if (verified) return verified;
   }
 
   return null;
@@ -405,6 +753,10 @@ function eliminationReverseSmarts(leavingGroup: string): string[] {
 }
 
 function oxidationCleavageForwardSmarts(mode: string): string[] {
+  if (mode === "alkeneReductiveCleavage") {
+    return alkeneReductiveCleavageReactionSmarts();
+  }
+
   if (mode === "alkeneOxidativeCleavage") {
     return [
       "[C;H1:1]=[C;H1:2]>>[C:1](=O)O.[C:2](=O)O",
@@ -433,7 +785,7 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
   if (rule.transform.type !== "customHandler") return [];
 
   const handler = rule.transform.handler;
-  const options = rule.transform.options ?? {};
+  const options = (rule.transform.options ?? {}) as Record<string, unknown>;
   const mode = String(options.mode ?? "");
   const output: string[] = [];
 
@@ -506,8 +858,25 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
       );
     }
 
-    if (mode === "synDihydroxylation") {
-      output.push("[C:1]([OH])[C:2]([OH])>>[C:1]=[C:2]");
+    if (
+      mode === "synDihydroxylation" ||
+      mode === "antiDihydroxylation"
+    ) {
+      // For the common H1/H1 vicinal-diol case, explicitly propose both alkene
+      // geometries. The previous achiral C=C reverse product discarded E/Z,
+      // which meant a later reverse Lindlar/dissolving-metal step could not
+      // recognize the alkene even though the forward synthesis was valid.
+      //
+      // We deliberately propose BOTH E and Z here. validateForward() replays
+      // the original syn/anti dihydroxylation rule and keeps only the geometry
+      // that actually regenerates the requested stereochemical target.
+      output.push(
+        "[*:3][C;H1:1]([OH])-[C;H1:2]([OH])[*:4]>>[*:3]/[C:1]=[C:2]\\[*:4]",
+        "[*:3][C;H1:1]([OH])-[C;H1:2]([OH])[*:4]>>[*:3]/[C:1]=[C:2]/[*:4]",
+        // Fallback for substitution patterns that do not define two alkene
+        // geometries. Forward replay still verifies the chemistry.
+        "[C:1]([OH])[C:2]([OH])>>[C:1]=[C:2]",
+      );
     }
   }
 
@@ -536,6 +905,7 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
     }
 
     if (
+      mode === "alkeneReductiveCleavage" ||
       mode === "alkeneOxidativeCleavage" ||
       mode === "alkyneOxidativeCleavage"
     ) {
@@ -592,6 +962,27 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
     output.push("[C:1](O)[C:3][OH:2]>>[C:1]1[O:2][C:3]1");
   }
 
+  if (handler === "ring" && mode === "intramolecularWilliamson") {
+    const ringSize = Number(options.ringSize ?? 0);
+    if (Number.isInteger(ringSize) && ringSize >= 3 && ringSize <= 7) {
+      const carbonMaps = Array.from(
+        { length: ringSize - 1 },
+        (_, index) => index + 2,
+      );
+      const cyclicCarbons = carbonMaps.map((map) => `[CH2:${map}]`).join("");
+      const openChain = carbonMaps.map((map) => `[CH2:${map}]`).join("-");
+
+      // Br/Cl/I are all legitimate Williamson precursors. Enumerate them here
+      // because automatic reversal of a ring-closure SMARTS cannot recreate an
+      // atom that disappeared as the leaving group.
+      for (const halogen of ["Br", "Cl", "I"] as const) {
+        output.push(
+          `[O:1]1${cyclicCarbons}1>>[OH:1]-${openChain}${halogen}`,
+        );
+      }
+    }
+  }
+
   if (handler === "rearrangement" && mode === "pinacol") {
     // Reverse both the hydride-shift (ring-retaining ketone) and cyclic
     // ring-contraction branches. Forward replay below rejects precursor sets
@@ -612,7 +1003,39 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
     output.push(...eliminationReverseSmarts(String(options.leavingGroup ?? "")));
   }
 
+  if (handler === "radical" && mode === "alkaneHalogenation") {
+    const halogen = options.halogen;
+    if (halogen === "Cl" || halogen === "Br") {
+      // Replacing the C-X bond with an implicit C-H is the exact reverse
+      // constitution of monohalogenation. Forward replay through the radical
+      // handler verifies that the reconstructed alkane genuinely regenerates
+      // the requested haloalkane.
+      output.push(`[C;X4:1]${halogen}>>[C:1]`);
+    }
+  }
+
   if (handler === "substitution") {
+    if (mode === "aromaticEas") {
+      const electrophile = String(options.electrophile ?? "");
+      // EAS is intrinsically easy to propose backwards: remove the installed
+      // electrophile and restore the aromatic hydrogen. Forward replay below
+      // is the authority on whether the proposed precursor actually regenerates
+      // the requested regioisomer, so these templates do not invent chemistry.
+      if (electrophile === "nitro") {
+        output.push("[c:1][N+](=O)[O-]>>[cH:1]");
+      } else if (electrophile === "sulfonic-acid") {
+        output.push("[c:1]S(=O)(=O)O>>[cH:1]");
+      } else if (electrophile === "bromo") {
+        output.push("[c:1]Br>>[cH:1]");
+      } else if (electrophile === "chloro") {
+        output.push("[c:1]Cl>>[cH:1]");
+      } else if (electrophile === "iodo") {
+        output.push("[c:1]I>>[cH:1]");
+      } else if (electrophile === "fluoro") {
+        output.push("[c:1]F>>[cH:1]");
+      }
+    }
+
     if (mode === "sn2" || mode === "alkylHalideSubstitution") {
       output.push(...sn2ReverseSmarts(String(options.nucleophile ?? "")));
     }
@@ -673,7 +1096,106 @@ function customReverseTransforms(rule: ReactionRule): ReverseTransform[] {
   }));
 }
 
+function explicitAlkyneReverseTransforms(
+  rule: ReactionRule,
+): ReverseTransform[] | null {
+  /*
+   * Some alkyne-forming reactions are NOT safely reversible by simply swapping
+   * the two sides of the forward SMARTS. Their forward rules remove leaving
+   * groups that are not atom-mapped into the product. When such a SMARTS is
+   * naively reversed, RDKit reconstructs those atoms as wildcard "*" atoms
+   * rather than actual Br/Cl/I atoms.
+   *
+   * Example:
+   *   R-C#CH + R'-Br -> R-C#C-R'
+   *
+   * Naive reverse:
+   *   R-C#C-R' -> R-C#CH + R'-*
+   *
+   * That wildcard precursor can never match an explicitly supplied
+   * 1-bromopropane starting material, so a perfectly valid acetylide synthesis
+   * becomes invisible to bidirectional planning.
+   *
+   * These explicit disconnections encode the actual synthetic chemistry while
+   * still relying on validateForward() below as the final authority.
+   */
+
+  if (rule.reactionClass === "acetylide SN2 alkylation") {
+    const halogens = ["Br", "Cl", "I"];
+    return halogens.map((halogen) => ({
+      // Cleave either alkyl side of an internal alkyne when that side could
+      // have originated from a methyl/primary alkyl halide. The same SMARTS
+      // naturally enumerates both orientations of an unsymmetrical alkyne.
+      smarts:
+        `[*:4][C:1]#[C:2]-[C;X4;H2,H3:3]>>` +
+        `[*:4][C:1]#[CH:2].[${halogen}]-[C:3]`,
+      source: "reversed-reaction-smarts" as const,
+    }));
+  }
+
+  if (rule.id === "alkyne-synthesis-double-dehydrohalogenation-vicinal") {
+    const halogens = ["Br", "Cl", "I"];
+    return halogens.flatMap((halogen) => [
+      {
+        // Terminal alkyne:
+        //   R-C#CH  ->  R-CH(X)-CH2X
+        //
+        // Explicit H counts prevent browser RDKit from satisfying the new
+        // single-bond valence with a carbanion such as [CH-]X.
+        smarts:
+          `[*:3][C:1]#[CH:2]>>` +
+          `[*:3][CH:1]([${halogen}])-[CH2:2][${halogen}]`,
+        source: "reversed-reaction-smarts" as const,
+      },
+      {
+        // Internal alkyne:
+        //   R-C#C-R'  ->  R-CH(X)-CH(X)-R'
+        smarts:
+          `[*:3][C:1]#[C:2][*:4]>>` +
+          `[*:3][CH:1]([${halogen}])-[CH:2]([${halogen}])[*:4]`,
+        source: "reversed-reaction-smarts" as const,
+      },
+    ]);
+  }
+
+  if (rule.id === "alkyne-synthesis-double-dehydrohalogenation-geminal") {
+    const halogens = ["Br", "Cl", "I"];
+    return halogens.flatMap((halogen) => [
+      {
+        // Terminal alkyne:
+        //   R-C#CH -> R-CH2-CHX2
+        smarts:
+          `[*:3][C:1]#[CH:2]>>` +
+          `[*:3][CH2:1]-[CH:2]([${halogen}])[${halogen}]`,
+        source: "reversed-reaction-smarts" as const,
+      },
+      {
+        // Internal alkyne, geminal dihalide on the right alkyne carbon.
+        smarts:
+          `[*:3][C:1]#[C:2][*:4]>>` +
+          `[*:3][CH2:1]-[C:2]([${halogen}])([${halogen}])[*:4]`,
+        source: "reversed-reaction-smarts" as const,
+      },
+      {
+        // Internal alkyne, equivalent alternative with the geminal center on
+        // the left alkyne carbon.
+        smarts:
+          `[*:3][C:1]#[C:2][*:4]>>` +
+          `[*:3][C:1]([${halogen}])([${halogen}])-[CH2:2][*:4]`,
+        source: "reversed-reaction-smarts" as const,
+      },
+    ]);
+  }
+
+  return null;
+}
+
 function reverseTransformsForRule(rule: ReactionRule): ReverseTransform[] {
+  const explicitAlkyneTransforms = explicitAlkyneReverseTransforms(rule);
+  if (explicitAlkyneTransforms) {
+    return explicitAlkyneTransforms;
+  }
+
   if (rule.transform.type === "reactionSmarts") {
     return expandElementAlternativesForReverse(rule.transform.smarts)
       .map(reverseReactionSmarts)
@@ -727,9 +1249,14 @@ async function createRetrosynthesisPathway(
   precursorSmiles: string,
   validation: ValidationResult,
   source: RetrosynthesisPathway["source"],
+  options: RetrosynthesisPredictionOptions = {},
 ): Promise<RetrosynthesisPathway> {
   const precursorComponents = splitReactionComponents(precursorSmiles);
-  const precursorLabel = await getComponentLabel(precursorComponents, "Precursor");
+  const precursorLabel = options.planning
+    ? precursorComponents.length > 1
+      ? "Precursor set"
+      : "Precursor"
+    : await getComponentLabel(precursorComponents, "Precursor");
   const customMode =
     rule.transform.type === "customHandler"
       ? String(rule.transform.options?.mode ?? "")
@@ -759,7 +1286,9 @@ async function createRetrosynthesisPathway(
     reagentNote: rule.reagentNote,
     shortExplanation: rule.explanation,
     priority: rule.priority,
-    planningCost: rule.planningCost ?? rule.priority,
+    planningCost:
+      (rule.planningCost ?? 100) +
+      (validation.selectivityAssessment?.planningPenalty ?? 0),
     display: rule.display ?? null,
     course: getRuleCourse(rule),
     chapter: getRuleChapter(rule),
@@ -768,6 +1297,7 @@ async function createRetrosynthesisPathway(
     purpose: rule.purpose ?? null,
     selectivity: rule.selectivity ?? [],
     selectivityProfile: rule.selectivityProfile ?? null,
+    selectivityAssessment: validation.selectivityAssessment,
     limitations: [
       ...(rule.limitations ?? []),
       ...(validation.confidence === "connectivity-confirmed"
@@ -785,7 +1315,20 @@ async function createRetrosynthesisPathway(
     source,
     alternativeRoutes: [],
     productMixture: validation.productMixture,
+    retrosynthesisTier:
+      rule.retrosynthesis?.tier && rule.retrosynthesis.tier !== "disabled"
+        ? rule.retrosynthesis.tier
+        : "standard",
+    retrosynthesisGroup: rule.retrosynthesis?.group ?? null,
   };
+}
+
+function retrosynthesisTierRank(
+  tier: RetrosynthesisPathway["retrosynthesisTier"],
+): number {
+  if (tier === "preferred") return 0;
+  if (tier === "secondary") return 2;
+  return 1;
 }
 
 function compareRetrosynthesisPathways(
@@ -795,6 +1338,14 @@ function compareRetrosynthesisPathways(
   const confidenceA = a.confidence === "confirmed" ? 0 : 1;
   const confidenceB = b.confidence === "confirmed" ? 0 : 1;
   if (confidenceA !== confidenceB) return confidenceA - confidenceB;
+
+  const tierA = retrosynthesisTierRank(a.retrosynthesisTier);
+  const tierB = retrosynthesisTierRank(b.retrosynthesisTier);
+  if (tierA !== tierB) return tierA - tierB;
+
+  if (a.planningCost !== b.planningCost) {
+    return a.planningCost - b.planningCost;
+  }
 
   if (a.priority !== b.priority) return a.priority - b.priority;
 
@@ -882,53 +1433,169 @@ async function dedupeAndRank(
 export async function predictRetrosynthesisPathwaysFromRules(
   targetSmiles: string,
   rules: ReactionRule[],
+  options: RetrosynthesisPredictionOptions = {},
 ): Promise<RetrosynthesisPathway[]> {
+  const signal = options.signal;
+  if (searchCancelled(signal)) return [];
+
   const targetComponents = splitReactionComponents(targetSmiles);
   if (targetComponents.length === 0) return [];
 
   const targetCanonical = await canonicalizeReactionSmiles(targetSmiles);
-  if (!targetCanonical) return [];
+  if (!targetCanonical || searchCancelled(signal)) return [];
 
-  const targetLabel = await getComponentLabel(targetComponents, "Target product");
+  const targetLabel = options.planning
+    ? "Target intermediate"
+    : await getComponentLabel(targetComponents, "Target product");
   const pathways: RetrosynthesisPathway[] = [];
+  const resultBudget = Math.max(
+    1,
+    Math.min(
+      MAX_TOTAL_RESULTS * 2,
+      options.maxResults ?? (options.planning ? 36 : MAX_TOTAL_RESULTS * 2),
+    ),
+  );
 
-  for (const rule of rules) {
-    const transforms = reverseTransformsForRule(rule);
-    if (transforms.length === 0) continue;
+  // Build the target molecules once. They are reused by the product-side SMARTS
+  // gate for hundreds of catalog rules instead of being reparsed per rule.
+  const rdkit = await getRDKit();
+  const targetMolecules = targetComponents.map((component) => rdkit.get_mol(component));
+  if (targetMolecules.some((molecule) => !molecule)) {
+    for (const molecule of targetMolecules) molecule?.delete?.();
+    return [];
+  }
 
-    for (const transform of transforms) {
-      const precursorCandidates = await runReverseTransform(
-        targetComponents,
-        transform,
-        rule,
-      );
+  const transformMatchCache = new Map<string, number | null>();
+  const reverseIndex = getReverseRuleIndex(rules);
+  const ruleScanLimit = Number.isFinite(options.maxRulesScanned)
+    ? Math.max(1, Math.min(reverseIndex.length, Math.floor(options.maxRulesScanned!)))
+    : reverseIndex.length;
+  const indexedRules = reverseIndex.slice(0, ruleScanLimit);
 
-      for (const precursorCandidate of precursorCandidates) {
-        const validation = await validateForward(
-          rule,
-          precursorCandidate,
-          targetCanonical,
-        );
-        if (!validation) continue;
+  type ReverseWorkItem = {
+    rule: ReactionRule;
+    transform: ReverseTransform;
+    specificity: number;
+    order: number;
+  };
+  const matchingTransforms: ReverseWorkItem[] = [];
 
-        pathways.push(
-          await createRetrosynthesisPathway(
-            rule,
-            targetSmiles,
-            targetLabel,
-            precursorCandidate,
-            validation,
-            transform.source,
-          ),
-        );
-
-        if (pathways.length >= MAX_TOTAL_RESULTS * 2) break;
+  try {
+    // Phase 1 is deliberately cheap: screen the whole allowed catalog against
+    // the product-side SMARTS before executing any reverse reaction. This lets
+    // a highly relevant rule late in a family (for example amine diazotization)
+    // reach the front of the expensive work queue instead of waiting behind
+    // unrelated generic transforms.
+    let workOrder = 0;
+    for (let ruleIndex = 0; ruleIndex < indexedRules.length; ruleIndex += 1) {
+      if (searchCancelled(signal)) return [];
+      if (ruleIndex > 0 && ruleIndex % 24 === 0 && !(await yieldToBrowser(signal))) {
+        return [];
       }
 
-      if (pathways.length >= MAX_TOTAL_RESULTS * 2) break;
+      const { rule, transforms } = indexedRules[ruleIndex];
+      for (const transform of transforms) {
+        if (searchCancelled(signal)) return [];
+
+        let specificity = transformMatchCache.get(transform.smarts);
+        if (specificity === undefined) {
+          specificity = reverseTransformMatchSpecificity(
+            rdkit,
+            targetMolecules,
+            transform,
+          );
+          transformMatchCache.set(transform.smarts, specificity);
+        }
+        if (specificity === null) continue;
+
+        matchingTransforms.push({
+          rule,
+          transform,
+          specificity,
+          order: workOrder,
+        });
+        workOrder += 1;
+      }
     }
 
-    if (pathways.length >= MAX_TOTAL_RESULTS * 2) break;
+    matchingTransforms.sort(
+      (a, b) =>
+        b.specificity - a.specificity ||
+        (a.rule.planningCost ?? 100) - (b.rule.planningCost ?? 100) ||
+        a.order - b.order,
+    );
+
+    // Phase 2 does the expensive reverse execution and exact forward replay only
+    // for transforms that can actually occur in the drawn target. Interactive
+    // planning may intentionally execute only the highest-specificity transforms
+    // first; the deep fallback removes this cap.
+    const transformBudget = Number.isFinite(options.maxTransformsExecuted)
+      ? Math.max(1, Math.min(
+          matchingTransforms.length,
+          Math.floor(options.maxTransformsExecuted!),
+        ))
+      : matchingTransforms.length;
+
+    for (let workIndex = 0; workIndex < transformBudget; workIndex += 1) {
+      if (searchCancelled(signal)) return [];
+      if (workIndex > 0 && workIndex % 6 === 0 && !(await yieldToBrowser(signal))) {
+        return [];
+      }
+
+      const { rule, transform } = matchingTransforms[workIndex];
+      let precursorCandidates: string[] = [];
+
+      try {
+        precursorCandidates = await runReverseTransform(
+          targetComponents,
+          transform,
+          rule,
+        );
+      } catch (error) {
+        console.error(`[PocketChem:Retro] Skipping reverse transform for ${rule.id}.`, {
+          smarts: transform.smarts,
+          error,
+        });
+        continue;
+      }
+
+      for (const precursorCandidate of precursorCandidates) {
+        if (searchCancelled(signal)) return [];
+
+        try {
+          const validation = await validateForward(
+            rule,
+            precursorCandidate,
+            targetCanonical,
+            Boolean(options.planning),
+          );
+          if (!validation) continue;
+
+          pathways.push(
+            await createRetrosynthesisPathway(
+              rule,
+              targetSmiles,
+              targetLabel,
+              precursorCandidate,
+              validation,
+              transform.source,
+              options,
+            ),
+          );
+        } catch (error) {
+          console.error(`[PocketChem:Retro] Skipping invalid candidate generated by ${rule.id}.`, {
+            precursorCandidate,
+            error,
+          });
+        }
+
+        if (pathways.length >= resultBudget) break;
+      }
+
+      if (pathways.length >= resultBudget) break;
+    }
+  } finally {
+    for (const molecule of targetMolecules) molecule?.delete?.();
   }
 
   return dedupeAndRank(pathways);

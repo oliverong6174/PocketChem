@@ -30,6 +30,13 @@ type StepSvgSet = {
 type RouteSvgMap = Record<string, StepSvgSet>;
 
 const KETCHER_READ_TIMEOUT_MS = 8000;
+// Normal search is intentionally interactive: a healthy textbook synthesis
+// should resolve quickly. Users can explicitly opt into a wider deep search.
+const SYNTHESIS_NORMAL_STALL_TIMEOUT_MS = 7000;
+const SYNTHESIS_NORMAL_HARD_TIMEOUT_MS = 15000;
+const SYNTHESIS_DEEP_STALL_TIMEOUT_MS = 18000;
+const SYNTHESIS_DEEP_HARD_TIMEOUT_MS = 45000;
+const EMPTY_KET = JSON.stringify({ root: { nodes: [] } });
 
 async function ketToSmiles(
   ketText: string,
@@ -117,22 +124,37 @@ function synthesisStepProductRenderer(step: SynthesisStep) {
 }
 
 function progressLabel(progress: MultistepSynthesisProgress): string {
+  const nodeProgress =
+    typeof progress.total === "number" && progress.total > 0
+      ? ` · ${Math.min(progress.processed ?? 0, progress.total)}/${progress.total} frontier nodes`
+      : "";
+  const candidates =
+    typeof progress.candidateCount === "number"
+      ? ` · ${progress.candidateCount} candidates`
+      : "";
+
   if (progress.phase === "forward") {
-    return "Exploring forward pathways…";
+    return `Forward reaction search · depth ${progress.depth}/${progress.maxSteps}${nodeProgress}${candidates}`;
   }
 
   if (progress.phase === "retrosynthesis") {
-    return "Working backward from the target…";
+    return `Reverse reaction search · depth ${progress.depth}/${progress.maxSteps}${nodeProgress}${candidates}`;
   }
 
-  return "Checking the shortest route connections…";
+  const left = progress.processed ?? 0;
+  const right = progress.candidateCount ?? 0;
+  return `Connecting search frontiers · testing ${progress.depth}-step routes · ${left} × ${right} states`;
 }
 
 function progressPercent(progress: MultistepSynthesisProgress): number {
-  const depthRatio = Math.min(1, Math.max(0, progress.depth / progress.maxSteps));
-  const phaseOffset =
-    progress.phase === "forward" ? 0 : progress.phase === "retrosynthesis" ? 5 : 10;
-  return Math.min(95, Math.round(20 + depthRatio * 65 + phaseOffset));
+  const enginePercent =
+    typeof progress.percent === "number"
+      ? progress.percent
+      : Math.round((progress.depth / Math.max(1, progress.maxSteps)) * 100);
+
+  // Reserve the first 20% for editor export + structure preparation and the
+  // final few percent for formatting the verified route.
+  return Math.min(96, Math.round(20 + enginePercent * 0.76));
 }
 
 async function moleculeDisplayName(smiles: string): Promise<string> {
@@ -156,6 +178,39 @@ async function moleculeDisplayName(smiles: string): Promise<string> {
   }
 }
 
+async function hydrateRouteLabels(
+  routes: MultistepSynthesisRoute[],
+): Promise<MultistepSynthesisRoute[]> {
+  return Promise.all(
+    routes.map(async (route) => ({
+      ...route,
+      steps: await Promise.all(
+        route.steps.map(async (step) => {
+          const productComponents = (
+            step.productMixture?.memberSmiles ?? step.productComponents
+          )
+            .flatMap((member) => member.split("."))
+            .map((component) => component.trim())
+            .filter(Boolean);
+
+          const [reactantNames, productNames] = await Promise.all([
+            Promise.all(step.reactantComponents.map(moleculeDisplayName)),
+            Promise.all(productComponents.map(moleculeDisplayName)),
+          ]);
+
+          return {
+            ...step,
+            reactantLabel:
+              reactantNames.length > 0 ? reactantNames.join(" + ") : step.reactantLabel,
+            productLabel:
+              productNames.length > 0 ? productNames.join(" + ") : step.productLabel,
+          };
+        }),
+      ),
+    })),
+  );
+}
+
 export default function SynthesisPage() {
   const [reactantKetcher, setReactantKetcher] = useState<KetcherApi | null>(null);
   const [productKetcher, setProductKetcher] = useState<KetcherApi | null>(null);
@@ -166,14 +221,22 @@ export default function SynthesisPage() {
     "Draw starting materials and a target product to begin.",
   );
   const [error, setError] = useState<string | null>(null);
+  const [technicalError, setTechnicalError] = useState<string | null>(null);
   const [startingSmiles, setStartingSmiles] = useState("");
   const [targetSmiles, setTargetSmiles] = useState("");
   const [startingNames, setStartingNames] = useState<string[]>([]);
   const [targetName, setTargetName] = useState("");
   const [searchProgress, setSearchProgress] = useState(0);
+  const [searchElapsedMs, setSearchElapsedMs] = useState(0);
+  const [searchDiagnostics, setSearchDiagnostics] = useState<
+    MultistepSynthesisProgress[]
+  >([]);
+  const [canSearchDeeper, setCanSearchDeeper] = useState(false);
+  const [activeSearchEffort, setActiveSearchEffort] = useState<"normal" | "deep">("normal");
   const searchRunRef = useRef(0);
   const searchAbortRef = useRef<AbortController | null>(null);
-  const [editorResetVersion, setEditorResetVersion] = useState(0);
+  const [drawerResetVersion, setDrawerResetVersion] = useState(0);
+  const [editorMountVersion, setEditorMountVersion] = useState(0);
 
   const editorsReady = Boolean(reactantKetcher && productKetcher);
 
@@ -323,8 +386,15 @@ export default function SynthesisPage() {
     }
   }
 
-  async function findSynthesis() {
+  async function findSynthesis(searchEffort: "normal" | "deep" = "normal") {
     if (!reactantKetcher || !productKetcher || isSearching) return;
+
+    const stallTimeoutMs = searchEffort === "deep"
+      ? SYNTHESIS_DEEP_STALL_TIMEOUT_MS
+      : SYNTHESIS_NORMAL_STALL_TIMEOUT_MS;
+    const hardTimeoutMs = searchEffort === "deep"
+      ? SYNTHESIS_DEEP_HARD_TIMEOUT_MS
+      : SYNTHESIS_NORMAL_HARD_TIMEOUT_MS;
 
     const runId = searchRunRef.current + 1;
     searchRunRef.current = runId;
@@ -332,6 +402,12 @@ export default function SynthesisPage() {
     const searchController = new AbortController();
     searchAbortRef.current = searchController;
     const prefix = `[PocketChem:Synthesis #${runId}]`;
+    let hardTimeoutId: ReturnType<typeof setTimeout> | null = null;
+    let stallTimeoutId: ReturnType<typeof setTimeout> | null = null;
+    let elapsedIntervalId: ReturnType<typeof setInterval> | null = null;
+    let timeoutReason: "stall" | "hard" | null = null;
+    let lastSearchStage = "preparing the search";
+
     console.groupCollapsed(`${prefix} Find Synthesis`);
     console.info(`${prefix} search requested`, {
       reactantKetcher,
@@ -344,11 +420,16 @@ export default function SynthesisPage() {
         window.synthesisReactantKetcher === window.synthesisProductKetcher,
     });
     setIsSearching(true);
+    setActiveSearchEffort(searchEffort);
+    setCanSearchDeeper(false);
     setError(null);
+    setTechnicalError(null);
     setRoutes([]);
     setRouteSvgs({});
     setStartingNames([]);
     setTargetName("");
+    setSearchElapsedMs(0);
+    setSearchDiagnostics([]);
     setSearchProgress(3);
     setStatus("Reading the starting materials and target product…");
 
@@ -362,8 +443,8 @@ export default function SynthesisPage() {
       if (!start || searchRunRef.current !== runId || searchController.signal.aborted) return;
       setSearchProgress(8);
 
-      // Read the Ketcher instances one at a time. Concurrent getSmiles() calls can
-      // leave one embedded editor waiting indefinitely in some browser sessions.
+      // Read the Ketcher instances one at a time. Concurrent editor exports can
+      // leave one embedded Ketcher worker waiting indefinitely in some sessions.
       setStatus("Reading target product…");
       const target = await readEditorSmiles(
         productKetcher,
@@ -374,7 +455,7 @@ export default function SynthesisPage() {
       setSearchProgress(14);
 
       console.info(`${prefix} both Ketcher reads completed`, { start, target });
-      setStatus("Naming structures and preparing the search…");
+      setStatus("Preparing structures for the reaction-rule search…");
 
       const startingComponents = splitReactionComponents(start);
       const targetComponents = splitReactionComponents(target);
@@ -395,37 +476,90 @@ export default function SynthesisPage() {
       setStartingSmiles(combinedStart);
       setTargetSmiles(targetComponents[0]);
 
-      const [resolvedStartingNames, resolvedTargetName] = await Promise.all([
-        Promise.all(startingComponents.map((component) => moleculeDisplayName(component))),
-        moleculeDisplayName(targetComponents[0]),
-      ]);
-      if (searchRunRef.current !== runId || searchController.signal.aborted) return;
-      setStartingNames(resolvedStartingNames);
-      setTargetName(resolvedTargetName);
+      // Do not make nomenclature a prerequisite for planning. Name generation
+      // is useful presentation work, but it used to block the actual synthesis
+      // search before the first reaction rule was even evaluated.
       setSearchProgress(20);
-      setStatus("Searching for the shortest synthesis…");
+      setStatus(searchEffort === "deep"
+        ? "Starting deep goal-directed synthesis search…"
+        : "Starting goal-directed synthesis search…");
 
       console.info(`${prefix} starting multistep synthesis engine`, {
         combinedStart,
         target: targetComponents[0],
-        beamWidth: 14,
-        branchLimit: 28,
+        searchEffort,
+        beamWidth: searchEffort === "deep" ? 16 : 10,
+        branchLimit: searchEffort === "deep" ? 32 : 18,
+        maxSteps: searchEffort === "deep" ? 9 : 7,
         maxRoutes: 1,
+        stallTimeoutMs,
+        hardTimeoutMs,
       });
 
-      const results = await findMultistepSynthesisRoutes(
+      const engineStartedAt = performance.now();
+      elapsedIntervalId = setInterval(() => {
+        if (searchRunRef.current === runId) {
+          setSearchElapsedMs(performance.now() - engineStartedAt);
+        }
+      }, 200);
+      let rejectTimeout: ((reason?: unknown) => void) | null = null;
+      const triggerTimeout = (reason: "stall" | "hard") => {
+        if (timeoutReason || searchController.signal.aborted) return;
+        timeoutReason = reason;
+        console.warn(`${prefix} synthesis watchdog stopped the search`, {
+          reason,
+          lastSearchStage,
+          elapsedMs: Math.round(performance.now() - engineStartedAt),
+        });
+        searchController.abort();
+        rejectTimeout?.(new Error(`SYNTHESIS_SEARCH_${reason.toUpperCase()}_TIMEOUT`));
+      };
+      const armStallWatchdog = () => {
+        if (stallTimeoutId !== null) clearTimeout(stallTimeoutId);
+        stallTimeoutId = setTimeout(
+          () => triggerTimeout("stall"),
+          stallTimeoutMs,
+        );
+      };
+
+      const timeoutPromise = new Promise<MultistepSynthesisRoute[]>((_resolve, reject) => {
+        rejectTimeout = reject;
+        hardTimeoutId = setTimeout(
+          () => triggerTimeout("hard"),
+          hardTimeoutMs,
+        );
+        armStallWatchdog();
+      });
+
+      const enginePromise = findMultistepSynthesisRoutes(
         combinedStart,
         targetComponents[0],
         {
-          beamWidth: 14,
-          branchLimit: 28,
+          beamWidth: searchEffort === "deep" ? 16 : 10,
+          branchLimit: searchEffort === "deep" ? 32 : 18,
+          maxSteps: searchEffort === "deep" ? 9 : 7,
           maxRoutes: 1,
+          preferFirstVerifiedRoute: true,
+          searchEffort,
           signal: searchController.signal,
         },
         (progress) => {
-          if (searchRunRef.current === runId) {
+          if (searchRunRef.current === runId && !searchController.signal.aborted) {
             console.debug(`${prefix} search progress`, progress);
-            setStatus(progressLabel(progress));
+            lastSearchStage = progressLabel(progress);
+            armStallWatchdog();
+            setStatus(lastSearchStage);
+
+            if (progress.frontierSample?.length) {
+              setSearchDiagnostics((current) => {
+                const key = `${progress.phase}:${progress.depth}`;
+                const withoutSameLayer = current.filter(
+                  (entry) => `${entry.phase}:${entry.depth}` !== key,
+                );
+                return [...withoutSameLayer, progress].slice(-18);
+              });
+            }
+
             setSearchProgress((current) =>
               Math.max(current, progressPercent(progress)),
             );
@@ -433,35 +567,102 @@ export default function SynthesisPage() {
         },
       );
 
+      // The stall watchdog catches a genuinely wedged planner operation; the
+      // separate hard cap prevents an actively progressing but pathological
+      // search from running forever.
+      const rawResults = await Promise.race([enginePromise, timeoutPromise]);
+
+      if (hardTimeoutId !== null) {
+        clearTimeout(hardTimeoutId);
+        hardTimeoutId = null;
+      }
+      if (stallTimeoutId !== null) {
+        clearTimeout(stallTimeoutId);
+        stallTimeoutId = null;
+      }
+      if (elapsedIntervalId !== null) {
+        clearInterval(elapsedIntervalId);
+        elapsedIntervalId = null;
+      }
+      setSearchElapsedMs(performance.now() - engineStartedAt);
+
       if (searchRunRef.current !== runId || searchController.signal.aborted) return;
-      setSearchProgress(100);
+      setSearchProgress(rawResults.length > 0 ? 97 : 100);
       console.info(`${prefix} synthesis engine finished`, {
-        routeCount: results.length,
-        routes: results,
+        routeCount: rawResults.length,
+        routes: rawResults,
+        elapsedMs: Math.round(performance.now() - engineStartedAt),
       });
+
+      let results = rawResults;
+      if (rawResults.length > 0) {
+        setStatus("Verified route found · formatting structures and names…");
+        const [hydratedRoutes, resolvedStartingNames, resolvedTargetName] =
+          await Promise.all([
+            hydrateRouteLabels(rawResults),
+            Promise.all(
+              startingComponents.map((component) => moleculeDisplayName(component)),
+            ),
+            moleculeDisplayName(targetComponents[0]),
+          ]);
+        if (searchRunRef.current !== runId || searchController.signal.aborted) return;
+        results = hydratedRoutes;
+        setStartingNames(resolvedStartingNames);
+        setTargetName(resolvedTargetName);
+        setSearchProgress(100);
+      }
+
       setRoutes(results);
 
       if (results.length === 0) {
-        setStatus("No verified route was found with the reactions PocketChem currently knows.");
+        if (searchEffort === "normal") {
+          setCanSearchDeeper(true);
+          setStatus("Normal search completed without a verified route. Search deeper to widen the planner.");
+        } else {
+          setStatus("Deep search completed: no verified route was found with PocketChem's current reaction set and search bounds.");
+        }
       } else if (results[0].steps.length === 0) {
         setStatus("A supplied starting material already matches the target product.");
       } else {
-        const shortest = results[0].steps.length;
+        const stepCount = results[0].steps.length;
         setStatus(
-          `Shortest verified route found: ${shortest} step${shortest === 1 ? "" : "s"}.`,
+          `Verified route found: ${stepCount} step${stepCount === 1 ? "" : "s"}.`,
         );
       }
     } catch (searchError) {
       console.error(`${prefix} multistep synthesis search failed`, searchError);
       if (searchRunRef.current === runId) {
-        setError(
-          "The synthesis search failed while evaluating reaction pathways. Check the structures and try again.",
-        );
-        setStatus("Synthesis search failed.");
+        if (timeoutReason) {
+          const timeoutDetail = timeoutReason === "stall"
+            ? `No planner progress was reported for ${Math.round(stallTimeoutMs / 1000)} seconds.`
+            : `The ${Math.round(hardTimeoutMs / 1000)}-second ${searchEffort === "deep" ? "deep-search safety" : "normal-search"} limit was reached.`;
+          if (searchEffort === "normal") setCanSearchDeeper(true);
+          setError(
+            `${timeoutDetail} Last stage: ${lastSearchStage}. A route may still exist; this is a computation stop, not a claim that the synthesis is impossible.${searchEffort === "normal" ? " Use Search deeper to widen the search." : ""}`,
+          );
+          setStatus(`Search stopped by ${timeoutReason === "stall" ? "stall watchdog" : "time limit"} · last stage: ${lastSearchStage}`);
+        } else {
+          const technicalDetail =
+            searchError instanceof Error
+              ? `${searchError.name}: ${searchError.message}${searchError.stack ? `\n\n${searchError.stack}` : ""}`
+              : String(searchError);
+
+          setTechnicalError(technicalDetail);
+          setError(
+            `The synthesis engine encountered an internal error during: ${lastSearchStage}. ` +
+              "The structures do not need to be redrawn. PocketChem will now skip isolated bad reaction rules where possible; " +
+              "the technical details are shown below.",
+          );
+          setStatus("Synthesis search encountered an internal reaction-engine error.");
+        }
       }
     } finally {
+      if (hardTimeoutId !== null) clearTimeout(hardTimeoutId);
+      if (stallTimeoutId !== null) clearTimeout(stallTimeoutId);
+      if (elapsedIntervalId !== null) clearInterval(elapsedIntervalId);
       console.info(`${prefix} search run finished`, {
         stillCurrentRun: searchRunRef.current === runId,
+        timeoutReason,
       });
       console.groupEnd();
       if (searchAbortRef.current === searchController) {
@@ -477,15 +678,17 @@ export default function SynthesisPage() {
     searchRunRef.current += 1;
     setIsSearching(false);
     setSearchProgress(0);
+    setSearchElapsedMs(0);
     setStatus("Synthesis search cancelled.");
   }
 
-  function clearSynthesis() {
+  async function clearSynthesis() {
     searchAbortRef.current?.abort();
     searchAbortRef.current = null;
     searchRunRef.current += 1;
     setIsSearching(false);
     setError(null);
+    setTechnicalError(null);
     setRoutes([]);
     setRouteSvgs({});
     setStartingSmiles("");
@@ -493,17 +696,37 @@ export default function SynthesisPage() {
     setStartingNames([]);
     setTargetName("");
     setSearchProgress(0);
-    setStatus("Resetting molecule editors…");
+    setSearchElapsedMs(0);
+    setSearchDiagnostics([]);
+    setCanSearchDeeper(false);
+    setStatus("Clearing molecule editors…");
 
-    // Do not use setMolecule("") as a clear operation. setMolecule is an
-    // import API and Ketcher attempts to fit/transform the imported structure;
-    // an empty structure can leave the canvas in a bad zoom/tool state.
-    // Remounting gives each drawer a genuinely fresh Ketcher canvas and also
-    // clears any active rotate/select/pointer interaction.
-    setReactantKetcher(null);
-    setProductKetcher(null);
-    setEditorResetVersion((version) => version + 1);
-    setStatus("Draw starting materials and a target product to begin.");
+    try {
+      // Keep both Ketcher instances mounted. The old implementation remounted
+      // the editors on every Clear, which forced Ketcher through its loading
+      // state again and produced the large dark/blank box seen in the UI.
+      // Importing a valid empty KET document replaces the canvas contents
+      // without asking Ketcher to parse an empty string. needZoom:false also
+      // prevents an empty import from changing the canvas zoom/viewport.
+      const clearOptions = { needZoom: false };
+      await Promise.all([
+        reactantKetcher?.setMolecule(EMPTY_KET, clearOptions),
+        productKetcher?.setMolecule(EMPTY_KET, clearOptions),
+      ]);
+
+      setDrawerResetVersion((version) => version + 1);
+      setStatus("Draw starting materials and a target product to begin.");
+    } catch (clearError) {
+      console.warn("Could not clear synthesis editors in place; remounting as fallback.", clearError);
+
+      // Rare fallback if Ketcher rejects the empty KET import. The normal path
+      // above does not remount, so users should not see a loading flash on Clear.
+      setReactantKetcher(null);
+      setProductKetcher(null);
+      setDrawerResetVersion((version) => version + 1);
+      setEditorMountVersion((version) => version + 1);
+      setStatus("Draw starting materials and a target product to begin.");
+    }
   }
 
   return (
@@ -529,9 +752,12 @@ export default function SynthesisPage() {
           </div>
           <div className="synthesis-ketcher-box">
             <MoleculeDrawer
-              key={`synthesis-reactant-${editorResetVersion}`}
+              key={`synthesis-reactant-${editorMountVersion}`}
               globalKey="synthesisReactantKetcher"
+              resetVersion={drawerResetVersion}
+              isolateEditor
               onReady={setReactantKetcher}
+              onNotReady={() => setReactantKetcher(null)}
             />
           </div>
         </div>
@@ -542,9 +768,12 @@ export default function SynthesisPage() {
           </div>
           <div className="synthesis-ketcher-box">
             <MoleculeDrawer
-              key={`synthesis-product-${editorResetVersion}`}
+              key={`synthesis-product-${editorMountVersion}`}
               globalKey="synthesisProductKetcher"
+              resetVersion={drawerResetVersion}
+              isolateEditor
               onReady={setProductKetcher}
+              onNotReady={() => setProductKetcher(null)}
             />
           </div>
         </div>
@@ -561,16 +790,26 @@ export default function SynthesisPage() {
             <button
               className="primary-button"
               disabled={!editorsReady || isSearching}
-              onClick={() => void findSynthesis()}
+              onClick={() => void findSynthesis("normal")}
               type="button"
             >
               {isSearching ? "Searching…" : "Find Synthesis"}
             </button>
+            {canSearchDeeper && !isSearching && (
+              <button
+                className="secondary-button"
+                disabled={!editorsReady}
+                onClick={() => void findSynthesis("deep")}
+                type="button"
+              >
+                Search deeper
+              </button>
+            )}
             <button
               className="secondary-button"
               disabled={!editorsReady}
               onClick={() =>
-                isSearching ? cancelSynthesisSearch() : clearSynthesis()
+                isSearching ? cancelSynthesisSearch() : void clearSynthesis()
               }
               type="button"
             >
@@ -580,22 +819,121 @@ export default function SynthesisPage() {
         </div>
 
         {isSearching && (
-          <div
-            className="synthesis-loading-track"
-            role="progressbar"
-            aria-label="Synthesis search progress"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(searchProgress)}
-          >
+          <div className="synthesis-search-telemetry">
             <div
-              className="synthesis-loading-fill"
-              style={{ width: `${Math.max(4, searchProgress)}%` }}
-            />
+              className="synthesis-loading-track"
+              role="progressbar"
+              aria-label="Synthesis search work completed"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(searchProgress)}
+            >
+              <div
+                className="synthesis-loading-fill"
+                style={{ width: `${Math.max(4, searchProgress)}%` }}
+              />
+            </div>
+            <div className="synthesis-progress-meta">
+              <span>Deterministic reaction-rule search · bar estimates completed search work, not time remaining</span>
+              <span>
+                {(searchElapsedMs / 1000).toFixed(1)}s · {activeSearchEffort === "deep" ? "deep" : "normal"} search · {Math.round((activeSearchEffort === "deep" ? SYNTHESIS_DEEP_STALL_TIMEOUT_MS : SYNTHESIS_NORMAL_STALL_TIMEOUT_MS) / 1000)}s stall guard · {Math.round((activeSearchEffort === "deep" ? SYNTHESIS_DEEP_HARD_TIMEOUT_MS : SYNTHESIS_NORMAL_HARD_TIMEOUT_MS) / 1000)}s cap
+              </span>
+            </div>
           </div>
         )}
 
         {error && <p className="reaction-detail reaction-limitation synthesis-error">{error}</p>}
+
+        {technicalError && (
+          <details className="reaction-detail synthesis-error-details">
+            <summary>Technical error details</summary>
+            <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
+              {technicalError}
+            </pre>
+          </details>
+        )}
+
+        {searchDiagnostics.length > 0 && (
+          <details
+            className="reaction-detail synthesis-error-details"
+            open={!isSearching}
+          >
+            <summary>
+              Search frontier diagnostics ({searchDiagnostics.length} completed layers)
+            </summary>
+            <div style={{ display: "grid", gap: "0.9rem", marginTop: "0.75rem" }}>
+              {searchDiagnostics.map((entry) => (
+                <div key={`${entry.phase}-${entry.depth}`}>
+                  <strong>
+                    {entry.phase === "forward"
+                      ? "Forward"
+                      : entry.phase === "retrosynthesis"
+                        ? "Reverse"
+                        : "Matching"}{" "}
+                    depth {entry.depth}
+                  </strong>
+                  <div>
+                    retained {entry.candidateCount ?? 0} · exact target{" "}
+                    {entry.exactTargetCount ?? 0} · target-as-mixture-member{" "}
+                    {entry.targetMixtureMemberCount ?? 0} · all starting materials consumed{" "}
+                    {entry.fullyConsumedStartingMaterialCount ?? 0}
+                  </div>
+                  {entry.frontierSample?.length ? (
+                    <pre
+                      style={{
+                        whiteSpace: "pre-wrap",
+                        overflowWrap: "anywhere",
+                        margin: "0.4rem 0 0",
+                      }}
+                    >
+                      {entry.frontierSample
+                        .map(
+                          (node, index) =>
+                            `${index + 1}. ${node.smiles}` +
+                            `${node.lastStepTitle ? ` ← ${node.lastStepTitle}` : ""}` +
+                            `${node.lastRuleId ? ` [${node.lastRuleId}]` : ""}` +
+                            ` · starts ${node.usedStartingMaterialCount}` +
+                            `${node.stereoMixture ? ` · ${node.stereoMixture}` : ""}` +
+                            ` · rank ${node.rank}`,
+                        )
+                        .join("\n")}
+                    </pre>
+                  ) : null}
+
+                  {entry.frontierRuleSummary?.length ? (
+                    <details style={{ marginTop: "0.45rem" }}>
+                      <summary>
+                        Rules retained ({entry.frontierRuleSummary.length})
+                      </summary>
+                      <pre
+                        style={{
+                          whiteSpace: "pre-wrap",
+                          overflowWrap: "anywhere",
+                          margin: "0.4rem 0 0",
+                        }}
+                      >
+                        {entry.frontierRuleSummary
+                          .map(
+                            (rule) =>
+                              `${rule.ruleId}` +
+                              ` · count ${rule.count}` +
+                              ` · best rank ${rule.bestRank}` +
+                              ` · starts ${rule.minUsedStartingMaterialCount}` +
+                              (rule.minUsedStartingMaterialCount !==
+                              rule.maxUsedStartingMaterialCount
+                                ? `-${rule.maxUsedStartingMaterialCount}`
+                                : "") +
+                              ` · ${rule.title}`,
+                          )
+                          .join("\n")}
+                      </pre>
+                    </details>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
 
         {startingNames.length > 0 && targetName && (
           <div className="synthesis-identity-row">
@@ -615,7 +953,7 @@ export default function SynthesisPage() {
         <div className="card synthesis-route-card" key={route.id}>
           <div className="synthesis-route-header">
             <div>
-              <p className="label">Shortest route</p>
+              <p className="label">Verified route</p>
               <h2>
                 {route.steps.length === 0
                   ? "A starting material already matches target"
@@ -629,7 +967,23 @@ export default function SynthesisPage() {
             </span>
           </div>
 
-          {route.steps.length > 0 && (
+          {route.steps.length > 0 && (() => {
+            const finalStep = route.steps[route.steps.length - 1];
+            const targetRequestsTetrahedralStereo = targetSmiles.includes("@");
+            const targetObtainedAsMixture = Boolean(
+              targetRequestsTetrahedralStereo && finalStep?.productMixture,
+            );
+
+            return (
+            <>
+              {targetObtainedAsMixture && finalStep?.productMixture && (
+                <p className="reaction-detail reaction-limitation">
+                  <strong>Stereochemistry:</strong>{" "}
+                  The drawn target stereoisomer is formed as part of a{" "}
+                  {finalStep.productMixture.label.toLowerCase()}, not as an
+                  enantiopure product.
+                </p>
+              )}
             <div className="synthesis-step-list">
               {route.steps.map((step) => {
                 const svgKey = `${route.id}--step-${step.stepNumber}`;
@@ -675,17 +1029,45 @@ export default function SynthesisPage() {
 
                       <div className="reaction-column reagent-column">
                         <div className="reagent-pill-group">
-                          {reagentBubbleLabels(
-                            step.reagentLabel,
-                            step.display?.reagentBubbleMode,
-                          ).map((reagent, index) => (
-                            <div
-                              className="reagent-pill"
-                              key={`${step.id}-reagent-${index}`}
-                            >
-                              {reagent}
-                            </div>
-                          ))}
+                          {(() => {
+                            const labels = reagentBubbleLabels(
+                              step.reagentLabel,
+                              step.display?.reagentBubbleMode,
+                            );
+                            const showAlternativeSeparators =
+                              labels.length > 1 &&
+                              /\bor\b/i.test(step.reagentLabel) &&
+                              !/\bthen\b/i.test(step.reagentLabel);
+
+                            return labels.map((reagent, index) => (
+                              <span
+                                key={`${step.id}-reagent-wrap-${index}`}
+                                style={{
+                                  display: "contents",
+                                }}
+                              >
+                                {index > 0 && showAlternativeSeparators && (
+                                  <span
+                                    aria-label="or"
+                                    style={{
+                                      fontSize: "0.78rem",
+                                      fontWeight: 800,
+                                      letterSpacing: "0.08em",
+                                      opacity: 0.72,
+                                    }}
+                                  >
+                                    OR
+                                  </span>
+                                )}
+                                <div
+                                  className="reagent-pill"
+                                  key={`${step.id}-reagent-${index}`}
+                                >
+                                  {reagent}
+                                </div>
+                              </span>
+                            ));
+                          })()}
                         </div>
                         <span className="reaction-arrow">→</span>
                         <p>{step.reagentNote}</p>
@@ -718,9 +1100,15 @@ export default function SynthesisPage() {
                     )}
 
                     <p className="reaction-note">{step.shortExplanation}</p>
-                    {step.selectivity.length > 0 && (
-                      <p className="reaction-detail">
-                        <strong>Selectivity:</strong> {step.selectivity.join(" · ")}
+                    {(step.selectivityAssessment || step.selectivity.length > 0) && (
+                      <p
+                        className="reaction-detail"
+                        title={step.selectivityAssessment?.basis}
+                      >
+                        <strong>Selectivity:</strong>{" "}
+                        {step.selectivityAssessment
+                          ? `${step.selectivityAssessment.label} · ${step.selectivityAssessment.basis.split(";")[0]}`
+                          : step.selectivity.join(" · ")}
                       </p>
                     )}
                     {step.limitations.length > 0 && (
@@ -732,7 +1120,9 @@ export default function SynthesisPage() {
                 );
               })}
             </div>
-          )}
+            </>
+            );
+          })()}
         </div>
       ))}
     </section>

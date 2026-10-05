@@ -8,7 +8,9 @@ function normalizeReactionRule(rule: ReactionRule): ReactionRule {
   const normalized: ReactionRule = {
     ...rule,
     additionalReactants: rule.additionalReactants?.map(resolveReactantRequirement),
-    planningCost: rule.planningCost ?? rule.priority,
+    // Educational/UI priority is not a synthesis-search cost. Rules that do
+    // not opt into a special planning cost should be neutral in the planner.
+    planningCost: rule.planningCost ?? 100,
   };
 
   normalized.display = deriveReactionDisplayMetadata(normalized) ?? undefined;

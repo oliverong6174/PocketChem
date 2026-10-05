@@ -17,7 +17,10 @@ import {
 } from "./reactionInput";
 import { runReactionSmarts } from "./rdkitReaction";
 import { classifyReactionProducts } from "./productMixtures";
-import { applyRuleProductSelectivity } from "./productSelectivity";
+import {
+  applyRuleProductSelectivity,
+  assessReactionProductSelectivity,
+} from "./productSelectivity";
 import {
   filterRulesMatchingReactant,
   matchAllRuleReactants,
@@ -27,6 +30,25 @@ type RuleExecution = {
   products: string[];
   productStatus: ProductGenerationStatus;
 };
+
+type ReactionPredictionOptions = {
+  /** Skip expensive nomenclature work while the synthesis planner explores nodes. */
+  planning?: boolean;
+  /** Cooperative cancellation for bounded multistep planning. */
+  signal?: AbortSignal;
+  /** Optional interactive-planner cap after structural trigger matching. */
+  maxExecutedRules?: number;
+};
+
+function searchCancelled(signal?: AbortSignal): boolean {
+  return Boolean(signal?.aborted);
+}
+
+async function yieldToBrowser(signal?: AbortSignal): Promise<boolean> {
+  if (searchCancelled(signal)) return false;
+  await new Promise<void>((resolve) => setTimeout(resolve, 0));
+  return !searchCancelled(signal);
+}
 
 async function getDisplayName(
   smiles: string,
@@ -191,11 +213,12 @@ function createPathwayBase(rule: ReactionRule) {
     purpose: rule.purpose ?? null,
     selectivity: rule.selectivity ?? [],
     selectivityProfile: rule.selectivityProfile ?? null,
+    selectivityAssessment: null,
     limitations: rule.limitations ?? [],
     display: rule.display ?? null,
     missingReactants: [],
     competition: rule.competition ?? null,
-    planningCost: rule.planningCost ?? rule.priority,
+    planningCost: rule.planningCost ?? 100,
     reactantRequirements: rule.additionalReactants ?? [],
   };
 }
@@ -254,12 +277,17 @@ function sharedMixtureDisplayName(
 
 async function createExecutedPathways(
   rule: ReactionRule,
-  reactants: ReactionComponent[]
+  reactants: ReactionComponent[],
+  options: ReactionPredictionOptions = {},
 ): Promise<ReactionPathway[]> {
   const execution = await applyRule(rule, reactants);
   const base = createPathwayBase(rule);
   const reactantSmiles = reactants.map((component) => component.smiles).join(".");
-  const reactantLabel = await getReactantLabel(reactants);
+  const reactantLabel = options.planning
+    ? reactants.length > 1
+      ? "Current intermediate + supplied reactant"
+      : "Current intermediate"
+    : await getReactantLabel(reactants);
   const hasGenericReactant = reactants.some((component) => component.isGeneric);
   const reactantComponents = reactants.map((component) => component.smiles);
 
@@ -310,13 +338,38 @@ async function createExecutedPathways(
   const classifiedProducts = await classifyReactionProducts(
     rule,
     selectedProducts,
+    reactantComponents,
   );
-  const namedProducts = await Promise.all(
-    classifiedProducts.map(async (product) => ({
-      ...product,
-      productName: await getProductName(product.smiles, rule.productHint),
-    })),
-  );
+  const namedProducts = options.planning
+    ? classifiedProducts.map((product) => ({
+        ...product,
+        productName: rule.productHint,
+      }))
+    : await (async () => {
+        // Enantiomers in a racemate share one reaction-card identity. Naming
+        // every mirror member independently is expensive and was a noticeable
+        // source of latency for otherwise one-step stereochemical reactions.
+        const namePromises = new Map<string, Promise<string>>();
+        return Promise.all(
+          classifiedProducts.map(async (product) => {
+            const key =
+              product.mixture?.kind === "racemic"
+                ? `racemate:${product.mixture.groupId}`
+                : `product:${product.structure.isomeric}`;
+
+            let pending = namePromises.get(key);
+            if (!pending) {
+              pending = getProductName(product.smiles, rule.productHint);
+              namePromises.set(key, pending);
+            }
+
+            return {
+              ...product,
+              productName: await pending,
+            };
+          }),
+        );
+      })();
 
   const mixtureNames = new Map<string, string | null>();
   for (const product of namedProducts) {
@@ -345,6 +398,12 @@ async function createExecutedPathways(
         }
       : null;
 
+    const selectivityAssessment = await assessReactionProductSelectivity(
+      rule,
+      reactants[0]?.smiles ?? reactantSmiles,
+      product.smiles,
+    );
+
     pathways.push({
       ...base,
       id: productIndex === 0 ? rule.id : `${rule.id}--${productIndex + 1}`,
@@ -358,6 +417,9 @@ async function createExecutedPathways(
       reactantComponents,
       hasGenericReactant,
       productMixture: mixture,
+      selectivityAssessment,
+      planningCost:
+        base.planningCost + (selectivityAssessment?.planningPenalty ?? 0),
     });
   }
 
@@ -451,23 +513,34 @@ function suppressCompetingSameConditionRules(rules: ReactionRule[]): ReactionRul
 export async function predictReactionPathwaysFromRules(
   reactantSmiles: string,
   functionalGroups: FunctionalGroupResult[] = [],
-  rules: ReactionRule[]
+  rules: ReactionRule[],
+  options: ReactionPredictionOptions = {},
 ): Promise<ReactionPathway[]> {
+  const signal = options.signal;
+  if (searchCancelled(signal)) return [];
+
   const components = await analyzeReactionComponents(
     reactantSmiles,
     functionalGroups
   );
 
-  if (components.length === 0) return [];
+  if (components.length === 0 || searchCancelled(signal)) return [];
 
   const multiRules = rules.filter((rule) => (rule.additionalReactants?.length ?? 0) > 0);
   const multiMatches: Array<{ rule: ReactionRule; reactants: ReactionComponent[] }> = [];
 
   if (components.length > 1) {
-    for (const rule of multiRules) {
-      const assignments = await matchAllRuleReactants(rule, components);
-      for (const reactants of assignments) {
-        multiMatches.push({ rule, reactants });
+    for (let ruleIndex = 0; ruleIndex < multiRules.length; ruleIndex += 1) {
+      if (searchCancelled(signal)) return [];
+      if (ruleIndex > 0 && ruleIndex % 12 === 0 && !(await yieldToBrowser(signal))) return [];
+      const rule = multiRules[ruleIndex];
+      try {
+        const assignments = await matchAllRuleReactants(rule, components);
+        for (const reactants of assignments) {
+          multiMatches.push({ rule, reactants });
+        }
+      } catch (error) {
+        console.error(`[PocketChem:ReactionEngine] Skipping rule ${rule.id} after reactant-matching failure.`, error);
       }
     }
 
@@ -479,9 +552,19 @@ export async function predictReactionPathwaysFromRules(
         (a, b) => a.rule.priority - b.rule.priority || a.rule.title.localeCompare(b.rule.title)
       );
 
+      const executableMultiMatches = options.planning && Number.isFinite(options.maxExecutedRules)
+        ? multiMatches.slice(0, Math.max(1, Math.floor(options.maxExecutedRules!)))
+        : multiMatches;
       const pathways: ReactionPathway[] = [];
-      for (const match of multiMatches) {
-        pathways.push(...await createExecutedPathways(match.rule, match.reactants));
+      for (let matchIndex = 0; matchIndex < executableMultiMatches.length; matchIndex += 1) {
+        if (searchCancelled(signal)) return [];
+        if (matchIndex > 0 && matchIndex % 8 === 0 && !(await yieldToBrowser(signal))) return [];
+        const match = executableMultiMatches[matchIndex];
+        try {
+          pathways.push(...await createExecutedPathways(match.rule, match.reactants, options));
+        } catch (error) {
+          console.error(`[PocketChem:ReactionEngine] Skipping rule ${match.rule.id} after execution failure.`, error);
+        }
       }
       return dedupeReactionPathways(pathways);
     }
@@ -491,13 +574,23 @@ export async function predictReactionPathwaysFromRules(
   const missingMulti: Array<{ rule: ReactionRule; reactant: ReactionComponent }> = [];
 
   for (const component of components) {
-    const componentRules = suppressCompetingSameConditionRules(
-      await filterRulesMatchingReactant(
-        rules,
-        component.smiles,
-        component.functionalGroups,
-      ),
-    );
+    if (searchCancelled(signal)) return [];
+    let componentRules: ReactionRule[] = [];
+    try {
+      componentRules = suppressCompetingSameConditionRules(
+        await filterRulesMatchingReactant(
+          rules,
+          component.smiles,
+          component.functionalGroups,
+        ),
+      );
+    } catch (error) {
+      console.error("[PocketChem:ReactionEngine] Could not match rules for one reactant component; continuing with the remaining components.", {
+        smiles: component.smiles,
+        error,
+      });
+      continue;
+    }
 
     for (const rule of componentRules) {
       if ((rule.additionalReactants?.length ?? 0) > 0) {
@@ -518,20 +611,37 @@ export async function predictReactionPathwaysFromRules(
   }
 
   matchingSingles.sort(
-    (a, b) => a.rule.priority - b.rule.priority || a.rule.title.localeCompare(b.rule.title)
+    (a, b) =>
+      (options.planning
+        ? (a.rule.planningCost ?? 100) - (b.rule.planningCost ?? 100)
+        : a.rule.priority - b.rule.priority) ||
+      a.rule.priority - b.rule.priority ||
+      a.rule.title.localeCompare(b.rule.title)
   );
   missingMulti.sort(
     (a, b) => a.rule.priority - b.rule.priority || a.rule.title.localeCompare(b.rule.title)
   );
 
+  const executableSingles = options.planning && Number.isFinite(options.maxExecutedRules)
+    ? matchingSingles.slice(0, Math.max(1, Math.floor(options.maxExecutedRules!)))
+    : matchingSingles;
   const pathways: ReactionPathway[] = [];
 
-  for (const match of matchingSingles) {
-    pathways.push(...await createExecutedPathways(match.rule, match.reactants));
+  for (let matchIndex = 0; matchIndex < executableSingles.length; matchIndex += 1) {
+    if (searchCancelled(signal)) return [];
+    if (matchIndex > 0 && matchIndex % 8 === 0 && !(await yieldToBrowser(signal))) return [];
+    const match = executableSingles[matchIndex];
+    try {
+      pathways.push(...await createExecutedPathways(match.rule, match.reactants, options));
+    } catch (error) {
+      console.error(`[PocketChem:ReactionEngine] Skipping rule ${match.rule.id} after execution failure.`, error);
+    }
   }
 
-  for (const match of missingMulti) {
-    pathways.push(await createMissingReactantPathway(match.rule, match.reactant));
+  if (!options.planning) {
+    for (const match of missingMulti) {
+      pathways.push(await createMissingReactantPathway(match.rule, match.reactant));
+    }
   }
 
   return dedupeReactionPathways(pathways);

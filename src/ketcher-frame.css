@@ -1,0 +1,63 @@
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+body {
+  overscroll-behavior: none;
+}
+
+.ketcher-frame-root {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.ketcher-frame-root > div {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+/*
+ * These rules used to live only in App.css. Once Ketcher moved into an iframe,
+ * parent-document CSS could no longer reach its toolbar DOM, so wheel scrolling
+ * stopped working and only Ketcher's arrow controls remained.
+ */
+[data-testid="left-toolbar-buttons"],
+[data-testid="right-toolbar"] > div:first-child {
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  touch-action: pan-y;
+}
+
+[data-testid="left-toolbar-buttons"]::-webkit-scrollbar,
+[data-testid="right-toolbar"] > div:first-child::-webkit-scrollbar {
+  width: 5px;
+}
+
+[data-testid="left-toolbar-buttons"]::-webkit-scrollbar-track,
+[data-testid="right-toolbar"] > div:first-child::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-testid="left-toolbar"],
+[data-testid="right-toolbar"] {
+  min-height: 0;
+  overscroll-behavior: contain;
+}

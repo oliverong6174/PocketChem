@@ -1,5 +1,12 @@
 import { getRDKit } from "../../rdkit";
-import type { ReactionRule, ReactionSitePreference } from "../reactionTypes";
+import type {
+  ReactionRule,
+  ReactionSelectivityAssessment,
+  ReactionSitePreference,
+} from "../reactionTypes";
+import {
+  runReactionSmartsWithMultiplicity,
+} from "./rdkitReaction";
 import {
   canonicalizeStereoStructure,
   filterProductsByRelativeSubstituentFace,
@@ -209,6 +216,170 @@ export async function halogenBearingCarbonSubstitutionScore(
   } finally {
     molecule.delete?.();
   }
+}
+
+
+type RadicalCarbonClass = 1 | 2 | 3;
+
+const RADICAL_HALOGENATION_RELATIVE_REACTIVITY: Record<
+  "Cl" | "Br",
+  Record<RadicalCarbonClass, number>
+> = {
+  // Approximate textbook relative H-abstraction reactivities. These are
+  // chemistry-model constants, not molecule-specific route hardcoding.
+  Cl: { 1: 1, 2: 3.8, 3: 5 },
+  Br: { 1: 1, 2: 82, 3: 1600 },
+};
+
+const RADICAL_SITE_MODELS: Array<{
+  carbonClass: RadicalCarbonClass;
+  hydrogensPerCarbon: number;
+  reactantSmarts: string;
+}> = [
+  { carbonClass: 3, hydrogensPerCarbon: 1, reactantSmarts: "[C;H1;X4:1]" },
+  { carbonClass: 2, hydrogensPerCarbon: 2, reactantSmarts: "[C;H2;X4:1]" },
+  { carbonClass: 1, hydrogensPerCarbon: 3, reactantSmarts: "[C;H3;X4:1]" },
+  // Methane is treated as a primary-like abstraction class for ranking.
+  { carbonClass: 1, hydrogensPerCarbon: 4, reactantSmarts: "[C;H4;X4:1]" },
+];
+
+async function radicalHalogenationProductFraction(
+  reactantSmiles: string,
+  productSmiles: string,
+  halogen: "Cl" | "Br",
+): Promise<number | null> {
+  const target = await canonicalizeStereoStructure(productSmiles);
+  if (!target) return null;
+
+  const rates = RADICAL_HALOGENATION_RELATIVE_REACTIVITY[halogen];
+  let desiredWeight = 0;
+  let totalWeight = 0;
+
+  for (const site of RADICAL_SITE_MODELS) {
+    const outcomes = await runReactionSmartsWithMultiplicity(
+      reactantSmiles,
+      `${site.reactantSmarts}>>[C:1]${halogen}`,
+      512,
+    );
+    const weightPerMatchedCarbon =
+      site.hydrogensPerCarbon * rates[site.carbonClass];
+
+    for (const outcome of outcomes) {
+      const weightedMultiplicity = outcome.multiplicity * weightPerMatchedCarbon;
+      totalWeight += weightedMultiplicity;
+
+      const structure = await canonicalizeStereoStructure(outcome.productSmiles);
+      if (structure?.connectivity === target.connectivity) {
+        desiredWeight += weightedMultiplicity;
+      }
+    }
+  }
+
+  if (!(totalWeight > 0) || !(desiredWeight > 0)) return null;
+  return Math.min(1, Math.max(0, desiredWeight / totalWeight));
+}
+
+function radicalProductCarbonClass(
+  substitutionScore: number,
+): RadicalCarbonClass | null {
+  if (substitutionScore >= 3) return 3;
+  if (substitutionScore === 2) return 2;
+  if (substitutionScore === 1 || substitutionScore === 0) return 1;
+  return null;
+}
+
+function selectivityPenaltyFromFraction(fraction: number): number {
+  // In synthesis planning, a route that depends on isolating one member of a
+  // constitutional mixture carries a real purification/selectivity burden.
+  // Step count is already charged elsewhere, so this penalty is deliberately
+  // strong enough that a short 10-20% shortcut does not automatically outrank
+  // a longer route that follows the dominant chemistry.
+  if (fraction >= 0.5) return 0;
+
+  const safeFraction = Math.max(0.001, Math.min(0.5, fraction));
+  const mixtureBurden = 150;
+  const informationPenalty = 700 * Math.log(0.5 / safeFraction);
+  return Math.round(mixtureBurden + informationPenalty);
+}
+
+function selectivityLevelFromFraction(
+  fraction: number,
+): ReactionSelectivityAssessment["level"] {
+  if (fraction >= 0.5) return "major";
+  if (fraction >= 0.2) return "competitive";
+  if (fraction >= 0.05) return "minor";
+  return "trace";
+}
+
+function percentLabel(fraction: number): string {
+  const percent = fraction * 100;
+  if (percent >= 10) return `${Math.round(percent)}%`;
+  if (percent >= 1) return `${percent.toFixed(1)}%`;
+  return `${percent.toFixed(2)}%`;
+}
+
+/**
+ * Estimate product-specific selectivity without deleting minor products.
+ *
+ * The first implemented quantitative model is alkane radical halogenation.
+ * It uses the rule's structured `most-stable-radical-site` preference, the
+ * halogen identity, C-H class counts in the actual substrate, and approximate
+ * textbook abstraction rate ratios. The estimate is intentionally used for
+ * ranking, not as an experimental yield prediction.
+ */
+export async function assessReactionProductSelectivity(
+  rule: ReactionRule,
+  reactantSmiles: string,
+  productSmiles: string,
+): Promise<ReactionSelectivityAssessment | null> {
+  if (
+    rule.selectivityProfile?.sitePreference !== "most-stable-radical-site" ||
+    rule.transform.type !== "customHandler" ||
+    rule.transform.handler !== "radical" ||
+    rule.transform.options?.mode !== "alkaneHalogenation"
+  ) {
+    return null;
+  }
+
+  const halogen = rule.transform.options?.halogen;
+  if (halogen !== "Cl" && halogen !== "Br") return null;
+
+  const substitutionScore = await halogenBearingCarbonSubstitutionScore(
+    productSmiles,
+    halogen,
+  );
+  const productClass = radicalProductCarbonClass(substitutionScore);
+  if (!productClass) return null;
+
+  const estimatedFraction = await radicalHalogenationProductFraction(
+    reactantSmiles,
+    productSmiles,
+    halogen,
+  );
+  if (estimatedFraction === null) return null;
+
+  const level = selectivityLevelFromFraction(estimatedFraction);
+  const planningPenalty = selectivityPenaltyFromFraction(estimatedFraction);
+  const className =
+    productClass === 3 ? "tertiary" : productClass === 2 ? "secondary" : "primary";
+  const labelPrefix =
+    level === "major"
+      ? "Major"
+      : level === "competitive"
+        ? "Competitive"
+        : level === "minor"
+          ? "Minor"
+          : "Trace";
+
+  return {
+    level,
+    estimatedFraction,
+    planningPenalty,
+    label: `${labelPrefix} product (~${percentLabel(estimatedFraction)})`,
+    basis:
+      `${halogen === "Br" ? "Bromination" : "Chlorination"} at a ${className} C-H site; ` +
+      "estimated from symmetry/site degeneracy and standard relative radical-abstraction reactivities.",
+  };
 }
 
 async function sameConnectivityProducts(products: string[]): Promise<string[]> {

@@ -1,4 +1,6 @@
 import { getRDKit } from "../../rdkit";
+import { getCompiledQuerySync } from "./rdkitCaches";
+import { REACTION_CONSTRAINTS } from "../constraints/reactionConstraints";
 import type { FunctionalGroupResult } from "../../functionalGroups";
 import type {
   ReactionComponent,
@@ -70,7 +72,7 @@ async function matchesSmarts(
 
   try {
     for (const smarts of includeSmarts) {
-      const query = rdkit.get_qmol(smarts);
+      const query = getCompiledQuerySync(rdkit, smarts);
 
       try {
         if (!query || molecule.get_substruct_match(query) === "{}") {
@@ -79,13 +81,11 @@ async function matchesSmarts(
       } catch (error) {
         console.warn(`Reaction trigger SMARTS failed: ${smarts}`, error);
         return false;
-      } finally {
-        query?.delete?.();
       }
     }
 
     for (const smarts of excludeSmarts) {
-      const query = rdkit.get_qmol(smarts);
+      const query = getCompiledQuerySync(rdkit, smarts);
 
       try {
         if (query && molecule.get_substruct_match(query) !== "{}") {
@@ -94,8 +94,6 @@ async function matchesSmarts(
       } catch (error) {
         console.warn(`Reaction exclusion SMARTS failed: ${smarts}`, error);
         return false;
-      } finally {
-        query?.delete?.();
       }
     }
 
@@ -105,6 +103,91 @@ async function matchesSmarts(
   }
 }
 
+
+function triggerPassesWithCachedSmarts(
+  trigger: ReactionTrigger,
+  detectedNames: Set<string>,
+  hasMatch: (smarts: string) => boolean,
+): boolean {
+  if (!namesPassTrigger(trigger, detectedNames)) return false;
+  const { anyNames, allNames, includeSmarts, excludeSmarts } =
+    getTriggerParts(trigger);
+  const hasTrigger =
+    anyNames.length > 0 ||
+    allNames.length > 0 ||
+    includeSmarts.length > 0 ||
+    excludeSmarts.length > 0;
+  if (!hasTrigger) return false;
+  return includeSmarts.every(hasMatch) && !excludeSmarts.some(hasMatch);
+}
+
+function blockingConstraintsPassWithCachedSmarts(
+  rule: ReactionRule,
+  detectedNames: Set<string>,
+  hasMatch: (smarts: string) => boolean,
+): boolean {
+  for (const constraintId of rule.constraints ?? []) {
+    const constraint = REACTION_CONSTRAINTS[constraintId];
+    if (!constraint?.blocksExecution) continue;
+
+    if (
+      constraint.satisfiedByTrigger &&
+      triggerPassesWithCachedSmarts(
+        constraint.satisfiedByTrigger,
+        detectedNames,
+        hasMatch,
+      )
+    ) {
+      continue;
+    }
+
+    if (
+      triggerPassesWithCachedSmarts(
+        constraint.failureTrigger,
+        detectedNames,
+        hasMatch,
+      )
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+async function blockingConstraintsPass(
+  rule: ReactionRule,
+  reactantSmiles: string,
+  functionalGroups: FunctionalGroupResult[],
+): Promise<boolean> {
+  for (const constraintId of rule.constraints ?? []) {
+    const constraint = REACTION_CONSTRAINTS[constraintId];
+    if (!constraint?.blocksExecution) continue;
+
+    if (
+      constraint.satisfiedByTrigger &&
+      (await triggerMatchesReactant(
+        constraint.satisfiedByTrigger,
+        reactantSmiles,
+        functionalGroups,
+      ))
+    ) {
+      continue;
+    }
+
+    if (
+      await triggerMatchesReactant(
+        constraint.failureTrigger,
+        reactantSmiles,
+        functionalGroups,
+      )
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
 export async function triggerMatchesReactant(
   trigger: ReactionTrigger,
   reactantSmiles: string,
@@ -148,13 +231,37 @@ export async function filterRulesMatchingReactant(
   });
 
   if (candidates.length === 0) return [];
-  if (
-    candidates.every((rule) => {
-      const { includeSmarts, excludeSmarts } = getTriggerParts(rule.trigger);
-      return includeSmarts.length === 0 && excludeSmarts.length === 0;
-    })
-  ) {
-    return candidates;
+  const needsMolecule = candidates.some((rule) => {
+    const { includeSmarts, excludeSmarts } = getTriggerParts(rule.trigger);
+    if (includeSmarts.length > 0 || excludeSmarts.length > 0) return true;
+
+    return (rule.constraints ?? []).some((constraintId) => {
+      const constraint = REACTION_CONSTRAINTS[constraintId];
+      if (!constraint?.blocksExecution) return false;
+      const failure = getTriggerParts(constraint.failureTrigger);
+      const satisfied = constraint.satisfiedByTrigger
+        ? getTriggerParts(constraint.satisfiedByTrigger)
+        : null;
+      return (
+        failure.includeSmarts.length > 0 ||
+        failure.excludeSmarts.length > 0 ||
+        Boolean(
+          satisfied &&
+            (satisfied.includeSmarts.length > 0 ||
+              satisfied.excludeSmarts.length > 0),
+        )
+      );
+    });
+  });
+
+  if (!needsMolecule) {
+    return candidates.filter((rule) =>
+      blockingConstraintsPassWithCachedSmarts(
+        rule,
+        detectedNames,
+        () => false,
+      ),
+    );
   }
 
   const rdkit = await getRDKit();
@@ -166,15 +273,12 @@ export async function filterRulesMatchingReactant(
     const cached = resultCache.get(smarts);
     if (cached !== undefined) return cached;
 
-    let query: any = null;
     let matched = false;
     try {
-      query = rdkit.get_qmol(smarts);
+      const query = getCompiledQuerySync(rdkit, smarts);
       matched = Boolean(query && molecule.get_substruct_match(query) !== "{}");
     } catch (error) {
       console.warn(`Reaction SMARTS failed: ${smarts}`, error);
-    } finally {
-      query?.delete?.();
     }
 
     resultCache.set(smarts, matched);
@@ -182,12 +286,14 @@ export async function filterRulesMatchingReactant(
   };
 
   try {
-    return candidates.filter((rule) => {
-      const { includeSmarts, excludeSmarts } = getTriggerParts(rule.trigger);
-      return (
-        includeSmarts.every(hasMatch) && !excludeSmarts.some(hasMatch)
-      );
-    });
+    return candidates.filter((rule) =>
+      triggerPassesWithCachedSmarts(rule.trigger, detectedNames, hasMatch) &&
+      blockingConstraintsPassWithCachedSmarts(
+        rule,
+        detectedNames,
+        hasMatch,
+      ),
+    );
   } finally {
     molecule.delete?.();
   }
@@ -198,7 +304,10 @@ export async function ruleMatchesReactant(
   reactantSmiles: string,
   functionalGroups: FunctionalGroupResult[] = []
 ): Promise<boolean> {
-  return triggerMatchesReactant(rule.trigger, reactantSmiles, functionalGroups);
+  if (!(await triggerMatchesReactant(rule.trigger, reactantSmiles, functionalGroups))) {
+    return false;
+  }
+  return blockingConstraintsPass(rule, reactantSmiles, functionalGroups);
 }
 
 /**
@@ -244,11 +353,17 @@ export async function matchAllRuleReactants(
       if (used.has(componentIndex)) continue;
 
       const component = components[componentIndex];
-      const matches = await triggerMatchesReactant(
-        requirement.trigger,
-        component.smiles,
-        component.functionalGroups
-      );
+      const matches = requirementIndex === 0
+        ? await ruleMatchesReactant(
+            rule,
+            component.smiles,
+            component.functionalGroups,
+          )
+        : await triggerMatchesReactant(
+            requirement.trigger,
+            component.smiles,
+            component.functionalGroups,
+          );
 
       if (!matches) continue;
 

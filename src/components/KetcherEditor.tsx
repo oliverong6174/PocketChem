@@ -41,7 +41,7 @@ export default function KetcherEditor({
 
   return (
     <Editor
-      staticResourcesUrl=""
+      staticResourcesUrl={import.meta.env.BASE_URL}
       structServiceProvider={structServiceProvider}
       errorHandler={(error) => {
         console.error(`[PocketChem:Ketcher:${debugLabel}] Editor error`, error);

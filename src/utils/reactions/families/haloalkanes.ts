@@ -95,6 +95,7 @@ const neutralAlcoholReactant = {
 };
 
 const unhinderedAlkoxideReactant = {
+  id: "ethoxide",
   label: "unhindered alkoxide base",
   trigger: {
     includeSmarts: ["[C;H1,H2,H3][O-]"],
@@ -115,7 +116,77 @@ const amideBaseReactant = {
   },
 };
 
+const intramolecularWilliamsonRules: ReactionRule[] = [
+  { ringSize: 3, planningCost: 95, tier: "secondary" as const },
+  { ringSize: 4, planningCost: 80, tier: "secondary" as const },
+  { ringSize: 5, planningCost: 36, tier: "preferred" as const },
+  { ringSize: 6, planningCost: 42, tier: "preferred" as const },
+  { ringSize: 7, planningCost: 75, tier: "secondary" as const },
+].map(({ ringSize, planningCost, tier }) => {
+  const carbonCount = ringSize - 1;
+  const tether = Array.from(
+    { length: carbonCount },
+    (_, index) =>
+      index === carbonCount - 1
+        ? "[CH2][Cl,Br,I]"
+        : "[CH2]",
+  ).join("-");
+
+  return {
+    id: `haloalkane-intramolecular-williamson-${ringSize}`,
+    family: "haloalkanes",
+    reactionType: "cyclization",
+    reactionClass: "intramolecular nucleophilic substitution",
+    title: "Intramolecular Williamson Ether Synthesis",
+    reagents: "NaH (or another strong base)",
+    reagentNote: `${ringSize}-membered cyclic ether closure`,
+    productHint: `${ringSize}-membered cyclic ether`,
+    explanation:
+      "Base converts the tethered alcohol to an alkoxide. The alkoxide then closes intramolecularly by SN2 at the terminal primary alkyl halide, forming a cyclic ether.",
+    trigger: {
+      includeSmarts: [`[O;H1]-${tether}`],
+    },
+    transform: {
+      type: "customHandler",
+      handler: "ring",
+      options: {
+        mode: "intramolecularWilliamson",
+        ringSize,
+        maxProducts: 6,
+      },
+    },
+    mechanism: "Intramolecular Williamson ether synthesis / SN2",
+    selectivityProfile: {
+      stereochemistry: {
+        mode: "inversion",
+        attackMode: "backside",
+        stereospecific: true,
+      },
+      mixture: "single",
+      allowsRearrangement: false,
+    },
+    selectivity: [
+      "Intramolecular SN2 is favored for a terminal primary leaving group.",
+      ringSize === 5 || ringSize === 6
+        ? `${ringSize}-membered ring formation is especially favorable.`
+        : `${ringSize}-membered ring formation is possible but less favorable than 5- or 6-membered closure.`,
+    ],
+    limitations: [
+      "The leaving-group carbon must be unhindered enough for SN2.",
+      "Highly strained or very large-ring closures require substrate-specific analysis.",
+    ],
+    productStatus: "computed",
+    planningCost,
+    retrosynthesis: {
+      tier,
+      group: "intramolecular-williamson",
+    },
+    priority: 175 + ringSize,
+  } satisfies ReactionRule;
+});
+
 export const haloalkaneReactionRules: ReactionRule[] = [
+  ...intramolecularWilliamsonRules,
   {
     id: "haloalkane-intramolecular-amine-cyclization-5",
     family: "haloalkanes",
@@ -429,15 +500,16 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     family: "haloalkanes",
     reactionType: "substitution",
     reactionClass: "nucleophilic substitution",
-    title: "SN2 Alkylation with an Acetylide",
-    reagents: "Polar aprotic conditions",
-    reagentNote: "Draw a methyl/primary alkyl halide and an acetylide ion",
-    productHint: "Higher alkyne",
+    title: "Acetylene-Derived Acetylide Chain Extension",
+    reagents: "HC≡CH, NaNH₂, NH₃(l)",
+    reagentNote: "Acetylene is deprotonated in situ, then the acetylide performs SN2",
+    productHint: "Higher terminal alkyne",
     explanation:
-      "An acetylide ion displaces the leaving group from a methyl or primary alkyl halide by SN2, forming a new carbon-carbon bond.",
+      "Sodium amide deprotonates acetylene to HC≡C⁻. The acetylide then displaces the leaving group from a methyl or primary alkyl halide by SN2, adding a two-carbon alkyne unit to the carbon skeleton.",
     trigger: primaryOrMethylHalideTrigger,
     additionalReactants: [
       {
+        id: "acetylide",
         label: "acetylide ion",
         trigger: {
           includeSmarts: ["[#6]#[C-]"],
@@ -623,8 +695,8 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     reactionType: "elimination",
     reactionClass: "beta elimination",
     title: "E2 with Hydroxide",
-    reagents: "Heat when elimination is desired",
-    reagentNote: "Draw the alkyl halide and hydroxide ion",
+    reagents: "NaOH or KOH, EtOH, heat",
+    reagentNote: "Small strong base; heat favors E2 elimination",
     productHint: "Alkene",
     explanation:
       "Hydroxide can remove a beta hydrogen while the leaving group departs in one concerted E2 step. More substituted alkenes are normally favored when conformational access is comparable.",
@@ -654,6 +726,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     ],
     productStatus: "representative",
     constraints: ["e2-needs-beta-carbon"],
+    planningCost: 92,
     priority: 270,
   },
   {
@@ -662,8 +735,8 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     reactionType: "elimination",
     reactionClass: "beta elimination",
     title: "E2 with an Unhindered Alkoxide",
-    reagents: "Heat when elimination is desired",
-    reagentNote: "Draw the alkyl halide and an unhindered alkoxide base",
+    reagents: "NaOEt, EtOH, heat",
+    reagentNote: "Small, unhindered strong base → Zaitsev-favored E2",
     productHint: "More substituted alkene",
     explanation:
       "A strong, relatively unhindered alkoxide removes a beta hydrogen as the leaving group departs. The more substituted Zaitsev alkene is normally favored.",
@@ -693,6 +766,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     ],
     productStatus: "representative",
     constraints: ["e2-needs-beta-carbon"],
+    planningCost: 78,
     priority: 272,
   },
   {
@@ -701,8 +775,8 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     reactionType: "elimination",
     reactionClass: "beta elimination",
     title: "E2 with tert-Butoxide: Hofmann Preference",
-    reagents: "Heat",
-    reagentNote: "Draw the alkyl halide and tert-butoxide ion",
+    reagents: "t-BuOK, t-BuOH, heat",
+    reagentNote: "Bulky strong base → Hofmann-favored E2",
     productHint: "Less substituted alkene",
     explanation:
       "Bulky tert-butoxide preferentially removes a less hindered beta hydrogen, often shifting the major constitutional product toward the less substituted Hofmann alkene.",
@@ -731,6 +805,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     ],
     productStatus: "representative",
     constraints: ["e2-needs-beta-carbon"],
+    planningCost: 76,
     priority: 274,
   },
   {
@@ -739,8 +814,8 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     reactionType: "elimination",
     reactionClass: "beta elimination",
     title: "E2 with Amide Base",
-    reagents: "Strong-base conditions",
-    reagentNote: "Draw the alkyl halide and amide base (for example NH₂⁻)",
+    reagents: "NaNH₂, NH₃(l) or THF",
+    reagentNote: "Very strong amide base promotes E2 elimination",
     productHint: "Alkene",
     explanation:
       "A very strong amide base can remove a beta hydrogen in a concerted E2 elimination. Constitutional products are ranked toward the more substituted alkene unless steric effects dictate otherwise.",
@@ -769,6 +844,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     ],
     productStatus: "representative",
     constraints: ["e2-needs-beta-carbon"],
+    planningCost: 90,
     priority: 276,
   },
 
@@ -783,8 +859,8 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     reactionType: "elimination",
     reactionClass: "carbocation elimination",
     title: "E1 Elimination in Water",
-    reagents: "Heat",
-    reagentNote: "Draw a secondary/tertiary alkyl halide and water",
+    reagents: "H₂O, heat",
+    reagentNote: "Polar protic solvolysis; heat favors E1 over SN1",
     productHint: "Major Zaitsev alkene",
     explanation:
       "The leaving group ionizes to a carbocation, then water removes a beta proton. Heating shifts the SN1/E1 competition toward elimination, and the more substituted alkene is usually favored.",
@@ -817,6 +893,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Equal-stability shifts and detailed migratory aptitude are not automatically ranked.",
     ],
     productStatus: "representative",
+    planningCost: 108,
     priority: 290,
   },
   {
@@ -825,8 +902,8 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     reactionType: "elimination",
     reactionClass: "carbocation elimination",
     title: "E1 Elimination in an Alcohol Solvent",
-    reagents: "Heat",
-    reagentNote: "Draw a secondary/tertiary alkyl halide and the alcohol solvent",
+    reagents: "EtOH or ROH, heat",
+    reagentNote: "Polar protic alcohol solvolysis; heat favors E1 over SN1",
     productHint: "Major Zaitsev alkene",
     explanation:
       "A polar protic alcohol can support carbocation formation; at elevated temperature, beta deprotonation competes with SN1 capture and produces an alkene, usually favoring the Zaitsev constitution.",
@@ -859,6 +936,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       "Equal-stability shifts and detailed migratory aptitude are not automatically ranked.",
     ],
     productStatus: "representative",
+    planningCost: 110,
     priority: 292,
   },
 

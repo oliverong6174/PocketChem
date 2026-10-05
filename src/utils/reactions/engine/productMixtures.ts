@@ -169,6 +169,31 @@ function mixtureLabel(kind: ReactionProductMixtureKind): string {
   return "Stereoisomeric mixture";
 }
 
+function shouldInferAchiralFacePairAsRacemate(
+  rule: ReactionRule,
+  members: Array<{ smiles: string; structure: CanonicalStereoStructure }>,
+  reactantSmiles: string[],
+): boolean {
+  if (members.length !== 2) return false;
+
+  const stereo = rule.selectivityProfile?.stereochemistry;
+  if (
+    !stereo?.stereospecific ||
+    (stereo.relativeRelationship !== "syn" &&
+      stereo.relativeRelationship !== "anti")
+  ) {
+    return false;
+  }
+
+  if (rule.selectivityProfile?.mixture !== "expected") return false;
+
+  // A pre-existing tetrahedral stereocenter makes opposite-face attack
+  // diastereomeric rather than enantiomeric, so do not apply this inference.
+  if (reactantSmiles.some((smiles) => /@/.test(smiles))) return false;
+
+  return members.every((member) => member.structure.hasSpecifiedStereo);
+}
+
 function groupId(ruleId: string, connectivity: string): string {
   let hash = 2166136261;
   const value = `${ruleId}::${connectivity}`;
@@ -190,6 +215,7 @@ function groupId(ruleId: string, connectivity: string): string {
 export async function classifyReactionProducts(
   rule: ReactionRule,
   products: string[],
+  reactantSmiles: string[] = [],
 ): Promise<ClassifiedReactionProduct[]> {
   const unique = new Map<string, {
     smiles: string;
@@ -219,7 +245,22 @@ export async function classifyReactionProducts(
   const mixtureByIsomeric = new Map<string, ReactionProductMixture>();
 
   for (const [connectivity, groupMembers] of byConnectivity) {
-    const kind = await mixtureKindForGroup(rule, groupMembers);
+    let kind = await mixtureKindForGroup(rule, groupMembers);
+
+    // Browser RDKit can occasionally canonicalize the two face-addition
+    // enantiomers with atom orderings that defeat a direct mirror-string test.
+    // For a stereospecific syn/anti addition to an achiral substrate, exactly
+    // two stereodefined products are the two enantiotopic-face products.
+    if (
+      shouldInferAchiralFacePairAsRacemate(
+        rule,
+        groupMembers,
+        reactantSmiles,
+      )
+    ) {
+      kind = "racemic";
+    }
+
     if (!kind) continue;
 
     const memberSmiles = groupMembers.map((member) => member.structure.isomeric);

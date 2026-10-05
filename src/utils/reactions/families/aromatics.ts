@@ -1,20 +1,14 @@
 import type { ReactionRule } from "../reactionTypes";
 
+// Structural aromatic scope is intentionally used instead of a functional-group
+// name allow-list. The hierarchy can label substituted benzenes by their most
+// specific group (for example "Benzoic acid" or "Benzonitrile") and omit a
+// generic "Benzene" label. Requiring a name therefore incorrectly blocked
+// valid EAS such as nitration of benzoic acid. The six-carbon aromatic-ring
+// SMARTS keeps the scope on benzene-like carbocyclic arenes while allowing any
+// substituent pattern with at least one aromatic C-H.
 const aromaticTrigger = {
-  anyFunctionalGroups: [
-    "Benzene",
-    "Alkylbenzene",
-    "Toluene",
-    "Phenol",
-    "Aniline",
-    "Anisole",
-    "Nitrobenzene",
-    "Aryl halide",
-    "Naphthalene",
-    "Anthracene",
-    "Phenanthrene",
-  ],
-  includeSmarts: ["[cH]"],
+  includeSmarts: ["[cH]1[c][c][c][c][c]1"],
 };
 
 // A haloalkyl side chain already attached to the arene is a structural partner
@@ -41,15 +35,11 @@ const intramolecularFriedelCraftsSideChainSmarts = [
 // carbonyl derivatives such as benzoic acid remain valid Birch substrates
 // even when the functional-group hierarchy suppresses the generic "Benzene"
 // label in favor of the more specific group name.
-const birchTrigger = {
-  ...aromaticTrigger,
-  anyFunctionalGroups: [
-    ...aromaticTrigger.anyFunctionalGroups,
-    "Benzaldehyde",
-    "Benzoic acid",
-    "Benzamide",
-  ],
-};
+// aromaticTrigger is now purely structural, so Birch no longer needs to
+// extend a functional-group allow-list. Reuse the structural aromatic trigger
+// directly; this already matches substituted benzene derivatives such as
+// benzaldehyde, benzoic acid, and benzamide when an aromatic C-H is present.
+const birchTrigger = aromaticTrigger;
 
 const easModelNotes = {
   productStatus: "computed" as const,
@@ -147,6 +137,8 @@ export const aromaticReactionRules: ReactionRule[] = [
       "For a monosubstituted alkyl/benzylic ring, para is preferred over ortho when steric effects distinguish them.",
     ],
     ...easModelNotes,
+    planningCost: 72,
+    retrosynthesis: { tier: "preferred", group: "aryl-nitration" },
     priority: 1800,
   },
   {
@@ -345,6 +337,14 @@ export const aromaticReactionRules: ReactionRule[] = [
     mechanism: "Electrophilic aromatic substitution",
     selectivityProfile: { mixture: "single", majorProductOnly: true },
     limitations: ["Strongly deactivated rings do not undergo Gattermann–Koch formylation readily."],
+    constraints: [
+      "friedel-crafts-ring-not-strongly-deactivated",
+      "friedel-crafts-amine-compatible",
+    ],
+    // Useful, but strategically less general than robust functional-group
+    // interconversions in multistep planning.
+    planningCost: 145,
+    retrosynthesis: { tier: "secondary", group: "aromatic-formylation" },
     priority: 1835,
   },
   {
@@ -371,6 +371,12 @@ export const aromaticReactionRules: ReactionRule[] = [
     selectivityProfile: { mixture: "single", majorProductOnly: true },
     selectivity: ["Alkyl groups are ortho/para directors; the less hindered para formylation product is used as the major representative for a simple monosubstituted alkylbenzene."],
     limitations: ["More highly substituted arenes require full directing-group competition rather than this monosubstituted-ring rule."],
+    constraints: [
+      "friedel-crafts-ring-not-strongly-deactivated",
+      "friedel-crafts-amine-compatible",
+    ],
+    planningCost: 140,
+    retrosynthesis: { tier: "secondary", group: "aromatic-formylation" },
     priority: 1836,
   },
   {
@@ -660,6 +666,8 @@ export const aromaticReactionRules: ReactionRule[] = [
     productStatus: "computed",
     mechanism: "Strong benzylic oxidation",
     constraints: ["benzylic-oxidation-needs-h"],
+    planningCost: 65,
+    retrosynthesis: { tier: "preferred", group: "benzylic-oxidation" },
     priority: 1880,
   },
   {
@@ -673,7 +681,8 @@ export const aromaticReactionRules: ReactionRule[] = [
     explanation:
       "A nitro substituent can be reduced to an amino group without hydrogenating the aromatic ring under suitable conditions.",
     trigger: {
-      anyFunctionalGroups: ["Nitrobenzene"],
+      // Structural scope avoids losing nitroarenes whose functional-group
+      // hierarchy is dominated by another group (for example nitrobenzoic acid).
       includeSmarts: ["[c][N+](=O)[O-]"],
     },
     transform: {
@@ -681,6 +690,8 @@ export const aromaticReactionRules: ReactionRule[] = [
       smarts: "[c:1][N+:2](=[O:3])[O-:4]>>[c:1][NH2+0:2]",
     },
     mechanism: "Multi-step reduction",
+    planningCost: 62,
+    retrosynthesis: { tier: "preferred", group: "nitro-to-amine" },
     priority: 1890,
   },
   ...arylSnArRules,

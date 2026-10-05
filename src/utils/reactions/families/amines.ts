@@ -155,11 +155,18 @@ export const amineReactionRules: ReactionRule[] = [
     productHint: "Diazonium salt",
     explanation:
       "Primary aromatic amines react with nitrous acid to form diazonium salts.",
-    trigger: { anyFunctionalGroups: ["Aniline", "Primary aryl amine"], includeSmarts: ["[c][NH2]"] },
+    trigger: {
+      // Structural scope keeps substituted anilines (e.g. aminobenzoic acids)
+      // eligible even when the functional-group hierarchy does not emit the
+      // generic "Aniline" label.
+      includeSmarts: ["[c][NH2]"],
+    },
     transform: {
       type: "reactionSmarts",
       smarts: "[c:1][NH2:2]>>[c:1][N+:2]#N",
     },
+    planningCost: 58,
+    retrosynthesis: { tier: "preferred", group: "aryl-diazonium" },
     priority: 1740,
   },
 

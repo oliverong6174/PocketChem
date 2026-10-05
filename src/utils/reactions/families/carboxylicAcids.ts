@@ -177,6 +177,11 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
       "acid to nitrile via amide",
       "primary amide dehydration sequence",
     ],
+    // Chemically valid, but it consumes the carboxyl group. Keep it available
+    // while discouraging it as a generic shortcut in aromatic synthesis plans
+    // when CO2H is meant to remain in the target.
+    planningCost: 135,
+    retrosynthesis: { tier: "secondary", group: "acid-to-nitrile" },
     priority: 1329,
   },
   {

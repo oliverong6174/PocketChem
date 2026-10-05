@@ -76,7 +76,8 @@ export type ReactionHandlerName =
   | "reduction"
   | "ring"
   | "rearrangement"
-  | "pericyclic";
+  | "pericyclic"
+  | "radical";
 
 export type ReactionPurpose = "protection" | "deprotection";
 
@@ -140,16 +141,19 @@ export type OxidationHandlerMode =
   | "alkyneOxidativeCleavage"
   | "vicinalDiolCleavage"
   | "baeyerVilliger"
-  | "benzylicSideChainOxidation";
+  | "benzylicSideChainOxidation"
+  | "alkeneReductiveCleavage";
 export type ReductionHandlerMode = "oneTwoAddition" | "carbonylToAlkane" | "birchReduction";
 export type RingHandlerMode =
   | "epoxideOpening"
   | "epoxideOrganometallicOpening"
-  | "epoxideNucleophileOpening";
+  | "epoxideNucleophileOpening"
+  | "intramolecularWilliamson";
 export type RearrangementHandlerMode = "pinacol";
 export type PericyclicHandlerMode =
   | "dielsAlder"
   | "intramolecularDielsAlder";
+export type RadicalHandlerMode = "alkaneHalogenation";
 
 type HandlerOptions<Mode extends string> = {
   mode: Mode;
@@ -359,6 +363,30 @@ export type ReactionMechanismProfile = {
   };
 };
 
+export type ReactionSelectivityLevel =
+  | "major"
+  | "competitive"
+  | "minor"
+  | "trace"
+  | "unknown";
+
+/**
+ * Dynamic, product-specific selectivity estimate used by the synthesis planner.
+ * This is intentionally separate from rule-level `selectivityProfile`: one
+ * reaction rule can generate both major and trace constitutional products.
+ */
+export type ReactionSelectivityAssessment = {
+  level: ReactionSelectivityLevel;
+  /** Approximate fraction of the product mixture represented by this path, 0-1. */
+  estimatedFraction: number | null;
+  /** Extra planner cost. Larger values make low-selectivity routes less preferred. */
+  planningPenalty: number;
+  /** Compact UI label such as "Trace product (~0.3%)". */
+  label: string;
+  /** Human-readable basis/limitations for the estimate. */
+  basis: string;
+};
+
 export type ReactionSelectivityProfile = {
   stereochemistry?: {
     mode: StereochemicalMode;
@@ -399,6 +427,7 @@ export type ReactionTransform =
   | { type: "customHandler"; handler: "ring"; options: HandlerOptions<RingHandlerMode> }
   | { type: "customHandler"; handler: "rearrangement"; options: HandlerOptions<RearrangementHandlerMode> }
   | { type: "customHandler"; handler: "pericyclic"; options: HandlerOptions<PericyclicHandlerMode> }
+  | { type: "customHandler"; handler: "radical"; options: HandlerOptions<RadicalHandlerMode> }
   | {
       type: "conceptOnly";
       reason: string;
@@ -524,6 +553,7 @@ export type ReactionPathway = {
   purpose: ReactionPurpose | null;
   selectivity: string[];
   selectivityProfile: ReactionSelectivityProfile | null;
+  selectivityAssessment?: ReactionSelectivityAssessment | null;
   limitations: string[];
   productStatus: ProductGenerationStatus;
   reactantComponents: string[];
@@ -601,6 +631,7 @@ export type RetrosynthesisPathway = {
   purpose: ReactionPurpose | null;
   selectivity: string[];
   selectivityProfile: ReactionSelectivityProfile | null;
+  selectivityAssessment?: ReactionSelectivityAssessment | null;
   limitations: string[];
 
   confidence: RetrosynthesisConfidence;
@@ -647,6 +678,7 @@ export type SynthesisStep = {
   purpose: ReactionPurpose | null;
   selectivity: string[];
   selectivityProfile: ReactionSelectivityProfile | null;
+  selectivityAssessment?: ReactionSelectivityAssessment | null;
   limitations: string[];
 
   retrosynthesisConfidence: RetrosynthesisConfidence | null;
@@ -670,12 +702,69 @@ export type MultistepSynthesisSearchOptions = {
   beamWidth?: number;
   branchLimit?: number;
   maxRoutes?: number;
+  /**
+   * Return the first verified bridge found by an adaptive bidirectional pass
+   * before running the exhaustive shortest-route sweep. Useful for interactive
+   * UI where responsiveness matters more than proving global shortestness.
+   */
+  preferFirstVerifiedRoute?: boolean;
+  /** Search breadth. Normal is tuned for interactive latency; deep widens the A-star and beam fallbacks. */
+  searchEffort?: "normal" | "deep";
   /** Optional cancellation signal for long multistep searches. */
   signal?: AbortSignal;
 };
 
+/**
+ * Live planner telemetry. `percent` is a work estimate, not a wall-clock ETA:
+ * forward/retro expansion dominates the cost while frontier matching is cheap.
+ */
 export type MultistepSynthesisProgress = {
   phase: "forward" | "retrosynthesis" | "matching";
   depth: number;
   maxSteps: number;
+  /** Number of parent nodes processed in the current expansion stage. */
+  processed?: number;
+  /** Total parent nodes scheduled for the current expansion stage. */
+  total?: number;
+  /** Candidate nodes retained/generated so far for this stage. */
+  candidateCount?: number;
+  /** Approximate overall search work completed, 0-100. */
+  percent?: number;
+
+  /**
+   * Optional lightweight snapshot of the BEST retained nodes at a completed
+   * search layer. This is intentionally canonical-SMILES based: diagnostics
+   * must not invoke nomenclature/SVG work inside the planner.
+   */
+  frontierSample?: Array<{
+    smiles: string;
+    depth: number;
+    rank: number;
+    lastRuleId: string | null;
+    lastStepTitle: string | null;
+    usedStartingMaterialCount: number;
+    stereoMixture: ReactionProductMixtureKind | null;
+  }>;
+
+  /** Exact target structure already present in this retained frontier. */
+  exactTargetCount?: number;
+  /** Target is explicitly one member of a known racemic/stereoisomeric mixture. */
+  targetMixtureMemberCount?: number;
+  /** Nodes that have consumed every explicitly supplied starting material. */
+  fullyConsumedStartingMaterialCount?: number;
+
+  /**
+   * Every reaction rule represented in the retained frontier, not merely the
+   * first few visually sampled nodes. This is the main pruning diagnostic:
+   * if a rule disappears between layers, we know exactly where that synthetic
+   * branch was lost.
+   */
+  frontierRuleSummary?: Array<{
+    ruleId: string;
+    title: string;
+    count: number;
+    bestRank: number;
+    minUsedStartingMaterialCount: number;
+    maxUsedStartingMaterialCount: number;
+  }>;
 };

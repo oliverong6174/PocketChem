@@ -1,5 +1,6 @@
 import { getRDKit } from "../../../rdkit";
 import { runReactionSmarts } from "../rdkitReaction";
+import { alkeneReductiveCleavageReactionSmarts } from "../cleavageSmarts";
 
 type OxidationMode =
   | "alcoholOxidation"
@@ -8,7 +9,8 @@ type OxidationMode =
   | "alkyneOxidativeCleavage"
   | "vicinalDiolCleavage"
   | "baeyerVilliger"
-  | "benzylicSideChainOxidation";
+  | "benzylicSideChainOxidation"
+  | "alkeneReductiveCleavage";
 type OxidationLevel = "mild" | "strong";
 type AlcoholType = "primary" | "secondary" | "tertiary" | "unknown";
 
@@ -39,6 +41,18 @@ async function runUniqueReactionSet(
   }
 
   return [...products];
+}
+
+
+async function alkeneReductiveCleavage(reactantSmiles: string): Promise<string[]> {
+  // Ring-specific templates are ordered first. Stop as soon as one ring-size
+  // family matches so the acyclic fallback cannot duplicate a cyclic cleavage.
+  const templates = alkeneReductiveCleavageReactionSmarts();
+  for (const smarts of templates) {
+    const products = await runReactionSmarts(reactantSmiles, smarts, 12);
+    if (products.length > 0) return [...new Set(products)];
+  }
+  return [];
 }
 
 /**
@@ -170,6 +184,10 @@ export async function oxidation(
 ): Promise<string[]> {
   const mode = options?.mode as OxidationMode | undefined;
   const level = (options?.level as OxidationLevel | undefined) ?? "mild";
+
+  if (mode === "alkeneReductiveCleavage") {
+    return alkeneReductiveCleavage(reactantSmiles);
+  }
 
   if (mode === "aldehydeOxidation") {
     return runReactionSmarts(

@@ -1018,6 +1018,26 @@ async function synDihydroxylation(reactantSmiles: string): Promise<string[]> {
 
   if (products.size > 0) return [...products];
 
+  // Ketcher's lightweight KET -> RDKit bridge does not always preserve alkene
+  // E/Z metadata. If both alkene carbons carry one H, the reaction nevertheless
+  // creates two tetrahedral centers. Conservatively enumerate both possible
+  // alkene geometries rather than erasing stereochemistry entirely. RDKit
+  // canonicalization later removes duplicates/meso redundancies.
+  const unspecifiedGeometryStereoSmarts = [
+    "[C;H1:1]=[C;H1:2]>>[C@:1]([OH])[C@:2]([OH])",
+    "[C;H1:1]=[C;H1:2]>>[C@@:1]([OH])[C@@:2]([OH])",
+    "[C;H1:1]=[C;H1:2]>>[C@:1]([OH])[C@@:2]([OH])",
+    "[C;H1:1]=[C;H1:2]>>[C@@:1]([OH])[C@:2]([OH])",
+  ];
+
+  for (const smarts of unspecifiedGeometryStereoSmarts) {
+    for (const product of await runReactionSmarts(reactantSmiles, smarts, 8)) {
+      products.add(product);
+    }
+  }
+
+  if (products.size > 0) return [...products];
+
   for (const product of await runReactionSmarts(
     reactantSmiles,
     "[C:1]=[C:2]>>[C:1]([OH])[C:2]([OH])",
@@ -1055,6 +1075,25 @@ async function antiDihydroxylation(reactantSmiles: string): Promise<string[]> {
   }
 
   for (const smarts of stereoSmarts) {
+    for (const product of await runReactionSmarts(reactantSmiles, smarts, 8)) {
+      products.add(product);
+    }
+  }
+
+  if (products.size > 0) return [...products];
+
+  // With unspecified/unsupported alkene geometry, retain every tetrahedral
+  // outcome that is compatible with an H1=H1 alkene. This lets synthesis
+  // planning reason about optically active products without pretending the
+  // starting alkene geometry was known.
+  const unspecifiedGeometryStereoSmarts = [
+    "[C;H1:1]=[C;H1:2]>>[C@:1]([OH])[C@:2]([OH])",
+    "[C;H1:1]=[C;H1:2]>>[C@@:1]([OH])[C@@:2]([OH])",
+    "[C;H1:1]=[C;H1:2]>>[C@:1]([OH])[C@@:2]([OH])",
+    "[C;H1:1]=[C;H1:2]>>[C@@:1]([OH])[C@:2]([OH])",
+  ];
+
+  for (const smarts of unspecifiedGeometryStereoSmarts) {
     for (const product of await runReactionSmarts(reactantSmiles, smarts, 8)) {
       products.add(product);
     }

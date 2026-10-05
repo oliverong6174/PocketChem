@@ -34,7 +34,7 @@ const geminalDihalideTrigger = {
 };
 
 const hydroborationAlternativeReagents =
-  "1) BH₃·THF  2) H₂O₂, OH⁻; 1) (Sia)₂BH  2) H₂O₂, OH⁻; or 1) 9-BBN  2) H₂O₂, OH⁻";
+  "1) (Sia)₂BH  2) H₂O₂, OH⁻ OR 1) 9-BBN  2) H₂O₂, OH⁻ OR 1) BH₃·THF  2) H₂O₂, OH⁻";
 
 type Hydrohalogen = HalogenProfile & {
   vinylHint: string;
@@ -669,7 +669,8 @@ export const alkyneReactionRules: ReactionRule[] = [
     reactionType: "oxidation",
     title: "Hydroboration–Oxidation of a Terminal Alkyne",
     reagents: hydroborationAlternativeReagents,
-    reagentNote: "Anti-Markovnikov hydration followed by tautomerization",
+    reagentNote:
+      "Bulky boranes ((Sia)₂BH or 9-BBN) are preferred for terminal alkynes; BH₃·THF is a less-selective alternative.",
     productHint: "Aldehyde",
     explanation:
       "Hydroboration followed by oxidation gives the anti-Markovnikov enol, which tautomerizes to an aldehyde. (Sia)₂BH and 9-BBN are especially useful bulky reagents; BH₃ is less hindered and can be less selective.",

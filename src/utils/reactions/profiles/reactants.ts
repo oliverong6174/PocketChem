@@ -97,6 +97,23 @@ const PROFILE_LIST: readonly ReactantProfile[] = [
     role: "nucleophile",
   },
   {
+    id: "ethoxide",
+    label: "unhindered alkoxide base",
+    aliases: [
+      "unhindered alkoxide base",
+      "ethoxide",
+      "ethoxide ion",
+      "EtO-",
+      "EtO⁻",
+      "NaOEt",
+      "sodium ethoxide",
+    ],
+    supplyMode: "auto",
+    presetSmiles: "CC[O-]",
+    contributesToProduct: false,
+    role: "base",
+  },
+  {
     id: "tert-butoxide",
     label: "tert-butoxide ion",
     aliases: ["tert-butoxide ion", "tert butoxide", "t-BuO-", "tert-butoxide"],
@@ -113,6 +130,25 @@ const PROFILE_LIST: readonly ReactantProfile[] = [
     presetSmiles: "[NH2-]",
     contributesToProduct: false,
     role: "base",
+  },
+  {
+    id: "acetylide",
+    label: "acetylide ion",
+    aliases: [
+      "acetylide ion",
+      "ethynide ion",
+      "sodium acetylide",
+      "HC≡C⁻",
+      "HC#C-",
+      "acetylene + NaNH2",
+      "acetylene + NaNH₂",
+    ],
+    supplyMode: "auto",
+    // Planning representation of acetylene after deprotonation by NaNH2.
+    // The UI/reaction rule still presents HC≡CH + NaNH2 as the actual reagents.
+    presetSmiles: "C#[C-]",
+    contributesToProduct: true,
+    role: "nucleophile",
   },
   {
     id: "carbon-dioxide",

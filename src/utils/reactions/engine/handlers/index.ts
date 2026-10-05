@@ -7,6 +7,7 @@ import { reduction } from "./reduction";
 import { ring } from "./ring";
 import { rearrangement } from "./rearrangement";
 import { pericyclic } from "./pericyclic";
+import { radical } from "./radical";
 import type { ReactionHandlerName } from "../../reactionTypes";
 
 type HandlerResult = string | string[] | null;
@@ -43,6 +44,7 @@ const handlers: Record<ReactionHandlerName, MultiReactantHandler> = {
   ring,
   rearrangement: primaryOnly(rearrangement),
   pericyclic,
+  radical: primaryOnly(radical),
 };
 
 export async function runCustomHandler(

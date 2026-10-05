@@ -811,17 +811,41 @@ export default function ReactionsPage({
 
                     <div className="reaction-column reagent-column">
                       <div className="reagent-pill-group">
-                        {reagentBubbleLabels(
-                          displayReagentLabel(pathway),
-                          pathway.display?.reagentBubbleMode,
-                        ).map((reagent, index) => (
-                          <div
-                            className="reagent-pill"
-                            key={`${pathway.id}-reagent-${index}`}
-                          >
-                            {reagent}
-                          </div>
-                        ))}
+                        {(() => {
+                          const reagentLabel = displayReagentLabel(pathway);
+                          const labels = reagentBubbleLabels(
+                            reagentLabel,
+                            pathway.display?.reagentBubbleMode,
+                          );
+                          const showAlternativeSeparators =
+                            labels.length > 1 &&
+                            /\bor\b/i.test(reagentLabel) &&
+                            !/\bthen\b/i.test(reagentLabel);
+
+                          return labels.map((reagent, index) => (
+                            <span
+                              key={`${pathway.id}-reagent-wrap-${index}`}
+                              style={{ display: "contents" }}
+                            >
+                              {index > 0 && showAlternativeSeparators && (
+                                <span
+                                  aria-label="or"
+                                  style={{
+                                    fontSize: "0.78rem",
+                                    fontWeight: 800,
+                                    letterSpacing: "0.08em",
+                                    opacity: 0.72,
+                                  }}
+                                >
+                                  OR
+                                </span>
+                              )}
+                              <div className="reagent-pill">
+                                {reagent}
+                              </div>
+                            </span>
+                          ));
+                        })()}
                       </div>
                       <span className="reaction-arrow">→</span>
                       <p>{pathway.reagentNote}</p>
@@ -877,10 +901,9 @@ export default function ReactionsPage({
                   {pathway.productMixture && (
                     <p className="reaction-detail">
                       <strong>Product mixture:</strong>{" "}
-                      {pathway.productMixture.label}
-                      {pathway.productMixture.kind === "racemic" && pathway.productVariants.length === 1
-                        ? ` · representative enantiomer shown; ${pathway.productMixture.memberCount}-member racemate`
-                        : ` · ${pathway.productMixture.memberCount} stereoisomer${pathway.productMixture.memberCount === 1 ? "" : "s"} shown`}
+                      {pathway.productMixture.kind === "racemic"
+                        ? "Racemic mixture · one enantiomer shown; + mirror-image enantiomer"
+                        : `${pathway.productMixture.label} · ${pathway.productMixture.memberCount} stereoisomer${pathway.productMixture.memberCount === 1 ? "" : "s"} shown`}
                     </p>
                   )}
 
@@ -1017,17 +1040,41 @@ export default function ReactionsPage({
 
                   <div className="reaction-column reagent-column">
                     <div className="reagent-pill-group">
-                      {reagentBubbleLabels(
-                          displayReagentLabel(pathway),
+                      {(() => {
+                        const reagentLabel = displayReagentLabel(pathway);
+                        const labels = reagentBubbleLabels(
+                          reagentLabel,
                           pathway.display?.reagentBubbleMode,
-                        ).map((reagent, index) => (
-                        <div
-                          className="reagent-pill"
-                          key={`${pathway.id}-retro-reagent-${index}`}
-                        >
-                          {reagent}
-                        </div>
-                      ))}
+                        );
+                        const showAlternativeSeparators =
+                          labels.length > 1 &&
+                          /\bor\b/i.test(reagentLabel) &&
+                          !/\bthen\b/i.test(reagentLabel);
+
+                        return labels.map((reagent, index) => (
+                          <span
+                            key={`${pathway.id}-retro-reagent-wrap-${index}`}
+                            style={{ display: "contents" }}
+                          >
+                            {index > 0 && showAlternativeSeparators && (
+                              <span
+                                aria-label="or"
+                                style={{
+                                  fontSize: "0.78rem",
+                                  fontWeight: 800,
+                                  letterSpacing: "0.08em",
+                                  opacity: 0.72,
+                                }}
+                              >
+                                OR
+                              </span>
+                            )}
+                            <div className="reagent-pill">
+                              {reagent}
+                            </div>
+                          </span>
+                        ));
+                      })()}
                     </div>
                     <span className="reaction-arrow">←</span>
                     <p>{pathway.reagentNote}</p>

@@ -3,7 +3,8 @@ import { runReactionSmarts } from "../rdkitReaction";
 type RingMode =
   | "epoxideOpening"
   | "epoxideOrganometallicOpening"
-  | "epoxideNucleophileOpening";
+  | "epoxideNucleophileOpening"
+  | "intramolecularWilliamson";
 type EpoxideNucleophile =
   | "water"
   | "hydroxide"
@@ -18,6 +19,41 @@ type Halogen = "Cl" | "Br" | "I";
 
 function unique(values: string[]): string[] {
   return [...new Set(values.filter(Boolean))];
+}
+
+
+function intramolecularWilliamsonSmarts(ringSize: number): string | null {
+  // A cyclic ether of ring size N contains one oxygen plus N-1 tether carbons.
+  // Restrict the electrophilic terminus to CH2-X so the closure is a clean
+  // intramolecular SN2 rather than a forced substitution at a hindered center.
+  if (!Number.isInteger(ringSize) || ringSize < 3 || ringSize > 7) return null;
+
+  const carbonMaps = Array.from(
+    { length: ringSize - 1 },
+    (_, index) => index + 2,
+  );
+  const reactantCarbons = carbonMaps
+    .map((map, index) =>
+      index === carbonMaps.length - 1
+        ? `[CH2:${map}][Cl,Br,I]`
+        : `[CH2:${map}]`,
+    )
+    .join("-");
+  const productCarbons = carbonMaps
+    .map((map) => `[CH2:${map}]`)
+    .join("");
+
+  return `[O;H1:1]-${reactantCarbons}>>[O:1]1${productCarbons}1`;
+}
+
+async function intramolecularWilliamson(
+  reactantSmiles: string,
+  ringSize: number,
+  maxProducts: number,
+): Promise<string[]> {
+  const smarts = intramolecularWilliamsonSmarts(ringSize);
+  if (!smarts) return [];
+  return unique(await runReactionSmarts(reactantSmiles, smarts, maxProducts));
 }
 
 type NucleophileTemplate = {
@@ -141,6 +177,12 @@ export async function ring(
   if (!primary) return [];
 
   const mode = options?.mode as RingMode | undefined;
+
+  if (mode === "intramolecularWilliamson") {
+    const ringSize = Number(options?.ringSize ?? 5);
+    const maxProducts = Number(options?.maxProducts ?? 8);
+    return intramolecularWilliamson(primary, ringSize, maxProducts);
+  }
 
   if (mode === "epoxideOrganometallicOpening") {
     const organometallic = reactants[1];

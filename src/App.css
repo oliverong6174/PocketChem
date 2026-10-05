@@ -1325,7 +1325,7 @@ body,
 
 /* Multistep synthesis */
 .synthesis-page {
-  max-width: 1440px;
+  max-width: 1680px;
   margin: 0 auto;
   display: grid;
   gap: 18px;
@@ -1376,7 +1376,7 @@ body,
   position: relative;
   width: 100%;
   min-width: 0;
-  height: clamp(275px, 34vh, 340px);
+  height: clamp(440px, 54vh, 580px);
   margin-top: 8px;
   background: white;
   color: #020617;
@@ -1421,6 +1421,11 @@ body,
   margin: 0 !important;
 }
 
+.synthesis-search-telemetry {
+  display: grid;
+  gap: 7px;
+}
+
 .synthesis-loading-track {
   width: 100%;
   height: 8px;
@@ -1435,6 +1440,22 @@ body,
   border-radius: inherit;
   background: linear-gradient(90deg, #2563eb, #38bdf8);
   transition: width 180ms ease-out;
+}
+
+.synthesis-progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.synthesis-progress-meta span:last-child {
+  flex: 0 0 auto;
+  color: #cbd5e1;
+  font-variant-numeric: tabular-nums;
 }
 
 .synthesis-page.is-searching .synthesis-ketcher-box {
@@ -1517,7 +1538,7 @@ body,
   }
 
   .synthesis-ketcher-box {
-    height: 340px;
+    height: 520px;
   }
 }
 
@@ -1537,8 +1558,14 @@ body,
     flex: 1 1 0;
   }
 
+  .synthesis-progress-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
   .synthesis-ketcher-box {
-    height: 320px;
+    height: 460px;
   }
 
   .synthesis-identity-row {
@@ -2899,4 +2926,15 @@ body,
   .ranking-result-title-row {
     gap: 10px;
   }
+}
+
+/* Each synthesis Ketcher runs in its own document so keyboard shortcuts,
+   atom-label typing and selection state cannot leak into the neighboring editor. */
+.ketcher-isolated-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  border: 0;
+  background: #fff;
 }

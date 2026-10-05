@@ -1,3 +1,4 @@
+
 import type { FunctionalGroupResult } from "./functionalGroups/types";
 import { analyzeFunctionalGroupHierarchy } from "./functionalGroups";
 import { analyzeNomenclatureAndProperties } from "./nomenclature";
@@ -19,6 +20,10 @@ import {
 } from "./stereochemistry/depictionEngine";
 import { generateMechanisticDielsAlderCandidates } from "./stereochemistry/dielsAlderMechanism";
 import { pericyclic } from "./reactions/engine/handlers/pericyclic";
+import {
+  areCanonicalEnantiomers,
+  canonicalizeStereoStructure,
+} from "./reactions/engine/stereochemistry";
 
 export {
   predictRetrosynthesisPathways,
@@ -333,6 +338,7 @@ async function applyMechanisticStereoRuntime(
     // drawing convention.
     if (
       !reactantsHaveSpecifiedStereo(pathway.reactantComponents) &&
+      (pathway.productMixture?.memberSmiles.length ?? 0) < 2 &&
       (rule.selectivityProfile?.mixture === "expected" ||
         directive.kind === "diels-alder" ||
         directive.kind === "epoxide-alcohol-opening")
@@ -350,11 +356,16 @@ async function applyMechanisticStereoRuntime(
     // mechanism-first filter. This is intentionally NOT based on the legacy
     // pathway.productSmiles: doing so could resurrect the exact wrong
     // regioisomer that the independent Diels-Alder pass just rejected.
+    const candidatesAlreadyHaveStereo = [...candidateSet].some(
+      (candidate) => /@/.test(candidate),
+    );
+
     if (
-      directive.kind === "diels-alder" ||
-      directive.kind === "epoxide-alcohol-opening" ||
-      directive.kind === "syn-vicinal" ||
-      directive.kind === "anti-vicinal"
+      !candidatesAlreadyHaveStereo &&
+      (directive.kind === "diels-alder" ||
+        directive.kind === "epoxide-alcohol-opening" ||
+        directive.kind === "syn-vicinal" ||
+        directive.kind === "anti-vicinal")
     ) {
       for (const seed of [...candidateSet]) {
         const completed = completeStereoRepresentative(rawGetMol, seed, directive);
@@ -370,21 +381,78 @@ async function applyMechanisticStereoRuntime(
       }
     }
 
-    let best = pathway.productSmiles;
-    let bestScore = -Infinity;
+    // Canonicalize BEFORE scoring/deduplication. RDKit may return the same
+    // stereoisomer with different atom orderings, which previously reached the
+    // UI as two nearly identical "alternative" molecules.
+    const canonicalCandidates = new Set<string>();
     for (const candidate of candidateSet) {
       const canonical = canonicalize(rawGetMol, candidate);
-      if (!canonical) continue;
-      const score = scoreStereoRepresentative(rawGetMol, canonical, directive);
-      if (score > bestScore) {
-        best = canonical;
-        bestScore = score;
+      if (canonical) canonicalCandidates.add(canonical);
+    }
+
+    const scoredCandidates = [...canonicalCandidates]
+      .map((canonical) => ({
+        canonical,
+        score: scoreStereoRepresentative(rawGetMol, canonical, directive),
+      }))
+      .filter((candidate) => candidate.score >= 0)
+      .sort(
+        (a, b) =>
+          b.score - a.score ||
+          a.canonical.localeCompare(b.canonical),
+      );
+
+    const bestScore = scoredCandidates[0]?.score ?? -Infinity;
+    const best =
+      scoredCandidates[0]?.canonical ??
+      canonicalize(rawGetMol, pathway.productSmiles) ??
+      pathway.productSmiles;
+
+    // Keep only equally mechanism-compatible stereochemical members. Do not
+    // append every temporary depiction candidate to the chemical mixture.
+    const mechanisticMembers = scoredCandidates
+      .filter((candidate) => Math.abs(candidate.score - bestScore) < 1e-9)
+      .map((candidate) => candidate.canonical);
+
+    let memberSmiles = pathway.productMixture
+      ? Array.from(new Set(mechanisticMembers))
+      : null;
+
+    let nextMixture = pathway.productMixture;
+    if (nextMixture && memberSmiles && memberSmiles.length === 2) {
+      const [left, right] = await Promise.all(
+        memberSmiles.map((smiles) => canonicalizeStereoStructure(smiles)),
+      );
+      if (
+        left &&
+        right &&
+        (await areCanonicalEnantiomers(left, right))
+      ) {
+        nextMixture = {
+          ...nextMixture,
+          kind: "racemic",
+          label: "Racemic mixture",
+        };
       }
     }
 
-    const memberSmiles = pathway.productMixture
-      ? Array.from(new Set([...pathway.productMixture.memberSmiles, ...candidateSet]))
-      : null;
+    // Never lose chemistry provenance merely because the depiction selector
+    // only needed one representative. If this is a known racemate, preserve
+    // its canonical mirror pair for search while the reaction card will still
+    // render only one representative.
+    if (
+      nextMixture?.kind === "racemic" &&
+      (memberSmiles?.length ?? 0) < 2
+    ) {
+      const canonicalOriginalMembers = new Set<string>();
+      for (const member of pathway.productMixture?.memberSmiles ?? []) {
+        const canonical = canonicalize(rawGetMol, member);
+        if (canonical) canonicalOriginalMembers.add(canonical);
+      }
+      if (canonicalOriginalMembers.size >= 2) {
+        memberSmiles = [...canonicalOriginalMembers];
+      }
+    }
 
     const nextProductLabel = best === pathway.productSmiles
       ? pathway.productLabel
@@ -394,14 +462,15 @@ async function applyMechanisticStereoRuntime(
       ...pathway,
       productSmiles: best,
       productLabel: nextProductLabel,
-      productMixture: pathway.productMixture && memberSmiles
-        ? {
-            ...pathway.productMixture,
-            memberSmiles,
-            memberCount: memberSmiles.length,
-            memberIndex: Math.max(0, memberSmiles.indexOf(best)),
-          }
-        : pathway.productMixture,
+      productMixture:
+        nextMixture && memberSmiles && memberSmiles.length > 0
+          ? {
+              ...nextMixture,
+              memberSmiles,
+              memberCount: memberSmiles.length,
+              memberIndex: Math.max(0, memberSmiles.indexOf(best)),
+            }
+          : nextMixture,
     };
 
     // Register the chosen product and every component separately because the

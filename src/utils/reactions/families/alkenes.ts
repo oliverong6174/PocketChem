@@ -759,10 +759,13 @@ export const alkeneReactionRules: ReactionRule[] = [
             "Ozone cleaves the alkene. Dimethyl sulfide or zinc prevents further oxidation, giving aldehydes and ketones.",
         trigger: alkeneTrigger,
         transform: {
-            type: "reactionSmarts",
-            smarts:
-                "[C:1]=[C:2]>>[C:1]=O.[C:2]=O"
+            type: "customHandler",
+            handler: "oxidation",
+            options: {
+                mode: "alkeneReductiveCleavage",
+            },
         },
+        productStatus: "computed",
         priority: 200
     },
 

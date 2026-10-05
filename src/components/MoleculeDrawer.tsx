@@ -10,14 +10,19 @@ import {
   type ReactNode,
 } from "react";
 import { resolveMoleculeName, type MoleculeNameResolution } from "../utils/moleculeNameResolver";
+import { extractKetMolecules, type KetDocument } from "../utils/ketcherKet";
 
 const KetcherEditor = lazy(() => import("./KetcherEditor"));
+const IsolatedKetcherEditor = lazy(() => import("./IsolatedKetcherEditor"));
 
 export type KetcherApi = {
   getSmiles: () => Promise<string>;
   getMolfile: () => Promise<string>;
   getKet: () => Promise<string>;
-  setMolecule: (structure: string) => Promise<void>;
+  setMolecule: (structure: string, options?: {
+    position?: { x: number; y: number };
+    needZoom?: boolean;
+  }) => Promise<void>;
   addFragment?: (structure: string, options?: {
     position?: { x: number; y: number };
     needZoom?: boolean;
@@ -42,6 +47,8 @@ export type MoleculeNameInputMode = "replace" | "add-or-replace";
 
 type MoleculeDrawerProps = {
   onReady?: (ketcher: KetcherApi) => void;
+  /** Called when a previously-ready isolated editor reloads/unmounts. */
+  onNotReady?: () => void;
   onChange?: () => void;
   nameInputMode?: MoleculeNameInputMode;
   onNameStructureApplied?: (resolution: MoleculeNameResolution, action: "add" | "replace") => void;
@@ -56,6 +63,14 @@ type MoleculeDrawerProps = {
    * reactant editors, so this intentionally accepts a unique string key.
    */
   globalKey?: string;
+  /** Reset the drawer-local name/input state without remounting Ketcher. */
+  resetVersion?: number;
+  /**
+   * Host this editor in its own iframe document. Use this when multiple Ketcher
+   * canvases are visible simultaneously so their global keyboard/selection
+   * handlers cannot interfere with one another.
+   */
+  isolateEditor?: boolean;
 };
 
 type ErrorBoundaryProps = {
@@ -160,11 +175,14 @@ const installKetcherScrollLock = () => {
 
 function MoleculeDrawer({
   onReady,
+  onNotReady,
   onChange,
   nameInputMode = "replace",
   onNameStructureApplied,
   onNameSubmitProcess,
   globalKey = "ketcher",
+  resetVersion = 0,
+  isolateEditor = false,
 }: MoleculeDrawerProps) {
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -182,6 +200,19 @@ function MoleculeDrawer({
   }, []);
 
   useEffect(() => {
+    // Clear PocketChem's drawer-local UI state while keeping the initialized
+    // Ketcher instance mounted. This avoids the large loading/blank-canvas flash
+    // that occurs when a parent remounts the entire editor just to clear it.
+    structureCheckVersionRef.current += 1;
+    suppressEditorChangeRef.current = false;
+    setNameQuery("");
+    setIsResolvingName(false);
+    setNameMessage(null);
+    setNameMessageKind("info");
+    setHasStructure(false);
+  }, [resetVersion]);
+
+  useEffect(() => {
     return () => {
       const globalKetchers = window as unknown as Record<
         string,
@@ -192,6 +223,21 @@ function MoleculeDrawer({
       }
     };
   }, [globalKey]);
+
+
+  const ketHasStructure = useCallback((ketText: string): boolean => {
+    const trimmed = ketText.trim();
+    if (!trimmed) return false;
+
+    try {
+      const document = JSON.parse(trimmed) as KetDocument;
+      return extractKetMolecules(document).some(
+        (molecule) => Array.isArray(molecule.atoms) && molecule.atoms.length > 0,
+      );
+    } catch {
+      return false;
+    }
+  }, []);
 
   const handleError = useCallback((error: unknown) => {
     console.error(`[PocketChem:Ketcher:${globalKey}] drawer error`, error);
@@ -208,8 +254,12 @@ function MoleculeDrawer({
     structureCheckVersionRef.current = checkVersion;
 
     try {
-      const currentSmiles = (await api.getSmiles()).trim();
-      const nextHasStructure = currentSmiles.length > 0;
+      // getKet() reads Ketcher's in-memory editor state and does not need the
+      // standalone Indigo export worker. Calling getSmiles() on every keystroke
+      // used to create avoidable worker contention between the two synthesis
+      // editors.
+      const currentKet = await api.getKet();
+      const nextHasStructure = ketHasStructure(currentKet);
       if (structureCheckVersionRef.current === checkVersion) {
         setHasStructure(nextHasStructure);
       }
@@ -219,7 +269,7 @@ function MoleculeDrawer({
       // progress. Keep the previous state and let the next change event retry.
       return false;
     }
-  }, []);
+  }, [ketHasStructure]);
 
   const handleEditorChange = useCallback(() => {
     void refreshHasStructure();
@@ -234,13 +284,31 @@ function MoleculeDrawer({
     // automatic Analyze/Predict action reads the structure that was just entered.
     for (let attempt = 0; attempt < 4; attempt += 1) {
       try {
-        if ((await api.getSmiles()).trim()) return;
+        if (ketHasStructure(await api.getKet())) return;
       } catch {
         // Retry on the next browser turn.
       }
       await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
     }
-  }, []);
+  }, [ketHasStructure]);
+
+  const handleEditorUnavailable = useCallback(() => {
+    console.info(`[PocketChem:Ketcher:${globalKey}] drawer unavailable`);
+    const previousApi = apiRef.current;
+    apiRef.current = null;
+    setReady(false);
+    setHasStructure(false);
+
+    const globalKetchers = window as unknown as Record<
+      string,
+      KetcherApi | undefined
+    >;
+    if (globalKetchers[globalKey] === previousApi) {
+      delete globalKetchers[globalKey];
+    }
+
+    onNotReady?.();
+  }, [globalKey, onNotReady]);
 
   const handleReady = useCallback((api: KetcherApi) => {
     console.info(`[PocketChem:Ketcher:${globalKey}] drawer ready`, {
@@ -360,12 +428,22 @@ function MoleculeDrawer({
 
       <KetcherErrorBoundary onError={handleError}>
         <Suspense fallback={<KetcherLoadingState />}>
-          <KetcherEditor
-            debugLabel={globalKey}
-            onChange={handleEditorChange}
-            onError={handleError}
-            onReady={handleReady}
-          />
+          {isolateEditor ? (
+            <IsolatedKetcherEditor
+              debugLabel={globalKey}
+              onChange={handleEditorChange}
+              onError={handleError}
+              onReady={handleReady}
+              onUnavailable={handleEditorUnavailable}
+            />
+          ) : (
+            <KetcherEditor
+              debugLabel={globalKey}
+              onChange={handleEditorChange}
+              onError={handleError}
+              onReady={handleReady}
+            />
+          )}
         </Suspense>
       </KetcherErrorBoundary>
       </div>

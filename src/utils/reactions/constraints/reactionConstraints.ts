@@ -14,6 +14,11 @@ export type ReactionConstraintDefinition = {
    * unreactive. This is essential for polyfunctional molecules.
    */
   satisfiedByTrigger?: ReactionTrigger;
+  /**
+   * When true, this is not merely a diagnostic: the reaction matcher must
+   * reject the rule on substrates that satisfy the failure trigger.
+   */
+  blocksExecution?: boolean;
   /** Optional diagnostic wording independent of the particular catalog rule. */
   title?: string;
   reagentLabel?: string;
@@ -123,18 +128,28 @@ export const REACTION_CONSTRAINTS: Readonly<
   },
   "friedel-crafts-ring-not-strongly-deactivated": {
     id: "friedel-crafts-ring-not-strongly-deactivated",
-    failureTrigger: { includeSmarts: ["[c][N+](=O)[O-]"] },
+    // One recursive SMARTS covers the textbook strong ring deactivators that
+    // make AlCl3-dependent Friedel-Crafts/Gattermann-Koch chemistry unsuitable:
+    // NO2, CN, directly attached carbonyl derivatives, sulfonyl groups, and CF3.
+    failureTrigger: {
+      includeSmarts: [
+        "[c]-[$([N+](=O)[O-]),$([C]#N),$([CH]=O),$([C](=O)[O,N,#6]),$([S](=O)(=O)[O,N,#6]),$([C](F)(F)F)]",
+      ],
+    },
+    blocksExecution: true,
     title: "NO REACTION — Friedel–Crafts on a Strongly Deactivated Ring",
-    reagentLabel: "Friedel–Crafts alkylation/acylation (AlCl₃)",
+    reagentLabel: "AlCl₃-dependent Friedel–Crafts / Gattermann–Koch conditions",
     diagnosticGroup: "friedel-crafts-strongly-deactivated-ring",
     explanation:
-      "A nitro group strongly withdraws electron density from the aromatic ring, making it too deactivated for ordinary Friedel–Crafts alkylation or acylation.",
-    suggestion: "Use a different bond-forming strategy or install the strongly deactivating group after Friedel–Crafts chemistry when the synthesis permits.",
+      "A strongly electron-withdrawing substituent such as NO₂, CN, a directly attached carbonyl derivative, SO₂R/SO₃H, or CF₃ deactivates the aromatic ring too strongly for ordinary AlCl₃-dependent Friedel–Crafts chemistry.",
+    suggestion:
+      "Use a different bond-forming strategy, or perform the Friedel–Crafts-type step before installing the strongly deactivating substituent when the synthesis permits.",
     category: "electronic",
   },
   "friedel-crafts-amine-compatible": {
     id: "friedel-crafts-amine-compatible",
     failureTrigger: { includeSmarts: ["[c][N;H1,H2;+0]"] },
+    blocksExecution: true,
     title: "NO REACTION — Friedel–Crafts with an Unprotected Aniline",
     reagentLabel: "Friedel–Crafts alkylation/acylation (AlCl₃)",
     diagnosticGroup: "friedel-crafts-unprotected-aniline",

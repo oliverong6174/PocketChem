@@ -1,7 +1,10 @@
 import type { ReactionRule } from "../reactionTypes";
 
 const diazoniumTrigger = {
-  anyFunctionalGroups: ["Benzenediazonium"],
+  // Structural scope is robust for diazonium salts carrying additional
+  // substituents such as CO2H, where the hierarchy may not retain the generic
+  // Benzenediazonium name.
+  includeSmarts: ["[c][N+]#[N]"],
 };
 
 export const diazoniumReactionRules: ReactionRule[] = [
@@ -57,6 +60,8 @@ export const diazoniumReactionRules: ReactionRule[] = [
       smarts: "[c:1][N+:2]#[N:3]>>[c:1]C#N",
     },
     mechanism: "Sandmeyer substitution",
+    planningCost: 52,
+    retrosynthesis: { tier: "preferred", group: "aryl-cyanation" },
     priority: 2020,
   },
   {

@@ -106,6 +106,22 @@ export function reagentBubbleLabels(
   if (mode === "single") return compact ? [compact] : [];
   const numberedSteps = compact.match(/(?:^|\s)\d+\)\s*/g) ?? [];
 
+  // A label can contain several complete numbered protocols separated by OR:
+  //   1) reagent A 2) workup OR 1) reagent B 2) workup
+  // Those are independent alternatives and should render as separate bubbles.
+  // By contrast, an ordinary numbered sequence remains one experimental protocol.
+  const protocolAlternatives = splitTopLevel(compact, "or");
+  const alternativesAreCompleteProtocols =
+    protocolAlternatives.length > 1 &&
+    protocolAlternatives.every((alternative) => {
+      const steps = alternative.match(/(?:^|\s)\d+\)\s*/g) ?? [];
+      return steps.length >= 2;
+    });
+
+  if (alternativesAreCompleteProtocols) {
+    return protocolAlternatives;
+  }
+
   // A numbered sequence is one experimental protocol, not a set of alternative
   // reagents. Keep the whole sequence in one bubble so internal "or" choices
   // (for example RMgX or RLi) stay attached to the correct step.

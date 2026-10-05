@@ -6,6 +6,17 @@ import {
   ORGANOMETALLIC_ION_PAIR_PROFILES,
 } from "../organometallic";
 
+const reactionComponentAnalysisCache = new Map<string, Promise<ReactionComponent[]>>();
+const MAX_COMPONENT_ANALYSIS_CACHE = 1400;
+
+function trimReactionComponentCache(): void {
+  while (reactionComponentAnalysisCache.size > MAX_COMPONENT_ANALYSIS_CACHE) {
+    const oldest = reactionComponentAnalysisCache.keys().next().value as string | undefined;
+    if (!oldest) break;
+    reactionComponentAnalysisCache.delete(oldest);
+  }
+}
+
 function nextRGroupMapFactory() {
   let next = 1;
   return (requested?: string) => {
@@ -185,29 +196,50 @@ export async function analyzeReactionComponents(
 ): Promise<ReactionComponent[]> {
   const componentSmiles = splitReactionComponents(smiles);
 
-  const components: ReactionComponent[] = [];
-
-  for (let index = 0; index < componentSmiles.length; index += 1) {
-    const component = componentSmiles[index];
-    let functionalGroups: FunctionalGroupResult[] = [];
-
-    if (componentSmiles.length === 1 && singleReactantFunctionalGroups.length > 0) {
-      functionalGroups = singleReactantFunctionalGroups;
-    } else {
-      try {
-        const hierarchy = await analyzeFunctionalGroupHierarchy(component);
-        functionalGroups = hierarchy.primaryGroups ?? [];
-      } catch (error) {
-        console.warn("Reaction component analysis failed:", component, error);
-      }
-    }
-
-    components.push({
-      smiles: component,
-      functionalGroups,
-      isGeneric: isGenericReactionSmiles(component),
-    });
+  // Planner nodes repeatedly revisit the same intermediates. Functional-group
+  // analysis is substantially more expensive than looking up the immutable
+  // result, so cache the normal no-precomputed-groups path. Calls that provide
+  // explicit single-reactant groups keep their caller-supplied data.
+  const canCache = singleReactantFunctionalGroups.length === 0;
+  const cacheKey = canCache ? componentSmiles.join(".") : "";
+  if (canCache) {
+    const cached = reactionComponentAnalysisCache.get(cacheKey);
+    if (cached) return cached;
   }
 
-  return components;
+  const pending = (async (): Promise<ReactionComponent[]> => {
+    const components: ReactionComponent[] = [];
+
+    for (let index = 0; index < componentSmiles.length; index += 1) {
+      const component = componentSmiles[index];
+      let functionalGroups: FunctionalGroupResult[] = [];
+
+      if (componentSmiles.length === 1 && singleReactantFunctionalGroups.length > 0) {
+        functionalGroups = singleReactantFunctionalGroups;
+      } else {
+        try {
+          const hierarchy = await analyzeFunctionalGroupHierarchy(component);
+          functionalGroups = hierarchy.primaryGroups ?? [];
+        } catch (error) {
+          console.warn("Reaction component analysis failed:", component, error);
+        }
+      }
+
+      components.push({
+        smiles: component,
+        functionalGroups,
+        isGeneric: isGenericReactionSmiles(component),
+      });
+    }
+
+    return components;
+  })();
+
+  if (canCache) {
+    reactionComponentAnalysisCache.set(cacheKey, pending);
+    trimReactionComponentCache();
+    pending.catch(() => reactionComponentAnalysisCache.delete(cacheKey));
+  }
+
+  return pending;
 }
