@@ -290,17 +290,10 @@ function resolveAliasTarget(
   );
   if (iupacMatches.length === 1) return iupacMatches[0];
 
-  // Different ChEBI records can be legacy/merged aliases for exactly the same
-  // structure. Without storing InChIKeys, exact SMILES identity is sufficient
-  // for this ambiguity collapse because these are ChEBI's selected structures.
-  const firstSmiles = index.records[candidates[0]]?.[1] ?? null;
-  if (
-    firstSmiles &&
-    candidates.every((recordIndex) => index.records[recordIndex]?.[1] === firstSmiles)
-  ) {
-    return candidates[0];
-  }
-
+  // Identical stored SMILES do not prove identical structures: the lean pack
+  // omits InChIKeys and ChEBI SMILES can drop stereodescriptors (e.g. axial
+  // allene chirality), so distinct stereoisomers may share a SMILES. Without
+  // an identity key the alias stays ambiguous.
   return null;
 }
 
