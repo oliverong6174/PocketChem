@@ -676,35 +676,6 @@ type ConjugatedCarbonMetrics = {
   maxConjugatedDoubleBondSpan: number;
 };
 
-type RankedDieneProduct = {
-  product: string;
-  orientationRank: number;
-  carbonDoubleBondCount: number;
-  maxConjugatedDoubleBondSpan: number;
-  alkeneScore: number;
-};
-
-function parseMatches(raw: string): number[][] {
-  try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-
-    return parsed
-      .map((entry) => {
-        if (Array.isArray(entry)) {
-          return entry.map(Number).filter(Number.isFinite);
-        }
-        if (entry && typeof entry === "object" && Array.isArray((entry as { atoms?: unknown[] }).atoms)) {
-          return (entry as { atoms: unknown[] }).atoms.map(Number).filter(Number.isFinite);
-        }
-        return [];
-      })
-      .filter((entry) => entry.length > 0);
-  } catch {
-    return [];
-  }
-}
-
 function parseV2000Graph(molBlock: string): ParsedV2000Graph | null {
   if (!molBlock || molBlock.includes("V3000")) return null;
 
@@ -824,36 +795,6 @@ async function conjugatedCarbonMetrics(smiles: string): Promise<ConjugatedCarbon
     };
   } finally {
     mol.delete?.();
-  }
-}
-
-async function ringJunctionAlkeneCount(smiles: string): Promise<number> {
-  const rdkit = await getRDKit();
-  const molecule = rdkit.get_mol(smiles);
-  if (!molecule) return 0;
-
-  const queries = ["[C;R2]=[C]", "[C]=[C;R2]"];
-  const seenBonds = new Set<string>();
-
-  try {
-    for (const smarts of queries) {
-      const query = rdkit.get_qmol(smarts);
-      if (!query) continue;
-      try {
-        const matches = parseMatches(molecule.get_substruct_matches?.(query) ?? "[]");
-        for (const match of matches) {
-          if (match.length < 2) continue;
-          const [first, second] = match;
-          const key = first < second ? `${first}-${second}` : `${second}-${first}`;
-          seenBonds.add(key);
-        }
-      } finally {
-        query.delete?.();
-      }
-    }
-    return seenBonds.size;
-  } finally {
-    molecule.delete?.();
   }
 }
 

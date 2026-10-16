@@ -27,9 +27,8 @@ const betaEliminationSmarts: Record<LeavingGroup, string> = {
  * still fall back to the constitutional product until the general alkene
  * stereochemistry enumerator is added.
  */
-const betaEliminationStereoSmarts: Record<
-  LeavingGroup,
-  { e: string; z: string }
+const betaEliminationStereoSmarts: Partial<
+  Record<LeavingGroup, { e: string; z: string }>
 > = {
   halide: {
     e: "[*:4][C;H1;X4:2]([Cl,Br,I:3])-[C;H2:1][*:5]>>[*:4]/[C:2]=[C:1]/[*:5]",
@@ -136,12 +135,14 @@ async function eliminateFromPrecursors(
     // This avoids accidentally assigning geometry to an unrelated alkene that
     // was already present elsewhere in the substrate.
     const stereoSmarts = betaEliminationStereoSmarts[leavingGroup];
-    eProducts.push(
-      ...(await runReactionSmarts(precursor, stereoSmarts.e, maxProducts))
-    );
-    zProducts.push(
-      ...(await runReactionSmarts(precursor, stereoSmarts.z, maxProducts))
-    );
+    if (stereoSmarts) {
+      eProducts.push(
+        ...(await runReactionSmarts(precursor, stereoSmarts.e, maxProducts))
+      );
+      zProducts.push(
+        ...(await runReactionSmarts(precursor, stereoSmarts.z, maxProducts))
+      );
+    }
 
     if (
       uniqueProducts([
@@ -234,7 +235,9 @@ export async function elimination(
     const maxShiftDepth = readPositiveIntegerOption(options, "maxShiftDepth", 2);
     const allowRearrangement = options?.allowRearrangement !== false;
 
-    const precursors = allowRearrangement
+    // Amines do not ionize to carbocations, so carbocation shift enumeration
+    // only applies to halide/alcohol leaving groups.
+    const precursors = allowRearrangement && leavingGroup !== "amine"
       ? await enumerateCarbocationPrecursors(reactantSmiles, {
           maxShiftDepth,
           maxCandidates: Math.max(6, maxProducts),

@@ -2,7 +2,6 @@ import type { FunctionalGroupResult } from "../../functionalGroups/types";
 import type { ParentDescriptor, ParsedMol } from "../types";
 
 import { getOtherAtom } from "../molParser";
-import { getNamingIntent } from "../nameBuilder/namingIntent";
 
 import {
   getChainUnsaturation,

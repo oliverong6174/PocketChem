@@ -76,6 +76,7 @@ function frontierDiagnosticFields(
   | "exactTargetCount"
   | "targetMixtureMemberCount"
   | "fullyConsumedStartingMaterialCount"
+  | "frontierRuleSummary"
 > {
   const ranked = [...nodes].sort(
     (a, b) =>
