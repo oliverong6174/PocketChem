@@ -10,6 +10,7 @@ export type {
   ReactionHandlerName,
   ReactionComponent,
   ReactionDisplayMetadata,
+  ReactionEngineIssue,
   ReactionPathway,
   ReactionProductMixture,
   ReactionProductMixtureKind,
@@ -31,6 +32,11 @@ export type {
   MultistepSynthesisSearchOptions,
   MultistepSynthesisProgress,
   SynthesisRouteConfidence,
+  RouteMatchLevel,
+  RouteStepReactantCheck,
+  RouteStepVerification,
+  RouteVerification,
+  RouteVerificationStatus,
   SynthesisStep,
   SynthesisStepSource,
 } from "./reactionTypes";
@@ -47,9 +53,15 @@ export {
 export { predictReactionPathwaysFromRules } from "./engine/reactionEngine";
 export { predictRetrosynthesisPathwaysFromRules } from "./engine/retroSynthesis";
 export { findMultistepSynthesisRoutesFromRules } from "./engine/multistepSynthesis";
+export { verifyMultistepRoute } from "./engine/routeVerification";
 export {
   getSequentialConditionOptions,
   runSequentialSynthesis,
+  runSequentialSynthesisDetailed,
+  type SequentialBranchExclusion,
+  type SequentialBranchRanking,
+  type SequentialStepMixture,
+  type SequentialSynthesisReport,
   type SequentialConditionOption,
   type SequentialSynthesisBranch,
   type SequentialSynthesisOptions,

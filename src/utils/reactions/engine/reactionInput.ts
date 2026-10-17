@@ -213,6 +213,7 @@ export async function analyzeReactionComponents(
     for (let index = 0; index < componentSmiles.length; index += 1) {
       const component = componentSmiles[index];
       let functionalGroups: FunctionalGroupResult[] = [];
+      let analysisError: string | undefined;
 
       if (componentSmiles.length === 1 && singleReactantFunctionalGroups.length > 0) {
         functionalGroups = singleReactantFunctionalGroups;
@@ -222,6 +223,7 @@ export async function analyzeReactionComponents(
           functionalGroups = hierarchy.primaryGroups ?? [];
         } catch (error) {
           console.warn("Reaction component analysis failed:", component, error);
+          analysisError = error instanceof Error ? error.message : String(error);
         }
       }
 
@@ -229,6 +231,7 @@ export async function analyzeReactionComponents(
         smiles: component,
         functionalGroups,
         isGeneric: isGenericReactionSmiles(component),
+        ...(analysisError ? { analysisError } : {}),
       });
     }
 

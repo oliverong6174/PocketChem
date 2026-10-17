@@ -967,6 +967,28 @@ export default function SynthesisPage() {
             </span>
           </div>
 
+          {route.verification && route.verification.status !== "verified" && (
+            <p className="reaction-detail reaction-limitation">
+              <strong>
+                {route.verification.status === "failed"
+                  ? "End-to-end replay did not confirm this route."
+                  : "End-to-end replay matched by connectivity only."}
+              </strong>{" "}
+              {route.verification.problems.slice(0, 3).join(" ")}
+            </p>
+          )}
+          {route.verification && route.verification.coproducts.length > 0 && (
+            <p className="reaction-note">
+              The final step also gives: {route.verification.coproducts.join(", ")}.
+            </p>
+          )}
+          {route.verification?.status === "verified" && (
+            <p className="reaction-note">
+              Replayed end to end from the supplied starting materials with PocketChem&apos;s
+              reaction model (a model check, not an experimental validation).
+            </p>
+          )}
+
           {route.steps.length > 0 && (() => {
             const finalStep = route.steps[route.steps.length - 1];
             const targetRequestsTetrahedralStereo = targetSmiles.includes("@");

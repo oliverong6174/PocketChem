@@ -8,7 +8,8 @@ import { analyzeNomenclatureAndProperties } from "../utils/nomenclatureUtils";
 import {
   getSequentialConditionOptions,
   reactionRegistry,
-  runSequentialSynthesis,
+  runSequentialSynthesisDetailed,
+  type SequentialBranchExclusion,
   type SequentialConditionOption,
   type SequentialSynthesisBranch,
   type SequentialSynthesisStep,
@@ -17,6 +18,24 @@ import {
 import { rendererForReactionDisplay } from "./reactionProductRenderer";
 
 type SvgMap = Record<string, string | null>;
+
+const STATUS_CHIP_LABEL: Record<SequentialSynthesisStep["status"], string> = {
+  reaction: "Reaction",
+  "no-reaction": "NO REACTION",
+  "needs-input": "NEEDS INPUT",
+  unsupported: "UNSUPPORTED",
+  "unknown-rule": "UNKNOWN CONDITION",
+  "execution-error": "EVALUATION FAILED",
+};
+
+const STATUS_HEADING: Record<SequentialSynthesisStep["status"], string> = {
+  reaction: "Reaction",
+  "no-reaction": "NO REACTION",
+  "needs-input": "ADDITIONAL STRUCTURE REQUIRED",
+  unsupported: "STRUCTURAL PRODUCT NOT SUPPORTED",
+  "unknown-rule": "CONDITION NOT IN REGISTRY",
+  "execution-error": "INTERNAL ENGINE ERROR — NOT A CHEMICAL PREDICTION",
+};
 
 function rendererForStep(step: SequentialSynthesisStep) {
   return rendererForReactionDisplay(step.display, { allowGenericHalogen: true });
@@ -46,6 +65,7 @@ export default function MultiCatalyticPage() {
   const [query, setQuery] = useState("");
   const [sequence, setSequence] = useState<SequentialConditionOption[]>([]);
   const [branches, setBranches] = useState<SequentialSynthesisBranch[]>([]);
+  const [exclusions, setExclusions] = useState<SequentialBranchExclusion[]>([]);
   const [startingSmiles, setStartingSmiles] = useState("");
   const [startingName, setStartingName] = useState("");
   const [svgs, setSvgs] = useState<SvgMap>({});
@@ -145,13 +165,15 @@ export default function MultiCatalyticPage() {
       setStartingSmiles(smiles);
       setStartingName(await moleculeDisplayName(smiles));
 
-      const results = await runSequentialSynthesis(
+      const report = await runSequentialSynthesisDetailed(
         smiles,
         sequence.map((condition) => condition.ruleId),
         reactionRegistry,
         { branchLimit: 6 },
       );
+      const results = report.branches;
       setBranches(results);
+      setExclusions(report.exclusions);
       setStatus(
         results.length === 0
           ? "No sequence result was generated."
@@ -171,6 +193,7 @@ export default function MultiCatalyticPage() {
     setQuery("");
     setSequence([]);
     setBranches([]);
+    setExclusions([]);
     setStartingSmiles("");
     setStartingName("");
     setSvgs({});
@@ -292,6 +315,21 @@ export default function MultiCatalyticPage() {
         </div>
       )}
 
+      {branches.length > 0 && exclusions.length > 0 && (
+        <p className="reaction-detail reaction-limitation">
+          {exclusions.length} lower-ranked outcome{exclusions.length === 1 ? " was" : "s were"} not
+          shown because of the 6-outcome limit per step:{" "}
+          {exclusions
+            .slice(0, 6)
+            .map((item) =>
+              `step ${item.stepNumber} ${item.label}${item.selectivityLabel ? ` (${item.selectivityLabel})` : ""}`,
+            )
+            .join("; ")}
+          {exclusions.length > 6 ? "; …" : ""}. Outcomes are ordered by PocketChem&apos;s heuristic
+          selectivity estimates where available; these are model estimates, not experimental results.
+        </p>
+      )}
+
       {branches.length > 0 && (
         <div className="multicatalytic-results">
           {branches.map((branch, branchIndex) => (
@@ -309,32 +347,27 @@ export default function MultiCatalyticPage() {
                     <div className="multicatalytic-result-step-heading">
                       <strong>Step {step.stepNumber}: {step.title}</strong>
                       <span className={step.status === "reaction" ? "reaction-status reaction-status-computed" : "no-reaction-chip"}>
-                        {step.status === "reaction"
-                          ? "Reaction"
-                          : step.status === "no-reaction"
-                            ? "NO REACTION"
-                            : step.status === "needs-input"
-                              ? "NEEDS INPUT"
-                              : "UNSUPPORTED"}
+                        {STATUS_CHIP_LABEL[step.status]}
                       </span>
                     </div>
+                    {step.inputUnresolved && (
+                      <p className="reaction-detail reaction-limitation">
+                        An earlier step in this sequence was not resolved (needs input, unsupported,
+                        unknown, or failed), so this step starts from that step&apos;s unchanged
+                        molecule. Treat the result as provisional.
+                      </p>
+                    )}
                     <div className="reagent-pill">{step.reagentLabel}</div>
 
                     {step.status !== "reaction" ? (
                       <div className="no-reaction-result">
-                        <strong>
-                          {step.status === "no-reaction"
-                            ? "NO REACTION"
-                            : step.status === "needs-input"
-                              ? "ADDITIONAL STRUCTURE REQUIRED"
-                              : "STRUCTURAL PRODUCT NOT SUPPORTED"}
-                        </strong>
+                        <strong>{STATUS_HEADING[step.status]}</strong>
                         <p>{step.explanation}</p>
                         {step.noReaction?.suggestion && <p><strong>Instead:</strong> {step.noReaction.suggestion}</p>}
                         <small>
                           {step.status === "no-reaction"
                             ? "Starting material carries forward unchanged to the next step."
-                            : "The sequence stops here until this step can be supplied or represented."}
+                            : "No chemistry was computed for this step. The molecule is carried forward unchanged, but the step itself is unresolved."}
                         </small>
                       </div>
                     ) : (
@@ -346,6 +379,35 @@ export default function MultiCatalyticPage() {
                           />
                         )}
                         <p className="multicatalytic-product-name">{step.productLabel}</p>
+                        {step.selectivity && (
+                          <p className="reaction-note">
+                            Estimated selectivity: {step.selectivity.label} (heuristic estimate, not
+                            experimentally verified).
+                          </p>
+                        )}
+                        {step.mixture?.collapsed && (
+                          <p className="reaction-note">
+                            Racemic mixture of {step.mixture.memberCount} enantiomers; one is drawn.
+                            Later steps are computed on that representative.
+                          </p>
+                        )}
+                        {step.mixture && !step.mixture.collapsed && (
+                          <p className="reaction-note">
+                            One member of a {step.mixture.kind} product mixture
+                            ({step.mixture.memberCount} members); the other members are separate outcomes.
+                          </p>
+                        )}
+                        {step.spectators.length > 0 && (
+                          <p className="reaction-note">
+                            Unchanged by this step and carried forward: {step.spectators.join(", ")}.
+                          </p>
+                        )}
+                        {step.productComponents.length > 1 && step.spectators.length === 0 && (
+                          <p className="reaction-note">
+                            This step gives a mixture of {step.productComponents.length} products
+                            (drawn together).
+                          </p>
+                        )}
                         <p className="reaction-note">{step.explanation}</p>
                       </>
                     )}

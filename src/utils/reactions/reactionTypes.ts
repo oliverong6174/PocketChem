@@ -570,6 +570,27 @@ export type ReactionComponent = {
   smiles: string;
   functionalGroups: FunctionalGroupResult[];
   isGeneric: boolean;
+  /**
+   * Set when functional-group analysis threw. `functionalGroups` is then empty
+   * because the analysis FAILED, not because the molecule has no groups, so
+   * name-gated rules must not be read as chemically inapplicable.
+   */
+  analysisError?: string;
+};
+
+/**
+ * An internal engine failure observed while predicting reactions. These are
+ * reported separately from chemical nonreactivity so that callers can avoid
+ * presenting an engine/matcher failure as "NO REACTION".
+ */
+export type ReactionEngineIssue = {
+  kind:
+    | "component-analysis"
+    | "rule-matching"
+    | "smarts-execution"
+    | "rule-execution";
+  ruleId?: string;
+  message: string;
 };
 
 export type ReactionPredictionInput = {
@@ -688,6 +709,65 @@ export type SynthesisStep = {
 
 export type SynthesisRouteConfidence = "verified" | "connectivity-verified";
 
+/** How closely two structures agree. */
+export type RouteMatchLevel =
+  /** Identical canonical isomeric SMILES (stereochemistry included). */
+  | "exact"
+  /** Same constitution; stereochemistry differs or is unspecified on one side. */
+  | "connectivity"
+  /** Equal to one member of a known stereo mixture produced by the step. */
+  | "mixture-member"
+  | "none";
+
+export type RouteVerificationStatus = "verified" | "connectivity-only" | "failed";
+
+export type RouteStepReactantCheck = {
+  smiles: string;
+  /** Where the reactant came from: a supplied material, an earlier step, or nowhere. */
+  origin:
+    | "starting-material"
+    | "earlier-step"
+    /** A reagent the rule itself supplies (for example a base); not a route material. */
+    | "rule-supplied-reagent"
+    | "missing"
+    | "already-consumed";
+  match: RouteMatchLevel;
+};
+
+export type RouteStepVerification = {
+  stepNumber: number;
+  ruleId: string;
+  status: RouteVerificationStatus;
+  reactants: RouteStepReactantCheck[];
+  /** Recorded step product versus the product obtained by replaying the rule. */
+  productMatch: RouteMatchLevel;
+  problems: string[];
+};
+
+/**
+ * Result of replaying a route from its supplied starting materials, one rule
+ * application at a time. "verified" means every reactant was available and
+ * every product and the target matched exactly (stereochemistry included);
+ * "connectivity-only" means the route is constitutionally consistent but at
+ * least one stereochemical or mixture-member match was not exact. This is a
+ * check against PocketChem's own reaction model, not experimental validation.
+ */
+export type RouteVerification = {
+  status: RouteVerificationStatus;
+  steps: RouteStepVerification[];
+  targetMatch: RouteMatchLevel;
+  /** Supplied starting materials the route never consumed. */
+  unusedStartingMaterials: string[];
+  /**
+   * Other products the route leaves in the final state beside the matched
+   * target (for example methanol next to ethanol after an ester reduction).
+   * The target is still an exact structure match; this only says it is not
+   * the sole product, so a "verified" route is not read as a clean one.
+   */
+  coproducts: string[];
+  problems: string[];
+};
+
 export type MultistepSynthesisRoute = {
   id: string;
   startingSmiles: string;
@@ -695,6 +775,8 @@ export type MultistepSynthesisRoute = {
   steps: SynthesisStep[];
   confidence: SynthesisRouteConfidence;
   score: number;
+  /** End-to-end replay result; absent only for routes built outside the planner. */
+  verification?: RouteVerification;
 };
 
 export type MultistepSynthesisSearchOptions = {

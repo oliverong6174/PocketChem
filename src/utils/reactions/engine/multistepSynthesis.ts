@@ -15,6 +15,7 @@ import {
 } from "./reactionInput";
 import { predictReactionPathwaysFromRules } from "./reactionEngine";
 import { predictRetrosynthesisPathwaysFromRules } from "./retroSynthesis";
+import { verifyMultistepRoute } from "./routeVerification";
 import {
   canonicalizeStereoStructure,
   compareStereoStructureKeys,
@@ -1179,7 +1180,7 @@ function balancedSplits(totalDepth: number): Array<[number, number]> {
  * disconnection before returning it. Carbon-bearing side precursors in a
  * retrosynthetic disconnection must match one of the supplied starting materials.
  */
-export async function findMultistepSynthesisRoutesFromRules(
+async function searchMultistepRoutes(
   startingSmiles: string,
   targetSmiles: string,
   rules: ReactionRule[],
@@ -1822,7 +1823,14 @@ export async function findMultistepSynthesisRoutesFromRules(
 
   async function runBestFirstBridge(): Promise<MultistepSynthesisRoute[]> {
     const maxExpansions = searchEffort === "deep" ? 96 : 40;
-    const fastBeamWidth = Math.min(beamWidth, searchEffort === "deep" ? 10 : 6);
+    // Children of ONE parent enter an ordered open list, so this cap only
+    // decides which siblings are ever considered. It must not be smaller than
+    // the number of distinct products a common substrate yields: acetone has
+    // seven, and a cap of 6 silently discarded the worst-ranked sibling
+    // (Baeyer-Villiger, one step from a valid ester-reduction route to ethanol)
+    // before it could be expanded. Normal and deep share the same cap; deep
+    // still differs by its larger branch limit, expansion budget and beams.
+    const fastBeamWidth = Math.min(beamWidth, 10);
     const fastBranchLimit = Math.min(branchLimit, searchEffort === "deep" ? 18 : 10);
 
     // Continue from the deepest non-empty forward layer already discovered by
@@ -2249,4 +2257,39 @@ export async function findMultistepSynthesisRoutesFromRules(
   }
 
   return selectivityFallbackRoutes;
+}
+
+/**
+ * Plans routes, then replays every returned route end to end from the supplied
+ * starting materials (see routeVerification.ts) and attaches the result. The
+ * replay never drops a route: a route whose replay could not be confirmed is
+ * still returned, labelled by its `verification`, so a planner or replay
+ * limitation cannot silently hide a route the user could still inspect.
+ */
+export async function findMultistepSynthesisRoutesFromRules(
+  startingSmiles: string,
+  targetSmiles: string,
+  rules: ReactionRule[],
+  options: MultistepSynthesisSearchOptions = {},
+  onProgress?: ProgressCallback,
+): Promise<MultistepSynthesisRoute[]> {
+  const routes = await searchMultistepRoutes(
+    startingSmiles,
+    targetSmiles,
+    rules,
+    options,
+    onProgress,
+  );
+  if (searchCancelled(options.signal)) return routes;
+
+  const verified: MultistepSynthesisRoute[] = [];
+  for (const route of routes) {
+    try {
+      verified.push({ ...route, verification: await verifyMultistepRoute(route, rules) });
+    } catch (error) {
+      console.error("[PocketChem:Synthesis] Route replay failed; returning the route unverified.", error);
+      verified.push(route);
+    }
+  }
+  return verified;
 }

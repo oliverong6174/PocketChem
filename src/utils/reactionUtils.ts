@@ -36,6 +36,8 @@ export {
   splitReactionComponents,
   getSequentialConditionOptions,
   runSequentialSynthesis,
+  runSequentialSynthesisDetailed,
+  verifyMultistepRoute,
   predictNoReactionOutcomes,
 } from "./reactions";
 
@@ -44,6 +46,7 @@ export { runMechanisticStereoRegressionSuite } from "./stereochemistry/regressio
 export type {
   ReactionComponent,
   ReactionDisplayMetadata,
+  ReactionEngineIssue,
   ReactionPathway,
   ReactionProductMixture,
   ReactionProductMixtureKind,
@@ -62,6 +65,15 @@ export type {
   SynthesisStepSource,
   SequentialConditionOption,
   SequentialSynthesisBranch,
+  RouteMatchLevel,
+  RouteStepReactantCheck,
+  RouteStepVerification,
+  RouteVerification,
+  RouteVerificationStatus,
+  SequentialBranchExclusion,
+  SequentialBranchRanking,
+  SequentialStepMixture,
+  SequentialSynthesisReport,
   SequentialSynthesisOptions,
   SequentialSynthesisStep,
   NoReactionOutcome,

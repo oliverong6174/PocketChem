@@ -21,7 +21,8 @@ function canonicalizeProductSet(productSmiles: string): string {
 export async function runReactionSmarts(
   reactantSmiles: string | string[],
   reactionSmarts: string,
-  maxProducts = 8
+  maxProducts = 8,
+  onIssue?: (message: string) => void,
 ): Promise<string[]> {
   const rdkit = await getRDKit();
   const reactantList = Array.isArray(reactantSmiles)
@@ -35,13 +36,19 @@ export async function runReactionSmarts(
 
   try {
     reaction = getCompiledReactionSync(rdkit, reactionSmarts);
-    if (!reaction) return [];
+    if (!reaction) {
+      onIssue?.(`Reaction SMARTS could not be compiled: ${reactionSmarts}`);
+      return [];
+    }
 
     molList = new rdkit.MolList();
 
     for (const smiles of reactantList) {
       const reactant = rdkit.get_mol(smiles);
-      if (!reactant) return [];
+      if (!reactant) {
+        onIssue?.(`RDKit could not parse reactant "${smiles}".`);
+        return [];
+      }
       reactants.push(reactant);
       molList.append(reactant);
     }
@@ -53,6 +60,7 @@ export async function runReactionSmarts(
       typeof products.size !== "function" ||
       typeof products.get !== "function"
     ) {
+      onIssue?.(`RDKit returned no usable product list for: ${reactionSmarts}`);
       return [];
     }
 
@@ -96,6 +104,9 @@ export async function runReactionSmarts(
     return [...uniqueProducts];
   } catch (error) {
     console.error("Reaction SMARTS failed:", reactionSmarts, error);
+    onIssue?.(
+      `Reaction SMARTS execution failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return [];
   } finally {
     products?.delete?.();

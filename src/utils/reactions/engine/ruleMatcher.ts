@@ -58,21 +58,34 @@ function namesPassTrigger(trigger: ReactionTrigger, detectedNames: Set<string>) 
   return !excludedNames.some((name) => detectedNames.has(normalizeName(name)));
 }
 
+/**
+ * Optional sink for matcher failures. A parse/compile/execution failure is NOT
+ * evidence of chemical nonreactivity, so callers that care (for example the
+ * sequential synthesis classifier) pass a sink and report it explicitly.
+ * Callers that omit it keep the historical behaviour (fail closed, console warning).
+ */
+export type MatcherIssueSink = (message: string) => void;
+
 async function matchesSmarts(
   reactantSmiles: string,
   includeSmarts: string[],
-  excludeSmarts: string[]
+  excludeSmarts: string[],
+  onIssue?: MatcherIssueSink,
 ): Promise<boolean> {
   if (includeSmarts.length === 0 && excludeSmarts.length === 0) return true;
 
   const rdkit = await getRDKit();
   const molecule = rdkit.get_mol(reactantSmiles);
 
-  if (!molecule) return false;
+  if (!molecule) {
+    onIssue?.(`RDKit could not parse the structure "${reactantSmiles}".`);
+    return false;
+  }
 
   try {
     for (const smarts of includeSmarts) {
       const query = getCompiledQuerySync(rdkit, smarts);
+      if (!query) onIssue?.(`Trigger SMARTS could not be compiled: ${smarts}`);
 
       try {
         if (!query || molecule.get_substruct_match(query) === "{}") {
@@ -80,12 +93,14 @@ async function matchesSmarts(
         }
       } catch (error) {
         console.warn(`Reaction trigger SMARTS failed: ${smarts}`, error);
+        onIssue?.(`Trigger SMARTS failed to execute: ${smarts}`);
         return false;
       }
     }
 
     for (const smarts of excludeSmarts) {
       const query = getCompiledQuerySync(rdkit, smarts);
+      if (!query) onIssue?.(`Exclusion SMARTS could not be compiled: ${smarts}`);
 
       try {
         if (query && molecule.get_substruct_match(query) !== "{}") {
@@ -93,6 +108,7 @@ async function matchesSmarts(
         }
       } catch (error) {
         console.warn(`Reaction exclusion SMARTS failed: ${smarts}`, error);
+        onIssue?.(`Exclusion SMARTS failed to execute: ${smarts}`);
         return false;
       }
     }
@@ -159,6 +175,7 @@ async function blockingConstraintsPass(
   rule: ReactionRule,
   reactantSmiles: string,
   functionalGroups: FunctionalGroupResult[],
+  onIssue?: MatcherIssueSink,
 ): Promise<boolean> {
   for (const constraintId of rule.constraints ?? []) {
     const constraint = REACTION_CONSTRAINTS[constraintId];
@@ -170,6 +187,7 @@ async function blockingConstraintsPass(
         constraint.satisfiedByTrigger,
         reactantSmiles,
         functionalGroups,
+        onIssue,
       ))
     ) {
       continue;
@@ -180,6 +198,7 @@ async function blockingConstraintsPass(
         constraint.failureTrigger,
         reactantSmiles,
         functionalGroups,
+        onIssue,
       )
     ) {
       return false;
@@ -191,7 +210,8 @@ async function blockingConstraintsPass(
 export async function triggerMatchesReactant(
   trigger: ReactionTrigger,
   reactantSmiles: string,
-  functionalGroups: FunctionalGroupResult[] = []
+  functionalGroups: FunctionalGroupResult[] = [],
+  onIssue?: MatcherIssueSink,
 ): Promise<boolean> {
   const detectedNames = detectedFunctionalGroupNames(functionalGroups);
   const { anyNames, allNames, includeSmarts, excludeSmarts } =
@@ -204,7 +224,7 @@ export async function triggerMatchesReactant(
 
   if (!hasNameTrigger && !hasSmartsTrigger) return false;
 
-  return matchesSmarts(reactantSmiles, includeSmarts, excludeSmarts);
+  return matchesSmarts(reactantSmiles, includeSmarts, excludeSmarts, onIssue);
 }
 
 /**
@@ -215,6 +235,7 @@ export async function filterRulesMatchingReactant(
   rules: ReactionRule[],
   reactantSmiles: string,
   functionalGroups: FunctionalGroupResult[] = [],
+  onIssue?: MatcherIssueSink,
 ): Promise<ReactionRule[]> {
   const detectedNames = detectedFunctionalGroupNames(functionalGroups);
   const candidates = rules.filter((rule) => {
@@ -266,7 +287,10 @@ export async function filterRulesMatchingReactant(
 
   const rdkit = await getRDKit();
   const molecule = rdkit.get_mol(reactantSmiles);
-  if (!molecule) return [];
+  if (!molecule) {
+    onIssue?.(`RDKit could not parse the structure "${reactantSmiles}".`);
+    return [];
+  }
 
   const resultCache = new Map<string, boolean>();
   const hasMatch = (smarts: string): boolean => {
@@ -276,9 +300,11 @@ export async function filterRulesMatchingReactant(
     let matched = false;
     try {
       const query = getCompiledQuerySync(rdkit, smarts);
+      if (!query) onIssue?.(`SMARTS could not be compiled: ${smarts}`);
       matched = Boolean(query && molecule.get_substruct_match(query) !== "{}");
     } catch (error) {
       console.warn(`Reaction SMARTS failed: ${smarts}`, error);
+      onIssue?.(`SMARTS failed to execute: ${smarts}`);
     }
 
     resultCache.set(smarts, matched);
@@ -302,12 +328,13 @@ export async function filterRulesMatchingReactant(
 export async function ruleMatchesReactant(
   rule: ReactionRule,
   reactantSmiles: string,
-  functionalGroups: FunctionalGroupResult[] = []
+  functionalGroups: FunctionalGroupResult[] = [],
+  onIssue?: MatcherIssueSink,
 ): Promise<boolean> {
-  if (!(await triggerMatchesReactant(rule.trigger, reactantSmiles, functionalGroups))) {
+  if (!(await triggerMatchesReactant(rule.trigger, reactantSmiles, functionalGroups, onIssue))) {
     return false;
   }
-  return blockingConstraintsPass(rule, reactantSmiles, functionalGroups);
+  return blockingConstraintsPass(rule, reactantSmiles, functionalGroups, onIssue);
 }
 
 /**
@@ -319,7 +346,8 @@ export async function ruleMatchesReactant(
  */
 export async function matchAllRuleReactants(
   rule: ReactionRule,
-  components: ReactionComponent[]
+  components: ReactionComponent[],
+  onIssue?: MatcherIssueSink,
 ): Promise<ReactionComponent[][]> {
   const requirements = [
     { label: "primary reactant", trigger: rule.trigger },
@@ -358,11 +386,13 @@ export async function matchAllRuleReactants(
             rule,
             component.smiles,
             component.functionalGroups,
+            onIssue,
           )
         : await triggerMatchesReactant(
             requirement.trigger,
             component.smiles,
             component.functionalGroups,
+            onIssue,
           );
 
       if (!matches) continue;

@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test --test-timeout=300000 scripts/tests/*.test.mjs",
+    "test:search": "node --test --test-timeout=600000 scripts/bench/*.bench.mjs"
   },
   "dependencies": {
     "@rdkit/rdkit": "^2025.3.4-1.0.0",
