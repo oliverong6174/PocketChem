@@ -1,5 +1,10 @@
 import type {
   MultistepSynthesisRoute,
+  RouteInventoryEntry,
+  RouteLeftoverSpecies,
+  RouteStepDependency,
+  RouteTargetLineage,
+  RouteVerificationOptions,
   ReactionPathway,
   ReactionRule,
   RouteMatchLevel,
@@ -25,6 +30,8 @@ import { canonicalizeStereoStructure } from "./stereochemistry";
  */
 
 type Species = {
+  /** Stable lot id: `sm<index>#<copy>` for supplied copies, `s<step>.<n>` for products. */
+  id: string;
   smiles: string;
   isomeric: string;
   connectivity: string;
@@ -35,6 +42,12 @@ type Species = {
    * from one), so it is only a representative, never an enantiopure product.
    */
   fromMixture: boolean;
+  /** Indices of the supplied starting materials this species descends from. */
+  lineage: number[];
+  /** Lots consumed to make this species (empty for supplied materials). */
+  parents: Species[];
+  /** Component index and copy number, for supplied lots. */
+  supply: { startIndex: number; copy: number } | null;
 };
 
 type Identity = { isomeric: string; connectivity: string };
@@ -108,9 +121,20 @@ function worstStatus(levels: RouteMatchLevel[], hasProblems: boolean): RouteVeri
   return levels.every((level) => level === "exact") ? "verified" : "connectivity-only";
 }
 
+function copiesFor(options: RouteVerificationOptions | undefined, index: number): number {
+  const requested = options?.startingMaterialCopies;
+  const value = Array.isArray(requested) ? requested[index] : requested;
+  return Number.isInteger(value) && (value as number) >= 1 ? (value as number) : 1;
+}
+
+function mergeLineage(lots: Species[]): number[] {
+  return [...new Set(lots.flatMap((lot) => lot.lineage))].sort((a, b) => a - b);
+}
+
 export async function verifyMultistepRoute(
   route: MultistepSynthesisRoute,
   rules: ReactionRule[],
+  options?: RouteVerificationOptions,
 ): Promise<RouteVerification> {
   const ruleById = new Map(rules.map((rule) => [rule.id, rule]));
   const problems: string[] = [];
@@ -118,16 +142,36 @@ export async function verifyMultistepRoute(
 
   const pool: Species[] = [];
   const startComponents = splitReactionComponents(route.startingSmiles);
-  for (const smiles of startComponents) {
+  const inventoryLots: Species[][] = [];
+  for (let startIndex = 0; startIndex < startComponents.length; startIndex += 1) {
+    const smiles = startComponents[startIndex];
     const id = await identity(smiles);
+    inventoryLots.push([]);
     if (!id) {
       problems.push(`Starting material "${smiles}" could not be parsed.`);
       continue;
     }
-    pool.push({ smiles, ...id, origin: "starting-material", producedByStep: null, fromMixture: false });
+    // Each copy is its own lot with the same structure; a lot is consumed once.
+    for (let copy = 1; copy <= copiesFor(options, startIndex); copy += 1) {
+      const lot: Species = {
+        id: `sm${startIndex}#${copy}`,
+        smiles,
+        ...id,
+        origin: "starting-material",
+        producedByStep: null,
+        fromMixture: false,
+        lineage: [startIndex],
+        parents: [],
+        supply: { startIndex, copy },
+      };
+      pool.push(lot);
+      inventoryLots[startIndex].push(lot);
+    }
   }
   const allStarting = [...pool];
   const consumedBy = new Map<Species, number>();
+  const allSpecies: Species[] = [...pool];
+  const stepDependencies: RouteStepDependency[] = [];
 
   for (let index = 0; index < route.steps.length; index += 1) {
     const step = route.steps[index];
@@ -166,7 +210,12 @@ export async function verifyMultistepRoute(
       step.reactantComponents.length > 0
         ? step.reactantComponents
         : splitReactionComponents(step.reactantSmiles);
-    for (const smiles of wanted) {
+    const namedLots =
+      step.reactantLotIds && step.reactantLotIds.length === wanted.length
+        ? step.reactantLotIds
+        : null;
+    for (let wantedIndex = 0; wantedIndex < wanted.length; wantedIndex += 1) {
+      const smiles = wanted[wantedIndex];
       const id = await identity(smiles);
       if (!id) {
         stepProblems.push(`Reactant "${smiles}" could not be parsed.`);
@@ -175,12 +224,40 @@ export async function verifyMultistepRoute(
       }
 
       const available = pool.filter((item) => !located.includes(item));
-      let hit =
-        available.find((item) => item.isomeric === id.isomeric) ?? null;
-      let level: RouteMatchLevel = hit ? "exact" : "none";
-      if (!hit) {
-        hit = available.find((item) => item.connectivity === id.connectivity) ?? null;
-        if (hit) level = "connectivity";
+      let hit: Species | null;
+      let level: RouteMatchLevel;
+      const namedId = namedLots?.[wantedIndex];
+      if (namedId) {
+        // Provenance was recorded: only that exact lot may serve this reactant.
+        const named = allSpecies.find((item) => item.id === namedId) ?? null;
+        const lotMatch = named ? matchLevel(named, id) : "none";
+        if (named && available.includes(named) && lotMatch !== "none") {
+          hit = named;
+          level = lotMatch;
+        } else if (named && consumedBy.has(named)) {
+          stepProblems.push(
+            `Reactant "${smiles}" names lot ${namedId}, which was already consumed by step ${consumedBy.get(named)} and cannot be reused.`,
+          );
+          reactantChecks.push({ smiles, origin: "already-consumed", match: "none", lotId: namedId });
+          levels.push("none");
+          continue;
+        } else {
+          stepProblems.push(
+            named
+              ? `Reactant "${smiles}" names lot ${namedId}, but that lot is "${named.smiles}".`
+              : `Reactant "${smiles}" names lot ${namedId}, which does not exist at this point in the route.`,
+          );
+          reactantChecks.push({ smiles, origin: "missing", match: "none", lotId: namedId });
+          levels.push("none");
+          continue;
+        }
+      } else {
+        hit = available.find((item) => item.isomeric === id.isomeric) ?? null;
+        level = hit ? "exact" : "none";
+        if (!hit) {
+          hit = available.find((item) => item.connectivity === id.connectivity) ?? null;
+          if (hit) level = "connectivity";
+        }
       }
 
       if (!hit) {
@@ -195,8 +272,13 @@ export async function verifyMultistepRoute(
           (item) => item.connectivity === id.connectivity,
         );
         if (consumed) {
+          const copies = allSpecies.filter(
+            (item) => item.supply && item.connectivity === id.connectivity,
+          ).length;
           stepProblems.push(
-            `Reactant "${smiles}" was already consumed by step ${consumedBy.get(consumed)} and cannot be reused.`,
+            `Reactant "${smiles}" was already consumed by step ${consumedBy.get(consumed)} and cannot be reused${
+              copies > 0 ? ` (only ${copies} cop${copies === 1 ? "y" : "ies"} supplied)` : ""
+            }.`,
           );
           reactantChecks.push({ smiles, origin: "already-consumed", match: "none" });
         } else {
@@ -216,7 +298,13 @@ export async function verifyMultistepRoute(
       }
       located.push(hit);
       levels.push(level);
-      reactantChecks.push({ smiles, origin: hit.origin, match: level });
+      reactantChecks.push({
+        smiles,
+        origin: hit.origin,
+        match: level,
+        lotId: hit.id,
+        lineage: [...hit.lineage],
+      });
     }
 
     // 2. Replay the rule on the materials that actually exist.
@@ -280,23 +368,44 @@ export async function verifyMultistepRoute(
       pool.splice(pool.indexOf(species), 1);
       consumedBy.set(species, stepNumber);
     }
+    const producedHere: Species[] = [];
     if (replayedProductSmiles) {
       const mixtureProduct =
         Boolean(step.productMixture && step.productMixture.memberCount > 1) ||
         located.some((item) => item.fromMixture);
+      const lineage = mergeLineage(located);
       for (const smiles of splitReactionComponents(replayedProductSmiles)) {
         const id = await identity(smiles);
         if (id) {
-          pool.push({
+          const species: Species = {
+            id: `s${stepNumber}.${producedHere.length + 1}`,
             smiles,
             ...id,
             origin: "earlier-step",
             producedByStep: stepNumber,
             fromMixture: mixtureProduct,
-          });
+            lineage,
+            parents: [...located],
+            supply: null,
+          };
+          pool.push(species);
+          allSpecies.push(species);
+          producedHere.push(species);
         }
       }
     }
+    stepDependencies.push({
+      stepNumber,
+      consumedLotIds: located.map((item) => item.id),
+      producedLotIds: producedHere.map((item) => item.id),
+      dependsOnSteps: [
+        ...new Set(
+          located
+            .map((item) => item.producedByStep)
+            .filter((value): value is number => value !== null),
+        ),
+      ].sort((a, b) => a - b),
+    });
 
     const hardProblems = stepProblems.filter(
       (message) => !message.includes("only by connectivity"),
@@ -373,6 +482,26 @@ export async function verifyMultistepRoute(
     status = "connectivity-only";
   } else status = "verified";
 
+  const inventory: RouteInventoryEntry[] = inventoryLots.map((lots, startIndex) => ({
+    startIndex,
+    smiles: startComponents[startIndex],
+    copies: lots.length,
+    consumed: lots.filter((lot) => consumedBy.has(lot)).length,
+    lotIds: lots.map((lot) => lot.id),
+    consumedByStep: lots.map((lot) => consumedBy.get(lot) ?? null),
+  }));
+  const leftovers: RouteLeftoverSpecies[] = pool.map((item) => ({
+    lotId: item.id,
+    smiles: item.smiles,
+    origin: item.origin,
+    producedByStep: item.producedByStep,
+    lineage: [...item.lineage],
+    fromMixture: item.fromMixture,
+  }));
+  const targetLineage = matchedSpecies
+    ? describeTargetLineage(matchedSpecies, route.steps.length)
+    : null;
+
   return {
     status,
     steps: stepResults,
@@ -384,5 +513,34 @@ export async function verifyMultistepRoute(
       .filter((item) => !consumedBy.has(item))
       .map((item) => item.smiles),
     problems,
+    inventory,
+    leftovers,
+    stepDependencies,
+    targetLineage,
+  };
+}
+
+/** Walks consumption back from the matched target to find what actually feeds it. */
+function describeTargetLineage(target: Species, stepCount: number): RouteTargetLineage {
+  const steps = new Set<number>();
+  const depth = new Map<number, number>();
+  const walk = (species: Species): number => {
+    if (species.producedByStep === null) return 0;
+    steps.add(species.producedByStep);
+    const cached = depth.get(species.producedByStep);
+    if (cached !== undefined) return cached;
+    const value = 1 + Math.max(0, ...species.parents.map(walk));
+    depth.set(species.producedByStep, value);
+    return value;
+  };
+  const longest = walk(target);
+  return {
+    lotId: target.id,
+    startingMaterialIndices: [...target.lineage],
+    contributingSteps: [...steps].sort((a, b) => a - b),
+    unusedSteps: Array.from({ length: stepCount }, (_unused, index) => index + 1).filter(
+      (number) => !steps.has(number),
+    ),
+    longestLinearSequence: longest,
   };
 }

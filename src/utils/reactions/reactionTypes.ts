@@ -705,6 +705,15 @@ export type SynthesisStep = {
   retrosynthesisConfidence: RetrosynthesisConfidence | null;
   productMixture: ReactionProductMixture | null;
   display: ReactionDisplayMetadata | null;
+  /**
+   * Optional material provenance, aligned with `reactantComponents`: the lot
+   * ids (see RouteVerification.inventory / leftovers) this step consumes. When
+   * present, the route verifier consumes exactly those lots instead of the
+   * first structure match, so two lots with the same structure but different
+   * histories (two copies of one starting material, a racemate and an
+   * enantiopure sample) are never confused.
+   */
+  reactantLotIds?: string[];
 };
 
 export type SynthesisRouteConfidence = "verified" | "connectivity-verified";
@@ -732,6 +741,10 @@ export type RouteStepReactantCheck = {
     | "missing"
     | "already-consumed";
   match: RouteMatchLevel;
+  /** Id of the lot this reactant was matched to (absent when nothing matched). */
+  lotId?: string;
+  /** Indices of the supplied starting materials this lot descends from. */
+  lineage?: number[];
 };
 
 export type RouteStepVerification = {
@@ -766,6 +779,61 @@ export type RouteVerification = {
    */
   coproducts: string[];
   problems: string[];
+  /** Supplied starting materials, their copies and what consumed them. */
+  inventory?: RouteInventoryEntry[];
+  /** Every species still present after the last step, with provenance. */
+  leftovers?: RouteLeftoverSpecies[];
+  /** Which earlier steps each step depends on; independent branches share none. */
+  stepDependencies?: RouteStepDependency[];
+  /** Which part of the route actually produces the matched target. */
+  targetLineage?: RouteTargetLineage | null;
+};
+
+/**
+ * Starting-material copies available to a route replay. A number applies to
+ * every supplied component; an array is indexed by component order. A copy is
+ * a qualitative availability count (one isolated batch), not an amount of
+ * substance: PocketChem does no mole or limiting-reagent accounting.
+ */
+export type RouteVerificationOptions = {
+  startingMaterialCopies?: number | number[];
+};
+
+export type RouteInventoryEntry = {
+  startIndex: number;
+  smiles: string;
+  copies: number;
+  consumed: number;
+  lotIds: string[];
+  /** Step number that consumed each lot, or null when it was never used. */
+  consumedByStep: Array<number | null>;
+};
+
+export type RouteLeftoverSpecies = {
+  lotId: string;
+  smiles: string;
+  origin: "starting-material" | "earlier-step";
+  producedByStep: number | null;
+  /** Indices of the supplied starting materials this species descends from. */
+  lineage: number[];
+  fromMixture: boolean;
+};
+
+export type RouteStepDependency = {
+  stepNumber: number;
+  consumedLotIds: string[];
+  producedLotIds: string[];
+  dependsOnSteps: number[];
+};
+
+export type RouteTargetLineage = {
+  lotId: string;
+  startingMaterialIndices: number[];
+  contributingSteps: number[];
+  /** Steps whose products never feed the target (side branches or waste). */
+  unusedSteps: number[];
+  /** Longest chain of dependent steps leading to the target. */
+  longestLinearSequence: number;
 };
 
 export type MultistepSynthesisRoute = {
