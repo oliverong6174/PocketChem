@@ -847,7 +847,36 @@ export type MultistepSynthesisRoute = {
   verification?: RouteVerification;
 };
 
+/**
+ * Budgets and inventory for the opt-in forward convergent lane (A -> A', B -> B',
+ * A' + B' -> target). Every field is optional; omitted fields use conservative
+ * defaults. A copy is a qualitative availability count, not an amount.
+ */
+export type ConvergentSearchOptions = {
+  /** Copies of each supplied material (number for all, array by component). Default one each. */
+  startingMaterialCopies?: number | number[];
+  maxStateExpansions?: number;
+  maxReactionExecutions?: number;
+  /** Most steps in one explored path. */
+  maxDepth?: number;
+  /** Most lots one step may consume. */
+  maxArity?: number;
+  maxLiveLots?: number;
+  maxLiveCoproducts?: number;
+  maxPathwaysPerExecution?: number;
+  /** Wall-clock budget for this lane, in milliseconds. */
+  maxWallMs?: number;
+  /** Absolute Date.now() deadline; the lane stops at the earlier of this and its wall budget. */
+  deadline?: number;
+  maxRoutes?: number;
+};
+
 export type MultistepSynthesisSearchOptions = {
+  /**
+   * Opt in to the forward convergent lane before the linear search. Off by
+   * default; when absent the search behaves exactly as before.
+   */
+  convergentSearch?: boolean | ConvergentSearchOptions;
   maxSteps?: number;
   beamWidth?: number;
   branchLimit?: number;

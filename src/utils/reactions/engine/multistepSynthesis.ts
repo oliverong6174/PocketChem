@@ -16,6 +16,7 @@ import {
 import { predictReactionPathwaysFromRules } from "./reactionEngine";
 import { predictRetrosynthesisPathwaysFromRules } from "./retroSynthesis";
 import { verifyMultistepRoute } from "./routeVerification";
+import { searchConvergentRoutesCore, type ConvergentSearchResult } from "./convergentSearch";
 import {
   canonicalizeStereoStructure,
   compareStereoStructureKeys,
@@ -2260,6 +2261,30 @@ async function searchMultistepRoutes(
 }
 
 /**
+ * Runs only the forward convergent lane (see convergentSearch.ts) and returns
+ * its routes with search statistics. Every returned route has been replayed
+ * against the supplied inventory; nothing unverified is returned.
+ */
+export function findConvergentSynthesisRoutes(
+  startingSmiles: string,
+  targetSmiles: string,
+  rules: ReactionRule[],
+  options: MultistepSynthesisSearchOptions = {},
+  onProgress?: ProgressCallback,
+): Promise<ConvergentSearchResult> {
+  const convergent = typeof options.convergentSearch === "object" ? options.convergentSearch : {};
+  return searchConvergentRoutesCore({
+    startingSmiles,
+    targetSmiles,
+    rules,
+    options: { maxRoutes: options.maxRoutes, ...convergent },
+    stepFromPathway: forwardStepFromPathway,
+    signal: options.signal,
+    onProgress,
+  });
+}
+
+/**
  * Plans routes, then replays every returned route end to end from the supplied
  * starting materials (see routeVerification.ts) and attaches the result. The
  * replay never drops a route: a route whose replay could not be confirmed is
@@ -2273,6 +2298,20 @@ export async function findMultistepSynthesisRoutesFromRules(
   options: MultistepSynthesisSearchOptions = {},
   onProgress?: ProgressCallback,
 ): Promise<MultistepSynthesisRoute[]> {
+  // Opt-in convergent lane. Its routes are already replayed against the supplied
+  // inventory, so they are returned as they are; anything else falls through to
+  // the unchanged linear search below.
+  if (options.convergentSearch) {
+    const convergent = await findConvergentSynthesisRoutes(
+      startingSmiles,
+      targetSmiles,
+      rules,
+      options,
+      onProgress,
+    );
+    if (convergent.routes.length > 0 || searchCancelled(options.signal)) return convergent.routes;
+  }
+
   const routes = await searchMultistepRoutes(
     startingSmiles,
     targetSmiles,
