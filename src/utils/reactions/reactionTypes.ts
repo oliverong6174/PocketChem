@@ -890,6 +890,15 @@ export type ConvergentSearchOptions = {
 
 export type MultistepSynthesisSearchOptions = {
   /**
+   * Called once for each route that has passed end-to-end replay (status
+   * "verified" or "connectivity-only", never "failed"). The convergent lane
+   * reports each route as soon as it is accepted, so a caller can keep it if the
+   * search is later cut short. The ordinary linear search does NOT stream: it
+   * reports its routes only after the whole search has finished and replayed them.
+   * Exceptions thrown by the callback are ignored.
+   */
+  onRouteFound?: (route: MultistepSynthesisRoute) => void;
+  /**
    * Opt in to the forward convergent lane before the linear search. Off by
    * default; when absent the search behaves exactly as before.
    */

@@ -128,6 +128,8 @@ export type ConvergentSearchArgs = {
   options: ConvergentSearchOptions;
   /** Builds the public step record from an engine pathway (shared with the linear lane). */
   stepFromPathway: (pathway: ReactionPathway) => SynthesisStep | null;
+  /** Called with each route that passed replay, as soon as it is accepted. */
+  onRouteFound?: (route: MultistepSynthesisRoute) => void;
   signal?: AbortSignal;
   onProgress?: (progress: MultistepSynthesisProgress) => void;
 };
@@ -558,11 +560,17 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
       return;
     }
     foundIds.add(route.id);
-    found.push({
+    const accepted: MultistepSynthesisRoute = {
       ...route,
       confidence: verification.status === "verified" ? "verified" : "connectivity-verified",
       verification,
-    });
+    };
+    found.push(accepted);
+    try {
+      args.onRouteFound?.(accepted);
+    } catch (error) {
+      console.error("[PocketChem:Synthesis] onRouteFound callback failed; continuing.", error);
+    }
   }
 
   /**
@@ -740,6 +748,14 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
   /** One retro expansion; its new goal sets are matched against every forward frontier so far. */
   async function advanceRetro(): Promise<boolean> {
     if (!retro) return false;
+    onProgress?.({
+      phase: "retrosynthesis",
+      depth: retro.stats.expansions + 1,
+      maxSteps: positive(retroOptions.maxRetroDepth, RETRO_DEFAULTS.maxRetroDepth),
+      processed: retro.stats.engineCalls,
+      total: positive(retroOptions.maxRetroCalls, RETRO_DEFAULTS.maxRetroCalls),
+      percent: Math.min(99, Math.round((stats.stateExpansions / maxExpansions) * 100)),
+    });
     const fresh = await retro.step(reached);
     stats.retro = { ...retro.stats, ...retroMeta };
     if (!fresh) return false;

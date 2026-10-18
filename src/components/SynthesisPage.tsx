@@ -21,6 +21,13 @@ import {
   type MultistepSynthesisRoute,
   type SynthesisStep,
 } from "../utils/reactionUtils";
+import {
+  buildSynthesisSearchOptions,
+  createRouteCollector,
+  DEFAULT_ADVANCED_SETTINGS,
+  type AdvancedSearchSettings,
+} from "../utils/reactions/engine/searchOptionsFromUi";
+import { describeRouteStructure } from "../utils/reactions/engine/routePresentation";
 
 type StepSvgSet = {
   reactants: string[];
@@ -211,6 +218,76 @@ async function hydrateRouteLabels(
   );
 }
 
+function RouteStructurePanel({ route }: { route: MultistepSynthesisRoute }) {
+  const verification = route.verification;
+  if (!verification) return null;
+  const structure = describeRouteStructure(route);
+  const multiCopy = (verification.inventory ?? []).some((entry) => entry.copies > 1);
+  if (structure.kind !== "convergent" && !multiCopy) return null;
+
+  const targetLotId = verification.targetLineage?.lotId;
+  const otherLeftovers = (verification.leftovers ?? []).filter((item) => item.lotId !== targetLotId);
+
+  return (
+    <div className="reaction-detail synthesis-structure-panel">
+      {structure.kind === "convergent" && (
+        <>
+          <p>
+            <strong>Convergent route.</strong> Independently prepared branches meet in one
+            reaction:
+          </p>
+          <ul>
+            {structure.joins.map((join) => (
+              <li key={join.step}>
+                Step {join.step} combines{" "}
+                {join.branches
+                  .map(
+                    (branch) =>
+                      `step${branch.steps.length === 1 ? "" : "s"} ${branch.steps.join(", ")}` +
+                      (branch.startingMaterials.length > 0
+                        ? ` (from supplied material${branch.startingMaterials.length === 1 ? "" : "s"} ${branch.startingMaterials
+                            .map((index) => index + 1)
+                            .join(", ")})`
+                        : ""),
+                  )
+                  .join(" and ")}
+                .
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {structure.unusedSteps.length > 0 && (
+        <p>Steps that do not feed the target: {structure.unusedSteps.join(", ")}.</p>
+      )}
+      {(verification.inventory ?? []).length > 0 && (
+        <p>
+          <strong>Material copies used:</strong>{" "}
+          {(verification.inventory ?? [])
+            .map(
+              (entry) =>
+                `supplied material ${entry.startIndex + 1}: ${entry.consumed} of ${entry.copies} cop${entry.copies === 1 ? "y" : "ies"}`,
+            )
+            .join(" · ")}
+        </p>
+      )}
+      {verification.unusedStartingMaterials.length > 0 && (
+        <p>Unused (spectator) materials: {verification.unusedStartingMaterials.join(", ")}.</p>
+      )}
+      {otherLeftovers.length > 0 && (
+        <p>
+          Other species left at the end:{" "}
+          {otherLeftovers.map((item) => item.smiles).join(", ")}.
+        </p>
+      )}
+      <p className="reaction-note">
+        A copy is a qualitative availability count, not an amount of substance. Selectivity
+        labels are model estimates, not measured yields.
+      </p>
+    </div>
+  );
+}
+
 export default function SynthesisPage() {
   const [reactantKetcher, setReactantKetcher] = useState<KetcherApi | null>(null);
   const [productKetcher, setProductKetcher] = useState<KetcherApi | null>(null);
@@ -235,6 +312,10 @@ export default function SynthesisPage() {
   const [activeSearchEffort, setActiveSearchEffort] = useState<"normal" | "deep">("normal");
   const searchRunRef = useRef(0);
   const searchAbortRef = useRef<AbortController | null>(null);
+  const [advanced, setAdvanced] = useState<AdvancedSearchSettings>(DEFAULT_ADVANCED_SETTINGS);
+  const [interruptedNote, setInterruptedNote] = useState<string | null>(null);
+  // Verified routes the current run has reported so far; tagged with the run that owns them.
+  const foundRoutesRef = useRef<{ runId: number; routes: MultistepSynthesisRoute[] }>({ runId: 0, routes: [] });
   const [drawerResetVersion, setDrawerResetVersion] = useState(0);
   const [editorMountVersion, setEditorMountVersion] = useState(0);
 
@@ -386,6 +467,23 @@ export default function SynthesisPage() {
     }
   }
 
+  async function showInterruptedRoutes(found: MultistepSynthesisRoute[], runId: number, reason: string) {
+    let shown = found;
+    try {
+      shown = await hydrateRouteLabels(found);
+    } catch (hydrateError) {
+      console.warn("[PocketChem:Synthesis] Could not format interrupted routes; showing them as found.", hydrateError);
+    }
+    // A newer search (or a Clear) owns the display now: never overwrite it.
+    if (searchRunRef.current !== runId) return;
+    setRoutes(shown);
+    setError(null);
+    setInterruptedNote(
+      `${reason} The route${shown.length === 1 ? "" : "s"} below passed end-to-end replay before the search stopped, but the search did not finish, so other (possibly better) routes may exist. This is a computation stop, not a claim about what is chemically possible.`,
+    );
+    setStatus("Search interrupted · verified route kept.");
+  }
+
   async function findSynthesis(searchEffort: "normal" | "deep" = "normal") {
     if (!reactantKetcher || !productKetcher || isSearching) return;
 
@@ -400,6 +498,11 @@ export default function SynthesisPage() {
     searchRunRef.current = runId;
     searchAbortRef.current?.abort();
     const searchController = new AbortController();
+    const collector = createRouteCollector(
+      () => searchRunRef.current === runId,
+      searchController.signal,
+    );
+    foundRoutesRef.current = { runId, routes: collector.routes };
     searchAbortRef.current = searchController;
     const prefix = `[PocketChem:Synthesis #${runId}]`;
     let hardTimeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -421,6 +524,7 @@ export default function SynthesisPage() {
     });
     setIsSearching(true);
     setActiveSearchEffort(searchEffort);
+    setInterruptedNote(null);
     setCanSearchDeeper(false);
     setError(null);
     setTechnicalError(null);
@@ -534,15 +638,10 @@ export default function SynthesisPage() {
       const enginePromise = findMultistepSynthesisRoutes(
         combinedStart,
         targetComponents[0],
-        {
-          beamWidth: searchEffort === "deep" ? 16 : 10,
-          branchLimit: searchEffort === "deep" ? 32 : 18,
-          maxSteps: searchEffort === "deep" ? 9 : 7,
-          maxRoutes: 1,
-          preferFirstVerifiedRoute: true,
-          searchEffort,
+        buildSynthesisSearchOptions(searchEffort, hardTimeoutMs, advanced, {
           signal: searchController.signal,
-        },
+          onRouteFound: collector.onRouteFound,
+        }),
         (progress) => {
           if (searchRunRef.current === runId && !searchController.signal.aborted) {
             console.debug(`${prefix} search progress`, progress);
@@ -632,7 +731,17 @@ export default function SynthesisPage() {
     } catch (searchError) {
       console.error(`${prefix} multistep synthesis search failed`, searchError);
       if (searchRunRef.current === runId) {
-        if (timeoutReason) {
+        const salvaged = foundRoutesRef.current.runId === runId ? [...foundRoutesRef.current.routes] : [];
+        if (timeoutReason && salvaged.length > 0) {
+          if (searchEffort === "normal") setCanSearchDeeper(true);
+          await showInterruptedRoutes(
+            salvaged,
+            runId,
+            timeoutReason === "stall"
+              ? `No planner progress was reported for ${Math.round(stallTimeoutMs / 1000)} seconds.`
+              : `The ${Math.round(hardTimeoutMs / 1000)}-second ${searchEffort === "deep" ? "deep-search" : "normal-search"} limit was reached.`,
+          );
+        } else if (timeoutReason) {
           const timeoutDetail = timeoutReason === "stall"
             ? `No planner progress was reported for ${Math.round(stallTimeoutMs / 1000)} seconds.`
             : `The ${Math.round(hardTimeoutMs / 1000)}-second ${searchEffort === "deep" ? "deep-search safety" : "normal-search"} limit was reached.`;
@@ -673,9 +782,12 @@ export default function SynthesisPage() {
   }
 
   function cancelSynthesisSearch() {
+    const previousRun = searchRunRef.current;
+    const kept = foundRoutesRef.current.runId === previousRun ? [...foundRoutesRef.current.routes] : [];
     searchAbortRef.current?.abort();
     searchAbortRef.current = null;
     searchRunRef.current += 1;
+    if (kept.length > 0) void showInterruptedRoutes(kept, searchRunRef.current, "The search was cancelled.");
     setIsSearching(false);
     setSearchProgress(0);
     setSearchElapsedMs(0);
@@ -687,6 +799,8 @@ export default function SynthesisPage() {
     searchAbortRef.current = null;
     searchRunRef.current += 1;
     setIsSearching(false);
+    setInterruptedNote(null);
+    foundRoutesRef.current = { runId: searchRunRef.current, routes: [] };
     setError(null);
     setTechnicalError(null);
     setRoutes([]);
@@ -818,6 +932,61 @@ export default function SynthesisPage() {
           </div>
         </div>
 
+        <details className="reaction-detail synthesis-advanced-search">
+          <summary>Advanced search: convergent routes and material copies</summary>
+          <div style={{ display: "grid", gap: "0.5rem", marginTop: "0.6rem" }}>
+            <label>
+              <input
+                type="checkbox"
+                checked={advanced.convergent}
+                disabled={isSearching}
+                onChange={(event) =>
+                  setAdvanced((current) => ({
+                    ...current,
+                    convergent: event.target.checked,
+                    bidirectional: event.target.checked ? current.bidirectional : false,
+                  }))
+                }
+              />{" "}
+              Try convergent routes first (separate branches that are joined in one step)
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={advanced.bidirectional}
+                disabled={isSearching || !advanced.convergent}
+                onChange={(event) =>
+                  setAdvanced((current) => ({ ...current, bidirectional: event.target.checked }))
+                }
+              />{" "}
+              Also work backward from the target (slower)
+            </label>
+            <label>
+              Copies of each supplied material{" "}
+              <select
+                value={advanced.copies}
+                disabled={isSearching || !advanced.convergent}
+                onChange={(event) =>
+                  setAdvanced((current) => ({
+                    ...current,
+                    copies: event.target.value === "2" ? 2 : 1,
+                  }))
+                }
+              >
+                <option value={1}>One copy (default)</option>
+                <option value={2}>Two copies</option>
+              </select>
+            </label>
+            <p className="reaction-note">
+              Advanced search is optional and uses part of the same time limit; it does not
+              guarantee that every possible synthesis is found, and not finding a route does not
+              mean the target is unreachable. A copy is a qualitative availability count, not an
+              amount of substance or a yield. Two copies never add a new compound: they only
+              allow a supplied material to be used twice.
+            </p>
+          </div>
+        </details>
+
         {isSearching && (
           <div className="synthesis-search-telemetry">
             <div
@@ -843,6 +1012,11 @@ export default function SynthesisPage() {
         )}
 
         {error && <p className="reaction-detail reaction-limitation synthesis-error">{error}</p>}
+        {interruptedNote && (
+          <p className="reaction-detail reaction-limitation synthesis-interrupted">
+            <strong>Search interrupted.</strong> {interruptedNote}
+          </p>
+        )}
 
         {technicalError && (
           <details className="reaction-detail synthesis-error-details">
@@ -989,6 +1163,8 @@ export default function SynthesisPage() {
             </p>
           )}
 
+          <RouteStructurePanel route={route} />
+
           {route.steps.length > 0 && (() => {
             const finalStep = route.steps[route.steps.length - 1];
             const targetRequestsTetrahedralStereo = targetSmiles.includes("@");
@@ -1010,12 +1186,18 @@ export default function SynthesisPage() {
               {route.steps.map((step) => {
                 const svgKey = `${route.id}--step-${step.stepNumber}`;
                 const svgs = routeSvgs[svgKey];
+                const structure = describeRouteStructure(route);
+                const stepInputs =
+                  structure.kind === "convergent" ? structure.stepInputs[step.stepNumber] : undefined;
 
                 return (
                   <div className="synthesis-step-card" key={step.id}>
                     <div className="reaction-card-heading">
                       <div>
                         <p className="synthesis-step-label">Step {step.stepNumber}</p>
+                        {stepInputs && stepInputs.length > 0 && (
+                          <p className="reaction-curriculum">Inputs: {stepInputs.join(" + ")}</p>
+                        )}
                         <h3>{step.title}</h3>
                         <p className="reaction-curriculum">
                           {courseLabel(step.course)} · {step.chapter}

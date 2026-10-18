@@ -2281,6 +2281,7 @@ export function findConvergentSynthesisRoutes(
     stepFromPathway: forwardStepFromPathway,
     signal: options.signal,
     onProgress,
+    onRouteFound: options.onRouteFound,
   });
 }
 
@@ -2322,9 +2323,27 @@ export async function findMultistepSynthesisRoutesFromRules(
   if (searchCancelled(options.signal)) return routes;
 
   const verified: MultistepSynthesisRoute[] = [];
+  // Inventory chosen for the convergent lane also applies to the replay of linear routes.
+  const copies =
+    typeof options.convergentSearch === "object" ? options.convergentSearch.startingMaterialCopies : undefined;
   for (const route of routes) {
     try {
-      verified.push({ ...route, verification: await verifyMultistepRoute(route, rules) });
+      const replayed = {
+        ...route,
+        verification: await verifyMultistepRoute(
+          route,
+          rules,
+          copies === undefined ? undefined : { startingMaterialCopies: copies },
+        ),
+      };
+      verified.push(replayed);
+      if (replayed.verification.status !== "failed") {
+        try {
+          options.onRouteFound?.(replayed);
+        } catch (callbackError) {
+          console.error("[PocketChem:Synthesis] onRouteFound callback failed; continuing.", callbackError);
+        }
+      }
     } catch (error) {
       console.error("[PocketChem:Synthesis] Route replay failed; returning the route unverified.", error);
       verified.push(route);
