@@ -852,7 +852,24 @@ export type MultistepSynthesisRoute = {
  * A' + B' -> target). Every field is optional; omitted fields use conservative
  * defaults. A copy is a qualitative availability count, not an amount.
  */
+/** Budgets for the retrosynthetic goal-set side of bidirectional convergent search. */
+export type RetroGoalSearchOptions = {
+  maxRetroExpansions?: number;
+  /** Most retro-engine disconnection calls (each is one goal structure). */
+  maxRetroCalls?: number;
+  maxRetroDepth?: number;
+  maxResultsPerGoal?: number;
+  /** Most unresolved goals one retro state may hold. */
+  maxGoals?: number;
+};
+
 export type ConvergentSearchOptions = {
+  /**
+   * Opt in to retrosynthetic goal-set exploration. The target is disconnected
+   * into sets of precursor goals, which are matched against forward pool states
+   * and replayed through the verifier. Off by default.
+   */
+  bidirectional?: boolean | RetroGoalSearchOptions;
   /** Copies of each supplied material (number for all, array by component). Default one each. */
   startingMaterialCopies?: number | number[];
   maxStateExpansions?: number;

@@ -28,6 +28,14 @@ import {
   type SuppliedMaterial,
 } from "./speciesPool";
 import { verifyMultistepRoute } from "./routeVerification";
+import {
+  RETRO_DEFAULTS,
+  createRetroSearch,
+  type RetroSearch,
+  type RetroState,
+  type RetroStats,
+  type RetroStructure,
+} from "./retroGoalSearch";
 
 /**
  * Forward convergent search (Phase 4, Stage 3).
@@ -85,6 +93,7 @@ export type ConvergentStopReason =
   | "exhausted"
   | "expansion-budget"
   | "execution-budget"
+  | "retro-budget"
   | "time-budget"
   | "cancelled";
 
@@ -99,6 +108,8 @@ export type ConvergentSearchStats = {
   /** Routes that reached the target structure but were not returned. */
   rejectedRoutes: Array<{ reason: string; steps: number }>;
   elapsedMs: number;
+  /** Present only when `bidirectional` was requested. */
+  retro: (RetroStats & { meetingsAttempted: number; chainsCompleted: number; chainsRejected: number }) | null;
 };
 
 /**
@@ -174,9 +185,12 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
     maxDepthReached: 0,
     rejectedRoutes: [],
     elapsedMs: 0,
+    retro: null,
   };
+  const retroMeta = { meetingsAttempted: 0, chainsCompleted: 0, chainsRejected: 0 };
   const finish = (routes: MultistepSynthesisRoute[], reason?: ConvergentStopReason): ConvergentSearchResult => {
     if (reason) stats.stopReason = reason;
+    if (stats.retro) Object.assign(stats.retro, retroMeta);
     stats.elapsedMs = Date.now() - startedAt;
     return { routes, stats };
   };
@@ -432,19 +446,20 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
     return out;
   }
 
-  /** The target lot a state holds, if any: exact structure or a known mixture member. */
-  async function targetLot(state: PoolState, producedIds: string[]): Promise<PoolLot | null> {
+  /** The produced lot that is `wanted`, if any: exact structure or a known mixture member. */
+  async function lotMatching(state: PoolState, producedIds: string[], wanted: Structure): Promise<PoolLot | null> {
     for (const id of producedIds) {
       const lot = lotById(state, id);
       if (!lot) continue;
-      if (lot.canonical === target!.canonical) return lot;
-      if (lot.connectivity !== target!.connectivity || !lot.stereoMixtureMembers?.length) continue;
+      if (lot.canonical === wanted.canonical) return lot;
+      if (lot.connectivity !== wanted.connectivity || !lot.stereoMixtureMembers?.length) continue;
       for (const member of lot.stereoMixtureMembers) {
-        if ((await structureOf(member))?.canonical === target!.canonical) return lot;
+        if ((await structureOf(member))?.canonical === wanted.canonical) return lot;
       }
     }
     return null;
   }
+  const targetLot = (state: PoolState, producedIds: string[]) => lotMatching(state, producedIds, target!);
 
   /** Route restricted to the target's ancestry, with lots renumbered to match the replay. */
   function routeFor(frontier: Frontier, lot: PoolLot): MultistepSynthesisRoute | { rejected: string } {
@@ -483,7 +498,9 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
   async function makeNext(
     current: Frontier,
     successor: Successor,
-  ): Promise<{ next: Frontier; budgeted: PoolState; hit: PoolLot | null } | null> {
+    /** Retro chains must not shelve lots a later step still needs. */
+    keepAllLots = false,
+  ): Promise<{ next: Frontier; budgeted: PoolState; hit: PoolLot | null; producedIds: string[] } | null> {
     const applied = applyStep(current.state, {
       ruleId: successor.pathway.ruleId,
       consumedLotIds: successor.consumedLotIds,
@@ -501,14 +518,16 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
     if (!step) return null;
     const keepScores = new Map<string, number>();
     for (const lot of liveLots(applied.state)) keepScores.set(lot.id, -(await distanceTo(lot.canonical)));
-    const budgeted = enforceBudget(
-      applied.state,
-      {
-        maxLiveLots: positive(options.maxLiveLots, CONVERGENT_DEFAULTS.maxLiveLots),
-        maxLiveCoproducts: positive(options.maxLiveCoproducts, CONVERGENT_DEFAULTS.maxLiveCoproducts),
-      },
-      (lot) => keepScores.get(lot.id) ?? 0,
-    ).state;
+    const budgeted = keepAllLots
+      ? applied.state
+      : enforceBudget(
+          applied.state,
+          {
+            maxLiveLots: positive(options.maxLiveLots, CONVERGENT_DEFAULTS.maxLiveLots),
+            maxLiveCoproducts: positive(options.maxLiveCoproducts, CONVERGENT_DEFAULTS.maxLiveCoproducts),
+          },
+          (lot) => keepScores.get(lot.id) ?? 0,
+        ).state;
     const next: Frontier = {
       state: budgeted,
       stepRecords: [...current.stepRecords, { step, reactantLotIds: successor.reactantLotIds }],
@@ -517,7 +536,7 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
       independentJoin: false,
       gatedJoins: [],
     };
-    return { next, budgeted, hit: await targetLot(budgeted, applied.producedLotIds) };
+    return { next, budgeted, hit: await targetLot(budgeted, applied.producedLotIds), producedIds: applied.producedLotIds };
   }
 
   /** Builds, replays and (only if the replay holds) records a route ending at `hit`. */
@@ -573,11 +592,178 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
   const found: MultistepSynthesisRoute[] = [];
   const foundIds = new Set<string>();
 
+  // ---- Bidirectional (opt-in): retro goal sets matched against forward states ----
+  const retroOptions = typeof options.bidirectional === "object" ? options.bidirectional : {};
+  const bidirectional = Boolean(options.bidirectional);
+  const retroStates: RetroState[] = [];
+  const retroTried = new Set<string>();
+  const rulesById = new Map(rules.map((rule) => [rule.id, rule]));
+  const RETRO_MATCH_BONUS = 60;
+
+  /** How a live lot can stand in for a goal. Connectivity-only fits are still replayed. */
+  function fitKind(lot: PoolLot, goal: RetroStructure): "exact" | "mixture-member" | "connectivity" | null {
+    if (lot.canonical === goal.canonical) return "exact";
+    if (lot.connectivity !== goal.connectivity) return null;
+    if (lot.stereoMixtureMembers?.includes(goal.smiles)) return "mixture-member";
+    return goal.hasSpecifiedStereo ? null : "connectivity";
+  }
+
+  /** Assigns every goal a distinct live lot (inventory: one lot per goal), or null. */
+  function matchGoals(state: PoolState, goals: RetroState["goals"]): Map<string, string> | null {
+    const live = liveLots(state);
+    if (goals.length > live.length) return null;
+    const fits = goals.map((goal) => live.filter((lot) => fitKind(lot, goal) !== null).map((lot) => lot.id));
+    if (fits.some((list) => list.length === 0)) return null;
+    const used = new Set<string>();
+    const chosen = new Map<string, string>();
+    const place = (position: number): boolean => {
+      if (position === goals.length) return true;
+      for (const id of fits[position]) {
+        if (used.has(id)) continue;
+        used.add(id);
+        chosen.set(goals[position].id, id);
+        if (place(position + 1)) return true;
+        used.delete(id);
+        chosen.delete(goals[position].id);
+      }
+      return false;
+    };
+    return place(0) ? chosen : null;
+  }
+
+  /** Ordering only: how many goals of the best retro state this state already holds. */
+  function retroProgress(state: PoolState): number {
+    if (retroStates.length === 0) return 0;
+    const live = liveLots(state);
+    let best = 0;
+    for (const retro of retroStates) {
+      const taken = new Set<string>();
+      let count = 0;
+      for (const goal of retro.goals) {
+        const lot = live.find((item) => !taken.has(item.id) && fitKind(item, goal) !== null);
+        if (lot) {
+          taken.add(lot.id);
+          count += 1;
+        }
+      }
+      best = Math.max(best, count);
+    }
+    return best;
+  }
+
+  /**
+   * Replays a retro chain forward from `base`: deepest disconnection first, each
+   * through the real engine on the matched lots. A chain whose step the engine
+   * does not reproduce (missing reactant, wrong product) is dropped. The final
+   * route still goes through acceptHit's end-to-end replay.
+   */
+  async function completeChain(base: Frontier, retro: RetroState, assigned: Map<string, string>): Promise<void> {
+    let frontier = base;
+    const lotOfGoal = new Map(assigned);
+    for (const step of [...retro.disconnections].reverse()) {
+      const rule = rulesById.get(step.ruleId);
+      const byId = new Map(liveLots(frontier.state).map((lot) => [lot.id, lot]));
+      const lots = step.consumesGoalIds.map((id) => byId.get(lotOfGoal.get(id) ?? ""));
+      if (!rule || lots.some((lot) => !lot)) {
+        retroMeta.chainsRejected += 1;
+        return;
+      }
+      const used = lots as PoolLot[];
+      const key = `${rule.id}|${used.map((lot) => lot.smiles).join("|")}`;
+      const pathways = await execute(key, used.map((lot) => lot.smiles).join("."), [rule]);
+      if (!pathways) return;
+      let advanced = false;
+      for (const successor of await successorsFor(used, rule.id, pathways)) {
+        const made = await makeNext(frontier, successor, true);
+        if (!made) continue;
+        const lot = await lotMatching(made.budgeted, made.producedIds, step.producesGoal);
+        if (!lot) continue;
+        lotOfGoal.set(step.producesGoalId, lot.id);
+        frontier = made.next;
+        advanced = true;
+        break;
+      }
+      if (!advanced) {
+        retroMeta.chainsRejected += 1;
+        return;
+      }
+    }
+    retroMeta.chainsCompleted += 1;
+    const finalId = lotOfGoal.get("g0");
+    const hit = finalId ? await lotMatching(frontier.state, [finalId], target!) : null;
+    if (hit) await acceptHit(frontier, hit);
+    else retroMeta.chainsRejected += 1;
+  }
+
+  /** Tries every known retro goal set whose goals the forward state can supply. */
+  async function tryMeetings(frontier: Frontier, retroList: RetroState[]): Promise<void> {
+    const forwardKey = stateKey(frontier.state, "future");
+    for (const retro of retroList) {
+      if (found.length > 0 || stopReason()) return;
+      const pair = `${retro.key}|${forwardKey}`;
+      if (retroTried.has(pair)) continue;
+      retroTried.add(pair);
+      const assigned = matchGoals(frontier.state, retro.goals);
+      if (!assigned) continue;
+      retroMeta.meetingsAttempted += 1;
+      await completeChain(frontier, retro, assigned);
+    }
+  }
+
+  // Forward species reached so far (ordering input for the retro side) and every
+  // forward frontier a newly found retro goal set can be matched against.
+  const reached = new Set<string>(initial.lots.map((lot) => lot.canonical));
+  const frontiers: Frontier[] = [open[0]];
+  let retro: RetroSearch | null = null;
+  if (bidirectional) {
+    const copies = sanitizeCopies(options.startingMaterialCopies, supplied.length);
+    retro = createRetroSearch({
+      target,
+      rules,
+      supplied: supplied.map((item, at) => ({ ...item, copies: copies[at] })),
+      structureOf,
+      presetsFor: (ruleId) => presetsByRule.get(ruleId) ?? new Set<string>(),
+      allowGeneric,
+      limits: {
+        maxRetroExpansions: positive(retroOptions.maxRetroExpansions, RETRO_DEFAULTS.maxRetroExpansions),
+        maxRetroCalls: positive(retroOptions.maxRetroCalls, RETRO_DEFAULTS.maxRetroCalls),
+        maxRetroDepth: positive(retroOptions.maxRetroDepth, RETRO_DEFAULTS.maxRetroDepth),
+        maxResultsPerGoal: positive(retroOptions.maxResultsPerGoal, RETRO_DEFAULTS.maxResultsPerGoal),
+        maxGoals: positive(retroOptions.maxGoals, RETRO_DEFAULTS.maxGoals),
+      },
+      haltReason: () => (signal?.aborted ? "cancelled" : Date.now() >= deadline ? "time-budget" : null),
+      signal,
+    });
+    stats.retro = { ...retro.stats, ...retroMeta };
+  }
+
+  /** One retro expansion; its new goal sets are matched against every forward frontier so far. */
+  async function advanceRetro(): Promise<boolean> {
+    if (!retro) return false;
+    const fresh = await retro.step(reached);
+    stats.retro = { ...retro.stats, ...retroMeta };
+    if (!fresh) return false;
+    for (const state of fresh) {
+      retroStates.push(state);
+      for (const frontier of frontiers) {
+        if (found.length > 0 || stopReason()) return true;
+        await tryMeetings(frontier, [state]);
+      }
+    }
+    return true;
+  }
+  if (retro) await advanceRetro();
+  if (found.length > 0) return finish(found, "found");
+
   while (open.length > 0) {
     const halt = stopReason();
     if (halt) return finish(found, found.length > 0 ? "found" : halt);
     if (stats.stateExpansions >= maxExpansions) return finish(found, found.length > 0 ? "found" : "expansion-budget");
 
+    if (retro && retro.stats.stopReason === "running") {
+      await advanceRetro();
+      if (found.length > 0) return finish(found, "found");
+    }
     let best = 0;
     for (let at = 1; at < open.length; at += 1) if (open[at].rank < open[best].rank) best = at;
     const current = open.splice(best, 1)[0];
@@ -621,11 +807,15 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
       let heuristic = Number.POSITIVE_INFINITY;
       for (const lot of liveLots(budgeted)) heuristic = Math.min(heuristic, await distanceTo(lot.canonical));
       Object.assign(next, await joinInfo(budgeted));
+      for (const lot of liveLots(budgeted)) reached.add(lot.canonical);
+      frontiers.push(next);
       await lookahead(next);
+      if (bidirectional && found.length === 0) await tryMeetings(next, retroStates);
       next.rank =
         budgeted.pathCost +
         (Number.isFinite(heuristic) ? heuristic : 0) * PLANNING_HEURISTIC_SCALE -
-        (next.independentJoin ? INDEPENDENT_JOIN_BONUS : 0);
+        (next.independentJoin ? INDEPENDENT_JOIN_BONUS : 0) -
+        (bidirectional ? retroProgress(budgeted) * RETRO_MATCH_BONUS : 0);
       open.push(next);
     }
 
@@ -634,5 +824,16 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
     // expanded; deeper exploration is the linear search's job.
     if (found.length > 0) return finish(found, "found");
   }
-  return finish(found, found.length > 0 ? "found" : "exhausted");
+  // The forward frontier ran dry: let the retro side use what budget it has left,
+  // matching its goal sets against everything the forward side reached.
+  while (found.length === 0 && retro && retro.stats.stopReason === "running") {
+    if (!(await advanceRetro())) break;
+  }
+  if (found.length > 0) return finish(found, "found");
+  const retroHalt = retro && retro.stats.stopReason !== "running" ? retro.stats.stopReason : null;
+  if (retroHalt === "time-budget" || retroHalt === "cancelled") return finish(found, retroHalt);
+  if (retroHalt === "expansion-budget" || retroHalt === "call-budget") {
+    return finish(found, "retro-budget");
+  }
+  return finish(found, "exhausted");
 }
