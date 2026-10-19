@@ -168,6 +168,7 @@ describe("best-so-far routes", () => {
     collector.onRouteFound(route("a"));
     collector.onRouteFound(route("a")); // duplicate
     collector.onRouteFound(route("b", "failed")); // never accepted
+    collector.onRouteFound({ id: "missing", confidence: "verified" }); // no replay: never accepted
     collector.onRouteFound(route("c"));
     collector.onRouteFound(route("d")); // over the cap
     assert.deepEqual(collector.routes.map((item) => item.id), ["a", "c"]);

@@ -294,6 +294,7 @@ export default function SynthesisPage() {
   const [routes, setRoutes] = useState<MultistepSynthesisRoute[]>([]);
   const [routeSvgs, setRouteSvgs] = useState<RouteSvgMap>({});
   const [isSearching, setIsSearching] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const [status, setStatus] = useState(
     "Draw starting materials and a target product to begin.",
   );
@@ -430,15 +431,19 @@ export default function SynthesisPage() {
       ]);
 
       if (!ketText.trim()) {
-        setError(`Draw ${label} before searching.`);
-        setStatus("Draw the missing structure and try again.");
+        if (searchRunRef.current === runId) {
+          setError(`Draw ${label} before searching.`);
+          setStatus("Draw the missing structure and try again.");
+        }
         return null;
       }
 
       const smiles = await ketToSmiles(ketText, label, runId);
       if (!smiles) {
-        setError(`PocketChem could not interpret ${label}.`);
-        setStatus("Could not convert the drawn structures.");
+        if (searchRunRef.current === runId) {
+          setError(`PocketChem could not interpret ${label}.`);
+          setStatus("Could not convert the drawn structures.");
+        }
         return null;
       }
 
@@ -455,12 +460,14 @@ export default function SynthesisPage() {
       const timedOut =
         readError instanceof Error && readError.message.startsWith("Timed out");
 
-      setError(
-        timedOut
-          ? `Ketcher took too long to read ${label}. Try the search again.`
-          : `PocketChem could not read ${label}. Check the structure and try again.`,
-      );
-      setStatus("Could not read the structures from Ketcher.");
+      if (searchRunRef.current === runId) {
+        setError(
+          timedOut
+            ? `Ketcher took too long to read ${label}. Try the search again.`
+            : `PocketChem could not read ${label}. Check the structure and try again.`,
+        );
+        setStatus("Could not read the structures from Ketcher.");
+      }
       return null;
     } finally {
       if (timeoutId !== null) clearTimeout(timeoutId);
@@ -485,7 +492,7 @@ export default function SynthesisPage() {
   }
 
   async function findSynthesis(searchEffort: "normal" | "deep" = "normal") {
-    if (!reactantKetcher || !productKetcher || isSearching) return;
+    if (!reactantKetcher || !productKetcher || isSearching || isClearing) return;
 
     const stallTimeoutMs = searchEffort === "deep"
       ? SYNTHESIS_DEEP_STALL_TIMEOUT_MS
@@ -724,8 +731,9 @@ export default function SynthesisPage() {
         setStatus("A supplied starting material already matches the target product.");
       } else {
         const stepCount = results[0].steps.length;
+        const replayConfirmed = results[0].verification?.status === "verified" || results[0].verification?.status === "connectivity-only";
         setStatus(
-          `Verified route found: ${stepCount} step${stepCount === 1 ? "" : "s"}.`,
+          `${replayConfirmed ? "Replay-confirmed route" : "Unverified candidate route"} found: ${stepCount} step${stepCount === 1 ? "" : "s"}.`,
         );
       }
     } catch (searchError) {
@@ -795,9 +803,12 @@ export default function SynthesisPage() {
   }
 
   async function clearSynthesis() {
+    if (isClearing) return;
     searchAbortRef.current?.abort();
     searchAbortRef.current = null;
     searchRunRef.current += 1;
+    const clearRunId = searchRunRef.current;
+    setIsClearing(true);
     setIsSearching(false);
     setInterruptedNote(null);
     foundRoutesRef.current = { runId: searchRunRef.current, routes: [] };
@@ -828,9 +839,11 @@ export default function SynthesisPage() {
         productKetcher?.setMolecule(EMPTY_KET, clearOptions),
       ]);
 
+      if (searchRunRef.current !== clearRunId) return;
       setDrawerResetVersion((version) => version + 1);
       setStatus("Draw starting materials and a target product to begin.");
     } catch (clearError) {
+      if (searchRunRef.current !== clearRunId) return;
       console.warn("Could not clear synthesis editors in place; remounting as fallback.", clearError);
 
       // Rare fallback if Ketcher rejects the empty KET import. The normal path
@@ -840,6 +853,8 @@ export default function SynthesisPage() {
       setDrawerResetVersion((version) => version + 1);
       setEditorMountVersion((version) => version + 1);
       setStatus("Draw starting materials and a target product to begin.");
+    } finally {
+      if (searchRunRef.current === clearRunId) setIsClearing(false);
     }
   }
 
@@ -903,7 +918,7 @@ export default function SynthesisPage() {
           <div className="reaction-actions synthesis-actions">
             <button
               className="primary-button"
-              disabled={!editorsReady || isSearching}
+              disabled={!editorsReady || isSearching || isClearing}
               onClick={() => void findSynthesis("normal")}
               type="button"
             >
@@ -912,7 +927,7 @@ export default function SynthesisPage() {
             {canSearchDeeper && !isSearching && (
               <button
                 className="secondary-button"
-                disabled={!editorsReady}
+                disabled={!editorsReady || isClearing}
                 onClick={() => void findSynthesis("deep")}
                 type="button"
               >
@@ -921,7 +936,7 @@ export default function SynthesisPage() {
             )}
             <button
               className="secondary-button"
-              disabled={!editorsReady}
+              disabled={!editorsReady || isClearing}
               onClick={() =>
                 isSearching ? cancelSynthesisSearch() : void clearSynthesis()
               }
@@ -1127,7 +1142,7 @@ export default function SynthesisPage() {
         <div className="card synthesis-route-card" key={route.id}>
           <div className="synthesis-route-header">
             <div>
-              <p className="label">Verified route</p>
+              <p className="label">{route.verification?.status === "verified" || route.verification?.status === "connectivity-only" ? "Replay-confirmed route" : "Unverified candidate route"}</p>
               <h2>
                 {route.steps.length === 0
                   ? "A starting material already matches target"
@@ -1135,9 +1150,11 @@ export default function SynthesisPage() {
               </h2>
             </div>
             <span className="status ready">
-              {route.confidence === "verified"
+              {route.verification?.status === "verified"
                 ? "Structure verified"
-                : "Connectivity verified"}
+                : route.verification?.status === "connectivity-only"
+                  ? "Connectivity verified"
+                  : "Not replay-verified"}
             </span>
           </div>
 

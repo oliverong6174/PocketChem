@@ -35,14 +35,13 @@ export function createRouteCollector(isCurrent: () => boolean, signal: AbortSign
     routes,
     onRouteFound(route: MultistepSynthesisRoute) {
       if (!isCurrent() || signal.aborted) return;
-      if (route.verification?.status === "failed") return;
+      if (route.verification?.status !== "verified" && route.verification?.status !== "connectivity-only") return;
       if (routes.length >= cap || routes.some((item) => item.id === route.id)) return;
-      // The confidence label always follows the replay, whatever the planner assigned.
-      routes.push(
-        route.verification
-          ? { ...route, confidence: route.verification.status === "verified" ? "verified" : "connectivity-verified" }
-          : route,
-      );
+      // The confidence label always follows successful replay, not the planner label.
+      routes.push({
+        ...route,
+        confidence: route.verification.status === "verified" ? "verified" : "connectivity-verified",
+      });
     },
   };
 }
