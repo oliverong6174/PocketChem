@@ -11,6 +11,21 @@ import type {
   FunctionalGroupResult,
 } from "./types";
 
+// Compiled group queries are immutable and reused for every molecule analysed; compiling
+// ~250 SMARTS per call used to be a large share of every planner expansion. They live for
+// the page's lifetime (a few hundred small objects) and are intentionally never deleted.
+const groupQueryCache = new Map<string, any>();
+
+function compiledGroupQuery(RDKit: any, smarts: string): any {
+  let query = groupQueryCache.get(smarts);
+  if (query === undefined) {
+    query = RDKit.get_qmol(smarts) ?? null;
+    if (query) groupQueryCache.set(smarts, query);
+  }
+  if (!query) throw new Error("Could not compile functional-group SMARTS");
+  return query;
+}
+
 export async function analyzeFunctionalGroupHierarchy(
   smiles: string
 ): Promise<FunctionalGroupHierarchy> {
@@ -42,10 +57,8 @@ export async function analyzeFunctionalGroupHierarchy(
   const detectedGroups: FunctionalGroupResult[] = [];
 
   for (const group of FUNCTIONAL_GROUPS) {
-    let query: any = null;
-
     try {
-      query = RDKit.get_qmol(group.smarts);
+      const query = compiledGroupQuery(RDKit, group.smarts);
       const matchesRaw = mol.get_substruct_matches(query);
 
        const detectedMatches = parseRDKitSubstructureMatches(matchesRaw);
@@ -55,14 +68,14 @@ export async function analyzeFunctionalGroupHierarchy(
           detectedMatches
         );
 
+      if (finalMatches.length > 0) {
+        // Display matches are only used for groups that were detected.
         const displayMatches = getDisplayMatchesForGroup(
           RDKit,
           mol,
           group,
           finalMatches
         );
-
-      if (finalMatches.length > 0) {
         detectedGroups.push({
           name: group.name,
           priority: group.priority,
@@ -81,8 +94,6 @@ export async function analyzeFunctionalGroupHierarchy(
       }
     } catch (error) {
       console.warn(`SMARTS failed for ${group.name}:`, error);
-    } finally {
-      query?.delete?.();
     }
   }
 

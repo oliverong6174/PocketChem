@@ -14,6 +14,7 @@ import type {
 import { runCustomHandler } from "./handlers";
 import {
   analyzeReactionComponents,
+  cachedComponentGroups,
   isGenericReactionSmiles,
 } from "./reactionInput";
 import { runReactionSmarts } from "./rdkitReaction";
@@ -126,10 +127,9 @@ async function buildAutoSuppliedReactants(
       return null;
     }
 
-    const hierarchy = await analyzeFunctionalGroupHierarchy(requirement.presetSmiles);
     supplied.push({
       smiles: requirement.presetSmiles,
-      functionalGroups: hierarchy.primaryGroups,
+      functionalGroups: await cachedComponentGroups(requirement.presetSmiles),
       isGeneric: false,
     });
   }

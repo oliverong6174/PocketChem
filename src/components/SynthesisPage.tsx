@@ -1176,7 +1176,10 @@ export default function SynthesisPage() {
           {route.verification?.status === "verified" && (
             <p className="reaction-note">
               Replayed end to end from the supplied starting materials with PocketChem&apos;s
-              reaction model (a model check, not an experimental validation).
+              reaction model (a model check, not an experimental validation). It does not check
+              whether the reagents are compatible with the other functional groups in each
+              intermediate (for example a strong base or organometallic reagent with an acidic
+              OH or N–H group), nor whether a protecting group would be needed.
             </p>
           )}
 

@@ -9,6 +9,27 @@ import {
 const reactionComponentAnalysisCache = new Map<string, Promise<ReactionComponent[]>>();
 const MAX_COMPONENT_ANALYSIS_CACHE = 1400;
 
+// Per-structure cache of functional-group analysis. The combined-string cache above misses
+// whenever the same molecule appears next to a different partner (every join, every
+// coproduct set), and rule-supplied reagents were re-analysed on every engine call.
+const singleComponentGroupCache = new Map<string, Promise<FunctionalGroupResult[]>>();
+const MAX_SINGLE_COMPONENT_CACHE = 4000;
+
+export function cachedComponentGroups(component: string): Promise<FunctionalGroupResult[]> {
+  let pending = singleComponentGroupCache.get(component);
+  if (!pending) {
+    pending = analyzeFunctionalGroupHierarchy(component).then((hierarchy) => hierarchy.primaryGroups ?? []);
+    singleComponentGroupCache.set(component, pending);
+    pending.catch(() => singleComponentGroupCache.delete(component));
+    while (singleComponentGroupCache.size > MAX_SINGLE_COMPONENT_CACHE) {
+      const oldest = singleComponentGroupCache.keys().next().value as string | undefined;
+      if (oldest === undefined) break;
+      singleComponentGroupCache.delete(oldest);
+    }
+  }
+  return pending;
+}
+
 function trimReactionComponentCache(): void {
   while (reactionComponentAnalysisCache.size > MAX_COMPONENT_ANALYSIS_CACHE) {
     const oldest = reactionComponentAnalysisCache.keys().next().value as string | undefined;
@@ -219,8 +240,7 @@ export async function analyzeReactionComponents(
         functionalGroups = singleReactantFunctionalGroups;
       } else {
         try {
-          const hierarchy = await analyzeFunctionalGroupHierarchy(component);
-          functionalGroups = hierarchy.primaryGroups ?? [];
+          functionalGroups = await cachedComponentGroups(component);
         } catch (error) {
           console.warn("Reaction component analysis failed:", component, error);
           analysisError = error instanceof Error ? error.message : String(error);

@@ -68,6 +68,12 @@ type SearchNode = {
 
 type ProgressCallback = (progress: MultistepSynthesisProgress) => void;
 
+/** Parent expansions the multi-start forward lane may spend before the other lanes run. */
+const FORWARD_LANE_PARENT_BUDGET_NORMAL = 30;
+/** Extra bridge expansions allowed after the first acceptable route, to let a shorter one win. */
+const BRIDGE_GRACE_EXPANSIONS = 6;
+const FORWARD_LANE_PARENT_BUDGET_DEEP = 50;
+
 function frontierDiagnosticFields(
   nodes: SearchNode[],
   targetCanonical: string,
@@ -1704,9 +1710,17 @@ async function searchMultistepRoutes(
       usedStartingMaterialIndices: [...node.usedStartingMaterialIndices],
     }));
     let firstStereoFallbackDepth: number | null = null;
+    // The lane is breadth-first, so each extra layer multiplies its cost. Bound it by the
+    // number of parent expansions (deterministic work, not wall clock) so that the
+    // goal-directed retrosynthesis and bridge lanes that follow always get to run; with
+    // several supplied materials the lane used to exhaust the whole interactive deadline
+    // at forward depth 3-4 and never reach them.
+    let laneParentsLeft = searchEffort === "deep" ? FORWARD_LANE_PARENT_BUDGET_DEEP : FORWARD_LANE_PARENT_BUDGET_NORMAL;
 
     for (let depth = 1; depth <= laneMaxDepth; depth += 1) {
-      if (searchCancelled(signal) || frontier.length === 0) return [];
+      if (searchCancelled(signal) || frontier.length === 0 || laneParentsLeft <= 0) return [];
+      if (frontier.length > laneParentsLeft) frontier = frontier.slice(0, laneParentsLeft);
+      laneParentsLeft -= frontier.length;
 
       onProgress?.({
         phase: "forward",
@@ -1865,12 +1879,18 @@ async function searchMultistepRoutes(
     );
     let expansions = 0;
     let preferForwardOnNearTie = true;
+    // Expansion count at which an acceptable (preferred) route was first found. Every other
+    // lane returns such a route at once; this one used to ignore it and keep expanding until
+    // its whole budget was spent, so a route found early was lost whenever the caller's
+    // deadline arrived first. A short grace window still lets a shorter route displace it.
+    let acceptedAt: number | null = null;
 
     const sortOpen = (nodes: SearchNode[]) =>
       nodes.sort((a, b) => a.rank - b.rank || a.depth - b.depth || a.canonical.localeCompare(b.canonical));
 
     while (
       expansions < maxExpansions &&
+      (acceptedAt === null || expansions < acceptedAt + BRIDGE_GRACE_EXPANSIONS) &&
       (forwardOpen.length > 0 || retroOpen.length > 0)
     ) {
       if (!(await yieldToBrowser(signal))) return [];
@@ -1961,7 +1981,7 @@ async function searchMultistepRoutes(
             normalizedTarget,
             maxRoutes,
           );
-          preferredDiscoveredRoutes(routes);
+          if (preferredDiscoveredRoutes(routes) && acceptedAt === null) acceptedAt = expansions;
         }
       } else {
         const parent = retroOpen.shift()!;
@@ -2027,7 +2047,7 @@ async function searchMultistepRoutes(
             normalizedTarget,
             maxRoutes,
           );
-          preferredDiscoveredRoutes(routes);
+          if (preferredDiscoveredRoutes(routes) && acceptedAt === null) acceptedAt = expansions;
         }
       }
     }
