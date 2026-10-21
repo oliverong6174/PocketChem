@@ -124,6 +124,7 @@ function makeSecondaryAlcoholOxidationRule(
 export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-deprotonation",
+    conditions: { reactionCentre: ["alcohol"], base: "strong", anhydrous: true },
     family: "alcohols",
     reactionType: "acidBase",
     title: "Alcohol Deprotonation",
@@ -469,6 +470,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   },
   {
     id: "primary-alcohol-mild-oxidation",
+    conditions: { oxidant: "mild", anhydrous: true },
     family: "alcohols",
     reactionType: "oxidation",
     title: "Primary Alcohol Oxidation to an Aldehyde",
@@ -494,6 +496,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   },
   {
     id: "primary-alcohol-strong-oxidation",
+    conditions: { oxidant: "strong", acid: "strong" },
     family: "alcohols",
     reactionType: "oxidation",
     title: "Primary Alcohol Oxidation to a Carboxylic Acid",
@@ -573,6 +576,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   },
   {
     id: "alcohol-williamson-ether",
+    conditions: { reactionCentre: ["alcohol"], base: "strong", anhydrous: true },
     family: "alcohols",
     reactionType: "substitution",
     title: "Williamson Ether Synthesis from an Alcohol",
@@ -639,6 +643,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   },
   {
     id: "fischer-esterification",
+    conditions: { reactionCentre: ["carboxylic-acid","alcohol"], acid: "strong" },
     family: "alcohols",
     reactionType: "substitution",
     title: "Fischer Esterification",

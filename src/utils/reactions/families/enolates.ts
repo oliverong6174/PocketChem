@@ -79,6 +79,7 @@ export const enolateReactionRules: ReactionRule[] = [
   },
   {
     id: "enolate-alkylation",
+    conditions: { base: "strong", anhydrous: true },
     family: "enolates",
     reactionType: "substitution",
     title: "Enolate Alkylation",

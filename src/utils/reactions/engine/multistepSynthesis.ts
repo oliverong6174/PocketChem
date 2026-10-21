@@ -16,6 +16,12 @@ import {
 import { predictReactionPathwaysFromRules } from "./reactionEngine";
 import { predictRetrosynthesisPathwaysFromRules } from "./retroSynthesis";
 import { verifyMultistepRoute } from "./routeVerification";
+import {
+  assessRouteCompatibility,
+  assessStepCompatibility,
+  compatibilityAdjustedLength,
+  compatibilityPenalty,
+} from "./compatibility";
 import { searchConvergentRoutesCore, type ConvergentSearchResult } from "./convergentSearch";
 import {
   canonicalizeStereoStructure,
@@ -68,10 +74,36 @@ type SearchNode = {
 
 type ProgressCallback = (progress: MultistepSynthesisProgress) => void;
 
+const rulesByIdCache = new WeakMap<ReactionRule[], Map<string, ReactionRule>>();
+
+/**
+ * Attaches advisory compatibility findings to a freshly built step and returns the planning
+ * cost they add (0 for rules without condition metadata). The cost only orders candidates;
+ * it never removes one, and structural verification is untouched.
+ */
+async function attachStepCompatibility(step: SynthesisStep, rules: ReactionRule[]): Promise<number> {
+  let byId = rulesByIdCache.get(rules);
+  if (!byId) {
+    byId = new Map(rules.map((rule) => [rule.id, rule]));
+    rulesByIdCache.set(rules, byId);
+  }
+  const found = await assessStepCompatibility(byId.get(step.ruleId), step.reactantComponents, step.productComponents);
+  if (found && found.length > 0) step.compatibility = found;
+  return compatibilityPenalty(found ?? undefined);
+}
+
 /** Parent expansions the multi-start forward lane may spend before the other lanes run. */
 const FORWARD_LANE_PARENT_BUDGET_NORMAL = 30;
 /** Extra bridge expansions allowed after the first acceptable route, to let a shorter one win. */
 const BRIDGE_GRACE_EXPANSIONS = 6;
+/** Extra expansions spent looking for a constraint-free route when the first one is flagged. */
+const BRIDGE_COMPAT_EXTRA_EXPANSIONS = 24;
+
+function routeHasModelConstraint(route: MultistepSynthesisRoute | undefined): boolean {
+  return Boolean(
+    route?.steps.some((step) => step.compatibility?.some((item) => item.severity === "model-constraint")),
+  );
+}
 const FORWARD_LANE_PARENT_BUDGET_DEEP = 50;
 
 function frontierDiagnosticFields(
@@ -818,6 +850,7 @@ async function expandForwardLayer(
 
         const step = forwardStepFromPathway(pathway);
         if (!step || pathway.productStatus === "concept-only") continue;
+        const compatibilityCost = await attachStepCompatibility(step, rules);
         if (!allowGeneric && isGenericReactionSmiles(step.productSmiles)) continue;
 
         const productComponents = step.productComponents;
@@ -885,6 +918,7 @@ async function expandForwardLayer(
             parent.pathCost +
             pathway.planningCost +
             stereoControlPenalty +
+            compatibilityCost +
             representationPenalty +
             componentMixturePenalty +
             stereochemicalMixturePenalty +
@@ -987,6 +1021,7 @@ async function expandRetroLayer(
     for (const pathway of diversePathwaySample(pathways, branchLimit)) {
       const step = retroStepFromPathway(pathway);
       if (!allowGeneric && isGenericReactionSmiles(step.reactantSmiles)) continue;
+      const compatibilityCost = await attachStepCompatibility(step, rules);
 
       for (let index = 0; index < pathway.precursorComponents.length; index += 1) {
         if (searchCancelled(signal)) return [];
@@ -1019,6 +1054,7 @@ async function expandRetroLayer(
           parent.pathCost +
           pathway.planningCost +
           retrosynthesisTierPenalty(pathway.retrosynthesisTier) +
+          compatibilityCost +
           confidencePenalty +
           multiReactantPenalty +
           continuationPenalty +
@@ -1401,7 +1437,7 @@ async function searchMultistepRoutes(
     // Once routes are in the same selectivity/stereochemical class, prefer the
     // shorter synthesis, then use the detailed planning score as a tie-break.
     return (
-      a.steps.length - b.steps.length ||
+      compatibilityAdjustedLength(a.steps) - compatibilityAdjustedLength(b.steps) ||
       a.score - b.score ||
       a.id.localeCompare(b.id)
     );
@@ -1884,13 +1920,25 @@ async function searchMultistepRoutes(
     // its whole budget was spent, so a route found early was lost whenever the caller's
     // deadline arrived first. A short grace window still lets a shorter route displace it.
     let acceptedAt: number | null = null;
+    // A route whose steps carry a deterministic compatibility constraint (see
+    // compatibility.ts) is accepted only provisionally: the bridge keeps looking for a clean
+    // alternative for a bounded number of extra expansions, then returns the best it has.
+    let cleanAt: number | null = null;
+    const noteAccepted = (accepted: MultistepSynthesisRoute[] | null) => {
+      if (!accepted) return;
+      if (acceptedAt === null) acceptedAt = expansions;
+      if (cleanAt === null && !routeHasModelConstraint(accepted[0])) cleanAt = expansions;
+    };
 
     const sortOpen = (nodes: SearchNode[]) =>
       nodes.sort((a, b) => a.rank - b.rank || a.depth - b.depth || a.canonical.localeCompare(b.canonical));
 
     while (
       expansions < maxExpansions &&
-      (acceptedAt === null || expansions < acceptedAt + BRIDGE_GRACE_EXPANSIONS) &&
+      (acceptedAt === null ||
+        (cleanAt !== null
+          ? expansions < cleanAt + BRIDGE_GRACE_EXPANSIONS
+          : expansions < acceptedAt + BRIDGE_COMPAT_EXTRA_EXPANSIONS)) &&
       (forwardOpen.length > 0 || retroOpen.length > 0)
     ) {
       if (!(await yieldToBrowser(signal))) return [];
@@ -1981,7 +2029,7 @@ async function searchMultistepRoutes(
             normalizedTarget,
             maxRoutes,
           );
-          if (preferredDiscoveredRoutes(routes) && acceptedAt === null) acceptedAt = expansions;
+          noteAccepted(preferredDiscoveredRoutes(routes));
         }
       } else {
         const parent = retroOpen.shift()!;
@@ -2047,7 +2095,7 @@ async function searchMultistepRoutes(
             normalizedTarget,
             maxRoutes,
           );
-          if (preferredDiscoveredRoutes(routes) && acceptedAt === null) acceptedAt = expansions;
+          noteAccepted(preferredDiscoveredRoutes(routes));
         }
       }
     }
@@ -2356,6 +2404,7 @@ export async function findMultistepSynthesisRoutesFromRules(
           copies === undefined ? undefined : { startingMaterialCopies: copies },
         ),
       };
+      replayed.compatibility = await assessRouteCompatibility(replayed, rules);
       verified.push(replayed);
       if (replayed.verification.status !== "failed") {
         try {

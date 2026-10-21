@@ -458,6 +458,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   },
   {
     id: "haloalkane-williamson-ether",
+    conditions: { base: "mild" },
     family: "haloalkanes",
     reactionType: "substitution",
     reactionClass: "nucleophilic substitution",
@@ -497,6 +498,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   },
   {
     id: "haloalkane-acetylide-alkylation",
+    conditions: { organometallic: true, anhydrous: true },
     family: "haloalkanes",
     reactionType: "substitution",
     reactionClass: "nucleophilic substitution",
@@ -969,6 +971,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
 
   {
     id: "haloalkane-grignard-formation-bromide",
+    conditions: { organometallic: true, anhydrous: true },
     family: "haloalkanes",
     reactionType: "substitution",
     title: "Grignard Reagent Formation",
@@ -995,6 +998,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   },
   {
     id: "haloalkane-grignard-formation-chloride",
+    conditions: { organometallic: true, anhydrous: true },
     family: "haloalkanes",
     reactionType: "substitution",
     title: "Grignard Reagent Formation",
@@ -1022,6 +1026,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   },
   {
     id: "haloalkane-grignard-formation-iodide",
+    conditions: { organometallic: true, anhydrous: true },
     family: "haloalkanes",
     reactionType: "substitution",
     title: "Grignard Reagent Formation",

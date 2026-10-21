@@ -37,6 +37,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   },
   {
     id: "aldehyde-organometallic-addition",
+    conditions: { organometallic: true, anhydrous: true },
     family: "aldehydes",
     reactionType: "addition",
     title: "Organometallic Addition",
@@ -61,6 +62,7 @@ export const aldehydeReactionRules: ReactionRule[] = [
   },
   {
     id: "aldehyde-oxidation",
+    conditions: { oxidant: "mild" },
     family: "aldehydes",
     reactionType: "oxidation",
     title: "Aldehyde Oxidation",

@@ -168,6 +168,7 @@ export const epoxideReactionRules: ReactionRule[] = [
   ...epoxideHxRules,
   {
     id: "epoxide-grignard-opening",
+    conditions: { organometallic: true, anhydrous: true },
     family: "epoxides",
     reactionType: "ringOpening",
     title: "Epoxide Opening with Grignard/Organolithium Reagent",

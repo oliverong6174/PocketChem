@@ -7,6 +7,7 @@ const phenolTrigger = {
 export const phenolReactionRules: ReactionRule[] = [
   {
     id: "phenol-deprotonation",
+    conditions: { reactionCentre: ["phenol"], base: "mild" },
     family: "phenols",
     reactionType: "acidBase",
     title: "Phenol Deprotonation",
@@ -25,6 +26,7 @@ export const phenolReactionRules: ReactionRule[] = [
   },
   {
     id: "phenol-williamson-ether",
+    conditions: { reactionCentre: ["phenol"], base: "mild" },
     family: "phenols",
     reactionType: "substitution",
     title: "Phenoxide Williamson Ether Synthesis",

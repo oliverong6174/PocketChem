@@ -44,6 +44,7 @@ export const nitrileReactionRules: ReactionRule[] = [
   },
   {
     id: "nitrile-lah-reduction",
+    conditions: { hydride: true, anhydrous: true },
     family: "nitriles",
     reactionType: "reduction",
     title: "Nitrile Reduction to a Primary Amine",
@@ -80,6 +81,7 @@ export const nitrileReactionRules: ReactionRule[] = [
   },
   {
     id: "nitrile-grignard-ketone",
+    conditions: { organometallic: true, anhydrous: true },
     family: "nitriles",
     reactionType: "addition",
     title: "Grignard/Organolithium Addition to a Nitrile",

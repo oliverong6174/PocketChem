@@ -472,8 +472,61 @@ export type ReactionReactantRequirement = {
   role?: ReactionReactantRole;
 };
 
+/**
+ * Machine-readable reaction conditions, declared per rule (never inferred from the
+ * free-text reagent label). They describe the conditions the rule's chemistry needs, not
+ * what the engine executes. A rule WITHOUT `conditions` is "not assessed" (unknown), which
+ * is different from `conditions: {}` ("assessed: nothing special").
+ */
+export type RuleConditions = {
+  /** mild: hydroxide/alkoxide/carbonate level; strong: amide, hydride, organolithium level. */
+  base?: "mild" | "strong";
+  /** strong: concentrated mineral acid or a strong Lewis acid. */
+  acid?: "mild" | "strong";
+  /** A carbanion nucleophile (Grignard, organolithium, Gilman, acetylide) is used or formed. */
+  organometallic?: boolean;
+  /** Radical chain halogenation (NBS/light, X2/hv). */
+  radical?: boolean;
+  oxidant?: "mild" | "strong";
+  /** Metal hydride reductant (LiAlH4, DIBAL-H). */
+  hydride?: boolean;
+  /** Water and protic functional groups are not tolerated. */
+  anhydrous?: boolean;
+  /**
+   * Group ids (see engine/compatibility.ts) that this rule's reaction centre consumes or
+   * regenerates. They are never reported as unreacted spectators, because a before/after
+   * count cannot tell "consumed and re-formed" (acetylene -> a new terminal alkyne) from
+   * "left alone".
+   */
+  reactionCentre?: string[];
+};
+
+export type CompatibilitySeverity = "model-constraint" | "plausible";
+
+/** An advisory finding. It never changes whether the structural replay passed. */
+export type CompatibilityWarning = {
+  stepNumber?: number;
+  ruleId: string;
+  severity: CompatibilitySeverity;
+  kind: "acid-base-quench" | "competing-electrophile" | "competing-reactivity";
+  /** Spectator group (present before and after the step) that causes the finding. */
+  group: string;
+  /** Declared condition that makes it a problem. */
+  condition: string;
+  message: string;
+};
+
+export type RouteCompatibility = {
+  warnings: CompatibilityWarning[];
+  /** Rule ids of steps that carry no condition metadata (nothing could be assessed). */
+  unassessedRuleIds: string[];
+  worst: "none" | CompatibilitySeverity;
+};
+
 export type ReactionRule = {
   id: string;
+  /** Declared reaction conditions; see RuleConditions. */
+  conditions?: RuleConditions;
   family: ReactionFamily;
 
   /** Chemical classification. This does not select executable code. */
@@ -683,6 +736,8 @@ export type SynthesisStep = {
   reactantSmiles: string;
   reactantComponents: string[];
   reactantLabel: string;
+  /** Advisory compatibility findings for this step (see engine/compatibility.ts). */
+  compatibility?: CompatibilityWarning[];
 
   productSmiles: string;
   productComponents: string[];
@@ -845,6 +900,8 @@ export type MultistepSynthesisRoute = {
   score: number;
   /** End-to-end replay result; absent only for routes built outside the planner. */
   verification?: RouteVerification;
+  /** Advisory chemical-compatibility summary; independent of `verification`. */
+  compatibility?: RouteCompatibility;
 };
 
 /**

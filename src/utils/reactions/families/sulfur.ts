@@ -3,6 +3,7 @@ import type { ReactionRule } from "../reactionTypes";
 export const sulfurReactionRules: ReactionRule[] = [
   {
     id: "thiol-deprotonation",
+    conditions: { reactionCentre: ["thiol"], base: "mild" },
     family: "sulfur",
     reactionType: "acidBase",
     title: "Thiol Deprotonation",

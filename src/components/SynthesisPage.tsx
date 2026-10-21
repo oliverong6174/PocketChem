@@ -1185,6 +1185,35 @@ export default function SynthesisPage() {
 
           <RouteStructurePanel route={route} />
 
+          {route.compatibility && (route.compatibility.warnings.length > 0 || route.compatibility.unassessedRuleIds.length > 0) && (
+            <div className="reaction-detail reaction-limitation synthesis-compatibility">
+              <p>
+                <strong>Compatibility notes (advisory).</strong> These come from declared reaction
+                conditions and the groups left unreacted in each step; they are not part of the
+                structural verification and are not experimental predictions.
+              </p>
+              {route.compatibility.warnings.length > 0 && (
+                <ul>
+                  {route.compatibility.warnings.map((warning, index) => (
+                    <li key={`${warning.stepNumber}-${warning.group}-${index}`}>
+                      Step {warning.stepNumber}:{" "}
+                      <strong>{warning.severity === "model-constraint" ? "likely problem" : "possible issue"}</strong>{" "}
+                      — {warning.message}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {route.compatibility.unassessedRuleIds.length > 0 && (
+                <p>
+                  {route.compatibility.unassessedRuleIds.length} reaction type
+                  {route.compatibility.unassessedRuleIds.length === 1 ? " has" : "s have"} no
+                  condition data yet, so compatibility could not be assessed for{" "}
+                  {route.compatibility.unassessedRuleIds.length === 1 ? "it" : "them"}.
+                </p>
+              )}
+            </div>
+          )}
+
           {route.steps.length > 0 && (() => {
             const finalStep = route.steps[route.steps.length - 1];
             const targetRequestsTetrahedralStereo = targetSmiles.includes("@");

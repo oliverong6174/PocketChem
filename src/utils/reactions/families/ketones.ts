@@ -8,6 +8,7 @@ const ketoneTrigger = {
 export const ketoneReactionRules: ReactionRule[] = [
   {
     id: "ketone-reduction",
+    conditions: {},
     family: "ketones",
     reactionType: "reduction",
     title: "Ketone Reduction",
@@ -30,6 +31,7 @@ export const ketoneReactionRules: ReactionRule[] = [
   },
     {
     id: "ketone-organometallic-addition",
+    conditions: { organometallic: true, anhydrous: true },
     family: "ketones",
     reactionType: "addition",
     title: "Organometallic Addition",

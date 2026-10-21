@@ -619,6 +619,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   },
   {
     id: "benzylic-bromination",
+    conditions: { radical: true },
     family: "aromatics",
     reactionType: "radical",
     title: "Benzylic Bromination",
@@ -647,6 +648,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   },
   {
     id: "benzylic-oxidation",
+    conditions: { oxidant: "strong" },
     family: "aromatics",
     reactionType: "oxidation",
     title: "Benzylic Side-Chain Oxidation",

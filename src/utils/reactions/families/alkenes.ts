@@ -330,6 +330,7 @@ export const alkeneReactionRules: ReactionRule[] = [
 
   {
     id: "alkene-acid-hydration",
+    conditions: { reactionCentre: ["alcohol"], acid: "strong" },
     family: "alkenes",
     reactionType: "addition",
     title: "Acid-Catalyzed Hydration",

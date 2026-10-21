@@ -16,6 +16,7 @@ const carboxylicAcidTrigger = {
 export const carboxylicAcidReactionRules: ReactionRule[] = [
   {
     id: "carboxylic-acid-deprotonation",
+    conditions: { reactionCentre: ["carboxylic-acid"], base: "mild" },
     family: "carboxylic-acids",
     reactionType: "acidBase",
     title: "Carboxylic Acid Deprotonation",
@@ -34,6 +35,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   },
   {
     id: "carboxylic-acid-lah-reduction",
+    conditions: { reactionCentre: ["carboxylic-acid"], hydride: true, anhydrous: true },
     family: "carboxylic-acids",
     reactionType: "reduction",
     title: "LiAlH₄ Reduction",
@@ -325,6 +327,7 @@ export const carboxylicAcidReactionRules: ReactionRule[] = [
   },
   {
     id: "organometallic-carboxylation",
+    conditions: { organometallic: true, anhydrous: true },
     family: "carboxylic-acids",
     reactionType: "coupling",
     title: "Grignard or Organolithium Carboxylation",
