@@ -2381,6 +2381,27 @@ export async function findMultistepSynthesisRoutesFromRules(
     if (convergent.routes.length > 0 || searchCancelled(options.signal)) return convergent.routes;
   }
 
+  // Inventory chosen for the convergent lane also applies to the replay of linear routes.
+  const copies =
+    typeof options.convergentSearch === "object" ? options.convergentSearch.startingMaterialCopies : undefined;
+  return searchLinearSynthesisRoutes(startingSmiles, targetSmiles, rules, options, onProgress, copies);
+}
+
+/**
+ * The linear lane on its own: plan, then replay every returned route end to end
+ * against the supplied inventory (see findMultistepSynthesisRoutesFromRules).
+ * `options.convergentSearch` is ignored here; the caller states the replay
+ * inventory explicitly through `startingMaterialCopies` (absent means one copy of
+ * each material). Reusable entry point for the adaptive scheduler.
+ */
+export async function searchLinearSynthesisRoutes(
+  startingSmiles: string,
+  targetSmiles: string,
+  rules: ReactionRule[],
+  options: MultistepSynthesisSearchOptions = {},
+  onProgress?: ProgressCallback,
+  startingMaterialCopies?: number | number[],
+): Promise<MultistepSynthesisRoute[]> {
   const routes = await searchMultistepRoutes(
     startingSmiles,
     targetSmiles,
@@ -2391,9 +2412,7 @@ export async function findMultistepSynthesisRoutesFromRules(
   if (searchCancelled(options.signal)) return routes;
 
   const verified: MultistepSynthesisRoute[] = [];
-  // Inventory chosen for the convergent lane also applies to the replay of linear routes.
-  const copies =
-    typeof options.convergentSearch === "object" ? options.convergentSearch.startingMaterialCopies : undefined;
+  const copies = startingMaterialCopies;
   for (const route of routes) {
     try {
       const replayed = {
