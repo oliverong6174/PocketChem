@@ -1593,6 +1593,12 @@ body,
   max-height: 82vh;
 }
 
+/* Synthesis editors: no upper cap. The iframe, shell and name panel are all sized from this box,
+   so dragging its bottom edge resizes the real drawing canvas and the page simply scrolls. */
+.synthesis-ketcher-box {
+  max-height: none;
+}
+
 /* Ketcher intentionally hides overflow in its vertical toolbar button tracks.
    Override that behavior so the mouse wheel / trackpad can reach every tool. */
 .ketcher-shell [data-testid="left-toolbar-buttons"],
@@ -1628,6 +1634,10 @@ body,
   .synthesis-ketcher-box {
     min-height: 280px;
     max-height: 88vh;
+  }
+
+  .synthesis-ketcher-box {
+    max-height: none;
   }
 }
 
@@ -2333,17 +2343,27 @@ body,
 
 .molecule-name-input-copy {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
+  gap: 2px 12px;
+  min-width: 0;
 }
 
+/* The label never wraps while there is room; the hint drops below it instead of squeezing it. */
 .molecule-name-input-copy label {
+  flex: 0 0 auto;
+  max-width: 100%;
+  white-space: nowrap;
   font-weight: 800;
   font-size: 13px;
 }
 
 .molecule-name-input-copy span {
+  flex: 1 1 16rem;
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
   color: #64748b;
   font-size: 11px;
 }
@@ -2405,6 +2425,15 @@ body,
     align-items: flex-start;
     flex-direction: column;
     gap: 2px;
+  }
+
+  .molecule-name-input-copy label {
+    white-space: normal;
+  }
+
+  .molecule-name-input-copy span {
+    flex-basis: auto;
+    text-align: left;
   }
 
   .molecule-name-input-row {

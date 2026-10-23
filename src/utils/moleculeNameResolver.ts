@@ -3,6 +3,7 @@ import {
   lookupLocalChemicalName,
   normalizeChemicalName,
 } from "./chemicalNameDatabase";
+import { toPlainChemicalName } from "./chemicalNameText";
 
 export type MoleculeNameResolution = {
   query: string;
@@ -14,6 +15,14 @@ export type MoleculeNameResolution = {
   inchiKey: string | null;
   source: "chebi";
 };
+
+/** The offline database has no unique entry for the name (as opposed to a database read failure). */
+export class MoleculeNameNotFoundError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "MoleculeNameNotFoundError";
+  }
+}
 
 const resolverCache = new Map<string, MoleculeNameResolution>();
 const MAX_CACHE_ENTRIES = 300;
@@ -64,7 +73,7 @@ export async function resolveMoleculeName(
   }
 
   if (!local) {
-    throw new Error(
+    throw new MoleculeNameNotFoundError(
       `No unique offline structure was found for “${query}”. Try another synonym or draw the molecule.`,
     );
   }
@@ -75,8 +84,9 @@ export async function resolveMoleculeName(
     // ChEBI's local structure is already the authoritative imported structure;
     // a separate online connectivity SMILES is intentionally not requested.
     connectivitySmiles: null,
-    iupacName: local.iupacName,
-    title: local.preferredName,
+    // ChEBI stores italics as inline HTML ("3<i>S</i>"); show names as plain text.
+    iupacName: toPlainChemicalName(local.iupacName),
+    title: toPlainChemicalName(local.preferredName),
     molecularFormula: local.molecularFormula,
     inchiKey: local.inchiKey,
     source: "chebi",

@@ -9,7 +9,8 @@ import {
   type ErrorInfo,
   type ReactNode,
 } from "react";
-import { resolveMoleculeName, type MoleculeNameResolution } from "../utils/moleculeNameResolver";
+import { type MoleculeNameResolution } from "../utils/moleculeNameResolver";
+import { loadInputIntoEditor, resolveMoleculeInput } from "../utils/moleculeInput";
 import { extractKetMolecules, type KetDocument } from "../utils/ketcherKet";
 
 const KetcherEditor = lazy(() => import("./KetcherEditor"));
@@ -71,6 +72,12 @@ type MoleculeDrawerProps = {
    * handlers cannot interfere with one another.
    */
   isolateEditor?: boolean;
+  /**
+   * Most disconnected molecules this editor accepts from text input (the synthesis target
+   * takes one). Input with more components is rejected, never silently truncated, and Add is
+   * refused when the editor already holds a structure.
+   */
+  maxComponents?: number;
 };
 
 type ErrorBoundaryProps = {
@@ -183,6 +190,7 @@ function MoleculeDrawer({
   globalKey = "ketcher",
   resetVersion = 0,
   isolateEditor = false,
+  maxComponents,
 }: MoleculeDrawerProps) {
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -341,7 +349,12 @@ function MoleculeDrawer({
     const query = nameQuery.trim();
     if (!query) {
       setNameMessageKind("error");
-      setNameMessage("Enter a common or IUPAC molecule name first.");
+      setNameMessage("Enter a chemical name or SMILES first.");
+      return;
+    }
+    if (action === "add" && maxComponents === 1 && hasStructure) {
+      setNameMessageKind("error");
+      setNameMessage("This editor holds a single molecule. Use Replace to change it; Add would create a second, disconnected molecule.");
       return;
     }
 
@@ -350,7 +363,9 @@ function MoleculeDrawer({
     setNameMessage(`Resolving “${query}”…`);
 
     try {
-      const resolution = await resolveMoleculeName(query);
+      // A chemical name (offline database) or a SMILES string (validated by RDKit). Ambiguous
+      // or invalid input throws with an explanatory message before the editor is touched.
+      const input = await resolveMoleculeInput(query, { maxComponents });
 
       // Invalidate any previously imported identity before changing Ketcher.
       // Suppress the editor's own change event during this programmatic import;
@@ -359,52 +374,46 @@ function MoleculeDrawer({
       onChange?.();
       suppressEditorChangeRef.current = true;
 
-      if (action === "add") {
-        if (api.addFragment) {
-          await api.addFragment(resolution.smiles, { needZoom: true });
-        } else {
-          const current = (await api.getSmiles()).trim();
-          await api.setMolecule(current ? `${current}.${resolution.smiles}` : resolution.smiles);
-        }
-      } else {
-        await api.setMolecule(resolution.smiles);
-      }
+      await loadInputIntoEditor(api, input, action);
 
       await waitForReadableStructure(api);
       setHasStructure(true);
-      const resolvedLabel = resolution.iupacName || resolution.title || resolution.query;
-      const formulaSuffix = resolution.molecularFormula ? ` · ${resolution.molecularFormula}` : "";
+      const resolvedLabel = input.label;
+      const noteSuffix = input.notes.length > 0 ? ` · ${input.notes.join(" ")}` : "";
 
-      onNameStructureApplied?.(resolution, action);
+      // Only a database name carries an identity to install; a SMILES is just a structure.
+      if (input.nameResolution) onNameStructureApplied?.(input.nameResolution, action);
       window.setTimeout(() => {
         suppressEditorChangeRef.current = false;
       }, 0);
 
       if (processAfterApply && onNameSubmitProcess) {
         setNameMessageKind("info");
-        setNameMessage(`Loaded: ${resolvedLabel}${formulaSuffix} · Processing…`);
+        setNameMessage(`Loaded: ${resolvedLabel} · Processing…`);
         try {
           await onNameSubmitProcess();
         } catch (processError) {
           console.error(`[PocketChem:NameInput:${globalKey}] automatic processing failed`, processError);
           setNameMessageKind("error");
-          setNameMessage(`Loaded: ${resolvedLabel}${formulaSuffix} · Automatic processing failed.`);
+          setNameMessage(`Loaded: ${resolvedLabel} · Automatic processing failed.`);
           return;
         }
       }
 
       setNameMessageKind("success");
-      setNameMessage(`${action === "add" ? "Added" : "Loaded"}: ${resolvedLabel}${formulaSuffix}`);
+      setNameMessage(`${action === "add" ? "Added" : "Loaded"}: ${resolvedLabel}${noteSuffix}`);
     } catch (error) {
       suppressEditorChangeRef.current = false;
       setNameMessageKind("error");
-      setNameMessage(error instanceof Error ? error.message : "The molecule name could not be resolved.");
+      setNameMessage(error instanceof Error ? error.message : "The molecule input could not be resolved.");
     } finally {
       setIsResolvingName(false);
     }
   }, [
     globalKey,
     isResolvingName,
+    hasStructure,
+    maxComponents,
     nameQuery,
     onChange,
     onNameStructureApplied,
@@ -456,8 +465,8 @@ function MoleculeDrawer({
         }}
       >
         <div className="molecule-name-input-copy">
-          <label htmlFor={`${globalKey}-molecule-name`}>Type a molecule name</label>
-          <span>Common name or IUPAC name</span>
+          <label htmlFor={`${globalKey}-molecule-name`}>Type a chemical name or SMILES</label>
+          <span>Common name, IUPAC name or SMILES (start with “smiles:” to force SMILES)</span>
         </div>
 
         <div className="molecule-name-input-row">
@@ -470,7 +479,7 @@ function MoleculeDrawer({
               setNameQuery(event.target.value);
               setNameMessage(null);
             }}
-            placeholder="e.g. acetone or 2-methylpropan-2-ol"
+            placeholder="Chemical name or SMILES"
             autoComplete="off"
             spellCheck={false}
             disabled={!ready || failed || isResolvingName}
