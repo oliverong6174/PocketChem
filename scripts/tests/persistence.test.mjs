@@ -703,14 +703,14 @@ describe("page integration", () => {
   const page = read("src", "components", "SynthesisPage.tsx");
   const app = read("src", "App.tsx");
 
-  test("[source] only Synthesis and Properties use persistence in this stage", () => {
+  test("[source] only Synthesis, Properties, Ranking and Spectroscopy use persistence (Reactions is 8B-2B)", () => {
     const users = [];
     for (const file of fs.readdirSync(path.join(root, "src", "components"))) {
       if (file.endsWith(".tsx") && /useWorkspacePersistence/.test(read("src", "components", file))) users.push(file);
     }
-    assert.deepEqual(users, ["SynthesisPage.tsx"]);
+    assert.deepEqual(users.sort(), ["RankingPage.tsx", "SpectroscopyPage.tsx", "SynthesisPage.tsx"]);
     assert.match(app, /useWorkspacePersistence/);
-    for (const other of ["ReactionsPage.tsx", "SpectroscopyPage.tsx", "RankingPage.tsx", "MultiCatalyticPage.tsx"]) {
+    for (const other of ["ReactionsPage.tsx", "MultiCatalyticPage.tsx"]) {
       assert.doesNotMatch(read("src", "components", other), /persistence|indexedDB/i, other);
     }
   });

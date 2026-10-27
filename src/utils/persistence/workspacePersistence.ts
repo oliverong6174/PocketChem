@@ -216,9 +216,15 @@ export class WorkspacePersistence<I, R> {
    * return null for "nothing worth keeping", which removes the record.
    */
   requestSave(capture: () => Capture<I, R> | null) {
-    if (this.phase !== "live" || !this.attached) return;
+    if (this.phase !== "live") return;
     this.pendingCapture = capture;
     this.cancelTimer();
+    if (!this.attached) {
+      // The page has been left: a late editor read finishing now is the newest state there is, so
+      // it is written straight away instead of waiting for a timer nobody will flush.
+      this.runPending();
+      return;
+    }
     const epoch = this.epoch;
     this.timer = this.timers.set(() => {
       this.timer = null;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   WorkspacePersistence,
   type PersistenceStatus,
@@ -6,8 +6,15 @@ import {
   type WorkspacePersistenceConfig,
 } from "./workspacePersistence";
 import { getWorkspaceStore } from "./workspaceStore";
+import { registerLeaveHook } from "./leaveGate";
 
-export type PageWorkspaceConfig<I, R> = Omit<WorkspacePersistenceConfig<I, R>, "store">;
+export type PageWorkspaceConfig<I, R> = Omit<WorkspacePersistenceConfig<I, R>, "store"> & {
+  /**
+   * Runs before the app switches away from the page (and when the tab is hidden): finish reading
+   * the editor so the final state can be saved. The controller's own pending save is flushed after.
+   */
+  beforeLeave?: () => Promise<void> | void;
+};
 
 /**
  * Creates the page's persistence controller and starts recovery exactly once. `recovery` is null
@@ -15,7 +22,15 @@ export type PageWorkspaceConfig<I, R> = Omit<WorkspacePersistenceConfig<I, R>, "
  */
 export function useWorkspacePersistence<I, R>(config: PageWorkspaceConfig<I, R>) {
   // Created once per mount; the config only supplies constants and module-level functions.
-  const [controller] = useState(() => new WorkspacePersistence<I, R>({ ...config, store: getWorkspaceStore() }));
+  const [controller] = useState(() => {
+    const { beforeLeave, ...rest } = config;
+    void beforeLeave;
+    return new WorkspacePersistence<I, R>({ ...rest, store: getWorkspaceStore() });
+  });
+  const beforeLeaveRef = useRef(config.beforeLeave);
+  useEffect(() => {
+    beforeLeaveRef.current = config.beforeLeave;
+  });
   const [recovery, setRecovery] = useState<RecoveryOutcome<I, R> | null>(null);
   const [status, setStatus] = useState<PersistenceStatus>(controller.getStatus());
 
@@ -26,12 +41,18 @@ export function useWorkspacePersistence<I, R>(config: PageWorkspaceConfig<I, R>)
       if (active) setRecovery(outcome);
     });
     const unsubscribe = controller.subscribe(setStatus);
+    const leave = async () => {
+      await beforeLeaveRef.current?.();
+      await controller.flush();
+    };
+    const unregisterLeave = registerLeaveHook(leave);
     // Writes are debounced; make sure the latest state is flushed when the tab is hidden or closed.
-    const flush = () => void controller.flush();
+    const flush = () => void leave();
     window.addEventListener("pagehide", flush);
     return () => {
       active = false;
       unsubscribe();
+      unregisterLeave();
       window.removeEventListener("pagehide", flush);
       controller.detach();
     };

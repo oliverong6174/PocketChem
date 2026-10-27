@@ -28,6 +28,7 @@ import {
 } from "../utils/reactions/engine/synthesisSearchRun";
 import { describeRouteStructure } from "../utils/reactions/engine/routePresentation";
 import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
+import { DebouncedTask } from "../utils/persistence/debouncedTask";
 import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
 import { ketHasStructureText, ketIdentityKey } from "../utils/persistence/ketIdentity";
 import {
@@ -364,6 +365,7 @@ export default function SynthesisPage() {
   // The page saves its inputs and its completed results, and restores them after a reload or
   // when you come back to the tab. Restoring never starts a search: restored routes are shown as
   // a saved snapshot, and nothing is written until recovery has finished.
+  const [snapshotTask] = useState(() => new DebouncedTask(async () => undefined));
   const { controller: persistence, recovery, status: persistenceStatus } = useWorkspacePersistence<
     SynthesisWorkspaceInputs,
     SynthesisWorkspaceResults
@@ -372,13 +374,14 @@ export default function SynthesisPage() {
     engineVersion: SYNTHESIS_ENGINE_VERSION,
     validateInputs: validateSynthesisInputs,
     validateResults: validateSynthesisResults,
+    // Leaving the page finishes reading the editors first, so a last-moment edit is not lost.
+    beforeLeave: () => snapshotTask.flushNow(),
   });
   const [resultMeta, setResultMeta] = useState<SynthesisResultMeta | null>(null);
   const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
   const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
   const [editorRestoreVersion, setEditorRestoreVersion] = useState(0);
   const snapshotRef = useRef<EditorSnapshot>(EMPTY_SNAPSHOT);
-  const snapshotTimerRef = useRef<number | undefined>(undefined);
   const pendingEditorRef = useRef<PendingEditorRestore | null>(null);
   const restoreBusyRef = useRef(0);
   const restoringRef = useRef(false);
@@ -400,6 +403,7 @@ export default function SynthesisPage() {
   const restoreEditorRef = useRef<((which: "reactant" | "target", api: KetcherApi) => Promise<void>) | null>(null);
   useEffect(() => {
     requestPersistRef.current = requestPersist;
+    snapshotTask.setTask(takeEditorSnapshot);
     restoreEditorRef.current = restoreEditor;
     reactantKetcherRef.current = reactantKetcher;
     productKetcherRef.current = productKetcher;
@@ -502,8 +506,7 @@ export default function SynthesisPage() {
 
   function scheduleEditorSnapshot() {
     if (restoringRef.current || pendingEditorRef.current) return;
-    window.clearTimeout(snapshotTimerRef.current);
-    snapshotTimerRef.current = window.setTimeout(() => void takeEditorSnapshot(), 600);
+    snapshotTask.schedule();
   }
 
   function handleEditorChange() {
@@ -518,8 +521,8 @@ export default function SynthesisPage() {
   }, [routes, resultMeta, copies, isSearching, startingNames, targetName, interruptedNote]);
 
   useEffect(() => {
-    return () => window.clearTimeout(snapshotTimerRef.current);
-  }, []);
+    return () => snapshotTask.cancel();
+  }, [snapshotTask]);
 
   function finishEditorRestore(token: number) {
     const pending = pendingEditorRef.current;
@@ -1104,7 +1107,7 @@ export default function SynthesisPage() {
     pendingEditorRef.current = null;
     snapshotRef.current = EMPTY_SNAPSHOT;
     searchKeysRef.current = null;
-    window.clearTimeout(snapshotTimerRef.current);
+    snapshotTask.cancel();
     setResultMeta(null);
     setInputsOnlyRestored(false);
     setRecoveryNotices([]);

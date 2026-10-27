@@ -52,6 +52,8 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
 
   import type { ReactionPathway } from "./utils/reactionUtils";
   import WorkspaceNotice, { type WorkspaceNoticeItem } from "./components/WorkspaceNotice";
+  import { DebouncedTask } from "./utils/persistence/debouncedTask";
+  import { runLeaveHooks } from "./utils/persistence/leaveGate";
   import { useWorkspacePersistence } from "./utils/persistence/useWorkspacePersistence";
   import { ketHasStructureText, ketIdentityKey } from "./utils/persistence/ketIdentity";
   import {
@@ -217,11 +219,13 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     const [analysisPanel, setAnalysisPanel] = useState<AnalysisPanel>("overview");
     const [reactionPathways, setReactionPathways] = useState<ReactionPathway[]>([]);
     const appShellRef = useRef<HTMLElement | null>(null);
+    const switchRequestRef = useRef(0);
 
     // ---- workspace recovery for the Properties page (Stage 8B-1) --------------------------------
     // The drawn structure and the completed analysis are saved and come back after a reload or a
     // visit to another page. Restored results are a saved snapshot: nothing is recomputed, and they
     // are labelled as stale as soon as the structure no longer matches the one that was analyzed.
+    const [snapshotTask] = useState(() => new DebouncedTask(async () => undefined));
     const { controller: persistence, recovery, status: persistenceStatus } = useWorkspacePersistence<
       PropertiesWorkspaceInputs,
       PropertiesWorkspaceResults
@@ -230,13 +234,14 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
       engineVersion: PROPERTIES_ENGINE_VERSION,
       validateInputs: validatePropertiesInputs,
       validateResults: validatePropertiesResults,
+      // Leaving the page finishes reading the editor first, so a last-moment edit is not lost.
+      beforeLeave: () => snapshotTask.flushNow(),
     });
     const [resultMeta, setResultMeta] = useState<PropertiesResultMeta | null>(null);
     const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
     const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
     const mainEditorApiRef = useRef<KetcherApi | null>(null);
     const propsSnapshotRef = useRef<{ ket: string | null; key: string | null }>({ ket: null, key: null });
-    const propsSnapshotTimerRef = useRef<number | undefined>(undefined);
     const propsRestoringRef = useRef(false);
     const propsRestoreBusyRef = useRef(0);
     const appliedRecoveryRef = useRef<unknown>(null);
@@ -315,8 +320,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
 
     function schedulePropertiesSnapshot() {
       if (propsRestoringRef.current) return;
-      window.clearTimeout(propsSnapshotTimerRef.current);
-      propsSnapshotTimerRef.current = window.setTimeout(() => void takePropertiesSnapshot(), 600);
+      snapshotTask.schedule();
     }
 
     /**
@@ -421,6 +425,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
 
     useEffect(() => {
       requestPersistRef.current = requestPersist;
+      snapshotTask.setTask(takePropertiesSnapshot);
       restoreMainEditorRef.current = () => void restoreMainEditor();
       scheduleSnapshotRef.current = schedulePropertiesSnapshot;
       applyRestoreRef.current = applyRestoredProperties;
@@ -457,8 +462,8 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     }, [activePage]);
 
     useEffect(() => {
-      return () => window.clearTimeout(propsSnapshotTimerRef.current);
-    }, []);
+      return () => snapshotTask.cancel();
+    }, [snapshotTask]);
 
     const handleMainEditorReady = useCallback((api?: KetcherApi) => {
       if (api) mainEditorApiRef.current = api;
@@ -504,7 +509,11 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     };
 
     const switchPage = (page: AppPage) => {
-      setActivePage(page);
+      // Let the page being left finish reading its editor and saving before it is unmounted.
+      const request = (switchRequestRef.current += 1);
+      void runLeaveHooks().then(() => {
+        if (switchRequestRef.current === request) setActivePage(page);
+      });
     };
 
     const handlePageTabKeyDown = (
@@ -1530,7 +1539,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     // Clearing also discards the saved workspace and invalidates any restoration still in flight.
     void persistence.discard();
     propsSnapshotRef.current = { ket: null, key: null };
-    window.clearTimeout(propsSnapshotTimerRef.current);
+    snapshotTask.cancel();
     setResultMeta(null);
     setInputsOnlyRestored(false);
     setRecoveryNotices([]);
