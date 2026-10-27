@@ -16,7 +16,7 @@
     type KeyboardEvent as ReactKeyboardEvent,
   } from "react";
 import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
-  import MoleculeDrawer from "./components/MoleculeDrawer";
+  import MoleculeDrawer, { type KetcherApi } from "./components/MoleculeDrawer";
   import {
     applyResolvedNameToIdentity,
     type MoleculeNameResolution,
@@ -51,6 +51,18 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   } from "./utils/ranking/acidBase/analyzeBasicity";
 
   import type { ReactionPathway } from "./utils/reactionUtils";
+  import WorkspaceNotice, { type WorkspaceNoticeItem } from "./components/WorkspaceNotice";
+  import { useWorkspacePersistence } from "./utils/persistence/useWorkspacePersistence";
+  import { ketHasStructureText, ketIdentityKey } from "./utils/persistence/ketIdentity";
+  import {
+    PROPERTIES_ENGINE_VERSION,
+    validatePropertiesInputs,
+    validatePropertiesResults,
+    type PropertiesWorkspaceInputs,
+    type PropertiesWorkspaceResults,
+  } from "./utils/persistence/propertiesWorkspace";
+  import type { Capture, RecoveryOutcome } from "./utils/persistence/workspacePersistence";
+  import type { WorkspaceResults } from "./utils/persistence/workspaceStore";
 
   import { initializeFunctionalGroups } from "./utils/functionalGroups/bootstrap";
 
@@ -86,6 +98,20 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
 
   type AnalysisPanel = "overview" | "acidBase" | "concepts" | "properties";
   type AppPage = "analysis" | "acidBase" | "reactions" | "spectroscopy" | "multiStep" | "multiCatalytic";
+
+  /** What the page knows about the dashboard results on screen. */
+  type PropertiesResultMeta = {
+    computedAt: string;
+    engineVersion: number;
+    /** Chemistry identity of the structure that was analyzed. */
+    structureKey: string;
+    /** Loaded from a previous session instead of computed in this one. */
+    restored: boolean;
+    /** Saved by an earlier version of the analysis code; shown as saved, never re-computed. */
+    engineMismatch: boolean;
+    /** The drawn structure changed after this analysis. */
+    stale: boolean;
+  };
 
   const APP_PAGES: Array<{ id: AppPage; label: string }> = [
     { id: "analysis", label: "Properties" },
@@ -192,8 +218,252 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     const [reactionPathways, setReactionPathways] = useState<ReactionPathway[]>([]);
     const appShellRef = useRef<HTMLElement | null>(null);
 
-    const handleMainEditorReady = useCallback(() => {
+    // ---- workspace recovery for the Properties page (Stage 8B-1) --------------------------------
+    // The drawn structure and the completed analysis are saved and come back after a reload or a
+    // visit to another page. Restored results are a saved snapshot: nothing is recomputed, and they
+    // are labelled as stale as soon as the structure no longer matches the one that was analyzed.
+    const { controller: persistence, recovery, status: persistenceStatus } = useWorkspacePersistence<
+      PropertiesWorkspaceInputs,
+      PropertiesWorkspaceResults
+    >({
+      page: "properties",
+      engineVersion: PROPERTIES_ENGINE_VERSION,
+      validateInputs: validatePropertiesInputs,
+      validateResults: validatePropertiesResults,
+    });
+    const [resultMeta, setResultMeta] = useState<PropertiesResultMeta | null>(null);
+    const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
+    const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
+    const mainEditorApiRef = useRef<KetcherApi | null>(null);
+    const propsSnapshotRef = useRef<{ ket: string | null; key: string | null }>({ ket: null, key: null });
+    const propsSnapshotTimerRef = useRef<number | undefined>(undefined);
+    const propsRestoringRef = useRef(false);
+    const propsRestoreBusyRef = useRef(0);
+    const appliedRecoveryRef = useRef<unknown>(null);
+    const applyRestoreRef = useRef<((outcome: RecoveryOutcome<PropertiesWorkspaceInputs, PropertiesWorkspaceResults>) => void) | null>(null);
+    const requestPersistRef = useRef<() => void>(() => undefined);
+    const restoreMainEditorRef = useRef<() => void>(() => undefined);
+    const scheduleSnapshotRef = useRef<() => void>(() => undefined);
+    const latestRef = useRef({
+      smiles, molfile, functionalGroups, acidityResults, basicityResults, resonanceResults, chiralityResults,
+      moleculeAnnotation, moleculeIdentity, reactionPathways, analysisPanel, selectedConcept,
+      selectedHybridization, selectedBondType, resultMeta, isAnalyzing,
+    });
+
+    function capturePropertiesWorkspace(): Capture<PropertiesWorkspaceInputs, PropertiesWorkspaceResults> | null {
+      const latest = latestRef.current;
+      const snapshot = propsSnapshotRef.current;
+      const inputs: PropertiesWorkspaceInputs = {
+        ket: snapshot.ket,
+        key: snapshot.key,
+        analysisPanel: latest.analysisPanel,
+        selectedConcept: latest.selectedConcept,
+        selectedHybridization: latest.selectedHybridization,
+        selectedBondType: latest.selectedBondType,
+      };
+      let results: WorkspaceResults<PropertiesWorkspaceResults> | null = null;
+      const meta = latest.resultMeta;
+      // Only a finished analysis is a result; a half-filled dashboard is never saved.
+      if (meta && !latest.isAnalyzing) {
+        results = {
+          computedAt: meta.computedAt,
+          engineVersion: meta.engineVersion,
+          stale: meta.stale,
+          status: "complete",
+          data: {
+            inputKey: meta.structureKey,
+            smiles: latest.smiles,
+            molfile: latest.molfile,
+            functionalGroups: latest.functionalGroups,
+            acidityResults: latest.acidityResults,
+            basicityResults: latest.basicityResults,
+            resonanceResults: latest.resonanceResults,
+            chiralityResults: latest.chiralityResults,
+            moleculeAnnotation: latest.moleculeAnnotation,
+            moleculeIdentity: latest.moleculeIdentity,
+            reactionPathways: latest.reactionPathways,
+          },
+        };
+      }
+      if (!inputs.ket && !results) return null;
+      return { inputs, results };
+    }
+
+    function requestPersist() {
+      persistence.requestSave(capturePropertiesWorkspace);
+    }
+
+    /** Reads the editor and refreshes the saved structure and the stale-result check. */
+    async function takePropertiesSnapshot() {
+      const api = mainEditorApiRef.current;
+      if (!api || analyzeInFlightRef.current || propsRestoringRef.current) return;
+      const token = persistence.token();
+      try {
+        const ket = await Promise.race([
+          api.getKet(),
+          new Promise<never>((_resolve, reject) => setTimeout(() => reject(new Error("Timed out reading the editor.")), 8000)),
+        ]);
+        const key = await ketIdentityKey(ket);
+        if (!persistence.isCurrent(token) || analyzeInFlightRef.current || propsRestoringRef.current) return;
+        propsSnapshotRef.current = { ket: ketHasStructureText(ket) ? ket : null, key };
+        setResultMeta((meta) => (meta && !meta.stale && meta.structureKey !== key ? { ...meta, stale: true } : meta));
+        requestPersist();
+      } catch (snapshotError) {
+        console.warn("[PocketChem:Properties] Could not read the editor for workspace recovery.", snapshotError);
+      }
+    }
+
+    function schedulePropertiesSnapshot() {
+      if (propsRestoringRef.current) return;
+      window.clearTimeout(propsSnapshotTimerRef.current);
+      propsSnapshotTimerRef.current = window.setTimeout(() => void takePropertiesSnapshot(), 600);
+    }
+
+    /**
+     * Puts the saved structure into a (new, empty) editor: after a reload, and whenever the page is
+     * revisited, because leaving the page unmounts the editor. A structure the user already drew wins.
+     */
+    async function restoreMainEditor() {
+      const api = mainEditorApiRef.current;
+      const saved = propsSnapshotRef.current;
+      if (!api || !saved.ket || propsRestoringRef.current) return;
+      const token = persistence.token();
+      propsRestoreBusyRef.current += 1;
+      propsRestoringRef.current = true;
+      let userContentWon = false;
+      try {
+        if (ketHasStructureText(await api.getKet())) {
+          userContentWon = true;
+          return;
+        }
+        if (!persistence.isCurrent(token)) return;
+        await api.setMolecule(saved.ket, { needZoom: true });
+        const actual = await ketIdentityKey(await api.getKet());
+        if (!persistence.isCurrent(token)) return;
+        if (saved.key && actual !== saved.key) throw new Error("The restored structure does not match the saved one.");
+      } catch (restoreError) {
+        console.warn("[PocketChem:Properties] Could not restore the saved structure.", restoreError);
+        if (persistence.isCurrent(token)) {
+          // Do not let an editor that failed to restore overwrite the saved copy.
+          persistence.disable();
+          setRecoveryNotices((notices) => [
+            ...notices,
+            { tone: "warn", text: "The saved structure could not be restored into the editor. Your saved work was kept and will not be overwritten; use Clear Analysis to start over." },
+          ]);
+        }
+      } finally {
+        propsRestoreBusyRef.current -= 1;
+        window.setTimeout(() => {
+          if (propsRestoreBusyRef.current === 0) propsRestoringRef.current = false;
+          if (userContentWon) void takePropertiesSnapshot();
+        }, 500);
+      }
+    }
+
+    function applyRestoredProperties(outcome: RecoveryOutcome<PropertiesWorkspaceInputs, PropertiesWorkspaceResults>) {
+      if (appliedRecoveryRef.current === outcome) return;
+      appliedRecoveryRef.current = outcome;
+      if (outcome.kind === "rejected") {
+        setRecoveryNotices([{ tone: "warn", text: `Saved work from a previous session could not be used (${outcome.message}). It was set aside and the page started clean.` }]);
+        return;
+      }
+      if (outcome.kind !== "restored" || !persistence.isCurrent(outcome.epoch)) return;
+
+      const latest = latestRef.current;
+      if (latestAnalyzeRunRef.current > 0 || latest.resultMeta || latest.smiles !== "Not analyzed yet") {
+        setRecoveryNotices([{ tone: "info", text: "Saved work from a previous session was not restored because you had already started new work on this page." }]);
+        return;
+      }
+
+      const { inputs, results } = outcome;
+      const notices: WorkspaceNoticeItem[] = [];
+      setAnalysisPanel(inputs.analysisPanel);
+      setSelectedConcept(inputs.selectedConcept);
+      setSelectedHybridization(inputs.selectedHybridization);
+      setSelectedBondType(inputs.selectedBondType);
+      propsSnapshotRef.current = { ket: inputs.ket, key: inputs.key };
+
+      if (results) {
+        const data = results.data;
+        setSmiles(data.smiles);
+        setMolfile(data.molfile);
+        setFunctionalGroups(data.functionalGroups);
+        setAcidityResults(data.acidityResults);
+        setBasicityResults(data.basicityResults);
+        setResonanceResults(data.resonanceResults);
+        setChiralityResults(data.chiralityResults);
+        setMoleculeAnnotation(data.moleculeAnnotation);
+        setMoleculeIdentity(data.moleculeIdentity);
+        setReactionPathways(data.reactionPathways);
+        setStatus("Restored from your previous session");
+        setResultMeta({
+          computedAt: results.computedAt,
+          engineVersion: results.engineVersion,
+          structureKey: data.inputKey,
+          restored: true,
+          engineMismatch: outcome.engineMismatch,
+          // A record whose results do not match its own saved structure is never presented as current.
+          stale: results.stale || inputs.key === null || inputs.key !== data.inputKey,
+        });
+      } else if (inputs.ket) {
+        setInputsOnlyRestored(true);
+        setStatus("Restored your drawn structure from your previous session.");
+      }
+      if (outcome.resultsDropped) {
+        notices.push({ tone: "warn", text: "Saved results could not be validated and were not restored. Your structure was." });
+      }
+      if (outcome.migratedFrom !== null) {
+        notices.push({ tone: "info", text: "Your saved workspace was upgraded from an older storage format." });
+      }
+      setRecoveryNotices(notices);
+      if (inputs.ket) restoreMainEditorRef.current();
+    }
+
+    useEffect(() => {
+      requestPersistRef.current = requestPersist;
+      restoreMainEditorRef.current = () => void restoreMainEditor();
+      scheduleSnapshotRef.current = schedulePropertiesSnapshot;
+      applyRestoreRef.current = applyRestoredProperties;
+      latestRef.current = {
+        smiles, molfile, functionalGroups, acidityResults, basicityResults, resonanceResults, chiralityResults,
+        moleculeAnnotation, moleculeIdentity, reactionPathways, analysisPanel, selectedConcept,
+        selectedHybridization, selectedBondType, resultMeta, isAnalyzing,
+      };
+    });
+
+    // Autosave: only settled state is watched (the debounce and the completed-analysis rule keep
+    // half-finished dashboards and rapid edits out of storage).
+    useEffect(() => {
+      requestPersistRef.current();
+    }, [
+      smiles, molfile, functionalGroups, acidityResults, basicityResults, resonanceResults, chiralityResults,
+      moleculeAnnotation, moleculeIdentity, reactionPathways, analysisPanel, selectedConcept,
+      selectedHybridization, selectedBondType, resultMeta, isAnalyzing,
+    ]);
+
+    useEffect(() => {
+      if (!recovery) return;
+      try {
+        applyRestoreRef.current?.(recovery);
+      } finally {
+        // Saving starts only after the recovered record has been applied (or deliberately skipped).
+        persistence.resumeAfterRestore();
+      }
+    }, [recovery, persistence]);
+
+    useEffect(() => {
+      // Leaving the page unmounts its editor; the next visit gets a new one.
+      if (activePage !== "analysis") mainEditorApiRef.current = null;
+    }, [activePage]);
+
+    useEffect(() => {
+      return () => window.clearTimeout(propsSnapshotTimerRef.current);
+    }, []);
+
+    const handleMainEditorReady = useCallback((api?: KetcherApi) => {
+      if (api) mainEditorApiRef.current = api;
       setIsMainEditorReady(true);
+      restoreMainEditorRef.current();
       window.setTimeout(() => {
         void getRDKit().catch((error) => {
           console.warn("RDKit warm-up was deferred after a load failure.", error);
@@ -205,6 +475,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
       // Any manual edit means the previously resolved name is no longer
       // guaranteed to describe the current graph.
       importedNameResolutionRef.current = null;
+      scheduleSnapshotRef.current();
     }, []);
 
     const handleMainNameApplied = useCallback((
@@ -359,6 +630,9 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
       latestAnalyzeRunRef.current = runId;
       analyzeInFlightRef.current = true;
       setIsAnalyzing(true);
+      setResultMeta(null);
+      setInputsOnlyRestored(false);
+      setRecoveryNotices([]);
       setStatus("Reading the structure…");
 
       try {
@@ -366,6 +640,14 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
         const result = editorSnapshot?.smiles ?? "";
         const currentMolfile = editorSnapshot?.molfile ?? null;
         const safeSmiles = sanitizeDisplayedSmiles(result);
+        // The structure this analysis is about; results are tied to it.
+        let analyzedKet: string | null = null;
+        try {
+          analyzedKet = await editor.getKet();
+        } catch {
+          analyzedKet = null;
+        }
+        const analyzedKey = await ketIdentityKey(analyzedKet);
 
         if (!safeSmiles) {
           setSmiles("No molecule detected");
@@ -431,6 +713,19 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
         );
         setAcidityResults(acidity);
         setBasicityResults(basicity);
+        if (analyzedKey) {
+          propsSnapshotRef.current = { ket: ketHasStructureText(analyzedKet) ? analyzedKet : null, key: analyzedKey };
+          setResultMeta({
+            computedAt: new Date().toISOString(),
+            engineVersion: PROPERTIES_ENGINE_VERSION,
+            structureKey: analyzedKey,
+            restored: false,
+            engineMismatch: false,
+            stale: false,
+          });
+          // Edits made while the analysis ran are caught by this re-check.
+          scheduleSnapshotRef.current();
+        }
         setStatus("Analysis complete");
       } catch (error) {
         console.error("Analyze error:", error);
@@ -1232,6 +1527,13 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   };
 
   const clearAnalysis = () => {
+    // Clearing also discards the saved workspace and invalidates any restoration still in flight.
+    void persistence.discard();
+    propsSnapshotRef.current = { ket: null, key: null };
+    window.clearTimeout(propsSnapshotTimerRef.current);
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
     importedNameResolutionRef.current = null;
     analyzeInFlightRef.current = false;
     latestAnalyzeRunRef.current += 1;
@@ -1262,6 +1564,43 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     setIsMainEditorReady(false);
     setMainEditorResetVersion((version) => version + 1);
   };
+
+  // What was recovered, what is only a saved snapshot, and what could not be saved.
+  const propertiesNotices: WorkspaceNoticeItem[] = [...recoveryNotices];
+  if (resultMeta?.restored) {
+    propertiesNotices.push({
+      tone: "info",
+      text: `Restored from your previous session (analyzed ${new Date(resultMeta.computedAt).toLocaleString()}). These results were not recomputed.`,
+    });
+  } else if (inputsOnlyRestored) {
+    propertiesNotices.push({ tone: "info", text: "Restored your drawn structure from your previous session." });
+  }
+  if (resultMeta?.engineMismatch) {
+    propertiesNotices.push({
+      tone: "warn",
+      text: "These results were saved by an earlier version of the analysis code. They are shown as saved and have not been recomputed.",
+    });
+  }
+  if (resultMeta?.stale) {
+    propertiesNotices.push({
+      tone: "warn",
+      text: `The structure changed after this analysis. The results below describe the earlier structure (${smiles}); analyze again to update them.`,
+    });
+  }
+  if (!persistenceStatus.available) {
+    propertiesNotices.push({ tone: "warn", text: "Browser storage is unavailable, so your work on this page will not be saved." });
+  }
+  if (persistenceStatus.saveError) {
+    propertiesNotices.push({
+      tone: "warn",
+      text: persistenceStatus.saveError.code === "quota"
+        ? "Your latest changes could not be saved because browser storage is full."
+        : `Your latest changes could not be saved (${persistenceStatus.saveError.message}).`,
+    });
+  }
+  if (persistenceStatus.resultsOmitted) {
+    propertiesNotices.push({ tone: "warn", text: "The results were too large to save; your structure was saved without them." });
+  }
 
   {/*RETURN STATEMENT*/}
 
@@ -1325,6 +1664,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
                 key={`main-editor-${mainEditorResetVersion}`}
                 onReady={handleMainEditorReady}
                 onChange={handleMainEditorChange}
+                onStructureLoaded={schedulePropertiesSnapshot}
                 onNameStructureApplied={handleMainNameApplied}
                 onNameSubmitProcess={analyzeMolecule}
               />
@@ -1368,6 +1708,13 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
                 {functionalGroupOccurrences.length === 1 ? "" : "s"}
               </span>
             </div>
+
+            <WorkspaceNotice
+              embedded
+              notices={propertiesNotices}
+              onDiscard={resultMeta?.restored || inputsOnlyRestored ? clearAnalysis : undefined}
+              discardDisabled={isAnalyzing}
+            />
 
             <div className="dashboard-mini-grid">
               <div>

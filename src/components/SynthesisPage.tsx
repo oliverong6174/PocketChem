@@ -27,6 +27,21 @@ import {
   type SearchRunState,
 } from "../utils/reactions/engine/synthesisSearchRun";
 import { describeRouteStructure } from "../utils/reactions/engine/routePresentation";
+import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
+import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
+import { ketHasStructureText, ketIdentityKey } from "../utils/persistence/ketIdentity";
+import {
+  SYNTHESIS_ENGINE_VERSION,
+  isSynthesisOutcomeKind,
+  synthesisInputKey,
+  validateSynthesisInputs,
+  validateSynthesisResults,
+  type SynthesisOutcomeKind,
+  type SynthesisWorkspaceInputs,
+  type SynthesisWorkspaceResults,
+} from "../utils/persistence/synthesisWorkspace";
+import type { Capture, RecoveryOutcome } from "../utils/persistence/workspacePersistence";
+import type { WorkspaceResults } from "../utils/persistence/workspaceStore";
 
 type StepSvgSet = {
   reactants: string[];
@@ -270,6 +285,46 @@ function RouteStructurePanel({ route }: { route: MultistepSynthesisRoute }) {
   );
 }
 
+type EditorSnapshot = {
+  reactantKet: string | null;
+  targetKet: string | null;
+  reactantKey: string | null;
+  targetKey: string | null;
+};
+
+const EMPTY_SNAPSHOT: EditorSnapshot = { reactantKet: null, targetKet: null, reactantKey: null, targetKey: null };
+
+/** What the page knows about the results on screen (kept beside, not inside, the route data). */
+type SynthesisResultMeta = {
+  kind: SynthesisOutcomeKind;
+  computedAt: string;
+  engineVersion: number;
+  /** Chemistry identity of the structures that produced the results. */
+  structureKey: string;
+  copies: 1 | 2;
+  startingSmiles: string;
+  targetSmiles: string;
+  outcomeMessage: string;
+  elapsedMs: number;
+  /** Loaded from a previous session instead of computed in this one. */
+  restored: boolean;
+  /** Saved by an earlier version of the synthesis engine; shown as saved, never re-verified. */
+  engineMismatch: boolean;
+  /** The structures changed after these results were computed. */
+  stale: boolean;
+};
+
+type PendingEditorRestore = {
+  token: number;
+  reactant: { ket: string | null; started: boolean; done: boolean; skipped: boolean };
+  target: { ket: string | null; started: boolean; done: boolean; skipped: boolean };
+};
+
+function formatWhen(iso: string): string {
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime()) ? iso : date.toLocaleString();
+}
+
 export default function SynthesisPage() {
   const [reactantKetcher, setReactantKetcher] = useState<KetcherApi | null>(null);
   const [productKetcher, setProductKetcher] = useState<KetcherApi | null>(null);
@@ -304,6 +359,349 @@ export default function SynthesisPage() {
   const [editorMountVersion, setEditorMountVersion] = useState(0);
 
   const editorsReady = Boolean(reactantKetcher && productKetcher);
+
+  // ---- workspace recovery (Stage 8B-1) ---------------------------------------------------------
+  // The page saves its inputs and its completed results, and restores them after a reload or
+  // when you come back to the tab. Restoring never starts a search: restored routes are shown as
+  // a saved snapshot, and nothing is written until recovery has finished.
+  const { controller: persistence, recovery, status: persistenceStatus } = useWorkspacePersistence<
+    SynthesisWorkspaceInputs,
+    SynthesisWorkspaceResults
+  >({
+    page: "synthesis",
+    engineVersion: SYNTHESIS_ENGINE_VERSION,
+    validateInputs: validateSynthesisInputs,
+    validateResults: validateSynthesisResults,
+  });
+  const [resultMeta, setResultMeta] = useState<SynthesisResultMeta | null>(null);
+  const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
+  const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
+  const [editorRestoreVersion, setEditorRestoreVersion] = useState(0);
+  const snapshotRef = useRef<EditorSnapshot>(EMPTY_SNAPSHOT);
+  const snapshotTimerRef = useRef<number | undefined>(undefined);
+  const pendingEditorRef = useRef<PendingEditorRestore | null>(null);
+  const restoreBusyRef = useRef(0);
+  const restoringRef = useRef(false);
+  const appliedRecoveryRef = useRef<unknown>(null);
+  const applyRestoreRef = useRef<((outcome: RecoveryOutcome<SynthesisWorkspaceInputs, SynthesisWorkspaceResults>) => void) | null>(null);
+  const searchKeysRef = useRef<{
+    reactantKet: string | null;
+    targetKet: string | null;
+    reactantKey: string;
+    targetKey: string;
+    copies: 1 | 2;
+  } | null>(null);
+  const reactantKetcherRef = useRef<KetcherApi | null>(null);
+  const productKetcherRef = useRef<KetcherApi | null>(null);
+  const latestRef = useRef({
+    routes, resultMeta, copies, isSearching, isClearing, interruptedNote, startingNames, targetName,
+  });
+  const requestPersistRef = useRef<() => void>(() => undefined);
+  const restoreEditorRef = useRef<((which: "reactant" | "target", api: KetcherApi) => Promise<void>) | null>(null);
+  useEffect(() => {
+    requestPersistRef.current = requestPersist;
+    restoreEditorRef.current = restoreEditor;
+    reactantKetcherRef.current = reactantKetcher;
+    productKetcherRef.current = productKetcher;
+    latestRef.current = { routes, resultMeta, copies, isSearching, isClearing, interruptedNote, startingNames, targetName };
+  });
+
+  function captureWorkspace(): Capture<SynthesisWorkspaceInputs, SynthesisWorkspaceResults> | null {
+    const latest = latestRef.current;
+    const snapshot = snapshotRef.current;
+    const inputs: SynthesisWorkspaceInputs = {
+      reactantKet: snapshot.reactantKet,
+      targetKet: snapshot.targetKet,
+      reactantKey: snapshot.reactantKey,
+      targetKey: snapshot.targetKey,
+      copies: latest.copies,
+    };
+    let results: WorkspaceResults<SynthesisWorkspaceResults> | null = null;
+    const meta = latest.resultMeta;
+    if (meta && !latest.isSearching) {
+      results = {
+        computedAt: meta.computedAt,
+        engineVersion: meta.engineVersion,
+        stale: meta.stale || latest.copies !== meta.copies,
+        status: meta.kind,
+        data: {
+          inputKey: synthesisInputKey(...(meta.structureKey.split(">>") as [string, string]), meta.copies),
+          startingSmiles: meta.startingSmiles,
+          targetSmiles: meta.targetSmiles,
+          copies: meta.copies,
+          startingNames: latest.startingNames,
+          targetName: latest.targetName,
+          routes: latest.routes,
+          outcomeMessage: meta.outcomeMessage,
+          interruptedNote: latest.interruptedNote,
+          elapsedMs: meta.elapsedMs,
+        },
+      };
+    } else if (latest.isSearching && latest.routes.length > 0 && searchKeysRef.current && runContextRef.current) {
+      // The tab was left or closed mid-search: keep the verified routes found so far, labelled as interrupted.
+      const keys = searchKeysRef.current;
+      results = {
+        computedAt: new Date().toISOString(),
+        engineVersion: SYNTHESIS_ENGINE_VERSION,
+        stale: false,
+        status: "found-interrupted",
+        data: {
+          inputKey: synthesisInputKey(keys.reactantKey, keys.targetKey, keys.copies),
+          startingSmiles: runContextRef.current.startingComponents.join("."),
+          targetSmiles: runContextRef.current.targetSmiles,
+          copies: keys.copies,
+          startingNames: latest.startingNames,
+          targetName: latest.targetName,
+          routes: latest.routes,
+          outcomeMessage: "The search was interrupted before it finished; the verified routes found so far were kept.",
+          interruptedNote: "The search was interrupted before it finished; the verified routes found so far were kept.",
+          elapsedMs: Date.now() - searchStartedAtRef.current,
+        },
+      };
+    }
+    if (!inputs.reactantKet && !inputs.targetKet && !results) return null;
+    return { inputs, results };
+  }
+
+  function requestPersist() {
+    persistence.requestSave(captureWorkspace);
+  }
+
+  /** Reads both editors (one at a time) and refreshes the saved inputs and the stale-result check. */
+  async function takeEditorSnapshot() {
+    const reactant = reactantKetcherRef.current;
+    const product = productKetcherRef.current;
+    const latest = latestRef.current;
+    if (!reactant || !product || latest.isSearching || latest.isClearing) return;
+    if (restoringRef.current || pendingEditorRef.current) return;
+    const token = persistence.token();
+    const timeout = <T,>(promise: Promise<T>) =>
+      Promise.race([
+        promise,
+        new Promise<never>((_resolve, reject) => setTimeout(() => reject(new Error("Timed out reading the editor.")), KETCHER_READ_TIMEOUT_MS)),
+      ]);
+    try {
+      const reactantKet = await timeout(reactant.getKet());
+      const targetKet = await timeout(product.getKet());
+      const [reactantKey, targetKey] = await Promise.all([ketIdentityKey(reactantKet), ketIdentityKey(targetKet)]);
+      if (!persistence.isCurrent(token) || restoringRef.current || pendingEditorRef.current) return;
+      if (latestRef.current.isSearching || latestRef.current.isClearing) return;
+      snapshotRef.current = {
+        reactantKet: ketHasStructureText(reactantKet) ? reactantKet : null,
+        targetKet: ketHasStructureText(targetKet) ? targetKet : null,
+        reactantKey,
+        targetKey,
+      };
+      const structureKey = reactantKey && targetKey ? `${reactantKey}>>${targetKey}` : null;
+      setResultMeta((meta) => (meta && !meta.stale && meta.structureKey !== structureKey ? { ...meta, stale: true } : meta));
+      requestPersist();
+    } catch (snapshotError) {
+      console.warn("[PocketChem:Synthesis] Could not read the editors for workspace recovery.", snapshotError);
+    }
+  }
+
+  function scheduleEditorSnapshot() {
+    if (restoringRef.current || pendingEditorRef.current) return;
+    window.clearTimeout(snapshotTimerRef.current);
+    snapshotTimerRef.current = window.setTimeout(() => void takeEditorSnapshot(), 600);
+  }
+
+  function handleEditorChange() {
+    // Programmatic restores are not user edits.
+    if (restoringRef.current) return;
+    scheduleEditorSnapshot();
+  }
+
+  // Autosave: only settled state is watched (never search progress or elapsed time).
+  useEffect(() => {
+    requestPersistRef.current();
+  }, [routes, resultMeta, copies, isSearching, startingNames, targetName, interruptedNote]);
+
+  useEffect(() => {
+    return () => window.clearTimeout(snapshotTimerRef.current);
+  }, []);
+
+  function finishEditorRestore(token: number) {
+    const pending = pendingEditorRef.current;
+    if (!pending || pending.token !== token) return;
+    if (!pending.reactant.done || !pending.target.done) return;
+    pendingEditorRef.current = null;
+    // If a user's newer drawing won over the saved one, record what is really in the editors now.
+    if (pending.reactant.skipped || pending.target.skipped) void takeEditorSnapshot();
+  }
+
+  async function restoreEditor(which: "reactant" | "target", api: KetcherApi) {
+    const pending = pendingEditorRef.current;
+    if (!pending) return;
+    const slot = pending[which];
+    if (slot.started) return;
+    slot.started = true;
+    if (!slot.ket) {
+      slot.done = true;
+      finishEditorRestore(pending.token);
+      return;
+    }
+    const token = pending.token;
+    restoreBusyRef.current += 1;
+    restoringRef.current = true;
+    try {
+      if (!persistence.isCurrent(token)) return;
+      // Newer user input always wins over a saved structure.
+      if (ketHasStructureText(await api.getKet())) {
+        slot.skipped = true;
+        return;
+      }
+      if (!persistence.isCurrent(token)) return;
+      await api.setMolecule(slot.ket, { needZoom: true });
+      const expected = which === "reactant" ? snapshotRef.current.reactantKey : snapshotRef.current.targetKey;
+      const actual = await ketIdentityKey(await api.getKet());
+      if (!persistence.isCurrent(token)) return;
+      if (expected && actual !== expected) throw new Error("The restored structure does not match the saved one.");
+    } catch (restoreError) {
+      console.warn("[PocketChem:Synthesis] Could not restore a saved structure.", restoreError);
+      if (persistence.isCurrent(token)) {
+        // Do not let an editor that failed to restore overwrite the saved copy.
+        persistence.disable();
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: "A saved structure could not be restored into the editor. Your saved work was kept and will not be overwritten; use Clear to start over." },
+        ]);
+      }
+    } finally {
+      slot.done = true;
+      restoreBusyRef.current -= 1;
+      finishEditorRestore(token);
+      window.setTimeout(() => {
+        if (restoreBusyRef.current === 0) restoringRef.current = false;
+      }, 500);
+    }
+  }
+
+  useEffect(() => {
+    const pending = pendingEditorRef.current;
+    if (!pending) return;
+    if (reactantKetcher) void restoreEditorRef.current?.("reactant", reactantKetcher);
+    if (productKetcher) void restoreEditorRef.current?.("target", productKetcher);
+  }, [reactantKetcher, productKetcher, editorRestoreVersion]);
+
+  function applyRestoredWorkspace(outcome: RecoveryOutcome<SynthesisWorkspaceInputs, SynthesisWorkspaceResults>) {
+    if (appliedRecoveryRef.current === outcome) return;
+    appliedRecoveryRef.current = outcome;
+    if (outcome.kind === "rejected") {
+      setRecoveryNotices([{ tone: "warn", text: `Saved work from a previous session could not be used (${outcome.message}). It was set aside and the page started clean.` }]);
+      return;
+    }
+    if (outcome.kind !== "restored" || !persistence.isCurrent(outcome.epoch)) return;
+
+    const latest = latestRef.current;
+    if (searchRunRef.current > 0 || latest.routes.length > 0 || latest.resultMeta) {
+      setRecoveryNotices([{ tone: "info", text: "Saved work from a previous session was not restored because you had already started new work on this page." }]);
+      return;
+    }
+
+    const { inputs, results } = outcome;
+    const notices: WorkspaceNoticeItem[] = [];
+    setCopies(inputs.copies);
+    snapshotRef.current = {
+      reactantKet: inputs.reactantKet,
+      targetKet: inputs.targetKet,
+      reactantKey: inputs.reactantKey,
+      targetKey: inputs.targetKey,
+    };
+    if (inputs.reactantKet || inputs.targetKet) {
+      pendingEditorRef.current = {
+        token: outcome.epoch,
+        reactant: { ket: inputs.reactantKet, started: false, done: false, skipped: false },
+        target: { ket: inputs.targetKet, started: false, done: false, skipped: false },
+      };
+      setEditorRestoreVersion((version) => version + 1);
+    }
+
+    if (results && isSynthesisOutcomeKind(results.status)) {
+      const data = results.data;
+      const structureKey = data.inputKey.slice(0, data.inputKey.lastIndexOf("|copies="));
+      const consistent =
+        inputs.reactantKey !== null && inputs.targetKey !== null && structureKey === `${inputs.reactantKey}>>${inputs.targetKey}`;
+      setRoutes(data.routes);
+      setStartingSmiles(data.startingSmiles);
+      setTargetSmiles(data.targetSmiles);
+      setStartingNames(data.startingNames);
+      setTargetName(data.targetName);
+      setInterruptedNote(data.interruptedNote);
+      setSearchElapsedMs(data.elapsedMs);
+      setStatus(`Restored from your previous session · ${data.outcomeMessage}`);
+      setResultMeta({
+        kind: results.status,
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        structureKey,
+        copies: data.copies,
+        startingSmiles: data.startingSmiles,
+        targetSmiles: data.targetSmiles,
+        outcomeMessage: data.outcomeMessage,
+        elapsedMs: data.elapsedMs,
+        restored: true,
+        engineMismatch: outcome.engineMismatch,
+        // A record whose results do not match its own saved structures is never presented as current.
+        stale: results.stale || !consistent,
+      });
+    } else if (inputs.reactantKet || inputs.targetKet) {
+      setInputsOnlyRestored(true);
+      setStatus("Restored your drawn structures from your previous session.");
+    }
+    if (outcome.resultsDropped) {
+      notices.push({ tone: "warn", text: "Saved results could not be validated and were not restored. Your structures were." });
+    }
+    if (outcome.migratedFrom !== null) {
+      notices.push({ tone: "info", text: "Your saved workspace was upgraded from an older storage format." });
+    }
+    setRecoveryNotices(notices);
+  }
+
+  useEffect(() => {
+    applyRestoreRef.current = applyRestoredWorkspace;
+  });
+  useEffect(() => {
+    if (!recovery) return;
+    try {
+      applyRestoreRef.current?.(recovery);
+    } finally {
+      // Saving starts only after the recovered record has been applied (or deliberately skipped).
+      persistence.resumeAfterRestore();
+    }
+  }, [recovery, persistence]);
+
+  /** Remembers the structures and outcome of a finished search so results can be tied to them. */
+  function recordFinishedSearch(state: SearchRunState) {
+    const outcome = state.outcome;
+    const keys = searchKeysRef.current;
+    const context = runContextRef.current;
+    if (!outcome || !keys || !context) return;
+    const meaningful =
+      outcome.kind === "found" ||
+      outcome.kind === "found-interrupted" ||
+      outcome.kind === "no-route-within-budget" ||
+      outcome.kind === "no-route-within-bounds" ||
+      (outcome.kind === "cancelled" && state.routes.length > 0);
+    if (!meaningful || !isSynthesisOutcomeKind(outcome.kind)) {
+      setResultMeta(null);
+      return;
+    }
+    setResultMeta({
+      kind: outcome.kind,
+      computedAt: new Date().toISOString(),
+      engineVersion: SYNTHESIS_ENGINE_VERSION,
+      structureKey: `${keys.reactantKey}>>${keys.targetKey}`,
+      copies: keys.copies,
+      startingSmiles: context.startingComponents.join("."),
+      targetSmiles: context.targetSmiles,
+      outcomeMessage: outcome.message,
+      elapsedMs: state.startedAt === null ? 0 : Date.now() - state.startedAt,
+      restored: false,
+      engineMismatch: false,
+      stale: false,
+    });
+  }
 
   useEffect(() => {
     const controller = new SearchRunController({ rules: reactionRegistry });
@@ -372,6 +770,7 @@ export default function SynthesisPage() {
     editor: KetcherApi,
     label: string,
     runId: number,
+    onKet?: (ket: string) => void,
   ): Promise<string | null> {
     const prefix = `[PocketChem:Synthesis #${runId}]`;
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -433,6 +832,7 @@ export default function SynthesisPage() {
         return null;
       }
 
+      onKet?.(ketText);
       const smiles = await ketToSmiles(ketText, label, runId);
       if (!smiles) {
         if (searchRunRef.current === runId) {
@@ -522,6 +922,7 @@ export default function SynthesisPage() {
     setSearchElapsedMs(state.startedAt === null ? 0 : Date.now() - state.startedAt);
     const outcome = state.outcome;
     if (!outcome) return;
+    recordFinishedSearch(state);
     setInterruptedNote(null);
     setError(null);
     setTechnicalError(state.errorDetail);
@@ -582,18 +983,28 @@ export default function SynthesisPage() {
     setSearchProgress(3);
     setStatus("Reading the starting materials and target product…");
     runContextRef.current = null;
+    // Earlier results (restored or not) are replaced by this search.
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
+    searchKeysRef.current = null;
+    const readKets: { reactant: string | null; target: string | null } = { reactant: null, target: null };
     searchStartedAtRef.current = Date.now();
 
     try {
       setStatus("Reading starting materials…");
-      const start = await readEditorSmiles(reactantKetcher, "the starting materials", runId);
+      const start = await readEditorSmiles(reactantKetcher, "the starting materials", runId, (ket) => {
+        readKets.reactant = ket;
+      });
       if (!start || searchRunRef.current !== runId || readController.signal.aborted) return;
       setSearchProgress(8);
 
       // Read the Ketcher instances one at a time. Concurrent editor exports can
       // leave one embedded Ketcher worker waiting indefinitely in some sessions.
       setStatus("Reading target product…");
-      const target = await readEditorSmiles(productKetcher, "the target product", runId);
+      const target = await readEditorSmiles(productKetcher, "the target product", runId, (ket) => {
+        readKets.target = ket;
+      });
       if (!target || searchRunRef.current !== runId || readController.signal.aborted) return;
       setSearchProgress(14);
 
@@ -611,6 +1022,27 @@ export default function SynthesisPage() {
       }
 
       const combinedStart = startingComponents.join(".");
+      // The structures this search is about; results are tied to them (and to the copies setting).
+      const [searchedReactantKey, searchedTargetKey] = await Promise.all([
+        ketIdentityKey(readKets.reactant),
+        ketIdentityKey(readKets.target),
+      ]);
+      if (searchRunRef.current !== runId || readController.signal.aborted) return;
+      if (searchedReactantKey && searchedTargetKey) {
+        searchKeysRef.current = {
+          reactantKet: readKets.reactant,
+          targetKet: readKets.target,
+          reactantKey: searchedReactantKey,
+          targetKey: searchedTargetKey,
+          copies,
+        };
+        snapshotRef.current = {
+          reactantKet: ketHasStructureText(readKets.reactant) ? readKets.reactant : null,
+          targetKet: ketHasStructureText(readKets.target) ? readKets.target : null,
+          reactantKey: searchedReactantKey,
+          targetKey: searchedTargetKey,
+        };
+      }
       setStartingSmiles(combinedStart);
       setTargetSmiles(targetComponents[0]);
       setSearchProgress(20);
@@ -667,6 +1099,15 @@ export default function SynthesisPage() {
     searchControllerRef.current?.reset();
     searchRunRef.current += 1;
     const clearRunId = searchRunRef.current;
+    // Clear also discards the saved workspace and invalidates any restoration still in flight.
+    void persistence.discard();
+    pendingEditorRef.current = null;
+    snapshotRef.current = EMPTY_SNAPSHOT;
+    searchKeysRef.current = null;
+    window.clearTimeout(snapshotTimerRef.current);
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
     setIsClearing(true);
     setIsSearching(false);
     setInterruptedNote(null);
@@ -715,6 +1156,45 @@ export default function SynthesisPage() {
     }
   }
 
+  // What was recovered, what is only a saved snapshot, and what could not be saved.
+  const resultsStale = Boolean(resultMeta && (resultMeta.stale || copies !== resultMeta.copies));
+  const workspaceNotices: WorkspaceNoticeItem[] = [...recoveryNotices];
+  if (resultMeta?.restored) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Restored from your previous session (computed ${formatWhen(resultMeta.computedAt)}). These results were not recomputed.`,
+    });
+  } else if (inputsOnlyRestored) {
+    workspaceNotices.push({ tone: "info", text: "Restored your drawn structures from your previous session." });
+  }
+  if (resultMeta?.engineMismatch) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: "These results were saved by an earlier version of the synthesis engine. They are shown as saved and have not been re-verified.",
+    });
+  }
+  if (resultMeta && resultsStale) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: `The starting materials, target or copies setting changed after these results were computed. The routes below are an earlier snapshot for ${resultMeta.startingSmiles} → ${resultMeta.targetSmiles}; search again to update them.`,
+    });
+  }
+  if (!persistenceStatus.available) {
+    workspaceNotices.push({ tone: "warn", text: "Browser storage is unavailable, so your work on this page will not be saved." });
+  }
+  if (persistenceStatus.saveError) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: persistenceStatus.saveError.code === "quota"
+        ? "Your latest changes could not be saved because browser storage is full."
+        : `Your latest changes could not be saved (${persistenceStatus.saveError.message}).`,
+    });
+  }
+  if (persistenceStatus.resultsOmitted) {
+    workspaceNotices.push({ tone: "warn", text: "The results were too large to save; your structures were saved without them." });
+  }
+  const canDiscardRecovered = Boolean(resultMeta?.restored || inputsOnlyRestored);
+
   return (
     <section className={`synthesis-page${isSearching ? " is-searching" : ""}`}>
       <div className="card synthesis-intro-card">
@@ -731,6 +1211,12 @@ export default function SynthesisPage() {
         </span>
       </div>
 
+      <WorkspaceNotice
+        notices={workspaceNotices}
+        onDiscard={canDiscardRecovered ? () => void clearSynthesis() : undefined}
+        discardDisabled={isSearching || isClearing}
+      />
+
       <div className="synthesis-drawers">
         <div className="card synthesis-drawer-card">
           <div className="synthesis-drawer-header">
@@ -743,6 +1229,8 @@ export default function SynthesisPage() {
               resetVersion={drawerResetVersion}
               isolateEditor
               nameInputMode="add-or-replace"
+              onChange={handleEditorChange}
+              onStructureLoaded={scheduleEditorSnapshot}
               onReady={setReactantKetcher}
               onNotReady={() => setReactantKetcher(null)}
             />
@@ -760,6 +1248,8 @@ export default function SynthesisPage() {
               resetVersion={drawerResetVersion}
               isolateEditor
               maxComponents={1}
+              onChange={handleEditorChange}
+              onStructureLoaded={scheduleEditorSnapshot}
               onReady={setProductKetcher}
               onNotReady={() => setProductKetcher(null)}
             />

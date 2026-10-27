@@ -78,6 +78,12 @@ type MoleculeDrawerProps = {
    * refused when the editor already holds a structure.
    */
   maxComponents?: number;
+  /**
+   * Called after a name or SMILES has been loaded into the editor. Name loads suppress the
+   * editor's own change events, so a page that mirrors the editor (workspace recovery) uses
+   * this to know the content changed.
+   */
+  onStructureLoaded?: () => void;
 };
 
 type ErrorBoundaryProps = {
@@ -191,6 +197,7 @@ function MoleculeDrawer({
   resetVersion = 0,
   isolateEditor = false,
   maxComponents,
+  onStructureLoaded,
 }: MoleculeDrawerProps) {
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -378,6 +385,7 @@ function MoleculeDrawer({
 
       await waitForReadableStructure(api);
       setHasStructure(true);
+      onStructureLoaded?.();
       const resolvedLabel = input.label;
       const noteSuffix = input.notes.length > 0 ? ` · ${input.notes.join(" ")}` : "";
 
@@ -418,6 +426,7 @@ function MoleculeDrawer({
     onChange,
     onNameStructureApplied,
     onNameSubmitProcess,
+    onStructureLoaded,
     waitForReadableStructure,
   ]);
 
