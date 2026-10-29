@@ -2328,6 +2328,9 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
               <ReactionsPage
                 initialPathways={reactionPathways}
                 initialReactantMolfile={molfile}
+                handoffId={reactionPathways.length > 0 || molfile ? (resultMeta?.computedAt ?? `unsaved:${smiles}`) : null}
+                handoffLabel={moleculeIdentity?.nomenclature.displayName || moleculeIdentity?.nomenclature.estimatedName || null}
+                handoffSmiles={sanitizeDisplayedSmiles(smiles) || null}
               />
             ) : activePage === "spectroscopy" ? (
               <SpectroscopyPage />

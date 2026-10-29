@@ -512,7 +512,7 @@ describe("page integration", () => {
   const synthesis = read("src", "components", "SynthesisPage.tsx");
   const app = read("src", "App.tsx");
 
-  test("[source] Ranking and Spectroscopy use the shared persistence layer; Reactions does not", () => {
+  test("[source] Ranking and Spectroscopy use the shared persistence layer; Multi-Catalytic does not", () => {
     assert.match(ranking, /useWorkspacePersistence/);
     assert.match(ranking, /page: "ranking"/);
     assert.match(spectroscopy, /useWorkspacePersistence/);
@@ -523,7 +523,7 @@ describe("page integration", () => {
       assert.match(text, /beforeLeave: \(\) => snapshotTask\.flushNow\(\)/);
       assert.match(text, /persistence\.resumeAfterRestore\(\)/);
     }
-    assert.doesNotMatch(read("src", "components", "ReactionsPage.tsx"), /persistence|indexedDB/i);
+    assert.doesNotMatch(read("src", "components", "MultiCatalyticPage.tsx"), /persistence|indexedDB/i);
   });
 
   test("[source] restoring never recomputes: no analysis call in the restore code, previews are only re-rendered", () => {

@@ -15,6 +15,25 @@ import {
   type HalogenSymbol,
 } from "../utils/reactions/profiles/halogens";
 import { rendererForReactionDisplay } from "./reactionProductRenderer";
+import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
+import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
+import { DebouncedTask } from "../utils/persistence/debouncedTask";
+import { restoreEditorContent } from "../utils/persistence/editorRestore";
+import { transferIntoEditor } from "../utils/persistence/handoffTransfer";
+import { ketHasStructureText, ketIdentityKey } from "../utils/persistence/ketIdentity";
+import {
+  REACTIONS_ENGINE_VERSION,
+  handoffOfferAvailable,
+  isReactionsOutcomeKind,
+  restoredResultsAreStale,
+  validateReactionsInputs,
+  validateReactionsResults,
+  type ReactionsOutcomeKind,
+  type ReactionsWorkspaceInputs,
+  type ReactionsWorkspaceResults,
+} from "../utils/persistence/reactionsWorkspace";
+import type { Capture, RecoveryOutcome } from "../utils/persistence/workspacePersistence";
+import type { WorkspaceResults } from "../utils/persistence/workspaceStore";
 
 import {
   predictReactionPathways,
@@ -36,6 +55,12 @@ type Props = {
   initialReactantSvg?: string | null;
   /** Preserved Ketcher V3000 block for each disconnected reactant component. */
   initialReactantComponentMolfiles?: string[];
+  /** Identifies the Properties analysis the initial props came from; null when there is none. */
+  handoffId?: string | null;
+  /** Display name of that analysis's molecule, for the "Use in Reactions" offer. */
+  handoffLabel?: string | null;
+  /** Its SMILES, used only when no molfile is available. */
+  handoffSmiles?: string | null;
 };
 
 type SvgListMap = Record<string, string[]>;
@@ -61,6 +86,22 @@ type DisplayReactionPathway = ReactionPathway & {
 };
 
 type AnalysisMode = "forward" | "retrosynthesis";
+
+/** What the page knows about the finished analysis on screen. */
+type ReactionsResultMeta = {
+  kind: ReactionsOutcomeKind;
+  computedAt: string;
+  engineVersion: number;
+  /** Chemistry identity of the structure(s) the analysis was run on. */
+  structureKey: string;
+  mode: AnalysisMode;
+  /** Loaded from a previous session instead of computed in this one. */
+  restored: boolean;
+  /** Saved by an earlier version of the reaction engine; shown as saved, never recomputed. */
+  engineMismatch: boolean;
+  /** The saved drawing could not be confirmed to match these results. */
+  stale: boolean;
+};
 const RESULTS_PER_BATCH = 12;
 
 function courseLabel(course: ReactionPathway["course"]) {
@@ -319,27 +360,22 @@ async function reactionInputDisplayName(smiles: string): Promise<string> {
 export default function ReactionsPage({
   initialPathways,
   initialReactantMolfile = null,
-  initialReactantSvg = null,
-  initialReactantComponentMolfiles = [],
+  handoffId = null,
+  handoffLabel = null,
+  handoffSmiles = null,
 }: Props) {
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [reactionSmiles, setReactionSmiles] = useState("");
-  // Preserve the main-page Ketcher depiction on the very first render. Without
-  // this handoff, initial pathways contain only canonical SMILES and RDKit is
-  // free to reflect/rotate an equivalent fused-ring drawing before the user
-  // ever presses Analyze on this page.
-  const [reactionMolfile, setReactionMolfile] = useState<string | null>(
-    initialReactantMolfile,
-  );
-  const [reactionSvgSnapshot, setReactionSvgSnapshot] = useState<string | null>(
-    initialReactantSvg,
-  );
-  const [reactionComponentMolfiles, setReactionComponentMolfiles] = useState<string[]>(
-    initialReactantComponentMolfiles,
-  );
+  // The molecule from the latest Properties analysis is never shown automatically: opening this
+  // page restores its own saved workspace. The user can adopt that molecule with "Use in
+  // Reactions" (adoptHandoff), which loads its exact Ketcher molfile and its already computed
+  // pathways, preserving the main-page depiction, scaffold orientation and wedge/hash bonds.
+  const [reactionMolfile, setReactionMolfile] = useState<string | null>(null);
+  const [reactionSvgSnapshot, setReactionSvgSnapshot] = useState<string | null>(null);
+  const [reactionComponentMolfiles, setReactionComponentMolfiles] = useState<string[]>([]);
   const [reactionInputName, setReactionInputName] = useState("");
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>("forward");
-  const [pathways, setPathways] = useState<ReactionPathway[]>(initialPathways);
+  const [pathways, setPathways] = useState<ReactionPathway[]>([]);
   const [retroPathways, setRetroPathways] = useState<RetrosynthesisPathway[]>([]);
   const [noReactionOutcomes, setNoReactionOutcomes] = useState<NoReactionOutcome[]>([]);
   const [reactantSvgs, setReactantSvgs] = useState<SvgListMap>({});
@@ -351,6 +387,413 @@ export default function ReactionsPage({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [visibleResultCount, setVisibleResultCount] = useState(RESULTS_PER_BATCH);
   const analysisRunRef = useRef(0);
+
+  // ---- workspace recovery (Stage 8B-2B) --------------------------------------------------------
+  // The drawn structure(s), the analysis mode and the finished analysis (pathways, retrosynthetic
+  // routes, NO REACTION outcomes) are saved and come back after a reload or a visit to another
+  // page. Restoring never runs a prediction. As before, editing the canvas discards the results on
+  // screen, so a saved result is always about the structures it was saved with.
+  const [snapshotTask] = useState(() => new DebouncedTask(async () => undefined));
+  // The last Properties analysis this workspace adopted (saved with the workspace, so a reload or
+  // a later visit does not offer the same molecule again).
+  const [handoffSeen, setHandoffSeen] = useState<string | null>(null);
+  const { controller: persistence, recovery, status: persistenceStatus } = useWorkspacePersistence<
+    ReactionsWorkspaceInputs,
+    ReactionsWorkspaceResults
+  >({
+    page: "reactions",
+    engineVersion: REACTIONS_ENGINE_VERSION,
+    validateInputs: validateReactionsInputs,
+    validateResults: validateReactionsResults,
+    beforeLeave: () => snapshotTask.flushNow(),
+  });
+  const [resultMeta, setResultMeta] = useState<ReactionsResultMeta | null>(null);
+  const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
+  const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
+  const [editorRestoreVersion, setEditorRestoreVersion] = useState(0);
+  const ketcherRef = useRef<KetcherApi | null>(null);
+  const snapshotRef = useRef<{ ket: string | null; key: string | null }>({ ket: null, key: null });
+  const pendingEditorRef = useRef<{ ket: string; key: string | null; token: number } | null>(null);
+  const restoringRef = useRef(false);
+  const analysisStartedRef = useRef(false);
+  const adoptedRef = useRef(false);
+  const adoptingRef = useRef(false);
+  const deferredRecoveryRef = useRef<RecoveryOutcome<ReactionsWorkspaceInputs, ReactionsWorkspaceResults> | null>(null);
+  const [isAdopting, setIsAdopting] = useState(false);
+  const appliedRecoveryRef = useRef<unknown>(null);
+  const applyRestoreRef = useRef<((outcome: RecoveryOutcome<ReactionsWorkspaceInputs, ReactionsWorkspaceResults>) => void) | null>(null);
+  const requestPersistRef = useRef<() => void>(() => undefined);
+  const restoreEditorRef = useRef<() => void>(() => undefined);
+  const latestRef = useRef({
+    reactionSmiles, reactionMolfile, reactionComponentMolfiles, reactionInputName, reactionStatus,
+    analysisMode, pathways, retroPathways, noReactionOutcomes, visibleResultCount, isAnalyzing, resultMeta, handoffSeen,
+  });
+
+  function captureReactions(): Capture<ReactionsWorkspaceInputs, ReactionsWorkspaceResults> | null {
+    const latest = latestRef.current;
+    const snapshot = snapshotRef.current;
+    const inputs: ReactionsWorkspaceInputs = {
+      ket: snapshot.ket,
+      key: snapshot.key,
+      analysisMode: latest.analysisMode,
+      visibleResultCount: latest.visibleResultCount,
+      // A prediction that is still running is recorded as interrupted, never as a result.
+      interrupted: latest.isAnalyzing ? latest.analysisMode : null,
+      handoffSeen: latest.handoffSeen,
+    };
+    let results: WorkspaceResults<ReactionsWorkspaceResults> | null = null;
+    const meta = latest.resultMeta;
+    if (meta && !latest.isAnalyzing && latest.reactionSmiles) {
+      const forward = meta.mode === "forward";
+      results = {
+        computedAt: meta.computedAt,
+        engineVersion: meta.engineVersion,
+        stale: meta.stale,
+        status: meta.kind,
+        data: {
+          inputKey: meta.structureKey,
+          mode: meta.mode,
+          smiles: latest.reactionSmiles,
+          molfile: latest.reactionMolfile,
+          componentMolfiles: latest.reactionComponentMolfiles,
+          inputName: latest.reactionInputName,
+          statusText: latest.reactionStatus,
+          pathways: forward ? latest.pathways : [],
+          retroPathways: forward ? [] : latest.retroPathways,
+          noReactionOutcomes: forward ? latest.noReactionOutcomes : [],
+        },
+      };
+    }
+    if (!inputs.ket && !results && !inputs.interrupted) return null;
+    return { inputs, results };
+  }
+
+  function requestPersist() {
+    persistence.requestSave(captureReactions);
+  }
+
+  /** Reads the editor and refreshes the saved drawing. */
+  async function takeEditorSnapshot() {
+    const api = ketcherRef.current;
+    if (!api || restoringRef.current || pendingEditorRef.current) return;
+    const token = persistence.token();
+    try {
+      const ket = await Promise.race([
+        api.getKet(),
+        new Promise<never>((_resolve, reject) => setTimeout(() => reject(new Error("Timed out reading the editor.")), 8000)),
+      ]);
+      const key = await ketIdentityKey(ket);
+      if (!persistence.isCurrent(token) || restoringRef.current || pendingEditorRef.current) return;
+      snapshotRef.current = { ket: ketHasStructureText(ket) ? ket : null, key };
+      requestPersist();
+    } catch (snapshotError) {
+      console.warn("[PocketChem:Reactions] Could not read the editor for workspace recovery.", snapshotError);
+    }
+  }
+
+  /** Drops the results on screen (the canvas no longer matches them). */
+  function discardShownResults(statusText: string) {
+    analysisRunRef.current += 1;
+    setResultMeta(null);
+    setReactionSmiles("");
+    setReactionMolfile(null);
+    setReactionComponentMolfiles([]);
+    setReactionSvgSnapshot(null);
+    setReactionInputName("");
+    setReactionError(null);
+    setPathways([]);
+    setRetroPathways([]);
+    setNoReactionOutcomes([]);
+    setReactantSvgs({});
+    setProductSvgs({});
+    setRetroTargetSvgs({});
+    setRetroPrecursorSvgs({});
+    setIsAnalyzing(false);
+    setVisibleResultCount(RESULTS_PER_BATCH);
+    setReactionStatus(statusText);
+  }
+
+  async function restoreEditor() {
+    const pending = pendingEditorRef.current;
+    const api = ketcherRef.current;
+    if (!pending || !api || restoringRef.current || adoptingRef.current) return;
+    restoringRef.current = true;
+    const { token } = pending;
+    // A transfer in progress invalidates a drawing restore, exactly like Clear does.
+    const outcome = await restoreEditorContent(api, { ket: pending.ket, key: pending.key }, () => persistence.isCurrent(token) && !adoptingRef.current);
+    if (persistence.isCurrent(token)) {
+      pendingEditorRef.current = null;
+      if (outcome.kind === "failed") {
+        // Do not let an editor that failed to restore overwrite the saved copy, and do not present
+        // the restored results as belonging to whatever is now on the canvas.
+        persistence.disable();
+        setResultMeta((meta) => (meta ? { ...meta, stale: true } : meta));
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: "The saved drawing could not be restored into the editor. Your saved work was kept and will not be overwritten; use Clear Analysis to start over." },
+        ]);
+      } else if (outcome.kind === "user-content-kept") {
+        // A drawing made before the saved one arrived wins, and results about another structure go.
+        discardShownResults("Structure changed. Predict again when the new input is ready.");
+      }
+    }
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      if (outcome.kind === "user-content-kept") snapshotTask.schedule();
+    }, 500);
+  }
+
+  function applyRestoredReactions(outcome: RecoveryOutcome<ReactionsWorkspaceInputs, ReactionsWorkspaceResults>) {
+    if (appliedRecoveryRef.current === outcome) return;
+    if (adoptingRef.current) {
+      // A molecule is being adopted right now: the record is applied only if that transfer fails.
+      deferredRecoveryRef.current = outcome;
+      return;
+    }
+    appliedRecoveryRef.current = outcome;
+    if (outcome.kind === "rejected") {
+      setRecoveryNotices([{ tone: "warn", text: `Saved work from a previous session could not be used (${outcome.message}). It was set aside and the page started clean.` }]);
+      return;
+    }
+    if (outcome.kind !== "restored" || !persistence.isCurrent(outcome.epoch)) return;
+    // Opening the page restores its own workspace; a Properties molecule never displaces it. Work
+    // (or an adoption) that began before the record arrived is the user's newer choice and wins.
+    if (analysisStartedRef.current || latestRef.current.isAnalyzing || adoptedRef.current) {
+      setRecoveryNotices([{ tone: "info", text: "Saved work from a previous session was not restored because you had already started working on this page." }]);
+      return;
+    }
+    setHandoffSeen(outcome.inputs.handoffSeen);
+
+    const { inputs, results } = outcome;
+    const notices: WorkspaceNoticeItem[] = [];
+    setAnalysisMode(inputs.analysisMode);
+    setVisibleResultCount(inputs.visibleResultCount);
+    snapshotRef.current = { ket: inputs.ket, key: inputs.key };
+    if (inputs.ket) {
+      pendingEditorRef.current = { ket: inputs.ket, key: inputs.key, token: outcome.epoch };
+      setEditorRestoreVersion((version) => version + 1);
+    }
+
+    if (results && isReactionsOutcomeKind(results.status)) {
+      const data = results.data;
+      setAnalysisMode(data.mode);
+      setReactionSmiles(data.smiles);
+      setReactionMolfile(data.molfile);
+      setReactionComponentMolfiles(data.componentMolfiles);
+      setReactionSvgSnapshot(null);
+      setReactionInputName(data.inputName);
+      setPathways(data.pathways);
+      setRetroPathways(data.retroPathways);
+      setNoReactionOutcomes(data.noReactionOutcomes);
+      setReactionError(null);
+      setReactionStatus(`Restored from your previous session · ${data.statusText}`);
+      setResultMeta({
+        kind: results.status,
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        structureKey: data.inputKey,
+        mode: data.mode,
+        restored: true,
+        engineMismatch: outcome.engineMismatch,
+        // A record whose results do not match its own saved drawing is never presented as current.
+        stale: restoredResultsAreStale(inputs, results),
+      });
+    } else if (inputs.interrupted) {
+      notices.push({
+        tone: "warn",
+        text: `A ${inputs.interrupted === "retrosynthesis" ? "reactant search" : "product prediction"} was running when this page was last saved. It did not finish and was not resumed; press the button again to run it.`,
+      });
+      setReactionStatus("The previous prediction was interrupted and did not finish.");
+    } else if (inputs.ket) {
+      setInputsOnlyRestored(true);
+      setReactionStatus("Restored your drawing from your previous session.");
+    }
+    if (outcome.resultsDropped) {
+      notices.push({ tone: "warn", text: "Saved reaction results could not be validated and were not restored. Your drawing was." });
+    }
+    if (outcome.migratedFrom !== null) {
+      notices.push({ tone: "info", text: "Your saved workspace was upgraded from an older storage format." });
+    }
+    setRecoveryNotices(notices);
+  }
+
+  /**
+   * "Use in Reactions": the user explicitly adopts the molecule from the latest Properties analysis.
+   *
+   * This is a transaction (see transferIntoEditor) and the saved Reactions workspace is never
+   * touched until it succeeds. Late restoration, pending saves and stale callbacks are held off
+   * while it runs; on failure the previous drawing is put back and the previous workspace carries
+   * on, and a recovery that arrived meanwhile is applied. On success the page shows the transferred
+   * molecule with the pathways Properties already computed (nothing is predicted here), every
+   * prediction belonging to the old molecule is cleared, and one write replaces the saved record
+   * with the new drawing and the adopted analysis id.
+   */
+  async function adoptHandoff() {
+    const api = ketcher;
+    const source = initialReactantMolfile || handoffSmiles;
+    if (!api || !source || handoffId === null || isAnalyzing) return;
+    if (adoptingRef.current || handoffSeen === handoffId) return; // one transfer at a time, never twice
+    adoptingRef.current = true;
+    setIsAdopting(true);
+    snapshotTask.cancel();
+    restoringRef.current = true;
+
+    const outcome = await transferIntoEditor(api, source, persistence);
+
+    if (outcome.kind !== "adopted") {
+      if (outcome.kind === "rolled-back") {
+        const deferred = deferredRecoveryRef.current;
+        deferredRecoveryRef.current = null;
+        if (deferred) {
+          try {
+            applyRestoreRef.current?.(deferred);
+          } finally {
+            persistence.resumeAfterRestore();
+          }
+        }
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: "The molecule from Properties could not be loaded. Your Reactions workspace is unchanged." },
+        ]);
+        requestPersistRef.current();
+      } else {
+        // The canvas may have changed, so the predictions on screen no longer describe it. The
+        // stored workspace is untouched and nothing is saved over it.
+        discardShownResults("The molecule from Properties could not be loaded.");
+        setRecoveryNotices([
+          { tone: "warn", text: "The molecule from Properties could not be loaded and the editor could not be restored. Your saved Reactions workspace is unchanged; reload this page to bring it back." },
+        ]);
+      }
+      adoptingRef.current = false;
+      setIsAdopting(false);
+      window.setTimeout(() => {
+        restoringRef.current = false;
+      }, 500);
+      return;
+    }
+
+    deferredRecoveryRef.current = null;
+    pendingEditorRef.current = null;
+    snapshotRef.current = { ket: outcome.ket, key: outcome.key };
+    adoptedRef.current = true;
+    analysisStartedRef.current = false;
+    analysisRunRef.current += 1;
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
+    setReactionSmiles("");
+    setReactionMolfile(initialReactantMolfile);
+    setReactionComponentMolfiles([]);
+    setReactionSvgSnapshot(null);
+    setReactionInputName("");
+    setReactionError(null);
+    setAnalysisMode("forward");
+    setPathways(initialPathways);
+    setRetroPathways([]);
+    setNoReactionOutcomes([]);
+    setReactantSvgs({});
+    setProductSvgs({});
+    setRetroTargetSvgs({});
+    setRetroPrecursorSvgs({});
+    setIsAnalyzing(false);
+    setVisibleResultCount(RESULTS_PER_BATCH);
+    setHandoffSeen(handoffId);
+    setReactionStatus("Using the molecule from Properties. Press Predict Products or Predict Reactants to run a prediction here.");
+    persistence.requestSave(() => ({
+      inputs: {
+        ket: outcome.ket,
+        key: outcome.key,
+        analysisMode: "forward",
+        visibleResultCount: RESULTS_PER_BATCH,
+        interrupted: null,
+        handoffSeen: handoffId,
+      },
+      results: null,
+    }));
+    await persistence.flush();
+    adoptingRef.current = false;
+    setIsAdopting(false);
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      snapshotTask.schedule();
+    }, 500);
+  }
+
+  useEffect(() => {
+    ketcherRef.current = ketcher;
+    requestPersistRef.current = requestPersist;
+    restoreEditorRef.current = () => void restoreEditor();
+    applyRestoreRef.current = applyRestoredReactions;
+    snapshotTask.setTask(takeEditorSnapshot);
+    latestRef.current = {
+      reactionSmiles, reactionMolfile, reactionComponentMolfiles, reactionInputName, reactionStatus,
+      analysisMode, pathways, retroPathways, noReactionOutcomes, visibleResultCount, isAnalyzing, resultMeta, handoffSeen,
+    };
+  });
+
+  // Autosave: only settled state is watched (the debounce and the finished-analysis rule keep
+  // half-finished predictions and rapid edits out of storage).
+  useEffect(() => {
+    requestPersistRef.current();
+  }, [
+    reactionSmiles, reactionMolfile, reactionComponentMolfiles, reactionInputName, analysisMode,
+    pathways, retroPathways, noReactionOutcomes, visibleResultCount, isAnalyzing, resultMeta, handoffSeen,
+  ]);
+
+  useEffect(() => {
+    if (!recovery) return;
+    try {
+      applyRestoreRef.current?.(recovery);
+    } finally {
+      // Saving starts only after the recovered record has been applied (or deliberately skipped).
+      persistence.resumeAfterRestore();
+    }
+  }, [recovery, persistence]);
+
+  useEffect(() => {
+    if (ketcher && pendingEditorRef.current) restoreEditorRef.current();
+  }, [ketcher, editorRestoreVersion]);
+
+  useEffect(() => {
+    return () => snapshotTask.cancel();
+  }, [snapshotTask]);
+
+  // What was recovered, what could not be saved.
+  const workspaceNotices: WorkspaceNoticeItem[] = [...recoveryNotices];
+  if (resultMeta?.restored) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Restored from your previous session (predicted ${new Date(resultMeta.computedAt).toLocaleString()}). These are previously computed model predictions and were not recomputed.`,
+    });
+  } else if (inputsOnlyRestored) {
+    workspaceNotices.push({ tone: "info", text: "Restored your drawing from your previous session." });
+  }
+  if (resultMeta?.engineMismatch) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: "These results were saved by an earlier version of the reaction engine. They are shown as saved and have not been recomputed.",
+    });
+  }
+  if (resultMeta?.stale) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: "These results may not describe the structure now on the canvas. They are a saved snapshot; predict again to update them.",
+    });
+  }
+  if (!persistenceStatus.available) {
+    workspaceNotices.push({ tone: "warn", text: "Browser storage is unavailable, so your work on this page will not be saved." });
+  }
+  if (persistenceStatus.saveError) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: persistenceStatus.saveError.code === "quota"
+        ? "Your latest changes could not be saved because browser storage is full."
+        : `Your latest changes could not be saved (${persistenceStatus.saveError.message}).`,
+    });
+  }
+  if (persistenceStatus.resultsOmitted) {
+    workspaceNotices.push({ tone: "warn", text: "The results were too large to save; your drawing was saved without them." });
+  }
 
   const displayPathways = useMemo(
     () => groupDisplayPathways(pathways),
@@ -540,6 +983,10 @@ export default function ReactionsPage({
 
     const runId = analysisRunRef.current + 1;
     analysisRunRef.current = runId;
+    analysisStartedRef.current = true;
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
     setIsAnalyzing(true);
     setReactionError(null);
     setReactionStatus(
@@ -573,6 +1020,31 @@ export default function ReactionsPage({
       }
 
       setReactionSmiles(smiles);
+      // The structure this analysis is about; the saved results are tied to it.
+      let analyzedKet: string | null = null;
+      try {
+        analyzedKet = (await ketcher?.getKet()) ?? null;
+      } catch {
+        analyzedKet = null;
+      }
+      const analyzedKey = await ketIdentityKey(analyzedKet);
+      if (analysisRunRef.current !== runId) return;
+      const recordFinished = (kind: ReactionsOutcomeKind) => {
+        if (!analyzedKey) return;
+        snapshotRef.current = { ket: ketHasStructureText(analyzedKet) ? analyzedKet : null, key: analyzedKey };
+        setResultMeta({
+          kind,
+          computedAt: new Date().toISOString(),
+          engineVersion: REACTIONS_ENGINE_VERSION,
+          structureKey: analyzedKey,
+          mode,
+          restored: false,
+          engineMismatch: false,
+          stale: false,
+        });
+        // Edits made while the prediction ran are caught by this re-read.
+        snapshotTask.schedule();
+      };
       const inputName = await reactionInputDisplayName(smiles);
       if (analysisRunRef.current !== runId) return;
       setReactionInputName(inputName);
@@ -588,6 +1060,7 @@ export default function ReactionsPage({
             ? `${results.length} verified precursor route${results.length === 1 ? "" : "s"} found.`
             : "No verified precursor routes were found.",
         );
+        recordFinished(results.length > 0 ? "retro-found" : "retro-none");
         return;
       }
 
@@ -620,6 +1093,7 @@ export default function ReactionsPage({
           ? `${outcomeCount} supported reaction outcome${outcomeCount === 1 ? "" : "s"} found.`
           : "No supported reactions were found.",
       );
+      recordFinished(outcomeCount > 0 ? "forward-found" : "forward-none");
     } catch (error) {
       console.error("Reaction analysis failed:", error);
       if (analysisRunRef.current === runId) {
@@ -631,6 +1105,17 @@ export default function ReactionsPage({
   }
 
   async function clearAnalysis() {
+    // Clearing also discards the saved workspace and invalidates any restoration still in flight.
+    void persistence.discard();
+    adoptedRef.current = false;
+    setHandoffSeen(null);
+    pendingEditorRef.current = null;
+    snapshotRef.current = { ket: null, key: null };
+    snapshotTask.cancel();
+    analysisStartedRef.current = false;
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
     analysisRunRef.current += 1;
     await ketcher?.setMolecule("");
     setReactionSmiles("");
@@ -652,6 +1137,10 @@ export default function ReactionsPage({
   }
 
   const handleReactionCanvasChange = useCallback(() => {
+    // Putting a saved drawing back into the editor is not a user edit.
+    if (restoringRef.current || pendingEditorRef.current) return;
+    setResultMeta(null);
+    snapshotTask.schedule();
     // Results belong to an exact Ketcher snapshot.  As soon as the student
     // changes that snapshot, invalidate both the old forward/retro result and
     // any in-flight async analysis.  This prevents a Diels–Alder/other result
@@ -674,7 +1163,7 @@ export default function ReactionsPage({
     setIsAnalyzing(false);
     setVisibleResultCount(RESULTS_PER_BATCH);
     setReactionStatus("Structure changed. Predict again when the new input is ready.");
-  }, []);
+  }, [snapshotTask]);
 
   return (
     <section className="card reactions-page-card">
@@ -691,12 +1180,33 @@ export default function ReactionsPage({
         </span>
       </div>
 
+      <WorkspaceNotice
+        embedded
+        notices={workspaceNotices}
+        onDiscard={resultMeta?.restored || inputsOnlyRestored ? () => void clearAnalysis() : undefined}
+        discardDisabled={isAnalyzing}
+      />
+
+      {recovery !== null && (initialReactantMolfile || handoffSmiles) && handoffOfferAvailable(handoffId, handoffSeen) && (
+        <div className="workspace-notice workspace-notice-embedded">
+          <ul>
+            <li className="workspace-notice-info">
+              A molecule from your Properties analysis is available{handoffLabel ? `: ${handoffLabel}` : ""}. Opening this page keeps your Reactions workspace.
+            </li>
+          </ul>
+          <button className="secondary-button" type="button" disabled={!ketcher || isAnalyzing || isAdopting} onClick={() => void adoptHandoff()}>
+            Use in Reactions
+          </button>
+        </div>
+      )}
+
       <div className="reaction-ketcher-panel">
         <div className="reaction-ketcher-box">
           <MoleculeDrawer
             globalKey="reactionKetcher"
             nameInputMode="add-or-replace"
             onChange={handleReactionCanvasChange}
+            onStructureLoaded={() => snapshotTask.schedule()}
             onReady={setKetcher}
           />
         </div>

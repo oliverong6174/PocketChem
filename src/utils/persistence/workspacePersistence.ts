@@ -8,6 +8,9 @@
  *              calls `resumeAfterRestore()`, so defaults can never replace recovered work.
  *   live       recovery finished (or there was nothing to recover); changes are saved, debounced.
  *   disabled   storage is unusable or the page asked to stop; nothing is written.
+ *   suspended  a page transaction (for example adopting a molecule from Properties) is in progress;
+ *              nothing is written and the previous phase returns on `resume()`, or the saved
+ *              workspace is overwritten in one write by `replaceWorkspace()`.
  *
  * `recover()` reads and validates the saved record exactly once. The page then applies it to its
  * own state and from that moment captures that state when saving. `discard()` (Clear / Reset / "Discard recovered work") bumps
@@ -76,7 +79,9 @@ export type WorkspacePersistenceConfig<I, R> = {
 };
 
 export class WorkspacePersistence<I, R> {
-  private phase: "loading" | "restoring" | "live" | "disabled" = "loading";
+  private phase: "loading" | "restoring" | "live" | "disabled" | "suspended" = "loading";
+  /** Where `resume()` goes back to; kept up to date if recovery finishes during a suspension. */
+  private resumePhase: "loading" | "restoring" | "live" | "disabled" | null = null;
   private epoch = 0;
   private attached = true;
   private timer: unknown = null;
@@ -155,16 +160,16 @@ export class WorkspacePersistence<I, R> {
     if (epoch !== this.epoch) return { kind: "superseded" };
 
     if (loaded.kind === "none") {
-      this.phase = "live";
+      this.settle("live");
       return { kind: "none" };
     }
     if (loaded.kind === "unavailable") {
-      this.phase = "disabled";
+      this.settle("disabled");
       this.setStatus({ available: false });
       return { kind: "unavailable", message: loaded.error.message };
     }
     if (loaded.kind === "corrupt" || loaded.kind === "incompatible") {
-      this.phase = "live";
+      this.settle("live");
       return { kind: "rejected", reason: loaded.kind, message: loaded.kind === "corrupt" ? loaded.reason : loaded.reason };
     }
 
@@ -172,7 +177,7 @@ export class WorkspacePersistence<I, R> {
     const inputs = this.config.validateInputs(record.inputs);
     if (inputs === null) {
       // The envelope was fine but the page cannot use the inputs: set the record aside.
-      this.phase = "live";
+      this.settle("live");
       void this.enqueue(() => this.config.store.remove(this.config.page));
       return { kind: "rejected", reason: "corrupt", message: "The saved inputs could not be used." };
     }
@@ -187,7 +192,7 @@ export class WorkspacePersistence<I, R> {
     this.createdAt = record.createdAt;
     this.hasRecord = true;
     this.lastSaved = canonical({ inputs, results });
-    this.phase = "restoring";
+    this.settle("restoring");
     return {
       kind: "restored",
       record: record as WorkspaceRecord<I, R>,
@@ -200,14 +205,56 @@ export class WorkspacePersistence<I, R> {
     };
   }
 
+  /** Recovery finished: go to `phase`, or remember it if a suspension is in progress. */
+  private settle(phase: "restoring" | "live" | "disabled") {
+    if (this.phase === "suspended") this.resumePhase = phase;
+    else this.phase = phase;
+  }
+
   /** The page has applied (or deliberately skipped) the recovered record; saving may begin. */
   resumeAfterRestore() {
     if (this.phase === "restoring") this.phase = "live";
+    else if (this.phase === "suspended" && this.resumePhase === "restoring") this.resumePhase = "live";
+  }
+
+  /**
+   * Starts a page transaction: scheduled saves are dropped and nothing is written until `resume()`
+   * or `replaceWorkspace()`. The saved record is not touched, so a failed transaction loses nothing.
+   */
+  suspend() {
+    if (this.phase === "suspended") return;
+    this.resumePhase = this.phase;
+    this.phase = "suspended";
+    this.cancelTimer();
+    this.pendingCapture = null;
+  }
+
+  /** The transaction failed and was rolled back: continue as before it started. */
+  resume() {
+    if (this.phase !== "suspended") return;
+    this.phase = this.resumePhase ?? "live";
+    this.resumePhase = null;
+  }
+
+  /**
+   * The transaction succeeded: the page now owns a new workspace. Everything scheduled or in flight
+   * for the old one (a recovery still loading, stale callbacks, pending saves) is invalidated, but the
+   * saved record is not deleted; the next write replaces it in a single put.
+   */
+  replaceWorkspace() {
+    this.epoch += 1;
+    this.cancelTimer();
+    this.pendingCapture = null;
+    this.resumePhase = null;
+    this.phase = this.config.store.available ? "live" : "disabled";
+    this.lastSaved = null;
+    this.setStatus({ saveError: null, resultsOmitted: false });
   }
 
   /** Stop writing (for example when the editors could not be restored and a save would erase work). */
   disable() {
     this.phase = "disabled";
+    this.resumePhase = null;
     this.cancelTimer();
   }
 
@@ -312,6 +359,7 @@ export class WorkspacePersistence<I, R> {
     this.cancelTimer();
     this.pendingCapture = null;
     this.phase = this.config.store.available ? "live" : "disabled";
+    this.resumePhase = null;
     this.lastSaved = null;
     this.createdAt = undefined;
     this.hasRecord = false;
