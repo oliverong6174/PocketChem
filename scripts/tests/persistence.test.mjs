@@ -800,7 +800,7 @@ describe("IndexedDB backend", () => {
     assert.equal(stores.get("records").get("k"), "two");
     await backend.delete("k");
     assert.equal(await backend.get("k"), undefined);
-    assert.equal(created.length, 1, "the object store is created once");
+    assert.equal(created.length, 2, "each object store (workspace records, saved analyses) is created exactly once");
   });
 
   test("[idb] a full WorkspaceStore works on it, including a simulated browser restart", async () => {

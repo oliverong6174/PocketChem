@@ -33,6 +33,7 @@ import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersis
 import { ketHasStructureText, ketIdentityKey } from "../utils/persistence/ketIdentity";
 import {
   SYNTHESIS_ENGINE_VERSION,
+  describeSynthesisAnalysis,
   isSynthesisOutcomeKind,
   synthesisInputKey,
   validateSynthesisInputs,
@@ -43,6 +44,9 @@ import {
 } from "../utils/persistence/synthesisWorkspace";
 import type { Capture, RecoveryOutcome } from "../utils/persistence/workspacePersistence";
 import type { WorkspaceResults } from "../utils/persistence/workspaceStore";
+import { getAppAnalysisLibrary } from "../utils/persistence/analysisLibraryApp";
+import type { OpenedAnalysis } from "../utils/persistence/analysisLibrary";
+import { transferIntoEditors } from "../utils/persistence/handoffTransfer";
 
 type StepSvgSet = {
   reactants: string[];
@@ -313,6 +317,8 @@ type SynthesisResultMeta = {
   engineMismatch: boolean;
   /** The structures changed after these results were computed. */
   stale: boolean;
+  /** Set when these results were opened from the Saved Analyses library. */
+  opened?: { name: string; savedAt: string } | null;
 };
 
 type PendingEditorRestore = {
@@ -326,7 +332,13 @@ function formatWhen(iso: string): string {
   return Number.isNaN(date.getTime()) ? iso : date.toLocaleString();
 }
 
-export default function SynthesisPage() {
+type SynthesisPageProps = {
+  /** A saved analysis the user chose on the Saved page; opened once recovery has finished. */
+  openRequest?: { id: string; recordId: string } | null;
+  onOpenHandled?: (requestId: string) => void;
+};
+
+export default function SynthesisPage({ openRequest = null, onOpenHandled }: SynthesisPageProps) {
   const [reactantKetcher, setReactantKetcher] = useState<KetcherApi | null>(null);
   const [productKetcher, setProductKetcher] = useState<KetcherApi | null>(null);
   const [routes, setRoutes] = useState<MultistepSynthesisRoute[]>([]);
@@ -381,6 +393,17 @@ export default function SynthesisPage() {
   const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
   const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
   const [editorRestoreVersion, setEditorRestoreVersion] = useState(0);
+  const [isOpening, setIsOpening] = useState(false);
+  const [saveForm, setSaveForm] = useState<{ name: string } | null>(null);
+  const [saveBusy, setSaveBusy] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<WorkspaceNoticeItem | null>(null);
+  const [openPrompt, setOpenPrompt] = useState<{
+    request: { id: string; recordId: string };
+    opened: OpenedAnalysis<SynthesisWorkspaceInputs, SynthesisWorkspaceResults>;
+  } | null>(null);
+  const openingRef = useRef(false);
+  const handledOpenRef = useRef<string | null>(null);
+  const beginOpenRef = useRef<((request: { id: string; recordId: string }) => Promise<void>) | null>(null);
   const snapshotRef = useRef<EditorSnapshot>(EMPTY_SNAPSHOT);
   const pendingEditorRef = useRef<PendingEditorRestore | null>(null);
   const restoreBusyRef = useRef(0);
@@ -535,7 +558,7 @@ export default function SynthesisPage() {
 
   async function restoreEditor(which: "reactant" | "target", api: KetcherApi) {
     const pending = pendingEditorRef.current;
-    if (!pending) return;
+    if (!pending || openingRef.current) return;
     const slot = pending[which];
     if (slot.started) return;
     slot.started = true;
@@ -545,20 +568,22 @@ export default function SynthesisPage() {
       return;
     }
     const token = pending.token;
+    // Opening a saved analysis invalidates a drawing restore, exactly like Clear does.
+    const stillWanted = () => persistence.isCurrent(token) && !openingRef.current;
     restoreBusyRef.current += 1;
     restoringRef.current = true;
     try {
-      if (!persistence.isCurrent(token)) return;
+      if (!stillWanted()) return;
       // Newer user input always wins over a saved structure.
       if (ketHasStructureText(await api.getKet())) {
         slot.skipped = true;
         return;
       }
-      if (!persistence.isCurrent(token)) return;
+      if (!stillWanted()) return;
       await api.setMolecule(slot.ket, { needZoom: true });
       const expected = which === "reactant" ? snapshotRef.current.reactantKey : snapshotRef.current.targetKey;
       const actual = await ketIdentityKey(await api.getKet());
-      if (!persistence.isCurrent(token)) return;
+      if (!stillWanted()) return;
       if (expected && actual !== expected) throw new Error("The restored structure does not match the saved one.");
     } catch (restoreError) {
       console.warn("[PocketChem:Synthesis] Could not restore a saved structure.", restoreError);
@@ -661,6 +686,213 @@ export default function SynthesisPage() {
     setRecoveryNotices(notices);
   }
 
+  // ---- Saved Analyses (Stage 8B-3A) ------------------------------------------------------------
+  // "Save Analysis" copies the finished analysis into the library under a name; "Open" (from the
+  // Saved page) puts a saved analysis back. Neither recomputes anything, and neither touches the
+  // automatic workspace except by replacing it when a saved analysis is opened on purpose.
+
+  async function saveCurrentAnalysis(name: string, announce = true): Promise<boolean> {
+    setSaveBusy(true);
+    try {
+      await snapshotTask.flushNow();
+      const capture = captureWorkspace();
+      if (!capture || !capture.results || latestRef.current.isSearching) {
+        setSaveMessage({ tone: "warn", text: "There is no finished search to save yet." });
+        return false;
+      }
+      const results = capture.results;
+      const saved = await getAppAnalysisLibrary().save("synthesis", {
+        name,
+        summary: describeSynthesisAnalysis(results.data, results.status, results.stale),
+        inputs: capture.inputs,
+        results,
+      });
+      if (!saved.ok) {
+        setSaveMessage({ tone: "warn", text: `The analysis was not saved: ${saved.error.message}` });
+        return false;
+      }
+      if (announce) setSaveMessage({ tone: "info", text: `Saved “${saved.value.name}” to Saved analyses.` });
+      return true;
+    } finally {
+      setSaveBusy(false);
+    }
+  }
+
+  function defaultAnalysisName(): string {
+    const l = latestRef.current;
+    const base = l.startingNames.length > 0 && l.targetName ? `${l.startingNames.join(" + ")} → ${l.targetName}` : "Synthesis analysis";
+    return base.slice(0, 100);
+  }
+
+  /** Replaces the Synthesis workspace with a saved analysis, as one transaction (see transferIntoEditors). */
+  async function applySavedAnalysis(opened: OpenedAnalysis<SynthesisWorkspaceInputs, SynthesisWorkspaceResults>): Promise<boolean> {
+    const reactant = reactantKetcherRef.current;
+    const product = productKetcherRef.current;
+    if (!reactant || !product || openingRef.current) return false;
+    openingRef.current = true;
+    setIsOpening(true);
+    snapshotTask.cancel();
+    restoringRef.current = true;
+    const { inputs, results } = opened;
+    const outcome = await transferIntoEditors(
+      [
+        { api: reactant, source: inputs.reactantKet, expectKey: inputs.reactantKet ? inputs.reactantKey : null },
+        { api: product, source: inputs.targetKet, expectKey: inputs.targetKet ? inputs.targetKey : null },
+      ],
+      persistence,
+    );
+    if (outcome.kind !== "adopted") {
+      if (outcome.kind === "rolled-back") {
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: `“${opened.record.name}” could not be opened. Your Synthesis workspace is unchanged.` },
+        ]);
+        requestPersistRef.current();
+      } else {
+        // The editors may have changed, so what is on screen no longer matches them.
+        searchControllerRef.current?.reset();
+        searchRunRef.current += 1;
+        setResultMeta(null);
+        setRoutes([]);
+        setRouteSvgs({});
+        setRecoveryNotices([
+          { tone: "warn", text: `“${opened.record.name}” could not be opened and the editors could not be restored. Your saved workspace is unchanged; reload this page to bring it back.` },
+        ]);
+      }
+      openingRef.current = false;
+      setIsOpening(false);
+      window.setTimeout(() => {
+        restoringRef.current = false;
+      }, 500);
+      return false;
+    }
+
+    // Success: the old workspace's callbacks are invalid and the saved analysis is the workspace now.
+    pendingEditorRef.current = null;
+    searchKeysRef.current = null;
+    runContextRef.current = null;
+    searchControllerRef.current?.reset();
+    searchRunRef.current += 1;
+    snapshotRef.current = {
+      reactantKet: outcome.editors[0].ket,
+      targetKet: outcome.editors[1].ket,
+      reactantKey: outcome.editors[0].key,
+      targetKey: outcome.editors[1].key,
+    };
+    setCopies(inputs.copies);
+    setIsSearching(false);
+    setSearchProgress(0);
+    setError(null);
+    setTechnicalError(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices(
+      opened.resultsDropped ? [{ tone: "warn", text: "The saved results could not be validated and were not opened. The structures were." }] : [],
+    );
+    if (results && isSynthesisOutcomeKind(results.status)) {
+      const data = results.data;
+      const structureKey = data.inputKey.slice(0, data.inputKey.lastIndexOf("|copies="));
+      const consistent =
+        inputs.reactantKey !== null && inputs.targetKey !== null && structureKey === `${inputs.reactantKey}>>${inputs.targetKey}`;
+      setRoutes(data.routes);
+      setRouteSvgs({});
+      setStartingSmiles(data.startingSmiles);
+      setTargetSmiles(data.targetSmiles);
+      setStartingNames(data.startingNames);
+      setTargetName(data.targetName);
+      setInterruptedNote(data.interruptedNote);
+      setSearchElapsedMs(data.elapsedMs);
+      setStatus(`Opened saved analysis “${opened.record.name}” · ${data.outcomeMessage}`);
+      setResultMeta({
+        kind: results.status,
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        structureKey,
+        copies: data.copies,
+        startingSmiles: data.startingSmiles,
+        targetSmiles: data.targetSmiles,
+        outcomeMessage: data.outcomeMessage,
+        elapsedMs: data.elapsedMs,
+        restored: false,
+        opened: { name: opened.record.name, savedAt: opened.record.updatedAt },
+        engineMismatch: opened.engineMismatch,
+        // Whatever was true when it was saved stays true; an inconsistent record is never shown as current.
+        stale: results.stale || !consistent,
+      });
+    } else {
+      setRoutes([]);
+      setRouteSvgs({});
+      setStartingSmiles("");
+      setTargetSmiles("");
+      setStartingNames([]);
+      setTargetName("");
+      setInterruptedNote(null);
+      setSearchElapsedMs(0);
+      setResultMeta(null);
+      setStatus(`Opened saved analysis “${opened.record.name}” (structures only).`);
+    }
+    // One write replaces the automatic workspace with the opened analysis.
+    persistence.requestSave(() => ({ inputs: opened.inputs, results: opened.results }));
+    await persistence.flush();
+    openingRef.current = false;
+    setIsOpening(false);
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      snapshotTask.schedule();
+    }, 500);
+    return true;
+  }
+
+  async function beginOpen(request: { id: string; recordId: string }) {
+    const handled = () => onOpenHandled?.(request.id);
+    const loaded = await getAppAnalysisLibrary().open<SynthesisWorkspaceInputs, SynthesisWorkspaceResults>(request.recordId);
+    if (!loaded.ok) {
+      setRecoveryNotices([{ tone: "warn", text: `The saved analysis could not be opened: ${loaded.error.message}` }]);
+      handled();
+      return;
+    }
+    if (loaded.value.record.page !== "synthesis") {
+      setRecoveryNotices([{ tone: "warn", text: "That saved analysis belongs to another page." }]);
+      handled();
+      return;
+    }
+    if (latestRef.current.isSearching || openingRef.current) {
+      setRecoveryNotices([{ tone: "warn", text: "Stop the current search before opening a saved analysis." }]);
+      handled();
+      return;
+    }
+    if (captureWorkspace() !== null) {
+      // The workspace has structures or results that are not a saved analysis: ask first.
+      setOpenPrompt({ request, opened: loaded.value });
+      return;
+    }
+    await applySavedAnalysis(loaded.value);
+    handled();
+  }
+
+  async function resolveOpenPrompt(choice: "replace" | "save-first" | "cancel") {
+    const prompt = openPrompt;
+    if (!prompt) return;
+    setOpenPrompt(null);
+    if (choice === "cancel") {
+      onOpenHandled?.(prompt.request.id);
+      return;
+    }
+    if (choice === "save-first") {
+      const saved = await saveCurrentAnalysis(`${defaultAnalysisName()} (before opening ${prompt.opened.record.name})`.slice(0, 120), false);
+      // If the current workspace could not be saved, nothing is replaced.
+      if (!saved) {
+        onOpenHandled?.(prompt.request.id);
+        return;
+      }
+    }
+    await applySavedAnalysis(prompt.opened);
+    onOpenHandled?.(prompt.request.id);
+  }
+
+  useEffect(() => {
+    beginOpenRef.current = beginOpen;
+  });
+
   useEffect(() => {
     applyRestoreRef.current = applyRestoredWorkspace;
   });
@@ -673,6 +905,15 @@ export default function SynthesisPage() {
       persistence.resumeAfterRestore();
     }
   }, [recovery, persistence]);
+
+  // An analysis chosen on the Saved page. Waits until recovery has finished, so the open can never
+  // be overwritten by an older asynchronous restoration, and for both editors.
+  useEffect(() => {
+    if (!openRequest || recovery === null || !editorsReady) return;
+    if (handledOpenRef.current === openRequest.id) return;
+    handledOpenRef.current = openRequest.id;
+    void beginOpenRef.current?.(openRequest);
+  }, [openRequest, recovery, editorsReady]);
 
   /** Remembers the structures and outcome of a finished search so results can be tied to them. */
   function recordFinishedSearch(state: SearchRunState) {
@@ -963,7 +1204,7 @@ export default function SynthesisPage() {
   });
 
   async function findSynthesis() {
-    if (!reactantKetcher || !productKetcher || isSearching || isClearing) return;
+    if (!reactantKetcher || !productKetcher || isSearching || isClearing || openingRef.current) return;
 
     const runId = searchRunRef.current + 1;
     searchRunRef.current = runId;
@@ -1170,6 +1411,13 @@ export default function SynthesisPage() {
   } else if (inputsOnlyRestored) {
     workspaceNotices.push({ tone: "info", text: "Restored your drawn structures from your previous session." });
   }
+  if (resultMeta?.opened) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Opened saved analysis “${resultMeta.opened.name}” (saved ${formatWhen(resultMeta.opened.savedAt)}; computed ${formatWhen(resultMeta.computedAt)}). These results were not recomputed.`,
+    });
+  }
+  if (saveMessage) workspaceNotices.push(saveMessage);
   if (resultMeta?.engineMismatch) {
     workspaceNotices.push({
       tone: "warn",
@@ -1219,6 +1467,29 @@ export default function SynthesisPage() {
         onDiscard={canDiscardRecovered ? () => void clearSynthesis() : undefined}
         discardDisabled={isSearching || isClearing}
       />
+
+      {openPrompt && (
+        <div className="card workspace-notice" role="alertdialog" aria-label="Replace the current workspace?">
+          <ul>
+            <li className="workspace-notice-warn">
+              Opening “{openPrompt.opened.record.name}” replaces the structures and results now on this page, which are not saved as an analysis.
+            </li>
+          </ul>
+          <div className="synthesis-actions">
+            {resultMeta && !isSearching && (
+              <button className="primary-button" type="button" disabled={saveBusy} onClick={() => void resolveOpenPrompt("save-first")}>
+                Save current, then open
+              </button>
+            )}
+            <button className="secondary-button" type="button" onClick={() => void resolveOpenPrompt("replace")}>
+              Replace without saving
+            </button>
+            <button className="secondary-button" type="button" onClick={() => void resolveOpenPrompt("cancel")}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="synthesis-drawers">
         <div className="card synthesis-drawer-card">
@@ -1286,8 +1557,50 @@ export default function SynthesisPage() {
             >
               {isSearching ? "Cancel" : "Clear"}
             </button>
+            <button
+              className="secondary-button"
+              disabled={!resultMeta || isSearching || isClearing || isOpening || saveBusy}
+              onClick={() => {
+                setSaveMessage(null);
+                setSaveForm({ name: defaultAnalysisName() });
+              }}
+              title={resultMeta ? "Keep this analysis in Saved analyses" : "Run a search first"}
+              type="button"
+            >
+              Save Analysis
+            </button>
           </div>
         </div>
+
+        {saveForm && (
+          <form
+            className="synthesis-save-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const name = saveForm.name;
+              void saveCurrentAnalysis(name).then((saved) => {
+                if (saved) setSaveForm(null);
+              });
+            }}
+          >
+            <label>
+              Name
+              <input
+                type="text"
+                value={saveForm.name}
+                maxLength={120}
+                onChange={(event) => setSaveForm({ name: event.target.value })}
+                autoFocus
+              />
+            </label>
+            <button className="primary-button" type="submit" disabled={saveBusy || !saveForm.name.trim()}>
+              {saveBusy ? "Saving…" : "Save"}
+            </button>
+            <button className="secondary-button" type="button" onClick={() => setSaveForm(null)}>
+              Cancel
+            </button>
+          </form>
+        )}
 
         <div className="synthesis-copies-control">
           <label>

@@ -78,7 +78,7 @@ export interface StorageBackend {
 }
 
 /** In-memory backend for tests; can simulate a byte quota and an unavailable database. */
-export class MemoryBackend implements StorageBackend {
+export class MemoryBackend implements ListableBackend {
   readonly map: Map<string, string>;
   quotaChars: number | null;
   failWith: PersistenceError | null = null;
@@ -109,10 +109,21 @@ export class MemoryBackend implements StorageBackend {
     if (this.failWith) throw this.failWith;
     this.map.delete(key);
   }
+
+  async list() {
+    if (this.failWith) throw this.failWith;
+    return [...this.map.entries()].map(([key, value]) => ({ key, value }));
+  }
 }
 
 const DB_NAME = "pocketchem-workspace";
-const STORE_NAME = "records";
+/**
+ * Version 1 had one object store ("records": automatic workspace recovery). Version 2 adds
+ * "analyses" (the Saved Analyses library). Upgrading keeps every existing record.
+ */
+export const DB_VERSION = 2;
+export const WORKSPACE_STORE_NAME = "records";
+export const ANALYSES_STORE_NAME = "analyses";
 
 function toPersistenceError(error: unknown, fallback: string): PersistenceError {
   if (error instanceof PersistenceError) return error;
@@ -125,8 +136,18 @@ function toPersistenceError(error: unknown, fallback: string): PersistenceError 
   return new PersistenceError("io", message);
 }
 
-/** IndexedDB backend: one object store, string values, each write in its own transaction. */
-export function createIndexedDbBackend(factory?: IDBFactory | null): StorageBackend | null {
+/** A storage backend that can also list everything it holds (the Saved Analyses library). */
+export interface ListableBackend extends StorageBackend {
+  list(): Promise<Array<{ key: string; value: string | undefined }>>;
+}
+
+export type IndexedDbBackends = { workspace: StorageBackend; analyses: ListableBackend };
+
+/**
+ * IndexedDB backends over one shared connection: the automatic workspace store and the Saved
+ * Analyses store. String values, each write in its own transaction.
+ */
+export function createIndexedDbBackends(factory?: IDBFactory | null): IndexedDbBackends | null {
   let idb: IDBFactory | undefined;
   try {
     idb = factory ?? (typeof indexedDB !== "undefined" ? indexedDB : undefined);
@@ -142,13 +163,17 @@ export function createIndexedDbBackend(factory?: IDBFactory | null): StorageBack
     const attempt = new Promise<IDBDatabase>((resolve, reject) => {
       let request: IDBOpenDBRequest;
       try {
-        request = factoryRef.open(DB_NAME, 1);
+        request = factoryRef.open(DB_NAME, DB_VERSION);
       } catch (error) {
         reject(toPersistenceError(error, "Could not open browser storage."));
         return;
       }
       request.onupgradeneeded = () => {
-        if (!request.result.objectStoreNames.contains(STORE_NAME)) request.result.createObjectStore(STORE_NAME);
+        // Creates what is missing and never touches what exists, so a version 1 database keeps its records.
+        const db = request.result;
+        for (const name of [WORKSPACE_STORE_NAME, ANALYSES_STORE_NAME]) {
+          if (!db.objectStoreNames.contains(name)) db.createObjectStore(name);
+        }
       };
       request.onsuccess = () => {
         const db = request.result;
@@ -172,34 +197,61 @@ export function createIndexedDbBackend(factory?: IDBFactory | null): StorageBack
     return attempt;
   }
 
-  async function run<T>(mode: IDBTransactionMode, work: (store: IDBObjectStore) => IDBRequest | null, result: (request: IDBRequest | null) => T): Promise<T> {
+  async function run<T>(
+    storeName: string,
+    mode: IDBTransactionMode,
+    work: (store: IDBObjectStore) => IDBRequest[],
+    result: (requests: IDBRequest[]) => T,
+  ): Promise<T> {
     const db = await open();
     return new Promise<T>((resolve, reject) => {
-      let request: IDBRequest | null = null;
+      let requests: IDBRequest[] = [];
       let transaction: IDBTransaction;
       try {
-        transaction = db.transaction(STORE_NAME, mode);
-        request = work(transaction.objectStore(STORE_NAME));
+        transaction = db.transaction(storeName, mode);
+        requests = work(transaction.objectStore(storeName));
       } catch (error) {
         reject(toPersistenceError(error, "Browser storage failed."));
         return;
       }
       // Resolve on transaction completion so a write is durable, not merely queued.
-      transaction.oncomplete = () => resolve(result(request));
-      transaction.onerror = () => reject(toPersistenceError(transaction.error ?? request?.error, "Browser storage failed."));
-      transaction.onabort = () => reject(toPersistenceError(transaction.error ?? request?.error, "Browser storage write was aborted."));
+      transaction.oncomplete = () => resolve(result(requests));
+      transaction.onerror = () => reject(toPersistenceError(transaction.error ?? requests[0]?.error, "Browser storage failed."));
+      transaction.onabort = () => reject(toPersistenceError(transaction.error ?? requests[0]?.error, "Browser storage write was aborted."));
     });
   }
 
-  return {
-    get: (key) =>
-      run("readonly", (store) => store.get(key), (request) => {
-        const value = request?.result;
-        return typeof value === "string" ? value : undefined;
+  function backendFor(storeName: string): StorageBackend {
+    return {
+      get: (key) =>
+        run(storeName, "readonly", (store) => [store.get(key)], ([request]) => {
+          const value = request?.result;
+          return typeof value === "string" ? value : undefined;
+        }),
+      put: (key, value) => run(storeName, "readwrite", (store) => [store.put(value, key)], () => undefined),
+      delete: (key) => run(storeName, "readwrite", (store) => [store.delete(key)], () => undefined),
+    };
+  }
+
+  const analyses: ListableBackend = {
+    ...backendFor(ANALYSES_STORE_NAME),
+    list: () =>
+      run(ANALYSES_STORE_NAME, "readonly", (store) => [store.getAllKeys(), store.getAll()], ([keys, values]) => {
+        const keyList = (keys?.result ?? []) as unknown[];
+        const valueList = (values?.result ?? []) as unknown[];
+        return keyList.map((key, index) => ({
+          key: String(key),
+          value: typeof valueList[index] === "string" ? (valueList[index] as string) : undefined,
+        }));
       }),
-    put: (key, value) => run("readwrite", (store) => store.put(value, key), () => undefined),
-    delete: (key) => run("readwrite", (store) => store.delete(key), () => undefined),
   };
+
+  return { workspace: backendFor(WORKSPACE_STORE_NAME), analyses };
+}
+
+/** The automatic-workspace backend (kept for callers that only need that store). */
+export function createIndexedDbBackend(factory?: IDBFactory | null): StorageBackend | null {
+  return createIndexedDbBackends(factory)?.workspace ?? null;
 }
 
 // ---- plain-data guard -------------------------------------------------------------------------
@@ -430,11 +482,18 @@ export class WorkspaceStore {
   }
 }
 
+let defaultBackends: IndexedDbBackends | null | undefined;
 let defaultStore: WorkspaceStore | null = null;
+
+/** The application-wide IndexedDB backends (shared connection); null when the browser blocks IndexedDB. */
+export function getIndexedDbBackends(): IndexedDbBackends | null {
+  if (defaultBackends === undefined) defaultBackends = createIndexedDbBackends();
+  return defaultBackends;
+}
 
 /** The application-wide store (IndexedDB, or unavailable when the browser blocks it). */
 export function getWorkspaceStore(): WorkspaceStore {
-  if (!defaultStore) defaultStore = new WorkspaceStore(createIndexedDbBackend());
+  if (!defaultStore) defaultStore = new WorkspaceStore(getIndexedDbBackends()?.workspace ?? null);
   return defaultStore;
 }
 

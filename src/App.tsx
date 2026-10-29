@@ -71,6 +71,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   const ReactionsPage = lazy(() => import("./components/ReactionsPage"));
   const AcidBasePage = lazy(() => import("./components/RankingPage"));
   const SynthesisPage = lazy(() => import("./components/SynthesisPage"));
+  const SavedAnalysesPage = lazy(() => import("./components/SavedAnalysesPage"));
   const MultiCatalyticPage = lazy(() => import("./components/MultiCatalyticPage"));
   const SpectroscopyPage = lazy(() => import("./components/SpectroscopyPage"));
 
@@ -99,7 +100,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     
 
   type AnalysisPanel = "overview" | "acidBase" | "concepts" | "properties";
-  type AppPage = "analysis" | "acidBase" | "reactions" | "spectroscopy" | "multiStep" | "multiCatalytic";
+  type AppPage = "analysis" | "acidBase" | "reactions" | "spectroscopy" | "multiStep" | "multiCatalytic" | "saved";
 
   /** What the page knows about the dashboard results on screen. */
   type PropertiesResultMeta = {
@@ -122,6 +123,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     { id: "spectroscopy", label: "Spectroscopy" },
     { id: "multiStep", label: "Multi-Step" },
     { id: "multiCatalytic", label: "Multi-Catalytic" },
+    { id: "saved", label: "Saved" },
   ];
 
   const ANALYSIS_PANELS: Array<{ id: AnalysisPanel; label: string }> = [
@@ -220,6 +222,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     const [reactionPathways, setReactionPathways] = useState<ReactionPathway[]>([]);
     const appShellRef = useRef<HTMLElement | null>(null);
     const switchRequestRef = useRef(0);
+    const openSequenceRef = useRef(0);
 
     // ---- workspace recovery for the Properties page (Stage 8B-1) --------------------------------
     // The drawn structure and the completed analysis are saved and come back after a reload or a
@@ -508,12 +511,24 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
 
     };
 
-    const switchPage = (page: AppPage) => {
+    // A saved analysis chosen on the Saved page, waiting for its page to open it. Any other way of
+    // changing page forgets it, so it can never be applied later by surprise.
+    const [pendingOpen, setPendingOpen] = useState<{ id: string; recordId: string; page: AppPage } | null>(null);
+
+    const switchPage = (page: AppPage, options?: { keepOpenRequest?: boolean }) => {
+      if (!options?.keepOpenRequest) setPendingOpen(null);
       // Let the page being left finish reading its editor and saving before it is unmounted.
       const request = (switchRequestRef.current += 1);
       void runLeaveHooks().then(() => {
         if (switchRequestRef.current === request) setActivePage(page);
       });
+    };
+
+    const openSavedAnalysis = (analysis: { id: string; page: string }) => {
+      if (analysis.page !== "synthesis") return;
+      openSequenceRef.current += 1;
+      setPendingOpen({ id: `open-${openSequenceRef.current}`, recordId: analysis.id, page: "multiStep" });
+      switchPage("multiStep", { keepOpenRequest: true });
     };
 
     const handlePageTabKeyDown = (
@@ -2335,7 +2350,12 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
             ) : activePage === "spectroscopy" ? (
               <SpectroscopyPage />
             ) : activePage === "multiStep" ? (
-              <SynthesisPage />
+              <SynthesisPage
+                openRequest={pendingOpen?.page === "multiStep" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : activePage === "saved" ? (
+              <SavedAnalysesPage onOpen={openSavedAnalysis} />
             ) : (
               <MultiCatalyticPage />
             )}
