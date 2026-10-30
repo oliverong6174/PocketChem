@@ -47,6 +47,16 @@ function rememberResolution(key: string, value: MoleculeNameResolution) {
 }
 
 /**
+ * What a failed database read is reported as. A real Error is passed on unchanged; anything else that
+ * was thrown is wrapped in the user-facing message with the original value kept as `cause`, so the
+ * underlying failure is not lost for debugging while users still see only the plain message.
+ */
+export function asLookupFailure(error: unknown): Error {
+  if (error instanceof Error) return error;
+  return new Error("PocketChem could not read its local chemical-name database.", { cause: error });
+}
+
+/**
  * Fully offline name resolution.
  *
  * Runtime resolution uses only the ChEBI-derived database bundled in
@@ -68,8 +78,7 @@ export async function resolveMoleculeName(
   try {
     local = await lookupLocalChemicalName(query);
   } catch (error) {
-    if (error instanceof Error) throw error;
-    throw new Error("PocketChem could not read its local chemical-name database.");
+    throw asLookupFailure(error);
   }
 
   if (!local) {
