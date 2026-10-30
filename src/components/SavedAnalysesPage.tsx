@@ -16,6 +16,7 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: "Search cancelled",
   "no-route-within-budget": "No route within the time limit",
   "no-route-within-bounds": "No route within the search limits",
+  complete: "Completed analysis",
 };
 
 type Props = {

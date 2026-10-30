@@ -141,3 +141,13 @@ export function validateSpectroscopyResults(raw: unknown): SpectroscopyWorkspace
   if (massSpec !== undefined && !validMassSpec(massSpec)) return null;
   return raw as unknown as SpectroscopyWorkspaceResults;
 }
+
+/** The one-line description a saved spectroscopy analysis gets in the library list. */
+export function describeSpectroscopyAnalysis(
+  data: Pick<SpectroscopyWorkspaceResults, "name" | "formula" | "smiles" | "result">,
+): string {
+  const who = data.name || data.smiles;
+  const formula = data.formula ? ` (${data.formula})` : "";
+  const { ir, protonNMR, carbonNMR, massSpec } = data.result;
+  return `${who}${formula} · predicted IR ${ir.length} bands, ¹H ${protonNMR.length} signals, ¹³C ${carbonNMR.length} signals, MS ${massSpec?.peaks.length ?? 0} peaks`;
+}

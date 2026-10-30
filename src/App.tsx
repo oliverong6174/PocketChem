@@ -54,6 +54,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import WorkspaceNotice, { type WorkspaceNoticeItem } from "./components/WorkspaceNotice";
   import { DebouncedTask } from "./utils/persistence/debouncedTask";
   import { runLeaveHooks } from "./utils/persistence/leaveGate";
+  import { ANALYSIS_APP_PAGE } from "./utils/persistence/analysisLibraryApp";
   import { useWorkspacePersistence } from "./utils/persistence/useWorkspacePersistence";
   import { ketHasStructureText, ketIdentityKey } from "./utils/persistence/ketIdentity";
   import {
@@ -525,10 +526,11 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     };
 
     const openSavedAnalysis = (analysis: { id: string; page: string }) => {
-      if (analysis.page !== "synthesis") return;
+      const target = ANALYSIS_APP_PAGE[analysis.page as keyof typeof ANALYSIS_APP_PAGE];
+      if (!target) return;
       openSequenceRef.current += 1;
-      setPendingOpen({ id: `open-${openSequenceRef.current}`, recordId: analysis.id, page: "multiStep" });
-      switchPage("multiStep", { keepOpenRequest: true });
+      setPendingOpen({ id: `open-${openSequenceRef.current}`, recordId: analysis.id, page: target });
+      switchPage(target, { keepOpenRequest: true });
     };
 
     const handlePageTabKeyDown = (
@@ -2338,7 +2340,10 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
         >
           <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
             {activePage === "acidBase" ? (
-              <AcidBasePage />
+              <AcidBasePage
+                openRequest={pendingOpen?.page === "acidBase" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
             ) : activePage === "reactions" ? (
               <ReactionsPage
                 initialPathways={reactionPathways}
@@ -2348,7 +2353,10 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
                 handoffSmiles={sanitizeDisplayedSmiles(smiles) || null}
               />
             ) : activePage === "spectroscopy" ? (
-              <SpectroscopyPage />
+              <SpectroscopyPage
+                openRequest={pendingOpen?.page === "spectroscopy" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
             ) : activePage === "multiStep" ? (
               <SynthesisPage
                 openRequest={pendingOpen?.page === "multiStep" ? pendingOpen : null}

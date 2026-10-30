@@ -25,6 +25,12 @@ import {
 } from "../utils/persistence/spectroscopyWorkspace";
 import type { Capture, RecoveryOutcome } from "../utils/persistence/workspacePersistence";
 import type { WorkspaceResults } from "../utils/persistence/workspaceStore";
+import { getAppAnalysisLibrary } from "../utils/persistence/analysisLibraryApp";
+import type { OpenedAnalysis } from "../utils/persistence/analysisLibrary";
+import { transferIntoEditors } from "../utils/persistence/handoffTransfer";
+import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./SavedAnalysisControls";
+import { useSavedAnalysisOpen } from "../utils/persistence/useSavedAnalysisOpen";
+import { describeSpectroscopyAnalysis } from "../utils/persistence/spectroscopyWorkspace";
 import {
   analyzeMolecularSpectroscopy,
   resolveIRPeakHighlightSite,
@@ -53,6 +59,8 @@ type SpectroscopyResultMeta = {
   engineMismatch: boolean;
   /** The drawn structure changed after this prediction. */
   stale: boolean;
+  /** Set when the spectra were opened from the Saved Analyses library. */
+  opened?: { name: string; savedAt: string } | null;
 };
 
 type Stick = {
@@ -849,7 +857,13 @@ function MassTable({
   );
 }
 
-export default function SpectroscopyPage() {
+type SpectroscopyPageProps = {
+  /** A saved analysis the user chose on the Saved page; opened once recovery has finished. */
+  openRequest?: { id: string; recordId: string } | null;
+  onOpenHandled?: (requestId: string) => void;
+};
+
+export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: SpectroscopyPageProps) {
   const importedNameResolutionRef = useRef<MoleculeNameResolution | null>(null);
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [editorResetVersion, setEditorResetVersion] = useState(0);
@@ -892,6 +906,11 @@ export default function SpectroscopyPage() {
   const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
   const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
   const [editorRestoreVersion, setEditorRestoreVersion] = useState(0);
+  const [isOpening, setIsOpening] = useState(false);
+  const [saveForm, setSaveForm] = useState<{ name: string } | null>(null);
+  const [saveBusy, setSaveBusy] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<WorkspaceNoticeItem | null>(null);
+  const openingRef = useRef(false);
   const ketcherRef = useRef<KetcherApi | null>(null);
   const snapshotRef = useRef<{ ket: string | null; key: string | null }>({ ket: null, key: null });
   const pendingEditorRef = useRef<{ ket: string; key: string | null; token: number } | null>(null);
@@ -962,10 +981,11 @@ export default function SpectroscopyPage() {
   async function restoreEditor() {
     const pending = pendingEditorRef.current;
     const api = ketcherRef.current;
-    if (!pending || !api || restoringRef.current) return;
+    if (!pending || !api || restoringRef.current || openingRef.current) return;
     restoringRef.current = true;
     const { token } = pending;
-    const outcome = await restoreEditorContent(api, { ket: pending.ket, key: pending.key }, () => persistence.isCurrent(token));
+    // Opening a saved analysis invalidates a drawing restore, exactly like Clear does.
+    const outcome = await restoreEditorContent(api, { ket: pending.ket, key: pending.key }, () => persistence.isCurrent(token) && !openingRef.current);
     if (persistence.isCurrent(token)) {
       pendingEditorRef.current = null;
       if (outcome.kind === "failed") {
@@ -1037,6 +1057,152 @@ export default function SpectroscopyPage() {
     setRecoveryNotices(notices);
   }
 
+  // ---- Saved Analyses (Stage 8B-3B-1) -----------------------------------------------------------
+  // "Save Analysis" copies the finished prediction (all four spectra, assignments and explanations)
+  // into the library; opening one puts it back and redraws the plots from the saved peaks.
+
+  function defaultAnalysisName(): string {
+    const l = latestRef.current;
+    return `Spectra of ${l.name || l.smiles}`.slice(0, 100);
+  }
+
+  async function saveCurrentAnalysis(analysisName: string, announce = true): Promise<boolean> {
+    setSaveBusy(true);
+    try {
+      await snapshotTask.flushNow();
+      const capture = captureSpectroscopy();
+      if (!capture || !capture.results || latestRef.current.isAnalyzing) {
+        setSaveMessage({ tone: "warn", text: "Predict spectra before saving an analysis." });
+        return false;
+      }
+      const saved = await getAppAnalysisLibrary().save("spectroscopy", {
+        name: analysisName,
+        summary: describeSpectroscopyAnalysis(capture.results.data),
+        inputs: capture.inputs,
+        results: capture.results,
+      });
+      if (!saved.ok) {
+        setSaveMessage({ tone: "warn", text: `The analysis was not saved: ${saved.error.message}` });
+        return false;
+      }
+      if (announce) setSaveMessage({ tone: "info", text: `Saved “${saved.value.name}” to Saved analyses.` });
+      return true;
+    } finally {
+      setSaveBusy(false);
+    }
+  }
+
+  /** Replaces the Spectroscopy workspace with a saved analysis, as one transaction (see transferIntoEditors). */
+  async function applySavedAnalysis(opened: OpenedAnalysis<SpectroscopyWorkspaceInputs, SpectroscopyWorkspaceResults>): Promise<boolean> {
+    const api = ketcherRef.current;
+    if (!api || openingRef.current) return false;
+    openingRef.current = true;
+    setIsOpening(true);
+    snapshotTask.cancel();
+    restoringRef.current = true;
+    const { inputs, results } = opened;
+    const outcome = await transferIntoEditors(
+      [{ api, source: inputs.ket, expectKey: inputs.ket ? inputs.key : null }],
+      persistence,
+    );
+    if (outcome.kind !== "adopted") {
+      if (outcome.kind === "rolled-back") {
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: `“${opened.record.name}” could not be opened. Your Spectroscopy workspace is unchanged.` },
+        ]);
+        requestPersistRef.current();
+      } else {
+        // The editor may have changed, so the spectra on screen no longer describe it.
+        setResultMeta(null);
+        setResult(null);
+        setStructureSvg(null);
+        setRecoveryNotices([
+          { tone: "warn", text: `“${opened.record.name}” could not be opened and the editor could not be restored. Your saved workspace is unchanged; reload this page to bring it back.` },
+        ]);
+      }
+      openingRef.current = false;
+      setIsOpening(false);
+      window.setTimeout(() => {
+        restoringRef.current = false;
+      }, 500);
+      return false;
+    }
+
+    // Success: the old workspace's callbacks are invalid and the saved analysis is the workspace now.
+    pendingEditorRef.current = null;
+    importedNameResolutionRef.current = null;
+    snapshotRef.current = { ket: outcome.editors[0].ket, key: outcome.editors[0].key };
+    svgAttemptedRef.current = null; // the structure preview is drawn again from the saved SMILES
+    setActiveTab(inputs.activeTab);
+    setProtonWindow(inputs.protonWindow);
+    setSelectedIrPeak(null);
+    setResolvedIrHighlight(null);
+    setIrHighlightedSvg(null);
+    setSelectedNmrSignal(null);
+    setNmrHighlightedSvg(null);
+    setSelectedMassPeak(null);
+    setMassFragmentSvg(null);
+    setMassPreviewSvgs([]);
+    setStructureSvg(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices(
+      opened.resultsDropped ? [{ tone: "warn", text: "The saved spectra could not be validated and were not opened. The structure was." }] : [],
+    );
+    if (results) {
+      const data = results.data;
+      setSmiles(data.smiles);
+      setStructureSource(data.structureSource);
+      setName(data.name);
+      setFormula(data.formula);
+      setResult(data.result);
+      setStatus(`Opened saved analysis “${opened.record.name}”`);
+      setResultMeta({
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        structureKey: data.inputKey,
+        restored: false,
+        opened: { name: opened.record.name, savedAt: opened.record.updatedAt },
+        engineMismatch: opened.engineMismatch,
+        // Whatever was true when it was saved stays true; an inconsistent record is never shown as current.
+        stale: results.stale || inputs.key === null || inputs.key !== data.inputKey,
+      });
+    } else {
+      setSmiles("Not analyzed yet");
+      setStructureSource("");
+      setName(null);
+      setFormula(null);
+      setResult(null);
+      setResultMeta(null);
+      setStatus(`Opened saved analysis “${opened.record.name}” (structure only).`);
+    }
+    // One write replaces the automatic workspace with the opened analysis.
+    persistence.requestSave(() => ({ inputs: opened.inputs, results: opened.results }));
+    await persistence.flush();
+    openingRef.current = false;
+    setIsOpening(false);
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      snapshotTask.schedule();
+    }, 500);
+    return true;
+  }
+
+  const savedOpen = useSavedAnalysisOpen<SpectroscopyWorkspaceInputs, SpectroscopyWorkspaceResults>({
+    page: "spectroscopy",
+    openRequest,
+    onOpenHandled,
+    ready: recovery !== null && ketcher !== null,
+    busyReason: () =>
+      latestRef.current.isAnalyzing || openingRef.current ? "Wait for the current prediction to finish before opening a saved analysis." : null,
+    hasUnsavedWork: () => captureSpectroscopy() !== null,
+    canSaveCurrent: () => Boolean(latestRef.current.resultMeta && latestRef.current.result),
+    saveCurrent: (analysisName) => saveCurrentAnalysis(analysisName, false),
+    defaultName: defaultAnalysisName,
+    apply: applySavedAnalysis,
+    notify: (item) => setRecoveryNotices((notices) => [...notices, item]),
+  });
+
   useEffect(() => {
     ketcherRef.current = ketcher;
     requestPersistRef.current = requestPersist;
@@ -1098,6 +1264,13 @@ export default function SpectroscopyPage() {
   } else if (inputsOnlyRestored) {
     workspaceNotices.push({ tone: "info", text: "Restored your drawn structure from your previous session." });
   }
+  if (resultMeta?.opened) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Opened saved analysis “${resultMeta.opened.name}” (saved ${new Date(resultMeta.opened.savedAt).toLocaleString()}; predicted ${new Date(resultMeta.computedAt).toLocaleString()}). These are saved model predictions, not experimental measurements, and they were not recomputed.`,
+    });
+  }
+  if (saveMessage) workspaceNotices.push(saveMessage);
   if (resultMeta?.engineMismatch) {
     workspaceNotices.push({
       tone: "warn",
@@ -1497,7 +1670,7 @@ export default function SpectroscopyPage() {
   }, [displayedStructureSvg, result, activeTab, selectedIrPeak, selectedNmrSignal, structureSource]);
 
   const analyze = async () => {
-    if (!ketcher || isAnalyzing) return;
+    if (!ketcher || isAnalyzing || openingRef.current) return;
     setIsAnalyzing(true);
     setResultMeta(null);
     setInputsOnlyRestored(false);
@@ -1646,7 +1819,33 @@ export default function SpectroscopyPage() {
             {isAnalyzing ? "Predicting…" : "Predict Spectra"}
           </button>
           <button className="secondary-button" type="button" onClick={clear} disabled={isAnalyzing}>Clear Analysis</button>
+          <button
+            className="secondary-button"
+            type="button"
+            disabled={!resultMeta || !result || isAnalyzing || isOpening || saveBusy}
+            title={result ? "Keep these spectra in Saved analyses" : "Predict spectra first"}
+            onClick={() => {
+              setSaveMessage(null);
+              setSaveForm({ name: defaultAnalysisName() });
+            }}
+          >
+            Save Analysis
+          </button>
         </div>
+
+        {saveForm && (
+          <SaveAnalysisForm
+            name={saveForm.name}
+            busy={saveBusy}
+            onChange={(analysisName) => setSaveForm({ name: analysisName })}
+            onCancel={() => setSaveForm(null)}
+            onSubmit={() => {
+              void saveCurrentAnalysis(saveForm.name).then((saved) => {
+                if (saved) setSaveForm(null);
+              });
+            }}
+          />
+        )}
       </section>
 
       <WorkspaceNotice
@@ -1654,6 +1853,15 @@ export default function SpectroscopyPage() {
         onDiscard={resultMeta?.restored || inputsOnlyRestored ? clear : undefined}
         discardDisabled={isAnalyzing}
       />
+
+      {savedOpen.prompt && (
+        <ReplaceWorkspacePrompt
+          name={savedOpen.prompt.opened.record.name}
+          canSaveFirst={Boolean(resultMeta && result) && !isAnalyzing}
+          busy={savedOpen.saveBusy}
+          onChoose={(choice) => void savedOpen.resolve(choice)}
+        />
+      )}
 
       <section className="card spectroscopy-results-card">
         <div className="spectroscopy-summary">

@@ -679,7 +679,7 @@ describe("Synthesis and navigation integration", () => {
   test("[navigation] the Saved page is in the navigation; a pending open is forgotten by any other page change", () => {
     assert.match(app, /\{ id: "saved", label: "Saved" \}/);
     assert.match(app, /if \(!options\?\.keepOpenRequest\) setPendingOpen\(null\);/);
-    assert.match(app, /switchPage\("multiStep", \{ keepOpenRequest: true \}\)/);
+    assert.match(app, /switchPage\(target, \{ keepOpenRequest: true \}\)/, "the page comes from ANALYSIS_APP_PAGE, where Synthesis maps to multiStep");
     assert.match(app, /onOpenHandled=\{\(requestId\) => setPendingOpen\(\(current\) => \(current\?\.id === requestId \? null : current\)\)\}/);
     assert.match(app, /openRequest=\{pendingOpen\?\.page === "multiStep" \? pendingOpen : null\}/);
     assert.match(app, /onClick=\{\(\) => switchPage\(page\.id\)\}/, "tabs never keep an open request");
@@ -693,12 +693,12 @@ describe("Synthesis and navigation integration", () => {
     assert.match(saved, /OPENABLE_ANALYSIS_PAGES/);
   });
 
-  test("[scope] only the Synthesis page saves into the library in this stage; the other pages and the engines are untouched", () => {
+  test("[scope] Synthesis, Ranking and Spectroscopy save into the library; Properties, Reactions and the engines are untouched", () => {
     const users = [];
     for (const file of fs.readdirSync(path.join(root, "src", "components"))) {
       if (file.endsWith(".tsx") && /getAppAnalysisLibrary/.test(read("src", "components", file))) users.push(file);
     }
-    assert.deepEqual(users.sort(), ["SavedAnalysesPage.tsx", "SynthesisPage.tsx"]);
+    assert.deepEqual(users.sort(), ["RankingPage.tsx", "SavedAnalysesPage.tsx", "SpectroscopyPage.tsx", "SynthesisPage.tsx"]);
     const libraryFiles = read("src", "utils", "persistence", "analysisLibrary.ts") + read("src", "utils", "persistence", "handoffTransfer.ts");
     assert.doesNotMatch(libraryFiles, /reactionRegistry|findMultistep|predictReaction|rdkit/i, "the library layer imports no chemistry");
     assert.doesNotMatch(read("src", "utils", "persistence", "analysisLibraryApp.ts"), /import\/export|exportAnalyses|importAnalyses/);

@@ -122,3 +122,13 @@ export function validateRankingResults(raw: unknown): RankingWorkspaceResults | 
   // The shown ranking is optional: if it is damaged the profiles can still be ordered again.
   return { molecules, displayed: validateDisplayed(raw.displayed, ids) };
 }
+
+/** The one-line description a saved ranking analysis gets in the library list. */
+export function describeRankingAnalysis(results: Pick<RankingWorkspaceResults, "molecules">, modeId: ComparisonModeId): string {
+  const mode = COMPARISON_MODES.find((candidate) => candidate.id === modeId);
+  const count = results.molecules.length;
+  const smiles = results.molecules.map((molecule) => molecule.smiles).join(", ");
+  const shown = smiles.length > 90 ? `${smiles.slice(0, 87)}…` : smiles;
+  const action = mode?.direction === "none" ? "compared" : "ranked";
+  return `${count} molecule${count === 1 ? "" : "s"} (${shown}) · ${action} by ${mode?.label ?? modeId}`;
+}

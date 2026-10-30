@@ -29,6 +29,12 @@ import {
 } from "../utils/persistence/rankingWorkspace";
 import type { Capture, RecoveryOutcome } from "../utils/persistence/workspacePersistence";
 import type { WorkspaceResults } from "../utils/persistence/workspaceStore";
+import { getAppAnalysisLibrary } from "../utils/persistence/analysisLibraryApp";
+import type { OpenedAnalysis } from "../utils/persistence/analysisLibrary";
+import { transferIntoEditors } from "../utils/persistence/handoffTransfer";
+import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./SavedAnalysisControls";
+import { useSavedAnalysisOpen } from "../utils/persistence/useSavedAnalysisOpen";
+import { describeRankingAnalysis } from "../utils/persistence/rankingWorkspace";
 
 type ComparisonMolecule = {
   id: number;
@@ -77,9 +83,17 @@ type RankingResultMeta = {
   restored: boolean;
   /** Saved by an earlier version of the ranking code, or no longer sorts as it was shown. */
   engineMismatch: boolean;
+  /** Set when the comparison was opened from the Saved Analyses library. */
+  opened?: { name: string; savedAt: string } | null;
 };
 
-export default function RankingPage() {
+type RankingPageProps = {
+  /** A saved analysis the user chose on the Saved page; opened once recovery has finished. */
+  openRequest?: { id: string; recordId: string } | null;
+  onOpenHandled?: (requestId: string) => void;
+};
+
+export default function RankingPage({ openRequest = null, onOpenHandled }: RankingPageProps) {
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [status, setStatus] = useState("Add a molecule to begin comparing.");
@@ -117,6 +131,11 @@ export default function RankingPage() {
   const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
   const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
   const [editorRestoreVersion, setEditorRestoreVersion] = useState(0);
+  const [isOpening, setIsOpening] = useState(false);
+  const [saveForm, setSaveForm] = useState<{ name: string } | null>(null);
+  const [saveBusy, setSaveBusy] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<WorkspaceNoticeItem | null>(null);
+  const openingRef = useRef(false);
   const ketcherRef = useRef<KetcherApi | null>(null);
   const snapshotRef = useRef<{ ket: string | null; key: string | null }>({ ket: null, key: null });
   const pendingEditorRef = useRef<{ ket: string; key: string | null; token: number } | null>(null);
@@ -126,7 +145,7 @@ export default function RankingPage() {
   const applyRestoreRef = useRef<((outcome: RecoveryOutcome<RankingWorkspaceInputs, RankingWorkspaceResults>) => void) | null>(null);
   const requestPersistRef = useRef<() => void>(() => undefined);
   const restoreEditorRef = useRef<() => void>(() => undefined);
-  const latestRef = useRef({ comparisonMolecules, activeCategory, rankingMode, resultMeta, displayed: null as DisplayedRanking | null });
+  const latestRef = useRef({ comparisonMolecules, activeCategory, rankingMode, resultMeta, displayed: null as DisplayedRanking | null, isAnalyzing });
 
   function captureRanking(): Capture<RankingWorkspaceInputs, RankingWorkspaceResults> | null {
     const latest = latestRef.current;
@@ -181,10 +200,11 @@ export default function RankingPage() {
   async function restoreEditor() {
     const pending = pendingEditorRef.current;
     const api = ketcherRef.current;
-    if (!pending || !api || restoringRef.current) return;
+    if (!pending || !api || restoringRef.current || openingRef.current) return;
     restoringRef.current = true;
     const { token } = pending;
-    const outcome = await restoreEditorContent(api, { ket: pending.ket, key: pending.key }, () => persistence.isCurrent(token));
+    // Opening a saved analysis invalidates a drawing restore, exactly like Clear does.
+    const outcome = await restoreEditorContent(api, { ket: pending.ket, key: pending.key }, () => persistence.isCurrent(token) && !openingRef.current);
     if (persistence.isCurrent(token)) {
       pendingEditorRef.current = null;
       if (outcome.kind === "failed") {
@@ -254,6 +274,132 @@ export default function RankingPage() {
     setRecoveryNotices(notices);
   }
 
+  // ---- Saved Analyses (Stage 8B-3B-1) -----------------------------------------------------------
+  // "Save Analysis" copies the comparison (every molecule's computed profile and the ranking as it
+  // was shown) into the library; opening one puts it back without recalculating anything.
+
+  function defaultAnalysisName(): string {
+    const l = latestRef.current;
+    const mode = getComparisonMode(l.rankingMode);
+    return `Ranking of ${l.comparisonMolecules.length} molecule${l.comparisonMolecules.length === 1 ? "" : "s"} · ${mode.label}`.slice(0, 100);
+  }
+
+  async function saveCurrentAnalysis(name: string, announce = true): Promise<boolean> {
+    setSaveBusy(true);
+    try {
+      await snapshotTask.flushNow();
+      const capture = captureRanking();
+      if (!capture || !capture.results || latestRef.current.isAnalyzing) {
+        setSaveMessage({ tone: "warn", text: "Add at least one molecule to the comparison before saving." });
+        return false;
+      }
+      const saved = await getAppAnalysisLibrary().save("ranking", {
+        name,
+        summary: describeRankingAnalysis(capture.results.data, capture.inputs.rankingMode),
+        inputs: capture.inputs,
+        results: capture.results,
+      });
+      if (!saved.ok) {
+        setSaveMessage({ tone: "warn", text: `The analysis was not saved: ${saved.error.message}` });
+        return false;
+      }
+      if (announce) setSaveMessage({ tone: "info", text: `Saved “${saved.value.name}” to Saved analyses.` });
+      return true;
+    } finally {
+      setSaveBusy(false);
+    }
+  }
+
+  /** Replaces the Ranking workspace with a saved analysis, as one transaction (see transferIntoEditors). */
+  async function applySavedAnalysis(opened: OpenedAnalysis<RankingWorkspaceInputs, RankingWorkspaceResults>): Promise<boolean> {
+    const api = ketcherRef.current;
+    if (!api || openingRef.current) return false;
+    openingRef.current = true;
+    setIsOpening(true);
+    snapshotTask.cancel();
+    restoringRef.current = true;
+    const { inputs, results } = opened;
+    const outcome = await transferIntoEditors(
+      [{ api, source: inputs.editorKet, expectKey: inputs.editorKet ? inputs.editorKey : null }],
+      persistence,
+    );
+    if (outcome.kind !== "adopted") {
+      setRecoveryNotices((notices) => [
+        ...notices,
+        {
+          tone: "warn",
+          text:
+            outcome.kind === "rolled-back"
+              ? `“${opened.record.name}” could not be opened. Your Ranking workspace is unchanged.`
+              : `“${opened.record.name}” could not be opened and the editor could not be restored. Your saved workspace is unchanged; reload this page to bring it back.`,
+        },
+      ]);
+      if (outcome.kind === "rolled-back") requestPersistRef.current();
+      openingRef.current = false;
+      setIsOpening(false);
+      window.setTimeout(() => {
+        restoringRef.current = false;
+      }, 500);
+      return false;
+    }
+
+    // Success: the old workspace's callbacks are invalid and the saved analysis is the workspace now.
+    pendingEditorRef.current = null;
+    snapshotRef.current = { ket: outcome.editors[0].ket, key: outcome.editors[0].key };
+    svgAttemptedRef.current.clear(); // previews are drawn again for the opened molecules
+    setActiveCategory(inputs.activeCategory);
+    setRankingMode(inputs.rankingMode);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices(
+      opened.resultsDropped ? [{ tone: "warn", text: "The saved comparison could not be validated and was not opened. The drawing was." }] : [],
+    );
+    if (results) {
+      const molecules: ComparisonMolecule[] = results.data.molecules.map((molecule) => ({ ...molecule, structureSvg: null }));
+      const saved = results.data.displayed;
+      const again = deriveRanking(molecules, inputs.rankingMode);
+      const derived = displayedRankingSnapshot(again.rankedRows, again.rankById, inputs.rankingMode);
+      const orderChanged = Boolean(saved && saved.modeId === derived.modeId && JSON.stringify(saved) !== JSON.stringify(derived));
+      setComparisonMolecules(molecules);
+      setResultMeta({
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        restored: false,
+        opened: { name: opened.record.name, savedAt: opened.record.updatedAt },
+        engineMismatch: opened.engineMismatch || orderChanged,
+      });
+      setStatus(`Opened saved analysis “${opened.record.name}” with ${molecules.length} molecule${molecules.length === 1 ? "" : "s"}. Nothing was recalculated.`);
+    } else {
+      setComparisonMolecules([]);
+      setResultMeta(null);
+      setStatus(`Opened saved analysis “${opened.record.name}” (drawing only).`);
+    }
+    // One write replaces the automatic workspace with the opened analysis.
+    persistence.requestSave(() => ({ inputs: opened.inputs, results: opened.results }));
+    await persistence.flush();
+    openingRef.current = false;
+    setIsOpening(false);
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      snapshotTask.schedule();
+    }, 500);
+    return true;
+  }
+
+  const savedOpen = useSavedAnalysisOpen<RankingWorkspaceInputs, RankingWorkspaceResults>({
+    page: "ranking",
+    openRequest,
+    onOpenHandled,
+    ready: recovery !== null && ketcher !== null,
+    busyReason: () =>
+      latestRef.current.isAnalyzing || openingRef.current ? "Wait for the current analysis to finish before opening a saved one." : null,
+    hasUnsavedWork: () => captureRanking() !== null,
+    canSaveCurrent: () => Boolean(latestRef.current.resultMeta) && latestRef.current.comparisonMolecules.length > 0,
+    saveCurrent: (name) => saveCurrentAnalysis(name, false),
+    defaultName: defaultAnalysisName,
+    apply: applySavedAnalysis,
+    notify: (item) => setRecoveryNotices((notices) => [...notices, item]),
+  });
+
   useEffect(() => {
     ketcherRef.current = ketcher;
     requestPersistRef.current = requestPersist;
@@ -266,6 +412,7 @@ export default function RankingPage() {
       rankingMode,
       resultMeta,
       displayed: displayedRankingSnapshot(rankedRows, rankById, rankingMode),
+      isAnalyzing,
     };
   });
 
@@ -342,6 +489,13 @@ export default function RankingPage() {
   } else if (inputsOnlyRestored) {
     workspaceNotices.push({ tone: "info", text: "Restored your drawing from your previous session." });
   }
+  if (resultMeta?.opened) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Opened saved analysis “${resultMeta.opened.name}” (saved ${new Date(resultMeta.opened.savedAt).toLocaleString()}; computed ${new Date(resultMeta.computedAt).toLocaleString()}). The profiles were not recalculated.`,
+    });
+  }
+  if (saveMessage) workspaceNotices.push(saveMessage);
   if (resultMeta?.engineMismatch) {
     workspaceNotices.push({
       tone: "warn",
@@ -369,7 +523,7 @@ export default function RankingPage() {
       return;
     }
 
-    if (isAnalyzing) return;
+    if (isAnalyzing || openingRef.current) return;
     if (comparisonMolecules.length >= 5) {
       setStatus("Comparison list is full. You can compare up to 5 molecules.");
       return;
@@ -478,6 +632,15 @@ export default function RankingPage() {
         discardDisabled={isAnalyzing}
       />
 
+      {savedOpen.prompt && (
+        <ReplaceWorkspacePrompt
+          name={savedOpen.prompt.opened.record.name}
+          canSaveFirst={Boolean(resultMeta) && comparisonMolecules.length > 0 && !isAnalyzing}
+          busy={savedOpen.saveBusy}
+          onChoose={(choice) => void savedOpen.resolve(choice)}
+        />
+      )}
+
       <div className="ranking-workspace">
         <aside className="card ranking-editor-card">
           <div className="card-header">
@@ -522,7 +685,32 @@ export default function RankingPage() {
             >
               Clear all
             </button>
+            <button
+              className="secondary-button"
+              onClick={() => {
+                setSaveMessage(null);
+                setSaveForm({ name: defaultAnalysisName() });
+              }}
+              disabled={!resultMeta || comparisonMolecules.length === 0 || isAnalyzing || isOpening || saveBusy}
+              title={comparisonMolecules.length > 0 ? "Keep this comparison in Saved analyses" : "Add a molecule first"}
+            >
+              Save Analysis
+            </button>
           </div>
+
+          {saveForm && (
+            <SaveAnalysisForm
+              name={saveForm.name}
+              busy={saveBusy}
+              onChange={(name) => setSaveForm({ name })}
+              onCancel={() => setSaveForm(null)}
+              onSubmit={() => {
+                void saveCurrentAnalysis(saveForm.name).then((saved) => {
+                  if (saved) setSaveForm(null);
+                });
+              }}
+            />
+          )}
 
           <p className="reaction-progress ranking-status" aria-live="polite">
             {isAnalyzing && <span className="loading-spinner" aria-hidden="true" />}
