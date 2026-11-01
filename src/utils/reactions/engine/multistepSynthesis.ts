@@ -16,6 +16,7 @@ import {
 import { predictReactionPathwaysFromRules } from "./reactionEngine";
 import { predictRetrosynthesisPathwaysFromRules } from "./retroSynthesis";
 import { verifyMultistepRoute } from "./routeVerification";
+import { assessRouteSelectivity } from "./selectivityAssessment";
 import {
   assessRouteCompatibility,
   assessStepCompatibility,
@@ -1324,7 +1325,8 @@ async function searchMultistepRoutes(
         planningSignatureDistance(startingPlanningSignatures[index] ?? null, targetPlanningSignature) *
         PLANNING_HEURISTIC_SCALE;
       return {
-        smiles: material.smiles,
+        // The canonical spelling roots the search so that equivalent inputs explore alike.
+        smiles: material.canonical,
         canonical: material.canonical,
         connectivity: material.connectivity,
         hasSpecifiedStereo: material.hasSpecifiedStereo,
@@ -1343,7 +1345,7 @@ async function searchMultistepRoutes(
   const retroLayers: SearchNode[][] = [
     [
       {
-        smiles: normalizedTarget,
+        smiles: targetCanonical,
         canonical: targetCanonical,
         connectivity: targetStructure.connectivity,
         hasSpecifiedStereo: targetStructure.hasSpecifiedStereo,
@@ -2424,6 +2426,7 @@ export async function searchLinearSynthesisRoutes(
         ),
       };
       replayed.compatibility = await assessRouteCompatibility(replayed, rules);
+      replayed.selectivity = await assessRouteSelectivity(replayed, rules);
       verified.push(replayed);
       if (replayed.verification.status !== "failed") {
         try {

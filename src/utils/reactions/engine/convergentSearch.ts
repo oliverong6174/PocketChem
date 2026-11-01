@@ -28,6 +28,7 @@ import {
   type SuppliedMaterial,
 } from "./speciesPool";
 import { verifyMultistepRoute } from "./routeVerification";
+import { assessRouteSelectivity } from "./selectivityAssessment";
 import { assessRouteCompatibility } from "./compatibility";
 import {
   RETRO_DEFAULTS,
@@ -566,6 +567,7 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
       confidence: verification.status === "verified" ? "verified" : "connectivity-verified",
       verification,
       compatibility: await assessRouteCompatibility(route, rules),
+      selectivity: await assessRouteSelectivity(route, rules),
     };
     found.push(accepted);
     try {

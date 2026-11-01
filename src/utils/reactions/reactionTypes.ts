@@ -523,6 +523,42 @@ export type RouteCompatibility = {
   worst: "none" | CompatibilitySeverity;
 };
 
+/**
+ * What is known about which constitutional outcome a step's rule produces, taken from
+ * the rule's own metadata and the engine's output for these reactants. "unassessed" is
+ * unknown, not wrong.
+ */
+export type StepSelectivityClass =
+  /** A numeric product-specific estimate marks this outcome as the major one. */
+  | "major"
+  /** The engine offers exactly one constitutional outcome for these reactants; nothing was ranked. */
+  | "single-outcome"
+  /** A product-specific estimate documents this outcome as minor or trace. */
+  | "disfavored"
+  /** The engine offers several constitutional outcomes for these reactants and does not rank them. */
+  | "unranked"
+  /** The step could not be assessed. */
+  | "unassessed";
+
+export type StepSelectivityFinding = {
+  stepNumber: number;
+  ruleId: string;
+  class: StepSelectivityClass;
+  /** Distinct constitutional outcomes the engine offered for this step's reactants. */
+  alternatives: number | null;
+  /** The rule's product structure is illustrative rather than computed. */
+  representative: boolean;
+  /** Limitations the rule itself documents (copied; empty when it documents none). */
+  limitations: string[];
+  basis: string;
+};
+
+/** Advisory; independent of `verification` (structure) and `compatibility` (conditions). */
+export type RouteSelectivity = {
+  findings: StepSelectivityFinding[];
+  counts: Record<StepSelectivityClass, number>;
+};
+
 export type ReactionRule = {
   id: string;
   /** Declared reaction conditions; see RuleConditions. */
@@ -902,6 +938,8 @@ export type MultistepSynthesisRoute = {
   verification?: RouteVerification;
   /** Advisory chemical-compatibility summary; independent of `verification`. */
   compatibility?: RouteCompatibility;
+  /** Advisory product-selectivity summary; absent on routes saved before it existed. */
+  selectivity?: RouteSelectivity;
 };
 
 /**

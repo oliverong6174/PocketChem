@@ -130,6 +130,13 @@ async function ketToSmiles(
   }
 }
 
+type SelectivityFinding = NonNullable<MultistepSynthesisRoute["selectivity"]>["findings"][number];
+
+/** A finding worth showing: the outcome is not established as major, or the rule documents a limitation. */
+function noteworthySelectivity(finding: SelectivityFinding): boolean {
+  return (finding.class !== "major" && finding.class !== "single-outcome") || finding.limitations.length > 0;
+}
+
 function courseLabel(course: SynthesisStep["course"]) {
   return course === "ochem-1"
     ? "O-Chem I"
@@ -1747,6 +1754,38 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
                   {route.compatibility.unassessedRuleIds.length === 1 ? "it" : "them"}.
                 </p>
               )}
+            </div>
+          )}
+
+          {route.selectivity && route.selectivity.findings.some((finding) => noteworthySelectivity(finding)) && (
+            <div className="reaction-detail reaction-limitation synthesis-selectivity">
+              <p>
+                <strong>Product-selectivity notes (advisory).</strong> Structure verification shows
+                each step&apos;s product follows from its reactants; it does not show that the product
+                is the one that dominates. The steps below are not established as major outcomes or
+                carry a limitation documented by their rule; this is not an experimental prediction.
+              </p>
+              <ul>
+                {route.selectivity.findings
+                  .filter((finding) => noteworthySelectivity(finding))
+                  .map((finding) => (
+                    <li key={`${finding.stepNumber}-${finding.ruleId}`}>
+                      Step {finding.stepNumber}:{" "}
+                      <strong>
+                        {finding.class === "disfavored"
+                          ? "documented minor outcome"
+                          : finding.class === "unranked"
+                            ? "outcome not ranked"
+                            : finding.class === "unassessed"
+                              ? "selectivity not assessed"
+                              : "rule limitation"}
+                      </strong>{" "}
+                      — {finding.class === "major" || finding.class === "single-outcome" ? "" : finding.basis}
+                      {finding.representative ? " The product shown is a representative structure." : ""}
+                      {finding.limitations.length > 0 ? ` Rule limitation: ${finding.limitations.join(" ")}` : ""}
+                    </li>
+                  ))}
+              </ul>
             </div>
           )}
 

@@ -10,9 +10,10 @@
  *   tier 0  verified, exact target structure
  *   tier 1  verified, target equals a member of a known stereo mixture
  *   tier 2  connectivity-only (stereochemistry differs or is unspecified)
- * Within a tier routes are ordered by compatibility-adjusted length (Stage 7 prices
- * advisory findings into the step count), then by how much of the route could be
- * assessed, then by discovery order. "Unassessed" stays unknown: it is neither
+ * Within a tier routes are ordered by steps whose outcome is documented as disfavored
+ * (Stage 9B-1), then by compatibility-adjusted length (Stage 7 prices advisory findings
+ * into the step count), then by steps whose outcome is one of several unranked ones,
+ * then by how much of the route could be assessed, then by discovery order. "Unassessed" stays unknown: it is neither
  * counted as a problem nor as compatible. Nothing here claims a route is the
  * shortest or optimal; the list is the best found within the computational budget.
  *
@@ -21,6 +22,7 @@
  */
 import type { MultistepSynthesisRoute, SynthesisStep } from "../reactionTypes";
 import { compatibilityAdjustedLength } from "./compatibility";
+import { selectivityConcerns } from "./selectivityAssessment";
 
 export type RouteTier = 0 | 1 | 2;
 
@@ -43,6 +45,10 @@ export type RankedRoute = {
   adjustedLength: number;
   compatibility: CompatibilityClass;
   unassessedSteps: number;
+  /** Steps whose outcome is documented as minor or trace (selectivity advisory). */
+  disfavoredSteps: number;
+  /** Steps that used one of several constitutional outcomes the engine did not rank. */
+  unrankedSteps: number;
   /** Supplied materials the route never consumed (informational only). */
   unusedStartingMaterials: string[];
   /** Id of the lane that first reported it. */
@@ -117,6 +123,7 @@ export function classifyRoute(
   if (verification.status === "connectivity-only") tier = 2;
   else tier = verification.targetMatch === "mixture-member" ? 1 : 0;
   const { label, unassessedSteps } = compatibilityClass(route);
+  const concerns = selectivityConcerns(route.selectivity);
   return {
     route,
     key: routeIdentityKey(route),
@@ -124,6 +131,8 @@ export function classifyRoute(
     adjustedLength: compatibilityAdjustedLength(route.steps),
     compatibility: label,
     unassessedSteps,
+    disfavoredSteps: concerns.disfavored,
+    unrankedSteps: concerns.unranked,
     unusedStartingMaterials: [...verification.unusedStartingMaterials],
     lane,
     order,
@@ -133,7 +142,9 @@ export function classifyRoute(
 export function compareRanked(a: RankedRoute, b: RankedRoute): number {
   return (
     a.tier - b.tier ||
+    a.disfavoredSteps - b.disfavoredSteps ||
     a.adjustedLength - b.adjustedLength ||
+    a.unrankedSteps - b.unrankedSteps ||
     a.unassessedSteps - b.unassessedSteps ||
     a.order - b.order
   );
@@ -142,7 +153,9 @@ export function compareRanked(a: RankedRoute, b: RankedRoute): number {
 /**
  * A route the search can stop improving on its own account: verified at least to a
  * known mixture member, with no model-constraint finding. (A route with unassessed
- * steps can still be adequate; unassessed is unknown, not a defect.)
+ * steps can still be adequate; unassessed is unknown, not a defect. A documented
+ * disfavored outcome makes a route improvable; an unranked one does not, because
+ * "not ranked" is missing information and is handled by ranking the routes already found.)
  */
 export function isAdequate(entry: RankedRoute): boolean {
   return entry.tier < 2 && entry.compatibility !== "model-constraint";
@@ -150,7 +163,7 @@ export function isAdequate(entry: RankedRoute): boolean {
 
 /** Could another route plausibly rank better than this one on checkable grounds? */
 export function isImprovable(entry: RankedRoute): boolean {
-  return !isAdequate(entry) || entry.compatibility === "plausible";
+  return !isAdequate(entry) || entry.compatibility === "plausible" || entry.disfavoredSteps > 0;
 }
 
 export class RouteBook {

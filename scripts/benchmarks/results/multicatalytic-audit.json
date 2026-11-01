@@ -1,0 +1,2055 @@
+{
+  "budgetMs": 25000,
+  "generatedAt": "2026-10-30T21:05:13.221Z",
+  "cases": [
+    {
+      "id": "C1",
+      "level": 1,
+      "title": "Propene -> 2-propanol -> acetone",
+      "tier": "R2",
+      "starts": [
+        "C=CC"
+      ],
+      "target": "CC(C)=O",
+      "steps": [
+        {
+          "reactants": [
+            "C=CC"
+          ],
+          "product": "CC(C)O",
+          "catalyst": "H3O+ (H2SO4/H2O), Bronsted acid, catalytic",
+          "reagents": "water",
+          "role": "acid-catalysed Markovnikov hydration"
+        },
+        {
+          "reactants": [
+            "CC(C)O"
+          ],
+          "product": "CC(C)=O",
+          "catalyst": "none (PCC is a stoichiometric oxidant)",
+          "reagents": "PCC",
+          "role": "oxidation"
+        }
+      ],
+      "refs": "Clayden, Organic Chemistry (alkene hydration; alcohol oxidation); Carey & Sundberg Part B."
+    },
+    {
+      "id": "C2",
+      "level": 1,
+      "title": "Benzene + chloroethane -> ethylbenzene -> (1-bromoethyl)benzene",
+      "tier": "R2",
+      "starts": [
+        "c1ccccc1",
+        "CCCl"
+      ],
+      "target": "CC(Br)c1ccccc1",
+      "steps": [
+        {
+          "reactants": [
+            "c1ccccc1",
+            "CCCl"
+          ],
+          "product": "CCc1ccccc1",
+          "catalyst": "AlCl3 (Lewis acid)",
+          "reagents": "chloroethane",
+          "role": "Friedel-Crafts alkylation"
+        },
+        {
+          "reactants": [
+            "CCc1ccccc1"
+          ],
+          "product": "CC(Br)c1ccccc1",
+          "catalyst": "radical initiator (hv / AIBN)",
+          "reagents": "NBS",
+          "role": "benzylic (Wohl-Ziegler) bromination"
+        }
+      ],
+      "refs": "Friedel-Crafts alkylation (March, Advanced Organic Chemistry); Wohl-Ziegler bromination (Djerassi, Chem. Rev. 1948, 43, 271)."
+    },
+    {
+      "id": "C3",
+      "level": 2,
+      "title": "2-Butanol -> 2-butene -> butane",
+      "tier": "R2",
+      "starts": [
+        "CC(O)CC"
+      ],
+      "target": "CCCC",
+      "steps": [
+        {
+          "reactants": [
+            "CC(O)CC"
+          ],
+          "product": "CC=CC",
+          "catalyst": "H2SO4 (acid, catalytic)",
+          "reagents": "heat",
+          "role": "acid-catalysed dehydration (Zaitsev, E major)"
+        },
+        {
+          "reactants": [
+            "CC=CC"
+          ],
+          "product": "CCCC",
+          "catalyst": "Pd/C (heterogeneous)",
+          "reagents": "H2",
+          "role": "catalytic hydrogenation"
+        }
+      ],
+      "refs": "Clayden (E1 dehydration; catalytic hydrogenation)."
+    },
+    {
+      "id": "C4",
+      "level": 2,
+      "title": "Bromobenzene + phenylboronic acid -> biphenyl -> 4-acetylbiphenyl",
+      "tier": "R1",
+      "starts": [
+        "Brc1ccccc1",
+        "OB(O)c1ccccc1",
+        "CC(=O)Cl"
+      ],
+      "target": "CC(=O)c1ccc(-c2ccccc2)cc1",
+      "steps": [
+        {
+          "reactants": [
+            "Brc1ccccc1",
+            "OB(O)c1ccccc1"
+          ],
+          "product": "c1ccc(-c2ccccc2)cc1",
+          "catalyst": "Pd(0) / ligand, base",
+          "reagents": "base",
+          "role": "Suzuki-Miyaura cross-coupling"
+        },
+        {
+          "reactants": [
+            "c1ccc(-c2ccccc2)cc1",
+            "CC(=O)Cl"
+          ],
+          "product": "CC(=O)c1ccc(-c2ccccc2)cc1",
+          "catalyst": "AlCl3 (Lewis acid, >= 1 equiv in acylation)",
+          "reagents": "acetyl chloride",
+          "role": "Friedel-Crafts acylation (para)"
+        }
+      ],
+      "refs": "Miyaura & Suzuki, Chem. Rev. 1995, 95, 2457. Biphenyl acylation gives the para mono-acetyl product with near-equimolar reagents (1984 Alexandria Univ. kinetics study, found by online check)."
+    },
+    {
+      "id": "C5",
+      "level": 2,
+      "title": "Iodobenzene + phenylacetylene -> diphenylacetylene -> (Z)-stilbene",
+      "tier": "R1",
+      "starts": [
+        "Ic1ccccc1",
+        "C#Cc1ccccc1"
+      ],
+      "target": "c1ccccc1/C=C\\c1ccccc1",
+      "steps": [
+        {
+          "reactants": [
+            "Ic1ccccc1",
+            "C#Cc1ccccc1"
+          ],
+          "product": "c1ccc(C#Cc2ccccc2)cc1",
+          "catalyst": "Pd(0) + CuI (cooperative co-catalysts), amine base",
+          "reagents": "base",
+          "role": "Sonogashira coupling"
+        },
+        {
+          "reactants": [
+            "c1ccc(C#Cc2ccccc2)cc1"
+          ],
+          "product": "c1ccccc1/C=C\\c1ccccc1",
+          "catalyst": "Lindlar Pd/CaCO3/Pb, quinoline",
+          "reagents": "H2",
+          "role": "syn-hydrogenation to the Z alkene"
+        }
+      ],
+      "refs": "Sonogashira, Tohda & Hagihara, Tetrahedron Lett. 1975, 16, 4467. Lindlar, Helv. Chim. Acta 1952, 35, 446; catalyst prep Org. Synth. 1966, 46, 89 (confirmed online; alkynes give cis alkenes)."
+    },
+    {
+      "id": "C6",
+      "level": 3,
+      "title": "Benzene + propanoyl chloride -> propiophenone -> propylbenzene -> (1-bromopropyl)benzene -> (E)-1-phenylpropene",
+      "tier": "R2",
+      "starts": [
+        "c1ccccc1",
+        "CCC(=O)Cl"
+      ],
+      "target": "C/C=C/c1ccccc1",
+      "steps": [
+        {
+          "reactants": [
+            "c1ccccc1",
+            "CCC(=O)Cl"
+          ],
+          "product": "CCC(=O)c1ccccc1",
+          "catalyst": "AlCl3 (stoichiometric in practice)",
+          "reagents": "propanoyl chloride",
+          "role": "Friedel-Crafts acylation"
+        },
+        {
+          "reactants": [
+            "CCC(=O)c1ccccc1"
+          ],
+          "product": "CCCc1ccccc1",
+          "catalyst": "none (Zn(Hg) is a stoichiometric reductant)",
+          "reagents": "Zn(Hg), HCl",
+          "role": "Clemmensen reduction (aryl ketone -> CH2)"
+        },
+        {
+          "reactants": [
+            "CCCc1ccccc1"
+          ],
+          "product": "CCC(Br)c1ccccc1",
+          "catalyst": "radical initiator",
+          "reagents": "NBS",
+          "role": "benzylic bromination"
+        },
+        {
+          "reactants": [
+            "CCC(Br)c1ccccc1"
+          ],
+          "product": "C/C=C/c1ccccc1",
+          "catalyst": "none (t-BuOK is a stoichiometric base)",
+          "reagents": "t-BuOK",
+          "role": "E2 elimination to the conjugated alkene"
+        }
+      ],
+      "refs": "Friedel-Crafts acylation / Clemmensen to avoid alkyl rearrangement: Clayden, March; Clemmensen, Ber. 1913, 46, 1837."
+    },
+    {
+      "id": "C7",
+      "level": 3,
+      "title": "Iodobenzene + methyl acrylate -> methyl cinnamate -> methyl 3-phenylpropanoate -> 3-phenylpropan-1-ol -> 3-phenylpropanal",
+      "tier": "R1",
+      "starts": [
+        "Ic1ccccc1",
+        "C=CC(=O)OC"
+      ],
+      "target": "O=CCCc1ccccc1",
+      "steps": [
+        {
+          "reactants": [
+            "Ic1ccccc1",
+            "C=CC(=O)OC"
+          ],
+          "product": "COC(=O)/C=C/c1ccccc1",
+          "catalyst": "Pd(OAc)2 (+ ligand), base",
+          "reagents": "Et3N or NaOAc",
+          "role": "Mizoroki-Heck coupling (E)"
+        },
+        {
+          "reactants": [
+            "COC(=O)/C=C/c1ccccc1"
+          ],
+          "product": "COC(=O)CCc1ccccc1",
+          "catalyst": "Pd/C",
+          "reagents": "H2",
+          "role": "chemoselective C=C hydrogenation (ester untouched)"
+        },
+        {
+          "reactants": [
+            "COC(=O)CCc1ccccc1"
+          ],
+          "product": "OCCCc1ccccc1",
+          "catalyst": "none (LiAlH4 stoichiometric)",
+          "reagents": "LiAlH4, then H3O+",
+          "role": "ester reduction"
+        },
+        {
+          "reactants": [
+            "OCCCc1ccccc1"
+          ],
+          "product": "O=CCCc1ccccc1",
+          "catalyst": "none (PCC / DMP / Swern)",
+          "reagents": "PCC",
+          "role": "primary alcohol -> aldehyde"
+        }
+      ],
+      "refs": "Heck, J. Org. Chem. 1972, 37, 2320; iodobenzene + methyl acrylate -> methyl cinnamate (patent examples, 99%, found by online check)."
+    },
+    {
+      "id": "C8",
+      "level": 3,
+      "title": "2-Butyne -> (E)-2-butene -> trans-2,3-epoxybutane -> (+/-)-butane-2,3-diol (stereochemical)",
+      "tier": "R2",
+      "starts": [
+        "CC#CC"
+      ],
+      "target": "CC(O)C(C)O",
+      "steps": [
+        {
+          "reactants": [
+            "CC#CC"
+          ],
+          "product": "C/C=C/C",
+          "catalyst": "none (Na / NH3(l), dissolving metal)",
+          "reagents": "Na, NH3(l)",
+          "role": "anti-reduction to the E alkene"
+        },
+        {
+          "reactants": [
+            "C/C=C/C"
+          ],
+          "product": "C[C@H]1O[C@@H]1C",
+          "catalyst": "none (mCPBA)",
+          "reagents": "mCPBA",
+          "role": "stereospecific syn epoxidation (trans epoxide)"
+        },
+        {
+          "reactants": [
+            "C[C@H]1O[C@@H]1C"
+          ],
+          "product": "CC(O)C(C)O",
+          "catalyst": "H3O+ (acid, catalytic)",
+          "reagents": "water",
+          "role": "anti ring opening -> racemic (R,R)/(S,S) diol (not meso)"
+        }
+      ],
+      "refs": "Clayden (epoxide opening is anti; trans epoxide -> chiral diol, cis epoxide -> meso)."
+    },
+    {
+      "id": "C9",
+      "level": 4,
+      "title": "Isopropanol + bromobenzene: acetone + phenylmagnesium bromide -> 2-phenylpropan-2-ol",
+      "tier": "R2",
+      "starts": [
+        "CC(C)O",
+        "Brc1ccccc1"
+      ],
+      "target": "CC(C)(O)c1ccccc1",
+      "steps": [
+        {
+          "reactants": [
+            "CC(C)O"
+          ],
+          "product": "CC(C)=O",
+          "catalyst": "none (PCC)",
+          "reagents": "PCC",
+          "role": "branch A: oxidation"
+        },
+        {
+          "reactants": [
+            "Brc1ccccc1"
+          ],
+          "product": "Br[Mg]c1ccccc1",
+          "catalyst": "none (Mg metal, anhydrous ether/THF)",
+          "reagents": "Mg",
+          "role": "branch B: Grignard formation"
+        },
+        {
+          "reactants": [
+            "CC(C)=O",
+            "Br[Mg]c1ccccc1"
+          ],
+          "product": "CC(C)(O)c1ccccc1",
+          "catalyst": "none",
+          "reagents": "then H3O+",
+          "role": "convergent carbonyl addition"
+        }
+      ],
+      "refs": "Grignard addition to ketones (Clayden; March). Anhydrous conditions required for the organometallic."
+    },
+    {
+      "id": "C10",
+      "level": 4,
+      "title": "Acetone + propanal -> isopropanol + propanoic acid -> isopropyl propanoate (positive control)",
+      "tier": "R2",
+      "starts": [
+        "CC(C)=O",
+        "CCC=O"
+      ],
+      "target": "CCC(=O)OC(C)C",
+      "steps": [
+        {
+          "reactants": [
+            "CC(C)=O"
+          ],
+          "product": "CC(C)O",
+          "catalyst": "none (NaBH4)",
+          "reagents": "NaBH4",
+          "role": "branch A: ketone reduction"
+        },
+        {
+          "reactants": [
+            "CCC=O"
+          ],
+          "product": "CCC(=O)O",
+          "catalyst": "none (Jones / KMnO4 / Ag2O)",
+          "reagents": "Jones reagent",
+          "role": "branch B: aldehyde oxidation"
+        },
+        {
+          "reactants": [
+            "CC(C)O",
+            "CCC(=O)O"
+          ],
+          "product": "CCC(=O)OC(C)C",
+          "catalyst": "H2SO4 (acid, catalytic)",
+          "reagents": "heat",
+          "role": "Fischer esterification (convergent)"
+        }
+      ],
+      "refs": "Fischer & Speier, Ber. 1895, 28, 3252."
+    },
+    {
+      "id": "C11",
+      "level": 5,
+      "title": "1-Octene -> 2-octanone (Wacker-Tsuji, Pd/Cu cooperative catalysis)",
+      "tier": "R1",
+      "starts": [
+        "C=CCCCCCC"
+      ],
+      "target": "CC(=O)CCCCCC",
+      "steps": [
+        {
+          "reactants": [
+            "C=CCCCCCC"
+          ],
+          "product": "CC(=O)CCCCCC",
+          "catalyst": "PdCl2 (substrate oxidation) + CuCl/CuCl2 (reoxidant) + O2, cooperative redox cycle",
+          "reagents": "O2, DMF/H2O",
+          "role": "Wacker-Tsuji oxidation to the methyl ketone"
+        }
+      ],
+      "refs": "Tsuji, Nagashima & Nemoto, Org. Synth. 1989, 62, 9 (1-decene -> 2-decanone; citation found online, procedure page not fetched)."
+    },
+    {
+      "id": "C12",
+      "level": 5,
+      "title": "Diethyl diallylmalonate -> diethyl cyclopent-3-ene-1,1-dicarboxylate (Grubbs RCM; outside coverage)",
+      "tier": "R1",
+      "starts": [
+        "C=CCC(CC=C)(C(=O)OCC)C(=O)OCC"
+      ],
+      "target": "CCOC(=O)C1(C(=O)OCC)CC=CC1",
+      "steps": [
+        {
+          "reactants": [
+            "C=CCC(CC=C)(C(=O)OCC)C(=O)OCC"
+          ],
+          "product": "CCOC(=O)C1(C(=O)OCC)CC=CC1",
+          "catalyst": "Ru alkylidene (Grubbs), loses ethylene",
+          "reagents": "CH2Cl2, rt",
+          "role": "ring-closing metathesis"
+        }
+      ],
+      "refs": "RCM of diethyl diallylmalonate: TCI practical example (98%, found by online check)."
+    }
+  ],
+  "results": [
+    {
+      "id": "C1",
+      "level": 1,
+      "title": "Propene -> 2-propanol -> acetone",
+      "tier": "R2",
+      "steps": 2,
+      "catalystRoles": [
+        "H3O+ (H2SO4/H2O), Bronsted acid, catalytic",
+        "none (PCC is a stoichiometric oxidant)"
+      ],
+      "coverage": [
+        {
+          "role": "acid-catalysed Markovnikov hydration",
+          "expected": "CC(C)O",
+          "input": "C=CC",
+          "pathwayCount": 28,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "alkene-acid-hydration",
+              "reagents": "H₂O/H⁺ (e.g. H₂O + dilute H₂SO₄ or H₃PO₄)",
+              "level": "exact",
+              "status": "computed"
+            },
+            {
+              "ruleId": "alkene-oxymercuration-demercuration",
+              "reagents": "1) Hg(OAc)₂, H₂O  2) NaBH₄",
+              "level": "exact",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [
+            "alkene-haloether-formation",
+            "alkene-alkoxymercuration-demercuration",
+            "alkene-epoxidation-acidic-alcohol-opening",
+            "alkene-epoxidation-organometallic-opening",
+            "alkene-alkyne-photochemical-2plus2",
+            "alkene-photochemical-2plus2"
+          ],
+          "error": null
+        },
+        {
+          "role": "oxidation",
+          "expected": "CC(C)=O",
+          "input": "CC(C)O",
+          "pathwayCount": 19,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "secondary-alcohol-oxidation-pcc",
+              "reagents": "PCC",
+              "level": "exact",
+              "status": "computed"
+            },
+            {
+              "ruleId": "secondary-alcohol-oxidation-dmp",
+              "reagents": "Dess–Martin periodinane (DMP)",
+              "level": "exact",
+              "status": "computed"
+            },
+            {
+              "ruleId": "secondary-alcohol-oxidation-jones",
+              "reagents": "CrO₃, H₂SO₄, H₂O (Jones reagent)",
+              "level": "exact",
+              "status": "computed"
+            },
+            {
+              "ruleId": "secondary-alcohol-oxidation-naocl",
+              "reagents": "NaOCl",
+              "level": "exact",
+              "status": "computed"
+            },
+            {
+              "ruleId": "secondary-alcohol-oxidation-kmno4",
+              "reagents": "KMnO₄",
+              "level": "exact",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [
+            "alcohol-williamson-ether",
+            "fischer-esterification",
+            "alcohol-acid-chloride-esterification"
+          ],
+          "error": null
+        }
+      ],
+      "sequencePage": {
+        "attempted": true,
+        "ruleIds": [
+          "alkene-acid-hydration",
+          "secondary-alcohol-oxidation-pcc"
+        ],
+        "statuses": [
+          [
+            "reaction",
+            "reaction"
+          ]
+        ],
+        "finalVsTarget": [
+          "exact"
+        ]
+      },
+      "planner": {
+        "outcome": "found",
+        "outcomeMessage": "Structure-verified route found: 2 steps. These are the best routes found within the search budget, not proven optimal.",
+        "elapsedMs": 2066,
+        "firstRouteAfterMs": 2066,
+        "routeCount": 1,
+        "routes": [
+          {
+            "id": "synthesis-route-1d8zjbq",
+            "stepCount": 2,
+            "verification": "verified",
+            "targetMatch": "exact",
+            "finalVsTarget": "exact",
+            "finalProduct": "CC(C)=O",
+            "unusedStartingMaterials": [],
+            "coproducts": [],
+            "problems": [],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "alkene-acid-hydration",
+                "reagents": "H₂O/H⁺ (e.g. H₂O + dilute H₂SO₄ or H₃PO₄)",
+                "reactants": [
+                  "C=CC"
+                ],
+                "product": "CC(C)O",
+                "introducedElements": [
+                  "O"
+                ],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "secondary-alcohol-oxidation-pcc",
+                "reagents": "PCC",
+                "reactants": [
+                  "CC(C)O"
+                ],
+                "product": "CC(C)=O",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "C2",
+      "level": 1,
+      "title": "Benzene + chloroethane -> ethylbenzene -> (1-bromoethyl)benzene",
+      "tier": "R2",
+      "steps": 2,
+      "catalystRoles": [
+        "AlCl3 (Lewis acid)",
+        "radical initiator (hv / AIBN)"
+      ],
+      "coverage": [
+        {
+          "role": "Friedel-Crafts alkylation",
+          "expected": "CCc1ccccc1",
+          "input": "c1ccccc1.CCCl",
+          "pathwayCount": 1,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "aromatic-friedel-crafts-alkylation",
+              "reagents": "AlCl₃",
+              "level": "exact",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [],
+          "error": null
+        },
+        {
+          "role": "benzylic (Wohl-Ziegler) bromination",
+          "expected": "CC(Br)c1ccccc1",
+          "input": "CCc1ccccc1",
+          "pathwayCount": 14,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "benzylic-bromination",
+              "reagents": "NBS, hν or radical initiator",
+              "level": "exact",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [
+            "aromatic-friedel-crafts-alkylation",
+            "aromatic-friedel-crafts-acylation"
+          ],
+          "error": null
+        }
+      ],
+      "sequencePage": {
+        "attempted": true,
+        "onlyFirstStartingMaterial": true,
+        "statuses": [
+          [
+            "needs-input",
+            "no-reaction"
+          ]
+        ]
+      },
+      "planner": {
+        "outcome": "found",
+        "outcomeMessage": "Structure-verified route found: 2 steps. These are the best routes found within the search budget, not proven optimal.",
+        "elapsedMs": 3365,
+        "firstRouteAfterMs": 3365,
+        "routeCount": 1,
+        "routes": [
+          {
+            "id": "convergent-route-aromatic-friedel-crafts-alkylation>benzylic-bromination-2",
+            "stepCount": 2,
+            "verification": "verified",
+            "targetMatch": "exact",
+            "finalVsTarget": "exact",
+            "finalProduct": "CC(Br)c1ccccc1",
+            "unusedStartingMaterials": [],
+            "coproducts": [],
+            "problems": [],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "aromatic-friedel-crafts-alkylation",
+                "reagents": "AlCl₃",
+                "reactants": [
+                  "c1ccccc1",
+                  "CCCl"
+                ],
+                "product": "CCc1ccccc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "benzylic-bromination",
+                "reagents": "NBS, hν or radical initiator",
+                "reactants": [
+                  "CCc1ccccc1"
+                ],
+                "product": "CC(Br)c1ccccc1",
+                "introducedElements": [
+                  "Br"
+                ],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "C3",
+      "level": 2,
+      "title": "2-Butanol -> 2-butene -> butane",
+      "tier": "R2",
+      "steps": 2,
+      "catalystRoles": [
+        "H2SO4 (acid, catalytic)",
+        "Pd/C (heterogeneous)"
+      ],
+      "coverage": [
+        {
+          "role": "acid-catalysed dehydration (Zaitsev, E major)",
+          "expected": "CC=CC",
+          "input": "CC(O)CC",
+          "pathwayCount": 19,
+          "producedExpected": "connectivity",
+          "producing": [
+            {
+              "ruleId": "alcohol-dehydration-alkene",
+              "reagents": "Concentrated H₂SO₄ or H₃PO₄, heat",
+              "level": "connectivity",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [
+            "alcohol-williamson-ether",
+            "fischer-esterification",
+            "alcohol-acid-chloride-esterification"
+          ],
+          "error": null
+        },
+        {
+          "role": "catalytic hydrogenation",
+          "expected": "CCCC",
+          "input": "CC=CC",
+          "pathwayCount": 28,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "alkene-hydrogenation",
+              "reagents": "H₂, Pd/C",
+              "level": "exact",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [
+            "alkene-haloether-formation",
+            "alkene-alkoxymercuration-demercuration",
+            "alkene-epoxidation-acidic-alcohol-opening",
+            "alkene-epoxidation-organometallic-opening",
+            "alkene-alkyne-photochemical-2plus2",
+            "alkene-photochemical-2plus2"
+          ],
+          "error": null
+        }
+      ],
+      "sequencePage": {
+        "attempted": true,
+        "ruleIds": [
+          "alcohol-dehydration-alkene",
+          "alkene-hydrogenation"
+        ],
+        "statuses": [
+          [
+            "reaction",
+            "reaction"
+          ]
+        ],
+        "finalVsTarget": [
+          "exact"
+        ]
+      },
+      "planner": {
+        "outcome": "found",
+        "outcomeMessage": "Structure-verified route found: 2 steps. These are the best routes found within the search budget, not proven optimal.",
+        "elapsedMs": 1545,
+        "firstRouteAfterMs": 1545,
+        "routeCount": 1,
+        "routes": [
+          {
+            "id": "synthesis-route-13tah1x",
+            "stepCount": 2,
+            "verification": "verified",
+            "targetMatch": "exact",
+            "finalVsTarget": "exact",
+            "finalProduct": "CCCC",
+            "unusedStartingMaterials": [],
+            "coproducts": [],
+            "problems": [],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "secondary-alcohol-oxidation-pcc",
+                "reagents": "PCC",
+                "reactants": [
+                  "CC(O)CC"
+                ],
+                "product": "CCC(C)=O",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "ketone-wolff-kishner",
+                "reagents": "NH₂NH₂, KOH, heat",
+                "reactants": [
+                  "CCC(C)=O"
+                ],
+                "product": "CCCC",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "C4",
+      "level": 2,
+      "title": "Bromobenzene + phenylboronic acid -> biphenyl -> 4-acetylbiphenyl",
+      "tier": "R1",
+      "steps": 2,
+      "catalystRoles": [
+        "Pd(0) / ligand, base",
+        "AlCl3 (Lewis acid, >= 1 equiv in acylation)"
+      ],
+      "coverage": [
+        {
+          "role": "Suzuki-Miyaura cross-coupling",
+          "expected": "c1ccc(-c2ccccc2)cc1",
+          "input": "Brc1ccccc1.OB(O)c1ccccc1",
+          "pathwayCount": 1,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "suzuki-coupling",
+              "reagents": "Pd catalyst, base",
+              "level": "exact",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [],
+          "error": null
+        },
+        {
+          "role": "Friedel-Crafts acylation (para)",
+          "expected": "CC(=O)c1ccc(-c2ccccc2)cc1",
+          "input": "c1ccc(-c2ccccc2)cc1.CC(=O)Cl",
+          "pathwayCount": 3,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "aromatic-friedel-crafts-acylation",
+              "reagents": "AlCl₃",
+              "level": "exact",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [],
+          "error": null
+        }
+      ],
+      "sequencePage": {
+        "attempted": true,
+        "onlyFirstStartingMaterial": true,
+        "statuses": [
+          [
+            "needs-input",
+            "needs-input"
+          ]
+        ]
+      },
+      "planner": {
+        "outcome": "found",
+        "outcomeMessage": "Structure-verified route found: 2 steps. These are the best routes found within the search budget, not proven optimal.",
+        "elapsedMs": 882,
+        "firstRouteAfterMs": 832,
+        "routeCount": 2,
+        "routes": [
+          {
+            "id": "convergent-route-aromatic-friedel-crafts-acylation>suzuki-coupling-2",
+            "stepCount": 2,
+            "verification": "verified",
+            "targetMatch": "exact",
+            "finalVsTarget": "exact",
+            "finalProduct": "CC(=O)c1ccc(-c2ccccc2)cc1",
+            "unusedStartingMaterials": [],
+            "coproducts": [],
+            "problems": [],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "aromatic-friedel-crafts-acylation",
+                "reagents": "AlCl₃",
+                "reactants": [
+                  "Brc1ccccc1",
+                  "CC(=O)Cl"
+                ],
+                "product": "CC(=O)c1ccc(Br)cc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "suzuki-coupling",
+                "reagents": "Pd catalyst, base",
+                "reactants": [
+                  "CC(=O)c1ccc(Br)cc1",
+                  "OB(O)c1ccccc1"
+                ],
+                "product": "CC(=O)c1ccc(-c2ccccc2)cc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          },
+          {
+            "id": "convergent-route-suzuki-coupling>aromatic-friedel-crafts-acylation-2",
+            "stepCount": 2,
+            "verification": "verified",
+            "targetMatch": "exact",
+            "finalVsTarget": "exact",
+            "finalProduct": "CC(=O)c1ccc(-c2ccccc2)cc1",
+            "unusedStartingMaterials": [],
+            "coproducts": [],
+            "problems": [],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "suzuki-coupling",
+                "reagents": "Pd catalyst, base",
+                "reactants": [
+                  "Brc1ccccc1",
+                  "OB(O)c1ccccc1"
+                ],
+                "product": "c1ccc(-c2ccccc2)cc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "aromatic-friedel-crafts-acylation",
+                "reagents": "AlCl₃",
+                "reactants": [
+                  "c1ccc(-c2ccccc2)cc1",
+                  "CC(=O)Cl"
+                ],
+                "product": "CC(=O)c1ccc(-c2ccccc2)cc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "C5",
+      "level": 2,
+      "title": "Iodobenzene + phenylacetylene -> diphenylacetylene -> (Z)-stilbene",
+      "tier": "R1",
+      "steps": 2,
+      "catalystRoles": [
+        "Pd(0) + CuI (cooperative co-catalysts), amine base",
+        "Lindlar Pd/CaCO3/Pb, quinoline"
+      ],
+      "coverage": [
+        {
+          "role": "Sonogashira coupling",
+          "expected": "c1ccc(C#Cc2ccccc2)cc1",
+          "input": "Ic1ccccc1.C#Cc1ccccc1",
+          "pathwayCount": 1,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "sonogashira-coupling",
+              "reagents": "Pd catalyst, CuI/base as applicable",
+              "level": "exact",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [],
+          "error": null
+        },
+        {
+          "role": "syn-hydrogenation to the Z alkene",
+          "expected": "c1ccccc1/C=C\\c1ccccc1",
+          "input": "c1ccc(C#Cc2ccccc2)cc1",
+          "pathwayCount": 33,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "alkyne-lindlar-reduction-internal",
+              "reagents": "H₂, Lindlar catalyst",
+              "level": "exact",
+              "status": "computed"
+            },
+            {
+              "ruleId": "alkyne-dissolving-metal-reduction-internal",
+              "reagents": "Na, NH₃(l); or Li, NH₃(l)",
+              "level": "connectivity",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [
+            "aromatic-friedel-crafts-alkylation",
+            "aromatic-friedel-crafts-acylation"
+          ],
+          "error": null
+        }
+      ],
+      "sequencePage": {
+        "attempted": true,
+        "onlyFirstStartingMaterial": true,
+        "statuses": [
+          [
+            "needs-input",
+            "no-reaction"
+          ]
+        ]
+      },
+      "planner": {
+        "outcome": "found",
+        "outcomeMessage": "Structure-verified route found: 2 steps. These are the best routes found within the search budget, not proven optimal.",
+        "elapsedMs": 1523,
+        "firstRouteAfterMs": 1523,
+        "routeCount": 1,
+        "routes": [
+          {
+            "id": "convergent-route-sonogashira-coupling>alkyne-lindlar-reduction-internal-2",
+            "stepCount": 2,
+            "verification": "verified",
+            "targetMatch": "exact",
+            "finalVsTarget": "exact",
+            "finalProduct": "C(=C\\c1ccccc1)\\c1ccccc1",
+            "unusedStartingMaterials": [],
+            "coproducts": [],
+            "problems": [],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "sonogashira-coupling",
+                "reagents": "Pd catalyst, CuI/base as applicable",
+                "reactants": [
+                  "Ic1ccccc1",
+                  "C#Cc1ccccc1"
+                ],
+                "product": "C(#Cc1ccccc1)c1ccccc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "alkyne-lindlar-reduction-internal",
+                "reagents": "H₂, Lindlar catalyst",
+                "reactants": [
+                  "C(#Cc1ccccc1)c1ccccc1"
+                ],
+                "product": "C(=C\\c1ccccc1)\\c1ccccc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "C6",
+      "level": 3,
+      "title": "Benzene + propanoyl chloride -> propiophenone -> propylbenzene -> (1-bromopropyl)benzene -> (E)-1-phenylpropene",
+      "tier": "R2",
+      "steps": 4,
+      "catalystRoles": [
+        "AlCl3 (stoichiometric in practice)",
+        "none (Zn(Hg) is a stoichiometric reductant)",
+        "radical initiator",
+        "none (t-BuOK is a stoichiometric base)"
+      ],
+      "coverage": [
+        {
+          "role": "Friedel-Crafts acylation",
+          "expected": "CCC(=O)c1ccccc1",
+          "input": "c1ccccc1.CCC(=O)Cl",
+          "pathwayCount": 1,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "aromatic-friedel-crafts-acylation",
+              "reagents": "AlCl₃",
+              "level": "exact",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [],
+          "error": null
+        },
+        {
+          "role": "Clemmensen reduction (aryl ketone -> CH2)",
+          "expected": "CCCc1ccccc1",
+          "input": "CCC(=O)c1ccccc1",
+          "pathwayCount": 28,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "ketone-wolff-kishner",
+              "reagents": "NH₂NH₂, KOH, heat",
+              "level": "exact",
+              "status": "representative"
+            },
+            {
+              "ruleId": "ketone-clemmensen",
+              "reagents": "Zn(Hg), HCl",
+              "level": "exact",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [
+            "ketone-organometallic-addition",
+            "ketone-ketal-formation",
+            "ketone-imine-formation",
+            "ketone-enamine-formation",
+            "ketone-wittig",
+            "carbonyl-reductive-amination"
+          ],
+          "error": null
+        },
+        {
+          "role": "benzylic bromination",
+          "expected": "CCC(Br)c1ccccc1",
+          "input": "CCCc1ccccc1",
+          "pathwayCount": 14,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "benzylic-bromination",
+              "reagents": "NBS, hν or radical initiator",
+              "level": "exact",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [
+            "aromatic-friedel-crafts-alkylation",
+            "aromatic-friedel-crafts-acylation"
+          ],
+          "error": null
+        },
+        {
+          "role": "E2 elimination to the conjugated alkene",
+          "expected": "C/C=C/c1ccccc1",
+          "input": "CCC(Br)c1ccccc1",
+          "pathwayCount": 29,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "haloalkane-e2-hydroxide",
+              "reagents": "NaOH or KOH, EtOH, heat",
+              "level": "exact",
+              "status": "representative"
+            },
+            {
+              "ruleId": "haloalkane-e2-zaitsev",
+              "reagents": "NaOEt, EtOH, heat",
+              "level": "exact",
+              "status": "representative"
+            },
+            {
+              "ruleId": "haloalkane-e2-hofmann",
+              "reagents": "t-BuOK, t-BuOH, heat",
+              "level": "exact",
+              "status": "representative"
+            },
+            {
+              "ruleId": "haloalkane-e2-amide-base",
+              "reagents": "NaNH₂, NH₃(l) or THF",
+              "level": "exact",
+              "status": "representative"
+            },
+            {
+              "ruleId": "haloalkane-e1-elimination",
+              "reagents": "H₂O, heat",
+              "level": "exact",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [
+            "haloalkane-williamson-ether",
+            "haloalkane-sn1-solvolysis-alcohol",
+            "haloalkane-e1-alcohol-solvolysis",
+            "aromatic-friedel-crafts-alkylation",
+            "aromatic-friedel-crafts-acylation"
+          ],
+          "error": null
+        }
+      ],
+      "sequencePage": {
+        "attempted": true,
+        "onlyFirstStartingMaterial": true,
+        "statuses": [
+          [
+            "needs-input",
+            "no-reaction",
+            "no-reaction",
+            "no-reaction"
+          ]
+        ]
+      },
+      "planner": {
+        "outcome": "found",
+        "outcomeMessage": "Structure-verified route found: 3 steps. These are the best routes found within the search budget, not proven optimal.",
+        "elapsedMs": 5031,
+        "firstRouteAfterMs": 5027,
+        "routeCount": 1,
+        "routes": [
+          {
+            "id": "convergent-route-aromatic-friedel-crafts-acylation>ketone-reduction>alcohol-dehydration-alkene-3",
+            "stepCount": 3,
+            "verification": "verified",
+            "targetMatch": "exact",
+            "finalVsTarget": "exact",
+            "finalProduct": "C/C=C/c1ccccc1",
+            "unusedStartingMaterials": [],
+            "coproducts": [],
+            "problems": [],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "aromatic-friedel-crafts-acylation",
+                "reagents": "AlCl₃",
+                "reactants": [
+                  "c1ccccc1",
+                  "CCC(=O)Cl"
+                ],
+                "product": "CCC(=O)c1ccccc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "ketone-reduction",
+                "reagents": "NaBH₄ or LiAlH₄, then H₃O⁺",
+                "reactants": [
+                  "CCC(=O)c1ccccc1"
+                ],
+                "product": "CCC(O)c1ccccc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 3,
+                "ruleId": "alcohol-dehydration-alkene",
+                "reagents": "Concentrated H₂SO₄ or H₃PO₄, heat",
+                "reactants": [
+                  "CCC(O)c1ccccc1"
+                ],
+                "product": "C/C=C/c1ccccc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "C7",
+      "level": 3,
+      "title": "Iodobenzene + methyl acrylate -> methyl cinnamate -> methyl 3-phenylpropanoate -> 3-phenylpropan-1-ol -> 3-phenylpropanal",
+      "tier": "R1",
+      "steps": 4,
+      "catalystRoles": [
+        "Pd(OAc)2 (+ ligand), base",
+        "Pd/C",
+        "none (LiAlH4 stoichiometric)",
+        "none (PCC / DMP / Swern)"
+      ],
+      "coverage": [
+        {
+          "role": "Mizoroki-Heck coupling (E)",
+          "expected": "COC(=O)/C=C/c1ccccc1",
+          "input": "Ic1ccccc1.C=CC(=O)OC",
+          "pathwayCount": 2,
+          "producedExpected": "connectivity",
+          "producing": [
+            {
+              "ruleId": "heck-coupling",
+              "reagents": "Pd catalyst, base, heat",
+              "level": "connectivity",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [],
+          "error": null
+        },
+        {
+          "role": "chemoselective C=C hydrogenation (ester untouched)",
+          "expected": "COC(=O)CCc1ccccc1",
+          "input": "COC(=O)/C=C/c1ccccc1",
+          "pathwayCount": 82,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "alkene-hydrogenation",
+              "reagents": "H₂, Pd/C",
+              "level": "exact",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [
+            "alkene-haloether-formation",
+            "alkene-alkoxymercuration-demercuration",
+            "alkene-epoxidation-acidic-alcohol-opening",
+            "alkene-epoxidation-organometallic-opening",
+            "alkene-alkyne-photochemical-2plus2",
+            "alkene-photochemical-2plus2"
+          ],
+          "error": null
+        },
+        {
+          "role": "ester reduction",
+          "expected": "OCCCc1ccccc1",
+          "input": "COC(=O)CCc1ccccc1",
+          "pathwayCount": 29,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "ester-lah-reduction",
+              "reagents": "1) LiAlH₄  2) H₃O⁺",
+              "level": "exact",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [
+            "ester-grignard-addition",
+            "ester-transesterification",
+            "ester-transesterification-alkoxide",
+            "ester-aminolysis",
+            "enolate-alkylation",
+            "aldol-addition-general"
+          ],
+          "error": null
+        },
+        {
+          "role": "primary alcohol -> aldehyde",
+          "expected": "O=CCCc1ccccc1",
+          "input": "OCCCc1ccccc1",
+          "pathwayCount": 30,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "primary-alcohol-mild-oxidation",
+              "reagents": "PCC, DMP, or Swern oxidation",
+              "level": "exact",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [
+            "alcohol-williamson-ether",
+            "fischer-esterification",
+            "alcohol-acid-chloride-esterification",
+            "aromatic-friedel-crafts-alkylation",
+            "aromatic-friedel-crafts-acylation"
+          ],
+          "error": null
+        }
+      ],
+      "sequencePage": {
+        "attempted": true,
+        "onlyFirstStartingMaterial": true,
+        "statuses": [
+          [
+            "needs-input",
+            "no-reaction",
+            "no-reaction",
+            "no-reaction"
+          ]
+        ]
+      },
+      "planner": {
+        "outcome": "found",
+        "outcomeMessage": "Structure-verified route found: 3 steps. These are the best routes found within the search budget, not proven optimal.",
+        "elapsedMs": 2280,
+        "firstRouteAfterMs": 2264,
+        "routeCount": 1,
+        "routes": [
+          {
+            "id": "convergent-route-ester-dibal-reduction>heck-coupling>alkene-hydrogenation-3",
+            "stepCount": 3,
+            "verification": "verified",
+            "targetMatch": "exact",
+            "finalVsTarget": "exact",
+            "finalProduct": "O=CCCc1ccccc1",
+            "unusedStartingMaterials": [],
+            "coproducts": [
+              "CO"
+            ],
+            "problems": [],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "ester-dibal-reduction",
+                "reagents": "1) DIBAL-H, −78 °C  2) H₂O",
+                "reactants": [
+                  "C=CC(=O)OC"
+                ],
+                "product": "C=CC=O.CO",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "heck-coupling",
+                "reagents": "Pd catalyst, base, heat",
+                "reactants": [
+                  "Ic1ccccc1",
+                  "C=CC=O"
+                ],
+                "product": "O=CC=Cc1ccccc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 3,
+                "ruleId": "alkene-hydrogenation",
+                "reagents": "H₂, Pd/C",
+                "reactants": [
+                  "O=CC=Cc1ccccc1"
+                ],
+                "product": "O=CCCc1ccccc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "C8",
+      "level": 3,
+      "title": "2-Butyne -> (E)-2-butene -> trans-2,3-epoxybutane -> (+/-)-butane-2,3-diol (stereochemical)",
+      "tier": "R2",
+      "steps": 3,
+      "catalystRoles": [
+        "none (Na / NH3(l), dissolving metal)",
+        "none (mCPBA)",
+        "H3O+ (acid, catalytic)"
+      ],
+      "coverage": [
+        {
+          "role": "anti-reduction to the E alkene",
+          "expected": "C/C=C/C",
+          "input": "CC#CC",
+          "pathwayCount": 21,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "alkyne-lindlar-reduction-internal",
+              "reagents": "H₂, Lindlar catalyst",
+              "level": "connectivity",
+              "status": "computed"
+            },
+            {
+              "ruleId": "alkyne-dissolving-metal-reduction-internal",
+              "reagents": "Na, NH₃(l); or Li, NH₃(l)",
+              "level": "exact",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [],
+          "error": null
+        },
+        {
+          "role": "stereospecific syn epoxidation (trans epoxide)",
+          "expected": "C[C@H]1O[C@@H]1C",
+          "input": "C/C=C/C",
+          "pathwayCount": 28,
+          "producedExpected": "connectivity",
+          "producing": [
+            {
+              "ruleId": "alkene-epoxidation",
+              "reagents": "mCPBA; or RCO₃H (peroxyacid)",
+              "level": "connectivity",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [
+            "alkene-haloether-formation",
+            "alkene-alkoxymercuration-demercuration",
+            "alkene-epoxidation-acidic-alcohol-opening",
+            "alkene-epoxidation-organometallic-opening",
+            "alkene-alkyne-photochemical-2plus2",
+            "alkene-photochemical-2plus2"
+          ],
+          "error": null
+        },
+        {
+          "role": "anti ring opening -> racemic (R,R)/(S,S) diol (not meso)",
+          "expected": "CC(O)C(C)O",
+          "input": "C[C@H]1O[C@@H]1C",
+          "pathwayCount": 17,
+          "producedExpected": "connectivity",
+          "producing": [
+            {
+              "ruleId": "epoxide-acid-water-opening",
+              "reagents": "H₃O⁺, H₂O",
+              "level": "connectivity",
+              "status": "computed"
+            },
+            {
+              "ruleId": "epoxide-base-hydroxide-opening",
+              "reagents": "1) NaOH or KOH  2) H₂O",
+              "level": "connectivity",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [
+            "epoxide-acid-alcohol-opening",
+            "epoxide-base-alkoxide-opening",
+            "epoxide-grignard-opening",
+            "epoxide-amine-opening"
+          ],
+          "error": null
+        }
+      ],
+      "stereoNote": "final diol meso? expected=false; target SMILES given as connectivity only",
+      "sequencePage": {
+        "attempted": true,
+        "ruleIds": [
+          "alkyne-lindlar-reduction-internal",
+          "alkene-epoxidation",
+          "epoxide-acid-water-opening"
+        ],
+        "statuses": [
+          [
+            "reaction",
+            "reaction",
+            "reaction"
+          ]
+        ],
+        "finalVsTarget": [
+          "exact"
+        ]
+      },
+      "planner": {
+        "outcome": "found",
+        "outcomeMessage": "Connectivity-verified route found: 2 steps. These are the best routes found within the search budget, not proven optimal.",
+        "elapsedMs": 1679,
+        "firstRouteAfterMs": 1679,
+        "routeCount": 1,
+        "routes": [
+          {
+            "id": "synthesis-route-1sdm76c",
+            "stepCount": 2,
+            "verification": "connectivity-only",
+            "targetMatch": "connectivity",
+            "finalVsTarget": "exact",
+            "finalProduct": "CC(O)C(C)O",
+            "unusedStartingMaterials": [],
+            "coproducts": [],
+            "problems": [
+              "Step 2: The replayed product matches \"CC(O)C(C)O\" only by connectivity (stereochemistry differs).",
+              "The target is reached only by connectivity: stereochemistry differs from the requested target."
+            ],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "alkyne-dissolving-metal-reduction-internal",
+                "reagents": "Na, NH₃(l); or Li, NH₃(l)",
+                "reactants": [
+                  "CC#CC"
+                ],
+                "product": "C/C=C/C",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "alkene-syn-dihydroxylation",
+                "reagents": "OsO₄/H₂O₂; OsO₄/NMO; or KMnO₄/OH⁻, cold/dilute",
+                "reactants": [
+                  "C/C=C/C"
+                ],
+                "product": "CC(O)C(C)O",
+                "introducedElements": [
+                  "O"
+                ],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          }
+        ],
+        "finalIsMeso": true
+      }
+    },
+    {
+      "id": "C9",
+      "level": 4,
+      "title": "Isopropanol + bromobenzene: acetone + phenylmagnesium bromide -> 2-phenylpropan-2-ol",
+      "tier": "R2",
+      "steps": 3,
+      "catalystRoles": [
+        "none (PCC)",
+        "none (Mg metal, anhydrous ether/THF)",
+        "none"
+      ],
+      "coverage": [
+        {
+          "role": "branch A: oxidation",
+          "expected": "CC(C)=O",
+          "input": "CC(C)O",
+          "pathwayCount": 19,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "secondary-alcohol-oxidation-pcc",
+              "reagents": "PCC",
+              "level": "exact",
+              "status": "computed"
+            },
+            {
+              "ruleId": "secondary-alcohol-oxidation-dmp",
+              "reagents": "Dess–Martin periodinane (DMP)",
+              "level": "exact",
+              "status": "computed"
+            },
+            {
+              "ruleId": "secondary-alcohol-oxidation-jones",
+              "reagents": "CrO₃, H₂SO₄, H₂O (Jones reagent)",
+              "level": "exact",
+              "status": "computed"
+            },
+            {
+              "ruleId": "secondary-alcohol-oxidation-naocl",
+              "reagents": "NaOCl",
+              "level": "exact",
+              "status": "computed"
+            },
+            {
+              "ruleId": "secondary-alcohol-oxidation-kmno4",
+              "reagents": "KMnO₄",
+              "level": "exact",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [
+            "alcohol-williamson-ether",
+            "fischer-esterification",
+            "alcohol-acid-chloride-esterification"
+          ],
+          "error": null
+        },
+        {
+          "role": "branch B: Grignard formation",
+          "expected": "Br[Mg]c1ccccc1",
+          "input": "Brc1ccccc1",
+          "pathwayCount": 21,
+          "producedExpected": "none",
+          "producing": [],
+          "needsInputRules": [
+            "aromatic-friedel-crafts-alkylation",
+            "aromatic-friedel-crafts-acylation",
+            "suzuki-coupling",
+            "sonogashira-coupling",
+            "heck-coupling"
+          ],
+          "error": null
+        },
+        {
+          "role": "convergent carbonyl addition",
+          "expected": "CC(C)(O)c1ccccc1",
+          "input": "CC(C)=O.Br[Mg]c1ccccc1",
+          "pathwayCount": 1,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "ketone-organometallic-addition",
+              "reagents": "1) RMgCl, RMgBr, RMgI, or RLi  2) H₃O⁺",
+              "level": "exact",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [],
+          "error": null
+        }
+      ],
+      "sequencePage": {
+        "attempted": false,
+        "reason": "a step has no producing rule in the registry"
+      },
+      "planner": {
+        "outcome": "found",
+        "outcomeMessage": "Structure-verified route found: 3 steps. These are the best routes found within the search budget, not proven optimal.",
+        "elapsedMs": 1384,
+        "firstRouteAfterMs": 1384,
+        "routeCount": 1,
+        "routes": [
+          {
+            "id": "convergent-route-alcohol-dehydration-alkene>heck-coupling>alkene-acid-hydration-3",
+            "stepCount": 3,
+            "verification": "verified",
+            "targetMatch": "exact",
+            "finalVsTarget": "exact",
+            "finalProduct": "CC(C)(O)c1ccccc1",
+            "unusedStartingMaterials": [],
+            "coproducts": [],
+            "problems": [],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "alcohol-dehydration-alkene",
+                "reagents": "Concentrated H₂SO₄ or H₃PO₄, heat",
+                "reactants": [
+                  "CC(C)O"
+                ],
+                "product": "C=CC",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "heck-coupling",
+                "reagents": "Pd catalyst, base, heat",
+                "reactants": [
+                  "Brc1ccccc1",
+                  "C=CC"
+                ],
+                "product": "C=C(C)c1ccccc1",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 3,
+                "ruleId": "alkene-acid-hydration",
+                "reagents": "H₂O/H⁺ (e.g. H₂O + dilute H₂SO₄ or H₃PO₄)",
+                "reactants": [
+                  "C=C(C)c1ccccc1"
+                ],
+                "product": "CC(C)(O)c1ccccc1",
+                "introducedElements": [
+                  "O"
+                ],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "C10",
+      "level": 4,
+      "title": "Acetone + propanal -> isopropanol + propanoic acid -> isopropyl propanoate (positive control)",
+      "tier": "R2",
+      "steps": 3,
+      "catalystRoles": [
+        "none (NaBH4)",
+        "none (Jones / KMnO4 / Ag2O)",
+        "H2SO4 (acid, catalytic)"
+      ],
+      "coverage": [
+        {
+          "role": "branch A: ketone reduction",
+          "expected": "CC(C)O",
+          "input": "CC(C)=O",
+          "pathwayCount": 20,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "ketone-reduction",
+              "reagents": "NaBH₄ or LiAlH₄, then H₃O⁺",
+              "level": "exact",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [
+            "ketone-organometallic-addition",
+            "ketone-ketal-formation",
+            "ketone-imine-formation",
+            "ketone-enamine-formation",
+            "ketone-wittig",
+            "carbonyl-reductive-amination"
+          ],
+          "error": null
+        },
+        {
+          "role": "branch B: aldehyde oxidation",
+          "expected": "CCC(=O)O",
+          "input": "CCC=O",
+          "pathwayCount": 19,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "aldehyde-oxidation",
+              "reagents": "KMnO4, CrO₃/H₃O⁺, Ag₂O, or Tollens reagent",
+              "level": "exact",
+              "status": "representative"
+            }
+          ],
+          "needsInputRules": [
+            "aldehyde-organometallic-addition",
+            "aldehyde-acetal-formation",
+            "aldehyde-imine-formation",
+            "aldehyde-enamine-formation",
+            "aldehyde-wittig",
+            "carbonyl-reductive-amination"
+          ],
+          "error": null
+        },
+        {
+          "role": "Fischer esterification (convergent)",
+          "expected": "CCC(=O)OC(C)C",
+          "input": "CC(C)O.CCC(=O)O",
+          "pathwayCount": 1,
+          "producedExpected": "exact",
+          "producing": [
+            {
+              "ruleId": "fischer-esterification",
+              "reagents": "Catalytic H₂SO₄, heat",
+              "level": "exact",
+              "status": "computed"
+            }
+          ],
+          "needsInputRules": [],
+          "error": null
+        }
+      ],
+      "sequencePage": {
+        "attempted": true,
+        "onlyFirstStartingMaterial": true,
+        "statuses": [
+          [
+            "reaction",
+            "no-reaction",
+            "needs-input"
+          ]
+        ]
+      },
+      "planner": {
+        "outcome": "found",
+        "outcomeMessage": "Structure-verified route found: 3 steps. These are the best routes found within the search budget, not proven optimal.",
+        "elapsedMs": 1250,
+        "firstRouteAfterMs": 1249,
+        "routeCount": 1,
+        "routes": [
+          {
+            "id": "convergent-route-ketone-reduction>aldehyde-oxidation>fischer-esterification-3",
+            "stepCount": 3,
+            "verification": "verified",
+            "targetMatch": "exact",
+            "finalVsTarget": "exact",
+            "finalProduct": "CCC(=O)OC(C)C",
+            "unusedStartingMaterials": [],
+            "coproducts": [],
+            "problems": [],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "ketone-reduction",
+                "reagents": "NaBH₄ or LiAlH₄, then H₃O⁺",
+                "reactants": [
+                  "CC(C)=O"
+                ],
+                "product": "CC(C)O",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "aldehyde-oxidation",
+                "reagents": "KMnO4, CrO₃/H₃O⁺, Ag₂O, or Tollens reagent",
+                "reactants": [
+                  "CCC=O"
+                ],
+                "product": "CCC(=O)O",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 3,
+                "ruleId": "fischer-esterification",
+                "reagents": "Catalytic H₂SO₄, heat",
+                "reactants": [
+                  "CC(C)O",
+                  "CCC(=O)O"
+                ],
+                "product": "CCC(=O)OC(C)C",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "C11",
+      "level": 5,
+      "title": "1-Octene -> 2-octanone (Wacker-Tsuji, Pd/Cu cooperative catalysis)",
+      "tier": "R1",
+      "steps": 1,
+      "catalystRoles": [
+        "PdCl2 (substrate oxidation) + CuCl/CuCl2 (reoxidant) + O2, cooperative redox cycle"
+      ],
+      "coverage": [
+        {
+          "role": "Wacker-Tsuji oxidation to the methyl ketone",
+          "expected": "CC(=O)CCCCCC",
+          "input": "C=CCCCCCC",
+          "pathwayCount": 28,
+          "producedExpected": "none",
+          "producing": [],
+          "needsInputRules": [
+            "alkene-haloether-formation",
+            "alkene-alkoxymercuration-demercuration",
+            "alkene-epoxidation-acidic-alcohol-opening",
+            "alkene-epoxidation-organometallic-opening",
+            "alkene-alkyne-photochemical-2plus2",
+            "alkene-photochemical-2plus2"
+          ],
+          "error": null
+        }
+      ],
+      "sequencePage": {
+        "attempted": false,
+        "reason": "a step has no producing rule in the registry"
+      },
+      "planner": {
+        "outcome": "found",
+        "outcomeMessage": "Structure-verified route found: 2 steps. These are the best routes found within the search budget, not proven optimal.",
+        "elapsedMs": 2694,
+        "firstRouteAfterMs": 2694,
+        "routeCount": 1,
+        "routes": [
+          {
+            "id": "synthesis-route-1wolaae",
+            "stepCount": 2,
+            "verification": "verified",
+            "targetMatch": "exact",
+            "finalVsTarget": "exact",
+            "finalProduct": "CC(=O)CCCCCC",
+            "unusedStartingMaterials": [],
+            "coproducts": [],
+            "problems": [],
+            "compatibilityWorst": "none",
+            "steps": [
+              {
+                "n": 1,
+                "ruleId": "alkene-anti-dihydroxylation",
+                "reagents": "1) mCPBA  2) H₃O⁺",
+                "reactants": [
+                  "C=CCCCCCC"
+                ],
+                "product": "CCCCCCC(O)CO",
+                "introducedElements": [
+                  "O"
+                ],
+                "metalsInProduct": [],
+                "compatibility": []
+              },
+              {
+                "n": 2,
+                "ruleId": "pinacol-rearrangement",
+                "reagents": "Concentrated H₂SO₄ or H₃PO₄, heat",
+                "reactants": [
+                  "CCCCCCC(O)CO"
+                ],
+                "product": "CC(=O)CCCCCC",
+                "introducedElements": [],
+                "metalsInProduct": [],
+                "compatibility": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "C12",
+      "level": 5,
+      "title": "Diethyl diallylmalonate -> diethyl cyclopent-3-ene-1,1-dicarboxylate (Grubbs RCM; outside coverage)",
+      "tier": "R1",
+      "steps": 1,
+      "catalystRoles": [
+        "Ru alkylidene (Grubbs), loses ethylene"
+      ],
+      "coverage": [
+        {
+          "role": "ring-closing metathesis",
+          "expected": "CCOC(=O)C1(C(=O)OCC)CC=CC1",
+          "input": "C=CCC(CC=C)(C(=O)OCC)C(=O)OCC",
+          "pathwayCount": 37,
+          "producedExpected": "none",
+          "producing": [],
+          "needsInputRules": [
+            "alkene-haloether-formation",
+            "alkene-alkoxymercuration-demercuration",
+            "alkene-epoxidation-acidic-alcohol-opening",
+            "alkene-epoxidation-organometallic-opening",
+            "alkene-alkyne-photochemical-2plus2",
+            "alkene-photochemical-2plus2"
+          ],
+          "error": null
+        }
+      ],
+      "sequencePage": {
+        "attempted": false,
+        "reason": "a step has no producing rule in the registry"
+      },
+      "planner": {
+        "outcome": "no-route-within-budget",
+        "outcomeMessage": "No verified route was found within the search budget. A route may still exist; this is a computation stop, not a claim that the synthesis is impossible.",
+        "elapsedMs": 25014,
+        "firstRouteAfterMs": null,
+        "routeCount": 0,
+        "routes": []
+      }
+    }
+  ]
+}

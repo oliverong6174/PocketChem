@@ -1,0 +1,17 @@
+{
+  "note": "Stage 9B-1 provenance correction. The original audit labelled cases R1/R2. Only the quoted transformation anchors below were retrievable online during the audit (search-result snippets, not primary papers); every multi-step case as a whole rests at least partly on citations recalled from memory, so EVERY case is 'provisionally assessed'. None may be used for reference-validated accuracy claims. Reference answers are unchanged.",
+  "caseStatus": {
+    "C1":  { "status": "provisional", "webAnchored": [],  "memoryOnly": ["alkene hydration then PCC oxidation (textbook)"] },
+    "C2":  { "status": "provisional", "webAnchored": [],  "memoryOnly": ["Friedel-Crafts alkylation; Wohl-Ziegler (Djerassi 1948)"] },
+    "C3":  { "status": "provisional", "webAnchored": [],  "memoryOnly": ["acid dehydration; catalytic hydrogenation (textbook)"] },
+    "C4":  { "status": "provisional", "webAnchored": ["biphenyl acetylation is para-selective with near-equimolar reagents (1984 kinetics study, search snippet)"], "memoryOnly": ["Miyaura & Suzuki, Chem. Rev. 1995, 95, 2457"] },
+    "C5":  { "status": "provisional", "webAnchored": ["Lindlar reduction of internal alkynes gives cis alkenes; Org. Synth. 1966, 46, 89 is the catalyst preparation (search snippet)"], "memoryOnly": ["Sonogashira, Tohda & Hagihara, Tetrahedron Lett. 1975, 16, 4467"] },
+    "C6":  { "status": "provisional", "webAnchored": [],  "memoryOnly": ["Friedel-Crafts acylation; Clemmensen, Ber. 1913, 46, 1837; NBS; E2"] },
+    "C7":  { "status": "provisional", "webAnchored": ["iodobenzene + methyl acrylate -> methyl cinnamate under Pd (patent examples, 99%)"], "memoryOnly": ["Heck, J. Org. Chem. 1972, 37, 2320; hydrogenation; LiAlH4; PCC"] },
+    "C8":  { "status": "provisional", "webAnchored": [],  "memoryOnly": ["Na/NH3 anti-reduction; syn epoxidation; anti ring opening (textbook)"] },
+    "C9":  { "status": "provisional", "webAnchored": [],  "memoryOnly": ["Grignard formation and addition (textbook)"] },
+    "C10": { "status": "provisional", "webAnchored": [],  "memoryOnly": ["Fischer & Speier, Ber. 1895, 28, 3252"] },
+    "C11": { "status": "provisional", "webAnchored": ["1-decene -> 2-decanone Wacker-Tsuji is Org. Synth. 1989, 62, 9 (Chem-Station entry; procedure page NOT fetched)"], "memoryOnly": [] },
+    "C12": { "status": "provisional (transformation web-anchored)", "webAnchored": ["RCM of diethyl diallylmalonate to diethyl cyclopent-3-ene-1,1-dicarboxylate, 98% (TCI practical example)"], "memoryOnly": [] }
+  }
+}
