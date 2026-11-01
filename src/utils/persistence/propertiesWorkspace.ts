@@ -116,3 +116,16 @@ export function validatePropertiesResults(raw: unknown): PropertiesWorkspaceResu
   }
   return raw as unknown as PropertiesWorkspaceResults;
 }
+
+/** The one-line description a saved Properties analysis gets in the library list. */
+export function describePropertiesAnalysis(
+  data: Pick<PropertiesWorkspaceResults, "smiles" | "functionalGroups" | "chiralityResults" | "reactionPathways" | "moleculeIdentity">,
+): string {
+  const nomenclature = data.moleculeIdentity?.nomenclature;
+  const name = nomenclature?.displayName || nomenclature?.estimatedName || data.smiles;
+  const formula = data.moleculeIdentity?.properties?.molecularFormula;
+  const groups = data.functionalGroups.length;
+  const centers = data.chiralityResults.length;
+  const reactions = data.reactionPathways.length;
+  return `${name}${formula ? ` (${formula})` : ""} · ${groups} functional group${groups === 1 ? "" : "s"}, ${centers} stereo result${centers === 1 ? "" : "s"}, ${reactions} predicted reaction${reactions === 1 ? "" : "s"}`;
+}

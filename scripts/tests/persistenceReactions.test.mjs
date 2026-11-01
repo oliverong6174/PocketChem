@@ -812,14 +812,14 @@ describe("reactions: \"Use in Reactions\" is an explicit, transactional action",
 
   test("[duplicate] a second press while a transfer runs, or after it succeeded, does nothing", () => {
     const text = page();
-    const body = text.slice(text.indexOf("async function adoptHandoff"), text.indexOf("useEffect(() => {\n    ketcherRef.current = ketcher;"));
+    const body = text.slice(text.indexOf("async function adoptHandoff"), text.indexOf("// ---- Saved Analyses (Stage 8B-3B-2)"));
     assert.match(body, /if \(adoptingRef\.current \|\| handoffSeen === handoffId\) return;/);
     assert.match(text, /disabled=\{!ketcher \|\| isAnalyzing \|\| isAdopting\}/);
   });
 
   test("[source] the page never discards the saved workspace to adopt; it uses the transaction and defers a late recovery", () => {
     const text = page();
-    const body = text.slice(text.indexOf("async function adoptHandoff"), text.indexOf("useEffect(() => {\n    ketcherRef.current = ketcher;"));
+    const body = text.slice(text.indexOf("async function adoptHandoff"), text.indexOf("// ---- Saved Analyses (Stage 8B-3B-2)"));
     assert.ok(body.length > 800);
     assert.doesNotMatch(body, /persistence\.discard\(\)/, "adopting must not delete the old workspace");
     assert.match(body, /transferIntoEditor\(api, source, persistence\)/);
@@ -832,7 +832,7 @@ describe("reactions: \"Use in Reactions\" is an explicit, transactional action",
 
   test("[source] old prediction cards cannot appear for the adopted molecule: every previous result is replaced on success", () => {
     const text = page();
-    const body = text.slice(text.indexOf("async function adoptHandoff"), text.indexOf("useEffect(() => {\n    ketcherRef.current = ketcher;"));
+    const body = text.slice(text.indexOf("async function adoptHandoff"), text.indexOf("// ---- Saved Analyses (Stage 8B-3B-2)"));
     const success = body.slice(body.indexOf("deferredRecoveryRef.current = null;\n    pendingEditorRef.current = null;"));
     for (const call of ["setReactionSmiles(\"\")", "setReactionComponentMolfiles([])", "setRetroPathways([])", "setNoReactionOutcomes([])", "setReactantSvgs({})", "setProductSvgs({})", "setRetroTargetSvgs({})", "setRetroPrecursorSvgs({})", "setPathways(initialPathways)", "setReactionMolfile(initialReactantMolfile)", "setHandoffSeen(handoffId)"]) {
       assert.ok(success.includes(call), call);

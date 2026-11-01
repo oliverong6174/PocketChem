@@ -496,8 +496,8 @@ describe("navigation and page wiring", () => {
   const synthesis = read("src", "components", "SynthesisPage.tsx");
 
   test("[navigation] each saved type opens on its own page; the page ids exist in the navigation", () => {
-    assert.deepEqual({ ...libApp.ANALYSIS_APP_PAGE }, { synthesis: "multiStep", ranking: "acidBase", spectroscopy: "spectroscopy" });
-    assert.deepEqual([...libApp.OPENABLE_ANALYSIS_PAGES], ["synthesis", "ranking", "spectroscopy"]);
+    assert.deepEqual({ ...libApp.ANALYSIS_APP_PAGE }, { synthesis: "multiStep", ranking: "acidBase", spectroscopy: "spectroscopy", properties: "analysis", reactions: "reactions" });
+    assert.deepEqual([...libApp.OPENABLE_ANALYSIS_PAGES], ["synthesis", "ranking", "spectroscopy", "properties", "reactions"]);
     for (const id of Object.values(libApp.ANALYSIS_APP_PAGE)) assert.match(app, new RegExp(`\\{ id: "${id}", label:`));
     assert.match(app, /const target = ANALYSIS_APP_PAGE\[analysis\.page as keyof typeof ANALYSIS_APP_PAGE\];/);
     assert.match(app, /switchPage\(target, \{ keepOpenRequest: true \}\)/);
@@ -547,12 +547,10 @@ describe("navigation and page wiring", () => {
     assert.match(spectroscopy, /if \(!ketcher \|\| isAnalyzing \|\| openingRef\.current\) return;/);
   });
 
-  test("[scope] Properties and Reactions are not part of this stage; the Synthesis library flow is unchanged", () => {
-    for (const file of ["ReactionsPage.tsx", "MultiCatalyticPage.tsx"]) assert.doesNotMatch(read("src", "components", file), /getAppAnalysisLibrary|SavedAnalysisControls/, file);
-    assert.doesNotMatch(app, /getAppAnalysisLibrary/);
+  test("[scope] Multi-Catalytic stays outside the library; the Synthesis library flow is unchanged", () => {
+    assert.doesNotMatch(read("src", "components", "MultiCatalyticPage.tsx"), /getAppAnalysisLibrary|SavedAnalysisControls/);
     assert.match(synthesis, /transferIntoEditors\(/);
     assert.match(synthesis, /async function applySavedAnalysis/);
     assert.doesNotMatch(synthesis, /useSavedAnalysisOpen/, "Synthesis keeps its Stage 8B-3A flow");
-    assert.doesNotMatch(libApp.OPENABLE_ANALYSIS_PAGES.join(","), /properties|reactions/);
   });
 });

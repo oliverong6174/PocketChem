@@ -19,10 +19,11 @@ import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
 import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
 import { DebouncedTask } from "../utils/persistence/debouncedTask";
 import { restoreEditorContent } from "../utils/persistence/editorRestore";
-import { transferIntoEditor } from "../utils/persistence/handoffTransfer";
+import { transferIntoEditor, transferIntoEditors } from "../utils/persistence/handoffTransfer";
 import { ketHasStructureText, ketIdentityKey } from "../utils/persistence/ketIdentity";
 import {
   REACTIONS_ENGINE_VERSION,
+  describeReactionsAnalysis,
   handoffOfferAvailable,
   isReactionsOutcomeKind,
   restoredResultsAreStale,
@@ -34,6 +35,10 @@ import {
 } from "../utils/persistence/reactionsWorkspace";
 import type { Capture, RecoveryOutcome } from "../utils/persistence/workspacePersistence";
 import type { WorkspaceResults } from "../utils/persistence/workspaceStore";
+import { getAppAnalysisLibrary } from "../utils/persistence/analysisLibraryApp";
+import type { OpenedAnalysis } from "../utils/persistence/analysisLibrary";
+import { useSavedAnalysisOpen } from "../utils/persistence/useSavedAnalysisOpen";
+import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./SavedAnalysisControls";
 
 import {
   predictReactionPathways,
@@ -61,6 +66,9 @@ type Props = {
   handoffLabel?: string | null;
   /** Its SMILES, used only when no molfile is available. */
   handoffSmiles?: string | null;
+  /** A saved analysis the user chose on the Saved page; opened once recovery has finished. */
+  openRequest?: { id: string; recordId: string } | null;
+  onOpenHandled?: (requestId: string) => void;
 };
 
 type SvgListMap = Record<string, string[]>;
@@ -101,6 +109,8 @@ type ReactionsResultMeta = {
   engineMismatch: boolean;
   /** The saved drawing could not be confirmed to match these results. */
   stale: boolean;
+  /** Set when the analysis was opened from the Saved Analyses library. */
+  opened?: { name: string; savedAt: string } | null;
 };
 const RESULTS_PER_BATCH = 12;
 
@@ -363,6 +373,8 @@ export default function ReactionsPage({
   handoffId = null,
   handoffLabel = null,
   handoffSmiles = null,
+  openRequest = null,
+  onOpenHandled,
 }: Props) {
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [reactionSmiles, setReactionSmiles] = useState("");
@@ -719,6 +731,171 @@ export default function ReactionsPage({
     }, 500);
   }
 
+  // ---- Saved Analyses (Stage 8B-3B-2) ------------------------------------------------------------
+  // "Save Analysis" copies the finished analysis (pathways, mixtures, retrosynthetic routes, NO REACTION
+  // outcomes, with their explanations) into the library; opening one puts it back and redraws the
+  // reaction and product images from the saved structures. Nothing is predicted when one is opened.
+
+  const [saveForm, setSaveForm] = useState<{ name: string } | null>(null);
+  const [saveBusy, setSaveBusy] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<WorkspaceNoticeItem | null>(null);
+
+  function defaultAnalysisName(): string {
+    const l = latestRef.current;
+    return `Reactions of ${l.reactionInputName || l.reactionSmiles || "this molecule"}`.slice(0, 100);
+  }
+
+  async function saveCurrentAnalysis(analysisName: string, announce = true): Promise<boolean> {
+    setSaveBusy(true);
+    try {
+      await snapshotTask.flushNow();
+      const capture = captureReactions();
+      if (!capture || !capture.results || latestRef.current.isAnalyzing) {
+        setSaveMessage({ tone: "warn", text: "Run a prediction before saving an analysis." });
+        return false;
+      }
+      const saved = await getAppAnalysisLibrary().save("reactions", {
+        name: analysisName,
+        summary: describeReactionsAnalysis(capture.results.data),
+        inputs: capture.inputs,
+        results: capture.results,
+      });
+      if (!saved.ok) {
+        setSaveMessage({ tone: "warn", text: `The analysis was not saved: ${saved.error.message}` });
+        return false;
+      }
+      if (announce) setSaveMessage({ tone: "info", text: `Saved “${saved.value.name}” to Saved analyses.` });
+      return true;
+    } finally {
+      setSaveBusy(false);
+    }
+  }
+
+  /**
+   * Replaces the Reactions workspace with a saved analysis, as one transaction (see
+   * transferIntoEditors). A saved analysis takes precedence over the older automatic workspace, and a
+   * Properties molecule is never adopted by opening one: the "Use in Reactions" offer stays an offer.
+   */
+  async function applySavedAnalysis(opened: OpenedAnalysis<ReactionsWorkspaceInputs, ReactionsWorkspaceResults>): Promise<boolean> {
+    const api = ketcherRef.current;
+    if (!api || adoptingRef.current) return false;
+    adoptingRef.current = true; // one transfer at a time, shared with "Use in Reactions"
+    setIsAdopting(true);
+    snapshotTask.cancel();
+    restoringRef.current = true;
+    const { inputs, results } = opened;
+    const outcome = await transferIntoEditors(
+      [{ api, source: inputs.ket, expectKey: inputs.ket ? inputs.key : null }],
+      persistence,
+    );
+    if (outcome.kind !== "adopted") {
+      if (outcome.kind === "rolled-back") {
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: `“${opened.record.name}” could not be opened. Your Reactions workspace is unchanged.` },
+        ]);
+        requestPersistRef.current();
+      } else {
+        // The canvas may have changed, so the predictions on screen no longer describe it.
+        discardShownResults("The saved analysis could not be opened.");
+        setRecoveryNotices([
+          { tone: "warn", text: `“${opened.record.name}” could not be opened and the editor could not be restored. Your saved workspace is unchanged; reload this page to bring it back.` },
+        ]);
+      }
+      adoptingRef.current = false;
+      setIsAdopting(false);
+      window.setTimeout(() => {
+        restoringRef.current = false;
+      }, 500);
+      return false;
+    }
+
+    // Success: the old workspace's callbacks are invalid and the saved analysis is the workspace now.
+    deferredRecoveryRef.current = null;
+    pendingEditorRef.current = null;
+    snapshotRef.current = { ket: outcome.editors[0].ket, key: outcome.editors[0].key };
+    adoptedRef.current = true;
+    analysisStartedRef.current = false;
+    analysisRunRef.current += 1;
+    setHandoffSeen(inputs.handoffSeen);
+    setInputsOnlyRestored(false);
+    setVisibleResultCount(inputs.visibleResultCount);
+    setReactantSvgs({});
+    setProductSvgs({});
+    setRetroTargetSvgs({});
+    setRetroPrecursorSvgs({});
+    setReactionError(null);
+    setIsAnalyzing(false);
+    const notices: WorkspaceNoticeItem[] = [];
+    if (opened.resultsDropped) notices.push({ tone: "warn", text: "The saved reaction results could not be validated and were not opened. The drawing was." });
+    if (results && isReactionsOutcomeKind(results.status)) {
+      const data = results.data;
+      setAnalysisMode(data.mode);
+      setReactionSmiles(data.smiles);
+      setReactionMolfile(data.molfile);
+      setReactionComponentMolfiles(data.componentMolfiles);
+      setReactionSvgSnapshot(null);
+      setReactionInputName(data.inputName);
+      setPathways(data.pathways);
+      setRetroPathways(data.retroPathways);
+      setNoReactionOutcomes(data.noReactionOutcomes);
+      setReactionStatus(`Opened saved analysis “${opened.record.name}” · ${data.statusText}`);
+      setResultMeta({
+        kind: results.status,
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        structureKey: data.inputKey,
+        mode: data.mode,
+        restored: false,
+        opened: { name: opened.record.name, savedAt: opened.record.updatedAt },
+        engineMismatch: opened.engineMismatch,
+        // Whatever was true when it was saved stays true; an inconsistent record is never shown as current.
+        stale: restoredResultsAreStale(inputs, results),
+      });
+    } else {
+      setAnalysisMode(inputs.analysisMode);
+      setReactionSmiles("");
+      setReactionMolfile(null);
+      setReactionComponentMolfiles([]);
+      setReactionSvgSnapshot(null);
+      setReactionInputName("");
+      setPathways([]);
+      setRetroPathways([]);
+      setNoReactionOutcomes([]);
+      setResultMeta(null);
+      if (inputs.interrupted) {
+        notices.push({ tone: "warn", text: "A prediction was running when this analysis was saved. It did not finish and was not resumed." });
+      }
+      setReactionStatus(`Opened saved analysis “${opened.record.name}” (drawing only).`);
+    }
+    setRecoveryNotices(notices);
+    // One write replaces the automatic workspace with the opened analysis.
+    persistence.requestSave(() => ({ inputs: opened.inputs, results: opened.results }));
+    await persistence.flush();
+    adoptingRef.current = false;
+    setIsAdopting(false);
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      snapshotTask.schedule();
+    }, 500);
+    return true;
+  }
+
+  const savedOpen = useSavedAnalysisOpen<ReactionsWorkspaceInputs, ReactionsWorkspaceResults>({
+    page: "reactions",
+    openRequest,
+    onOpenHandled,
+    ready: recovery !== null && ketcher !== null,
+    busyReason: () =>
+      latestRef.current.isAnalyzing || adoptingRef.current ? "Wait for the current prediction to finish before opening a saved analysis." : null,
+    hasUnsavedWork: () => captureReactions() !== null,
+    canSaveCurrent: () => Boolean(latestRef.current.resultMeta) && !latestRef.current.isAnalyzing,
+    saveCurrent: (analysisName) => saveCurrentAnalysis(analysisName, false),
+    defaultName: defaultAnalysisName,
+    apply: applySavedAnalysis,
+    notify: (item) => setRecoveryNotices((notices) => [...notices, item]),
+  });
+
   useEffect(() => {
     ketcherRef.current = ketcher;
     requestPersistRef.current = requestPersist;
@@ -768,6 +945,13 @@ export default function ReactionsPage({
   } else if (inputsOnlyRestored) {
     workspaceNotices.push({ tone: "info", text: "Restored your drawing from your previous session." });
   }
+  if (resultMeta?.opened) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Opened saved analysis “${resultMeta.opened.name}” (saved ${new Date(resultMeta.opened.savedAt).toLocaleString()}; predicted ${new Date(resultMeta.computedAt).toLocaleString()}). These are saved model predictions and were not recomputed.`,
+    });
+  }
+  if (saveMessage) workspaceNotices.push(saveMessage);
   if (resultMeta?.engineMismatch) {
     workspaceNotices.push({
       tone: "warn",
@@ -1187,6 +1371,16 @@ export default function ReactionsPage({
         discardDisabled={isAnalyzing}
       />
 
+      {savedOpen.prompt && (
+        <ReplaceWorkspacePrompt
+          embedded
+          name={savedOpen.prompt.opened.record.name}
+          canSaveFirst={Boolean(resultMeta) && !isAnalyzing}
+          busy={savedOpen.saveBusy}
+          onChoose={(choice) => void savedOpen.resolve(choice)}
+        />
+      )}
+
       {recovery !== null && (initialReactantMolfile || handoffSmiles) && handoffOfferAvailable(handoffId, handoffSeen) && (
         <div className="workspace-notice workspace-notice-embedded">
           <ul>
@@ -1239,7 +1433,33 @@ export default function ReactionsPage({
           >
             Clear Analysis
           </button>
+
+          <button
+            className="secondary-button"
+            disabled={!resultMeta || isAnalyzing || isAdopting || saveBusy}
+            title={resultMeta ? "Keep this analysis in Saved analyses" : "Run a prediction first"}
+            onClick={() => {
+              setSaveMessage(null);
+              setSaveForm({ name: defaultAnalysisName() });
+            }}
+          >
+            Save Analysis
+          </button>
         </div>
+
+        {saveForm && (
+          <SaveAnalysisForm
+            name={saveForm.name}
+            busy={saveBusy}
+            onChange={(analysisName) => setSaveForm({ name: analysisName })}
+            onCancel={() => setSaveForm(null)}
+            onSubmit={() => {
+              void saveCurrentAnalysis(saveForm.name).then((saved) => {
+                if (saved) setSaveForm(null);
+              });
+            }}
+          />
+        )}
 
         {reactionSmiles && (
           <p className="empty" title={reactionSmiles}>

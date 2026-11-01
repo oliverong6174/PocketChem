@@ -31,6 +31,8 @@ export function SaveAnalysisForm({ name, busy, onChange, onSubmit, onCancel }: S
 }
 
 type PromptProps = {
+  /** Render inside an existing card instead of as its own card. */
+  embedded?: boolean;
   name: string;
   canSaveFirst: boolean;
   busy: boolean;
@@ -38,9 +40,9 @@ type PromptProps = {
 };
 
 /** Asked before a saved analysis replaces work that is not itself saved as an analysis. */
-export function ReplaceWorkspacePrompt({ name, canSaveFirst, busy, onChoose }: PromptProps) {
+export function ReplaceWorkspacePrompt({ embedded = false, name, canSaveFirst, busy, onChoose }: PromptProps) {
   return (
-    <div className="card workspace-notice" role="alertdialog" aria-label="Replace the current workspace?">
+    <div className={embedded ? "workspace-notice workspace-notice-embedded" : "card workspace-notice"} role="alertdialog" aria-label="Replace the current workspace?">
       <ul>
         <li className="workspace-notice-warn">
           Opening “{name}” replaces the structures and results now on this page, which are not saved as an analysis.

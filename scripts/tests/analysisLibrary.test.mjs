@@ -693,12 +693,12 @@ describe("Synthesis and navigation integration", () => {
     assert.match(saved, /OPENABLE_ANALYSIS_PAGES/);
   });
 
-  test("[scope] Synthesis, Ranking and Spectroscopy save into the library; Properties, Reactions and the engines are untouched", () => {
+  test("[scope] the five analysis pages save into the library; the chemistry layers import none of it", () => {
     const users = [];
     for (const file of fs.readdirSync(path.join(root, "src", "components"))) {
       if (file.endsWith(".tsx") && /getAppAnalysisLibrary/.test(read("src", "components", file))) users.push(file);
     }
-    assert.deepEqual(users.sort(), ["RankingPage.tsx", "SavedAnalysesPage.tsx", "SpectroscopyPage.tsx", "SynthesisPage.tsx"]);
+    assert.deepEqual(users.sort(), ["RankingPage.tsx", "ReactionsPage.tsx", "SavedAnalysesPage.tsx", "SpectroscopyPage.tsx", "SynthesisPage.tsx"]); // Properties lives in App.tsx
     const libraryFiles = read("src", "utils", "persistence", "analysisLibrary.ts") + read("src", "utils", "persistence", "handoffTransfer.ts");
     assert.doesNotMatch(libraryFiles, /reactionRegistry|findMultistep|predictReaction|rdkit/i, "the library layer imports no chemistry");
     assert.doesNotMatch(read("src", "utils", "persistence", "analysisLibraryApp.ts"), /import\/export|exportAnalyses|importAnalyses/);

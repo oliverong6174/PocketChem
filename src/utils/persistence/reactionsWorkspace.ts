@@ -197,3 +197,17 @@ export function validateReactionsResults(raw: unknown): ReactionsWorkspaceResult
   if (raw.mode === "retrosynthesis" && (pathways.length > 0 || noReactionOutcomes.length > 0)) return null;
   return raw as unknown as ReactionsWorkspaceResults;
 }
+
+/** The one-line description a saved Reactions analysis gets in the library list. */
+export function describeReactionsAnalysis(
+  data: Pick<ReactionsWorkspaceResults, "mode" | "inputName" | "smiles" | "pathways" | "retroPathways" | "noReactionOutcomes">,
+): string {
+  const who = data.inputName || data.smiles;
+  if (data.mode === "retrosynthesis") {
+    const routes = data.retroPathways.length;
+    return `${who} · ${routes} precursor route${routes === 1 ? "" : "s"}`;
+  }
+  const reactions = data.pathways.length;
+  const none = data.noReactionOutcomes.length;
+  return `${who} · ${reactions} predicted reaction${reactions === 1 ? "" : "s"}, ${none} no-reaction outcome${none === 1 ? "" : "s"}`;
+}

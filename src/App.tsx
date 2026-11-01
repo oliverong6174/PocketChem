@@ -59,6 +59,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import { ketHasStructureText, ketIdentityKey } from "./utils/persistence/ketIdentity";
   import {
     PROPERTIES_ENGINE_VERSION,
+    describePropertiesAnalysis,
     validatePropertiesInputs,
     validatePropertiesResults,
     type PropertiesWorkspaceInputs,
@@ -66,6 +67,11 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   } from "./utils/persistence/propertiesWorkspace";
   import type { Capture, RecoveryOutcome } from "./utils/persistence/workspacePersistence";
   import type { WorkspaceResults } from "./utils/persistence/workspaceStore";
+  import { getAppAnalysisLibrary } from "./utils/persistence/analysisLibraryApp";
+  import type { OpenedAnalysis } from "./utils/persistence/analysisLibrary";
+  import { transferIntoEditors } from "./utils/persistence/handoffTransfer";
+  import { useSavedAnalysisOpen } from "./utils/persistence/useSavedAnalysisOpen";
+  import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./components/SavedAnalysisControls";
 
   import { initializeFunctionalGroups } from "./utils/functionalGroups/bootstrap";
 
@@ -115,6 +121,8 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     engineMismatch: boolean;
     /** The drawn structure changed after this analysis. */
     stale: boolean;
+    /** Set when the results were opened from the Saved Analyses library. */
+    opened?: { name: string; savedAt: string } | null;
   };
 
   const APP_PAGES: Array<{ id: AppPage; label: string }> = [
@@ -247,6 +255,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     const mainEditorApiRef = useRef<KetcherApi | null>(null);
     const propsSnapshotRef = useRef<{ ket: string | null; key: string | null }>({ ket: null, key: null });
     const propsRestoringRef = useRef(false);
+    const openingRef = useRef(false);
     const propsRestoreBusyRef = useRef(0);
     const appliedRecoveryRef = useRef<unknown>(null);
     const applyRestoreRef = useRef<((outcome: RecoveryOutcome<PropertiesWorkspaceInputs, PropertiesWorkspaceResults>) => void) | null>(null);
@@ -334,8 +343,10 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     async function restoreMainEditor() {
       const api = mainEditorApiRef.current;
       const saved = propsSnapshotRef.current;
-      if (!api || !saved.ket || propsRestoringRef.current) return;
+      if (!api || !saved.ket || propsRestoringRef.current || openingRef.current) return;
       const token = persistence.token();
+      // Opening a saved analysis invalidates a drawing restore, exactly like Clear does.
+      const stillWanted = () => persistence.isCurrent(token) && !openingRef.current;
       propsRestoreBusyRef.current += 1;
       propsRestoringRef.current = true;
       let userContentWon = false;
@@ -344,10 +355,10 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
           userContentWon = true;
           return;
         }
-        if (!persistence.isCurrent(token)) return;
+        if (!stillWanted()) return;
         await api.setMolecule(saved.ket, { needZoom: true });
         const actual = await ketIdentityKey(await api.getKet());
-        if (!persistence.isCurrent(token)) return;
+        if (!stillWanted()) return;
         if (saved.key && actual !== saved.key) throw new Error("The restored structure does not match the saved one.");
       } catch (restoreError) {
         console.warn("[PocketChem:Properties] Could not restore the saved structure.", restoreError);
@@ -521,7 +532,11 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
       // Let the page being left finish reading its editor and saving before it is unmounted.
       const request = (switchRequestRef.current += 1);
       void runLeaveHooks().then(() => {
-        if (switchRequestRef.current === request) setActivePage(page);
+        if (switchRequestRef.current === request) {
+          // Leaving Properties unmounts its editor; the next visit gets a new one.
+          if (page !== "analysis") setIsMainEditorReady(false);
+          setActivePage(page);
+        }
       });
     };
 
@@ -532,6 +547,164 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
       setPendingOpen({ id: `open-${openSequenceRef.current}`, recordId: analysis.id, page: target });
       switchPage(target, { keepOpenRequest: true });
     };
+
+
+    // ---- Saved Analyses for Properties (Stage 8B-3B-2) ---------------------------------------------
+    // "Save Analysis" copies the finished analysis (structure, groups, acid/base, resonance,
+    // chirality, annotation, name and properties, predicted reactions) into the library; opening one
+    // puts it back without recomputing anything.
+    const [isOpening, setIsOpening] = useState(false);
+    const [saveForm, setSaveForm] = useState<{ name: string } | null>(null);
+    const [saveBusy, setSaveBusy] = useState(false);
+    const [saveMessage, setSaveMessage] = useState<WorkspaceNoticeItem | null>(null);
+
+    function defaultAnalysisName(): string {
+      const l = latestRef.current;
+      const nomenclature = l.moleculeIdentity?.nomenclature;
+      return `Properties of ${nomenclature?.displayName || nomenclature?.estimatedName || l.smiles}`.slice(0, 100);
+    }
+
+    async function saveCurrentAnalysis(analysisName: string, announce = true): Promise<boolean> {
+      setSaveBusy(true);
+      try {
+        await snapshotTask.flushNow();
+        const capture = capturePropertiesWorkspace();
+        if (!capture || !capture.results || latestRef.current.isAnalyzing) {
+          setSaveMessage({ tone: "warn", text: "Analyze a molecule before saving an analysis." });
+          return false;
+        }
+        const saved = await getAppAnalysisLibrary().save("properties", {
+          name: analysisName,
+          summary: describePropertiesAnalysis(capture.results.data),
+          inputs: capture.inputs,
+          results: capture.results,
+        });
+        if (!saved.ok) {
+          setSaveMessage({ tone: "warn", text: `The analysis was not saved: ${saved.error.message}` });
+          return false;
+        }
+        if (announce) setSaveMessage({ tone: "info", text: `Saved “${saved.value.name}” to Saved analyses.` });
+        return true;
+      } finally {
+        setSaveBusy(false);
+      }
+    }
+
+    /** Replaces the Properties workspace with a saved analysis, as one transaction (see transferIntoEditors). */
+    async function applySavedAnalysis(opened: OpenedAnalysis<PropertiesWorkspaceInputs, PropertiesWorkspaceResults>): Promise<boolean> {
+      const api = mainEditorApiRef.current;
+      if (!api || openingRef.current || analyzeInFlightRef.current) return false;
+      openingRef.current = true;
+      setIsOpening(true);
+      snapshotTask.cancel();
+      propsRestoringRef.current = true;
+      const { inputs, results } = opened;
+      const outcome = await transferIntoEditors(
+        [{ api, source: inputs.ket, expectKey: inputs.ket ? inputs.key : null }],
+        persistence,
+      );
+      if (outcome.kind !== "adopted") {
+        if (outcome.kind === "rolled-back") {
+          setRecoveryNotices((notices) => [
+            ...notices,
+            { tone: "warn", text: `“${opened.record.name}” could not be opened. Your Properties workspace is unchanged.` },
+          ]);
+          requestPersistRef.current();
+        } else {
+          // The editor may have changed, so the results on screen no longer describe it.
+          setResultMeta(null);
+          setRecoveryNotices([
+            { tone: "warn", text: `“${opened.record.name}” could not be opened and the editor could not be restored. Your saved workspace is unchanged; reload this page to bring it back.` },
+          ]);
+        }
+        openingRef.current = false;
+        setIsOpening(false);
+        window.setTimeout(() => {
+          propsRestoringRef.current = false;
+        }, 500);
+        return false;
+      }
+
+      // Success: the old workspace's callbacks are invalid and the saved analysis is the workspace now.
+      importedNameResolutionRef.current = null;
+      latestAnalyzeRunRef.current += 1;
+      propsSnapshotRef.current = { ket: outcome.editors[0].ket, key: outcome.editors[0].key };
+      setAnalysisPanel(inputs.analysisPanel);
+      setSelectedConcept(inputs.selectedConcept);
+      setSelectedHybridization(inputs.selectedHybridization);
+      setSelectedBondType(inputs.selectedBondType);
+      setSelectedAtomIndex(null);
+      setSelectedBondIndex(null);
+      setAnnotationCardIndex(0);
+      setHighlightedMoleculeSvg(null);
+      setInputsOnlyRestored(false);
+      setRecoveryNotices(
+        opened.resultsDropped ? [{ tone: "warn", text: "The saved results could not be validated and were not opened. The structure was." }] : [],
+      );
+      if (results) {
+        const data = results.data;
+        setSmiles(data.smiles);
+        setMolfile(data.molfile);
+        setFunctionalGroups(data.functionalGroups);
+        setAcidityResults(data.acidityResults);
+        setBasicityResults(data.basicityResults);
+        setResonanceResults(data.resonanceResults);
+        setChiralityResults(data.chiralityResults);
+        setMoleculeAnnotation(data.moleculeAnnotation);
+        setMoleculeIdentity(data.moleculeIdentity);
+        setReactionPathways(data.reactionPathways);
+        setStatus(`Opened saved analysis “${opened.record.name}”`);
+        setResultMeta({
+          computedAt: results.computedAt,
+          engineVersion: results.engineVersion,
+          structureKey: data.inputKey,
+          restored: false,
+          opened: { name: opened.record.name, savedAt: opened.record.updatedAt },
+          engineMismatch: opened.engineMismatch,
+          // Whatever was true when it was saved stays true; an inconsistent record is never shown as current.
+          stale: results.stale || inputs.key === null || inputs.key !== data.inputKey,
+        });
+      } else {
+        setSmiles("Not analyzed yet");
+        setMolfile(null);
+        setMainGroup(null);
+        setFunctionalGroups([]);
+        setAcidityResults([]);
+        setBasicityResults([]);
+        setResonanceResults([]);
+        setChiralityResults([]);
+        setMoleculeAnnotation(null);
+        setMoleculeIdentity(null);
+        setReactionPathways([]);
+        setResultMeta(null);
+        setStatus(`Opened saved analysis “${opened.record.name}” (structure only).`);
+      }
+      // One write replaces the automatic workspace with the opened analysis.
+      persistence.requestSave(() => ({ inputs: opened.inputs, results: opened.results }));
+      await persistence.flush();
+      openingRef.current = false;
+      setIsOpening(false);
+      window.setTimeout(() => {
+        propsRestoringRef.current = false;
+        schedulePropertiesSnapshot();
+      }, 500);
+      return true;
+    }
+
+    const savedOpen = useSavedAnalysisOpen<PropertiesWorkspaceInputs, PropertiesWorkspaceResults>({
+      page: "properties",
+      openRequest: pendingOpen?.page === "analysis" ? pendingOpen : null,
+      onOpenHandled: (requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current)),
+      ready: recovery !== null && activePage === "analysis" && isMainEditorReady,
+      busyReason: () =>
+        latestRef.current.isAnalyzing || openingRef.current ? "Wait for the current analysis to finish before opening a saved one." : null,
+      hasUnsavedWork: () => capturePropertiesWorkspace() !== null,
+      canSaveCurrent: () => Boolean(latestRef.current.resultMeta),
+      saveCurrent: (analysisName) => saveCurrentAnalysis(analysisName, false),
+      defaultName: defaultAnalysisName,
+      apply: applySavedAnalysis,
+      notify: (item) => setRecoveryNotices((notices) => [...notices, item]),
+    });
 
     const handlePageTabKeyDown = (
       event: ReactKeyboardEvent<HTMLButtonElement>,
@@ -644,7 +817,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     }
 
     const analyzeMolecule = async () => {
-      if (analyzeInFlightRef.current) return;
+      if (analyzeInFlightRef.current || openingRef.current) return;
 
       const editor = window.ketcher;
       if (!editor) {
@@ -1601,6 +1774,13 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   } else if (inputsOnlyRestored) {
     propertiesNotices.push({ tone: "info", text: "Restored your drawn structure from your previous session." });
   }
+  if (resultMeta?.opened) {
+    propertiesNotices.push({
+      tone: "info",
+      text: `Opened saved analysis “${resultMeta.opened.name}” (saved ${new Date(resultMeta.opened.savedAt).toLocaleString()}; analyzed ${new Date(resultMeta.computedAt).toLocaleString()}). These results were not recomputed.`,
+    });
+  }
+  if (saveMessage) propertiesNotices.push(saveMessage);
   if (resultMeta?.engineMismatch) {
     propertiesNotices.push({
       tone: "warn",
@@ -1714,7 +1894,34 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
               >
                 Clear Analysis
               </button>
+
+              <button
+                className="secondary-button"
+                onClick={() => {
+                  setSaveMessage(null);
+                  setSaveForm({ name: defaultAnalysisName() });
+                }}
+                disabled={!resultMeta || isAnalyzing || isOpening || saveBusy}
+                title={resultMeta ? "Keep this analysis in Saved analyses" : "Analyze a molecule first"}
+                type="button"
+              >
+                Save Analysis
+              </button>
             </div>
+
+            {saveForm && (
+              <SaveAnalysisForm
+                name={saveForm.name}
+                busy={saveBusy}
+                onChange={(analysisName) => setSaveForm({ name: analysisName })}
+                onCancel={() => setSaveForm(null)}
+                onSubmit={() => {
+                  void saveCurrentAnalysis(saveForm.name).then((saved) => {
+                    if (saved) setSaveForm(null);
+                  });
+                }}
+              />
+            )}
           </div>
 
           <div className="card analysis-card analysis-dashboard-card">
@@ -1741,6 +1948,16 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
               onDiscard={resultMeta?.restored || inputsOnlyRestored ? clearAnalysis : undefined}
               discardDisabled={isAnalyzing}
             />
+
+            {savedOpen.prompt && (
+              <ReplaceWorkspacePrompt
+                embedded
+                name={savedOpen.prompt.opened.record.name}
+                canSaveFirst={Boolean(resultMeta) && !isAnalyzing}
+                busy={savedOpen.saveBusy}
+                onChoose={(choice) => void savedOpen.resolve(choice)}
+              />
+            )}
 
             <div className="dashboard-mini-grid">
               <div>
@@ -2351,6 +2568,8 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
                 handoffId={reactionPathways.length > 0 || molfile ? (resultMeta?.computedAt ?? `unsaved:${smiles}`) : null}
                 handoffLabel={moleculeIdentity?.nomenclature.displayName || moleculeIdentity?.nomenclature.estimatedName || null}
                 handoffSmiles={sanitizeDisplayedSmiles(smiles) || null}
+                openRequest={pendingOpen?.page === "reactions" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />
             ) : activePage === "spectroscopy" ? (
               <SpectroscopyPage

@@ -17,6 +17,10 @@ const STATUS_LABELS: Record<string, string> = {
   "no-route-within-budget": "No route within the time limit",
   "no-route-within-bounds": "No route within the search limits",
   complete: "Completed analysis",
+  "forward-found": "Reactions predicted",
+  "forward-none": "No supported reaction",
+  "retro-found": "Precursor routes found",
+  "retro-none": "No precursor routes",
 };
 
 type Props = {
