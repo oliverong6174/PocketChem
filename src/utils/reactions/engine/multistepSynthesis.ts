@@ -479,7 +479,7 @@ async function matchStartingMaterialSideReactants(
   return allocated;
 }
 
-function forwardStepFromPathway(pathway: ReactionPathway): SynthesisStep | null {
+export function forwardStepFromPathway(pathway: ReactionPathway): SynthesisStep | null {
   if (!pathway.productSmiles) return null;
 
   return {

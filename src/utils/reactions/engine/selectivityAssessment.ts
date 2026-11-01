@@ -11,6 +11,7 @@
 import type {
   MultistepSynthesisRoute,
   ReactionRule,
+  ReactionSelectivityAssessment,
   RouteSelectivity,
   StepSelectivityClass,
   StepSelectivityFinding,
@@ -60,17 +61,26 @@ function constitutionalOutcomes(rule: ReactionRule, reactantSmiles: string): Pro
   return pending;
 }
 
-export async function assessStepSelectivity(
-  step: SynthesisStep,
-  rule: ReactionRule | undefined,
-): Promise<StepSelectivityFinding> {
+/**
+ * Classifies one step from its rule's own numeric estimate and the number of distinct
+ * constitutional outcomes the engine offered. `alternatives` is null when the outcomes could
+ * not be reproduced (unassessed). Shared by route assessment and the reaction workspace.
+ */
+export function classifyStepSelectivity(args: {
+  stepNumber: number;
+  ruleId: string;
+  rule: ReactionRule | undefined;
+  dynamic: ReactionSelectivityAssessment | null | undefined;
+  limitations?: string[];
+  alternatives: number | null;
+}): StepSelectivityFinding {
+  const { rule, dynamic, alternatives } = args;
   const base = {
-    stepNumber: step.stepNumber,
-    ruleId: step.ruleId,
+    stepNumber: args.stepNumber,
+    ruleId: args.ruleId,
     representative: rule?.productStatus === "representative",
-    limitations: [...(rule?.limitations ?? step.limitations ?? [])],
+    limitations: [...(rule?.limitations ?? args.limitations ?? [])],
   };
-  const dynamic = step.selectivityAssessment;
   if (dynamic && (dynamic.level === "minor" || dynamic.level === "trace")) {
     return { ...base, class: "disfavored", alternatives: null, basis: `${dynamic.label}. ${dynamic.basis}` };
   }
@@ -78,13 +88,10 @@ export async function assessStepSelectivity(
     return { ...base, class: "major", alternatives: null, basis: `${dynamic.label}. ${dynamic.basis}` };
   }
   if (!rule) return { ...base, class: "unassessed", alternatives: null, basis: "The reaction rule is not in the registry." };
-
-  const outcomes = await constitutionalOutcomes(rule, step.reactantSmiles);
-  const own = await connectivityOf(step.productSmiles);
-  if (!outcomes || !own || !outcomes.includes(own)) {
+  if (alternatives === null) {
     return { ...base, class: "unassessed", alternatives: null, basis: "The step's outcomes could not be reproduced for comparison." };
   }
-  if (outcomes.length === 1) {
+  if (alternatives === 1) {
     return {
       ...base,
       class: "single-outcome",
@@ -96,9 +103,31 @@ export async function assessStepSelectivity(
   return {
     ...base,
     class: "unranked",
-    alternatives: outcomes.length,
-    basis: `The engine offers ${outcomes.length} constitutional outcomes for these reactants and does not rank them; this route uses one of them.${competitive}`,
+    alternatives,
+    basis: `The engine offers ${alternatives} constitutional outcomes for these reactants and does not rank them; this route uses one of them.${competitive}`,
   };
+}
+
+export async function assessStepSelectivity(
+  step: SynthesisStep,
+  rule: ReactionRule | undefined,
+): Promise<StepSelectivityFinding> {
+  const dynamic = step.selectivityAssessment;
+  const decided = dynamic && (dynamic.level === "minor" || dynamic.level === "trace" || dynamic.level === "major");
+  let alternatives: number | null = null;
+  if (rule && !decided) {
+    const outcomes = await constitutionalOutcomes(rule, step.reactantSmiles);
+    const own = await connectivityOf(step.productSmiles);
+    alternatives = outcomes && own && outcomes.includes(own) ? outcomes.length : null;
+  }
+  return classifyStepSelectivity({
+    stepNumber: step.stepNumber,
+    ruleId: step.ruleId,
+    rule,
+    dynamic,
+    limitations: step.limitations,
+    alternatives,
+  });
 }
 
 export async function assessRouteSelectivity(
