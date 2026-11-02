@@ -14,6 +14,7 @@ import type {
 } from "../reactionTypes";
 import { resolveReactantRequirement } from "../profiles/reactants";
 import { assessRouteCompatibility, assessStepCompatibility } from "./compatibility";
+import { describeRuleRoles, type StepRoleProfile } from "./catalystRoles";
 import { forwardStepFromPathway } from "./multistepSynthesis";
 import { predictReactionPathwaysFromRules } from "./reactionEngine";
 import { splitReactionComponents } from "./reactionInput";
@@ -103,6 +104,8 @@ export type WorkspaceStep = {
   explanation: string;
   /** Lots the caller asked to use. */
   requestedLotIds: string[];
+  /** The outcome index the caller asked for, if any. */
+  requestedOutcome: number | null;
   /** Lots actually consumed (empty unless status is "reaction"). */
   consumedLotIds: string[];
   producedLotIds: string[];
@@ -118,7 +121,21 @@ export type WorkspaceStep = {
   issues: string[];
   /** Advisory; null means the rule declares no conditions (unassessed, not compatible). */
   compatibility: CompatibilityWarning[] | null;
+  /**
+   * Catalyst / reagent roles of the rule, captured when the step was attempted. Absent in
+   * workspaces saved before roles existed (shown as unassessed, never rewritten).
+   */
+  roles?: StepRoleProfile;
 };
+
+/**
+ * What the user did, in order. Lot ids are assigned deterministically, so replaying the actions
+ * on the same rules rebuilds the same workspace (see replayActions). Script-only
+ * "dependency-failed" entries are not actions: they were never requested of the engine.
+ */
+export type WorkspaceAction =
+  | { kind: "material"; smiles: string }
+  | { kind: "step"; request: WorkspaceStepRequest };
 
 export type ReactionWorkspace = {
   pool: PoolState;
@@ -126,6 +143,7 @@ export type ReactionWorkspace = {
   history: WorkspaceStep[];
   /** One public step record per committed step, parallel to pool.steps. */
   records: Array<{ step: SynthesisStep; reactantLotIds: string[] }>;
+  actions: WorkspaceAction[];
 };
 
 export type WorkspaceStepRequest = {
@@ -184,7 +202,13 @@ export async function createWorkspace(inputs: readonly string[]): Promise<Create
   if (materials.length === 0) return { ok: false, problems: ["No starting material was provided."] };
   return {
     ok: true,
-    workspace: { pool: createPoolState(materials, 1), materials, history: [], records: [] },
+    workspace: {
+      pool: createPoolState(materials, 1),
+      materials,
+      history: [],
+      records: [],
+      actions: materials.map((material) => ({ kind: "material" as const, smiles: material.smiles })),
+    },
   };
 }
 
@@ -223,6 +247,7 @@ export async function addMaterial(
     lotIds: lots.map((lot) => lot.id),
     workspace: {
       ...workspace,
+      actions: [...workspace.actions, ...added.map((material) => ({ kind: "material" as const, smiles: material.smiles }))],
       materials: [...workspace.materials, ...added],
       pool: {
         ...workspace.pool,
@@ -260,7 +285,7 @@ export function workspaceInventory(workspace: ReactionWorkspace): WorkspaceInven
  * would duplicate a single drawn structure internally, which here would create material, so
  * the workspace asks for n lots (for example two copies of an alcohol for an acetal).
  */
-function structuralArity(rule: ReactionRule): { arity: number; partnerLabels: string[] } {
+export function structuralArity(rule: ReactionRule): { arity: number; partnerLabels: string[] } {
   const partnerLabels: string[] = [];
   for (const requirement of (rule.additionalReactants ?? []).map(resolveReactantRequirement)) {
     if (requirement.supplyMode === "auto" || requirement.supplyMode === "condition-only") continue;
@@ -285,6 +310,7 @@ function baseStep(
     status: "execution-error",
     explanation: "",
     requestedLotIds: [...request.lotIds],
+    requestedOutcome: request.outcome ?? null,
     consumedLotIds: [],
     producedLotIds: [],
     retainedLotIds: liveLots(workspace.pool).map((lot) => lot.id),
@@ -295,7 +321,14 @@ function baseStep(
     missingPartners: [],
     issues: [],
     compatibility: null,
+    ...(rule ? { roles: describeRuleRoles(rule) } : {}),
   };
+}
+
+function requestOf(step: WorkspaceStep): WorkspaceStepRequest {
+  return step.requestedOutcome === null
+    ? { ruleId: step.ruleId, lotIds: [...step.requestedLotIds] }
+    : { ruleId: step.ruleId, lotIds: [...step.requestedLotIds], outcome: step.requestedOutcome };
 }
 
 /** Records a step that did not change the shelf. */
@@ -305,9 +338,17 @@ function withFailure(
   status: WorkspaceStepStatus,
   explanation: string,
   extra: Partial<WorkspaceStep> = {},
+  recordAction = true,
 ): { workspace: ReactionWorkspace; step: WorkspaceStep } {
   const recorded: WorkspaceStep = { ...step, ...extra, status, explanation };
-  return { workspace: { ...workspace, history: [...workspace.history, recorded] }, step: recorded };
+  return {
+    workspace: {
+      ...workspace,
+      history: [...workspace.history, recorded],
+      actions: recordAction ? [...workspace.actions, { kind: "step", request: requestOf(step) }] : workspace.actions,
+    },
+    step: recorded,
+  };
 }
 
 type PathwayMatch = {
@@ -658,6 +699,7 @@ export async function executeWorkspaceStep(
       ...workspace,
       pool: applied.state,
       history: [...workspace.history, recorded],
+      actions: [...workspace.actions, { kind: "step", request: requestOf(step) }],
       records: [
         ...workspace.records,
         {
@@ -795,6 +837,8 @@ export async function runWorkspaceScript(
         base,
         dependencyFailed ? "dependency-failed" : "invalid-selection",
         `${problems.join(" ")} This step was not run and no material changed.`,
+        {},
+        false,
       ).workspace;
       continue;
     }
@@ -849,4 +893,35 @@ export async function assessWorkspace(
   const compatibility = await assessRouteCompatibility(route, rules);
   const selectivity = await assessRouteSelectivity(route, rules);
   return { route: { ...route, verification, compatibility, selectivity }, verification, compatibility, selectivity };
+}
+
+/**
+ * Rebuilds a workspace from its action log by running every action again on the given rules.
+ * Used to recompute saved work whose stored result could not be shown; the stored result
+ * itself is never rewritten by it.
+ */
+export async function replayActions(
+  actions: readonly WorkspaceAction[],
+  rules: ReactionRule[],
+  options: WorkspaceOptions = {},
+): Promise<CreateWorkspaceResult> {
+  const first = actions.findIndex((action) => action.kind === "material");
+  if (first !== 0) return { ok: false, problems: ["The first action must add a starting material."] };
+  let leading = 0;
+  while (leading < actions.length && actions[leading].kind === "material") leading += 1;
+  const created = await createWorkspace(
+    actions.slice(0, leading).map((action) => (action as { kind: "material"; smiles: string }).smiles),
+  );
+  if (!created.ok) return created;
+  let current = created.workspace;
+  for (const action of actions.slice(leading)) {
+    if (action.kind === "material") {
+      const added = await addMaterial(current, action.smiles);
+      if (!added.ok) return added;
+      current = added.workspace;
+    } else {
+      current = (await executeWorkspaceStep(current, action.request, rules, options)).workspace;
+    }
+  }
+  return { ok: true, workspace: current };
 }

@@ -8,6 +8,7 @@ const PAGE_LABELS: Record<string, string> = {
   reactions: "Reactions",
   spectroscopy: "Spectroscopy",
   ranking: "Ranking",
+  multicatalytic: "Multi-Catalytic Workspace",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -17,6 +18,8 @@ const STATUS_LABELS: Record<string, string> = {
   "no-route-within-budget": "No route within the time limit",
   "no-route-within-bounds": "No route within the search limits",
   complete: "Completed analysis",
+  workspace: "Workspace with completed steps",
+  "workspace-empty": "Inventory only (no step completed)",
   "forward-found": "Reactions predicted",
   "forward-none": "No supported reaction",
   "retro-found": "Precursor routes found",

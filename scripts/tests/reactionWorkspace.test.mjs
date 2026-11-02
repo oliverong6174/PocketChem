@@ -100,7 +100,7 @@ describe("D2: two-material coupling", () => {
 });
 
 describe("D3 + D4: two transformed branches, convergence, post-convergence modification", () => {
-  test("[engine] BuBr -> BuMgBr and BuOH -> butanal join to 5-nonanol, which is then oxidised", async () => {
+  test("[engine] BuBr -> BuMgBr and BuOH -> butanal join to octan-4-ol, which is then oxidised", async () => {
     const start = await create("CCCCBr", "CCCCO");
     const done = await run(start, [
       { ruleId: "haloalkane-grignard-formation-bromide", reactants: [{ material: 0 }] },
@@ -113,7 +113,7 @@ describe("D3 + D4: two transformed branches, convergence, post-convergence modif
 
     const joined = done.history[2];
     assert.deepEqual(joined.consumedLotIds.sort(), ["s1.1", "s2.1"]);
-    // Provenance: the 5-nonanol lot descends from both supplied materials; the two branches
+    // Provenance: the octan-4-ol lot descends from both supplied materials; the two branches
     // share no ancestor before the join.
     const nonanol = done.pool.lots.find((lot) => lot.id === "s3.1");
     assert.deepEqual(nonanol.lineage, [0, 1]);
@@ -411,5 +411,39 @@ describe("workspace values are immutable", () => {
     const before = JSON.stringify(start);
     await ws.executeWorkspaceStep(start, { ruleId: "primary-alcohol-mild-oxidation", lotIds: ["sm0#1"] }, registry);
     assert.equal(JSON.stringify(start), before);
+  });
+});
+
+describe("action log and replay", () => {
+  test("[engine] replaying the action log rebuilds an identical workspace, failures included", async () => {
+    const start = await create("CCCCBr", "CCCCO", "CC(C)CC");
+    let current = start;
+    current = (await ws.executeWorkspaceStep(current, { ruleId: "haloalkane-grignard-formation-bromide", lotIds: ["sm0#1"] }, registry)).workspace;
+    current = (await ws.executeWorkspaceStep(current, { ruleId: "primary-alcohol-mild-oxidation", lotIds: ["sm1#1"] }, registry)).workspace;
+    current = (await ws.executeWorkspaceStep(current, { ruleId: "alkane-radical-bromination", lotIds: ["sm2#1"] }, registry)).workspace; // needs-selection
+    current = (await ws.executeWorkspaceStep(current, { ruleId: "aldehyde-organometallic-addition", lotIds: ["s2.1", "s1.1"] }, registry)).workspace;
+    const added = await ws.addMaterial(current, "CC(=O)O");
+    assert.ok(added.ok);
+    current = (await ws.executeWorkspaceStep(added.workspace, { ruleId: "fischer-esterification", lotIds: [added.lotIds[0]] }, registry)).workspace; // needs-input
+
+    assert.equal(current.actions.length, 9, "3 materials + 1 added material + 5 step requests (failed and pending ones included)");
+    const replayed = await ws.replayActions(current.actions, registry);
+    assert.ok(replayed.ok);
+    assert.deepEqual(JSON.parse(JSON.stringify(replayed.workspace)), JSON.parse(JSON.stringify(current)));
+    assert.deepEqual(statuses(replayed.workspace), ["reaction", "reaction", "needs-selection", "reaction", "needs-input"]);
+  });
+
+  test("a script-only dependency failure is not an action, so replay does not invent a request", async () => {
+    const done = await run(await create("CCO"), [
+      { ruleId: "fischer-esterification", reactants: [{ material: 0 }] },
+      { ruleId: "primary-alcohol-mild-oxidation", reactants: [{ attempt: 1, product: 1 }] },
+    ]);
+    assert.deepEqual(statuses(done), ["needs-input", "dependency-failed"]);
+    assert.equal(done.actions.filter((action) => action.kind === "step").length, 1);
+  });
+
+  test("replay refuses an action log that does not start with a material", async () => {
+    const result = await ws.replayActions([{ kind: "step", request: { ruleId: "x", lotIds: [] } }], registry);
+    assert.equal(result.ok, false);
   });
 });

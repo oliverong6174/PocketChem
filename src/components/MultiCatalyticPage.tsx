@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
+import ReactionWorkspacePanel from "./ReactionWorkspacePanel";
 import {
   analyzeFunctionalGroupHierarchy,
   getCondensedSulfonateSvg,
@@ -60,7 +61,67 @@ async function moleculeDisplayName(smiles: string): Promise<string> {
   }
 }
 
-export default function MultiCatalyticPage() {
+type MultiCatalyticPageProps = {
+  /** A saved Multi-Catalytic analysis chosen on the Saved page. */
+  openRequest?: { id: string; recordId: string } | null;
+  onOpenHandled?: (requestId: string) => void;
+};
+
+type MultiCatalyticMode = "workspace" | "sequence";
+
+/**
+ * Two tools share this page. The workspace keeps an inventory of several molecules and runs one
+ * explicitly chosen reaction at a time (Stage 9B-2). The ordered sequence is the original
+ * single-molecule tool and is unchanged. Both stay mounted once opened so neither loses its state.
+ */
+export default function MultiCatalyticPage({ openRequest = null, onOpenHandled }: MultiCatalyticPageProps) {
+  const [mode, setMode] = useState<MultiCatalyticMode>("workspace");
+  const [sequenceOpened, setSequenceOpened] = useState(false);
+
+  function choose(next: MultiCatalyticMode) {
+    if (next === "sequence") setSequenceOpened(true);
+    setMode(next);
+  }
+
+  return (
+    <section className="card multicatalytic-page-card">
+      <div className="multicatalytic-mode-tabs" role="tablist" aria-label="Multi-Catalytic tools">
+        <button
+          type="button"
+          role="tab"
+          id="multicatalytic-tab-workspace"
+          aria-selected={mode === "workspace"}
+          aria-controls="multicatalytic-panel-workspace"
+          className={mode === "workspace" ? "active" : ""}
+          onClick={() => choose("workspace")}
+        >
+          Workspace (several molecules)
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="multicatalytic-tab-sequence"
+          aria-selected={mode === "sequence"}
+          aria-controls="multicatalytic-panel-sequence"
+          className={mode === "sequence" ? "active" : ""}
+          onClick={() => choose("sequence")}
+        >
+          Ordered sequence (one molecule)
+        </button>
+      </div>
+      <div id="multicatalytic-panel-workspace" role="tabpanel" aria-labelledby="multicatalytic-tab-workspace" hidden={mode !== "workspace"}>
+        <ReactionWorkspacePanel openRequest={openRequest} onOpenHandled={onOpenHandled} />
+      </div>
+      {sequenceOpened && (
+        <div id="multicatalytic-panel-sequence" role="tabpanel" aria-labelledby="multicatalytic-tab-sequence" hidden={mode !== "sequence"}>
+          <OrderedSequencePanel />
+        </div>
+      )}
+    </section>
+  );
+}
+
+function OrderedSequencePanel() {
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [query, setQuery] = useState("");
   const [sequence, setSequence] = useState<SequentialConditionOption[]>([]);
@@ -202,7 +263,7 @@ export default function MultiCatalyticPage() {
   }
 
   return (
-    <section className="card multicatalytic-page-card">
+    <div className="multicatalytic-sequence-mode">
       <div className="card-header">
         <div>
           <h2>Multi-Catalytic Synthesis</h2>
@@ -418,6 +479,6 @@ export default function MultiCatalyticPage() {
           ))}
         </div>
       )}
-    </section>
+    </div>
   );
 }

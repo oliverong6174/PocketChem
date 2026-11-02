@@ -2584,7 +2584,10 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
             ) : activePage === "saved" ? (
               <SavedAnalysesPage onOpen={openSavedAnalysis} />
             ) : (
-              <MultiCatalyticPage />
+              <MultiCatalyticPage
+                openRequest={pendingOpen?.page === "multiCatalytic" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
             )}
           </Suspense>
         </section>
