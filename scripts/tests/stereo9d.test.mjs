@@ -243,3 +243,52 @@ describe("defects found by the held-out benchmark (Stage 9D)", () => {
     }
   });
 });
+
+describe("oxidation of stereo-defined alcohols (found by INT-2; previously the product was silently dropped)", () => {
+  const oxidize = async (ruleId, alcohol) => {
+    const created = await ws.createWorkspace([alcohol]);
+    return ws.executeWorkspaceStep(created.workspace, { ruleId, lotIds: ["sm0#1"] }, registry);
+  };
+  test("[engine] both enantiomers of butan-2-ol are oxidised by every secondary-alcohol oxidant rule", async () => {
+    const rules = registry.filter((rule) => rule.id.startsWith("secondary-alcohol-oxidation-")).map((rule) => rule.id);
+    assert.ok(rules.length >= 4);
+    for (const alcohol of ["C[C@H](O)CC", "C[C@@H](O)CC"]) {
+      for (const id of rules) {
+        const result = await oxidize(id, alcohol);
+        assert.equal(result.step.status, "reaction", `${id} on ${alcohol}`);
+        assert.equal(await canon(result.step.outcomes[0].productSmiles), await canon("CCC(C)=O"));
+      }
+    }
+  });
+  test("[engine] a second stereocentre survives and the destroyed one does not leave a stray tag", async () => {
+    const result = await oxidize("secondary-alcohol-oxidation-pcc", "CCCC[C@H](CC)[C@@H](O)CC");
+    assert.equal(result.step.status, "reaction");
+    const product = result.step.outcomes[0].productSmiles;
+    assert.equal((product.match(/@@?/g) ?? []).length, 1, product);
+    assert.equal(await canon(product.replace(/@@?/g, "")), await canon("CCCCC(CC)C(=O)CC"));
+  });
+  test("[engine] a diol with two stereocentres: only the oxidised centre loses its tag", async () => {
+    const result = await oxidize("secondary-alcohol-oxidation-pcc", "C[C@H](O)[C@@H](C)O");
+    assert.equal(result.step.status, "reaction");
+    assert.equal((result.step.outcomes[0].productSmiles.match(/@@?/g) ?? []).length, 1);
+  });
+  test("[engine] valid stereo products are untouched by the repair (SN2 inversion, epoxidation)", async () => {
+    const inversion = await page("haloalkane-sn2-hydroxide", "CCCCCC[C@@H](C)Br");
+    assert.ok(/@/.test(inversion[0].productSmiles));
+    assert.equal(cip(inversion[0].productSmiles), "S");
+  });
+  test("[engine] the planner finds (S)-butan-2-ol to butanone, which it could not before", async () => {
+    const run = await loadModule("/src/utils/reactions/engine/synthesisSearchRun.ts");
+    const controller = new run.SearchRunController({ rules: registry, totalMs: 15000 });
+    await controller.start({ startingSmiles: "C[C@@H](O)CC", targetSmiles: "CCC(C)=O", copies: 1 });
+    const best = controller.getState().ranked[0];
+    assert.ok(best, controller.getState().outcome?.kind);
+    assert.deepEqual(best.route.steps.map((step) => step.ruleId), ["secondary-alcohol-oxidation-pcc"]);
+  });
+  test("[known-gap] isotope-labelled [13CH3]CO to [13CH3]C=O: the first accepted route is an isotopologue that fails end-to-end replay", { todo: "the linear search is not resumed after a candidate fails replay; the one-step route exists" }, async () => {
+    const run = await loadModule("/src/utils/reactions/engine/synthesisSearchRun.ts");
+    const controller = new run.SearchRunController({ rules: registry, totalMs: 15000 });
+    await controller.start({ startingSmiles: "[13CH3]CO", targetSmiles: "[13CH3]C=O", copies: 1 });
+    assert.ok(controller.getState().ranked[0]);
+  });
+});
