@@ -166,7 +166,8 @@ describe("D6: competing products and explicit selection", () => {
   });
 
   test("[engine] unranked regioisomers are never called major and need an explicit choice", async () => {
-    const start = await create("Brc1ccccc1", "C=CC(=O)OC");
+    // An alkyl alkene: no documented regiochemical preference is modeled, so nothing is ranked.
+    const start = await create("Brc1ccccc1", "C=CCCCC");
     const pending = await run(start, [{ ruleId: "heck-coupling", reactants: [{ material: 0 }, { material: 1 }] }]);
     assert.deepEqual(statuses(pending), ["needs-selection"]);
     const classes = pending.history[0].outcomes.map((item) => item.selectivityFinding.class);

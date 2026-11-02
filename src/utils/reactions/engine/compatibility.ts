@@ -279,3 +279,36 @@ export async function assessRouteCompatibility(
         : "none",
   };
 }
+
+export type DeclaredIntolerance = {
+  group: string;
+  label: string;
+  severity: CompatibilitySeverity;
+  condition: string;
+  why: string;
+};
+
+/**
+ * What a rule's declared conditions cannot coexist with, inside ONE reaction vessel. These are the
+ * same findings assessStepCompatibility reports for groups that survive a step, listed without a
+ * substrate. They say nothing about later steps: a product is isolated before the next step runs.
+ * Null when the rule declares no conditions (unassessed, which is not the same as tolerant).
+ */
+export function declaredIntolerances(rule: ReactionRule | undefined): DeclaredIntolerance[] | null {
+  if (!rule?.conditions) return null;
+  const centre = new Set(rule.conditions.reactionCentre ?? []);
+  const seen = new Set<string>();
+  const out: DeclaredIntolerance[] = [];
+  for (const finding of relevantFindings(rule.conditions)) {
+    if (seen.has(finding.group) || centre.has(finding.group)) continue;
+    seen.add(finding.group);
+    out.push({
+      group: finding.group,
+      label: GROUP_SMARTS[finding.group].label,
+      severity: finding.severity,
+      condition: finding.condition,
+      why: finding.why,
+    });
+  }
+  return out;
+}

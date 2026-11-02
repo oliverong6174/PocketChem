@@ -1,5 +1,6 @@
 import type { StepSelectivityClass } from "../reactionTypes";
 import { COMBINATION_LABEL, type ChemicalRole, type ChemicalRoleKind, type StepRoleProfile } from "./catalystRoles";
+import { DIMENSION_LABEL, type StepConditionProfile } from "./conditionModel";
 import type { CatalysisAssessment } from "./workspaceCatalysis";
 import type { PoolLot } from "./speciesPool";
 import type { ReactionWorkspace, WorkspaceOutcome, WorkspaceStep, WorkspaceStepStatus } from "./reactionWorkspace";
@@ -204,14 +205,50 @@ export function catalysisSummaryLines(assessment: CatalysisAssessment): string[]
     lines.push("No completed step has a catalyst declared in the registry.");
   } else {
     lines.push(
-      `${catalytic} completed step${catalytic === 1 ? "" : "s"} use a catalyst declared in the registry; ${assessment.distinctCatalystSystems.length} distinct catalyst system${assessment.distinctCatalystSystems.length === 1 ? "" : "s"}: ${assessment.distinctCatalystSystems.join("; ")}.`,
+      `${catalytic} completed step${catalytic === 1 ? " uses" : "s use"} a catalyst declared in the registry; ${assessment.distinctCatalystSystems.length} distinct catalyst system${assessment.distinctCatalystSystems.length === 1 ? "" : "s"}: ${assessment.distinctCatalystSystems.join("; ")}.`,
     );
   }
   if (assessment.genericCatalystStepNumbers.length > 0) {
     lines.push(`Step${assessment.genericCatalystStepNumbers.length === 1 ? "" : "s"} ${assessment.genericCatalystStepNumbers.join(", ")}: the catalyst is named only by type, so which species is used is not established.`);
   }
+  const required = assessment.boundaries.filter((boundary) => boundary.isolationRequired);
+  for (const boundary of required) {
+    lines.push(
+      `Steps ${boundary.from} → ${boundary.to}: these reactions could not share a vessel (${boundary.reasons.join(" ")}). They did not: the product of step ${boundary.from} is isolated before step ${boundary.to}, so this is not a conflict here, but it is why that isolation is needed.`,
+    );
+  }
+  for (const vessel of assessment.vessels) {
+    lines.push(
+      vessel.documentedConflicts > 0
+        ? `Steps ${vessel.stepNumbers.join(", ")} were declared to share one vessel and ${vessel.documentedConflicts === 1 ? "1 pair has" : `${vessel.documentedConflicts} pairs have`} a documented conflict of declared conditions.`
+        : `Steps ${vessel.stepNumbers.join(", ")} were declared to share one vessel; no documented conflict was found among the declared conditions, which is not evidence that the one-pot sequence works.`,
+    );
+  }
   if (assessment.unassessedStepNumbers.length > 0) {
     lines.push(`Step${assessment.unassessedStepNumbers.length === 1 ? "" : "s"} ${assessment.unassessedStepNumbers.join(", ")}: catalyst and reagent roles are unassessed.`);
   }
   return lines;
+}
+
+/** Lines for a step's "Conditions" block: what the registry states, what it does not, and the isolation boundary. */
+export function conditionLines(profile: StepConditionProfile | undefined): { heading: string; lines: string[] } {
+  if (!profile) {
+    return { heading: "Conditions were not recorded for this step (saved before conditions were modeled); they are unassessed.", lines: [] };
+  }
+  const lines: string[] = [];
+  for (const item of profile.declared) {
+    lines.push(`${DIMENSION_LABEL[item.dimension]}: ${item.value}${item.source === "rule-conditions" ? " (declared by the rule)" : ""}`);
+  }
+  for (const role of profile.workup) lines.push(`Workup: ${role.name} (part of this step, not of the next)`);
+  if (profile.intolerances === null) {
+    lines.push("In one vessel: the rule declares no conditions, so what it cannot coexist with is unassessed (not the same as tolerant).");
+  } else if (profile.intolerances.length === 0) {
+    lines.push("In one vessel: no incompatibility follows from the declared conditions.");
+  } else {
+    lines.push(
+      `In one vessel it could not coexist with: ${profile.intolerances.map((item) => item.label).join(", ")} (${[...new Set(profile.intolerances.map((item) => item.condition))].join("; ")}).`,
+    );
+  }
+  if (profile.notStated.length > 0) lines.push(`Not stated by the registry: ${profile.notStated.join(", ")}.`);
+  return { heading: `Reagent text as written: “${profile.reagentText}”.`, lines };
 }

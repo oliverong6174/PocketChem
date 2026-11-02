@@ -23,6 +23,7 @@ import {
   STEP_STATUS_HEADING,
   catalysisSummaryLines,
   combinationLabel,
+  conditionLines,
   inventoryGroups,
   isUnresolvedStep,
   lotLabel,
@@ -104,6 +105,8 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
   const [saveForm, setSaveForm] = useState<{ name: string } | null>(null);
   const [saveBusy, setSaveBusy] = useState(false);
   const [saveMessage, setSaveMessage] = useState<WorkspaceNoticeItem | null>(null);
+  // A what-if only (never saved): completed steps the user imagines sharing one vessel.
+  const [vesselSteps, setVesselSteps] = useState<number[]>([]);
 
   // Latest values for asynchronous work and for the debounced save, which must never see stale state.
   const workspaceRef = useRef<ReactionWorkspace | null>(null);
@@ -579,7 +582,18 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
   // ---- rendering ---------------------------------------------------------------------------------
 
   const groups = workspace ? inventoryGroups(workspace) : { live: [], consumed: [] };
-  const catalysis = useMemo(() => (workspace && workspace.records.length > 0 ? assessWorkspaceCatalysis(workspace, reactionRegistry) : null), [workspace]);
+  const catalysis = useMemo(
+    () =>
+      workspace && workspace.records.length > 0
+        ? assessWorkspaceCatalysis(workspace, reactionRegistry, {
+            // Step numbers from before an undo may no longer exist; only existing steps are judged.
+            sharedVessels: ((existing) => (existing.length >= 2 ? [existing] : []))(
+              vesselSteps.filter((step) => step <= workspace.records.length),
+            ),
+          })
+        : null,
+    [workspace, vesselSteps],
+  );
   const pending = workspace ? pendingSelection(workspace) : null;
   const assessed = workspace && assessment.workspace === workspace ? assessment.data : null;
   const expectedMolecules = requirement?.arity ?? 1;
@@ -620,6 +634,7 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
     const unresolved = isUnresolvedStep(step);
     const selected = step.selectedOutcome !== null ? step.outcomes[step.selectedOutcome] : null;
     const roles = roleLines(step.roles);
+    const conditions = conditionLines(step.conditions);
     return (
       <div className="multicatalytic-result-step" key={step.attempt} data-status={step.status}>
         <div className="multicatalytic-result-step-heading">
@@ -645,6 +660,17 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
               ))}
             </ul>
           )}
+        </div>
+        <div className="workspace-roles">
+          <small className="reaction-note"><strong>Conditions.</strong> {conditions.heading}</small>
+          {conditions.lines.length > 0 && (
+            <ul>
+              {conditions.lines.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          )}
+          <small className="reaction-note">{step.conditions?.isolation.statement}</small>
         </div>
         <p className="reaction-note">
           <strong>Selected:</strong> {step.requestedLotIds.length > 0 ? step.requestedLotIds.map(renderLot) : "nothing"}
@@ -989,6 +1015,28 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
                   {catalysisSummaryLines(catalysis).map((line) => (
                     <p key={line}>{line}</p>
                   ))}
+                  {workspace && workspace.records.length >= 2 && (
+                    <details>
+                      <summary>What if steps shared one vessel? (a what-if, not saved)</summary>
+                      <p>As run, every step is isolated. Tick two or more completed steps to ask whether their declared conditions could share a vessel.</p>
+                      {workspace.records.map((record) => (
+                        <label key={record.step.stepNumber} className="reaction-note">
+                          <input
+                            type="checkbox"
+                            checked={vesselSteps.includes(record.step.stepNumber)}
+                            onChange={() =>
+                              setVesselSteps((current) =>
+                                current.includes(record.step.stepNumber)
+                                  ? current.filter((item) => item !== record.step.stepNumber)
+                                  : [...current, record.step.stepNumber],
+                              )
+                            }
+                          />{" "}
+                          Step {record.step.stepNumber}: {record.step.title}
+                        </label>
+                      ))}
+                    </details>
+                  )}
                   {catalysis.combinations.length > 0 && (
                     <details>
                       <summary>If two of these steps were ever combined in one pot ({catalysis.combinations.length} pair{catalysis.combinations.length === 1 ? "" : "s"})</summary>

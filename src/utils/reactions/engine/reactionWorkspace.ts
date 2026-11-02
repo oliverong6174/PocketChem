@@ -15,6 +15,7 @@ import type {
 import { resolveReactantRequirement } from "../profiles/reactants";
 import { assessRouteCompatibility, assessStepCompatibility } from "./compatibility";
 import { describeRuleRoles, type StepRoleProfile } from "./catalystRoles";
+import { describeStepConditions, type StepConditionProfile } from "./conditionModel";
 import { forwardStepFromPathway } from "./multistepSynthesis";
 import { predictReactionPathwaysFromRules } from "./reactionEngine";
 import { splitReactionComponents } from "./reactionInput";
@@ -126,6 +127,8 @@ export type WorkspaceStep = {
    * workspaces saved before roles existed (shown as unassessed, never rewritten).
    */
   roles?: StepRoleProfile;
+  /** Declared conditions, in-vessel intolerances and the isolation boundary, captured with the step. */
+  conditions?: StepConditionProfile;
 };
 
 /**
@@ -321,7 +324,7 @@ function baseStep(
     missingPartners: [],
     issues: [],
     compatibility: null,
-    ...(rule ? { roles: describeRuleRoles(rule) } : {}),
+    ...(rule ? (() => { const roles = describeRuleRoles(rule); return { roles, conditions: describeStepConditions(rule, roles) }; })() : {}),
   };
 }
 
@@ -589,6 +592,12 @@ export async function executeWorkspaceStep(
       { issues: uniqueIssues },
     );
   }
+  // Offer outcomes the rule itself rates highest first (stable otherwise), so a bounded list never hides them.
+  const levelRank = (item: { pathway: ReactionPathway }) => {
+    const level = item.pathway.selectivityAssessment?.level;
+    return level === "major" ? 0 : level === "competitive" ? 1 : level === "minor" || level === "trace" ? 3 : 2;
+  };
+  distinct.sort((a, b) => levelRank(a) - levelRank(b));
   const maxOutcomes = Math.max(1, Math.floor(options.maxOutcomes ?? DEFAULT_MAX_OUTCOMES));
   const kept = distinct.slice(0, maxOutcomes);
   const constitutions = new Set(distinct.map((item) => item.connectivityKey)).size;

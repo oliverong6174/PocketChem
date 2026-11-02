@@ -169,6 +169,18 @@ function isRoleProfile(value: unknown): boolean {
   );
 }
 
+/** Conditions are optional (older saves have none), but a present value must be well formed. */
+function isConditionProfile(value: unknown): boolean {
+  if (value === undefined) return true;
+  if (!isObject(value) || !isString(value.ruleId) || !isString(value.reagentText)) return false;
+  if (!Array.isArray(value.declared) || value.declared.length > 20) return false;
+  if (!value.declared.every((item) => isObject(item) && isString(item.dimension) && isString(item.value) && isString(item.source))) return false;
+  if (typeof value.declaresRuleConditions !== "boolean" || typeof value.anhydrous !== "boolean") return false;
+  if (!Array.isArray(value.workup) || !Array.isArray(value.notStated) || !isStringArray(value.notStated)) return false;
+  if (value.intolerances !== null && !Array.isArray(value.intolerances)) return false;
+  return isObject(value.isolation) && value.isolation.kind === "isolated-step" && isString(value.isolation.statement);
+}
+
 function isHistoryStep(value: unknown): boolean {
   if (!isObject(value)) return false;
   return (
@@ -183,7 +195,8 @@ function isHistoryStep(value: unknown): boolean {
     (value.selectedBy === null || value.selectedBy === "only-option" || value.selectedBy === "user") &&
     isStringArray(value.missingPartners) && isStringArray(value.issues) &&
     (value.compatibility === null || Array.isArray(value.compatibility)) &&
-    isRoleProfile(value.roles)
+    isRoleProfile(value.roles) &&
+    isConditionProfile(value.conditions)
   );
 }
 
