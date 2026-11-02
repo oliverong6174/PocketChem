@@ -1,0 +1,3110 @@
+{
+  "summary": {
+    "generatedBy": "scripts/benchmarks/independent/run.mjs",
+    "cases": 57,
+    "counts": {
+      "validatedHeldOut": 35,
+      "provisional": 18,
+      "overlappingFixtures": 7
+    },
+    "referenceValidated": {
+      "structure": {
+        "correct": 29
+      },
+      "connectivity": {
+        "correct": 27,
+        "wrong": 2,
+        "abstained": 1
+      },
+      "regiochemistry": {
+        "correct": 10,
+        "wrong": 2
+      },
+      "stereochemistry": {
+        "correct": 4,
+        "incomplete": 2,
+        "not-scored": 2
+      },
+      "classification": {
+        "abstained": 6
+      },
+      "conditions": {
+        "unassessed": 1,
+        "correct": 4
+      },
+      "ambiguity": {
+        "correct": 1
+      },
+      "unsupported": {
+        "supported-correct": 3
+      },
+      "routeDiscovery": {
+        "found": 1
+      },
+      "routeVerification": {
+        "verified": 2
+      },
+      "routePlausibility": {
+        "plausible": 1
+      },
+      "workspace": {
+        "correct": 1
+      }
+    },
+    "provisionalOnly": {
+      "structure": {
+        "correct": 11
+      },
+      "connectivity": {
+        "correct": 11,
+        "wrong": 2,
+        "abstained": 1
+      },
+      "regiochemistry": {
+        "correct": 5,
+        "wrong": 1,
+        "abstained": 1
+      },
+      "stereochemistry": {
+        "incomplete": 1
+      },
+      "classification": {
+        "abstained": 2
+      },
+      "unsupported": {
+        "correct-abstention": 1
+      },
+      "routeDiscovery": {
+        "found": 2
+      },
+      "routeVerification": {
+        "verified": 3
+      },
+      "routePlausibility": {
+        "implausible": 1,
+        "plausible": 1
+      },
+      "workspace": {
+        "correct": 1
+      }
+    },
+    "overlappingOnly": {
+      "structure": {
+        "correct": 5
+      },
+      "connectivity": {
+        "correct": 4,
+        "wrong": 1
+      },
+      "regiochemistry": {
+        "correct": 1
+      },
+      "stereochemistry": {
+        "correct": 2
+      },
+      "classification": {
+        "abstained": 1
+      },
+      "ambiguity": {
+        "correct": 1
+      },
+      "unsupported": {
+        "wrong": 1,
+        "correct-abstention": 1
+      }
+    },
+    "allCases": {
+      "structure": {
+        "correct": 43
+      },
+      "connectivity": {
+        "correct": 41,
+        "wrong": 4,
+        "abstained": 2
+      },
+      "regiochemistry": {
+        "correct": 15,
+        "wrong": 3,
+        "abstained": 1
+      },
+      "stereochemistry": {
+        "correct": 6,
+        "incomplete": 3,
+        "not-scored": 2
+      },
+      "classification": {
+        "abstained": 8
+      },
+      "conditions": {
+        "unassessed": 1,
+        "correct": 4
+      },
+      "ambiguity": {
+        "correct": 2
+      },
+      "unsupported": {
+        "wrong": 1,
+        "correct-abstention": 1,
+        "supported-correct": 3
+      },
+      "routeDiscovery": {
+        "found": 3
+      },
+      "routeVerification": {
+        "verified": 5
+      },
+      "routePlausibility": {
+        "implausible": 1,
+        "plausible": 2
+      },
+      "workspace": {
+        "correct": 2
+      }
+    },
+    "byCategory": {
+      "substitution-elimination": {
+        "structure": {
+          "correct": 3
+        },
+        "connectivity": {
+          "correct": 3
+        },
+        "regiochemistry": {
+          "correct": 2
+        },
+        "stereochemistry": {
+          "correct": 1
+        },
+        "classification": {
+          "abstained": 2
+        }
+      },
+      "alkenes": {
+        "structure": {
+          "correct": 4
+        },
+        "connectivity": {
+          "correct": 4
+        },
+        "regiochemistry": {
+          "correct": 2
+        },
+        "stereochemistry": {
+          "incomplete": 2,
+          "correct": 1
+        }
+      },
+      "alkynes": {
+        "structure": {
+          "correct": 4
+        },
+        "connectivity": {
+          "correct": 4
+        },
+        "regiochemistry": {
+          "correct": 2
+        },
+        "stereochemistry": {
+          "correct": 2
+        }
+      },
+      "carbonyl": {
+        "structure": {
+          "correct": 4
+        },
+        "connectivity": {
+          "correct": 4
+        },
+        "regiochemistry": {
+          "correct": 1,
+          "wrong": 1
+        },
+        "classification": {
+          "abstained": 2
+        },
+        "conditions": {
+          "unassessed": 1,
+          "correct": 1
+        }
+      },
+      "aromatic-substitution": {
+        "structure": {
+          "correct": 3
+        },
+        "connectivity": {
+          "wrong": 2,
+          "correct": 1
+        },
+        "regiochemistry": {
+          "correct": 2,
+          "wrong": 1
+        },
+        "classification": {
+          "abstained": 2
+        }
+      },
+      "organometallic": {
+        "structure": {
+          "correct": 4
+        },
+        "connectivity": {
+          "correct": 4,
+          "abstained": 1
+        },
+        "conditions": {
+          "correct": 2
+        }
+      },
+      "oxidation-reduction": {
+        "structure": {
+          "correct": 6
+        },
+        "connectivity": {
+          "correct": 6
+        },
+        "regiochemistry": {
+          "correct": 1
+        },
+        "conditions": {
+          "correct": 1
+        }
+      },
+      "competing-pathways": {
+        "structure": {
+          "correct": 1
+        },
+        "connectivity": {
+          "correct": 1
+        },
+        "ambiguity": {
+          "correct": 1
+        }
+      },
+      "unsupported": {
+        "stereochemistry": {
+          "not-scored": 2
+        },
+        "unsupported": {
+          "supported-correct": 3
+        }
+      },
+      "multistep-route": {
+        "routeDiscovery": {
+          "found": 1
+        },
+        "routeVerification": {
+          "verified": 1
+        },
+        "routePlausibility": {
+          "plausible": 1
+        }
+      },
+      "multicatalytic": {
+        "routeVerification": {
+          "verified": 1
+        },
+        "workspace": {
+          "correct": 1
+        }
+      }
+    },
+    "runtime": {
+      "totalMs": 12157,
+      "slowestMs": 2814,
+      "peakRssMB": 312
+    }
+  },
+  "records": [
+    {
+      "id": "SE-01",
+      "category": "substitution-elimination",
+      "kind": "step",
+      "title": "SN2 with inversion: (R)-2-bromooctane + hydroxide",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "haloalkane-sn2-hydroxide"
+        ],
+        "outcomes": [
+          {
+            "product": "CCCCCC[C@H](C)O",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 317
+    },
+    {
+      "id": "SE-02",
+      "category": "substitution-elimination",
+      "kind": "step",
+      "title": "E2 with an unhindered alkoxide: 2-bromo-2,3-dimethylbutane gives the more substituted alkene",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": "only outcome"
+        },
+        "classification": {
+          "status": "abstained",
+          "detail": "single-outcome"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "haloalkane-e2-zaitsev"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(C)=C(C)C",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 29
+    },
+    {
+      "id": "SE-03",
+      "category": "substitution-elimination",
+      "kind": "step",
+      "title": "E2 with a bulky base: the same substrate gives the less substituted alkene as major",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": "only outcome"
+        },
+        "classification": {
+          "status": "abstained",
+          "detail": "single-outcome"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "haloalkane-e2-hofmann"
+        ],
+        "outcomes": [
+          {
+            "product": "C=C(C)C(C)C",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 22
+    },
+    {
+      "id": "SE-04",
+      "category": "substitution-elimination",
+      "kind": "step",
+      "title": "No SN2 at a tertiary carbon: tert-butyl bromide + cyanide",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": "engine predicts no reaction"
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "no-reaction",
+        "rules": [
+          "haloalkane-sn2-cyanide"
+        ],
+        "outcomes": []
+      },
+      "ms": 4
+    },
+    {
+      "id": "SE-05",
+      "category": "substitution-elimination",
+      "kind": "step",
+      "title": "SN1 hydrolysis of a tertiary chloride (water as nucleophile)",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": "only outcome"
+        },
+        "classification": {
+          "status": "abstained",
+          "detail": "single-outcome"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "haloalkane-sn1-solvolysis-water"
+        ],
+        "outcomes": [
+          {
+            "product": "CCC(C)(C)O",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 29
+    },
+    {
+      "id": "AL-01",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "HBr + 1-methylcyclohexene: Markovnikov, tertiary bromide",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-hx-addition-hbr"
+        ],
+        "outcomes": [
+          {
+            "product": "CC1(Br)CCCCC1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 29
+    },
+    {
+      "id": "AL-02",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "HBr with peroxides + 2-methylbut-1-ene: anti-Markovnikov",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-hbr-peroxide"
+        ],
+        "outcomes": [
+          {
+            "product": "CCC(C)CBr",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 16
+    },
+    {
+      "id": "AL-03",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "Hydroboration-oxidation of 1-methylcyclohexene: trans-2-methylcyclohexanol (racemic)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "incomplete",
+          "detail": "stereochemistry unspecified in the product"
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-hydroboration-oxidation"
+        ],
+        "outcomes": [
+          {
+            "product": "CC1CCCCC1O",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 24
+    },
+    {
+      "id": "AL-04",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "Oxymercuration-demercuration of 3,3-dimethylbut-1-ene: no rearrangement",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-oxymercuration-demercuration"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(O)C(C)(C)C",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 19
+    },
+    {
+      "id": "AL-05",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "Acid-catalyzed hydration of 3,3-dimethylbut-1-ene: methyl shift gives the tertiary alcohol",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": "PocketChem does not model carbocation rearrangement in acid-catalyzed hydration (the rule documents it).",
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "wrong",
+          "detail": "missing CC(C)(O)C(C)C; offered CC(O)C(C)(C)C"
+        },
+        "regiochemistry": {
+          "status": "wrong",
+          "detail": "engine major CC(O)C(C)(C)C"
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": "expected products not offered"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-acid-hydration"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(O)C(C)(C)C",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 17
+    },
+    {
+      "id": "AL-06",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "Reductive ozonolysis of methylenecyclohexane: cyclohexanone + formaldehyde",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-ozonolysis-reductive"
+        ],
+        "outcomes": [
+          {
+            "product": "C=O.O=C1CCCCC1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 36
+    },
+    {
+      "id": "AL-07",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "Anti addition of Br2 to cyclopentene: trans-1,2-dibromocyclopentane (racemic)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": true,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-halogenation-bromine"
+        ],
+        "outcomes": [
+          {
+            "product": "Br[C@H]1CCC[C@@H]1Br",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": "racemic"
+          }
+        ]
+      },
+      "ms": 29
+    },
+    {
+      "id": "AL-08",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "OsO4 syn dihydroxylation of cyclohexene: cis-cyclohexane-1,2-diol (meso)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": true,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-syn-dihydroxylation"
+        ],
+        "outcomes": [
+          {
+            "product": "O[C@@H]1CCCC[C@@H]1O",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 23
+    },
+    {
+      "id": "AL-09",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "OsO4 syn dihydroxylation of 1-methylcyclohexene: cis diol (a case outside the H1=H1 stereo templates)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "incomplete",
+          "detail": "stereochemistry unspecified in the product"
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-syn-dihydroxylation"
+        ],
+        "outcomes": [
+          {
+            "product": "CC1(O)CCCCC1O",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 19
+    },
+    {
+      "id": "AL-10",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "Epoxidation of (E)-hex-3-ene: trans-2,3-diethyloxirane (racemic)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-epoxidation"
+        ],
+        "outcomes": [
+          {
+            "product": "CC[C@H]1O[C@@H]1CC",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": "racemic"
+          }
+        ]
+      },
+      "ms": 23
+    },
+    {
+      "id": "AL-11",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "Catalytic hydrogenation of 1,2-dimethylcyclohexene: cis-1,2-dimethylcyclohexane (syn addition)",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "incomplete",
+          "detail": "stereochemistry unspecified in the product"
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-hydrogenation"
+        ],
+        "outcomes": [
+          {
+            "product": "CC1CCCCC1C",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 18
+    },
+    {
+      "id": "AY-01",
+      "category": "alkynes",
+      "kind": "step",
+      "title": "Hg2+ hydration of 3-methylbut-1-yne: methyl ketone",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkyne-mercury-hydration-terminal"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(=O)C(C)C",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 12
+    },
+    {
+      "id": "AY-02",
+      "category": "alkynes",
+      "kind": "step",
+      "title": "Hindered-borane hydroboration-oxidation of 4-methylpent-1-yne: aldehyde",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkyne-hydroboration-oxidation"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(C)CCC=O",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 14
+    },
+    {
+      "id": "AY-03",
+      "category": "alkynes",
+      "kind": "step",
+      "title": "Lindlar reduction of hex-3-yne: (Z)-hex-3-ene",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkyne-lindlar-reduction-internal"
+        ],
+        "outcomes": [
+          {
+            "product": "CC/C=C\\CC",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 15
+    },
+    {
+      "id": "AY-04",
+      "category": "alkynes",
+      "kind": "step",
+      "title": "Na/NH3 reduction of hex-3-yne: (E)-hex-3-ene",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkyne-dissolving-metal-reduction-internal"
+        ],
+        "outcomes": [
+          {
+            "product": "CC/C=C/CC",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 14
+    },
+    {
+      "id": "AY-05",
+      "category": "alkynes",
+      "kind": "step",
+      "title": "Acetylide alkylation: pent-1-yne + NaNH2, then ethyl bromide, gives hept-3-yne",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "terminal-alkyne-alkylation"
+        ],
+        "outcomes": [
+          {
+            "product": "CCC#CCCC",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 18
+    },
+    {
+      "id": "CB-01",
+      "category": "carbonyl",
+      "kind": "step",
+      "title": "Grignard addition to an aldehyde: cyclohexanecarbaldehyde + MeMgBr gives a secondary alcohol",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "aldehyde-organometallic-addition"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(O)C1CCCCC1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 25
+    },
+    {
+      "id": "CB-02",
+      "category": "carbonyl",
+      "kind": "step",
+      "title": "Excess Grignard + ester: ethyl benzoate + 2 MeMgBr gives a tertiary alcohol",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": "only outcome"
+        },
+        "classification": {
+          "status": "abstained",
+          "detail": "single-outcome"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "ester-grignard-addition"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(C)(O)c1ccccc1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 35
+    },
+    {
+      "id": "CB-03",
+      "category": "carbonyl",
+      "kind": "step",
+      "title": "DIBAL-H at -78 C: methyl hexanoate to hexanal",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "wrong",
+          "detail": "engine major CCCCCC=O, CO"
+        },
+        "classification": {
+          "status": "abstained",
+          "detail": "single-outcome"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "unassessed",
+          "detail": "no curated roles for this rule"
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "ester-dibal-reduction"
+        ],
+        "outcomes": [
+          {
+            "product": "CCCCCC=O.CO",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 22
+    },
+    {
+      "id": "CB-04",
+      "category": "carbonyl",
+      "kind": "step",
+      "title": "LiAlH4 reduction of an ester gives two alcohols: ethyl phenylacetate to 2-phenylethanol + ethanol",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "correct",
+          "detail": "none (none)"
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "ester-lah-reduction"
+        ],
+        "outcomes": [
+          {
+            "product": "CCO.OCCc1ccccc1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 25
+    },
+    {
+      "id": "CB-05",
+      "category": "carbonyl",
+      "kind": "step",
+      "title": "Chemoselective ketone reduction in a keto ester (NaBH4 does not reduce esters)",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "ketone-reduction"
+        ],
+        "outcomes": [
+          {
+            "product": "COC(=O)CCC(C)O",
+            "class": "unranked",
+            "level": null,
+            "mixture": null
+          },
+          {
+            "product": "COC(O)CCC(C)=O",
+            "class": "unranked",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 26
+    },
+    {
+      "id": "CB-06",
+      "category": "carbonyl",
+      "kind": "step",
+      "title": "Wittig methylenation: cyclohexanone to methylenecyclohexane",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "ketone-wittig"
+        ],
+        "outcomes": [
+          {
+            "product": "C=C1CCCCC1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 21
+    },
+    {
+      "id": "CB-07",
+      "category": "carbonyl",
+      "kind": "step",
+      "title": "Cannizzaro: benzaldehyde with concentrated NaOH gives benzyl alcohol and benzoic acid/benzoate",
+      "provenance": "provisional",
+      "overlapsFixtures": true,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "wrong",
+          "detail": "missing OC(=O)c1ccccc1; offered O=C([O-])c1ccccc1, OCc1ccccc1"
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "aldehyde-cannizzaro"
+        ],
+        "outcomes": [
+          {
+            "product": "O=C([O-])c1ccccc1.OCc1ccccc1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 28
+    },
+    {
+      "id": "AR-01",
+      "category": "aromatic-substitution",
+      "kind": "step",
+      "title": "Nitration of toluene: ortho and para both formed (ortho slightly more), meta minor",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "wrong",
+          "detail": "missing Cc1ccccc1[N+](=O)[O-]; offered Cc1ccc([N+](=O)[O-])cc1"
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": "only outcome"
+        },
+        "classification": {
+          "status": "abstained",
+          "detail": "single-outcome"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "aromatic-nitration"
+        ],
+        "outcomes": [
+          {
+            "product": "Cc1ccc([N+](=O)[O-])cc1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 31
+    },
+    {
+      "id": "AR-02",
+      "category": "aromatic-substitution",
+      "kind": "step",
+      "title": "Bromination of nitrobenzene: meta",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": "only outcome"
+        },
+        "classification": {
+          "status": "abstained",
+          "detail": "single-outcome"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "aromatic-halogenation-bromination"
+        ],
+        "outcomes": [
+          {
+            "product": "O=[N+]([O-])c1cccc(Br)c1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 24
+    },
+    {
+      "id": "AR-03",
+      "category": "aromatic-substitution",
+      "kind": "step",
+      "title": "Friedel-Crafts acylation of anisole: para",
+      "provenance": "provisional",
+      "overlapsFixtures": true,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": "engine-ranked major"
+        },
+        "classification": {
+          "status": "abstained",
+          "detail": ", unranked"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "aromatic-friedel-crafts-acylation"
+        ],
+        "outcomes": [
+          {
+            "product": "COc1ccc(C(C)=O)cc1",
+            "class": "major",
+            "level": "major",
+            "mixture": null
+          },
+          {
+            "product": "COc1ccccc1C(C)=O",
+            "class": "unranked",
+            "level": "competitive",
+            "mixture": null
+          },
+          {
+            "product": "COc1cccc(C(C)=O)c1",
+            "class": "disfavored",
+            "level": "minor",
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 61
+    },
+    {
+      "id": "AR-04",
+      "category": "aromatic-substitution",
+      "kind": "step",
+      "title": "Friedel-Crafts acylation fails on a strongly deactivated ring (nitrobenzene)",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": "engine predicts no reaction"
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "no-reaction",
+        "rules": [
+          "aromatic-friedel-crafts-acylation"
+        ],
+        "outcomes": []
+      },
+      "ms": 3
+    },
+    {
+      "id": "AR-05",
+      "category": "aromatic-substitution",
+      "kind": "step",
+      "title": "Friedel-Crafts alkylation with rearrangement: neopentyl chloride gives 2-methyl-2-phenylbutane",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": "PocketChem's Friedel-Crafts rule documents that it shows direct attachment and does not model carbocation rearrangement.",
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "wrong",
+          "detail": "offers forbidden CC(C)(C)Cc1ccccc1"
+        },
+        "regiochemistry": {
+          "status": "wrong",
+          "detail": "engine major CC(C)(C)Cc1ccccc1"
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": "expected products not offered"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "aromatic-friedel-crafts-alkylation"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(C)(C)Cc1ccccc1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 31
+    },
+    {
+      "id": "OM-01",
+      "category": "organometallic",
+      "kind": "step",
+      "title": "Grignard + CO2: cyclopentylmagnesium bromide gives cyclopentanecarboxylic acid",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "organometallic-carboxylation"
+        ],
+        "outcomes": [
+          {
+            "product": "O=C(O)C1CCCC1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 19
+    },
+    {
+      "id": "OM-02",
+      "category": "organometallic",
+      "kind": "step",
+      "title": "Grignard + ethylene oxide: PhMgBr gives 2-phenylethanol",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "abstained",
+          "detail": "status unsupported"
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "unsupported",
+        "rules": [
+          "epoxide-grignard-opening"
+        ],
+        "outcomes": []
+      },
+      "ms": 13
+    },
+    {
+      "id": "OM-03",
+      "category": "organometallic",
+      "kind": "step",
+      "title": "Gilman reagent conjugate addition: cyclohex-2-enone + Me2CuLi gives 3-methylcyclohexanone",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "abstained",
+          "detail": "status no-reaction"
+        },
+        "regiochemistry": {
+          "status": "abstained",
+          "detail": "no products offered"
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "no-reaction",
+        "rules": [
+          "organocuprate-conjugate-addition"
+        ],
+        "outcomes": []
+      },
+      "ms": 4
+    },
+    {
+      "id": "OM-04",
+      "category": "organometallic",
+      "kind": "step",
+      "title": "Suzuki coupling: 4-bromotoluene + phenylboronic acid gives 4-methylbiphenyl",
+      "provenance": "verified-primary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "correct",
+          "detail": "catalytic (generic)"
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "suzuki-coupling"
+        ],
+        "outcomes": [
+          {
+            "product": "Cc1ccc(-c2ccccc2)cc1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 36
+    },
+    {
+      "id": "OM-05",
+      "category": "organometallic",
+      "kind": "step",
+      "title": "Sonogashira coupling: 4-iodoanisole + phenylacetylene gives 4-methoxytolan",
+      "provenance": "verified-primary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "correct",
+          "detail": "catalytic (generic)"
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "sonogashira-coupling"
+        ],
+        "outcomes": [
+          {
+            "product": "COc1ccc(C#Cc2ccccc2)cc1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 33
+    },
+    {
+      "id": "OM-06",
+      "category": "organometallic",
+      "kind": "step",
+      "title": "Grignard + nitrile: benzonitrile + EtMgBr gives propiophenone",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "nitrile-grignard-ketone"
+        ],
+        "outcomes": [
+          {
+            "product": "CCC(=O)c1ccccc1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 23
+    },
+    {
+      "id": "OR-01",
+      "category": "oxidation-reduction",
+      "kind": "step",
+      "title": "PCC oxidation of a primary alcohol stops at the aldehyde (octan-1-ol)",
+      "provenance": "verified-primary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "correct",
+          "detail": "none (none)"
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "primary-alcohol-mild-oxidation"
+        ],
+        "outcomes": [
+          {
+            "product": "CCCCCCCC=O",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 16
+    },
+    {
+      "id": "OR-02",
+      "category": "oxidation-reduction",
+      "kind": "step",
+      "title": "Jones oxidation takes a primary alcohol to the carboxylic acid (hexan-1-ol)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "primary-alcohol-strong-oxidation"
+        ],
+        "outcomes": [
+          {
+            "product": "CCCCCC(=O)O",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 14
+    },
+    {
+      "id": "OR-03",
+      "category": "oxidation-reduction",
+      "kind": "step",
+      "title": "Birch reduction of anisole: 1-methoxycyclohexa-1,4-diene",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "aromatic-birch-reduction"
+        ],
+        "outcomes": [
+          {
+            "product": "COC1=CCC=CC1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 16
+    },
+    {
+      "id": "OR-04",
+      "category": "oxidation-reduction",
+      "kind": "step",
+      "title": "Reduction of a nitroarene to the aniline (4-nitrotoluene)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "nitroarene-reduction"
+        ],
+        "outcomes": [
+          {
+            "product": "Cc1ccc(N)cc1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 21
+    },
+    {
+      "id": "OR-05",
+      "category": "oxidation-reduction",
+      "kind": "step",
+      "title": "LiAlH4 reduction of an amide to an amine (N-methylbenzamide)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "amide-lah-reduction"
+        ],
+        "outcomes": [
+          {
+            "product": "CNCc1ccccc1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 20
+    },
+    {
+      "id": "OR-06",
+      "category": "oxidation-reduction",
+      "kind": "step",
+      "title": "LiAlH4 reduction of a nitrile to a primary amine (hexanenitrile)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "nitrile-lah-reduction"
+        ],
+        "outcomes": [
+          {
+            "product": "CCCCCCN",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 14
+    },
+    {
+      "id": "CP-01",
+      "category": "competing-pathways",
+      "kind": "step",
+      "title": "HBr + 1,3-butadiene without a stated temperature: 1,2 and 1,4 adducts are both legitimate",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "ambiguity": {
+          "status": "correct",
+          "detail": "no single winner declared"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "diene-hx-1-2-hbr",
+          "diene-hx-1-4-hbr"
+        ],
+        "outcomes": [
+          {
+            "product": "C=CC(C)Br",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          },
+          {
+            "product": "CC=CCBr",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 23
+    },
+    {
+      "id": "CP-02",
+      "category": "competing-pathways",
+      "kind": "step",
+      "title": "Friedel-Crafts acylation of naphthalene: alpha versus beta is solvent-dependent (ambiguous)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": true,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "ambiguity": {
+          "status": "correct",
+          "detail": "no single winner declared"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "aromatic-friedel-crafts-acylation"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(=O)c1ccc2ccccc2c1",
+            "class": "unranked",
+            "level": null,
+            "mixture": null
+          },
+          {
+            "product": "CC(=O)c1cccc2ccccc12",
+            "class": "unranked",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 138
+    },
+    {
+      "id": "US-01",
+      "category": "unsupported",
+      "kind": "unsupported",
+      "title": "Wacker oxidation: oct-1-ene to octan-2-one (PdCl2/CuCl2/O2)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": true,
+      "knownGap": null,
+      "dimensions": {
+        "unsupported": {
+          "status": "wrong",
+          "detail": "rules ketone-baeyer-villiger, thioether-oxidation-sulfoxide, thioether-oxidation-sulfone, sulfoxide-oxidation-sulfone, sulfoxide-reduction-thioether claim the reagents but do not give the reference product"
+        }
+      },
+      "engine": {
+        "claimingRules": [
+          "ketone-baeyer-villiger",
+          "thioether-oxidation-sulfoxide",
+          "thioether-oxidation-sulfone",
+          "sulfoxide-oxidation-sulfone",
+          "sulfoxide-reduction-thioether"
+        ],
+        "producingRules": []
+      },
+      "ms": 1150
+    },
+    {
+      "id": "US-02",
+      "category": "unsupported",
+      "kind": "unsupported",
+      "title": "Ring-closing metathesis (Grubbs): diethyl diallylmalonate to diethyl cyclopent-3-ene-1,1-dicarboxylate",
+      "provenance": "provisional",
+      "overlapsFixtures": true,
+      "knownGap": null,
+      "dimensions": {
+        "unsupported": {
+          "status": "correct-abstention",
+          "detail": "no rule claims this reagent system and nothing produces the reference product"
+        }
+      },
+      "engine": {
+        "claimingRules": [],
+        "producingRules": []
+      },
+      "ms": 998
+    },
+    {
+      "id": "US-03",
+      "category": "unsupported",
+      "kind": "unsupported",
+      "title": "Sharpless asymmetric epoxidation of geraniol (enantioselective, ligand-controlled)",
+      "provenance": "verified-primary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "stereochemistry": {
+          "status": "not-scored",
+          "detail": "stereo specified; configuration not asserted by the reference"
+        },
+        "unsupported": {
+          "status": "supported-correct",
+          "detail": "produced by alkene-epoxidation"
+        }
+      },
+      "engine": {
+        "claimingRules": [],
+        "producingRules": [
+          "alkene-epoxidation"
+        ]
+      },
+      "ms": 1169
+    },
+    {
+      "id": "US-04",
+      "category": "unsupported",
+      "kind": "unsupported",
+      "title": "Baeyer-Villiger oxidation: cyclohexanone to epsilon-caprolactone",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "unsupported": {
+          "status": "supported-correct",
+          "detail": "produced by ketone-baeyer-villiger"
+        }
+      },
+      "engine": {
+        "claimingRules": [
+          "ketone-baeyer-villiger"
+        ],
+        "producingRules": [
+          "ketone-baeyer-villiger"
+        ]
+      },
+      "ms": 260
+    },
+    {
+      "id": "US-05",
+      "category": "unsupported",
+      "kind": "unsupported",
+      "title": "Mitsunobu inversion: (S)-octan-2-ol + benzoic acid gives (R)-octan-2-yl benzoate",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "stereochemistry": {
+          "status": "not-scored",
+          "detail": "stereo specified; configuration not asserted by the reference"
+        },
+        "unsupported": {
+          "status": "supported-correct",
+          "detail": "produced by fischer-esterification"
+        }
+      },
+      "engine": {
+        "claimingRules": [],
+        "producingRules": [
+          "fischer-esterification"
+        ]
+      },
+      "ms": 97
+    },
+    {
+      "id": "RT-01",
+      "category": "multistep-route",
+      "kind": "route",
+      "title": "Styrene to acetophenone (hydration, then oxidation)",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "routeDiscovery": {
+          "status": "found",
+          "detail": ""
+        },
+        "routeVerification": {
+          "status": "verified",
+          "detail": ""
+        },
+        "routePlausibility": {
+          "status": "implausible",
+          "detail": "unexpected rules benzylic-allylic-alcohol-oxidation"
+        }
+      },
+      "engine": {
+        "outcome": "found",
+        "ruleSequence": [
+          "alkene-acid-hydration",
+          "benzylic-allylic-alcohol-oxidation"
+        ],
+        "routes": 1,
+        "ms": 2528
+      },
+      "ms": 2528
+    },
+    {
+      "id": "RT-02",
+      "category": "multistep-route",
+      "kind": "route",
+      "title": "Benzene to 1-bromo-3-nitrobenzene: nitration must come before bromination (meta directing)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "routeDiscovery": {
+          "status": "found",
+          "detail": ""
+        },
+        "routeVerification": {
+          "status": "verified",
+          "detail": ""
+        },
+        "routePlausibility": {
+          "status": "plausible",
+          "detail": "aromatic-nitration > aromatic-halogenation-bromination"
+        }
+      },
+      "engine": {
+        "outcome": "found",
+        "ruleSequence": [
+          "aromatic-nitration",
+          "aromatic-halogenation-bromination"
+        ],
+        "routes": 1,
+        "ms": 1537
+      },
+      "ms": 1537
+    },
+    {
+      "id": "RT-03",
+      "category": "multistep-route",
+      "kind": "route",
+      "title": "Toluene to 4-nitrobenzoic acid: nitrate first (o/p), then oxidize the methyl group",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "routeDiscovery": {
+          "status": "found",
+          "detail": ""
+        },
+        "routeVerification": {
+          "status": "verified",
+          "detail": ""
+        },
+        "routePlausibility": {
+          "status": "plausible",
+          "detail": "aromatic-nitration > benzylic-oxidation"
+        }
+      },
+      "engine": {
+        "outcome": "found",
+        "ruleSequence": [
+          "aromatic-nitration",
+          "benzylic-oxidation"
+        ],
+        "routes": 1,
+        "ms": 2814
+      },
+      "ms": 2814
+    },
+    {
+      "id": "WS-01",
+      "category": "multicatalytic",
+      "kind": "workspace",
+      "title": "Suzuki coupling, then hydride reduction: 4-bromobenzaldehyde + PhB(OH)2 to (biphenyl-4-yl)methanol",
+      "provenance": "provisional",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "workspace": {
+          "status": "correct",
+          "detail": ""
+        },
+        "routeVerification": {
+          "status": "verified",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "statuses": [
+          "reaction",
+          "reaction"
+        ],
+        "final": [
+          "OCc1ccc(-c2ccccc2)cc1"
+        ]
+      },
+      "ms": 71
+    },
+    {
+      "id": "WS-02",
+      "category": "multicatalytic",
+      "kind": "workspace",
+      "title": "Convergent: Sonogashira join of 4-iodoanisole and hex-1-yne, then Lindlar semi-hydrogenation (Z)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "workspace": {
+          "status": "correct",
+          "detail": ""
+        },
+        "routeVerification": {
+          "status": "verified",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "statuses": [
+          "reaction",
+          "reaction"
+        ],
+        "final": [
+          "CCCC/C=C\\c1ccc(OC)cc1"
+        ]
+      },
+      "ms": 84
+    }
+  ],
+  "sources": {
+    "reusch-e2": {
+      "cite": "Reusch, W. Virtual Textbook of Organic Chemistry (MSU): Steric Hindrance in E2 Elimination of 2-Bromo-2,3-Dimethylbutane by Alkoxide Bases",
+      "url": "https://www2.chemistry.msu.edu/faculty/reusch/virttxtjml/e2steric.htm",
+      "says": "methoxide gives about 80% of the more substituted alkene; tert-butoxide reverses the ratio to about 25:75"
+    },
+    "hamburg-sn2": {
+      "cite": "Univ. Hamburg organic chemistry lectures: Nucleophilic substitution and optical activity (2-bromooctane / 2-octanol)",
+      "url": "https://www-archiv.fdm.uni-hamburg.de/b-online/library/newton/Chy251_253/Lectures/Sn2OpticalActivity/Sn2OpticalActivity.html",
+      "says": "SN2 at 2-bromooctane proceeds with complete inversion (Hughes experiments)"
+    },
+    "ncstate-sn2": {
+      "cite": "NC State OpenStax-derived text, 11.2 The SN2 Reaction",
+      "url": "https://ncstate.pressbooks.pub/organicchem/chapter/11-2-the-sn2-reaction/",
+      "says": "SN2 is concerted backside attack with inversion of configuration"
+    },
+    "ubc-hbo": {
+      "cite": "UBC CHEM 203 lecture notes (15 Oct 2014): hydroboration-oxidation",
+      "url": "https://groups.chem.ubc.ca/chem203/15Oct14.pdf",
+      "says": "syn addition of H and B; anti-Markovnikov OH; retention on oxidation"
+    },
+    "jove-oxymerc": {
+      "cite": "JoVE Science Education 8.7: Oxymercuration-Reduction of Alkenes",
+      "url": "https://www.jove.com/t/11778",
+      "says": "mercurinium ion intermediate, no carbocation rearrangement, Markovnikov OH"
+    },
+    "vanderbilt-alkynes": {
+      "cite": "Vanderbilt University organic chemistry course, Chapter 9 Alkynes",
+      "url": "https://cdn.vanderbilt.edu/vu-wordpress-0/wp-content/uploads/sites/210/2017/04/19175255/Chapter_9.pdf",
+      "says": "Hg2+ hydration gives methyl ketones from terminal alkynes; hindered boranes give aldehydes"
+    },
+    "libretexts-alkyne-red": {
+      "cite": "LibreTexts (CCBC Organic Chemistry 1) 9.06 Reduction of Alkynes",
+      "url": "https://chem.libretexts.org/Workbench/Community_College_of_Baltimore_County_Organic_Chemistry_1/09%3A_Alkynes/9.06%3A_10.6_Reduction_of_Alkynes",
+      "says": "Lindlar gives cis alkenes; Na/NH3 gives trans alkenes"
+    },
+    "wikipedia-semihydrog": {
+      "cite": "Wikipedia: Semi-hydrogenation of alkynes",
+      "url": "https://en.wikipedia.org/wiki/Semi-hydrogenation_of_alkynes",
+      "says": "Lindlar catalyst: Pd/CaCO3 poisoned with lead; cis alkenes"
+    },
+    "orgosolver-dibal": {
+      "cite": "OrgoSolver reaction library: ester to aldehyde (DIBAL-H, -78 C)",
+      "url": "https://orgosolver.com/reaction-library/ester-reaction-guides/ester-to-aldehyde-dibalh",
+      "says": "one equivalent DIBAL-H at -78 C stops at the aldehyde; excess or warming over-reduces"
+    },
+    "pmc-dibal": {
+      "cite": "DIBALH: from known fundamental to an unusual reaction (PMC9042244)",
+      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9042244/",
+      "says": "DIBAL-H partial reduction of esters to aldehydes at low temperature"
+    },
+    "ic-os3": {
+      "cite": "Imperial College organic synthesis lecture 3",
+      "url": "https://www.ch.ic.ac.uk/local/organic/tutorial/OS_Lecture3_0304.pdf",
+      "says": "two equivalents of RMgX react with an ester to give a tertiary alcohol; LiAlH4 reduces esters to primary alcohols"
+    },
+    "uis-eas": {
+      "cite": "LibreTexts (Univ. of Illinois Springfield CHE 269) 18.07 EAS of Substituted Benzenes",
+      "url": "https://chem.libretexts.org/Courses/University_of_Illinois_Springfield/UIS%3A_CHE_269_(Morsch_and_Andrews)/Chapters/Chapter_18%3A_Electrophilic_Aromatic_Substitution/18.07_EAS_of_Substituted_Benzenes",
+      "says": "bromination of nitrobenzene needs strong heating and gives the meta isomer chiefly; toluene nitration ~58% ortho, ~37-39% para, 3-4.5% meta"
+    },
+    "ncstate-fc": {
+      "cite": "NC State: Chemistry of Benzene: Electrophilic Aromatic Substitution, solutions to problems",
+      "url": "https://ncstate.pressbooks.pub/orgchemstudentsolutions/?p=1894",
+      "says": "neopentyl chloride with benzene/AlCl3 gives 2-methyl-2-phenylbutane via a methyl shift (other pages in the search disagreed)"
+    },
+    "libretexts-grignard": {
+      "cite": "LibreTexts: Grignard Reagents (Synthesis of Aldehydes and Ketones)",
+      "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_%28Organic_Chemistry%29/Aldehydes_and_Ketones/Synthesis_of_Aldehydes_and_Ketones/Grignard_Reagents",
+      "says": "Grignard + nitrile gives a ketone on hydrolysis"
+    },
+    "chemguide-grignard": {
+      "cite": "Chemguide: An introduction to Grignard reagents",
+      "url": "https://chemguide.co.uk/organicprops/haloalkanes/grignard.html",
+      "says": "Grignard + CO2 then acid gives a carboxylic acid with one more carbon; Grignard + ethylene oxide gives a primary alcohol with two more carbons"
+    },
+    "iupac-birch": {
+      "cite": "IUPAC Pure Appl. Chem. 2003, 75, 1443 (Birch reduction)",
+      "url": "https://rsync.iupac.org/publications/pac/2003/pdf/7510x1443.pdf",
+      "says": "electron-donating substituents (OMe, Me, NR2) give 2,5-dihydro products, i.e. the substituent stays on a double bond"
+    },
+    "wikipedia-mch": {
+      "cite": "Wikipedia: Methylenecyclohexane",
+      "url": "https://en.wikipedia.org/wiki/Methylenecyclohexane",
+      "says": "made from cyclohexanone by Wittig methylenation"
+    },
+    "ncstate-halogenation": {
+      "cite": "NC State: 5.4 Halogenation of Alkenes: Addition of X2",
+      "url": "https://ncstate.pressbooks.pub/ch220/chapter/halogenation-of-alkenes-addition-of-x2/",
+      "says": "anti addition through a bromonium ion; cyclopentene gives only trans-1,2-dibromocyclopentane as a racemate"
+    },
+    "libretexts-syn-diol": {
+      "cite": "LibreTexts: Vicinal Syn Dihydroxylation",
+      "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_%28Organic_Chemistry%29/Alkenes/Reactivity_of_Alkenes/Vicinal_Syn_Dihydroxylation",
+      "says": "OsO4 adds syn through a cyclic osmate ester; cyclohexene gives cis-1,2-cyclohexanediol"
+    },
+    "jove-epoxidation": {
+      "cite": "JoVE / LibreTexts epoxidation pages (mCPBA)",
+      "url": "https://chem.libretexts.org/Courses/Nassau_Community_College/Organic_Chemistry_I_and_II/Map%253A_Organic_Chemistry_(Wade)/08%253A_Reactions_of_Alkenes/8.12%253A_Oxidation_of_Alkenes_-_Epoxidation",
+      "says": "concerted syn addition: a cis alkene gives a cis epoxide and a trans alkene a trans epoxide"
+    },
+    "ucla-pcc": {
+      "cite": "UCLA Illustrated Glossary of Organic Chemistry: PCC",
+      "url": "https://www.chem.ucla.edu/~harding/IGOC/P/pcc.html",
+      "says": "PCC oxidizes primary alcohols to aldehydes and secondary alcohols to ketones; anhydrous so no over-oxidation"
+    },
+    "moc-pcc": {
+      "cite": "Master Organic Chemistry: Oxidation of primary alcohols to aldehydes using PCC",
+      "url": "https://www.masterorganicchemistry.com/?p=3401",
+      "says": "PCC stops at the aldehyde; Jones (aqueous, strongly acidic) gives the carboxylic acid"
+    },
+    "ncstate-amines": {
+      "cite": "NC State: 12.4 Synthesis of Amines (reduction of nitriles, amides, nitro compounds)",
+      "url": "https://ncstate.pressbooks.pub/ch220/chapter/synthesis-of-amines/",
+      "says": "LiAlH4 reduces nitriles to primary amines and amides to amines; nitroarenes are reduced to amines by H2/catalyst or Fe/Sn/Zn with acid"
+    },
+    "openstax-conj": {
+      "cite": "OpenStax Organic Chemistry 14.3 Kinetic versus Thermodynamic Control of Reactions",
+      "url": "https://openstax.org/books/organic-chemistry/pages/14-3-kinetic-versus-thermodynamic-control-of-reactions",
+      "says": "HBr + 1,3-butadiene: 1,2 adduct (kinetic) favored at low T (71:29 at 0 C), 1,4 adduct (thermodynamic) at higher T (15:85 at 40 C)"
+    },
+    "rsc-naphthalene-fc": {
+      "cite": "J. Chem. Soc. 1966 (RSC) acylation of naphthalenes; solvent-dependent isomer ratios and reversible acylation",
+      "url": "https://pubs.rsc.org/en/Content/ArticleLanding/1966/J3/J39660000181",
+      "says": "the alpha/beta product ratio depends on solvent (CS2 vs nitrobenzene); alpha is kinetic, beta thermodynamic (shown for substituted naphthalenes)"
+    },
+    "libretexts-wacker": {
+      "cite": "LibreTexts: Wacker Oxidation",
+      "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_(Organic_Chemistry)/Reactions/Organic_Reactions/Wacker_Oxidation",
+      "says": "PdCl2/CuCl2/O2 converts terminal alkenes to methyl ketones (Markovnikov)"
+    },
+    "katsuki-sharpless-1980": {
+      "cite": "Katsuki, T.; Sharpless, K. B. J. Am. Chem. Soc. 1980, 102, 5974-5976 (bibliographic data confirmed via Chem-Station)",
+      "url": "https://en.chem-station.com/?p=1560",
+      "says": "Ti(OiPr)4/dialkyl tartrate/TBHP enantioselective epoxidation of allylic alcohols; configuration set by the tartrate"
+    },
+    "orgosolver-bv": {
+      "cite": "OrgoSolver: Baeyer-Villiger oxidation (mCPBA, RCO3H)",
+      "url": "https://orgosolver.com/reaction-library/alkene-reaction-guides/baeyer-villiger-reaction",
+      "says": "cyclohexanone + peracid gives the ring-expanded lactone (epsilon-caprolactone)"
+    },
+    "namereaction-mitsunobu": {
+      "cite": "name-reaction.com / Chem-Station: Mitsunobu reaction",
+      "url": "https://www.name-reaction.com/mitsunobu-reaction",
+      "says": "secondary alcohols undergo complete inversion (SN2) with PPh3/DEAD and a carboxylic acid"
+    },
+    "heck-1979": {
+      "cite": "Heck, R. F. Acc. Chem. Res. 1979, 12, 146-151",
+      "url": "https://uwindsor.ca/people/jgreen/sites/uwindsor.ca.people.jgreen/files/acr-1979-12-146_heck_0.pdf",
+      "says": "Pd-catalyzed arylation of alkenes; syn insertion and syn beta-H elimination; trans-cinnamates"
+    },
+    "suzuki-1979": {
+      "cite": "Miyaura, N.; Yamada, K.; Suzuki, A. Tetrahedron Lett. 1979, 20, 3437-3440; Miyaura, N.; Suzuki, A. Chem. Rev. 1995, 95, 2457-2483 (confirmed this session)",
+      "url": "https://eprints.lib.hokudai.ac.jp/repo/huscap/all/44006/tetrahedronletters1979.pdf",
+      "says": "Pd-catalyzed cross-coupling of organoboron compounds with organic halides"
+    },
+    "sonogashira-1975": {
+      "cite": "Sonogashira, K.; Tohda, Y.; Hagihara, N. Tetrahedron Lett. 1975, 16, 4467-4470 (confirmed this session)",
+      "url": "https://www.thieme-connect.com/products/ejournals/html/10.1055/a-2467-6312",
+      "says": "Pd/Cu coupling of terminal alkynes with aryl/vinyl halides"
+    },
+    "corey-suggs-1975": {
+      "cite": "Corey, E. J.; Suggs, J. W. Tetrahedron Lett. 1975, 16, 2647-2650 (confirmed this session)",
+      "url": "https://www.organic-chemistry.org/abstracts/literature/599.shtm",
+      "says": "pyridinium chlorochromate oxidizes alcohols to carbonyl compounds"
+    }
+  }
+}

@@ -20,7 +20,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { closeEngine, getRdkit, loadEngine, loadModule } from "../../tests/engine.mjs";
-import { CASES, SOURCES } from "./cases.mjs";
+import { CASES, CORRECTIONS, SOURCES } from "./cases.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -123,8 +123,11 @@ function scoreRegiochemistry(expect, outcomes) {
     return sole.every((c) => offered.includes(c)) ? verdict("correct") : verdict("wrong", "expected regioisomer missing");
   }
   if (engine.kind === "unranked") return verdict("abstained", "engine offers several outcomes and ranks none as major");
-  const stray = engine.constitutions.filter((c) => !expectedMajor.includes(c));
-  if (stray.length === 0 && engine.constitutions.length > 0) return verdict("correct", engine.kind === "sole" ? "only outcome" : "engine-ranked major");
+  // Only products the case lists can make this wrong; an unlisted coproduct is ignored.
+  const expectedMinor = (expect.products ?? []).filter((p) => p.role === "minor").map((p) => constitution(p.smiles));
+  const hitsMajor = engine.constitutions.some((c) => expectedMajor.includes(c));
+  const hitsWrong = engine.constitutions.some((c) => expectedMinor.includes(c) || forbidden.includes(c));
+  if (hitsMajor && !hitsWrong) return verdict("correct", engine.kind === "sole" ? "only outcome" : "engine-ranked major");
   return verdict("wrong", `engine major ${engine.constitutions.join(", ")}`);
 }
 
@@ -298,8 +301,15 @@ for (const testCase of CASES) {
       else status = verdict("wrong", `rules ${run.claimingRules.join(", ")} claim the reagents but do not give the reference product`);
       const stereoWanted = testCase.expect.products.some((p) => p.stereoSpecified);
       if (produced && stereoWanted) {
-        const marked = run.producedPathways.some((p) => hasStereoMark(p.productSmiles));
-        record.dimensions.stereochemistry = marked ? verdict("not-scored", "stereo specified; configuration not asserted by the reference") : verdict("incomplete", "stereochemistry unspecified");
+        const target = testCase.expect.products.find((p) => p.stereoSpecified || p.cip);
+        const wantedConstitution = constitution(target.smiles);
+        const members = run.producedPathways.flatMap((p) => (p.productMixture?.memberSmiles?.length ? p.productMixture.memberSmiles : [p.productSmiles]).flatMap(components)).filter((part) => constitution(part) === wantedConstitution);
+        const tetrahedral = members.filter((part) => /@/.test(part));
+        if (tetrahedral.length === 0) record.dimensions.stereochemistry = verdict("incomplete", "no new tetrahedral stereochemistry specified");
+        else if (target.cip) {
+          const got = new Set(tetrahedral.map(cipAtoms));
+          record.dimensions.stereochemistry = got.size === 1 && got.has(target.cip[0]) ? verdict("correct") : verdict("wrong", `CIP ${[...got].join("/")} vs expected ${target.cip.join("/")}`);
+        } else record.dimensions.stereochemistry = verdict("not-scored", "stereo specified; configuration not asserted by the reference");
       }
       record.dimensions.unsupported = status;
       record.engine = { claimingRules: run.claimingRules, producingRules: run.producing };
@@ -392,7 +402,7 @@ const summary = {
   runtime: { totalMs: records.reduce((sum, r) => sum + r.ms, 0), slowestMs: Math.max(...records.map((r) => r.ms)), peakRssMB: Math.round(peakRss / 1048576) },
 };
 fs.mkdirSync(path.dirname(outFile), { recursive: true });
-fs.writeFileSync(outFile, JSON.stringify({ summary, records, sources: SOURCES }, null, 2));
+fs.writeFileSync(outFile, JSON.stringify({ summary, records, sources: SOURCES, corrections: CORRECTIONS }, null, 2));
 console.log(`\nwrote ${path.relative(process.cwd(), outFile)}\n${JSON.stringify(summary.referenceValidated, null, 1)}`);
 await closeEngine();
 process.exit(0);

@@ -262,8 +262,8 @@ export const CASES = [
     id: "CB-07", category: "carbonyl", kind: "step",
     title: "Cannizzaro: benzaldehyde with concentrated NaOH gives benzyl alcohol and benzoic acid/benzoate",
     reactants: ["O=Cc1ccccc1", "O=Cc1ccccc1"], rule: "aldehyde-cannizzaro",
-    expect: { products: [{ smiles: "OCc1ccccc1", role: "formed" }, { smiles: "OC(=O)c1ccccc1", role: "formed" }] },
-    provenance: { level: M.provisional, sources: [], note: "Retrieved only from educational-company pages." },
+    expect: { products: [{ smiles: "OCc1ccccc1", role: "formed" }, { smiles: "[O-]C(=O)c1ccccc1", role: "formed" }] },
+    provenance: { level: M.provisional, sources: [], note: "Retrieved only from educational-company pages. The retrieved text names sodium benzoate (a carboxylate salt under the basic conditions); the first-pass expectation wrote the free acid (authoring slip, corrected after run 1)." },
   },
 
   // ----------------------------------------------------------------- aromatic substitution
@@ -412,7 +412,7 @@ export const CASES = [
   {
     id: "US-01", category: "unsupported", kind: "unsupported",
     title: "Wacker oxidation: oct-1-ene to octan-2-one (PdCl2/CuCl2/O2)",
-    reactants: ["C=CCCCCCC"], reagentPattern: "Wacker|PdCl|PdCl2|oxygen",
+    reactants: ["C=CCCCCCC"], reagentPattern: "Wacker|PdCl",
     expect: { products: [{ smiles: "CC(=O)CCCCCC", role: "sole" }] },
     provenance: { level: M.secondary, sources: ["libretexts-wacker"], note: "" },
   },
@@ -441,8 +441,8 @@ export const CASES = [
     id: "US-05", category: "unsupported", kind: "unsupported",
     title: "Mitsunobu inversion: (S)-octan-2-ol + benzoic acid gives (R)-octan-2-yl benzoate",
     reactants: ["CCCCCC[C@H](C)O", "OC(=O)c1ccccc1"], reagentPattern: "Mitsunobu|DEAD|DIAD|PPh3.*DE",
-    expect: { products: [{ smiles: "CCCCCC[C@H](C)OC(=O)c1ccccc1", role: "sole", stereoSpecified: true }] },
-    provenance: { level: M.secondary, sources: ["namereaction-mitsunobu"], note: "Inversion is sourced; CIP labels of the ester were not asserted." },
+    expect: { products: [{ smiles: "CCCCCC[C@@H](C)OC(=O)c1ccccc1", role: "sole", cip: ["R"] }] },
+    provenance: { level: M.secondary, sources: ["namereaction-mitsunobu"], note: "Inversion is sourced. The first-pass expected SMILES kept the (S) tag (retention): an authoring error found when reviewing run 1, corrected by derivation (the ester O has the same CIP rank as the alcohol O, so inversion flips S to R)." },
   },
 
   // ----------------------------------------------------------------- multi-step routes (search)
@@ -450,7 +450,8 @@ export const CASES = [
     id: "RT-01", category: "multistep-route", kind: "route",
     title: "Styrene to acetophenone (hydration, then oxidation)",
     start: "C=Cc1ccccc1", target: "CC(=O)c1ccccc1",
-    expect: { feasible: true, allowedRules: ["alkene-acid-hydration", "alkene-oxymercuration-demercuration", "secondary-alcohol-oxidation-pcc", "secondary-alcohol-oxidation-strong"], forbiddenRules: ["alkene-hydroboration-oxidation"] },
+    expect: { feasible: true, allowedRules: ["alkene-acid-hydration", "alkene-oxymercuration-demercuration", "secondary-alcohol-oxidation-pcc", "secondary-alcohol-oxidation-strong", "benzylic-allylic-alcohol-oxidation"], forbiddenRules: ["alkene-hydroboration-oxidation"] },
+    // run 1 found hydration + benzylic-allylic-alcohol-oxidation; that oxidation (a benzylic secondary alcohol to the ketone) is chemically acceptable, so the pre-registered allow-list was incomplete and was extended after review (disclosed in CORRECTIONS).
     provenance: { level: M.provisional, sources: ["jove-oxymerc", "ucla-pcc"], note: "Each step is standard; the Markovnikov hydration of styrene was not sourced." },
   },
   {
@@ -491,4 +492,17 @@ export const CASES = [
     expect: { statuses: ["reaction", "reaction"], live: [`CCCC/C=C${B}c1ccc(OC)cc1`], catalyticSteps: [1, 2], intermediates: { 1: "CCCCC#Cc1ccc(OC)cc1" } },
     provenance: { level: M.secondary, sources: ["sonogashira-1975", "libretexts-alkyne-red"], note: "Both steps are sourced individually; the sequence is not a literature route. Only one branch (the alkyne partner) is untransformed." },
   },
+];
+
+/**
+ * Corrections made after the first scoring pass (run 1 is kept in results/). Each is an authoring or scorer
+ * defect, not a change of a literature-based answer to suit PocketChem, and is disclosed in the report.
+ */
+export const CORRECTIONS = [
+  { id: "scorer-coproducts", scope: "scorer", note: "Regiochemistry counted an unlisted coproduct (methanol from DIBAL reduction) as a stray 'major'. Now only products the case lists (major, minor, forbidden) can make a verdict wrong." },
+  { id: "CB-07", scope: "case", note: "Expected product changed from benzoic acid to the benzoate anion (the sourced product is sodium benzoate)." },
+  { id: "US-01", scope: "case", note: "The registry-claim pattern included the word 'oxygen' and matched unrelated oxidation rules; narrowed to Wacker/PdCl." },
+  { id: "US-05", scope: "case", note: "Expected ester stereochemistry was written as retention; corrected to inversion, (R)." },
+  { id: "scorer-unsupported-stereo", scope: "scorer", note: "For stereo-specified unsupported cases only new tetrahedral centres ('@') count; a retained alkene geometry ('/') no longer counts as stereochemistry being specified." },
+  { id: "RT-01", scope: "case", note: "Allow-list extended with benzylic-allylic-alcohol-oxidation after review." },
 ];
