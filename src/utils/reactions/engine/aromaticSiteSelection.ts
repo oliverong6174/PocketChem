@@ -100,6 +100,14 @@ function isSulfonylSulfur(graph: Graph, atom: number): boolean {
 }
 
 /**
+ * Small preference for para over ortho used to order products for bulky electrophiles (Friedel-Crafts). It is a
+ * steric tie-break, not an electronic difference between the two positions, so formal ortho and para
+ * products must not be separated by it when the electrophile is not bulky: toluene nitration is about
+ * 58% ortho, 4% meta and 38% para (LibreTexts/UIS CHE 269, 18.07), i.e. ortho is not minor.
+ */
+const PARA_STERIC_BONUS = 0.45;
+
+/**
  * Scores one pre-existing substituent on a simple benzene ring.  Critically,
  * classification starts from the atom DIRECTLY bonded to the ring, so
  * Ar-CH2-C(=O)R remains an alkyl/benzylic o/p director while Ar-C(=O)-R is a
@@ -109,7 +117,7 @@ function substituentContribution(graph: Graph, root: number, distance: number): 
   const symbol=graph.symbols[root];
   const orthoPara = distance===1 || distance===3;
   const meta = distance===2;
-  const paraBonus = distance===3 ? 0.45 : 0;
+  const paraBonus = distance===3 ? PARA_STERIC_BONUS : 0;
 
   if (symbol === "O") return 4.0 + (orthoPara ? 4.0 + paraBonus : 0) + (meta ? -1.5 : 0);
   if (symbol === "N") {
@@ -216,7 +224,11 @@ async function scoreProduct(substrate: string, product: string, electrophile: Ea
   } finally { substrateQuery.delete?.(); mol.delete?.(); }
 }
 
-/** Rank formal EAS products by ring activation plus directing effects. */
+/**
+ * Keeps every product whose site is as electronically activated as the best one. The para steric tie-break does
+ * not exclude ortho (see PARA_STERIC_BONUS); the ortho:para ratio itself is not modelled, so the survivors are
+ * returned unranked and callers must not describe any one of them as the major product.
+ */
 export async function selectMajorAromaticEasProducts(
   substrateSmiles: string,
   products: string[],
@@ -233,7 +245,7 @@ export async function selectMajorAromaticEasProducts(
   // Do not partially rank fused/unsupported systems.
   if (unsupported || !scored.length) return products;
   const best=Math.max(...scored.map((item)=>item.score));
-  return scored.filter((item)=>Math.abs(item.score-best)<1e-6).map((item)=>item.product);
+  return scored.filter((item)=>best-item.score<PARA_STERIC_BONUS+1e-6).map((item)=>item.product);
 }
 
 /**

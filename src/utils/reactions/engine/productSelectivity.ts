@@ -13,6 +13,7 @@ import {
   canonicalizeStereoStructure,
   filterProductsByRelativeSubstituentFace,
 } from "./stereochemistry";
+import { elimination } from "./handlers/elimination";
 
 type Histogram = Map<number, number>;
 
@@ -425,7 +426,7 @@ async function assessEasDirecting(
   const ties = numeric.filter((score) => Math.abs(score - best) < 1e-6).length;
   const gap = best - numeric[index];
   const basisTail =
-    "Estimated from the substituents' directing effects only; the ortho/para ratio, steric effects and, for alkylation, carbocation rearrangement and polyalkylation are not modeled.";
+    "Estimated from the substituents' directing effects only: this ranks ring positions of one alkyl group, not direct versus carbocation-rearranged products (listed separately and left unranked). The ortho/para ratio, steric effects and polyalkylation are not modeled.";
   if (gap < 1e-6 && ties === 1) {
     return { level: "major", estimatedFraction: null, planningPenalty: 0, label: "Favored ring position (qualitative)", basis: `Most activated position for substitution. ${basisTail}` };
   }
@@ -433,6 +434,78 @@ async function assessEasDirecting(
     return { level: "competitive", estimatedFraction: null, planningPenalty: 10, label: "Competitive ring position (qualitative)", basis: `Similarly activated as the best position. ${basisTail}` };
   }
   return { level: "minor", estimatedFraction: null, planningPenalty: 40, label: "Disfavored ring position (qualitative)", basis: `Clearly less activated than the best position. ${basisTail}` };
+}
+
+const ELIMINATION_REFERENCES = {
+  smallBase:
+    "Zaitsev rule: with small strong bases (hydroxide, methoxide, ethoxide) E2 gives mainly the more substituted alkene (LibreTexts, Elimination by the E2 mechanism; UCLA Illustrated Glossary of Organic Chemistry, Hofmann's rule: 2-bromo-2-methylbutane with methoxide gives 2-methylbut-2-ene as the major product; Reusch, MSU: 2-bromo-2,3-dimethylbutane with methoxide gives 80% of the tetrasubstituted alkene).",
+  bulkyBase:
+    "Bulky bases such as tert-butoxide tend to give higher yields of the less substituted alkene (LibreTexts, Elimination by the E2 mechanism); for tertiary halides this is the major product: 2-bromo-2-methylbutane gives 2-methylbut-1-ene (UCLA glossary) and 2-bromo-2,3-dimethylbutane gives about 75% of 2,3-dimethylbut-1-ene (Reusch, MSU).",
+};
+
+/** Alkene bonds conjugated with an aryl group, carbonyl, nitrile or another alkene: substitution count alone does not rank these. */
+const CONJUGATED_ALKENE = "[CX3]=[CX3]-[$(c),$([CX3]=O),$(C#N),$([CX3]=[CX3])]";
+
+/**
+ * Qualitative Zaitsev/Hofmann ranking of the constitutional alkenes an E1/E2 rule offers. The rule's own
+ * outcomes are the siblings. Returns null (unranked) whenever the principle does not safely apply: one
+ * constitution only, the leaving group on a ring carbon (anti-periplanar access decides), or alkenes that differ
+ * in conjugation. Fractions are never invented; E/Z geometry within one constitution is not ranked here.
+ */
+async function assessEliminationRegiochemistry(
+  rule: ReactionRule,
+  substrate: string,
+  productSmiles: string,
+): Promise<ReactionSelectivityAssessment | null> {
+  const mode = rule.selectivityProfile?.regiochemistry?.mode;
+  const transform = rule.transform;
+  if ((mode !== "zaitsev" && mode !== "hofmann") || transform.type !== "customHandler" || transform.handler !== "elimination") {
+    return null;
+  }
+  const options = transform.options;
+  if (options.mode !== "e1" && options.mode !== "e2" && options.mode !== "betaElimination") return null;
+  if (await smartsMatches(substrate, "[C;R]-[Cl,Br,I,OX2H]")) return null;
+
+  const siblings = await elimination(substrate, options);
+  const groups = new Map<string, { score: number; conjugated: boolean }>();
+  const baseline = await totalAlkeneSubstitutionScore(substrate);
+  for (const sibling of siblings) {
+    const key = (await canonicalizeStereoStructure(sibling))?.connectivity;
+    if (!key || groups.has(key)) continue;
+    groups.set(key, {
+      score: (await totalAlkeneSubstitutionScore(sibling)) - baseline,
+      conjugated: await smartsMatches(sibling, CONJUGATED_ALKENE),
+    });
+  }
+  const own = groups.get((await canonicalizeStereoStructure(productSmiles))?.connectivity ?? "");
+  if (!own || groups.size < 2) return null;
+  const all = [...groups.values()];
+  if (all.some((entry) => entry.conjugated !== all[0].conjugated)) return null;
+
+  const scores = all.map((entry) => entry.score);
+  const high = Math.max(...scores);
+  const low = Math.min(...scores);
+  const tail = " Qualitative preference, not a measured ratio; E/Z geometry within a constitution is not ranked.";
+  if (high === low) {
+    return { level: "competitive", estimatedFraction: null, planningPenalty: 10, label: "Competitive alkene (qualitative)", basis: `The alkenes are equally substituted.${tail}` };
+  }
+  if (mode === "zaitsev") {
+    return own.score === high
+      ? { level: "major", estimatedFraction: null, planningPenalty: 0, label: "Major product (qualitative)", basis: `${ELIMINATION_REFERENCES.smallBase} This is the more substituted alkene.${tail}` }
+      : { level: "minor", estimatedFraction: null, planningPenalty: 40, label: "Minor product (qualitative)", basis: `${ELIMINATION_REFERENCES.smallBase} This is a less substituted alkene.${tail}` };
+  }
+  // Hofmann (bulky base): the documented major-product cases are tertiary halides; elsewhere both stay competitive.
+  const tertiary = await smartsMatches(substrate, "[C;H0;X4]-[Cl,Br,I,OX2H]");
+  if (tertiary && own.score === low) {
+    return { level: "major", estimatedFraction: null, planningPenalty: 0, label: "Major product (qualitative)", basis: `${ELIMINATION_REFERENCES.bulkyBase} This is the less substituted alkene from a tertiary halide.${tail}` };
+  }
+  return {
+    level: "competitive",
+    estimatedFraction: null,
+    planningPenalty: 10,
+    label: "Competitive alkene (qualitative)",
+    basis: `${ELIMINATION_REFERENCES.bulkyBase} ${tertiary ? "This is the more substituted alkene, which remains a significant product." : "The documented major-product cases are tertiary halides; for this substrate neither alkene is ranked as major."}${tail}`,
+  };
 }
 
 export async function assessReactionProductSelectivity(
@@ -443,6 +516,9 @@ export async function assessReactionProductSelectivity(
 ): Promise<ReactionSelectivityAssessment | null> {
   if (rule.selectivityProfile?.easDirecting) {
     return assessEasDirecting(rule, allReactantSmiles, productSmiles);
+  }
+  if (rule.selectivityProfile?.regiochemistry?.mode === "zaitsev" || rule.selectivityProfile?.regiochemistry?.mode === "hofmann") {
+    return assessEliminationRegiochemistry(rule, reactantSmiles, productSmiles);
   }
   if (rule.productPreferences?.length) {
     return assessDeclaredPreference(rule, allReactantSmiles, productSmiles);
@@ -564,6 +640,20 @@ export async function applyRuleProductSelectivity(
   selected = await applyMechanismProductPostconditions(rule, selected);
 
   if (profile?.mixture === "expected") return selected;
+
+  if (profile?.keepConstitutionalAlternatives && selected.length > 1) {
+    if (!profile.stereochemistry?.stereoselective) return selected;
+    // One product per constitution (the first, which the handler orders E before Z); constitutions are all kept.
+    const seen = new Set<string>();
+    const perConstitution: string[] = [];
+    for (const product of selected) {
+      const key = (await canonicalizeStereoStructure(product))?.connectivity ?? product;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      perConstitution.push(product);
+    }
+    return perConstitution;
+  }
 
   // `mixture: "single"` is now enforced, not merely descriptive metadata.
   // A rule that promises one major product must not leak lower-ranked RDKit

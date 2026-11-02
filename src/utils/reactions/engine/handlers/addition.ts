@@ -4,6 +4,7 @@ import { classifyCarbonyl } from "./carbonylUtils";
 import { epoxideOrganometallicOpening } from "./ring";
 import { totalAlkeneSubstitutionScore } from "../productSelectivity";
 import { filterProductsByRelativeSubstituentFace } from "../stereochemistry";
+import { enumerateCarbocationPrecursors } from "./carbocationUtils";
 
 export type OneTwoAdditionNucleophile = "water" | "cyanide";
 export type AlkeneAdditionRegioselectivity =
@@ -426,6 +427,32 @@ async function epoxidationThenOrganometallicOpening(
   return [...products];
 }
 
+/**
+ * Adds the products of favorable 1,2-hydride/alkyl shifts of the carbocation that the Markovnikov product
+ * implies. The alcohol (or halide) product is the virtual precursor of that cation, so the shared
+ * SN1/E1 shift enumerator applies directly; shifts that only trade equally stable cations are not
+ * generated. Direct and rearranged products are all returned and none is ranked. Only rules that declare
+ * `rearrangement: "carbocation"` (the ionic mechanisms) use this; hydroboration and oxymercuration do not.
+ */
+async function addCarbocationRearrangements(
+  products: string[],
+  leavingGroup: "alcohol" | "halide",
+  options?: Record<string, unknown>,
+): Promise<string[]> {
+  if (options?.rearrangement !== "carbocation") return products;
+  const all = new Set(products);
+  for (const product of products) {
+    const shifted = await enumerateCarbocationPrecursors(product, {
+      leavingGroup,
+      includeUnrearranged: false,
+      maxShiftDepth: 2,
+      maxCandidates: 4,
+    });
+    for (const precursor of shifted) all.add(precursor.smiles);
+  }
+  return [...all];
+}
+
 async function alkeneHydration(
   reactantSmiles: string,
   options?: Record<string, unknown>,
@@ -451,7 +478,7 @@ async function alkeneHydration(
     }
   }
 
-  return [...products];
+  return addCarbocationRearrangements([...products], "alcohol", options);
 }
 
 async function alkeneHydrohalogenation(
@@ -488,7 +515,7 @@ async function alkeneHydrohalogenation(
     }
   }
 
-  return [...products];
+  return addCarbocationRearrangements([...products], "halide", options);
 }
 
 

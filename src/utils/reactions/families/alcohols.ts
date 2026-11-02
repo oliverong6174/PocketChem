@@ -176,7 +176,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
       allowsRearrangement: true,
     },
     selectivity: [
@@ -223,7 +223,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
       allowsRearrangement: false,
     },
     selectivity: ["No free primary carbocation", "Usually the more stable accessible alkene"],

@@ -4,7 +4,7 @@
 // lets the molecule continue. The legacy behavior is an explicit diagnostic mode.
 import { after, before, describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { closeEngine, loadEngine } from "./engine.mjs";
+import { closeEngine, loadEngine, loadModule } from "./engine.mjs";
 
 let utils;
 let registry;
@@ -78,7 +78,11 @@ describe("default policy: a branch stops when an intermediate was not formed", (
 describe("independent branches continue when an unrelated branch fails", () => {
   // OCC(C)O is methylated at either hydroxyl (two branches). The "partner" rule fits only a free primary
   // OH, so only one branch hits a needs-input stop; the other continues to a real oxidation.
-  const methylate = variant(
+  // Built in before(): byId is only populated by the file-level before() hook, after describe bodies run.
+  let methylate;
+  let needsPartner;
+  before(() => {
+  methylate = variant(
     "alkene-hydrogenation",
     {
       trigger: { includeSmarts: ["[OX2H]"] },
@@ -90,11 +94,12 @@ describe("independent branches continue when an unrelated branch fails", () => {
     },
     "synthetic-methylate-hydroxyl",
   );
-  const needsPartner = variant(
+  needsPartner = variant(
     "fischer-esterification",
     { trigger: { includeSmarts: ["[CH2][OX2H]"] }, constraints: [], competition: undefined },
     "synthetic-needs-partner-primary-oh",
   );
+  });
   const rules = () => [...registry, methylate, needsPartner];
 
   test("[engine] one branch stops at needs-input while the other runs its remaining steps", async () => {
@@ -105,8 +110,11 @@ describe("independent branches continue when an unrelated branch fails", () => {
     const continued = byPath["reaction>no-reaction>reaction"];
     assert.ok(stopped, JSON.stringify(Object.keys(byPath)));
     assert.ok(continued, JSON.stringify(Object.keys(byPath)));
-    assert.equal(stopped.steps[0].productSmiles, "OCC(C)OC", "the branch with the free primary OH");
-    assert.equal(continued.steps[2].productSmiles, "COCC(C)=O");
+    // Compared as canonical structures: the same molecule can be written several ways.
+    const stereo = await loadModule("/src/utils/reactions/engine/stereochemistry.ts");
+    const canon = async (smiles) => (await stereo.canonicalizeStereoStructure(smiles)).isomeric;
+    assert.equal(await canon(stopped.steps[0].productSmiles), await canon("OCC(C)OC"), "the branch with the free primary OH");
+    assert.equal(await canon(continued.steps[2].productSmiles), await canon("COCC(C)=O"));
   });
 
   test("[engine] diagnostic mode lets the stopped branch continue provisionally and nothing else changes", async () => {

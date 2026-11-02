@@ -162,6 +162,7 @@ export const alkeneReactionRules: ReactionRule[] = [
         mode: "alkeneHydrohalogenation",
         halogen: halogen.symbol,
         regioselectivity: "markovnikov",
+        rearrangement: "carbocation",
       },
     },
     productStatus: "computed",
@@ -184,7 +185,7 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Carbocation rearrangements can occur under the ionic mechanism.",
     ],
     limitations: [
-      "The current hydrohalogenation handler enforces the unrearranged Markovnikov connectivity; carbocation rearrangements are not yet generated for this alkene rule.",
+      "When the first-formed carbocation can shift to a clearly more stable one (3,3-dimethylbut-1-ene, 3-methylbut-1-ene) both the direct and the rearranged halide are listed and neither is ranked: textbooks report an approximately equal mixture for HCl + 3,3-dimethylbut-1-ene. Shifts between equally stable cations are not generated.",
     ],
     competition: { group: "hx-addition-conjugation", specificity: 10 },
     priority: 110 + index,
@@ -359,6 +360,7 @@ export const alkeneReactionRules: ReactionRule[] = [
       options: {
         mode: "alkeneHydration",
         regioselectivity: "markovnikov",
+        rearrangement: "carbocation",
       },
     },
     productStatus: "computed",
@@ -373,7 +375,7 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Carbocation rearrangements may occur.",
     ],
     limitations: [
-      "The current hydration handler enforces the unrearranged Markovnikov connectivity but does not yet generate carbocation-rearranged hydration products.",
+      "When the first-formed carbocation can shift to a clearly more stable one (3,3-dimethylbut-1-ene, 3-methylbut-1-ene) both the direct and the rearranged alcohol are listed and neither is ranked. Shifts between equally stable cations are not generated.",
     ],
     priority: 140,
   },

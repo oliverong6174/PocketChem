@@ -44,12 +44,13 @@ const birchTrigger = aromaticTrigger;
 const easModelNotes = {
   productStatus: "computed" as const,
   selectivityProfile: {
-    mixture: "single" as const,
-    majorProductOnly: true,
+    // Positions as activated as the best one are all kept: ortho and para are both formed from an ortho/para director.
+    mixture: "possible" as const,
     sitePreference: "most-activated-aromatic-site" as const,
   },
   limitations: [
-    "Simple benzene rings are ranked by ring activation/deactivation plus ortho/meta/para directing effects. Fused polycyclic aromatics intentionally fall back to unranked enumeration rather than applying simple-benzene directing constants outside their domain.",
+    "Simple benzene rings are screened by ring activation/deactivation plus ortho/meta/para directing effects; positions the model scores as equally activated (for example ortho and para of toluene) are all listed and left unranked. The ortho:para ratio, which depends on the electrophile, solvent and temperature, is not predicted.",
+    "Fused polycyclic aromatics intentionally fall back to unranked enumeration rather than applying simple-benzene directing constants outside their domain.",
   ],
 };
 
@@ -134,7 +135,7 @@ export const aromaticReactionRules: ReactionRule[] = [
     selectivity: [
       "Directing groups are classified from the atom directly bonded to the ring: resonance donors and alkyl/benzylic groups direct ortho/para; directly attached carbonyl, nitro, cyano, and sulfonyl groups direct meta; halogens are deactivating but ortho/para directing.",
       "When several benzene rings are present, ring activation/deactivation is ranked before positional preference; Ar–CH₂–C(=O)R is therefore not misclassified as a directly attached acyl meta director.",
-      "For a monosubstituted alkyl/benzylic ring, para is preferred over ortho when steric effects distinguish them.",
+      "For a monosubstituted alkyl/benzylic ring both ortho and para products are formed (toluene nitration is reported as about 58% ortho, 4% meta, 38% para); PocketChem lists both and does not rank them.",
     ],
     ...easModelNotes,
     planningCost: 72,
@@ -518,16 +519,18 @@ export const aromaticReactionRules: ReactionRule[] = [
       type: "reactionSmarts",
       smarts: "[cH:1].[C;X4:2][Cl,Br,I]>>[c:1]-[C:2]",
       maxProducts: 12,
+      carbocationRearrangement: { leavingGroup: "halide" },
     },
     productStatus: "representative",
     mechanism: "Electrophilic aromatic substitution",
-    selectivityProfile: { easDirecting: "alkyl", mixture: "possible" },
+    selectivityProfile: { easDirecting: "alkyl", mixture: "possible", allowsRearrangement: true },
     competition: { group: "friedel-crafts-alkylation", specificity: 10 },
     limitations: [
       "Ring positions are ranked qualitatively by the substituents' directing effects only (simple benzene rings); the ortho/para ratio is not modeled. Fused rings are not ranked.",
       "Fails on strongly deactivated rings.",
       "Amino groups complex strongly with AlCl₃ unless protected.",
-      "Carbocation rearrangement and polyalkylation may occur; the generated structure represents direct attachment of the drawn alkyl group.",
+      "The alkyl halide is treated as a carbocation source: when a 1,2-hydride or methyl shift gives a clearly more stable cation (neopentyl to tert-pentyl, n-propyl to isopropyl) the rearranged alkylarene is listed as well as the direct one. The ratio of direct to rearranged product depends on conditions and is not predicted, so neither is ranked.",
+      "Polyalkylation is not modeled.",
     ],
     constraints: [
       "friedel-crafts-ring-not-strongly-deactivated",

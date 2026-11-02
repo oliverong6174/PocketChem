@@ -719,7 +719,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
     },
     selectivity: ["Anti-periplanar beta H / leaving-group geometry", "Usually Zaitsev"],
     limitations: [
@@ -759,7 +759,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
     },
     selectivity: ["Anti-periplanar geometry", "Usually Zaitsev"],
     limitations: [
@@ -799,7 +799,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "hofmann", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
     },
     selectivity: ["Anti-periplanar geometry", "Often Hofmann with a bulky base"],
     limitations: [
@@ -838,7 +838,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
     },
     selectivity: ["Anti-periplanar geometry", "Often Zaitsev with a small strong base"],
     limitations: [
@@ -885,7 +885,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
       allowsRearrangement: true,
     },
     selectivity: ["Usually Zaitsev", "Carbocation rearrangements are possible"],
@@ -928,7 +928,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
       allowsRearrangement: true,
     },
     selectivity: ["Usually Zaitsev", "Carbocation rearrangements are possible"],

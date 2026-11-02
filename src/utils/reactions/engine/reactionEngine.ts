@@ -12,6 +12,7 @@ import type {
   ReactionRule,
 } from "../reactionTypes";
 import { runCustomHandler } from "./handlers";
+import { enumerateCarbocationPrecursors } from "./handlers/carbocationUtils";
 import {
   analyzeReactionComponents,
   cachedComponentGroups,
@@ -182,26 +183,36 @@ async function applyRule(
   const hasGenericReactant = reactants.some((component) => component.isGeneric);
 
   switch (rule.transform.type) {
-    case "reactionSmarts":
+    case "reactionSmarts": {
+      const { smarts, maxProducts, forwardTemplates, carbocationRearrangement } = rule.transform;
+      const run = (inputs: string[]) =>
+        forwardTemplates?.length
+          ? runForwardTemplates(inputs, forwardTemplates, smarts, maxProducts, onIssue)
+          : runReactionSmarts(inputs, smarts, maxProducts, onIssue);
+      const products = await run(reactantSmiles);
+      if (carbocationRearrangement) {
+        // Each reactant that ionizes to a cation which can shift to a clearly more stable one is
+        // replaced by that shifted precursor; direct and rearranged products are all kept.
+        for (let index = 0; index < reactantSmiles.length; index += 1) {
+          const shifted = await enumerateCarbocationPrecursors(reactantSmiles[index], {
+            leavingGroup: carbocationRearrangement.leavingGroup,
+            includeUnrearranged: false,
+            maxShiftDepth: 2,
+            maxCandidates: 4,
+          });
+          for (const precursor of shifted) {
+            const inputs = reactantSmiles.map((smiles, position) => (position === index ? precursor.smiles : smiles));
+            for (const product of await run(inputs)) if (!products.includes(product)) products.push(product);
+          }
+        }
+      }
       return {
-        products: rule.transform.forwardTemplates?.length
-          ? await runForwardTemplates(
-              reactantSmiles,
-              rule.transform.forwardTemplates,
-              rule.transform.smarts,
-              rule.transform.maxProducts,
-              onIssue,
-            )
-          : await runReactionSmarts(
-              reactantSmiles,
-              rule.transform.smarts,
-              rule.transform.maxProducts,
-              onIssue,
-            ),
+        products,
         productStatus: hasGenericReactant
           ? "generic"
           : rule.productStatus ?? "computed",
       };
+    }
 
     case "customHandler": {
       // Custom handlers receive the ordered structural reactants. Most handlers

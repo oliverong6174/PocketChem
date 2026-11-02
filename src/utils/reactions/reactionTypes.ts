@@ -414,6 +414,12 @@ export type ReactionSelectivityProfile = {
   easDirecting?: "alkyl" | "acyl";
   /** Keep the handler-ranked major constitutional product rather than every lower-probability regioisomer. */
   majorProductOnly?: boolean;
+  /**
+   * Elimination rules: keep every constitutional alkene (Zaitsev and Hofmann) instead of only the handler-preferred one.
+   * Geometric isomers of one constitution still follow `stereochemistry.stereoselective` (E first). The qualitative
+   * major/minor label comes from assessReactionProductSelectivity, not from deleting the alternatives.
+   */
+  keepConstitutionalAlternatives?: boolean;
   allowsRearrangement?: boolean;
 };
 
@@ -452,6 +458,12 @@ export type ReactionTransform =
       maxProducts?: number;
       /** Forward-only templates that can carry alkene geometry or fixed regiochemistry (see engine/forwardTemplates.ts). */
       forwardTemplates?: ForwardTemplate[];
+      /**
+       * The electrophile reactant ionizes to a carbocation that may undergo favorable 1,2-hydride/alkyl shifts
+       * (Friedel-Crafts alkylation of a neopentyl or primary halide). The template is also run on each rearranged
+       * precursor; direct and rearranged products are all returned and none is ranked.
+       */
+      carbocationRearrangement?: { leavingGroup: "halide" };
     }
   | { type: "customHandler"; handler: "addition"; options: HandlerOptions<AdditionHandlerMode> }
   | { type: "customHandler"; handler: "substitution"; options: HandlerOptions<SubstitutionHandlerMode> }
