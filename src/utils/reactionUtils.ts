@@ -510,6 +510,24 @@ async function applyMechanisticStereoRuntime(
       .filter((candidate) => Math.abs(candidate.score - bestScore) < 1e-9)
       .map((candidate) => candidate.canonical);
 
+    // Stage 9E: an achiral stereospecific addition to a stereo-free reactant whose relative configuration is
+    // determined (alkene geometry drawn, or a 5-7 membered ring alkene) gives a chiral product as a racemate: neither
+    // enantiotopic face is preferred. The mirror image used to be generated, scored below the drawing
+    // representative, and dropped, leaving one enantiomer presented as the product. A meso product is its own mirror image
+    // and is left alone.
+    if (
+      !forceRacemic &&
+      !pathway.productMixture &&
+      (additionDirective || directive.kind === "diels-alder") &&
+      determined &&
+      !leftUnspecified &&
+      // Only a reactant stereocentre makes the faces diastereotopic; alkene geometry (E/Z) does not.
+      !pathway.reactantComponents.some((component) => component.includes("@")) &&
+      /@/.test(best)
+    ) {
+      const bestMirror = canonicalize(rawGetMol, mirrorTetrahedralSmiles(best));
+      if (bestMirror && bestMirror !== best) forceRacemic = true;
+    }
     const seedMixture: ReactionPathway["productMixture"] =
       pathway.productMixture ??
       (forceRacemic
@@ -567,6 +585,25 @@ async function applyMechanisticStereoRuntime(
       if (canonicalOriginalMembers.size >= 2) {
         memberSmiles = [...canonicalOriginalMembers];
       }
+    }
+
+    // Stage 9E: when the alkene geometry is undetermined the engine lists every stereoisomer the mechanism permits.
+    // Choosing one drawing representative must not shrink that set: a mixture label with a single member would present an
+    // arbitrary configuration as the product.
+    if (
+      additionDirective &&
+      !determined &&
+      nextMixture &&
+      pathway.productMixture &&
+      (memberSmiles?.length ?? 0) < pathway.productMixture.memberSmiles.length
+    ) {
+      const original = new Set<string>();
+      for (const member of pathway.productMixture.memberSmiles) {
+        const canonical = canonicalize(rawGetMol, member);
+        if (canonical) original.add(canonical);
+      }
+      if (best) original.add(best);
+      if (original.size > (memberSmiles?.length ?? 0)) memberSmiles = [...original];
     }
 
     const nextProductLabel = best === pathway.productSmiles

@@ -32,7 +32,7 @@ const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
   selectivityProfile: {
     stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
     regiochemistry: { mode: "directed", regioselective: true },
-    mixture: "possible",
+    mixture: "expected",
     allowsRearrangement: false,
   },
   selectivity: [
@@ -67,7 +67,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 800,
@@ -96,7 +96,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 810,
@@ -128,7 +128,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 820,
@@ -160,7 +160,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 830,
@@ -193,7 +193,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     selectivity: [
@@ -229,7 +229,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 855,
@@ -258,7 +258,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 860,

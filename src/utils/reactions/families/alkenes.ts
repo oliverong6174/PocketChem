@@ -284,7 +284,7 @@ export const alkeneReactionRules: ReactionRule[] = [
       sitePreference: "most-substituted-alkene",
       stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     selectivity: [
@@ -292,7 +292,7 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Br and OH add anti through bromonium-ion opening.",
     ],
     limitations: [
-      "The current product graph enforces the correct constitutional orientation; explicit anti stereocenter assignment will be completed in the alkene stereochemistry phase.",
+      "The anti relationship is applied when the alkene geometry is drawn or the alkene is in a 5-7 membered ring. The product of an achiral reaction that is chiral is shown as both enantiomers (a racemate); an acyclic alkene of undefined geometry is left unspecified.",
     ],
     priority: 130,
   },
