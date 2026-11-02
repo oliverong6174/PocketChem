@@ -224,3 +224,48 @@ describe("epoxidation is stereospecific in the alkene geometry (syn addition of 
     assert.notEqual(assessed.verification.status, "failed", assessed.verification.problems.join(" | "));
   });
 });
+
+describe("Friedel-Crafts steric limit (Stage 9D)", () => {
+  test("[engine] m-xylene: the position between the two methyl groups is disfavored, 4-position favored", async () => {
+    const step = await outcomes("aromatic-friedel-crafts-acylation", ["Cc1cccc(C)c1", "CC(=O)Cl"]);
+    assert.equal(classOf(step, "CC(=O)c1ccc(C)cc1C"), "major");
+    assert.equal(classOf(step, "CC(=O)c1c(C)cccc1C"), "disfavored");
+  });
+  test("[engine] halogenation keeps its purely electronic ranking (the penalty applies to Friedel-Crafts only)", async () => {
+    const step = await outcomes("aromatic-halogenation-bromination", ["Cc1cccc(C)c1"]);
+    assert.ok(step.outcomes.length >= 1);
+  });
+});
+
+describe("Heck regiochemistry and geometry generalize across the substrate class (Stage 9D)", () => {
+  const alkenes = [
+    ["acrylonitrile", "C=CC#N"],
+    ["N,N-dimethylacrylamide", "C=CC(=O)N(C)C"],
+    ["phenyl vinyl sulfone", "C=CS(=O)(=O)c1ccccc1"],
+    ["4-methylstyrene", "C=Cc1ccc(C)cc1"],
+    ["ethyl acrylate with an electron-poor aryl bromide", "C=CC(=O)OCC"],
+  ];
+  for (const [name, alkene] of alkenes) {
+    test(`[engine] ${name}: E-linear product is major (E geometry assigned), alpha-aryl product minor`, async () => {
+      const aryl = name.includes("electron-poor") ? "Brc1ccc(C#N)cc1" : "Brc1ccccc1";
+      const step = await outcomes("heck-coupling", [aryl, alkene]);
+      assert.equal(step.outcomes.length, 2);
+      assert.equal(step.outcomes[0].selectivityFinding.class, "major");
+      assert.match(step.outcomes[0].productSmiles, /\//, "E geometry is encoded");
+      assert.equal(step.outcomes[1].selectivityFinding.class, "disfavored");
+      assert.match(step.outcomes[1].productSmiles, /^C=C\(/, "the 1,1-disubstituted (alpha) product");
+    });
+  }
+  test("[engine] a 1,1-disubstituted alkene can only be arylated at CH2: one outcome, not ranked, no geometry claimed", async () => {
+    const step = await outcomes("heck-coupling", ["Brc1ccccc1", "C=C(C)C(=O)OC"]);
+    assert.equal(step.status, "reaction");
+    assert.equal(step.outcomes.length, 1);
+    assert.equal(step.outcomes[0].selectivityFinding.class, "single-outcome");
+    assert.equal(step.outcomes[0].selectivity, null);
+  });
+  test("[engine] a 1,2-disubstituted alkene keeps every attachment site, unranked (uncertainty retained)", async () => {
+    const step = await outcomes("heck-coupling", ["Brc1ccccc1", "C/C=C/C(=O)OC"]);
+    assert.equal(step.outcomes.length, 2);
+    assert.ok(step.outcomes.every((item) => item.selectivityFinding.class === "unranked"));
+  });
+});

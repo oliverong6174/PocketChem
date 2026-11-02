@@ -149,9 +149,29 @@ function matchesInstalledElectrophile(graph: Graph, root: number, electrophile: 
   return isSulfonylSulfur(graph,root);
 }
 
-function scoreSite(graph: Graph, ring: number[], site: number, installedRoot: number): number {
+/**
+ * Friedel-Crafts electrophiles are bulky: a ring position flanked on BOTH sides by substituents (for
+ * example between the two methyl groups of m-xylene) is strongly disfavored for steric reasons even when
+ * electronically activated. Halogenation/nitration use smaller electrophiles and keep the purely
+ * electronic score. The size of this penalty is a model parameter, not a measured value.
+ */
+const FLANKED_SITE_PENALTY = 2.5;
+
+function isFlanked(graph: Graph, ring: number[], site: number, installedRoot: number): boolean {
+  const ringSet = new Set(ring);
+  const index = ring.indexOf(site);
+  const neighbours = [ring[(index + 1) % ring.length], ring[(index + ring.length - 1) % ring.length]];
+  return neighbours.every((neighbour) =>
+    (graph.adjacency.get(neighbour) ?? []).some((bond) => {
+      const root = other(bond, neighbour);
+      return !ringSet.has(root) && root !== installedRoot;
+    }),
+  );
+}
+
+function scoreSite(graph: Graph, ring: number[], site: number, installedRoot: number, bulky = false): number {
   const ringSet=new Set(ring);
-  let score=0;
+  let score=bulky && isFlanked(graph, ring, site, installedRoot) ? -FLANKED_SITE_PENALTY : 0;
   for (const ringAtom of ring) {
     for (const bond of graph.adjacency.get(ringAtom) ?? []) {
       const root=other(bond,ringAtom);
@@ -187,7 +207,7 @@ async function scoreProduct(substrate: string, product: string, electrophile: Ea
           if (ringSet.has(root) || !matchesInstalledElectrophile(graph,root,electrophile)) continue;
           const isNew=mappings.some((mapping)=>!new Set(mapping).has(root));
           if (!isNew) continue;
-          const value=scoreSite(graph,ring,site,root);
+          const value=scoreSite(graph,ring,site,root,electrophile === "alkyl" || electrophile === "acyl");
           if (best===null || value>best) best=value;
         }
       }
