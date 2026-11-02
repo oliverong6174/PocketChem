@@ -80,7 +80,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -130,7 +130,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 880
+      "elapsedMs": 167
     },
     {
       "id": "D2a",
@@ -184,7 +184,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -216,7 +216,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 172
+      "elapsedMs": 28
     },
     {
       "id": "D2b",
@@ -270,7 +270,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -304,7 +304,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 261
+      "elapsedMs": 46
     },
     {
       "id": "D2c",
@@ -361,7 +361,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -395,7 +395,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 81
+      "elapsedMs": 26
     },
     {
       "id": "D3+D4",
@@ -494,7 +494,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -533,7 +533,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 296
+      "elapsedMs": 70
     },
     {
       "id": "D3b+D4b",
@@ -642,7 +642,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -704,7 +704,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 516
+      "elapsedMs": 67
     },
     {
       "id": "INT-1",
@@ -806,7 +806,7 @@
             "unassessed": 0
           },
           "supportedSteps": 1,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -929,7 +929,221 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 1084
+      "elapsedMs": 106
+    },
+    {
+      "id": "INT-2",
+      "title": "Integrated: Lindlar then stereospecific epoxidation (branch A), Grignard formation (branch B), epoxide opening join, then PCC",
+      "starts": [
+        "CCC#CCC",
+        "CCCCBr"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "alkyne-lindlar-reduction-internal",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CC/C=C\\CC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "named"
+        },
+        {
+          "attempt": 2,
+          "rule": "alkene-epoxidation",
+          "status": "reaction",
+          "consumed": [
+            "s1.1"
+          ],
+          "produced": [
+            "s2.1"
+          ],
+          "product": "CC[C@@H]1O[C@@H]1CC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "unknown"
+        },
+        {
+          "attempt": 3,
+          "rule": "haloalkane-grignard-formation-bromide",
+          "status": "reaction",
+          "consumed": [
+            "sm1#1"
+          ],
+          "produced": [
+            "s3.1"
+          ],
+          "product": "CCC[CH2][Mg][Br]",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        },
+        {
+          "attempt": 4,
+          "rule": "epoxide-grignard-opening",
+          "status": "reaction",
+          "consumed": [
+            "s2.1",
+            "s3.1"
+          ],
+          "produced": [
+            "s4.1"
+          ],
+          "product": "CCCC[C@H](CC)[C@@H](O)CC",
+          "outcomes": 2,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "unknown"
+        },
+        {
+          "attempt": 5,
+          "rule": "secondary-alcohol-oxidation-pcc",
+          "status": "reaction",
+          "consumed": [
+            "s4.1"
+          ],
+          "produced": [
+            "s5.1"
+          ],
+          "product": "CCCC[C@H](CC)C(=O)CC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s5.1",
+          "smiles": "CCCC[C@H](CC)C(=O)CC",
+          "role": "primary",
+          "lineage": [
+            0,
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Lindlar semi-hydrogenation gives the (Z)-alkene; peroxyacid epoxidation of a Z alkene gives the cis (meso) epoxide; BuMgBr opens the epoxide by SN2 at a ring carbon; PCC oxidises the secondary alcohol (Corey & Suggs 1975). Provisional as a sequence: the stereochemical outcome of the opening step (relative configuration) is not asserted, and PocketChem does not model it."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 5,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "alkene-epoxidation",
+            "alkyne-lindlar-reduction-internal",
+            "secondary-alcohol-oxidation-pcc"
+          ],
+          "oneRoutePairs": [
+            {
+              "steps": [
+                1,
+                2
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                1,
+                3
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                1,
+                4
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                1,
+                5
+              ],
+              "category": "unassessed"
+            }
+          ],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction,reaction,reaction,reaction,reaction"
+        },
+        {
+          "name": "final inventory (constitution)",
+          "ok": true,
+          "detail": "CCCCC(CC)C(=O)CC"
+        },
+        {
+          "name": "constitution of step 4",
+          "ok": true,
+          "detail": "CCCC[C@H](CC)[C@@H](O)CC"
+        },
+        {
+          "name": "constitution of step 5",
+          "ok": true,
+          "detail": "CCCC[C@H](CC)C(=O)CC"
+        },
+        {
+          "name": "supplied materials consumed",
+          "ok": true,
+          "detail": "0,1"
+        },
+        {
+          "name": "catalytic steps",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "distinct catalyst systems",
+          "ok": true,
+          "detail": "Lindlar catalyst"
+        },
+        {
+          "name": "intermediate of step 1",
+          "ok": true,
+          "detail": "CC/C=C\\CC"
+        },
+        {
+          "name": "intermediate of step 2",
+          "ok": true,
+          "detail": "CC[C@@H]1O[C@@H]1CC"
+        },
+        {
+          "name": "intermediate of step 3",
+          "ok": true,
+          "detail": "CCC[CH2][Mg][Br]"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 96
     },
     {
       "id": "D5",
@@ -1013,7 +1227,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -1081,7 +1295,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 347
+      "elapsedMs": 63
     },
     {
       "id": "D6a",
@@ -1148,7 +1362,7 @@
             "unassessed": 0
           },
           "supportedSteps": 1,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -1185,7 +1399,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 491
+      "elapsedMs": 67
     },
     {
       "id": "D6b",
@@ -1256,7 +1470,7 @@
           "detail": "unranked,unranked"
         }
       ],
-      "elapsedMs": 312
+      "elapsedMs": 29
     },
     {
       "id": "D6c",
@@ -1324,7 +1538,7 @@
             "unassessed": 0
           },
           "supportedSteps": 1,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -1363,7 +1577,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 543
+      "elapsedMs": 65
     },
     {
       "id": "D6d",
@@ -1432,7 +1646,7 @@
             "unassessed": 0
           },
           "supportedSteps": 1,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -1471,7 +1685,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 718
+      "elapsedMs": 192
     },
     {
       "id": "D6e",
@@ -1522,7 +1736,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -1551,7 +1765,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 142
+      "elapsedMs": 44
     },
     {
       "id": "D6f",
@@ -1602,7 +1816,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -1631,7 +1845,7 @@
           "detail": "connectivity-only"
         }
       ],
-      "elapsedMs": 266
+      "elapsedMs": 34
     },
     {
       "id": "D7",
@@ -1696,7 +1910,7 @@
           "detail": "CCO"
         }
       ],
-      "elapsedMs": 2
+      "elapsedMs": 0
     },
     {
       "id": "D8",
@@ -1778,7 +1992,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -1805,7 +2019,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 38
+      "elapsedMs": 16
     },
     {
       "id": "D9",
@@ -1880,7 +2094,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -1909,7 +2123,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 136
+      "elapsedMs": 29
     },
     {
       "id": "D10",
@@ -1978,7 +2192,7 @@
             "unassessed": 0
           },
           "supportedSteps": 0,
-          "note": "Only a rule's own numeric estimate counts; single-outcome means unranked, not major."
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
         },
         "5-condition-compatible": {
           "declaredConditionWarnings": 0,
@@ -2015,15 +2229,15 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 119
+      "elapsedMs": 24
     }
   ],
   "performance": {
     "chain": "C=CCC → alkene-acid-hydration → secondary-alcohol-oxidation-pcc → ketone-reduction",
     "repeats": 7,
-    "sequentialMedianMs": 113,
-    "workspaceMedianMs": 98,
+    "sequentialMedianMs": 39,
+    "workspaceMedianMs": 39,
     "note": "Same rules, same molecule. The workspace additionally records every alternative outcome, canonicalises every lot and assesses selectivity per step; its verification replay is timed separately below.",
-    "assessmentMs": 45
+    "assessmentMs": 15
   }
 }

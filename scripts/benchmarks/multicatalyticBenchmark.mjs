@@ -121,6 +121,29 @@ const SCENARIOS = [
     plausibility: "Fischer esterification of 4-bromobenzoic acid with methanol (H₂SO₄ cat.); Lindlar partial hydrogenation of methyl propiolate to methyl acrylate; Heck coupling of the aryl bromide with the acrylate gives the (E)-cinnamate (Pd cat.); Pd/C hydrogenation of the conjugated C=C. Provisional: terminal acrylates polymerise readily and propiolate semi-hydrogenation needs careful control, which the model does not assess.",
   },
   {
+    id: "INT-2",
+    title: "Integrated: Lindlar then stereospecific epoxidation (branch A), Grignard formation (branch B), epoxide opening join, then PCC",
+    starts: ["CCC#CCC", "CCCCBr"],
+    script: [
+      { ruleId: "alkyne-lindlar-reduction-internal", reactants: [{ material: 0 }] },
+      { ruleId: "alkene-epoxidation", reactants: [{ attempt: 1, product: 1 }] },
+      { ruleId: "haloalkane-grignard-formation-bromide", reactants: [{ material: 1 }] },
+      { ruleId: "epoxide-grignard-opening", reactants: [{ attempt: 2, product: 1 }, { attempt: 3, product: 1 }], outcome: 0 }, // the two ring carbons of the meso epoxide are equivalent: an explicit choice is required
+      { ruleId: "secondary-alcohol-oxidation-pcc", reactants: [{ attempt: 4, product: 1 }] },
+    ],
+    expect: {
+      statuses: ["reaction", "reaction", "reaction", "reaction", "reaction"],
+      liveConstitution: ["CCCCC(CC)C(=O)CC"],
+      consumedSupplied: [0, 1],
+      catalyticSteps: 1,
+      catalystSystems: 1,
+      // hand-written stereo: (Z)-alkene; cis (meso, (R,S)) epoxide (CIP of the string checked with RDKit)
+      intermediates: { 1: "CC/C=C\\CC", 2: "CC[C@H]1O[C@H]1CC", 3: "CCC[CH2][Mg][Br]" },
+      intermediateConstitutions: { 4: "CCCCC(CC)C(O)CC", 5: "CCCCC(CC)C(=O)CC" },
+    },
+    plausibility: "Lindlar semi-hydrogenation gives the (Z)-alkene; peroxyacid epoxidation of a Z alkene gives the cis (meso) epoxide; BuMgBr opens the epoxide by SN2 at a ring carbon; PCC oxidises the secondary alcohol (Corey & Suggs 1975). Provisional as a sequence: the stereochemical outcome of the opening step (relative configuration) is not asserted, and PocketChem does not model it.",
+  },
+  {
     id: "D5",
     title: "Several distinct catalytic steps (Sonogashira, Lindlar, Pd/C hydrogenation)",
     starts: ["Ic1ccccc1", "C#CCCCC"],
@@ -259,6 +282,20 @@ async function evaluate(scenario, seen) {
   if (e.live) {
     const want = await Promise.all(e.live.map(canon));
     add("final inventory", sameSet(live.map((l) => l.canonical), want), live.map((l) => l.smiles).join(" + "));
+  }
+  if (e.liveConstitution) {
+    const conn = async (s) => (await stereo.canonicalizeStereoStructure(s)).connectivity;
+    const want = await Promise.all(e.liveConstitution.map(conn));
+    const got = await Promise.all(live.map((l) => conn(l.smiles)));
+    add("final inventory (constitution)", sameSet(got, want), got.join(" + "));
+  }
+  if (e.intermediateConstitutions) {
+    for (const [stepNumber, smiles] of Object.entries(e.intermediateConstitutions)) {
+      const step = finalWorkspace.history.find((item) => item.committedStep === Number(stepNumber));
+      const got = step ? step.outcomes[step.selectedOutcome].productSmiles : null;
+      const conn = async (s) => (await stereo.canonicalizeStereoStructure(s)).connectivity;
+      add(`constitution of step ${stepNumber}`, got !== null && (await conn(got)) === (await conn(smiles)), String(got));
+    }
   }
   if (e.liveCount !== undefined) add("inventory size", live.length === e.liveCount, String(live.length));
   if (e.consumedSupplied) {
