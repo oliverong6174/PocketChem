@@ -18,6 +18,7 @@ import {
   isGenericReactionSmiles,
 } from "./reactionInput";
 import { runReactionSmarts } from "./rdkitReaction";
+import { runForwardTemplates } from "./forwardTemplates";
 import { classifyReactionProducts } from "./productMixtures";
 import {
   applyRuleProductSelectivity,
@@ -183,12 +184,20 @@ async function applyRule(
   switch (rule.transform.type) {
     case "reactionSmarts":
       return {
-        products: await runReactionSmarts(
-          reactantSmiles,
-          rule.transform.smarts,
-          rule.transform.maxProducts,
-          onIssue,
-        ),
+        products: rule.transform.forwardTemplates?.length
+          ? await runForwardTemplates(
+              reactantSmiles,
+              rule.transform.forwardTemplates,
+              rule.transform.smarts,
+              rule.transform.maxProducts,
+              onIssue,
+            )
+          : await runReactionSmarts(
+              reactantSmiles,
+              rule.transform.smarts,
+              rule.transform.maxProducts,
+              onIssue,
+            ),
         productStatus: hasGenericReactant
           ? "generic"
           : rule.productStatus ?? "computed",
@@ -427,6 +436,7 @@ async function createExecutedPathways(
       rule,
       reactants[0]?.smiles ?? reactantSmiles,
       product.smiles,
+      reactantComponents,
     );
 
     pathways.push({

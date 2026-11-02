@@ -560,12 +560,26 @@ export const alkeneReactionRules: ReactionRule[] = [
     transform: {
       type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]1[O][C:2]1",
+      // Peroxyacid epoxidation is stereospecific: a Z (cis) alkene gives the cis epoxide and an E (trans)
+      // alkene the trans epoxide, each as both enantiomers (both faces). In these ring templates equal
+      // chirality tags give the cis ring and opposite tags the trans ring (checked on 2-butene,
+      // 2-pentene and stilbene: trans-stilbene oxide comes out (R,R)/(S,S)). Only H1=H1 alkenes are
+      // covered; every other alkene keeps the plain template (constitution only, stereochemistry unspecified).
+      forwardTemplates: [
+        { whenAlkene: "Z", smarts: "[C;H1:1]=[C;H1:2]>>[C@:1]1[O][C@:2]1" },
+        { whenAlkene: "Z", smarts: "[C;H1:1]=[C;H1:2]>>[C@@:1]1[O][C@@:2]1" },
+        { whenAlkene: "E", smarts: "[C;H1:1]=[C;H1:2]>>[C@:1]1[O][C@@:2]1" },
+        { whenAlkene: "E", smarts: "[C;H1:1]=[C;H1:2]>>[C@@:1]1[O][C@:2]1" },
+        // A ring alkene of 5-7 members can only be cis; both faces give the (meso or racemic) cis epoxide.
+        { whenAlkene: "unspecified", smarts: "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]>>[C@:1]1[O][C@:2]1" },
+        { whenAlkene: "unspecified", smarts: "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]>>[C@@:1]1[O][C@@:2]1" },
+      ],
     },
     productStatus: "representative",
     selectivityProfile: {
       stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
       sitePreference: "most-substituted-alkene",
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     selectivity: [

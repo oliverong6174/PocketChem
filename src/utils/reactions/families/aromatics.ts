@@ -521,9 +521,10 @@ export const aromaticReactionRules: ReactionRule[] = [
     },
     productStatus: "representative",
     mechanism: "Electrophilic aromatic substitution",
+    selectivityProfile: { easDirecting: "alkyl", mixture: "possible" },
     competition: { group: "friedel-crafts-alkylation", specificity: 10 },
     limitations: [
-      "The engine enumerates available aromatic C-H sites but does not rank ortho/para/meta directing effects.",
+      "Ring positions are ranked qualitatively by the substituents' directing effects only (simple benzene rings); the ortho/para ratio is not modeled. Fused rings are not ranked.",
       "Fails on strongly deactivated rings.",
       "Amino groups complex strongly with AlCl₃ unless protected.",
       "Carbocation rearrangement and polyalkylation may occur; the generated structure represents direct attachment of the drawn alkyl group.",
@@ -558,7 +559,8 @@ export const aromaticReactionRules: ReactionRule[] = [
     },
     productStatus: "representative",
     mechanism: "Electrophilic aromatic substitution",
-    limitations: ["The engine enumerates available aromatic C-H sites but does not rank ortho/para/meta directing effects.", "Fails on strongly deactivated rings and often on unprotected amino-substituted rings."],
+    selectivityProfile: { easDirecting: "acyl", mixture: "possible" },
+    limitations: ["Ring positions are ranked qualitatively by the substituents' directing effects only (simple benzene rings); the ortho/para ratio is not modeled.", "Fails on strongly deactivated rings and often on unprotected amino-substituted rings."],
     constraints: [
       "friedel-crafts-ring-not-strongly-deactivated",
       "friedel-crafts-amine-compatible",

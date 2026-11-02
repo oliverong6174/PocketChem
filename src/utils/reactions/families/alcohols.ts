@@ -815,6 +815,8 @@ export const alcoholReactionRules: ReactionRule[] = [
     ],
     limitations: [
       "PocketChem reports the highest-priority migration class rather than mixing generic dehydration products into the same strong-acid/heat condition.",
+      "The leaving hydroxyl is chosen by carbocation stability (substitution plus aryl stabilization) before any migration is ranked; ties keep every tied orientation.",
+      "Where hydride ranks against aryl migration differs between sources and substrates, so the hydride-first order is a simplification; stereochemical requirements of the migration are not modeled.",
     ],
     // Must outrank ordinary secondary/tertiary alcohol E1 dehydration (500).
     competition: { group: "acidic-alcohol-rearrangement", specificity: 100 },

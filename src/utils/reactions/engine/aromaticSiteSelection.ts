@@ -134,8 +134,13 @@ function substituentContribution(graph: Graph, root: number, distance: number): 
   return 0;
 }
 
-function matchesInstalledElectrophile(graph: Graph, root: number, electrophile: AromaticEasElectrophileId): boolean {
+/** What a Friedel-Crafts step installs: an sp3 carbon (alkyl) or a carbonyl carbon (acyl). */
+export type EasInstalledGroup = AromaticEasElectrophileId | "alkyl" | "acyl";
+
+function matchesInstalledElectrophile(graph: Graph, root: number, electrophile: EasInstalledGroup): boolean {
   const symbol=graph.symbols[root];
+  if (electrophile === "alkyl") return symbol === "C" && !isCarbonylCarbon(graph,root);
+  if (electrophile === "acyl") return symbol === "C" && isCarbonylCarbon(graph,root);
   if (electrophile === "bromo") return symbol === "Br";
   if (electrophile === "chloro") return symbol === "Cl";
   if (electrophile === "iodo") return symbol === "I";
@@ -157,7 +162,7 @@ function scoreSite(graph: Graph, ring: number[], site: number, installedRoot: nu
   return score;
 }
 
-async function scoreProduct(substrate: string, product: string, electrophile: AromaticEasElectrophileId): Promise<number | null> {
+async function scoreProduct(substrate: string, product: string, electrophile: EasInstalledGroup): Promise<number | null> {
   const rdkit=await getRDKit();
   const mol=rdkit.get_mol(product);
   const substrateQuery=rdkit.get_qmol(substrate);
@@ -209,4 +214,19 @@ export async function selectMajorAromaticEasProducts(
   if (unsupported || !scored.length) return products;
   const best=Math.max(...scored.map((item)=>item.score));
   return scored.filter((item)=>Math.abs(item.score-best)<1e-6).map((item)=>item.product);
+}
+
+/**
+ * Directing-effect score of each product (higher = the substitution site is more activated), or
+ * null for a product on a ring the simple benzene model does not cover (fused rings, no ring),
+ * in which case callers must not rank at all.
+ */
+export async function scoreEasProducts(
+  substrateSmiles: string,
+  products: string[],
+  installed: EasInstalledGroup,
+): Promise<Array<number | null>> {
+  const scores: Array<number | null> = [];
+  for (const product of products) scores.push(await scoreProduct(substrateSmiles, product, installed));
+  return scores;
 }

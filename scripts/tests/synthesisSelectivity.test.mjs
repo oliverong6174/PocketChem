@@ -46,9 +46,11 @@ const stepOf = (ruleId, reactantSmiles, productSmiles, extra = {}) => ({
 
 describe("step selectivity classes", () => {
   test("[engine] two constitutional outcomes the engine does not rank are 'unranked', with the count", async () => {
-    const diol = "CCCCCCC(O)CO";
-    for (const product of ["CCCCCCC(C)=O", "CCCCCCCC=O"]) {
-      const finding = await selectivity.assessStepSelectivity(stepOf("pinacol-rearrangement", diol, product), rule("pinacol-rearrangement"));
+    // An alkyl alkene in a Heck coupling has no modeled regiochemical preference (Stage 9C ranks only
+    // acceptor/aryl-substituted alkenes), so both attachment sites are offered and neither is ranked.
+    const reactants = "Brc1ccccc1.C=CCCCC";
+    for (const product of ["CCCCC=Cc1ccccc1", "C=C(CCCC)c1ccccc1"]) {
+      const finding = await selectivity.assessStepSelectivity(stepOf("heck-coupling", reactants, product), rule("heck-coupling"));
       assert.equal(finding.class, "unranked");
       assert.equal(finding.alternatives, 2);
     }
@@ -58,7 +60,7 @@ describe("step selectivity classes", () => {
     for (const product of ["CC=Cc1ccccc1", "C=C(C)c1ccccc1"]) {
       const finding = await selectivity.assessStepSelectivity(stepOf("heck-coupling", "Brc1ccccc1.C=CC", product), rule("heck-coupling"));
       assert.equal(finding.class, "unranked");
-      assert.ok(finding.limitations.some((text) => /does not rank/.test(text)), "the rule's own limitation is carried");
+      assert.ok(finding.limitations.some((text) => /unranked/.test(text)), "the rule's own limitation is carried");
       assert.equal(finding.representative, true);
     }
   });
@@ -301,36 +303,46 @@ describe("candidate comparison with real rule metadata (no search)", () => {
     return route;
   };
 
+  test("[engine] the old anti-dihydroxylation -> pinacol route to 2-octanone is no longer reproduced (Stage 9C)", async () => {
+    // Before Stage 9C the pinacol rule offered both an aldehyde and a ketone for octane-1,2-diol, so this route
+    // was structurally accepted. The more stable (secondary) cation now decides, giving octanal only: the
+    // recorded 2-octanone is not an outcome of the rule, and the step is unassessed rather than unranked.
+    const pinacol = await withAdvisories(buildRoute("p", [["start", "C=CCCCCCC"], ["alkene-anti-dihydroxylation", "CCCCCCC(O)CO"], ["pinacol-rearrangement", "CCCCCCC(C)=O"]]));
+    assert.equal(pinacol.selectivity.findings[1].class, "unassessed");
+    const aldehyde = await withAdvisories(buildRoute("a", [["start", "C=CCCCCCC"], ["alkene-anti-dihydroxylation", "CCCCCCC(O)CO"], ["pinacol-rearrangement", "CCCCCCCC=O"]]));
+    assert.equal(aldehyde.selectivity.findings[1].class, "single-outcome");
+  });
+
   test("[engine] the route whose steps are not ranked-ambiguous ranks first, whichever was discovered first", async () => {
     const hydration = await withAdvisories(buildRoute("h", [["start", "C=CCCCCCC"], ["alkene-acid-hydration", "CCCCCCC(C)O"], ["secondary-alcohol-oxidation-pcc", "CCCCCCC(C)=O"]]));
-    const pinacol = await withAdvisories(buildRoute("p", [["start", "C=CCCCCCC"], ["alkene-anti-dihydroxylation", "CCCCCCC(O)CO"], ["pinacol-rearrangement", "CCCCCCC(C)=O"]]));
+    // A real unranked step: Heck coupling of an alkyl alkene offers two attachment sites and ranks neither.
+    const heck = await withAdvisories(buildRoute("u", [["start", "Brc1ccccc1.C=CCCCC"], ["heck-coupling", "CCCCC=Cc1ccccc1"], ["alkene-hydrogenation", "CCCCCCc1ccccc1"]]));
 
-    // Evidence actually present in the metadata: the pinacol step offers two unranked outcomes.
-    const pinacolStep = pinacol.selectivity.findings[1];
-    assert.equal(pinacolStep.class, "unranked");
-    assert.equal(pinacolStep.alternatives, 2);
+    const heckStep = heck.selectivity.findings[0];
+    assert.equal(heckStep.class, "unranked");
+    assert.equal(heckStep.alternatives, 2);
     assert.equal(hydration.selectivity.counts.unranked, 0);
     assert.equal(hydration.selectivity.counts.disfavored, 0);
 
     // Same structural standing and length; the difference is only the unranked step.
     const h = book.classifyRoute(hydration, "linear", 1);
-    const p = book.classifyRoute(pinacol, "linear", 2);
-    assert.equal(h.tier, p.tier);
-    assert.equal(h.adjustedLength, p.adjustedLength);
+    const u = book.classifyRoute(heck, "linear", 2);
+    assert.equal(h.tier, u.tier);
+    assert.equal(h.adjustedLength, u.adjustedLength);
     assert.equal(h.unrankedSteps, 0);
-    assert.equal(p.unrankedSteps, 1);
+    assert.equal(u.unrankedSteps, 1);
 
-    for (const order of [[hydration, pinacol], [pinacol, hydration]]) {
+    for (const order of [[hydration, heck], [heck, hydration]]) {
       const routeBook = new book.RouteBook();
       order.forEach((route, index) => routeBook.offer(route, `lane-${index}`));
-      assert.deepEqual(routeBook.entries().map((entry) => entry.route.id), ["h", "p"], "ranking does not depend on discovery order");
+      assert.deepEqual(routeBook.entries().map((entry) => entry.route.id), ["h", "u"], "ranking does not depend on discovery order");
     }
   });
 
-  test("[engine] the conclusion rests on 'unranked' only: it is not evidence that the pinacol product is minor", async () => {
-    const pinacol = await withAdvisories(buildRoute("p", [["start", "C=CCCCCCC"], ["alkene-anti-dihydroxylation", "CCCCCCC(O)CO"], ["pinacol-rearrangement", "CCCCCCC(C)=O"]]));
-    assert.equal(pinacol.selectivity.counts.disfavored, 0);
-    assert.ok(pinacol.selectivity.findings.every((finding) => finding.class !== "major"));
+  test("[engine] the conclusion rests on 'unranked' only: it is not evidence that an unranked product is minor", async () => {
+    const heck = await withAdvisories(buildRoute("u", [["start", "Brc1ccccc1.C=CCCCC"], ["heck-coupling", "CCCCC=Cc1ccccc1"], ["alkene-hydrogenation", "CCCCCCc1ccccc1"]]));
+    assert.equal(heck.selectivity.counts.disfavored, 0);
+    assert.ok(heck.selectivity.findings.every((finding) => finding.class !== "major"));
   });
 
   test("[engine] canonical forms: equivalent spellings agree; distinct stereoisomers, charges and isotopes stay distinct", async () => {

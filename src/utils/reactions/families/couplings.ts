@@ -77,11 +77,39 @@ export const couplingReactionRules: ReactionRule[] = [
       type: "reactionSmarts",
       smarts: "[c:1][Cl,Br,I].[C:2]=[C:3]>>[c:1]-[C:2]=[C:3]",
       maxProducts: 16,
+      // Terminal monosubstituted alkenes: syn carbopalladation then syn beta-hydride elimination gives the
+      // E (trans) 1,2-disubstituted alkene from beta-arylation, and the 1,1-disubstituted alkene from
+      // alpha-arylation. Other alkene types keep the plain template (no geometry assigned).
+      forwardTemplates: [
+        { smarts: "[c:1][Cl,Br,I].[CH2:3]=[CH:2][*:4]>>[c:1]/[CH:3]=[CH:2]/[*:4]" },
+        { smarts: "[c:1][Cl,Br,I].[CH2:3]=[CH:2][*:4]>>[c:1][C:2](=[CH2:3])[*:4]" },
+      ],
     },
     mechanism: "Palladium-catalyzed migratory insertion and beta-hydride elimination",
     productStatus: "representative",
+    productPreferences: [
+      {
+        id: "heck-linear-acceptor-or-styrene",
+        whenReactantSmarts: ["[CH2]=[CH]-[$([CX3]=O),$(C#N),$(c),$([SX4](=O)=O)]"],
+        productSmarts: "[c][CH]=[CH]-[$([CX3]=O),$(C#N),$(c),$([SX4](=O)=O)]",
+        level: "major",
+        basis:
+          "Aryl palladium adds to the unsubstituted terminus of a monosubstituted alkene bearing an electron-withdrawing group or an aryl group, and beta-hydride elimination gives the (E)-1,2-disubstituted alkene.",
+        references: ["Heck, R. F. Acc. Chem. Res. 1979, 12, 146-151 (syn insertion and syn beta-hydride elimination; methyl trans-cinnamate from iodobenzene and methyl acrylate).", "Beletskaya, I. P.; Cheprakov, A. V. Chem. Rev. 2000, 100, 3009-3066 (citation checked; the regiochemistry section itself was not re-read)."],
+      },
+      {
+        id: "heck-branched-acceptor-or-styrene",
+        whenReactantSmarts: ["[CH2]=[CH]-[$([CX3]=O),$(C#N),$(c),$([SX4](=O)=O)]"],
+        productSmarts: "[CH2]=[C](-[c])-[$([CX3]=O),$(C#N),$(c),$([SX4](=O)=O)]",
+        level: "minor",
+        basis:
+          "Alpha-arylation (the 1,1-disubstituted alkene) is the minor outcome for these alkenes under standard neutral Pd conditions; it becomes competitive with electron-rich alkenes or cationic palladium, which this preference does not cover.",
+        references: ["Heck, R. F. Acc. Chem. Res. 1979, 12, 146-151 (syn insertion and syn beta-hydride elimination; methyl trans-cinnamate from iodobenzene and methyl acrylate).", "Beletskaya, I. P.; Cheprakov, A. V. Chem. Rev. 2000, 100, 3009-3066 (citation checked; the regiochemistry section itself was not re-read)."],
+      },
+    ],
     limitations: [
-      "The engine enumerates constitutional attachment possibilities but does not rank Heck regiochemistry or assign E/Z geometry.",
+      "E geometry and the linear/branched preference are modeled for monosubstituted alkenes bearing a carbonyl, nitrile, sulfonyl or aryl group. Other alkenes (alkyl, electron-rich, di- or trisubstituted) keep every attachment site, unranked and without assigned geometry.",
+      "Ligand, base, Pd source and cationic-versus-neutral pathway are not modeled.",
     ],
     priority: 2270,
   },

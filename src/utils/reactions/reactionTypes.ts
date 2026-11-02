@@ -406,17 +406,52 @@ export type ReactionSelectivityProfile = {
   mixture?: "single" | "possible" | "expected";
   /** Prefer the alkene site consumed by the transformation when several C=C bonds are present. */
   sitePreference?: ReactionSitePreference;
+  /**
+   * Rank the ring positions of an electrophilic aromatic substitution by the substituents' directing
+   * effects (the same simple benzene model as halogenation/nitration). "alkyl" or "acyl" names what
+   * the step installs. The ranking is qualitative; ortho/para ratios are not modeled.
+   */
+  easDirecting?: "alkyl" | "acyl";
   /** Keep the handler-ranked major constitutional product rather than every lower-probability regioisomer. */
   majorProductOnly?: boolean;
   allowsRearrangement?: boolean;
 };
 
 /** How PocketChem generates the product structure. */
+/** A forward-only reaction template, optionally conditional on the reactant's defined alkene geometry. */
+export type ForwardTemplate = {
+  smarts: string;
+  /** Apply only when the reactants' single defined C=C is E, Z, or has no defined geometry. */
+  whenAlkene?: "E" | "Z" | "unspecified";
+  maxProducts?: number;
+};
+
+/**
+ * A documented qualitative product preference of a rule. It marks the product(s) matching
+ * `productSmarts` as the major (or minor) outcome when the `whenReactantSmarts` condition that
+ * causes the preference holds. It carries no fraction, and products it does not describe stay
+ * unranked: absence of a preference is not evidence of equal outcomes, nor of a major product.
+ */
+export type ProductPreference = {
+  id: string;
+  /** Every one of these must match some reactant (the structural factor behind the preference). */
+  whenReactantSmarts: string[];
+  /** None of these may match any reactant. */
+  unlessReactantSmarts?: string[];
+  productSmarts: string;
+  level: "major" | "minor";
+  basis: string;
+  references: string[];
+};
+
 export type ReactionTransform =
   | {
       type: "reactionSmarts";
+      /** Template used for retrosynthesis, and for forward products when no forwardTemplates apply. */
       smarts: string;
       maxProducts?: number;
+      /** Forward-only templates that can carry alkene geometry or fixed regiochemistry (see engine/forwardTemplates.ts). */
+      forwardTemplates?: ForwardTemplate[];
     }
   | { type: "customHandler"; handler: "addition"; options: HandlerOptions<AdditionHandlerMode> }
   | { type: "customHandler"; handler: "substitution"; options: HandlerOptions<SubstitutionHandlerMode> }
@@ -617,6 +652,8 @@ export type ReactionRule = {
   purpose?: ReactionPurpose;
   selectivity?: string[];
   selectivityProfile?: ReactionSelectivityProfile;
+  /** Qualitative, referenced product preferences (see ProductPreference). */
+  productPreferences?: ProductPreference[];
   limitations?: string[];
   productStatus?: ProductGenerationStatus;
 };

@@ -52,77 +52,76 @@ function uniqueProducts(products: string[]): string[] {
   return [...new Set(products.filter(Boolean))];
 }
 
+/**
+ * Which hydroxyl leaves decides everything that follows: the carbon that loses its OH becomes
+ * the carbocation, and the group that migrates comes from the OTHER carbinol carbon (which ends
+ * as the carbonyl). Textbook rule: the more stable carbocation forms first, and then
+ * H > aryl > alkyl migrate. The stability score of the leaving carbon is its number of carbon
+ * substituents plus one for each aryl group (an aryl group stabilises a cation about as much as
+ * one more alkyl substituent). Ties keep every tied orientation, so a genuinely ambiguous diol
+ * still gives several outcomes. Applied before the migration hierarchy, it fixes diols such as
+ * propane-1,2-diol, where the secondary cation (hydride shift, giving the aldehyde) beats the
+ * primary one (giving the ketone).
+ */
+const LEAVING_CARBON_TIERS: ReadonlyArray<readonly string[]> = [
+  // score 4
+  ["H0;$(C(-c)-c)"],
+  // score 3
+  ["H0;$(C-c);!$(C(-c)-c)", "H1;$(C(-c)-c)"],
+  // score 2
+  ["H0;!$(C-c)", "H1;$(C-c);!$(C(-c)-c)"],
+  // score 1
+  ["H1;!$(C-c)", "H2;$(C-c)"],
+  // score 0
+  ["H2;!$(C-c)"],
+];
+
+/** Restrict the leaving carbon (map number 3) of a reaction SMARTS to a stability tier member. */
+function withLeavingCarbon(smarts: string, atomExpression: string): string {
+  if (smarts.includes("[C;R:3]")) return smarts.replace("[C;R:3]", `[C;R;X4;${atomExpression}:3]`);
+  return smarts.replace("[C:3]", `[C;X4;${atomExpression}:3]`);
+}
+
+async function migrationHierarchy(
+  reactantSmiles: string,
+  atomExpressions: readonly string[],
+  maxProducts: number,
+): Promise<string[]> {
+  const classes: string[][] = [
+    // Hydride migration: the H-bearing carbinol carbon becomes the carbonyl (fixes secondary cyclic diols
+    // such as (1S,2R)-4-ethylcyclopentane-1,2-diol, which keep the ring and give 3-ethylcyclopentanone).
+    [PINACOL_HYDRIDE_SHIFT_SMARTS],
+    // Aryl migration.
+    [PINACOL_ARYL_SHIFT_SMARTS],
+    // Exocyclic alkyl migration, most substituted migrating carbon first.
+    ...PINACOL_ALKYL_SHIFT_SMARTS.map((smarts) => [smarts]),
+    // Ring C-C migration (ring contraction) is a fallback, not an assumption for every cyclic diol.
+    [PINACOL_RING_CONTRACTION_SMARTS],
+  ];
+  for (const migrationClass of classes) {
+    const products: string[] = [];
+    for (const smarts of migrationClass) {
+      for (const expression of atomExpressions) {
+        products.push(...(await runReactionSmarts(reactantSmiles, withLeavingCarbon(smarts, expression), maxProducts)));
+      }
+    }
+    const unique = uniqueProducts(products);
+    if (unique.length > 0) return unique.slice(0, maxProducts);
+  }
+  return [];
+}
+
 async function pinacolRearrangement(
   reactantSmiles: string,
   maxProducts: number,
 ): Promise<string[]> {
-  // Hydride has a higher migratory aptitude than an ordinary alkyl/ring bond.
-  // This fixes secondary cyclic vicinal diols such as
-  // (1S,2R)-4-ethylcyclopentane-1,2-diol: both carbinol centers bear H, so the
-  // major rearrangement is the ring-retaining ketone (3-ethylcyclopentanone),
-  // not dehydration products or a ring-contracted aldehyde.
-  const hydrideProducts = uniqueProducts(
-    await runReactionSmarts(
-      reactantSmiles,
-      PINACOL_HYDRIDE_SHIFT_SMARTS,
-      maxProducts,
-    ),
-  );
-
-  if (hydrideProducts.length > 0) {
-    return hydrideProducts.slice(0, maxProducts);
+  // The most stable carbocation that can form decides first; only if that tier gives nothing
+  // does a less stable one get considered.
+  for (const tier of LEAVING_CARBON_TIERS) {
+    const products = await migrationHierarchy(reactantSmiles, tier, maxProducts);
+    if (products.length > 0) return products;
   }
-
-  // If hydride migration is unavailable, do NOT assume that every cyclic
-  // tertiary vicinal diol must ring-contract.  The previous implementation
-  // short-circuited here and therefore never even evaluated an exocyclic
-  // alkyl (often methyl) migration.  That incorrectly forced substrates such
-  // as 1,2-dialkylcycloalkan-1,2-diols into the contracted-ring product.
-  //
-  // Rank the remaining migration classes instead:
-  //   aryl > exocyclic alkyl > ring C-C migration.
-  // This keeps the product list selective (one preferred migration class),
-  // while allowing the ring-retaining pinacolone product whenever a genuine
-  // exocyclic C-C migration is available.
-  const arylProducts = uniqueProducts(
-    await runReactionSmarts(
-      reactantSmiles,
-      PINACOL_ARYL_SHIFT_SMARTS,
-      maxProducts,
-    ),
-  );
-
-  if (arylProducts.length > 0) {
-    return arylProducts.slice(0, maxProducts);
-  }
-
-  for (const alkylShiftSmarts of PINACOL_ALKYL_SHIFT_SMARTS) {
-    const alkylProducts = uniqueProducts(
-      await runReactionSmarts(
-        reactantSmiles,
-        alkylShiftSmarts,
-        maxProducts,
-      ),
-    );
-
-    if (alkylProducts.length > 0) {
-      return alkylProducts.slice(0, maxProducts);
-    }
-  }
-
-  // Ring contraction is now a fallback for cyclic systems that do not have a
-  // higher-ranked hydride/aryl/exocyclic-alkyl migration available.  This is
-  // deliberately a fallback rather than an unconditional "cyclic = contract"
-  // rule, because the latter was the bug that produced the wrong scaffold.
-  const ringContractions = uniqueProducts(
-    await runReactionSmarts(
-      reactantSmiles,
-      PINACOL_RING_CONTRACTION_SMARTS,
-      maxProducts,
-    ),
-  );
-
-  return ringContractions.slice(0, maxProducts);
+  return [];
 }
 
 /**

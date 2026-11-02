@@ -5,8 +5,10 @@ import type {
   ReactionSitePreference,
 } from "../reactionTypes";
 import {
+  runReactionSmarts,
   runReactionSmartsWithMultiplicity,
 } from "./rdkitReaction";
+import { scoreEasProducts } from "./aromaticSiteSelection";
 import {
   canonicalizeStereoStructure,
   filterProductsByRelativeSubstituentFace,
@@ -327,11 +329,124 @@ function percentLabel(fraction: number): string {
  * textbook abstraction rate ratios. The estimate is intentionally used for
  * ranking, not as an experimental yield prediction.
  */
+async function smartsMatches(smiles: string, smarts: string): Promise<boolean> {
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(smiles);
+  const query = rdkit.get_qmol(smarts);
+  try {
+    if (!mol || !query) return false;
+    const match = mol.get_substruct_match?.(query);
+    return typeof match === "string" && match !== "{}" && match !== "";
+  } catch {
+    return false;
+  } finally {
+    query?.delete?.();
+    mol?.delete?.();
+  }
+}
+
+/**
+ * Qualitative, referenced preferences declared on the rule (ProductPreference). The first
+ * preference whose structural condition holds and whose product pattern matches decides; a
+ * product no preference describes returns null and stays unranked. No fraction is invented.
+ */
+async function assessDeclaredPreference(
+  rule: ReactionRule,
+  reactants: string[],
+  productSmiles: string,
+): Promise<ReactionSelectivityAssessment | null> {
+  for (const preference of rule.productPreferences ?? []) {
+    let applies = true;
+    for (const smarts of preference.whenReactantSmarts) {
+      let found = false;
+      for (const reactant of reactants) {
+        if (await smartsMatches(reactant, smarts)) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        applies = false;
+        break;
+      }
+    }
+    if (!applies) continue;
+    for (const smarts of preference.unlessReactantSmarts ?? []) {
+      for (const reactant of reactants) {
+        if (await smartsMatches(reactant, smarts)) applies = false;
+      }
+    }
+    if (!applies) continue;
+    if (!(await smartsMatches(productSmiles, preference.productSmarts))) continue;
+    return {
+      level: preference.level,
+      estimatedFraction: null,
+      planningPenalty: preference.level === "minor" ? 40 : 0,
+      label: preference.level === "major" ? "Major product (qualitative)" : "Minor product (qualitative)",
+      basis: `${preference.basis} Source: ${preference.references.join("; ")} Qualitative preference, not a measured ratio.`,
+    };
+  }
+  return null;
+}
+
+const easSiblingCache = new Map<string, Promise<{ keys: string[]; scores: Array<number | null> }>>();
+
+/**
+ * Qualitative ranking of the ring positions of a Friedel-Crafts step by directing effects. The
+ * siblings are every product the rule's own template gives for these reactants. A ring the simple
+ * model does not cover (fused, no benzene ring) is not ranked at all.
+ */
+async function assessEasDirecting(
+  rule: ReactionRule,
+  reactants: string[],
+  productSmiles: string,
+): Promise<ReactionSelectivityAssessment | null> {
+  const installed = rule.selectivityProfile?.easDirecting;
+  if (!installed || rule.transform.type !== "reactionSmarts" || reactants.length < 2) return null;
+  const cacheKey = `${rule.id}|${reactants.join(".")}`;
+  let pending = easSiblingCache.get(cacheKey);
+  if (!pending) {
+    pending = (async () => {
+      const siblings = await runReactionSmarts(reactants, (rule.transform as { smarts: string }).smarts, 24);
+      const keys: string[] = [];
+      for (const sibling of siblings) keys.push((await canonicalizeStereoStructure(sibling))?.isomeric ?? sibling);
+      return { keys, scores: await scoreEasProducts(reactants[0], siblings, installed) };
+    })();
+    if (easSiblingCache.size > 200) easSiblingCache.clear();
+    easSiblingCache.set(cacheKey, pending);
+  }
+  const { keys, scores } = await pending;
+  if (keys.length < 2 || scores.some((score) => score === null)) return null;
+  const own = (await canonicalizeStereoStructure(productSmiles))?.isomeric ?? productSmiles;
+  const index = keys.indexOf(own);
+  if (index < 0) return null;
+  const numeric = scores as number[];
+  const best = Math.max(...numeric);
+  const ties = numeric.filter((score) => Math.abs(score - best) < 1e-6).length;
+  const gap = best - numeric[index];
+  const basisTail =
+    "Estimated from the substituents' directing effects only; the ortho/para ratio, steric effects and, for alkylation, carbocation rearrangement and polyalkylation are not modeled.";
+  if (gap < 1e-6 && ties === 1) {
+    return { level: "major", estimatedFraction: null, planningPenalty: 0, label: "Favored ring position (qualitative)", basis: `Most activated position for substitution. ${basisTail}` };
+  }
+  if (gap <= 1.0) {
+    return { level: "competitive", estimatedFraction: null, planningPenalty: 10, label: "Competitive ring position (qualitative)", basis: `Similarly activated as the best position. ${basisTail}` };
+  }
+  return { level: "minor", estimatedFraction: null, planningPenalty: 40, label: "Disfavored ring position (qualitative)", basis: `Clearly less activated than the best position. ${basisTail}` };
+}
+
 export async function assessReactionProductSelectivity(
   rule: ReactionRule,
   reactantSmiles: string,
   productSmiles: string,
+  allReactantSmiles: string[] = [reactantSmiles],
 ): Promise<ReactionSelectivityAssessment | null> {
+  if (rule.selectivityProfile?.easDirecting) {
+    return assessEasDirecting(rule, allReactantSmiles, productSmiles);
+  }
+  if (rule.productPreferences?.length) {
+    return assessDeclaredPreference(rule, allReactantSmiles, productSmiles);
+  }
   if (
     rule.selectivityProfile?.sitePreference !== "most-stable-radical-site" ||
     rule.transform.type !== "customHandler" ||
