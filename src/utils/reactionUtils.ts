@@ -139,8 +139,41 @@ function alkeneGeometryDetermined(rdkit: any, rawGetMol: RawGetMol, reactants: r
   return false;
 }
 
-function stereocentreCount(smiles: string): number {
-  return (smiles.match(/@@?/g) ?? []).length;
+/**
+ * Exactly one aliphatic C=C in the reactants and it is terminal (CH2=C): a stereospecific addition then creates ONE
+ * new stereocentre, so the achiral reaction gives a racemate. Counting "@" in a completed representative is not
+ * reliable (the depiction completer can leave a quaternary centre unmarked), so this is decided from the reactants.
+ */
+function singleNewStereocentreFromTerminalAlkene(rdkit: any, rawGetMol: RawGetMol, reactants: readonly string[]): boolean {
+  let alkenes = 0;
+  let terminal = false;
+  for (const smiles of reactants) {
+    const mol = rawGetMol(smiles) as any;
+    if (!mol) continue;
+    try {
+      for (const [smarts, isTerminalQuery] of [["[C]=[C]", false], ["[CH2]=[C]", true]] as const) {
+        const query = rdkit.get_qmol?.(smarts);
+        if (!query) continue;
+        try {
+          const raw = mol.get_substruct_matches?.(query);
+          const parsed: unknown = raw ? JSON.parse(raw) : [];
+          // RDKit returns an array of matches, or a single {atoms: [...]} object when there is exactly one.
+          const matches: unknown[] = Array.isArray(parsed) ? parsed : parsed && typeof parsed === "object" && "atoms" in parsed ? [parsed] : [];
+          const distinct = new Set(matches.map((match) => {
+            const atoms: number[] = Array.isArray(match) ? match : (match as { atoms?: number[] }).atoms ?? [];
+            return [...atoms].sort((a, b) => a - b).join("-");
+          }));
+          if (isTerminalQuery) terminal = terminal || distinct.size > 0;
+          else alkenes += distinct.size;
+        } finally {
+          query.delete?.();
+        }
+      }
+    } finally {
+      mol.delete?.();
+    }
+  }
+  return alkenes === 1 && terminal;
 }
 
 function hasActivatedAlkeneSubstituent(rdkit: any, rawGetMol: RawGetMol, smiles: string) {
@@ -423,7 +456,10 @@ async function applyMechanisticStereoRuntime(
         const completed = completeStereoRepresentative(rawGetMol, seed, directive);
         if (!completed) continue;
         if (!determined) {
-          if (!reactantsHaveSpecifiedStereo(pathway.reactantComponents) && stereocentreCount(completed) === 1) {
+          if (
+            !reactantsHaveSpecifiedStereo(pathway.reactantComponents) &&
+            singleNewStereocentreFromTerminalAlkene(rdkit, rawGetMol, pathway.reactantComponents)
+          ) {
             forceRacemic = true;
           } else {
             leftUnspecified = true;

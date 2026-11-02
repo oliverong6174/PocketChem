@@ -208,3 +208,38 @@ describe("corrections preserve identity and material accounting", () => {
     assert.equal(zWorkspace.history[0].outcomes[0].mixture.collapsed, true);
   });
 });
+
+describe("defects found by the held-out benchmark (Stage 9D)", () => {
+  const step = async (ruleId, reactants) => {
+    const created = await ws.createWorkspace(reactants);
+    const lots = created.workspace.pool.lots.map((lot) => lot.id);
+    return ws.executeWorkspaceStep(created.workspace, { ruleId, lotIds: lots }, registry);
+  };
+  test("[engine] Gilman 1,4-addition reaches cyclic, acyclic and ester Michael acceptors (the rule no longer depends on a classifier name)", async () => {
+    for (const [acceptor, product] of [["O=C1C=CCCC1", "CC1CCCC(=O)C1"], ["CC(=O)C=CC", "CCC(C)CC(C)=O"], ["C=CC(=O)OC", "CCCC(=O)OC"]]) {
+      const result = await step("organocuprate-conjugate-addition", [acceptor, "[Li+].C[Cu-]C"]);
+      assert.equal(result.step.status, "reaction", acceptor);
+      assert.equal(result.step.outcomes[0].productSmiles.length > 0, true);
+    }
+    const cyclic = await step("organocuprate-conjugate-addition", ["O=C1C=CCCC1", "[Li+].C[Cu-]C"]);
+    assert.equal((await stereo.canonicalizeStereoStructure(cyclic.step.outcomes[0].productSmiles)).connectivity, (await stereo.canonicalizeStereoStructure("CC1CCCC(=O)C1")).connectivity);
+  });
+  test("[engine] a saturated ketone or a carboxylic acid is not a Michael acceptor for the Gilman rule", async () => {
+    assert.notEqual((await step("organocuprate-conjugate-addition", ["O=C1CCCCC1", "[Li+].C[Cu-]C"])).step.status, "reaction");
+    assert.notEqual((await step("organocuprate-conjugate-addition", ["C=CC(=O)O", "[Li+].C[Cu-]C"])).step.status, "reaction");
+  });
+  test("[engine] epoxide opening works for aryl, vinyl and alkyl Grignard reagents", async () => {
+    for (const [grignard, product] of [["Br[Mg]c1ccccc1", "OCCc1ccccc1"], ["C=C[Mg]Br", "C=CCCO"], ["CC[Mg]Br", "CCCCO"]]) {
+      const result = await step("epoxide-grignard-opening", ["C1CO1", grignard]);
+      assert.equal(result.step.status, "reaction", grignard);
+      assert.equal((await canon(result.step.outcomes[0].productSmiles)), await canon(product), grignard);
+    }
+  });
+  test("[engine] a trisubstituted allylic-alcohol epoxide gets no invented stereochemistry on the Reactions page", async () => {
+    const out = await page("alkene-epoxidation", "CC(C)=CCCC(C)=CCO");
+    for (const pathway of out) {
+      assert.equal(hasStereo(pathway.productSmiles), false, pathway.productSmiles);
+      assert.equal(pathway.productMixture, null);
+    }
+  });
+});

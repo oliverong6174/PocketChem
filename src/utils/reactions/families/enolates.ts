@@ -231,9 +231,11 @@ export const enolateReactionRules: ReactionRule[] = [
     productHint: "Beta-substituted carbonyl",
     explanation:
       "Gilman reagents are soft carbon nucleophiles that typically add to the beta carbon of an alpha,beta-unsaturated carbonyl, preserving the carbonyl group after workup.",
+    // Structural trigger only: the functional-group classifier names cyclic enones such as cyclohex-2-enone
+    // "Crotonaldehyde"/"Acryloyl" rather than "Enone", so a name-based condition made the rule unreachable for them.
     trigger: {
-      anyFunctionalGroups: ["Enone", "Enal", "Enoate", "Chalcone"],
       includeSmarts: ["[C]=[C][C](=O)"],
+      excludeSmarts: ["[CX3](=O)[OX2H1]"],
     },
     additionalReactants: [
       { label: "Gilman or organocuprate reagent", trigger: { includeSmarts: ["[#6][Cu]"] } },

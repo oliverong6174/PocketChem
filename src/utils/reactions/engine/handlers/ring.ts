@@ -91,8 +91,9 @@ function nucleophileTemplate(
   }
   if (nucleophile === "organometallic") {
     return {
-      reactantSuffix: ".[C:4][Mg,Li]",
-      attachedGroup: "[C:4]",
+      // Any carbon (alkyl, aryl, vinyl, alkynyl) bonded to the metal can attack; [C:4] excluded aromatic carbons.
+      reactantSuffix: ".[#6:4][Mg,Li]",
+      attachedGroup: "[#6:4]",
     };
   }
   if (nucleophile === "halide" && halogen) {
