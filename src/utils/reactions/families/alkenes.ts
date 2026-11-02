@@ -234,12 +234,25 @@ export const alkeneReactionRules: ReactionRule[] = [
     transform: {
       type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]([Br])[C:2]([Br])",
+      // Anti addition (bromonium ion, backside attack), stereospecific in the alkene geometry: an E alkene
+      // gives the (R,S) (meso when symmetric) dibromide and a Z alkene the (R,R)/(S,S) racemate; a 5-7
+      // membered ring alkene gives the trans dibromide as a racemate. Equal chirality tags give the (R,S)
+      // relationship and opposite tags (R,R)/(S,S) (checked on 2-butene, 2-pentene and cyclohexene).
+      // Only H1=H1 alkenes are covered; every other alkene stays constitution-only.
+      forwardTemplates: [
+        { whenAlkene: "E", smarts: "[C;H1:1]=[C;H1:2]>>[C@:1](Br)[C@:2]Br" },
+        { whenAlkene: "E", smarts: "[C;H1:1]=[C;H1:2]>>[C@@:1](Br)[C@@:2]Br" },
+        { whenAlkene: "Z", smarts: "[C;H1:1]=[C;H1:2]>>[C@:1](Br)[C@@:2]Br" },
+        { whenAlkene: "Z", smarts: "[C;H1:1]=[C;H1:2]>>[C@@:1](Br)[C@:2]Br" },
+        { whenAlkene: "unspecified", smarts: "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]>>[C@:1](Br)[C@@:2]Br" },
+        { whenAlkene: "unspecified", smarts: "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]>>[C@@:1](Br)[C@:2]Br" },
+      ],
     },
     productStatus: "representative",
     selectivityProfile: {
       stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", stereospecific: true },
       sitePreference: "most-substituted-alkene",
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     selectivity: ["Anti addition", "More substituted/electron-rich alkene sites are preferred when several nonequivalent C=C bonds are present."],
@@ -485,11 +498,21 @@ export const alkeneReactionRules: ReactionRule[] = [
     transform: {
       type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]1[C][C:2]1",
+      // Stereospecific: the alkene's cis/trans relationship is kept in the ring (Z gives cis, E gives trans,
+      // as racemates when chiral; ring alkenes of 5-7 members give cis). H1=H1 alkenes only.
+      forwardTemplates: [
+        { whenAlkene: "E", smarts: "[C;H1:1]=[C;H1:2]>>[C@:1]1[CH2][C@@:2]1" },
+        { whenAlkene: "E", smarts: "[C;H1:1]=[C;H1:2]>>[C@@:1]1[CH2][C@:2]1" },
+        { whenAlkene: "Z", smarts: "[C;H1:1]=[C;H1:2]>>[C@:1]1[CH2][C@:2]1" },
+        { whenAlkene: "Z", smarts: "[C;H1:1]=[C;H1:2]>>[C@@:1]1[CH2][C@@:2]1" },
+        { whenAlkene: "unspecified", smarts: "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]>>[C@:1]1[CH2][C@:2]1" },
+        { whenAlkene: "unspecified", smarts: "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]>>[C@@:1]1[CH2][C@@:2]1" },
+      ],
     },
     productStatus: "representative",
     selectivityProfile: {
       stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     selectivity: ["Stereospecific cyclopropanation; alkene geometry is retained in the ring relationship."],
@@ -510,11 +533,20 @@ export const alkeneReactionRules: ReactionRule[] = [
     transform: {
       type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]1[C]([Cl])([Cl])[C:2]1",
+      // Stereospecific carbene addition: alkene geometry is kept in the ring (see Simmons-Smith above).
+      forwardTemplates: [
+        { whenAlkene: "E", smarts: "[C;H1:1]=[C;H1:2]>>[C@:1]1[C]([Cl])([Cl])[C@@:2]1" },
+        { whenAlkene: "E", smarts: "[C;H1:1]=[C;H1:2]>>[C@@:1]1[C]([Cl])([Cl])[C@:2]1" },
+        { whenAlkene: "Z", smarts: "[C;H1:1]=[C;H1:2]>>[C@:1]1[C]([Cl])([Cl])[C@:2]1" },
+        { whenAlkene: "Z", smarts: "[C;H1:1]=[C;H1:2]>>[C@@:1]1[C]([Cl])([Cl])[C@@:2]1" },
+        { whenAlkene: "unspecified", smarts: "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]>>[C@:1]1[C]([Cl])([Cl])[C@:2]1" },
+        { whenAlkene: "unspecified", smarts: "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]>>[C@@:1]1[C]([Cl])([Cl])[C@@:2]1" },
+      ],
     },
     productStatus: "computed",
     selectivityProfile: {
       stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     selectivity: ["Carbene addition is stereospecific and preserves the alkene's relative stereochemistry."],
@@ -535,11 +567,20 @@ export const alkeneReactionRules: ReactionRule[] = [
     transform: {
       type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1]1[C]([Br])([Br])[C:2]1",
+      // Stereospecific carbene addition: alkene geometry is kept in the ring (see Simmons-Smith above).
+      forwardTemplates: [
+        { whenAlkene: "E", smarts: "[C;H1:1]=[C;H1:2]>>[C@:1]1[C]([Br])([Br])[C@@:2]1" },
+        { whenAlkene: "E", smarts: "[C;H1:1]=[C;H1:2]>>[C@@:1]1[C]([Br])([Br])[C@:2]1" },
+        { whenAlkene: "Z", smarts: "[C;H1:1]=[C;H1:2]>>[C@:1]1[C]([Br])([Br])[C@:2]1" },
+        { whenAlkene: "Z", smarts: "[C;H1:1]=[C;H1:2]>>[C@@:1]1[C]([Br])([Br])[C@@:2]1" },
+        { whenAlkene: "unspecified", smarts: "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]>>[C@:1]1[C]([Br])([Br])[C@:2]1" },
+        { whenAlkene: "unspecified", smarts: "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]>>[C@@:1]1[C]([Br])([Br])[C@@:2]1" },
+      ],
     },
     productStatus: "computed",
     selectivityProfile: {
       stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     selectivity: ["Carbene addition is stereospecific and preserves the alkene's relative stereochemistry."],

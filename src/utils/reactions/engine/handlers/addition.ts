@@ -934,9 +934,31 @@ async function alkeneGeometry(smiles: string): Promise<"E" | "Z" | null> {
  * pattern does not create two tetrahedral centers), PocketChem falls back to
  * the constitutionally correct diol without inventing stereochemistry.
  */
+/**
+ * A 5-7 membered ring alkene can only be cis, so syn addition gives the cis diol (meso) and anti addition the
+ * trans diol (a racemate). Equal chirality tags give the (R,S)/cis relationship and opposite tags (R,R)/(S,S)/trans
+ * (checked on cyclopentene and cyclohexene). Without this, the unspecified-geometry fallback enumerated both
+ * relationships, including ones the mechanism forbids.
+ */
+const RING_ALKENE_LHS = "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]";
+async function ringDihydroxylation(reactantSmiles: string, relationship: "syn" | "anti"): Promise<string[]> {
+  const tags: Array<[string, string]> = relationship === "syn" ? [["@", "@"], ["@@", "@@"]] : [["@", "@@"], ["@@", "@"]];
+  const products = new Set<string>();
+  for (const [a, b] of tags) {
+    for (const product of await runReactionSmarts(reactantSmiles, `${RING_ALKENE_LHS}>>[C${a}:1]([OH])[C${b}:2]([OH])`, 8)) {
+      products.add(product);
+    }
+  }
+  return [...products];
+}
+
 async function synDihydroxylation(reactantSmiles: string): Promise<string[]> {
   const geometry = await alkeneGeometry(reactantSmiles);
   const products = new Set<string>();
+  if (geometry === null) {
+    const ring = await ringDihydroxylation(reactantSmiles, "syn");
+    if (ring.length > 0) return ring;
+  }
 
   let stereoSmarts: string[] = [];
   if (geometry === "E") {
@@ -1001,6 +1023,10 @@ async function synDihydroxylation(reactantSmiles: string): Promise<string[]> {
 async function antiDihydroxylation(reactantSmiles: string): Promise<string[]> {
   const geometry = await alkeneGeometry(reactantSmiles);
   const products = new Set<string>();
+  if (geometry === null) {
+    const ring = await ringDihydroxylation(reactantSmiles, "anti");
+    if (ring.length > 0) return ring;
+  }
 
   let stereoSmarts: string[] = [];
   if (geometry === "E") {
