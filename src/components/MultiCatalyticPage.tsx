@@ -27,6 +27,7 @@ const STATUS_CHIP_LABEL: Record<SequentialSynthesisStep["status"], string> = {
   unsupported: "UNSUPPORTED",
   "unknown-rule": "UNKNOWN CONDITION",
   "execution-error": "EVALUATION FAILED",
+  "not-run": "NOT RUN",
 };
 
 const STATUS_HEADING: Record<SequentialSynthesisStep["status"], string> = {
@@ -36,6 +37,7 @@ const STATUS_HEADING: Record<SequentialSynthesisStep["status"], string> = {
   unsupported: "STRUCTURAL PRODUCT NOT SUPPORTED",
   "unknown-rule": "CONDITION NOT IN REGISTRY",
   "execution-error": "INTERNAL ENGINE ERROR — NOT A CHEMICAL PREDICTION",
+  "not-run": "NOT RUN — A REQUIRED INTERMEDIATE WAS NOT FORMED",
 };
 
 function rendererForStep(step: SequentialSynthesisStep) {
@@ -131,6 +133,9 @@ function OrderedSequencePanel() {
   const [startingName, setStartingName] = useState("");
   const [svgs, setSvgs] = useState<SvgMap>({});
   const [isRunning, setIsRunning] = useState(false);
+  // Legacy diagnostic mode: keep applying later conditions to the last established molecule after a
+  // step that formed no product. Off by default; its results are provisional.
+  const [diagnosticMode, setDiagnosticMode] = useState(false);
   const [status, setStatus] = useState("Draw one starting molecule, then build a reagent sequence.");
   const [error, setError] = useState<string | null>(null);
 
@@ -230,7 +235,7 @@ function OrderedSequencePanel() {
         smiles,
         sequence.map((condition) => condition.ruleId),
         reactionRegistry,
-        { branchLimit: 6 },
+        { branchLimit: 6, unresolvedStepPolicy: diagnosticMode ? "continue-provisional" : "stop" },
       );
       const results = report.branches;
       setBranches(results);
@@ -356,6 +361,19 @@ function OrderedSequencePanel() {
         </div>
       </div>
 
+      <label className="reaction-note multicatalytic-diagnostic">
+        <input
+          type="checkbox"
+          checked={diagnosticMode}
+          disabled={isRunning}
+          onChange={(event: { target: { checked: boolean } }) => {
+            setDiagnosticMode(event.target.checked);
+            setBranches([]);
+          }}
+        />{" "}
+        Diagnostic mode: continue after a step that formed no product. Later steps then act on the last established molecule and are
+        provisional. By default a branch stops, because a step cannot use an intermediate that was never made.
+      </label>
       <div className="reaction-actions">
         <button className="primary-button" type="button" disabled={!ketcher || isRunning} onClick={() => void runSequence()}>
           {isRunning ? "Computing…" : "Run Sequence"}
@@ -428,7 +446,11 @@ function OrderedSequencePanel() {
                         <small>
                           {step.status === "no-reaction"
                             ? "Starting material carries forward unchanged to the next step."
-                            : "No chemistry was computed for this step. The molecule is carried forward unchanged, but the step itself is unresolved."}
+                            : step.status === "not-run"
+                              ? "Nothing was run for this step."
+                              : diagnosticMode
+                                ? "No chemistry was computed for this step. Diagnostic mode: the molecule is carried forward unchanged, but the step itself is unresolved."
+                                : "No chemistry was computed for this step. Later steps of this branch are not run."}
                         </small>
                       </div>
                     ) : (

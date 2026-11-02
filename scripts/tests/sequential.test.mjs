@@ -33,6 +33,10 @@ after(async () => {
 
 // ---- helpers ---------------------------------------------------------------
 
+// Stage 9C: by default a branch stops after a step that formed no product. The tests that document the
+// legacy behavior (later steps run on the unchanged molecule and are marked provisional) opt into it.
+const LEGACY = { branchLimit: 12, unresolvedStepPolicy: "continue-provisional" };
+
 function run(smiles, ruleIds, rules = registry, options = { branchLimit: 12 }) {
   return utils.runSequentialSynthesis(smiles, ruleIds, rules, options);
 }
@@ -178,9 +182,9 @@ describe("unsupported outcomes", () => {
 // ---- 5. unknown rule ids ----------------------------------------------------
 
 describe("unknown reaction ids", () => {
-  test("[engine] an unknown id keeps its slot, is explained, and later steps still run", async () => {
+  test("[engine] diagnostic mode: an unknown id keeps its slot, is explained, and later steps still run", async () => {
     const branch = only(
-      await run("CC=C", ["alkene-hydrogenation", "does-not-exist", "alkene-hx-addition-hbr"]),
+      await run("CC=C", ["alkene-hydrogenation", "does-not-exist", "alkene-hx-addition-hbr"], registry, LEGACY),
     );
     assert.deepEqual(statuses(branch), ["reaction", "unknown-rule", "no-reaction"]);
     assert.equal(branch.steps.length, 3, "the unknown id must not disappear");
@@ -191,8 +195,8 @@ describe("unknown reaction ids", () => {
     assert.equal(branch.finalSmiles, "CCC");
   });
 
-  test("[engine] unknown id at the start leaves the starting molecule intact", async () => {
-    const branch = only(await run("CC=C", ["does-not-exist", "alkene-hydrogenation"]));
+  test("[engine] diagnostic mode: unknown id at the start leaves the starting molecule intact", async () => {
+    const branch = only(await run("CC=C", ["does-not-exist", "alkene-hydrogenation"], registry, LEGACY));
     assert.deepEqual(statuses(branch), ["unknown-rule", "reaction"]);
     assert.equal(canon(branch.finalSmiles), canon("CCC"));
   });
@@ -239,13 +243,13 @@ describe("engine failures are never reported as chemical nonreactivity", () => {
     assert.deepEqual(statuses(branch), ["execution-error"]);
   });
 
-  test("[engine] an errored step does not block later steps, which are marked unresolved", async () => {
+  test("[engine] diagnostic mode: an errored step does not block later steps, which are marked unresolved", async () => {
     const bad = variant(
       "alkene-hydrogenation",
       { transform: { type: "reactionSmarts", smarts: "[C:1]>>>>(((" } },
       "synthetic-bad-smarts-2",
     );
-    const branch = only(await run("CC=C", [bad.id, "alkene-hx-addition-hbr"], [...registry, bad]));
+    const branch = only(await run("CC=C", [bad.id, "alkene-hx-addition-hbr"], [...registry, bad], LEGACY));
     assert.deepEqual(statuses(branch), ["execution-error", "reaction"]);
     assert.equal(branch.steps[1].inputUnresolved, true);
     assert.equal(canon(branch.finalSmiles), canon("CC(C)Br"));

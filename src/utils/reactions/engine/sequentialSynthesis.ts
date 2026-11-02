@@ -42,9 +42,17 @@ export type SequentialConditionOption = {
  * - execution-error: an internal matcher/SMARTS/handler failure prevented the
  *                    evaluation. This is NOT evidence of nonreactivity.
  *
- * Every status other than "reaction" leaves the molecule unchanged for the
- * next step; only "no-reaction" is a chemical conclusion, so steps that follow
- * any other status carry `inputUnresolved: true`.
+ * - not-run:         an earlier step in this branch needed input, was
+ *                    unsupported, unknown or failed, so no product was formed
+ *                    for this step to act on and it was NOT evaluated (default
+ *                    policy, Stage 9C).
+ *
+ * "no-reaction" is a chemical conclusion: the molecule is still there and the
+ * next step runs on it. Every other non-reaction status means the intermediate
+ * that the next step needs was not established. By default the branch then stops
+ * (later steps are "not-run"). With `unresolvedStepPolicy: "continue-provisional"`
+ * (the legacy diagnostic mode) later steps run on the unchanged molecule and
+ * carry `inputUnresolved: true`.
  */
 export type SequentialSynthesisStepStatus =
   | "reaction"
@@ -52,7 +60,8 @@ export type SequentialSynthesisStepStatus =
   | "needs-input"
   | "unsupported"
   | "unknown-rule"
-  | "execution-error";
+  | "execution-error"
+  | "not-run";
 
 export type SequentialSynthesisStep = {
   stepNumber: number;
@@ -132,8 +141,15 @@ export type SequentialSynthesisBranch = {
   representsRacemate: boolean;
 };
 
+export type UnresolvedStepPolicy =
+  /** Default: later steps of a branch whose earlier step formed no product are not run. */
+  | "stop"
+  /** Legacy diagnostic mode: later steps run on the unchanged molecule and are marked provisional. */
+  | "continue-provisional";
+
 export type SequentialSynthesisOptions = {
   branchLimit?: number;
+  unresolvedStepPolicy?: UnresolvedStepPolicy;
 };
 
 /** A viable outcome dropped only because of the branch limit. */
@@ -264,6 +280,31 @@ function describeRule(rule: ReactionRule): StepDescriptor {
 function branchHasUnresolvedStep(branch: SequentialSynthesisBranch): boolean {
   return branch.steps.some(
     (step) => step.status !== "reaction" && step.status !== "no-reaction",
+  );
+}
+
+/** The first earlier step of the branch that left the intermediate this step would need unestablished. */
+function firstUnresolvedStep(branch: SequentialSynthesisBranch): SequentialSynthesisStep | undefined {
+  return branch.steps.find((step) => step.status !== "reaction" && step.status !== "no-reaction" && step.status !== "not-run");
+}
+
+function notRunStep(
+  branch: SequentialSynthesisBranch,
+  stepIndex: number,
+  rule: StepDescriptor,
+): SequentialSynthesisBranch {
+  const cause = firstUnresolvedStep(branch);
+  return appendNonReactionStep(
+    branch,
+    stepIndex,
+    rule,
+    "not-run",
+    cause
+      ? `Step ${cause.stepNumber} (${cause.title}) did not form a product (${cause.status}), so the molecule this step needs was not established. ` +
+          "This step was not evaluated and no chemistry was applied; the structure shown is the last established molecule, not a product of this step."
+      : "An earlier step did not form a product, so this step was not evaluated.",
+    "NOT RUN",
+    null,
   );
 }
 
@@ -507,6 +548,7 @@ export async function runSequentialSynthesisDetailed(
     return { branches: [], branchLimit, exclusions: [] };
   }
   const exclusions: SequentialBranchExclusion[] = [];
+  const policy: UnresolvedStepPolicy = options.unresolvedStepPolicy ?? "stop";
   // Outcomes of one non-racemic stereo-mixture stay together when ranking and
   // pruning, so one reaction mixture never consumes several independent slots.
   const unitKeys = new WeakMap<SequentialSynthesisBranch, string>();
@@ -532,7 +574,9 @@ export async function runSequentialSynthesisDetailed(
       // Reagent order is meaningful, so an unknown condition keeps its slot as
       // an explicit, unresolved step instead of silently disappearing.
       branches = branches.map((branch) =>
-        appendNonReactionStep(
+        policy === "stop" && branchHasUnresolvedStep(branch)
+          ? notRunStep(branch, stepIndex, { id: ruleId, title: "Unknown reaction condition", reagents: ruleId, reagentNote: "", display: null })
+          : appendNonReactionStep(
           branch,
           stepIndex,
           {
@@ -557,6 +601,13 @@ export async function runSequentialSynthesisDetailed(
 
     for (const branch of branches) {
       const reactantSmiles = branch.finalSmiles;
+
+      // A branch whose earlier step formed no product has nothing for this step to act on.
+      // Other branches are unaffected.
+      if (policy === "stop" && branchHasUnresolvedStep(branch)) {
+        nextBranches.push(notRunStep(branch, stepIndex, describeRule(rule)));
+        continue;
+      }
 
       if (rule.transform.type === "conceptOnly") {
         nextBranches.push(

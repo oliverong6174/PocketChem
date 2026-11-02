@@ -22,8 +22,8 @@ after(async () => {
   await closeEngine();
 });
 
-function detailed(smiles, ruleIds, branchLimit = 12) {
-  return utils.runSequentialSynthesisDetailed(smiles, ruleIds, registry, { branchLimit });
+function detailed(smiles, ruleIds, branchLimit = 12, extra = {}) {
+  return utils.runSequentialSynthesisDetailed(smiles, ruleIds, registry, { branchLimit, ...extra });
 }
 
 /** Order-independent canonical multiset of components. */
@@ -190,8 +190,8 @@ describe("Phase 1 distinctions are preserved", () => {
     assert.equal(state(branches[0].finalSmiles), state("CCO.CO"));
   });
 
-  test("[engine] unresolved statuses keep their meaning when spectators exist", async () => {
-    const { branches } = await detailed("C=CC.CCCCO", ["not-a-real-rule", "alkene-hx-addition-hbr"]);
+  test("[engine] diagnostic mode: unresolved statuses keep their meaning when spectators exist", async () => {
+    const { branches } = await detailed("C=CC.CCCCO", ["not-a-real-rule", "alkene-hx-addition-hbr"], 12, { unresolvedStepPolicy: "continue-provisional" });
     assert.equal(branches[0].steps[0].status, "unknown-rule");
     assert.equal(branches[0].steps[1].status, "reaction");
     assert.equal(branches[0].steps[1].inputUnresolved, true);
