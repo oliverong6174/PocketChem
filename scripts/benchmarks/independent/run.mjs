@@ -297,9 +297,11 @@ for (const testCase of CASES) {
       const produced = run.producing.length > 0;
       let status;
       if (!claimed && !produced) status = verdict("correct-abstention", "no rule claims this reagent system and nothing produces the reference product");
-      else if (produced) status = verdict("supported-correct", `produced by ${run.producing.join(", ")}`);
+      else if (produced && claimed) status = verdict("supported-correct", `claimed by ${run.claimingRules.join(", ")} and produced by ${run.producing.join(", ")}`);
+      // The same constitution comes from an unrelated rule; the engine never claimed this reagent system.
+      else if (produced) status = verdict("other-rule-match", `no rule claims these reagents; the structure also arises from ${run.producing.join(", ")}`);
       else status = verdict("wrong", `rules ${run.claimingRules.join(", ")} claim the reagents but do not give the reference product`);
-      const stereoWanted = testCase.expect.products.some((p) => p.stereoSpecified);
+      const stereoWanted = testCase.expect.products.some((p) => p.stereoSpecified || p.cip);
       if (produced && stereoWanted) {
         const target = testCase.expect.products.find((p) => p.stereoSpecified || p.cip);
         const wantedConstitution = constitution(target.smiles);

@@ -505,4 +505,5 @@ export const CORRECTIONS = [
   { id: "US-05", scope: "case", note: "Expected ester stereochemistry was written as retention; corrected to inversion, (R)." },
   { id: "scorer-unsupported-stereo", scope: "scorer", note: "For stereo-specified unsupported cases only new tetrahedral centres ('@') count; a retained alkene geometry ('/') no longer counts as stereochemistry being specified." },
   { id: "RT-01", scope: "case", note: "Allow-list extended with benzylic-allylic-alcohol-oxidation after review." },
+  { id: "scorer-unsupported-claims", scope: "scorer", note: "Run 3 onward: an unsupported case whose reference structure also arises from an unrelated rule (Fischer for the Mitsunobu ester, mCPBA epoxidation for the Sharpless epoxide) is 'other-rule-match', not 'supported-correct', because no rule claims the reagent system; stereo-labelled expectations are scored for such matches too." },
 ];
