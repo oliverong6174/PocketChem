@@ -1,0 +1,353 @@
+{
+ "auditedOn": "2026-11-02",
+ "results": [
+  {
+   "id": "reusch-e2",
+   "url": "https://www2.chemistry.msu.edu/faculty/reusch/virttxtjml/e2steric.htm",
+   "cite": "Reusch, W. Virtual Textbook of Organic Chemistry (MSU): Steric Hindrance in E2 Elimination of 2-Bromo-2,3-Dimethylbutane by Alkoxide Bases",
+   "status": "not-supported",
+   "coverage": 0,
+   "missing": [
+    "methoxide",
+    "substituted",
+    "alkene",
+    "tert-butoxide",
+    "reverses",
+    "ratio"
+   ],
+   "readableChars": 19
+  },
+  {
+   "id": "hamburg-sn2",
+   "url": "https://www-archiv.fdm.uni-hamburg.de/b-online/library/newton/Chy251_253/Lectures/Sn2OpticalActivity/Sn2OpticalActivity.html",
+   "cite": "Univ. Hamburg organic chemistry lectures: Nucleophilic substitution and optical activity (2-bromooctane / 2-octanol)",
+   "status": "supported",
+   "coverage": 0.67,
+   "missing": [
+    "proceeds",
+    "experiments"
+   ],
+   "readableChars": 5762
+  },
+  {
+   "id": "ncstate-sn2",
+   "url": "https://ncstate.pressbooks.pub/organicchem/chapter/11-2-the-sn2-reaction/",
+   "cite": "NC State OpenStax-derived text, 11.2 The SN2 Reaction",
+   "status": "supported",
+   "coverage": 0.6,
+   "missing": [
+    "concerted",
+    "attack"
+   ],
+   "readableChars": 28145
+  },
+  {
+   "id": "ubc-hbo",
+   "url": "https://groups.chem.ubc.ca/chem203/15Oct14.pdf",
+   "cite": "UBC CHEM 203 lecture notes (15 Oct 2014): hydroboration-oxidation",
+   "status": "unreadable",
+   "detail": "PDF without extractable text (433146 bytes; scanned or compressed)"
+  },
+  {
+   "id": "jove-oxymerc",
+   "url": "https://www.jove.com/t/11778",
+   "cite": "JoVE Science Education 8.7: Oxymercuration-Reduction of Alkenes",
+   "status": "supported",
+   "coverage": 1,
+   "missing": [],
+   "readableChars": 6120
+  },
+  {
+   "id": "vanderbilt-alkynes",
+   "url": "https://cdn.vanderbilt.edu/vu-wordpress-0/wp-content/uploads/sites/210/2017/04/19175255/Chapter_9.pdf",
+   "cite": "Vanderbilt University organic chemistry course, Chapter 9 Alkynes",
+   "status": "unreadable",
+   "detail": "PDF without extractable text (455460 bytes; scanned or compressed)"
+  },
+  {
+   "id": "libretexts-alkyne-red",
+   "url": "https://chem.libretexts.org/Workbench/Community_College_of_Baltimore_County_Organic_Chemistry_1/09%3A_Alkynes/9.06%3A_10.6_Reduction_of_Alkynes",
+   "cite": "LibreTexts (CCBC Organic Chemistry 1) 9.06 Reduction of Alkynes",
+   "status": "supported",
+   "coverage": 1,
+   "missing": [],
+   "readableChars": 21671
+  },
+  {
+   "id": "wikipedia-semihydrog",
+   "url": "https://en.wikipedia.org/wiki/Semi-hydrogenation_of_alkynes",
+   "cite": "Wikipedia: Semi-hydrogenation of alkynes",
+   "status": "supported",
+   "coverage": 0.8,
+   "missing": [
+    "caco3"
+   ],
+   "readableChars": 17756
+  },
+  {
+   "id": "orgosolver-dibal",
+   "url": "https://orgosolver.com/reaction-library/ester-reaction-guides/ester-to-aldehyde-dibalh",
+   "cite": "OrgoSolver reaction library: ester to aldehyde (DIBAL-H, -78 C)",
+   "status": "supported",
+   "coverage": 0.86,
+   "missing": [
+    "over-reduces"
+   ],
+   "readableChars": 11733
+  },
+  {
+   "id": "pmc-dibal",
+   "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9042244/",
+   "cite": "DIBALH: from known fundamental to an unusual reaction (PMC9042244)",
+   "status": "unreachable",
+   "detail": "bot-wall / challenge page"
+  },
+  {
+   "id": "ic-os3",
+   "url": "https://www.ch.ic.ac.uk/local/organic/tutorial/OS_Lecture3_0304.pdf",
+   "cite": "Imperial College organic synthesis lecture 3",
+   "status": "unreadable",
+   "detail": "PDF without extractable text (176690 bytes; scanned or compressed)"
+  },
+  {
+   "id": "uis-eas",
+   "url": "https://chem.libretexts.org/Courses/University_of_Illinois_Springfield/UIS%3A_CHE_269_(Morsch_and_Andrews)/Chapters/Chapter_18%3A_Electrophilic_Aromatic_Substitution/18.07_EAS_of_Substituted_Benzenes",
+   "cite": "LibreTexts (Univ. of Illinois Springfield CHE 269) 18.07 EAS of Substituted Benzenes",
+   "status": "supported",
+   "coverage": 0.8,
+   "missing": [
+    "needs",
+    "chiefly"
+   ],
+   "readableChars": 28373
+  },
+  {
+   "id": "ncstate-fc",
+   "url": "https://ncstate.pressbooks.pub/orgchemstudentsolutions/?p=1894",
+   "cite": "NC State: Chemistry of Benzene: Electrophilic Aromatic Substitution, solutions to problems",
+   "status": "partial",
+   "coverage": 0.5,
+   "missing": [
+    "neopentyl",
+    "alcl3",
+    "methyl-2-phenylbutane",
+    "pages",
+    "disagreed"
+   ],
+   "readableChars": 29763
+  },
+  {
+   "id": "libretexts-grignard",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_%28Organic_Chemistry%29/Aldehydes_and_Ketones/Synthesis_of_Aldehydes_and_Ketones/Grignard_Reagents",
+   "cite": "LibreTexts: Grignard Reagents (Synthesis of Aldehydes and Ketones)",
+   "status": "partial",
+   "coverage": 0.5,
+   "missing": [
+    "nitrile",
+    "hydrolysis"
+   ],
+   "readableChars": 21976
+  },
+  {
+   "id": "chemguide-grignard",
+   "url": "https://chemguide.co.uk/organicprops/haloalkanes/grignard.html",
+   "cite": "Chemguide: An introduction to Grignard reagents",
+   "status": "supported",
+   "coverage": 0.75,
+   "missing": [
+    "ethylene",
+    "carbons"
+   ],
+   "readableChars": 9956
+  },
+  {
+   "id": "iupac-birch",
+   "url": "https://rsync.iupac.org/publications/pac/2003/pdf/7510x1443.pdf",
+   "cite": "IUPAC Pure Appl. Chem. 2003, 75, 1443 (Birch reduction)",
+   "status": "unreachable",
+   "detail": "HTTP 403"
+  },
+  {
+   "id": "wikipedia-mch",
+   "url": "https://en.wikipedia.org/wiki/Methylenecyclohexane",
+   "cite": "Wikipedia: Methylenecyclohexane",
+   "status": "supported",
+   "coverage": 0.67,
+   "missing": [
+    "methylenation"
+   ],
+   "readableChars": 8162
+  },
+  {
+   "id": "ncstate-halogenation",
+   "url": "https://ncstate.pressbooks.pub/ch220/chapter/halogenation-of-alkenes-addition-of-x2/",
+   "cite": "NC State: 5.4 Halogenation of Alkenes: Addition of X2",
+   "status": "partial",
+   "coverage": 0.57,
+   "missing": [
+    "trans-1",
+    "dibromocyclopentane",
+    "racemate"
+   ],
+   "readableChars": 16048
+  },
+  {
+   "id": "libretexts-syn-diol",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_%28Organic_Chemistry%29/Alkenes/Reactivity_of_Alkenes/Vicinal_Syn_Dihydroxylation",
+   "cite": "LibreTexts: Vicinal Syn Dihydroxylation",
+   "status": "supported",
+   "coverage": 0.71,
+   "missing": [
+    "osmate",
+    "cis-1"
+   ],
+   "readableChars": 21465
+  },
+  {
+   "id": "jove-epoxidation",
+   "url": "https://chem.libretexts.org/Courses/Nassau_Community_College/Organic_Chemistry_I_and_II/Map%253A_Organic_Chemistry_(Wade)/08%253A_Reactions_of_Alkenes/8.12%253A_Oxidation_of_Alkenes_-_Epoxidation",
+   "cite": "JoVE / LibreTexts epoxidation pages (mCPBA)",
+   "status": "supported",
+   "coverage": 1,
+   "missing": [],
+   "readableChars": 27949
+  },
+  {
+   "id": "ucla-pcc",
+   "url": "https://www.chem.ucla.edu/~harding/IGOC/P/pcc.html",
+   "cite": "UCLA Illustrated Glossary of Organic Chemistry: PCC",
+   "status": "partial",
+   "coverage": 0.5,
+   "missing": [
+    "alcohols",
+    "aldehydes",
+    "ketones",
+    "over-oxidation"
+   ],
+   "readableChars": 1171
+  },
+  {
+   "id": "moc-pcc",
+   "url": "https://www.masterorganicchemistry.com/?p=3401",
+   "cite": "Master Organic Chemistry: Oxidation of primary alcohols to aldehydes using PCC",
+   "status": "partial",
+   "coverage": 0.43,
+   "missing": [
+    "stops",
+    "aqueous",
+    "strongly",
+    "acidic"
+   ],
+   "readableChars": 12722
+  },
+  {
+   "id": "ncstate-amines",
+   "url": "https://ncstate.pressbooks.pub/ch220/chapter/synthesis-of-amines/",
+   "cite": "NC State: 12.4 Synthesis of Amines (reduction of nitriles, amides, nitro compounds)",
+   "status": "supported",
+   "coverage": 0.67,
+   "missing": [
+    "lialh4",
+    "reduces",
+    "nitroarenes"
+   ],
+   "readableChars": 18007
+  },
+  {
+   "id": "openstax-conj",
+   "url": "https://openstax.org/books/organic-chemistry/pages/14-3-kinetic-versus-thermodynamic-control-of-reactions",
+   "cite": "OpenStax Organic Chemistry 14.3 Kinetic versus Thermodynamic Control of Reactions",
+   "status": "supported",
+   "coverage": 0.83,
+   "missing": [
+    "favored"
+   ],
+   "readableChars": 9436
+  },
+  {
+   "id": "rsc-naphthalene-fc",
+   "url": "https://pubs.rsc.org/en/Content/ArticleLanding/1966/J3/J39660000181",
+   "cite": "J. Chem. Soc. 1966 (RSC) acylation of naphthalenes; solvent-dependent isomer ratios and reversible acylation",
+   "status": "unreachable",
+   "detail": "HTTP 403"
+  },
+  {
+   "id": "libretexts-wacker",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_(Organic_Chemistry)/Reactions/Organic_Reactions/Wacker_Oxidation",
+   "cite": "LibreTexts: Wacker Oxidation",
+   "status": "supported",
+   "coverage": 0.63,
+   "missing": [
+    "pdcl2",
+    "cucl2",
+    "converts"
+   ],
+   "readableChars": 34765
+  },
+  {
+   "id": "katsuki-sharpless-1980",
+   "url": "https://en.chem-station.com/?p=1560",
+   "cite": "Katsuki, T.; Sharpless, K. B. J. Am. Chem. Soc. 1980, 102, 5974-5976 (bibliographic data confirmed via Chem-Station)",
+   "status": "supported",
+   "coverage": 0.86,
+   "missing": [
+    "dialkyl"
+   ],
+   "readableChars": 14784
+  },
+  {
+   "id": "orgosolver-bv",
+   "url": "https://orgosolver.com/reaction-library/alkene-reaction-guides/baeyer-villiger-reaction",
+   "cite": "OrgoSolver: Baeyer-Villiger oxidation (mCPBA, RCO3H)",
+   "status": "supported",
+   "coverage": 0.6,
+   "missing": [
+    "ring-expanded",
+    "epsilon-caprolactone"
+   ],
+   "readableChars": 10592
+  },
+  {
+   "id": "namereaction-mitsunobu",
+   "url": "https://www.name-reaction.com/mitsunobu-reaction",
+   "cite": "name-reaction.com / Chem-Station: Mitsunobu reaction",
+   "status": "supported",
+   "coverage": 0.67,
+   "missing": [
+    "undergo",
+    "complete"
+   ],
+   "readableChars": 2724
+  },
+  {
+   "id": "heck-1979",
+   "url": "https://uwindsor.ca/people/jgreen/sites/uwindsor.ca.people.jgreen/files/acr-1979-12-146_heck_0.pdf",
+   "cite": "Heck, R. F. Acc. Chem. Res. 1979, 12, 146-151",
+   "status": "unreadable",
+   "detail": "PDF without extractable text (659174 bytes; scanned or compressed)"
+  },
+  {
+   "id": "suzuki-1979",
+   "url": "https://eprints.lib.hokudai.ac.jp/repo/huscap/all/44006/tetrahedronletters1979.pdf",
+   "cite": "Miyaura, N.; Yamada, K.; Suzuki, A. Tetrahedron Lett. 1979, 20, 3437-3440; Miyaura, N.; Suzuki, A. Chem. Rev. 1995, 95, 2457-2483 (confirmed this session)",
+   "status": "unreadable",
+   "detail": "PDF without extractable text (365319 bytes; scanned or compressed)"
+  },
+  {
+   "id": "sonogashira-1975",
+   "url": "https://www.thieme-connect.com/products/ejournals/html/10.1055/a-2467-6312",
+   "cite": "Sonogashira, K.; Tohda, Y.; Hagihara, N. Tetrahedron Lett. 1975, 16, 4467-4470 (confirmed this session)",
+   "status": "unreachable",
+   "detail": "bot-wall / challenge page"
+  },
+  {
+   "id": "corey-suggs-1975",
+   "url": "https://www.organic-chemistry.org/abstracts/literature/599.shtm",
+   "cite": "Corey, E. J.; Suggs, J. W. Tetrahedron Lett. 1975, 16, 2647-2650 (confirmed this session)",
+   "status": "supported",
+   "coverage": 1,
+   "missing": [],
+   "readableChars": 2664
+  }
+ ]
+}

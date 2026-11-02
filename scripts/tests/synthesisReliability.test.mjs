@@ -195,14 +195,15 @@ describe("L3: estragole from p-cresol + bromomethane + acetylene (Deep search bu
     clearTimeout(timerB);
   });
 
-  test("[engine] a verified route is found before the 45 s deadline, using all three materials", () => {
+  test("[engine] a verified route is found before the 45 s deadline, using all three materials", async () => {
     assert.equal(first.aborted, false, "search hit the hard deadline");
     assert.ok(first.routes.length >= 1);
     const route = first.routes[0];
     assert.equal(route.verification.status, "verified");
     assert.deepEqual(normalizeRules(route.steps), EXPECTED_RULES);
     assert.deepEqual(route.verification.unusedStartingMaterials, []);
-    assert.equal(route.steps[route.steps.length - 1].productSmiles, TARGET);
+    // Same molecule, compared as a canonical isomeric structure (stereo, isotopes and charge included) rather than as a spelling.
+    assert.equal(await canon(route.steps[route.steps.length - 1].productSmiles), await canon(TARGET));
   });
 
   test("[engine] the starting-material order does not change the rules used", () => {

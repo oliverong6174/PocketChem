@@ -285,10 +285,12 @@ describe("oxidation of stereo-defined alcohols (found by INT-2; previously the p
     assert.ok(best, controller.getState().outcome?.kind);
     assert.deepEqual(best.route.steps.map((step) => step.ruleId), ["secondary-alcohol-oxidation-pcc"]);
   });
-  test("[known-gap] isotope-labelled [13CH3]CO to [13CH3]C=O: the first accepted route is an isotopologue that fails end-to-end replay", { todo: "the linear search is not resumed after a candidate fails replay; the one-step route exists" }, async () => {
+  test("[engine] isotope-labelled [13CH3]CO to [13CH3]C=O is found as the one-step oxidation (Stage 9E: isotopes kept in the identity key; goal-reaching pathways are not pruned)", async () => {
     const run = await loadModule("/src/utils/reactions/engine/synthesisSearchRun.ts");
     const controller = new run.SearchRunController({ rules: registry, totalMs: 15000 });
     await controller.start({ startingSmiles: "[13CH3]CO", targetSmiles: "[13CH3]C=O", copies: 1 });
-    assert.ok(controller.getState().ranked[0]);
+    const best = controller.getState().ranked[0];
+    assert.ok(best, controller.getState().outcome?.kind);
+    assert.deepEqual(best.route.steps.map((step) => step.ruleId), ["primary-alcohol-mild-oxidation"]);
   });
 });

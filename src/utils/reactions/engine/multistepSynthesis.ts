@@ -765,6 +765,45 @@ function diversePathwaySample<
   return selected;
 }
 
+/**
+ * Branch-limit sampling that never discards a pathway reaching the other search front.
+ *
+ * `diversePathwaySample` breaks cost ties by rule id, and most rules share the default
+ * planning cost, so with more pathways than `limit` the cut fell alphabetically: from ethanol,
+ * `primary-alcohol-mild-oxidation` (a one-step route to the target) sorted after ten `alcohol-*`
+ * rules and was dropped before it could meet the goal. A pathway one of whose structures is
+ * already known on the opposite frontier (`goalKeys`, canonical isomeric SMILES) is kept first;
+ * the remaining slots are sampled as before.
+ */
+async function samplePathwaysKeepingGoalReaching<
+  T extends { family: string; planningCost: number; ruleId: string },
+>(
+  pathways: T[],
+  limit: number,
+  structuresOf: (pathway: T) => string[],
+  goalKeys: Set<string>,
+): Promise<T[]> {
+  if (pathways.length <= limit || goalKeys.size === 0) return diversePathwaySample(pathways, limit);
+
+  const reaching: T[] = [];
+  const rest: T[] = [];
+  for (const pathway of pathways) {
+    let reachesGoal = false;
+    for (const component of structuresOf(pathway)) {
+      const structure = await canonicalizeSmiles(component);
+      if (structure && goalKeys.has(structure.isomeric)) {
+        reachesGoal = true;
+        break;
+      }
+    }
+    (reachesGoal ? reaching : rest).push(pathway);
+  }
+  if (reaching.length === 0) return diversePathwaySample(pathways, limit);
+
+  const kept = diversePathwaySample(reaching, limit);
+  return [...kept, ...diversePathwaySample(rest, limit - kept.length)];
+}
+
 async function expandForwardLayer(
   parents: SearchNode[],
   rules: ReactionRule[],
@@ -832,7 +871,13 @@ async function expandForwardLayer(
       }
       if (!(await yieldToBrowser(signal))) return [];
 
-      for (const pathway of diversePathwaySample(pathways, branchLimit)) {
+      const sampledPathways = await samplePathwaysKeepingGoalReaching(
+        pathways,
+        branchLimit,
+        (pathway) => splitReactionComponents(pathway.productSmiles ?? ""),
+        preferredKeys,
+      );
+      for (const pathway of sampledPathways) {
         // A combined input is useful only when the chosen reaction actually
         // consumes both structures. This prevents a second disconnected
         // starting material from merely generating unrelated single-substrate
@@ -1019,7 +1064,13 @@ async function expandRetroLayer(
     }
     if (!(await yieldToBrowser(signal))) return [];
 
-    for (const pathway of diversePathwaySample(pathways, branchLimit)) {
+    const sampledPathways = await samplePathwaysKeepingGoalReaching(
+      pathways,
+      branchLimit,
+      (pathway) => pathway.precursorComponents,
+      preferredKeys,
+    );
+    for (const pathway of sampledPathways) {
       const step = retroStepFromPathway(pathway);
       if (!allowGeneric && isGenericReactionSmiles(step.reactantSmiles)) continue;
       const compatibilityCost = await attachStepCompatibility(step, rules);
@@ -2389,12 +2440,27 @@ export async function findMultistepSynthesisRoutesFromRules(
   return searchLinearSynthesisRoutes(startingSmiles, targetSmiles, rules, options, onProgress, copies);
 }
 
+/** Test seams for the linear lane; production callers never pass these. */
+export type LinearSearchHooks = {
+  plan?: typeof searchMultistepRoutes;
+  verify?: typeof verifyMultistepRoute;
+};
+
+/** Widest candidate list the resume pass asks the planner for. */
+const RESUME_MAX_ROUTES = 10;
+
 /**
  * The linear lane on its own: plan, then replay every returned route end to end
  * against the supplied inventory (see findMultistepSynthesisRoutesFromRules).
  * `options.convergentSearch` is ignored here; the caller states the replay
  * inventory explicitly through `startingMaterialCopies` (absent means one copy of
  * each material). Reusable entry point for the adaptive scheduler.
+ *
+ * The first-verified-route planner stops at its first candidate set, so a set whose every
+ * route fails replay used to end the search with nothing even when other routes existed.
+ * In that case, and only then, the planner is run once more as an exhaustive
+ * shortest-first sweep that asks for more candidates (same abort signal, so the caller's
+ * deadline still applies); routes already replayed are not replayed again.
  */
 export async function searchLinearSynthesisRoutes(
   startingSmiles: string,
@@ -2403,42 +2469,64 @@ export async function searchLinearSynthesisRoutes(
   options: MultistepSynthesisSearchOptions = {},
   onProgress?: ProgressCallback,
   startingMaterialCopies?: number | number[],
+  hooks: LinearSearchHooks = {},
 ): Promise<MultistepSynthesisRoute[]> {
-  const routes = await searchMultistepRoutes(
-    startingSmiles,
-    targetSmiles,
-    rules,
-    options,
-    onProgress,
-  );
+  const plan = hooks.plan ?? searchMultistepRoutes;
+  const verify = hooks.verify ?? verifyMultistepRoute;
+  const copies = startingMaterialCopies;
+
+  const replayAll = async (candidates: MultistepSynthesisRoute[]): Promise<MultistepSynthesisRoute[]> => {
+    const replayedRoutes: MultistepSynthesisRoute[] = [];
+    for (const route of candidates) {
+      try {
+        const replayed = {
+          ...route,
+          verification: await verify(
+            route,
+            rules,
+            copies === undefined ? undefined : { startingMaterialCopies: copies },
+          ),
+        };
+        replayed.compatibility = await assessRouteCompatibility(replayed, rules);
+        replayed.selectivity = await assessRouteSelectivity(replayed, rules);
+        replayedRoutes.push(replayed);
+        if (replayed.verification.status !== "failed") {
+          try {
+            options.onRouteFound?.(replayed);
+          } catch (callbackError) {
+            console.error("[PocketChem:Synthesis] onRouteFound callback failed; continuing.", callbackError);
+          }
+        }
+      } catch (error) {
+        console.error("[PocketChem:Synthesis] Route replay failed; returning the route unverified.", error);
+        replayedRoutes.push(route);
+      }
+    }
+    return replayedRoutes;
+  };
+
+  const routes = await plan(startingSmiles, targetSmiles, rules, options, onProgress);
   if (searchCancelled(options.signal)) return routes;
 
-  const verified: MultistepSynthesisRoute[] = [];
-  const copies = startingMaterialCopies;
-  for (const route of routes) {
-    try {
-      const replayed = {
-        ...route,
-        verification: await verifyMultistepRoute(
-          route,
-          rules,
-          copies === undefined ? undefined : { startingMaterialCopies: copies },
-        ),
-      };
-      replayed.compatibility = await assessRouteCompatibility(replayed, rules);
-      replayed.selectivity = await assessRouteSelectivity(replayed, rules);
-      verified.push(replayed);
-      if (replayed.verification.status !== "failed") {
-        try {
-          options.onRouteFound?.(replayed);
-        } catch (callbackError) {
-          console.error("[PocketChem:Synthesis] onRouteFound callback failed; continuing.", callbackError);
-        }
-      }
-    } catch (error) {
-      console.error("[PocketChem:Synthesis] Route replay failed; returning the route unverified.", error);
-      verified.push(route);
-    }
+  const verified = await replayAll(routes);
+
+  const everyCandidateFailed =
+    verified.length > 0 && verified.every((route) => route.verification?.status === "failed");
+  if (everyCandidateFailed && !searchCancelled(options.signal)) {
+    const tried = new Set(verified.map((route) => route.id));
+    const widened = await plan(
+      startingSmiles,
+      targetSmiles,
+      rules,
+      {
+        ...options,
+        preferFirstVerifiedRoute: false,
+        maxRoutes: Math.min(RESUME_MAX_ROUTES, Math.max(5, (options.maxRoutes ?? 1) * 5)),
+      },
+      onProgress,
+    );
+    if (searchCancelled(options.signal)) return verified;
+    verified.push(...(await replayAll(widened.filter((route) => !tried.has(route.id)))));
   }
   return verified;
 }

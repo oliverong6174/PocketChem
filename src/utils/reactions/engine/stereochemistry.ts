@@ -45,6 +45,28 @@ export function connectivityKeyFromCanonicalSmiles(smiles: string): string {
     .join(".");
 }
 
+/**
+ * Canonical SMILES with R/S and E/Z removed but isotopes and charges kept.
+ *
+ * RDKit's `doIsomericSmiles: false` also drops isotope labels, so `[13CH3]CO` and
+ * `C[13CH2]O` shared one "connectivity" key and an isotopologue was treated as the
+ * same compound with unspecified stereochemistry. Isotope labels are part of a
+ * structure's identity here, so the stereo tokens are removed from the isomeric
+ * string and the result is re-canonicalized (stereo can influence atom order).
+ */
+function stereoFreeKey(rdkit: Awaited<ReturnType<typeof getRDKit>>, isomeric: string): string | null {
+  if (!smilesHasSpecifiedStereo(isomeric)) return isomeric;
+  const stripped = isomeric.replace(/@@?/g, "").replace(/[\\/]/g, "");
+  const mol = rdkit.get_mol(stripped);
+  if (!mol) return null;
+  try {
+    const key = mol.get_smiles?.();
+    return typeof key === "string" && key.trim() ? key.trim() : null;
+  } finally {
+    mol.delete?.();
+  }
+}
+
 export async function canonicalizeStereoStructure(
   smiles: string,
 ): Promise<CanonicalStereoStructure | null> {
@@ -54,23 +76,15 @@ export async function canonicalizeStereoStructure(
 
   try {
     const isomeric = mol.get_smiles?.();
-    const connectivity = mol.get_smiles?.(
-      JSON.stringify({ doIsomericSmiles: false }),
-    );
-
-    if (
-      typeof isomeric !== "string" ||
-      !isomeric.trim() ||
-      typeof connectivity !== "string" ||
-      !connectivity.trim()
-    ) {
-      return null;
-    }
+    if (typeof isomeric !== "string" || !isomeric.trim()) return null;
 
     const normalizedIsomeric = isomeric.trim();
+    const connectivity = stereoFreeKey(rdkit, normalizedIsomeric);
+    if (!connectivity) return null;
+
     return {
       isomeric: normalizedIsomeric,
-      connectivity: connectivity.trim(),
+      connectivity,
       hasSpecifiedStereo: smilesHasSpecifiedStereo(normalizedIsomeric),
     };
   } catch {
