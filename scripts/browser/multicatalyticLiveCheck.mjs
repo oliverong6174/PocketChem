@@ -216,6 +216,8 @@ async function main() {
     await waitFor(() => cdp.evaluate(`window.__pc.text().includes('Structure replay passed')`), "structure replay result");
     check("structure replay is reported and is not described as experimental validation", (await cdp.evaluate(`window.__pc.text()`)).includes("This is not experimental validation"));
     check("the unrelated acetic acid molecule stayed in the inventory untouched", await cdp.evaluate(`window.__pc.inventoryIds().includes('sm2#1')`));
+    check("each step shows its catalysts/reagents and conditions, with the isolation statement", await cdp.evaluate(`window.__pc.text().includes('Catalysts and reagents.') && window.__pc.text().includes('Conditions.') && window.__pc.text().includes('is isolated before the next step runs')`));
+    check("the assessment says steps run in isolation and claims no tandem or cooperative catalysis", await cdp.evaluate(`window.__pc.text().includes('does not claim, a one-pot tandem process or cooperative catalysis')`));
     check("every history entry is a completed reaction", (await cdp.evaluate(`window.__pc.historyStatuses().join(',')`)) === "reaction,reaction,reaction,reaction");
     console.log("   screenshot:", await cdp.screenshot("workspace-convergent"));
 
@@ -285,6 +287,8 @@ async function main() {
     await cdp.evaluate(`window.__pc.clickButton('Ordered sequence (one molecule)')`);
     await waitFor(() => cdp.evaluate(`window.__pc.text().includes('Add reagent / catalyst')`), "ordered-sequence tool");
     check("the original ordered-sequence tool still opens", true);
+    check("diagnostic mode is an explicit opt-in and is off by default", (await cdp.evaluate(`document.querySelector('.multicatalytic-diagnostic input').checked`)) === false);
+    check("the page explains why a branch stops by default", await cdp.evaluate(`window.__pc.text().includes('a step cannot use an intermediate that was never made')`));
 
     check("no uncaught page exceptions were raised", cdp.consoleErrors.length === 0, cdp.consoleErrors.slice(0, 2).join(" | "));
   } finally {

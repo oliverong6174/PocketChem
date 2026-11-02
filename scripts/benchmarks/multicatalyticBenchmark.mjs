@@ -64,6 +64,14 @@ const SCENARIOS = [
     plausibility: "Suzuki–Miyaura coupling of an aryl bromide with an arylboronic acid (textbook).",
   },
   {
+    id: "D2c",
+    title: "Duplicate material copies: an acetal consumes two ethanol molecules, supplied as two copies",
+    starts: ["CC=O", "CCO", "CCO"],
+    script: [{ ruleId: "aldehyde-acetal-formation", reactants: [{ material: 0 }, { material: 1 }, { material: 2 }] }],
+    expect: { statuses: ["reaction"], live: ["CCOC(C)OCC"], consumedSupplied: [0, 1, 2] },
+    plausibility: "Acid-catalysed acetal formation consumes two equivalents of alcohol (textbook); here two separate ethanol molecules are required in the inventory.",
+  },
+  {
     id: "D3+D4",
     title: "Two transformed branches, convergence, post-convergence modification",
     starts: ["CCCCBr", "CCCCO"],
@@ -90,6 +98,29 @@ const SCENARIOS = [
     plausibility: "Hydration gives hexan-2-ol; SOCl₂ gives propanoyl chloride; acylation gives hexan-2-yl propanoate; LiAlH₄ cleaves the ester to propan-1-ol and hexan-2-ol (textbook).",
   },
   {
+    id: "INT-1",
+    title: "Integrated: two catalytic branches, Heck join with an explicit outcome choice, then Pd/C hydrogenation",
+    starts: ["OC(=O)c1ccc(Br)cc1", "CO", "C#CC(=O)OC"],
+    script: [
+      { ruleId: "fischer-esterification", reactants: [{ material: 0 }, { material: 1 }] },
+      { ruleId: "alkyne-lindlar-reduction-terminal", reactants: [{ material: 2 }] },
+      { ruleId: "heck-coupling", reactants: [{ attempt: 1, product: 1 }, { attempt: 2, product: 1 }], outcome: 0 },
+      { ruleId: "alkene-hydrogenation", reactants: [{ attempt: 3, product: 1 }] },
+    ],
+    expect: {
+      statuses: ["reaction", "reaction", "reaction", "reaction"],
+      live: ["COC(=O)CCc1ccc(C(=O)OC)cc1"],
+      consumedSupplied: [0, 1, 2],
+      independentBranchesBeforeJoin: true,
+      catalyticSteps: 4,
+      catalystSystems: 4,
+      genericCatalystSteps: [3],
+      intermediates: { 1: "COC(=O)c1ccc(Br)cc1", 2: "C=CC(=O)OC", 3: "COC(=O)/C=C/c1ccc(C(=O)OC)cc1" },
+      selectionClasses: { 3: "major" },
+    },
+    plausibility: "Fischer esterification of 4-bromobenzoic acid with methanol (H₂SO₄ cat.); Lindlar partial hydrogenation of methyl propiolate to methyl acrylate; Heck coupling of the aryl bromide with the acrylate gives the (E)-cinnamate (Pd cat.); Pd/C hydrogenation of the conjugated C=C. Provisional: terminal acrylates polymerise readily and propiolate semi-hydrogenation needs careful control, which the model does not assess.",
+  },
+  {
     id: "D5",
     title: "Several distinct catalytic steps (Sonogashira, Lindlar, Pd/C hydrogenation)",
     starts: ["Ic1ccccc1", "C#CCCCC"],
@@ -112,11 +143,45 @@ const SCENARIOS = [
   },
   {
     id: "D6b",
-    title: "Competing products with no ranking (Heck regioisomers)",
-    starts: ["Brc1ccccc1", "C=CC(=O)OC"],
+    title: "Competing products with no ranking (Heck of an alkyl alkene)",
+    starts: ["Brc1ccccc1", "C=CCCCC"],
     script: [{ ruleId: "heck-coupling", reactants: [{ material: 0 }, { material: 1 }] }],
     expect: { statuses: ["needs-selection"], liveUnchanged: true, outcomeClasses: ["unranked", "unranked"] },
-    plausibility: "The Heck reaction of aryl halides with acrylates gives the linear (E) product as the textbook outcome, but PocketChem offers two regioisomers and does not rank them; no outcome is called major.",
+    plausibility: "No regiochemical preference is modeled for alkyl alkenes (mixtures and double-bond isomerization are common in practice); both attachment sites are offered and neither is called major.",
+  },
+  {
+    id: "D6c",
+    title: "Qualitative major/minor from a referenced preference (Heck of methyl acrylate)",
+    starts: ["Brc1ccccc1", "C=CC(=O)OC"],
+    script: [{ ruleId: "heck-coupling", reactants: [{ material: 0 }, { material: 1 }] }],
+    expect: { statuses: ["needs-selection"], liveUnchanged: true, outcomeClasses: ["major", "disfavored"] },
+    selectAfter: { index: 0, live: ["COC(=O)/C=C/c1ccccc1"] },
+    plausibility: "Methyl (E)-cinnamate is the standard Heck product of an aryl halide with methyl acrylate (Heck, Acc. Chem. Res. 1979, 12, 146); the alpha-aryl acrylate is minor. The ranking is qualitative: no ratio is claimed.",
+  },
+  {
+    id: "D6d",
+    title: "Friedel–Crafts ring positions ranked by directing effects",
+    starts: ["COc1ccccc1", "CC(=O)Cl"],
+    script: [{ ruleId: "aromatic-friedel-crafts-acylation", reactants: [{ material: 0 }, { material: 1 }] }],
+    expect: { statuses: ["needs-selection"], liveUnchanged: true, outcomeClasses: ["major", "unranked", "disfavored"] },
+    selectAfter: { index: 0, live: ["COc1ccc(C(C)=O)cc1"] },
+    plausibility: "Acylation of anisole gives 4-methoxyacetophenone as the main product (textbook); ortho is a minor competing product in practice, which the model shows as competitive, not as a ratio.",
+  },
+  {
+    id: "D6e",
+    title: "Pinacol rearrangement: the more stable carbocation decides the leaving hydroxyl",
+    starts: ["CCCCCCC(O)CO"],
+    script: [{ ruleId: "pinacol-rearrangement", reactants: [{ material: 0 }] }],
+    expect: { statuses: ["reaction"], live: ["CCCCCCCC=O"] },
+    plausibility: "Terminal 1,2-diols rearrange through the secondary cation with hydride shift to the aldehyde (acid dehydration of 1,2-propanediol gives propanal as an intermediate, PNNL 2009); the hydride-versus-aryl migratory order is not settled in sources and is a documented simplification.",
+  },
+  {
+    id: "D6f",
+    title: "Epoxidation keeps the alkene geometry (E gives the trans racemate, Z the cis meso compound)",
+    starts: ["c1ccccc1/C=C/c1ccccc1"],
+    script: [{ ruleId: "alkene-epoxidation", reactants: [{ material: 0 }] }],
+    expect: { statuses: ["reaction"], liveCount: 1 },
+    plausibility: "Peroxyacid epoxidation is a concerted syn addition of oxygen: trans-stilbene gives trans-stilbene oxide, (R,R)/(S,S).",
   },
   {
     id: "D7",
@@ -215,6 +280,21 @@ async function evaluate(scenario, seen) {
   if (e.catalyticSteps !== undefined) add("catalytic steps", catalysis.catalyticStepNumbers.length === e.catalyticSteps);
   if (e.catalystSystems !== undefined) add("distinct catalyst systems", catalysis.distinctCatalystSystems.length === e.catalystSystems, catalysis.distinctCatalystSystems.join("; "));
   if (e.genericCatalystSteps) add("generic (type-only) catalyst steps", JSON.stringify(catalysis.genericCatalystStepNumbers) === JSON.stringify(e.genericCatalystSteps));
+  if (e.intermediates) {
+    for (const [stepNumber, smiles] of Object.entries(e.intermediates)) {
+      const step = finalWorkspace.history.find((item) => item.committedStep === Number(stepNumber));
+      const got = step ? step.outcomes[step.selectedOutcome].productSmiles : null;
+      add(`intermediate of step ${stepNumber}`, got !== null && (await canon(got)) === (await canon(smiles)), String(got));
+    }
+  }
+  if (e.selectionClasses) {
+    for (const [stepNumber, wantClass] of Object.entries(e.selectionClasses)) {
+      const step = finalWorkspace.history.find((item) => item.committedStep === Number(stepNumber));
+      const got = step ? step.outcomes[step.selectedOutcome].selectivityFinding.class : null;
+      add(`selectivity class of the chosen outcome in step ${stepNumber}`, got === wantClass, String(got));
+      add(`step ${stepNumber} was chosen explicitly by the user`, step?.selectedBy === "user");
+    }
+  }
   if (assessment) add("structure replay", assessment.verification.status !== "failed", assessment.verification.status);
   return checks;
 }
@@ -232,7 +312,7 @@ for (const scenario of SCENARIOS) {
     "1-syntactically-valid": seen.lotSyntax.every(Boolean),
     "2-structure-replay": assessment ? assessment.verification.status : "no committed step",
     "3-chemically-plausible": { established: "asserted (not computed)", basis: scenario.plausibility },
-    "4-selectivity-supported": classes ? { counts: classes, supportedSteps: classes.major, note: "Only a rule's own numeric estimate counts; single-outcome means unranked, not major." } : null,
+    "4-selectivity-supported": classes ? { counts: classes, supportedSteps: classes.major, note: "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major." } : null,
     "5-condition-compatible": assessment ? {
       declaredConditionWarnings: assessment.compatibility.warnings.length,
       unassessedRules: assessment.compatibility.unassessedRuleIds,
