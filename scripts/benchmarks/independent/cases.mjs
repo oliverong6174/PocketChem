@@ -226,7 +226,7 @@ export const CASES = [
   {
     id: "CB-02", category: "carbonyl", kind: "step",
     title: "Excess Grignard + ester: ethyl benzoate + 2 MeMgBr gives a tertiary alcohol",
-    reactants: ["CCOC(=O)c1ccccc1", "C[Mg]Br"], rule: "ester-grignard-addition",
+    reactants: ["CCOC(=O)c1ccccc1", "C[Mg]Br", "C[Mg]Br"], rule: "ester-grignard-addition", // the case states 2 equivalents: two separate MeMgBr molecules are supplied
     expect: { products: [{ smiles: "CC(C)(O)c1ccccc1", role: "major" }] },
     provenance: { level: M.secondary, sources: ["ic-os3"], note: "" },
   },
