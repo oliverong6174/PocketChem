@@ -274,3 +274,49 @@ describe("carbonyl additions never assign a configuration they cannot support", 
     await assertNoInvented("aldol", "CC(C)=O.CC=O");
   });
 });
+
+describe("isotopes, charges and geometry survive the Stage 9E templates", () => {
+  const BS = String.fromCharCode(92);
+  test("an isotope label on an epoxide substituent is kept through HX, hydroxide and alkoxide openings", async () => {
+    const hbr = await base("epoxide-hx-opening-hbr", "[13CH3]C1CO1");
+    // Bromide on the primary carbon (less substituted), label still on the methyl group.
+    assert.deepEqual(await Promise.all(hbr.map((p) => canon(p.productSmiles))), [await canon("[13CH3]C(O)CBr")]);
+    for (const [ruleId, smiles] of [["epoxide-base-hydroxide-opening", "[13CH3]C1CO1"], ["epoxide-base-alkoxide-opening", "[13CH3]C1CO1.[O-]C"]]) {
+      const out = await base(ruleId, smiles);
+      assert.ok(out.length > 0 && out.every((p) => p.productSmiles.includes("[13CH3]")), ruleId);
+    }
+  });
+  test("a labelled stereo-defined epoxide is still inverted at the attacked carbon, label intact", async () => {
+    const out = await base("epoxide-base-hydroxide-opening", "[13CH3][C@H]1O[C@@H]1C");
+    assert.ok(out.length > 0);
+    for (const pathway of out) {
+      assert.ok(pathway.productSmiles.includes("[13CH3]"));
+      assert.equal(tagCount(pathway.productSmiles), 2, "both centres are defined");
+    }
+    // The unlabelled analogue gives the meso diol; the label breaks the symmetry, so the result is a single chiral diastereomer, not (R,R).
+    assert.deepEqual(labels(await base("epoxide-base-hydroxide-opening", TRANS_EPOXIDE)), ["RS"]);
+  });
+  test("a charged substituent is untouched by ring opening and by the ring-completion templates", async () => {
+    for (const [smiles, ruleId] of [["C[N+](C)(C)CC1CO1", "epoxide-base-hydroxide-opening"], ["C[N+](C)(C)CC1CO1", "epoxide-hx-opening-hbr"]]) {
+      const out = await base(ruleId, smiles);
+      assert.ok(out.length > 0 && out.every((p) => p.productSmiles.includes("[N+]")), `${ruleId}`);
+    }
+  });
+  test("halohydrin keeps an isotope label and a defined geometry's diastereomer", async () => {
+    const labelled = await base("alkene-halohydrin-formation", `[13CH3]/C=C/C`);
+    assert.ok(labelled.length > 0 && labelled.every((p) => p.productSmiles.includes("[13CH3]")));
+    const unlabelledE = await base("alkene-halohydrin-formation", "C/C=C/C");
+    const unlabelledZ = await base("alkene-halohydrin-formation", "C/C=C" + BS + "C");
+    assert.notDeepEqual(labels(unlabelledE), labels(unlabelledZ));
+  });
+  test("E2 keeps the E geometry of the alkene it forms (2-bromobutane + ethoxide gives (E)-2-butene as the major product)", async () => {
+    const out = await base("haloalkane-e2-zaitsev", "CCC(C)Br");
+    const major = out.find((p) => p.selectivityAssessment?.level === "major");
+    assert.ok(major);
+    assert.equal(await canon(major.productSmiles), await canon("C/C=C/C"));
+  });
+  test("E1/E2 labelled substrates keep the isotope (labelled 2-bromobutane gives labelled 2-butene)", async () => {
+    const out = await base("haloalkane-e2-zaitsev", "[13CH3]CC(C)Br");
+    assert.ok(out.length >= 1 && out.every((p) => p.productSmiles.includes("[13CH3]")));
+  });
+});
