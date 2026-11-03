@@ -29,7 +29,11 @@ const DEV_INFORMED_RULES = new Set([
   "alkene-halogenation-bromine", "alkene-epoxidation", "alkene-syn-dihydroxylation", "alkene-anti-dihydroxylation",
   "aromatic-friedel-crafts-acylation", "aromatic-friedel-crafts-alkylation", "heck-coupling", "pinacol-rearrangement",
 ]);
-const DEV_GUIDED_CASES = new Set(["OM-02", "OM-03"]);
+// Stage 9D: OM-02, OM-03 exposed defects that were then fixed.
+// Stage 9E Phase C targeted these gaps by name (the 9D report listed them as known limitations): E2 Zaitsev/Hofmann selectivity (SE-02, SE-03),
+// toluene nitration regioisomers (AR-01), carbocation rearrangement in Friedel-Crafts alkylation (AR-05) and acid hydration (AL-05).
+// A change in their verdicts is development evidence, never validation.
+const DEV_GUIDED_CASES = new Set(["OM-02", "OM-03", "SE-02", "SE-03", "AR-01", "AR-05", "AL-05"]);
 
 const effective = Object.fromEntries(audit.results.map((r) => [r.id, { ...r, ...(MANUAL[r.id] ?? {}) }]));
 const RANK = { supported: 3, partial: 2, "not-supported": 1, unreadable: 0, unreachable: 0 };

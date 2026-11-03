@@ -16,7 +16,7 @@
    "id": "SE-02",
    "claimed": "verified-secondary",
    "audited": "verified-secondary",
-   "category": "independent-held-out",
+   "category": "development-guided",
    "sources": [
     "reusch-e2:supported"
    ],
@@ -27,7 +27,7 @@
    "id": "SE-03",
    "claimed": "verified-secondary",
    "audited": "verified-secondary",
-   "category": "independent-held-out",
+   "category": "development-guided",
    "sources": [
     "reusch-e2:supported"
    ],
@@ -98,7 +98,7 @@
    "id": "AL-05",
    "claimed": "provisional",
    "audited": "provisional",
-   "category": "provisional",
+   "category": "development-guided",
    "sources": [
     "jove-oxymerc:supported"
    ],
@@ -299,7 +299,7 @@
    "id": "AR-01",
    "claimed": "verified-secondary",
    "audited": "verified-secondary",
-   "category": "independent-held-out",
+   "category": "development-guided",
    "sources": [
     "uis-eas:supported"
    ],
@@ -341,7 +341,7 @@
    "id": "AR-05",
    "claimed": "verified-secondary",
    "audited": "source-partial",
-   "category": "source-unconfirmed",
+   "category": "development-guided",
    "sources": [
     "ncstate-fc:partial"
    ],
@@ -616,14 +616,11 @@
  "summary": {
   "independent-held-out": [
    "SE-01",
-   "SE-02",
-   "SE-03",
    "AL-04",
    "AY-03",
    "AY-04",
    "CB-03",
    "CB-06",
-   "AR-01",
    "AR-02",
    "OM-01",
    "OR-01",
@@ -634,12 +631,20 @@
    "RT-02",
    "WS-02"
   ],
+  "development-guided": [
+   "SE-02",
+   "SE-03",
+   "AL-05",
+   "AR-01",
+   "AR-05",
+   "OM-02",
+   "OM-03"
+  ],
   "provisional": [
    "SE-04",
    "SE-05",
    "AL-01",
    "AL-02",
-   "AL-05",
    "AL-06",
    "AL-11",
    "AY-05",
@@ -656,7 +661,6 @@
    "AY-02",
    "CB-02",
    "CB-04",
-   "AR-05",
    "OM-04",
    "OM-05",
    "OM-06",
@@ -676,10 +680,6 @@
    "AL-09",
    "AL-10"
   ],
-  "development-guided": [
-   "OM-02",
-   "OM-03"
-  ],
   "unsupported-probe": [
    "US-03",
    "US-04",
@@ -688,14 +688,11 @@
  },
  "strict": [
   "SE-01",
-  "SE-02",
-  "SE-03",
   "AL-04",
   "AY-03",
   "AY-04",
   "CB-03",
   "CB-06",
-  "AR-01",
   "AR-02",
   "OM-01",
   "OR-01",

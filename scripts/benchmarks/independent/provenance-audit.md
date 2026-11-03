@@ -44,15 +44,15 @@ Source audit date: 2026-11-02. Cases are not modified; this overlay only re-labe
 
 | category | n | cases |
 |---|---|---|
-| independent-held-out | 18 | SE-01, SE-02, SE-03, AL-04, AY-03, AY-04, CB-03, CB-06, AR-01, AR-02, OM-01, OR-01, OR-04, OR-05, OR-06, CP-01, RT-02, WS-02 |
-| provisional | 14 | SE-04, SE-05, AL-01, AL-02, AL-05, AL-06, AL-11, AY-05, CB-01, CB-05, AR-04, RT-01, RT-03, WS-01 |
-| source-unconfirmed | 11 | AL-03, AY-01, AY-02, CB-02, CB-04, AR-05, OM-04, OM-05, OM-06, OR-02, OR-03 |
+| independent-held-out | 15 | SE-01, AL-04, AY-03, AY-04, CB-03, CB-06, AR-02, OM-01, OR-01, OR-04, OR-05, OR-06, CP-01, RT-02, WS-02 |
+| development-guided | 7 | SE-02, SE-03, AL-05, AR-01, AR-05, OM-02, OM-03 |
+| provisional | 13 | SE-04, SE-05, AL-01, AL-02, AL-06, AL-11, AY-05, CB-01, CB-05, AR-04, RT-01, RT-03, WS-01 |
+| source-unconfirmed | 10 | AL-03, AY-01, AY-02, CB-02, CB-04, OM-04, OM-05, OM-06, OR-02, OR-03 |
 | existing-fixture-overlap | 7 | AL-07, AL-08, CB-07, AR-03, CP-02, US-01, US-02 |
 | verified-development-informed | 2 | AL-09, AL-10 |
-| development-guided | 2 | OM-02, OM-03 |
 | unsupported-probe | 3 | US-03, US-04, US-05 |
 
-Original 9D headline set (non-provisional, non-overlapping): **35** cases. After this audit the strictly independent held-out set is **18** cases.
+Original 9D headline set (non-provisional, non-overlapping): **35** cases. After this audit the strictly independent held-out set is **15** cases.
 
 ### Relabelled cases
 
@@ -76,15 +76,15 @@ Original 9D headline set (non-provisional, non-overlapping): **35** cases. After
 
 ## Dimension tallies by category (pre-fix engine, then post-development engine)
 
-### Strictly independent held-out (18 cases)
+### Strictly independent held-out (15 cases)
 
 | dimension | pre-fix | post-development |
 |---|---|---|
-| structure | correct 16 | correct 16 |
-| connectivity | correct 15, wrong 1 | correct 15, wrong 1 |
-| regiochemistry | correct 7 | correct 7 |
+| structure | correct 13 | correct 13 |
+| connectivity | correct 13 | correct 13 |
+| regiochemistry | correct 4 | correct 4 |
 | stereochemistry | correct 3 | correct 3 |
-| classification | abstained 5 | abstained 5 |
+| classification | abstained 2 | abstained 2 |
 | conditions | unassessed 1, correct 1 | unassessed 1, correct 1 |
 | ambiguity | correct 1 | correct 1 |
 | routeDiscovery | found 1 | found 1 |
@@ -117,10 +117,11 @@ Original 9D headline set (non-provisional, non-overlapping): **35** cases. After
 | connectivity | correct 2 | correct 2 |
 | stereochemistry | incomplete 1, correct 1 | incomplete 1, correct 1 |
 
-### Development-guided (2 cases)
+### Development-guided (7 cases)
 
 | dimension | pre-fix | post-development |
 |---|---|---|
-| structure | - | correct 2 |
-| connectivity | abstained 2 | correct 2 |
-| regiochemistry | abstained 1 | correct 1 |
+| structure | correct 5 | correct 7 |
+| connectivity | correct 2, wrong 3, abstained 2 | correct 4, wrong 3 |
+| regiochemistry | correct 3, wrong 2, abstained 1 | correct 4, wrong 2 |
+| classification | abstained 3 | abstained 3 |
