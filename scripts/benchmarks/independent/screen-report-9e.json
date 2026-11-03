@@ -1,0 +1,22 @@
+{
+  "cases": 11,
+  "byCategory": {
+    "epoxide-regiochemistry": 4,
+    "substitution-elimination": 1,
+    "competing-pathways": 1,
+    "carbonyl": 3,
+    "alkenes": 2
+  },
+  "byProvenance": {
+    "verified-primary": 0,
+    "verified-secondary": 11,
+    "provisional": 0
+  },
+  "problems": [],
+  "overlapping": {
+    "HX-06": [
+      "scripts\\tests\\mechanism9e.test.mjs"
+    ]
+  },
+  "heldOut": 10
+}

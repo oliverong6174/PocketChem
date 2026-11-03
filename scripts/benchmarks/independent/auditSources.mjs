@@ -7,7 +7,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { SOURCES } from "./cases.mjs";
+// --cases <module> audits another case file (default cases.mjs); the result goes to results/source-audit[-name].json.
+const argValue = (name) => (process.argv.includes(name) ? process.argv[process.argv.indexOf(name) + 1] : null);
+const casesArg = argValue("--cases") ?? "./cases.mjs";
+const { SOURCES } = await import(casesArg);
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const STOP = new Set(["with", "that", "this", "from", "gives", "give", "which", "their", "using", "into", "when", "than", "both", "about", "other", "only", "same", "have", "does", "very", "also", "more", "most", "such", "each", "then"]);
@@ -53,7 +56,8 @@ for (const [id, source] of Object.entries(SOURCES)) {
   console.log(id.padEnd(26), result.status.padEnd(14), result.coverage ?? "", result.detail ?? "");
 }
 fs.mkdirSync(path.join(here, "results"), { recursive: true });
-fs.writeFileSync(path.join(here, "results", "source-audit.json"), JSON.stringify({ auditedOn: new Date().toISOString().slice(0, 10), results }, null, 1));
+const auditName = casesArg === "./cases.mjs" ? "source-audit.json" : `source-audit-${path.basename(casesArg, ".mjs")}.json`;
+fs.writeFileSync(path.join(here, "results", auditName), JSON.stringify({ auditedOn: new Date().toISOString().slice(0, 10), results }, null, 1));
 const counts = {};
 for (const r of results) counts[r.status] = (counts[r.status] ?? 0) + 1;
 console.log(counts);

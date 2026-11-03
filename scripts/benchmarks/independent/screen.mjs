@@ -13,7 +13,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { closeEngine, getRdkit, loadEngine } from "../../tests/engine.mjs";
-import { CASES, SOURCES } from "./cases.mjs";
+// --cases <module> screens another case file (default cases.mjs).
+const argValue = (name) => (process.argv.includes(name) ? process.argv[process.argv.indexOf(name) + 1] : null);
+const { CASES, SOURCES } = await import(argValue("--cases") ?? "./cases.mjs");
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..", "..", "..");

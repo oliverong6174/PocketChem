@@ -20,14 +20,15 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { closeEngine, getRdkit, loadEngine, loadModule } from "../../tests/engine.mjs";
-import { CASES, CORRECTIONS, SOURCES } from "./cases.mjs";
+// --cases <module> selects another frozen case file (default cases.mjs); --screen <json> its screening report.
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const argValue = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] : null);
+const { CASES, CORRECTIONS, SOURCES } = await import(argValue("--cases") ?? "./cases.mjs");
 const outFile = argValue("--out") ?? path.join(here, "results", "independent-results.json");
 const only = argValue("--only")?.split(",") ?? null;
-const screen = JSON.parse(fs.readFileSync(path.join(here, "screen-report.json"), "utf8"));
+const screen = JSON.parse(fs.readFileSync(path.join(here, argValue("--screen") ?? "screen-report.json"), "utf8"));
 
 const { utils } = await loadEngine();
 const registry = utils.reactionRegistry;
