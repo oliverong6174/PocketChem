@@ -207,3 +207,25 @@ describe("the linear lane resumes once when every first-pass candidate fails rep
     assert.deepEqual(routes, []);
   });
 });
+
+describe("a rule with several unranked outcomes does not hide the one the goal needs", () => {
+  // Nitration of toluene offers ortho and para. The branch sampler used to keep ONE outcome per rule by input order,
+  // so after the ortho/para change (Phase C) the para route disappeared and 4-nitrobenzoic acid timed out.
+  test("toluene -> 2-nitrotoluene and toluene -> 4-nitrotoluene are both one-step routes", async () => {
+    for (const target of ["Cc1ccccc1[N+](=O)[O-]", "Cc1ccc([N+](=O)[O-])cc1"]) {
+      const state = await search("Cc1ccccc1", target);
+      assert.deepEqual(state.ranked[0]?.route.steps.map((step) => step.ruleId), ["aromatic-nitration"], target);
+    }
+  });
+  test("toluene -> 4-nitrobenzoic acid is found (nitrate, then oxidise the methyl group)", async () => {
+    const state = await search("Cc1ccccc1", "OC(=O)c1ccc([N+](=O)[O-])cc1");
+    assert.ok(state.ranked[0], state.outcome?.message);
+    assert.deepEqual(state.ranked[0].route.steps.map((step) => step.ruleId), ["aromatic-nitration", "benzylic-oxidation"]);
+  });
+  test("the Zaitsev AND the Hofmann alkene are both reachable targets (2-bromo-2,3-dimethylbutane)", async () => {
+    for (const target of ["CC(C)=C(C)C", "C=C(C)C(C)C"]) {
+      const state = await search("CC(C)C(C)(C)Br", target);
+      assert.ok(state.ranked[0], `${target}: ${state.outcome?.message}`);
+    }
+  });
+});

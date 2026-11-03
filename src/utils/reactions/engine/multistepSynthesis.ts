@@ -730,6 +730,13 @@ function cachedRetroPredictions(
   return pending;
 }
 
+/**
+ * Most outcomes of one rule kept when the branch limit forces a cut. A rule can legitimately return several unranked
+ * outcomes (ortho and para products, Zaitsev and Hofmann alkenes, direct and rearranged products); they are alternatives
+ * of equal standing, so dropping all but one by input order would hide whichever the search needed.
+ */
+const MAX_SIBLING_OUTCOMES = 4;
+
 function diversePathwaySample<
   T extends { family: string; planningCost: number; ruleId: string },
 >(pathways: T[], limit: number): T[] {
@@ -741,25 +748,32 @@ function diversePathwaySample<
       a.ruleId.localeCompare(b.ruleId),
   );
 
+  // The limit counts distinct RULES, not pathways. Broad-family diversity was too coarse: dozens of unrelated alkene
+  // reactions share family="alkenes", so an essential reaction such as Br2 addition could disappear before synthesis even
+  // began. Every selected rule then keeps up to MAX_SIBLING_OUTCOMES of its own outcomes.
+  const byRule = new Map<string, T[]>();
+  for (const pathway of ranked) {
+    const group = byRule.get(pathway.ruleId);
+    if (group) group.push(pathway);
+    else byRule.set(pathway.ruleId, [pathway]);
+  }
+
+  const chosenRules = [...byRule.values()].slice(0, Math.max(0, limit));
+  // Best outcome of every chosen rule first, then second outcomes, and so on, so a later cut never favours one rule.
   const selected: T[] = [];
-  const selectedIndices = new Set<number>();
-  const seenRules = new Set<string>();
+  for (let round = 0; round < MAX_SIBLING_OUTCOMES; round += 1) {
+    for (const group of chosenRules) {
+      if (group[round]) selected.push(group[round]);
+    }
+  }
 
-  // Preserve one representative from every distinct reaction rule before
-  // allowing a rule that generated multiple regio-/stereoisomers to occupy
-  // another slot. Broad-family diversity was too coarse: dozens of unrelated
-  // alkene reactions all share family="alkenes", so an essential reaction
-  // such as Br2 addition could disappear before synthesis even began.
-  ranked.forEach((pathway, index) => {
-    if (selected.length >= limit || seenRules.has(pathway.ruleId)) return;
-    seenRules.add(pathway.ruleId);
-    selected.push(pathway);
-    selectedIndices.add(index);
-  });
-
-  for (let index = 0; index < ranked.length && selected.length < limit; index += 1) {
-    if (selectedIndices.has(index)) continue;
-    selected.push(ranked[index]);
+  // Unused slots (fewer rules than the limit) are not left empty: remaining outcomes fill them in rank order.
+  if (selected.length < limit) {
+    const have = new Set(selected);
+    for (const pathway of ranked) {
+      if (selected.length >= limit) break;
+      if (!have.has(pathway)) selected.push(pathway);
+    }
   }
 
   return selected;
@@ -801,7 +815,7 @@ async function samplePathwaysKeepingGoalReaching<
   if (reaching.length === 0) return diversePathwaySample(pathways, limit);
 
   const kept = diversePathwaySample(reaching, limit);
-  return [...kept, ...diversePathwaySample(rest, limit - kept.length)];
+  return [...kept, ...diversePathwaySample(rest, Math.max(0, limit - kept.length))];
 }
 
 async function expandForwardLayer(
