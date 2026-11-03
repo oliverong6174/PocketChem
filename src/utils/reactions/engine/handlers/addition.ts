@@ -878,6 +878,24 @@ async function alkeneHalohydrin(
     return [];
   }
 
+  // Anti addition (bromonium ion opening) is stereospecific in the alkene geometry: the tag pairs are the ones used for
+  // Br2 addition (E: (@,@) / (@@,@@); Z: (@,@@) / (@@,@)), with OH and X in the two positions. Only H1=H1 alkenes are
+  // covered; the product carries the right diastereomer for the geometry drawn instead of one chosen by a drawing convention.
+  const geometry = await alkeneGeometry(reactantSmiles);
+  if (geometry === "E" || geometry === "Z") {
+    const tags = geometry === "E" ? [["@", "@"], ["@@", "@@"]] : [["@", "@@"], ["@@", "@"]];
+    const stereoProducts = new Set<string>();
+    for (const [first, second] of tags) {
+      for (const hydroxylFirst of [true, false]) {
+        const smarts = hydroxylFirst
+          ? `[C;H1:1]=[C;H1:2]>>[C${first}:1]([OH])[C${second}:2]([${halogen}])`
+          : `[C;H1:1]=[C;H1:2]>>[C${first}:1]([${halogen}])[C${second}:2]([OH])`;
+        for (const product of await runReactionSmarts(reactantSmiles, smarts, 8)) stereoProducts.add(product);
+      }
+    }
+    if (stereoProducts.size > 0) return [...stereoProducts];
+  }
+
   const products = new Set<string>();
   for (const smarts of alkeneHalohydrinReactionSmarts(halogen)) {
     for (const product of await runReactionSmarts(reactantSmiles, smarts, 8)) {

@@ -185,6 +185,79 @@ describe("an achiral reaction cannot choose an enantiomer", () => {
   });
 });
 
+describe("alkene geometry is used where the engine can use it, and declared unknown where it cannot", () => {
+  const BS = String.fromCharCode(92);
+  const E2 = "C/C=C/C";
+  const Z2 = "C/C=C" + BS + "C";
+  const TRI_E = "C/C=C(" + BS + "C)CC";
+  const TRI_Z = "C/C=C(/C)CC";
+  const set = async (ruleId, alkene) => {
+    const [pathway] = await page(ruleId, alkene);
+    assert.ok(pathway, `${ruleId} on ${alkene}`);
+    return [...new Set(await Promise.all(members(pathway).map(canon)))].sort();
+  };
+  test("halohydrin formation distinguishes E from Z: the two geometries give different diastereomers (they used to give the same one)", async () => {
+    const fromE = await set("alkene-halohydrin-formation", E2);
+    const fromZ = await set("alkene-halohydrin-formation", Z2);
+    assert.notDeepEqual(fromE, fromZ);
+    assert.equal(fromE.length, 2);
+    assert.equal(fromZ.length, 2);
+  });
+  test("halohydrin stereo-pattern equals the anti diol and the anti dibromide of the same alkene (O/Br swapped in the same slot)", async () => {
+    for (const alkene of [E2, Z2]) {
+      const bromohydrin = await set("alkene-halohydrin-formation", alkene);
+      const antiDiol = await set("alkene-anti-dihydroxylation", alkene);
+      // Replace one OH by Br: every position of the diol is a possible site, so compare against both substitutions.
+      const expected = new Set();
+      for (const diol of antiDiol) {
+        const positions = [...diol.matchAll(/O/g)].map((m) => m.index);
+        for (const at of positions) expected.add(await canon(diol.slice(0, at) + "Br" + diol.slice(at + 1)));
+      }
+      for (const member of bromohydrin) assert.ok(expected.has(member), `${alkene}: ${member}`);
+    }
+  });
+  test("acyclic tri- and tetrasubstituted alkenes: the geometry cannot be mapped, so NO diastereomer is chosen and the reason is stated", async () => {
+    for (const ruleId of ["alkene-epoxidation", "alkene-syn-dihydroxylation", "alkene-anti-dihydroxylation", "alkene-halogenation-bromine", "alkene-halohydrin-formation"]) {
+      for (const alkene of [TRI_E, TRI_Z]) {
+        const [pathway] = await page(ruleId, alkene);
+        assert.ok(pathway, `${ruleId} on ${alkene}`);
+        assert.doesNotMatch(pathway.productSmiles, /@/, `${ruleId} on ${alkene}`);
+        assert.ok(pathway.limitations.some((text) => /not assigned/.test(text) && /tri- and tetrasubstituted/.test(text)), `${ruleId}: limitation missing`);
+      }
+    }
+  });
+  test("no rule gives (E)- and (Z)-2-butene the same defined stereoisomers", async () => {
+    const hierarchyE = await groups.analyzeFunctionalGroupHierarchy(E2);
+    const hierarchyZ = await groups.analyzeFunctionalGroupHierarchy(Z2);
+    const byRule = async (smiles, hierarchy) => {
+      const out = new Map();
+      for (const p of await utils.predictReactionPathways(smiles, hierarchy.primaryGroups)) {
+        if (!p.productSmiles || !/@/.test(p.productSmiles)) continue;
+        const key = (await stereo.canonicalizeStereoStructure(p.productSmiles)).connectivity;
+        const sets = out.get(p.ruleId) ?? new Map();
+        sets.set(key, [...new Set([...(sets.get(key) ?? []), ...(await Promise.all(members(p).map(canon)))])].sort().join("+"));
+        out.set(p.ruleId, sets);
+      }
+      return out;
+    };
+    const [forE, forZ] = [await byRule(E2, hierarchyE), await byRule(Z2, hierarchyZ)];
+    for (const [ruleId, sets] of forE) {
+      for (const [key, value] of sets) {
+        const other = forZ.get(ruleId)?.get(key);
+        if (other !== undefined) assert.notEqual(other, value, `${ruleId}: E and Z gave the same stereoisomers`);
+      }
+    }
+  });
+  test("a ring trisubstituted alkene (1-methylcyclohexene) gives the racemic cis diol for syn and trans diol for anti addition", async () => {
+    const ref = (smiles) => [smiles, smiles.replace(/@@?/g, (tag) => (tag === "@" ? "@@" : "@"))];
+    const expectSet = async (smiles) => [...new Set(await Promise.all(ref(smiles).map(canon)))].sort();
+    // References built from the validated cyclohexane-1,2-diol faces by replacing the implicit H on C1 with methyl.
+    assert.deepEqual(await set("alkene-syn-dihydroxylation", "CC1=CCCCC1"), await expectSet("O[C@@](C)1CCCC[C@@H]1O"));
+    assert.deepEqual(await set("alkene-anti-dihydroxylation", "CC1=CCCCC1"), await expectSet("O[C@@](C)1CCCC[C@H]1O"));
+    assert.deepEqual(await set("alkene-halogenation-bromine", "CC1=CCCCC1"), await expectSet("Br[C@@](C)1CCCC[C@H]1Br"));
+  });
+});
+
 describe("carbonyl additions never assign a configuration they cannot support", () => {
   const assertNoInvented = async (ruleIdPrefix, smiles) => {
     const hierarchy = await groups.analyzeFunctionalGroupHierarchy(smiles.split(".")[0]);

@@ -123,7 +123,19 @@ function alkeneGeometryDetermined(rdkit: any, rawGetMol: RawGetMol, reactants: r
     const mol = rawGetMol(smiles) as any;
     if (!mol) continue;
     try {
-      if (definedAlkeneGeometries(mol).length > 0) return true;
+      // Stage 9E: a drawn E/Z geometry is usable only where the engine's geometry-conditional templates exist, i.e. for
+      // 1,2-disubstituted (H1=H1) acyclic alkenes. For tri- and tetrasubstituted alkenes the templates cannot see the
+      // geometry, and completing the product here would give (E) and (Z) the same diastereomer, wrong for one of them.
+      if (definedAlkeneGeometries(mol).length > 0) {
+        const disubstituted = rdkit.get_qmol?.("[C;H1]=[C;H1]");
+        if (disubstituted) {
+          try {
+            if (mol.get_substruct_match?.(disubstituted) !== "{}") return true;
+          } finally {
+            disubstituted.delete?.();
+          }
+        }
+      }
       const query = rdkit.get_qmol?.("[C;r5,r6,r7]=@[C;r5,r6,r7]");
       if (query) {
         try {
@@ -615,7 +627,9 @@ async function applyMechanisticStereoRuntime(
       limitations: leftUnspecified
         ? [
             ...pathway.limitations,
-            "The relative stereochemistry of this stereospecific addition is not determined because the alkene geometry is not specified (draw the alkene as E or Z, or in a ring). The product is shown without assigned stereochemistry.",
+            pathway.reactantComponents.some((component) => component.includes("/") || component.includes(String.fromCharCode(92)))
+              ? "The relative stereochemistry of this stereospecific addition is not assigned: PocketChem derives it from the alkene geometry only for 1,2-disubstituted alkenes drawn as E or Z and for alkenes in 5-7 membered rings. For tri- and tetrasubstituted alkenes, even with a geometry drawn, the product is shown without assigned stereochemistry rather than with an arbitrary diastereomer."
+              : "The relative stereochemistry of this stereospecific addition is not determined because the alkene geometry is not specified (draw the alkene as E or Z, or in a ring). The product is shown without assigned stereochemistry.",
           ]
         : pathway.limitations,
       productSmiles: best,
