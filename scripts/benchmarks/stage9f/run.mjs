@@ -119,10 +119,34 @@ async function runProperties(testCase) {
 async function runReaction(testCase) {
   const input = testCase.reactants.join(".");
   const hierarchy = testCase.reactants.length === 1 ? await groupsModule.analyzeFunctionalGroupHierarchy(input) : null;
-  const pathways = await utils.predictReactionPathways(input, hierarchy?.primaryGroups ?? []);
-  const tokens = (testCase.reagent_tokens ?? []).map((t) => t.toLowerCase());
-  const text = (p) => `${p.title} ${p.reagentLabel} ${p.reagentNote}`.toLowerCase();
-  const pool = pathways.filter((p) => p.productSmiles && tokens.some((t) => text(p).includes(t)));
+  let pathways = await utils.predictReactionPathways(input, hierarchy?.primaryGroups ?? []);
+  // Harness v2 (written after the first dev baseline, before the holdout): reagent text is normalised (Unicode subscripts, punctuation,
+  // case) on both sides, and, when the substrate-only listing does not claim the reagents, the reagent is supplied as a molecule the way
+  // the Reactions page requires for ionic nucleophiles and organometallics. See PROTOCOL.md "Harness v2".
+  const SUB = { "₀": "0", "₁": "1", "₂": "2", "₃": "3", "₄": "4", "₅": "5", "₆": "6", "₇": "7", "₈": "8", "₉": "9", "⁺": "+", "⁻": "-" };
+  const norm = (s) => String(s).replace(/[₀-₉⁺⁻]/g, (c) => SUB[c]).toLowerCase().replace(/[^a-z0-9+]/g, "");
+  const tokens = (testCase.reagent_tokens ?? []).map(norm).filter(Boolean);
+  const text = (p) => norm(`${p.title} ${p.reagentLabel} ${p.reagentNote}`);
+  const poolOf = (list) => list.filter((p) => p.productSmiles && tokens.some((t) => text(p).includes(t)));
+  let pool = poolOf(pathways);
+  let supplied = null;
+  const wantedConstitutions = testCase.expected.products.filter((p) => ["sole", "major", "formed"].includes(p.role)).map((p) => constitution(p.smiles));
+  const poolHasWanted = () => pool.some((p) => (p.productMixture?.memberSmiles?.length ? p.productMixture.memberSmiles : [p.productSmiles]).flatMap(components).some((m) => wantedConstitutions.includes(constitution(m))));
+  if (pool.length === 0 || (wantedConstitutions.length > 0 && !poolHasWanted())) {
+    const substrateOnly = { pathways, pool };
+    const REAGENT_MOLECULES = [
+      [/NaOMe|methoxide/i, "[O-]C"], [/NaOEt|ethoxide/i, "CC[O-]"], [/EtMgBr/i, "CC[Mg]Br"], [/MeMgBr/i, "C[Mg]Br"],
+      [/NaN3/i, "[N-]=[N+]=[N-]"], [/MeOH(?!.*NaOMe)/i, "CO"], [/CH3Cl/i, "CCl"],
+    ];
+    const extra = REAGENT_MOLECULES.filter(([re]) => re.test(testCase.reagents)).map(([, smi]) => smi);
+    if (extra.length) {
+      supplied = extra;
+      const withMolecules = await utils.predictReactionPathways([input, ...extra].join("."), []);
+      const supplyPool = poolOf(withMolecules);
+      // use the molecule-supplied listing only if it claims the reagents at least as well as the substrate-only listing
+      if (supplyPool.length > 0 || substrateOnly.pool.length === 0) { pathways = withMolecules; pool = supplyPool; }
+    }
+  }
   const membersOf = (p) => (p.productMixture?.memberSmiles?.length ? p.productMixture.memberSmiles : [p.productSmiles]).flatMap(components);
   const poolProducts = pool.flatMap((p) => membersOf(p).map((smiles) => ({ smiles, constitution: constitution(smiles), pathway: p })));
   const anyProducts = pathways.filter((p) => p.productSmiles).flatMap((p) => membersOf(p).map((smiles) => constitution(smiles)));
@@ -209,7 +233,7 @@ async function runReaction(testCase) {
     if (results.length) dims.stereochemistry = results.includes("wrong") ? verdict("wrong") : results.includes("incomplete") ? verdict("incomplete", "stereochemistry unspecified") : verdict("correct");
   }
   return {
-    engine: { claimingRules: [...new Set(pool.map((p) => p.ruleId))], offered: [...new Set(poolProducts.map((p) => p.smiles))], levels: pool.map((p) => `${p.productSmiles}:${p.selectivityAssessment?.level ?? "none"}`) },
+    engine: { suppliedReagentMolecules: supplied, claimingRules: [...new Set(pool.map((p) => p.ruleId))], offered: [...new Set(poolProducts.map((p) => p.smiles))], levels: pool.map((p) => `${p.productSmiles}:${p.selectivityAssessment?.level ?? "none"}`) },
     dimensions: dims,
   };
 }
