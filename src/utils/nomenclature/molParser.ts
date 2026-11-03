@@ -63,6 +63,17 @@ export function parseMolBlock(molblock: string): ParsedMol {
     }
   }
 
+  for (const line of lines) {
+    if (!line.startsWith("M  ISO")) continue;
+    const parts = line.trim().split(/\s+/);
+    const pairCount = Number.parseInt(parts[2] ?? "0", 10);
+    for (let i = 0; i < pairCount; i++) {
+      const atom = atoms[Number.parseInt(parts[3 + i * 2] ?? "", 10) - 1];
+      const mass = Number.parseInt(parts[4 + i * 2] ?? "", 10);
+      if (atom && Number.isFinite(mass) && mass > 0) atom.isotope = mass;
+    }
+  }
+
   const adjacency = new Map<number, ParsedBond[]>();
   atoms.forEach((atom) => adjacency.set(atom.atomIndex, []));
 

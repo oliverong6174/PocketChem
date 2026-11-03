@@ -800,7 +800,9 @@ export function detectNamingFeatures(
       type: "aldehyde",
       locants: aldehydeLocants,
       suffix: "al",
-      prefix: "formyl",
+      // The aldehyde carbon is a member of the parent chain here, so as a prefix it is "oxo" (4-oxobutanoic acid). "formyl" would add a
+      // second carbon for the same atom (the old 4-formylbutanoic acid, which has five carbons).
+      prefix: "oxo",
       priority: 2,
     });
   }

@@ -23,6 +23,8 @@ type HeterocycleTemplate = {
   locants: HeterocycleLocant[];
   minUnsaturatedBonds?: number;
   maxUnsaturatedBonds?: number;
+  /** Index permutations of the template atoms that are symmetry operations of the parent (alternative numberings of a symmetric fused system). */
+  symmetries?: number[][];
 };
 
 export type HeterocycleNomenclatureResult = {
@@ -46,6 +48,20 @@ export type HeterocycleNomenclatureResult = {
  */
 const HETEROCYCLE_TEMPLATES: HeterocycleTemplate[] = [
   // Fused systems -------------------------------------------------------------
+  {
+    name: "naphthalene",
+    stem: "naphthalen",
+    smarts: "[#6]1~[#6]~[#6]~[#6]~[#6]2~[#6]~[#6]~[#6]~[#6]~[#6]1~2",
+    // Query order: C1 C2 C3 C4 C4a C5 C6 C7 C8 C8a
+    locants: [1, 2, 3, 4, "4a", 5, 6, 7, 8, "8a"],
+    minUnsaturatedBonds: 5,
+    // Mirror through the midpoints of C2-C3 and C6-C7; mirror through C4a-C8a; and their product.
+    symmetries: [
+      [3, 2, 1, 0, 9, 8, 7, 6, 5, 4],
+      [8, 7, 6, 5, 4, 3, 2, 1, 0, 9],
+      [5, 6, 7, 8, 9, 0, 1, 2, 3, 4],
+    ],
+  },
   {
     name: "purine",
     stem: "purin",
@@ -384,19 +400,55 @@ function getExternalRankingVector(
   return [...suffixLike, ...ordinary];
 }
 
+/** All rotations and reflections of a ring walk whose element sequence equals the original (so heteroatoms keep their template positions). */
+function ringNumberings(parsedMol: ParsedMol, atoms: number[]): number[][] {
+  const n = atoms.length;
+  const elements = atoms.map((atom) => parsedMol.atoms[atom]?.element ?? "?");
+  const seen = new Set<string>();
+  const out: number[][] = [];
+  for (const direction of [1, -1]) {
+    for (let start = 0; start < n; start += 1) {
+      const variant = Array.from({ length: n }, (_, k) => atoms[(((start + direction * k) % n) + n) % n]);
+      if (!variant.every((atom, k) => (parsedMol.atoms[atom]?.element ?? "?") === elements[k])) continue;
+      const key = variant.join(",");
+      if (!seen.has(key)) { seen.add(key); out.push(variant); }
+    }
+  }
+  return out.length ? out : [atoms];
+}
+
 function findHeterocycleMatch(
   RDKit: RDKitModule,
   mol: RDKitMol,
   parsedMol: ParsedMol
 ): HeterocycleMatch | null {
+  // Atoms shared by two or more rings (fused, bridged, spiro). A monocyclic template (a single ring closure) must not claim a ring
+  // that is part of such a system: the ring name plus substituent chains would describe a different molecule (cyclohexene oxide
+  // read as a di(hexyloxy-pentyl)oxirane). Fused systems that have their own template are unaffected.
+  const sharedRingAtoms = new Set<number>();
+  {
+    const sharedQuery = RDKit.get_qmol("[R;!R1]");
+    try {
+      if (sharedQuery) {
+        for (const atoms of parseMatchArray(mol.get_substruct_matches(sharedQuery))) {
+          for (const atom of atoms) sharedRingAtoms.add(atom);
+        }
+      }
+    } finally {
+      sharedQuery?.delete?.();
+    }
+  }
+
   for (const template of HETEROCYCLE_TEMPLATES) {
     let query: RDKitQuery | null = null;
     try {
       query = RDKit.get_qmol(template.smarts);
       if (!query) continue;
+      const monocyclic = !/[2-9]/.test(template.smarts.replace(/\[[^\]]*\]/g, ""));
 
       const matches = parseMatchArray(mol.get_substruct_matches(query))
         .filter((atoms) => atoms.length === template.locants.length)
+        .filter((atoms) => !(monocyclic && atoms.some((atom) => sharedRingAtoms.has(atom))))
         .filter((atoms) => {
           const unsaturated = countInternalUnsaturatedBonds(parsedMol, atoms);
           if (
@@ -416,7 +468,15 @@ function findHeterocycleMatch(
 
       if (matches.length === 0) continue;
 
-      const best = [...matches].sort((a, b) =>
+      // RDKit reports one match per atom SET, so only one of the equivalent numberings of a ring is seen and lowest-locant
+      // selection never had a choice (2,3,3-trimethyloxirane, 4-methyloxetane, 5-methylthiophene). Every rotation and reflection of
+      // the ring walk that keeps the template's element sequence is a legal numbering; rank them all.
+      const numberings = matches.flatMap((atoms) =>
+        monocyclic
+          ? ringNumberings(parsedMol, atoms)
+          : [atoms, ...(template.symmetries ?? []).map((permutation) => permutation.map((index) => atoms[index]))],
+      );
+      const best = [...numberings].sort((a, b) =>
         compareNumericVectors(
           getExternalRankingVector(parsedMol, a, template.locants),
           getExternalRankingVector(parsedMol, b, template.locants)

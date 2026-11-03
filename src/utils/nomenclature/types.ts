@@ -84,6 +84,8 @@ export type ParsedAtom = {
   atomIndex: number;
   element: string;
   charge: number;
+  /** Mass number of an isotopically labelled atom ([13C], [2H]); absent for natural abundance. */
+  isotope?: number;
 };
 
 export type ParsedBond = {
