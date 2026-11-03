@@ -16,7 +16,13 @@ type EpoxideNucleophile =
   | "ammonia"
   | "organometallic"
   | "halide";
-type AttackPreference = "more-substituted" | "less-substituted";
+/**
+ * "tertiary-else-less-substituted" is the hydrogen halide rule: the halide attacks a tertiary epoxide carbon (SN1-like) when there
+ * is one, otherwise the less substituted carbon (SN2-like). It is NOT "more substituted": for propylene oxide + HBr the halide ends up
+ * on the primary carbon (LibreTexts, Wade 15.08 and Nassau 8.14: "when both the epoxide carbons are either primary or secondary the
+ * halogen anion will attack the less substituted carbon").
+ */
+type AttackPreference = "more-substituted" | "less-substituted" | "tertiary-else-less-substituted";
 type Halogen = "Cl" | "Br" | "I";
 
 function unique(values: string[]): string[] {
@@ -137,7 +143,10 @@ function epoxideOpeningSmarts(
   const { reactantSuffix, attachedGroup, attachedChain } = template;
   const sites: Array<{ attackedH: 0 | 1 | 2; otherH: 0 | 1 | 2 }> = [];
   for (const [moreH, lessH] of [[0, 1], [0, 2], [1, 2]] as const) {
-    sites.push(preference === "more-substituted"
+    // moreH is the hydrogen count of the more substituted carbon (fewer hydrogens).
+    const attacksMoreSubstituted =
+      preference === "more-substituted" || (preference === "tertiary-else-less-substituted" && moreH === 0);
+    sites.push(attacksMoreSubstituted
       ? { attackedH: moreH, otherH: lessH }
       : { attackedH: lessH, otherH: moreH });
   }

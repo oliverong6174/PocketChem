@@ -16,7 +16,7 @@ const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
   reagentNote: "Acidic halohydrin formation",
   productHint: `${symbol}-substituted alcohol`,
   explanation:
-    `Under acidic conditions, ${acid} protonates the epoxide and ${anionName} attacks the more substituted epoxide carbon. Ring opening is backside, so the halogen and the oxygen-derived OH are anti.`,
+    `${acid} protonates the epoxide and ${anionName} opens it from the back side, so the halogen and the oxygen-derived OH are anti. When one epoxide carbon is tertiary the halide attacks it (SN1-like); when both carbons are primary or secondary it attacks the less substituted carbon (SN2-like).`,
   trigger: epoxideTrigger,
   transform: {
     type: "customHandler",
@@ -24,7 +24,7 @@ const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
     options: {
       mode: "epoxideNucleophileOpening",
       nucleophile: "halide",
-      attackPreference: "more-substituted",
+      attackPreference: "tertiary-else-less-substituted",
       halogen: symbol,
     },
   },
@@ -36,7 +36,7 @@ const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
     allowsRearrangement: false,
   },
   selectivity: [
-    "Acidic opening favors attack at the more substituted epoxide carbon.",
+    "A tertiary epoxide carbon is attacked by the halide; otherwise the halide attacks the less substituted carbon (LibreTexts, Wade 15.08 and Nassau 8.14). This differs from acid-catalysed opening by water or an alcohol, where the more substituted carbon is favoured.",
     "Attack is backside/anti relative to the epoxide oxygen bond being broken.",
   ],
   priority: 840 + index,

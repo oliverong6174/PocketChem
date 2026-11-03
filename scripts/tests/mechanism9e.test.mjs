@@ -197,3 +197,32 @@ describe("the Reactions-page layer shows the same alternatives for a single draw
     assert.deepEqual(await constitutions(out), await wanted("Cc1ccccc1[N+](=O)[O-]", "Cc1ccc([N+](=O)[O-])cc1"));
   });
 });
+
+describe("epoxide opening by hydrogen halides follows the sourced regiochemistry (LibreTexts Wade 15.08, Nassau 8.14)", () => {
+  const hx = (smiles, acid = "hbr") => run(`epoxide-hx-opening-${acid}`, smiles);
+  test("primary/secondary epoxide carbons: the halide attacks the LESS substituted carbon (propylene oxide gives 1-bromopropan-2-ol)", async () => {
+    assert.deepEqual(await constitutions(await hx("CC1CO1")), await wanted("CC(O)CBr"));
+    assert.deepEqual(await constitutions(await hx("CCC1CO1")), await wanted("CCC(O)CBr"));
+  });
+  test("one tertiary epoxide carbon: the halide attacks the tertiary carbon", async () => {
+    assert.deepEqual(await constitutions(await hx("CC1(C)CO1")), await wanted("CC(C)(Br)CO"));
+    assert.deepEqual(await constitutions(await hx("CC1(C)OC1C")), await wanted("CC(O)C(C)(C)Br"));
+  });
+  test("the rule holds for HCl and HI too", async () => {
+    assert.deepEqual(await constitutions(await hx("CC1CO1", "hcl")), await wanted("CC(O)CCl"));
+    assert.deepEqual(await constitutions(await hx("CC1CO1", "hi")), await wanted("CC(O)CI"));
+  });
+  test("a symmetric epoxide gives one constitution, and stereo-defined ones keep the inversion rule", async () => {
+    assert.deepEqual(await constitutions(await hx("CC1OC1C")), await wanted("CC(O)C(C)Br"));
+  });
+  test("other openings are unchanged: methoxide still attacks the less substituted carbon, acid/methanol the more substituted one", async () => {
+    assert.deepEqual(await constitutions(await run("epoxide-base-alkoxide-opening", "CC1CO1.[O-]C")), await wanted("COCC(C)O"));
+    assert.deepEqual(await constitutions(await run("epoxide-acid-alcohol-opening", "CC1CO1.CO")), await wanted("COC(C)CO"));
+    assert.deepEqual(await constitutions(await run("epoxide-acid-water-opening", "CC1(C)CO1")), await wanted("CC(C)(O)CO"));
+  });
+  test("the rule text no longer claims the more substituted carbon is attacked", () => {
+    const text = rule("epoxide-hx-opening-hbr").selectivity.join(" ");
+    assert.doesNotMatch(text, /Acidic opening favors attack at the more substituted/);
+    assert.match(text, /tertiary/);
+  });
+});
