@@ -35,7 +35,8 @@ if (setName === "holdout") {
 }
 for (const group of Object.values(manifest.files)) {
   const full = path.join(here, group.path);
-  const hash = crypto.createHash("sha256").update(fs.readFileSync(full)).digest("hex");
+  // line endings are normalised so the check survives a CRLF checkout
+  const hash = crypto.createHash("sha256").update(fs.readFileSync(full, "utf8").replace(/\r\n/g, "\n")).digest("hex");
   if (hash !== group.sha256) throw new Error(`Frozen file ${group.path} changed (hash mismatch). Frozen cases must not be edited.`);
 }
 
