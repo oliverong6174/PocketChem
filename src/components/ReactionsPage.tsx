@@ -78,6 +78,8 @@ type DisplayProductVariant = {
   completeSmiles: string;
   componentSmiles: string[];
   label: string;
+  /** The engine's qualitative ranking of this outcome, when it has one; null means unranked (not "minor"). */
+  assessment: ReactionPathway["selectivityAssessment"];
 };
 
 const HALOGEN_SYMBOLS: readonly HalogenSymbol[] = ["Cl", "Br", "I"];
@@ -183,6 +185,7 @@ function productVariantsForPathway(pathway: ReactionPathway): DisplayProductVari
       .map((component) => component.trim())
       .filter(Boolean),
     label: pathway.productMixture?.displayName ?? pathway.productLabel,
+    assessment: pathway.selectivityAssessment ?? null,
   }));
 }
 
@@ -312,7 +315,7 @@ function displayProductLabel(pathway: ReactionPathway | DisplayReactionPathway):
     return generalizedSeriesText(pathway, base);
   }
   if ("productVariants" in pathway && pathway.productVariants.length > 1 && !pathway.productMixture) {
-    return `${pathway.productVariants.length} chemically competitive product alternatives`;
+    return `${pathway.productVariants.length} product alternatives`;
   }
   return base;
 }
@@ -1612,6 +1615,14 @@ export default function ReactionsPage({
                                   </div>
                                 ))}
                               </div>
+                              {pathway.productVariants.length > 1 && pathway.productVariants[variantIndex]?.assessment && (
+                                <span
+                                  className={`reaction-variant-assessment level-${pathway.productVariants[variantIndex].assessment?.level}`}
+                                  title={pathway.productVariants[variantIndex].assessment?.basis}
+                                >
+                                  {pathway.productVariants[variantIndex].assessment?.label}
+                                </span>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -1641,10 +1652,21 @@ export default function ReactionsPage({
                     <p className="reaction-detail">
                       <strong>Alternative products:</strong>{" "}
                       {pathway.halogenSeries
-                        ? "Parallel halogen variants are condensed onto this one card; any remaining structural alternatives are genuine selectivity ties after major-product ranking."
-                        : "Major-product ranking has already removed lower-probability atom-map/regioisomer matches; multiple structures remain only when the rule represents a genuine mixture or an unresolved chemical tie."}
+                        ? "Parallel halogen variants are condensed onto this one card. The remaining structural alternatives are listed; a label under a structure is the engine's qualitative ranking."
+                        : pathway.productVariants.some((variant) => variant.assessment)
+                          ? "The rule offers several outcomes. A label under a structure is the engine's qualitative ranking, taken from the evidence quoted below; it is not a measured ratio. A structure without a label is unranked, which means PocketChem does not know, not that it is minor."
+                          : "The rule offers several outcomes and PocketChem does not rank them: it has no sourced basis for saying which one dominates, so none is called the major product."}
                     </p>
                   )}
+
+                  {!pathway.productMixture && pathway.productVariants.length > 1 && (() => {
+                    const evidence = [...new Set(pathway.productVariants.map((variant) => variant.assessment?.basis).filter((basis): basis is string => Boolean(basis)))];
+                    return evidence.length > 0 ? (
+                      <p className="reaction-detail">
+                        <strong>Selectivity evidence:</strong> {evidence.join(" ")}
+                      </p>
+                    ) : null;
+                  })()}
 
                   <p className="reaction-note">{pathway.shortExplanation}</p>
 

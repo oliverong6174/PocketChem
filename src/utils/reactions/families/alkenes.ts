@@ -292,7 +292,7 @@ export const alkeneReactionRules: ReactionRule[] = [
       "Br and OH add anti through bromonium-ion opening.",
     ],
     limitations: [
-      "The anti relationship is applied when the alkene geometry is drawn or the alkene is in a 5-7 membered ring. The product of an achiral reaction that is chiral is shown as both enantiomers (a racemate); an acyclic alkene of undefined geometry is left unspecified.",
+      "The anti relationship is applied for 1,2-disubstituted alkenes drawn as E or Z and for alkenes in 5-7 membered rings. A chiral product of an achiral reaction is shown as both enantiomers (a racemate); an acyclic alkene of undefined geometry, or a tri-/tetrasubstituted one, is left without assigned stereochemistry.",
     ],
     priority: 130,
   },

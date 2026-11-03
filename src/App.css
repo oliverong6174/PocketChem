@@ -2030,6 +2030,33 @@ body,
   font-size: 0.78rem;
 }
 
+/* Qualitative ranking of one outcome of a rule that offers several (colour is secondary: the text carries the meaning). */
+.reaction-variant-assessment {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #1e293b;
+  cursor: help;
+}
+
+.reaction-variant-assessment.level-major {
+  background: #dcfce7;
+  color: #14532d;
+}
+
+.reaction-variant-assessment.level-competitive {
+  background: #fef3c7;
+  color: #713f12;
+}
+
+.reaction-variant-assessment.level-minor,
+.reaction-variant-assessment.level-trace {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
 
 /* Spectroscopy */
 .spectroscopy-page {

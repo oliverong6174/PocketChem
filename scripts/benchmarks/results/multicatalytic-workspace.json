@@ -130,7 +130,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 167
+      "elapsedMs": 135
     },
     {
       "id": "D2a",
@@ -216,7 +216,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 28
+      "elapsedMs": 23
     },
     {
       "id": "D2b",
@@ -304,7 +304,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 46
+      "elapsedMs": 33
     },
     {
       "id": "D2c",
@@ -533,7 +533,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 70
+      "elapsedMs": 60
     },
     {
       "id": "D3b+D4b",
@@ -704,7 +704,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 67
+      "elapsedMs": 62
     },
     {
       "id": "INT-1",
@@ -929,7 +929,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 106
+      "elapsedMs": 100
     },
     {
       "id": "INT-2",
@@ -995,8 +995,8 @@
           "produced": [
             "s4.1"
           ],
-          "product": "CCCC[C@H](CC)[C@@H](O)CC",
-          "outcomes": 2,
+          "product": "CCCC[C@H](CC)[C@H](O)CC",
+          "outcomes": 1,
           "selectivityClass": "single-outcome",
           "catalystIdentity": "unknown"
         },
@@ -1029,7 +1029,7 @@
       ],
       "levels": {
         "1-syntactically-valid": true,
-        "2-structure-replay": "verified",
+        "2-structure-replay": "connectivity-only",
         "3-chemically-plausible": {
           "established": "asserted (not computed)",
           "basis": "Lindlar semi-hydrogenation gives the (Z)-alkene; peroxyacid epoxidation of a Z alkene gives the cis (meso) epoxide; BuMgBr opens the epoxide by SN2 at a ring carbon; PCC oxidises the secondary alcohol (Corey & Suggs 1975). Provisional as a sequence: the stereochemical outcome of the opening step (relative configuration) is not asserted, and PocketChem does not model it."
@@ -1100,7 +1100,7 @@
         {
           "name": "constitution of step 4",
           "ok": true,
-          "detail": "CCCC[C@H](CC)[C@@H](O)CC"
+          "detail": "CCCC[C@H](CC)[C@H](O)CC"
         },
         {
           "name": "constitution of step 5",
@@ -1140,10 +1140,10 @@
         {
           "name": "structure replay",
           "ok": true,
-          "detail": "verified"
+          "detail": "connectivity-only"
         }
       ],
-      "elapsedMs": 96
+      "elapsedMs": 72
     },
     {
       "id": "D5",
@@ -1295,7 +1295,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 63
+      "elapsedMs": 48
     },
     {
       "id": "D6a",
@@ -1399,7 +1399,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 67
+      "elapsedMs": 52
     },
     {
       "id": "D6b",
@@ -1470,7 +1470,7 @@
           "detail": "unranked,unranked"
         }
       ],
-      "elapsedMs": 29
+      "elapsedMs": 25
     },
     {
       "id": "D6c",
@@ -1577,7 +1577,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 65
+      "elapsedMs": 52
     },
     {
       "id": "D6d",
@@ -1685,7 +1685,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 192
+      "elapsedMs": 64
     },
     {
       "id": "D6e",
@@ -1765,7 +1765,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 44
+      "elapsedMs": 17
     },
     {
       "id": "D6f",
@@ -1845,7 +1845,7 @@
           "detail": "connectivity-only"
         }
       ],
-      "elapsedMs": 34
+      "elapsedMs": 27
     },
     {
       "id": "D7",
@@ -2019,7 +2019,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 16
+      "elapsedMs": 7
     },
     {
       "id": "D9",
@@ -2123,7 +2123,7 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 29
+      "elapsedMs": 17
     },
     {
       "id": "D10",
@@ -2229,15 +2229,15 @@
           "detail": "verified"
         }
       ],
-      "elapsedMs": 24
+      "elapsedMs": 10
     }
   ],
   "performance": {
     "chain": "C=CCC → alkene-acid-hydration → secondary-alcohol-oxidation-pcc → ketone-reduction",
     "repeats": 7,
-    "sequentialMedianMs": 39,
-    "workspaceMedianMs": 39,
+    "sequentialMedianMs": 21,
+    "workspaceMedianMs": 21,
     "note": "Same rules, same molecule. The workspace additionally records every alternative outcome, canonicalises every lot and assesses selectivity per step; its verification replay is timed separately below.",
-    "assessmentMs": 15
+    "assessmentMs": 29
   }
 }
