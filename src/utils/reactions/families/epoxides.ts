@@ -16,7 +16,7 @@ const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
   reagentNote: "Acidic halohydrin formation",
   productHint: `${symbol}-substituted alcohol`,
   explanation:
-    `${acid} protonates the epoxide and ${anionName} opens it from the back side, so the halogen and the oxygen-derived OH are anti. When one epoxide carbon is tertiary the halide attacks it (SN1-like); when both carbons are primary or secondary it attacks the less substituted carbon (SN2-like).`,
+    `${acid} protonates the epoxide and ${anionName} opens it from the back side, so the halogen and the oxygen-derived OH are anti. When exactly one epoxide carbon can carry positive charge (tertiary, benzylic or allylic) the halide attacks it (SN1-like); when neither can, it attacks the less substituted carbon (SN2-like); when both can, both regioisomers are listed and neither is preferred.`,
   trigger: epoxideTrigger,
   transform: {
     type: "customHandler",
@@ -24,7 +24,7 @@ const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
     options: {
       mode: "epoxideNucleophileOpening",
       nucleophile: "halide",
-      attackPreference: "tertiary-else-less-substituted",
+      attackPreference: "cation-stabilized-else-less-substituted",
       halogen: symbol,
     },
   },
@@ -36,7 +36,7 @@ const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
     allowsRearrangement: false,
   },
   selectivity: [
-    "A tertiary epoxide carbon is attacked by the halide; otherwise the halide attacks the less substituted carbon (LibreTexts, Wade 15.08 and Nassau 8.14). This differs from acid-catalysed opening by water or an alcohol, where the more substituted carbon is favoured.",
+    "A tertiary epoxide carbon is attacked by the halide; otherwise the halide attacks the less substituted carbon (LibreTexts, Wade 15.08 and Nassau 8.14). A benzylic or allylic carbon stabilizes positive charge like a tertiary one and is treated the same way (Parker and Isaacs, Chem. Rev. 1959, 59, 737, for aryl epoxides; not re-read in this stage, so the benzylic and allylic extension is a mechanistic generalisation rather than a quoted rule). This differs from acid-catalysed opening by water or an alcohol, where the more substituted carbon is favoured.",
     "Attack is backside/anti relative to the epoxide oxygen bond being broken.",
   ],
   priority: 840 + index,

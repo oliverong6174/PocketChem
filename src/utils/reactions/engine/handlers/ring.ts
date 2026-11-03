@@ -22,7 +22,14 @@ type EpoxideNucleophile =
  * on the primary carbon (LibreTexts, Wade 15.08 and Nassau 8.14: "when both the epoxide carbons are either primary or secondary the
  * halogen anion will attack the less substituted carbon").
  */
-type AttackPreference = "more-substituted" | "less-substituted" | "tertiary-else-less-substituted";
+/**
+ * "cation-stabilized-else-less-substituted" generalises the hydrogen halide rule beyond tertiary carbons: the halide attacks the epoxide
+ * carbon that better carries positive charge in the SN1-like transition state (tertiary, benzylic or allylic) when exactly one of the two
+ * does, the less substituted carbon when neither does, and both regioisomers are kept when both do (no basis to choose). Styrene oxide + HBr
+ * therefore opens at the benzylic carbon, not at CH2.
+ */
+const CATION_STABILIZED = "cation-stabilized-else-less-substituted";
+type AttackPreference = "more-substituted" | "less-substituted" | "tertiary-else-less-substituted" | typeof CATION_STABILIZED;
 type Halogen = "Cl" | "Br" | "I";
 
 function unique(values: string[]): string[] {
@@ -210,17 +217,70 @@ async function isUnspecifiedFusedRingEpoxide(smiles: string): Promise<boolean> {
   }
 }
 
+/**
+ * Chooses between the regioisomeric halohydrins from the product alone. In X-C1-C2-OH the halide attacked C1. C1 is "cation stabilized"
+ * when it carries no hydrogen (tertiary) or is bonded to an aromatic atom or a C=C (benzylic, allylic). Products are kept when
+ * C1 is stabilized and C2 is not, when neither is stabilized and C1 is at least as unsubstituted as C2, or when both are stabilized.
+ * A product whose halohydrin pattern is not unique (two epoxides opened, say) is kept unchanged.
+ */
+async function keepCationStabilizedAttack(products: string[]): Promise<string[]> {
+  const rdkit = await getRDKit();
+  const queries = {
+    pattern: rdkit.get_qmol("[C:1]([Cl,Br,I])[C:2][OX2H]"),
+    stabilized: rdkit.get_qmol("[C;H0,$(C-a),$(C-[#6]=[#6])]"),
+    h0: rdkit.get_qmol("[C;H0]"),
+    h1: rdkit.get_qmol("[C;H1]"),
+  };
+  const atomsOf = (mol: { get_substruct_matches: (query: unknown) => string }, query: unknown): Set<number> => {
+    const parsed = JSON.parse(mol.get_substruct_matches(query));
+    const list = Array.isArray(parsed) ? parsed : parsed?.atoms ? [parsed] : [];
+    return new Set(list.flatMap((match: { atoms: number[] }) => match.atoms));
+  };
+  try {
+    const kept: string[] = [];
+    for (const product of products) {
+      const mol = rdkit.get_mol(product);
+      if (!mol) { kept.push(product); continue; }
+      try {
+        const parsed = JSON.parse(mol.get_substruct_matches(queries.pattern));
+        const matches: Array<{ atoms: number[] }> = Array.isArray(parsed) ? parsed : parsed?.atoms ? [parsed] : [];
+        if (matches.length !== 1) { kept.push(product); continue; }
+        const [halo, , other] = matches[0].atoms;
+        const stabilized = atomsOf(mol, queries.stabilized);
+        const h0 = atomsOf(mol, queries.h0);
+        const h1 = atomsOf(mol, queries.h1);
+        const hydrogens = (atom: number) => (h0.has(atom) ? 0 : h1.has(atom) ? 1 : 2);
+        const haloStable = stabilized.has(halo);
+        const otherStable = stabilized.has(other);
+        const keep = haloStable !== otherStable ? haloStable : haloStable ? true : hydrogens(halo) >= hydrogens(other);
+        if (keep) kept.push(product);
+      } finally {
+        mol.delete?.();
+      }
+    }
+    return kept;
+  } finally {
+    for (const query of Object.values(queries)) query?.delete?.();
+  }
+}
+
 async function runRankedEpoxideOpening(
   reactants: string[],
   preference: AttackPreference,
   nucleophile: EpoxideNucleophile,
   halogen?: Halogen,
 ): Promise<string[]> {
-  const products: string[] = [];
+  let products: string[] = [];
   const fusedRing = await isUnspecifiedFusedRingEpoxide(reactants[0]);
-  for (const smarts of epoxideOpeningSmarts(preference, nucleophile, halogen, fusedRing)) {
-    products.push(...await runReactionSmarts(reactants, smarts, 16));
+  // The cation-stabilization rule needs both regioisomers; the choice is made afterwards from the product structure.
+  const orientations: AttackPreference[] =
+    preference === CATION_STABILIZED ? ["more-substituted", "less-substituted"] : [preference];
+  for (const orientation of orientations) {
+    for (const smarts of epoxideOpeningSmarts(orientation, nucleophile, halogen, fusedRing)) {
+      products.push(...await runReactionSmarts(reactants, smarts, 16));
+    }
   }
+  if (preference === CATION_STABILIZED) products = await keepCationStabilizedAttack(unique(products));
   // Both attack sites of a symmetric epoxide give the same compound written differently: keep one of each structure.
   const byStructure = new Map<string, string>();
   for (const product of unique(products)) {
