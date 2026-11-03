@@ -1,0 +1,2164 @@
+{
+ "capability": "ranking",
+ "authored_on": "2026-11-03",
+ "sources": {
+  "pka_pka-compilation-williams": {
+   "cite": "R. Williams, pKa Data Compiled (ACS Organic Division, updated 4/7/2022), via OrganicChemistryData.org",
+   "url": "https://organicchemistrydata.org/hansreich/resources/pka/pka_data/pka-compilation-williams.pdf",
+   "snapshot": "rk-pka_pka-compilation-williams.txt",
+   "fetched": true,
+   "says": "Aqueous pKa/pKaH tables, e.g. ammonia 9.21, piperidine 11.22, aniline 4.19, imidazole 6.95, formic acid 3.77, acetylacetone 8.95, p-methoxyphenol 10.16, 4-nitrophenol row 7.14 (PDF text extracted with pdftotext; two-column layout is noisy, so PubChem values are the primary numbers used)."
+  },
+  "pc_pka": {
+   "cite": "PubChem PUG-View, 'Dissociation Constants' heading (HSDB/CRC-derived experimental values)",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/",
+   "snapshot": "rk-pc_pka.txt",
+   "fetched": true,
+   "says": "TFA pKa 0.3, chloroacetic acid 2.87, formic acid 3.742, acetic acid 4.756, isopropanol 17.1, 4-chlorophenol 9.41, p-cresol 10.26, acetylacetone 8.93, acetone ~20, piperidine 11.12, pyridine 5.23, cyclohexylamine 10.63, 4-nitroaniline 1.01."
+  },
+  "pc_pka2": {
+   "cite": "PubChem PUG-View, 'Dissociation Constants' heading (second batch)",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/",
+   "snapshot": "rk-pc_pka2.txt",
+   "fetched": true,
+   "says": "Phenol 9.99, 4-nitrophenol 7.15, 4-methoxyphenol 10.05, diethylamine 11.09, triethylamine 10.78/10.9, ethylamine 10.7/10.87, pyrrole conjugate acid -3.80, imidazole 6.95, ethanethiol 10.61, benzenethiol 6.62, nitromethane 10.21, aniline conjugate acid 4.6, ammonia pKb 4.751 (pKaH ~9.25)."
+  },
+  "pc_bp": {
+   "cite": "PubChem PUG-View, 'Boiling Point' heading (experimental)",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/",
+   "snapshot": "rk-pc_bp.txt",
+   "fetched": true,
+   "says": "Normal boiling points (C): 1-butanol 117.7, butanal 74.8, butane -0.5, pentane 36.06, isopentane 27.83, neopentane 9.5, hexane 68.73, heptane 98.38, cyclohexane 80.7, 1-propanol 97.2, acetone 56.08, diethyl ether 34.6, acetamide 222, acetic acid 117.9, ethyl acetate 77.1, methyl formate 31.5, cis-2-butene 3.73, trans-2-butene 0.88, 2-butanol 99.5, tert-butanol 82.3, iodomethane 42.5, o/m/p-dichlorobenzene 180.1/173/173.9."
+  },
+  "pc_mp": {
+   "cite": "PubChem PUG-View, 'Melting Point' heading (experimental)",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/",
+   "snapshot": "rk-pc_mp.txt",
+   "fetched": true,
+   "says": "Melting points (C): p-dichlorobenzene 53, o-dichlorobenzene -17, m-dichlorobenzene -24.8, neopentane -16.6, pentane -129.7, isopentane -159.8."
+  },
+  "pc_logp": {
+   "cite": "PubChem PUG-View, 'LogP' heading (experimental log Kow)",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/",
+   "snapshot": "rk-pc_logp.txt",
+   "fetched": true,
+   "says": "log Kow: hexane 3.90, pentane 3.39, cyclohexane 3.44, 1-pentanol 1.51, iodomethane 1.51, diethyl ether 0.89, 1-butanol 0.88, ethyl acetate 0.73, 1-propanol 0.25, acetic acid -0.17, acetone -0.24, glycerol -1.76."
+  },
+  "pc_sol": {
+   "cite": "PubChem PUG-View, 'Solubility' heading (experimental)",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/",
+   "snapshot": "rk-pc_sol.txt",
+   "fetched": true,
+   "says": "Water solubility: tert-butanol miscible (1000 mg/mL), 1-butanol 68 g/L, ethyl acetate 64-80 g/L, pentane 38 mg/L, hexane 9.5 mg/L, acetic acid miscible, diethylamine infinitely soluble."
+  },
+  "pc_mass": {
+   "cite": "PubChem PUG REST compound properties (computed exact masses)",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/",
+   "snapshot": "rk-pc_mass.txt",
+   "fetched": true,
+   "says": "Monoisotopic masses: CH3I 141.93, heptane 100.13, cyclohexane 84.09, hexane 86.11, pentane/isopentane 72.09, butane 58.08, diethyl ether 74.07, ethyl acetate 88.05, butanone/THF 72.06, acetic acid 60.02, acetone 58.04."
+  },
+  "wiki_carbenium": {
+   "cite": "Wikipedia, 'Carbenium ion' (last resort; cites hydride ion affinity data)",
+   "url": "https://en.wikipedia.org/wiki/Carbenium_ion",
+   "snapshot": "rk-wiki_carbenium.txt",
+   "fetched": true,
+   "says": "Hydride ion affinities (kcal/mol) 231, 246, 273, 312 for tBu+, iPr+, Et+, CH3+; stability 3>2>1>methyl.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_bde": {
+   "cite": "Wikipedia, 'Bond-dissociation energy' (last resort; table of C-H BDEs)",
+   "url": "https://en.wikipedia.org/wiki/Bond-dissociation_energy",
+   "snapshot": "rk-wiki_bde.txt",
+   "fetched": true,
+   "says": "C-H BDE (kcal/mol): methyl 105, ethyl 101, isopropyl 99, t-butyl 96.5, alpha-amine 91, alpha-ether 92, alpha-ketone 96, vinyl 111, allylic 89, benzylic 90.",
+   "last_resort_wikipedia": true
+  },
+  "lt_alkstab": {
+   "cite": "OpenStax Organic Chemistry (McMurry) section 7.6 Stability of Alkenes, via LibreTexts",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(OpenStax)/07%3A_Alkenes-_Structure_and_Reactivity/7.06%3A_Stability_of_Alkenes",
+   "snapshot": "rk-lt_alkstab.txt",
+   "fetched": true,
+   "says": "Heats of hydrogenation (kJ/mol): ethylene -136, propene -125, cis-2-butene -119, trans-2-butene -115, 2-methylpropene -118, 2-methyl-2-butene -112, 2,3-dimethyl-2-butene -110; more substituted = more stable."
+  },
+  "os_sn2": {
+   "cite": "OpenStax Organic Chemistry (McMurry) section 11.3 Characteristics of the SN2 Reaction, via LibreTexts",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(OpenStax)/11%3A_Reactions_of_Alkyl_Halides-_Nucleophilic_Substitutions_and_Eliminations/11.03%3A_Characteristics_of_the_SN2_Reaction",
+   "snapshot": "rk-os_sn2.txt",
+   "fetched": true,
+   "says": "Substrate order methyl > primary > isopropyl >> tert-butyl; table of nucleophile relative rates toward CH3Br: H2O 1, acetate 500, NH3 700, Cl- 1000, HO- 10000, MeO- 25000, I- 100000, CN- 125000, HS- 125000."
+  },
+  "os_sn1": {
+   "cite": "OpenStax Organic Chemistry (McMurry) section 11.5 Characteristics of the SN1 Reaction, via LibreTexts",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(OpenStax)/11%3A_Reactions_of_Alkyl_Halides-_Nucleophilic_Substitutions_and_Eliminations/11.05%3A_Characteristics_of_the_SN1_Reaction",
+   "snapshot": "rk-os_sn1.txt",
+   "fetched": true,
+   "says": "SN1 reactivity follows carbocation stability 3>2>1>methyl; allylic/benzylic extra stabilized (primary allylic ~ secondary alkyl, secondary allylic ~ tertiary); 3-bromo-1-butene and 1-bromo-2-butene react at nearly the same rate."
+  },
+  "wiki_lg": {
+   "cite": "Wikipedia, 'Leaving group' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Leaving_group",
+   "snapshot": "rk-wiki_lg.txt",
+   "fetched": true,
+   "says": "In one study (citation needed on the page) reactivity Cl 1 < I 91 < OTs 3.7e4 < OTf 1.4e8; a table of k(X)/k(Br) in two SN2 reactions gives Cl 0.0074/0.0024, I 3.5/1.9, OTs 0.44/3.6, i.e. tosylate placement depends on the nucleophile.",
+   "last_resort_wikipedia": true
+  },
+  "lt_carbonylrx": {
+   "cite": "LibreTexts, Organic Chemistry (Morsch et al.) 21.2 Nucleophilic acyl substitution reactions",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(Morsch_et_al.)/21%3A_Carboxylic_Acid_Derivatives-_Nucleophilic_Acyl_Substitution_Reactions/21.02%3A_Nucleophilic_Acyl_Substitution_Reactions",
+   "snapshot": "rk-lt_carbonylrx.txt",
+   "fetched": true,
+   "says": "Acid halides and anhydrides are most reactive derivatives, amides least; reactivity follows leaving-group ability (conjugate-acid pKa) and carbonyl stabilization by the Y group (the ranking scheme itself is an image, not captured in text)."
+  },
+  "wiki_carbonyl": {
+   "cite": "Wikipedia, 'Carbonyl group' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Carbonyl_group",
+   "snapshot": "rk-wiki_carbonyl.txt",
+   "fetched": true,
+   "says": "Qualitative electrophilicity order RCHO > R2CO > RCO2R' > RCONH2.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_hydrate": {
+   "cite": "Wikipedia, 'Geminal diol' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Geminal_diol",
+   "snapshot": "rk-wiki_hydrate.txt",
+   "fetched": true,
+   "says": "Hydration equilibrium constants: acetone ~1e-3, formaldehyde ~1e3, hexafluoroacetone ~1e6.",
+   "last_resort_wikipedia": true
+  },
+  "pmc_nitration": {
+   "cite": "ACS Omega 2022, 7, 8199 (PMC8928515) Table 3: relative nitration rate constants, via PMC",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8928515/table/tbl3",
+   "snapshot": "rk-pmc_nitration.txt",
+   "fetched": true,
+   "says": "log k_rel for nitration (benzene = 0): tBu-benzene 1.29, o-xylene 2.28, mesitylene 2.98, 1,2,3,4-tetramethylbenzene 3.33, fluorobenzene -0.92, iodobenzene -1.00, chlorobenzene -1.52, bromobenzene -1.52."
+  },
+  "wiki_hammett": {
+   "cite": "Wikipedia, 'Hammett equation' substituent-constant table (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Hammett_equation",
+   "snapshot": "rk-wiki_hammett.txt",
+   "fetched": true,
+   "says": "sigma_para / sigma_meta: NMe2 -0.83/-0.211, NH2 -0.66/-0.161, NHBu -0.51/-0.34, OH -0.37/+0.12, F +0.062/+0.337, Cl +0.227/+0.373, Br +0.232/+0.393, CF3 +0.54/+0.43.",
+   "last_resort_wikipedia": true
+  }
+ },
+ "cases": [
+  {
+   "id": "RK-01",
+   "category": "acid-base",
+   "title": "Carboxylic acids: halogenation lowers pKa",
+   "source_ids": [
+    "pc_pka",
+    "pka_pka-compilation-williams"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Aqueous 25 C values; values for TFA vary 0.2-0.5 between compilations but order is unaffected.",
+   "mode_id": "acidity",
+   "smiles": [
+    "OC(=O)C(F)(F)F",
+    "OC(=O)CCl",
+    "OC=O",
+    "CC(=O)O"
+   ],
+   "expected_order": [
+    [
+     "OC(=O)C(F)(F)F"
+    ],
+    [
+     "OC(=O)CCl"
+    ],
+    [
+     "OC=O"
+    ],
+    [
+     "CC(=O)O"
+    ]
+   ],
+   "basis": "aqueous pKa values (PubChem experimental: TFA 0.3, ClCH2CO2H 2.87, HCO2H 3.742, AcOH 4.756; Williams table formic 3.77)",
+   "values": {
+    "OC(=O)C(F)(F)F": 0.3,
+    "OC(=O)CCl": 2.87,
+    "OC=O": 3.742,
+    "CC(=O)O": 4.756
+   },
+   "tie_tolerance_note": "Lowest pKa = most acidic = ranked first.",
+   "case_type": []
+  },
+  {
+   "id": "RK-02",
+   "category": "acid-base",
+   "title": "Thiols versus alcohols versus phenol: S-H is the more acidic despite lower electronegativity",
+   "source_ids": [
+    "pc_pka2",
+    "pc_pka"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Phenol (9.99) and ethanethiol (10.61) differ by only 0.6 pKa units; both literature values are aqueous 25 C. Order of S-H vs O-H acids is solvent-dependent in non-aqueous media.",
+   "mode_id": "acidity",
+   "smiles": [
+    "Sc1ccccc1",
+    "Oc1ccccc1",
+    "CCS",
+    "CC(C)O"
+   ],
+   "expected_order": [
+    [
+     "Sc1ccccc1"
+    ],
+    [
+     "Oc1ccccc1"
+    ],
+    [
+     "CCS"
+    ],
+    [
+     "CC(C)O"
+    ]
+   ],
+   "basis": "aqueous pKa: benzenethiol 6.62, phenol 9.99, ethanethiol 10.61, 2-propanol 17.1 (PubChem experimental)",
+   "values": {
+    "Sc1ccccc1": 6.62,
+    "Oc1ccccc1": 9.99,
+    "CCS": 10.61,
+    "CC(C)O": 17.1
+   },
+   "tie_tolerance_note": "No ties; phenol/ethanethiol are the closest pair.",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-03",
+   "category": "acid-base",
+   "title": "Para-substituted phenols with a near-tied electron-donor pair",
+   "source_ids": [
+    "pc_pka",
+    "pc_pka2",
+    "pka_pka-compilation-williams"
+   ],
+   "evidence": "verified",
+   "uncertainty": "4-methoxyphenol (10.05-10.16) and 4-methylphenol (10.26) differ by 0.1-0.2 pKa units, within inter-laboratory scatter; they are therefore grouped as a tie.",
+   "mode_id": "acidity",
+   "smiles": [
+    "O=[N+]([O-])c1ccc(O)cc1",
+    "Clc1ccc(O)cc1",
+    "Oc1ccccc1",
+    "COc1ccc(O)cc1",
+    "Cc1ccc(O)cc1"
+   ],
+   "expected_order": [
+    [
+     "O=[N+]([O-])c1ccc(O)cc1"
+    ],
+    [
+     "Clc1ccc(O)cc1"
+    ],
+    [
+     "Oc1ccccc1"
+    ],
+    [
+     "COc1ccc(O)cc1",
+     "Cc1ccc(O)cc1"
+    ]
+   ],
+   "basis": "aqueous pKa: 4-nitrophenol 7.15, 4-chlorophenol 9.41, phenol 9.99, 4-methoxyphenol 10.05 (Williams: 10.16), 4-methylphenol 10.26",
+   "values": {
+    "O=[N+]([O-])c1ccc(O)cc1": 7.15,
+    "Clc1ccc(O)cc1": 9.41,
+    "Oc1ccccc1": 9.99,
+    "COc1ccc(O)cc1": 10.05,
+    "Cc1ccc(O)cc1": 10.26
+   },
+   "tie_tolerance_note": "Treat |delta pKa| < 0.3 as a tie.",
+   "case_type": [
+    "near_tie"
+   ]
+  },
+  {
+   "id": "RK-04",
+   "category": "acid-base",
+   "title": "C-H acids with two carbonyl/nitro activators versus an alcohol and a ketone",
+   "source_ids": [
+    "pc_pka",
+    "pc_pka2",
+    "pka_pka-compilation-williams"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Aqueous scale only. In DMSO the relative acidity of alcohols and simple ketones changes and C-H/O-H ordering is solvent-dependent; acetone pKa is ~19-20 depending on compilation.",
+   "mode_id": "acidity",
+   "smiles": [
+    "CC(=O)CC(C)=O",
+    "C[N+](=O)[O-]",
+    "CC(C)O",
+    "CC(C)=O"
+   ],
+   "expected_order": [
+    [
+     "CC(=O)CC(C)=O"
+    ],
+    [
+     "C[N+](=O)[O-]"
+    ],
+    [
+     "CC(C)O"
+    ],
+    [
+     "CC(C)=O"
+    ]
+   ],
+   "basis": "aqueous pKa: acetylacetone 8.93, nitromethane 10.21, 2-propanol 17.1, acetone ~20",
+   "values": {
+    "CC(=O)CC(C)=O": 8.93,
+    "C[N+](=O)[O-]": 10.21,
+    "CC(C)O": 17.1,
+    "CC(C)=O": 20
+   },
+   "tie_tolerance_note": "Spacing is >1 pKa unit between every adjacent pair.",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-05",
+   "category": "acid-base",
+   "title": "Amines and heteroaromatic amines by conjugate-acid pKa",
+   "source_ids": [
+    "pc_pka",
+    "pc_pka2",
+    "pka_pka-compilation-williams"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Aqueous values. Ammonia value derived as 14 - pKb.",
+   "mode_id": "basicity",
+   "smiles": [
+    "C1CCNCC1",
+    "N",
+    "c1ccncc1",
+    "Nc1ccccc1"
+   ],
+   "expected_order": [
+    [
+     "C1CCNCC1"
+    ],
+    [
+     "N"
+    ],
+    [
+     "c1ccncc1"
+    ],
+    [
+     "Nc1ccccc1"
+    ]
+   ],
+   "basis": "pKaH: piperidine 11.12 (Williams 11.22), ammonia ~9.25 (from pKb 4.751; Williams 9.21), pyridine 5.23, aniline 4.6",
+   "values": {
+    "C1CCNCC1": 11.12,
+    "N": 9.25,
+    "c1ccncc1": 5.23,
+    "Nc1ccccc1": 4.6
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-06",
+   "category": "acid-base",
+   "title": "Nitrogen lone pair availability: alkylamine > imidazole > nitroaniline > pyrrole",
+   "source_ids": [
+    "pc_pka",
+    "pc_pka2",
+    "pka_pka-compilation-williams"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Pyrrole is protonated at carbon, not nitrogen; its conjugate-acid pKa -3.8 refers to that species.",
+   "mode_id": "basicity",
+   "smiles": [
+    "NC1CCCCC1",
+    "c1c[nH]cn1",
+    "Nc1ccc([N+](=O)[O-])cc1",
+    "c1cc[nH]c1"
+   ],
+   "expected_order": [
+    [
+     "NC1CCCCC1"
+    ],
+    [
+     "c1c[nH]cn1"
+    ],
+    [
+     "Nc1ccc([N+](=O)[O-])cc1"
+    ],
+    [
+     "c1cc[nH]c1"
+    ]
+   ],
+   "basis": "pKaH: cyclohexylamine 10.63, imidazole 6.95, 4-nitroaniline 1.01, pyrrole -3.80 (protonation on carbon)",
+   "values": {
+    "NC1CCCCC1": 10.63,
+    "c1c[nH]cn1": 6.95,
+    "Nc1ccc([N+](=O)[O-])cc1": 1.01,
+    "c1cc[nH]c1": -3.8
+   },
+   "tie_tolerance_note": "",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-07",
+   "category": "acid-base",
+   "title": "Primary/secondary/tertiary ethylamines: aqueous order is not monotonic",
+   "source_ids": [
+    "pc_pka2"
+   ],
+   "evidence": "verified",
+   "uncertainty": "PubChem lists two values each for ethylamine (10.7, 10.87) and triethylamine (10.78, 10.9) so their order is not resolved; only diethylamine as highest is clear. Solvent-dependent: gas-phase and water orders differ.",
+   "mode_id": "basicity",
+   "smiles": [
+    "CCNCC",
+    "CCN(CC)CC",
+    "CCN"
+   ],
+   "expected_order": [
+    [
+     "CCNCC"
+    ],
+    [
+     "CCN(CC)CC",
+     "CCN"
+    ]
+   ],
+   "basis": "aqueous pKaH: diethylamine 11.09, triethylamine 10.78 (also 10.9), ethylamine 10.7 and 10.87",
+   "values": {
+    "CCNCC": 11.09,
+    "CCN(CC)CC": 10.78,
+    "CCN": 10.7
+   },
+   "tie_tolerance_note": "Triethylamine and ethylamine are within 0.2 pKa units: tie.",
+   "case_type": [
+    "near_tie"
+   ]
+  },
+  {
+   "id": "RK-08",
+   "category": "stability",
+   "title": "Conjugate-base stability follows the pKa of the acid",
+   "source_ids": [
+    "pc_pka",
+    "pc_pka2"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Uses pKa as the experimental proxy for conjugate-base stability (aqueous).",
+   "mode_id": "conjugateBaseStability",
+   "smiles": [
+    "CC(=O)O",
+    "O=[N+]([O-])c1ccc(O)cc1",
+    "Oc1ccccc1",
+    "CC(C)O"
+   ],
+   "expected_order": [
+    [
+     "CC(=O)O"
+    ],
+    [
+     "O=[N+]([O-])c1ccc(O)cc1"
+    ],
+    [
+     "Oc1ccccc1"
+    ],
+    [
+     "CC(C)O"
+    ]
+   ],
+   "basis": "aqueous pKa of the strongest acidic site: acetic acid 4.756, 4-nitrophenol 7.15, phenol 9.99, 2-propanol 17.1",
+   "values": {
+    "CC(=O)O": 4.756,
+    "O=[N+]([O-])c1ccc(O)cc1": 7.15,
+    "Oc1ccccc1": 9.99,
+    "CC(C)O": 17.1
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-09",
+   "category": "stability",
+   "title": "Alkyl carbocation stability via hydride ion affinity of the parent hydrocarbons",
+   "source_ids": [
+    "wiki_carbenium"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Molecules are the neutral hydrocarbons; the tertiary C-H of isobutane gives tBu+, propane's secondary site gives iPr+. Gas-phase values, not solution.",
+   "mode_id": "cationStability",
+   "smiles": [
+    "CC(C)C",
+    "CCC",
+    "CC",
+    "C"
+   ],
+   "expected_order": [
+    [
+     "CC(C)C"
+    ],
+    [
+     "CCC"
+    ],
+    [
+     "CC"
+    ],
+    [
+     "C"
+    ]
+   ],
+   "basis": "gas-phase hydride ion affinities (kcal/mol) of tBu+, iPr+, Et+, CH3+ (lower HIA = more stable cation)",
+   "values": {
+    "CC(C)C": 231,
+    "CCC": 246,
+    "CC": 273,
+    "C": 312
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-10",
+   "category": "stability",
+   "title": "Alkyl radical stability from C-H bond dissociation energies",
+   "source_ids": [
+    "wiki_bde"
+   ],
+   "evidence": "verified",
+   "uncertainty": "BDE values are +-1-2 kcal/mol; adjacent spacings (2-3.5 kcal/mol) exceed that.",
+   "mode_id": "radicalStability",
+   "smiles": [
+    "CC(C)C",
+    "CCC",
+    "CC",
+    "C"
+   ],
+   "expected_order": [
+    [
+     "CC(C)C"
+    ],
+    [
+     "CCC"
+    ],
+    [
+     "CC"
+    ],
+    [
+     "C"
+    ]
+   ],
+   "basis": "C-H BDE (kcal/mol): t-butyl 96.5, isopropyl 99, ethyl 101, methyl 105 (lower BDE = more stable radical)",
+   "values": {
+    "CC(C)C": 96.5,
+    "CCC": 99,
+    "CC": 101,
+    "C": 105
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-11",
+   "category": "stability",
+   "title": "Allylic and heteroatom-stabilized radicals versus ketone alpha and vinyl",
+   "source_ids": [
+    "wiki_bde"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Table rows are model C-H bonds; trimethylamine is matched to the (CH3)2NCH2-H row and THF to the ether row. Propene/trimethylamine/THF differ by only 1-2 kcal/mol, within BDE uncertainty, so their relative order is the weakest part of this case.",
+   "mode_id": "radicalStability",
+   "smiles": [
+    "C=CC",
+    "CN(C)C",
+    "C1CCOC1",
+    "CC(C)=O",
+    "C=C"
+   ],
+   "expected_order": [
+    [
+     "C=CC"
+    ],
+    [
+     "CN(C)C"
+    ],
+    [
+     "C1CCOC1"
+    ],
+    [
+     "CC(C)=O"
+    ],
+    [
+     "C=C"
+    ]
+   ],
+   "basis": "C-H BDE (kcal/mol): allylic 89, alpha-to-amine ((CH3)2N-CH2-H) 91, alpha-to-ether 92, alpha-to-ketone 96, vinyl 111",
+   "values": {
+    "C=CC": 89,
+    "CN(C)C": 91,
+    "C1CCOC1": 92,
+    "CC(C)=O": 96,
+    "C=C": 111
+   },
+   "tie_tolerance_note": "89/91/92 kcal/mol are within quoted +-1-2 error; consider tolerance of 2 kcal/mol.",
+   "case_type": [
+    "near_tie"
+   ]
+  },
+  {
+   "id": "RK-12",
+   "category": "stability",
+   "title": "Alkene stability by heat of hydrogenation: substitution",
+   "source_ids": [
+    "lt_alkstab"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "mode_id": "alkeneStability",
+   "smiles": [
+    "CC=C(C)C",
+    "C/C=C/C",
+    "C=CC",
+    "C=C"
+   ],
+   "expected_order": [
+    [
+     "CC=C(C)C"
+    ],
+    [
+     "C/C=C/C"
+    ],
+    [
+     "C=CC"
+    ],
+    [
+     "C=C"
+    ]
+   ],
+   "basis": "heats of hydrogenation (kJ/mol): 2-methyl-2-butene -112, trans-2-butene -115, propene -125, ethylene -136 (less exothermic = more stable)",
+   "values": {
+    "CC=C(C)C": -112,
+    "C/C=C/C": -115,
+    "C=CC": -125,
+    "C=C": -136
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-13",
+   "category": "stability",
+   "title": "Cis versus trans disubstituted alkenes are not equally stable",
+   "source_ids": [
+    "lt_alkstab"
+   ],
+   "evidence": "verified",
+   "uncertainty": "cis/trans gap is 4 kJ/mol (equilibrium data give 2.8 kJ/mol); direction is unambiguous.",
+   "mode_id": "alkeneStability",
+   "smiles": [
+    "C/C=C/C",
+    "C/C=C\\C",
+    "C=CC"
+   ],
+   "expected_order": [
+    [
+     "C/C=C/C"
+    ],
+    [
+     "C/C=C\\C"
+    ],
+    [
+     "C=CC"
+    ]
+   ],
+   "basis": "heats of hydrogenation (kJ/mol): trans-2-butene -115, cis-2-butene -119, propene -125",
+   "values": {
+    "C/C=C/C": -115,
+    "C/C=C\\C": -119,
+    "C=CC": -125
+   },
+   "tie_tolerance_note": "A tool that scores only substitution count will tie cis and trans.",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-14",
+   "category": "substitution",
+   "title": "SN2 substrate steric order with the same leaving group",
+   "source_ids": [
+    "os_sn2"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source states the order for halides generally and gives no numeric rates for these iodides.",
+   "mode_id": "sn2Reactivity",
+   "smiles": [
+    "CI",
+    "CCI",
+    "CC(C)I",
+    "CC(C)(C)I"
+   ],
+   "expected_order": [
+    [
+     "CI"
+    ],
+    [
+     "CCI"
+    ],
+    [
+     "CC(C)I"
+    ],
+    [
+     "CC(C)(C)I"
+    ]
+   ],
+   "basis": "textbook SN2 steric order methyl > primary > secondary >> tertiary (tertiary effectively unreactive)",
+   "values": {
+    "CI": null,
+    "CCI": null,
+    "CC(C)I": null,
+    "CC(C)(C)I": null
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-15",
+   "category": "substitution",
+   "title": "SN1 reactivity follows carbocation stability",
+   "source_ids": [
+    "os_sn1"
+   ],
+   "evidence": "verified",
+   "uncertainty": "No numeric rates in the fetched text; chlorides used (source discusses halides generally).",
+   "mode_id": "sn1Reactivity",
+   "smiles": [
+    "CC(C)(C)Cl",
+    "CC(C)Cl",
+    "CCCl",
+    "CCl"
+   ],
+   "expected_order": [
+    [
+     "CC(C)(C)Cl"
+    ],
+    [
+     "CC(C)Cl"
+    ],
+    [
+     "CCCl"
+    ],
+    [
+     "CCl"
+    ]
+   ],
+   "basis": "carbocation stability 3 > 2 > 1 > methyl equals SN1 reactivity order for halides",
+   "values": {
+    "CC(C)(C)Cl": null,
+    "CC(C)Cl": null,
+    "CCCl": null,
+    "CCl": null
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-16",
+   "category": "substitution",
+   "title": "Allylic chlorides: both isomers ionize to the same allylic cation",
+   "source_ids": [
+    "os_sn1"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "The source states the tie for the bromides and a stability equivalence in general terms; transferred here to chlorides. Magnitude of the gap to isopropyl chloride is not given.",
+   "mode_id": "sn1Reactivity",
+   "smiles": [
+    "C=CC(C)Cl",
+    "CC=CCCl",
+    "CC(C)Cl",
+    "CCCl"
+   ],
+   "expected_order": [
+    [
+     "C=CC(C)Cl",
+     "CC=CCCl"
+    ],
+    [
+     "CC(C)Cl"
+    ],
+    [
+     "CCCl"
+    ]
+   ],
+   "basis": "3-halo-1-butene and 1-halo-2-butene undergo SN1 at nearly the same rate (same 1-methylallyl cation); a secondary allylic cation is about as stable as a tertiary alkyl one, so both exceed isopropyl and ethyl",
+   "values": {
+    "C=CC(C)Cl": null,
+    "CC=CCCl": null,
+    "CC(C)Cl": null,
+    "CCCl": null
+   },
+   "tie_tolerance_note": "The two allylic chlorides give the same cation and should tie.",
+   "case_type": [
+    "near_tie"
+   ]
+  },
+  {
+   "id": "RK-17",
+   "category": "substitution",
+   "title": "Methyl electrophiles: chloride, iodide, tosylate, triflate",
+   "source_ids": [
+    "wiki_lg"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source is Wikipedia and the cited study has a 'citation needed' flag; the study's substrate is not stated, so the methyl substrates here are an assumption. The order Cl < I < OTs < OTf itself is textbook-consistent.",
+   "mode_id": "leavingGroupAbility",
+   "smiles": [
+    "COS(=O)(=O)C(F)(F)F",
+    "COS(=O)(=O)c1ccc(C)cc1",
+    "CI",
+    "CCl"
+   ],
+   "expected_order": [
+    [
+     "COS(=O)(=O)C(F)(F)F"
+    ],
+    [
+     "COS(=O)(=O)c1ccc(C)cc1"
+    ],
+    [
+     "CI"
+    ],
+    [
+     "CCl"
+    ]
+   ],
+   "basis": "relative rates for leaving groups (chloride = 1): iodide 91, tosylate 3.7e4, triflate 1.4e8",
+   "values": {
+    "COS(=O)(=O)C(F)(F)F": 140000000,
+    "COS(=O)(=O)c1ccc(C)cc1": 37000,
+    "CI": 91,
+    "CCl": 1
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-18",
+   "category": "substitution",
+   "title": "Condition-dependent: tosylate versus halides",
+   "source_ids": [
+    "wiki_lg"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Tosylate is slower than iodide with a soft thiolate nucleophile (0.44 vs 3.5) but faster than iodide with ethoxide (3.6 vs 1.9). The honest answer for tosylate is 'condition dependent'; only I > Cl is solvent- and nucleophile-independent. Source does not state the substrate; ethyl assumed. expected_order lists only the robust part; the tosylate placement should be reported as unranked/condition dependent.",
+   "mode_id": "leavingGroupAbility",
+   "smiles": [
+    "CCI",
+    "CCCl",
+    "CCOS(=O)(=O)c1ccc(C)cc1"
+   ],
+   "expected_order": [
+    [
+     "CCI"
+    ],
+    [
+     "CCCl"
+    ]
+   ],
+   "basis": "relative rates k(X)/k(Br) in two SN2 reactions: I 3.5/1.9, Cl 0.0074/0.0024, OTs 0.44/3.6",
+   "values": {
+    "CCI": 3.5,
+    "CCCl": 0.0074,
+    "CCOS(=O)(=O)c1ccc(C)cc1": 0.44
+   },
+   "tie_tolerance_note": "Tool may place tosylate anywhere; do not score its position.",
+   "case_type": [
+    "condition_dependent"
+   ]
+  },
+  {
+   "id": "RK-19",
+   "category": "substitution",
+   "title": "Anionic nucleophiles toward CH3Br",
+   "source_ids": [
+    "os_sn2"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Table is for the textbook's (protic/polar) conditions; in polar aprotic solvents the halide order inverts and OH- exceeds I-.",
+   "mode_id": "nucleophilicity",
+   "smiles": [
+    "[I-]",
+    "[OH-]",
+    "[Cl-]",
+    "CC(=O)[O-]",
+    "O"
+   ],
+   "expected_order": [
+    [
+     "[I-]"
+    ],
+    [
+     "[OH-]"
+    ],
+    [
+     "[Cl-]"
+    ],
+    [
+     "CC(=O)[O-]"
+    ],
+    [
+     "O"
+    ]
+   ],
+   "basis": "relative SN2 rates with bromomethane: I- 100000, HO- 10000, Cl- 1000, AcO- 500, H2O 1",
+   "values": {
+    "[I-]": 100000,
+    "[OH-]": 10000,
+    "[Cl-]": 1000,
+    "CC(=O)[O-]": 500,
+    "O": 1
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-20",
+   "category": "substitution",
+   "title": "A neutral nucleophile beats a charged one: ammonia versus acetate",
+   "source_ids": [
+    "os_sn2"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Gaps between 1000/700/500 are small (about 1.4x each) and conditions (solvent) are not specified beyond the table; treat NH3 vs acetate as the least robust pair.",
+   "mode_id": "nucleophilicity",
+   "smiles": [
+    "[Cl-]",
+    "N",
+    "CC(=O)[O-]",
+    "O"
+   ],
+   "expected_order": [
+    [
+     "[Cl-]"
+    ],
+    [
+     "N"
+    ],
+    [
+     "CC(=O)[O-]"
+    ],
+    [
+     "O"
+    ]
+   ],
+   "basis": "relative SN2 rates with bromomethane: Cl- 1000, NH3 700, acetate 500, H2O 1",
+   "values": {
+    "[Cl-]": 1000,
+    "N": 700,
+    "CC(=O)[O-]": 500,
+    "O": 1
+   },
+   "tie_tolerance_note": "A rule 'anion > neutral' wrongly puts acetate above ammonia.",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-21",
+   "category": "substitution",
+   "title": "Cyanide and hydrosulfide tie at the top of the table",
+   "source_ids": [
+    "os_sn2"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Table rounds values; I- (1.0e5) is within 25% of CN-/HS- (1.25e5). Solvent-dependent (aprotic solvents change the halide/hydroxide order).",
+   "mode_id": "nucleophilicity",
+   "smiles": [
+    "[C-]#N",
+    "[SH-]",
+    "[I-]",
+    "[OH-]"
+   ],
+   "expected_order": [
+    [
+     "[C-]#N",
+     "[SH-]"
+    ],
+    [
+     "[I-]"
+    ],
+    [
+     "[OH-]"
+    ]
+   ],
+   "basis": "relative SN2 rates with bromomethane: CN- 125000, HS- 125000, I- 100000, HO- 10000",
+   "values": {
+    "[C-]#N": 125000,
+    "[SH-]": 125000,
+    "[I-]": 100000,
+    "[OH-]": 10000
+   },
+   "tie_tolerance_note": "CN- and HS- are equal in the source; I- within 25% should be treated as a near-tie with them.",
+   "case_type": [
+    "near_tie"
+   ]
+  },
+  {
+   "id": "RK-22",
+   "category": "carbonyl",
+   "title": "Acyl-substitution reactivity: acid chloride > anhydride > ester > amide",
+   "source_ids": [
+    "lt_carbonylrx"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "The fetched text states acid halides/anhydrides are most reactive and amides least, and explains the pKa/resonance criteria, but the full ranking scheme is an image not captured as text; acid chloride vs anhydride and anhydride vs ester rest on the standard textbook scheme.",
+   "mode_id": "carbonylReactivity",
+   "smiles": [
+    "CCC(=O)Cl",
+    "CC(=O)OC(C)=O",
+    "CCOC(C)=O",
+    "CC(N)=O"
+   ],
+   "expected_order": [
+    [
+     "CCC(=O)Cl"
+    ],
+    [
+     "CC(=O)OC(C)=O"
+    ],
+    [
+     "CCOC(C)=O"
+    ],
+    [
+     "CC(N)=O"
+    ]
+   ],
+   "basis": "standard ordering of carboxylic acid derivatives by leaving-group ability (conjugate-acid pKa) and carbonyl stabilization",
+   "values": {
+    "CCC(=O)Cl": null,
+    "CC(=O)OC(C)=O": null,
+    "CCOC(C)=O": null,
+    "CC(N)=O": null
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-23",
+   "category": "carbonyl",
+   "title": "Carbonyl electrophilicity: hexafluoroacetone far above acetone, then ester and amide",
+   "source_ids": [
+    "wiki_hydrate",
+    "wiki_carbonyl"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Hydration K is a thermodynamic proxy for electrophilicity; ester vs amide ranking is qualitative.",
+   "mode_id": "carbonylReactivity",
+   "smiles": [
+    "FC(F)(F)C(=O)C(F)(F)F",
+    "CC(C)=O",
+    "CCOC(C)=O",
+    "CC(N)=O"
+   ],
+   "expected_order": [
+    [
+     "FC(F)(F)C(=O)C(F)(F)F"
+    ],
+    [
+     "CC(C)=O"
+    ],
+    [
+     "CCOC(C)=O"
+    ],
+    [
+     "CC(N)=O"
+    ]
+   ],
+   "basis": "hydration equilibrium constants: hexafluoroacetone ~1e6, acetone ~1e-3; ketone > ester > amide electrophilicity (qualitative)",
+   "values": {
+    "FC(F)(F)C(=O)C(F)(F)F": 1000000,
+    "CC(C)=O": 0.001,
+    "CCOC(C)=O": null,
+    "CC(N)=O": null
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-24",
+   "category": "aromatic",
+   "title": "Halobenzenes nitration: fluorine is the least deactivating; chloro and bromo tie",
+   "source_ids": [
+    "pmc_nitration"
+   ],
+   "evidence": "verified",
+   "uncertainty": "F and I differ by only 0.08 log units (a 20% rate difference), so that pair is close; nitration rates may not transfer to other electrophiles.",
+   "mode_id": "easReactivity",
+   "smiles": [
+    "Fc1ccccc1",
+    "Ic1ccccc1",
+    "Clc1ccccc1",
+    "Brc1ccccc1"
+   ],
+   "expected_order": [
+    [
+     "Fc1ccccc1"
+    ],
+    [
+     "Ic1ccccc1"
+    ],
+    [
+     "Clc1ccccc1",
+     "Brc1ccccc1"
+    ]
+   ],
+   "basis": "log k_rel (nitration, benzene = 0): F -0.92, I -1.00, Cl -1.52, Br -1.52",
+   "values": {
+    "Fc1ccccc1": -0.92,
+    "Ic1ccccc1": -1,
+    "Clc1ccccc1": -1.52,
+    "Brc1ccccc1": -1.52
+   },
+   "tie_tolerance_note": "Cl and Br are equal (-1.52).",
+   "case_type": [
+    "naive_wrong",
+    "tie"
+   ]
+  },
+  {
+   "id": "RK-25",
+   "category": "aromatic",
+   "title": "Alkylbenzenes activate by degree of methylation; fluorobenzene deactivates",
+   "source_ids": [
+    "pmc_nitration"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "mode_id": "easReactivity",
+   "smiles": [
+    "Cc1ccc(C)c(C)c1C",
+    "Cc1cc(C)cc(C)c1",
+    "Cc1ccccc1C",
+    "CC(C)(C)c1ccccc1",
+    "Fc1ccccc1"
+   ],
+   "expected_order": [
+    [
+     "Cc1ccc(C)c(C)c1C"
+    ],
+    [
+     "Cc1cc(C)cc(C)c1"
+    ],
+    [
+     "Cc1ccccc1C"
+    ],
+    [
+     "CC(C)(C)c1ccccc1"
+    ],
+    [
+     "Fc1ccccc1"
+    ]
+   ],
+   "basis": "log k_rel (nitration, benzene = 0): 1,2,3,4-tetramethylbenzene 3.33, mesitylene 2.98, o-xylene 2.28, tert-butylbenzene 1.29, fluorobenzene -0.92",
+   "values": {
+    "Cc1ccc(C)c(C)c1C": 3.33,
+    "Cc1cc(C)cc(C)c1": 2.98,
+    "Cc1ccccc1C": 2.28,
+    "CC(C)(C)c1ccccc1": 1.29,
+    "Fc1ccccc1": -0.92
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-26",
+   "category": "electronic",
+   "title": "Hammett sigma-para of electron-withdrawing substituents",
+   "source_ids": [
+    "wiki_hammett"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Cl and Br differ by 0.005 (a tie); sigma_meta order is CF3 0.43 > Br 0.393 > Cl 0.373 > F 0.337, which separates them slightly, so only the tie-tolerant reading is safe.",
+   "mode_id": "ewgStrength",
+   "smiles": [
+    "FC(F)(F)c1ccccc1",
+    "Clc1ccccc1",
+    "Brc1ccccc1",
+    "Fc1ccccc1"
+   ],
+   "expected_order": [
+    [
+     "FC(F)(F)c1ccccc1"
+    ],
+    [
+     "Clc1ccccc1",
+     "Brc1ccccc1"
+    ],
+    [
+     "Fc1ccccc1"
+    ]
+   ],
+   "basis": "sigma_para: CF3 +0.54, Br +0.232, Cl +0.227, F +0.062",
+   "values": {
+    "FC(F)(F)c1ccccc1": 0.54,
+    "Clc1ccccc1": 0.227,
+    "Brc1ccccc1": 0.232,
+    "Fc1ccccc1": 0.062
+   },
+   "tie_tolerance_note": "Cl/Br tie.",
+   "case_type": [
+    "near_tie"
+   ]
+  },
+  {
+   "id": "RK-27",
+   "category": "electronic",
+   "title": "Hammett sigma-para of electron-donating substituents (more negative = stronger donor)",
+   "source_ids": [
+    "wiki_hammett"
+   ],
+   "evidence": "verified",
+   "uncertainty": "N-butylaniline is matched to the 'butylamino' table row.",
+   "mode_id": "edgStrength",
+   "smiles": [
+    "CN(C)c1ccccc1",
+    "Nc1ccccc1",
+    "CCCCNc1ccccc1",
+    "Oc1ccccc1"
+   ],
+   "expected_order": [
+    [
+     "CN(C)c1ccccc1"
+    ],
+    [
+     "Nc1ccccc1"
+    ],
+    [
+     "CCCCNc1ccccc1"
+    ],
+    [
+     "Oc1ccccc1"
+    ]
+   ],
+   "basis": "sigma_para: NMe2 -0.83, NH2 -0.66, NHBu -0.51, OH -0.37",
+   "values": {
+    "CN(C)c1ccccc1": -0.83,
+    "Nc1ccccc1": -0.66,
+    "CCCCNc1ccccc1": -0.51,
+    "Oc1ccccc1": -0.37
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-28",
+   "category": "physical",
+   "title": "Hydrogen bonding versus dipole versus dispersion at similar size",
+   "source_ids": [
+    "pc_bp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "mode_id": "boilingPoint",
+   "smiles": [
+    "CCCCO",
+    "CCCC=O",
+    "CCCC"
+   ],
+   "expected_order": [
+    [
+     "CCCCO"
+    ],
+    [
+     "CCCC=O"
+    ],
+    [
+     "CCCC"
+    ]
+   ],
+   "basis": "normal boiling points (C): 1-butanol 117.7, butanal 74.8, butane -0.5",
+   "values": {
+    "CCCCO": 117.7,
+    "CCCC=O": 74.8,
+    "CCCC": -0.5
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-29",
+   "category": "physical",
+   "title": "Chain branching lowers boiling point among C5H12 isomers",
+   "source_ids": [
+    "pc_bp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "A size-only (same formula) boiling-point score will tie these three.",
+   "mode_id": "boilingPoint",
+   "smiles": [
+    "CCCCC",
+    "CCC(C)C",
+    "CC(C)(C)C"
+   ],
+   "expected_order": [
+    [
+     "CCCCC"
+    ],
+    [
+     "CCC(C)C"
+    ],
+    [
+     "CC(C)(C)C"
+    ]
+   ],
+   "basis": "normal boiling points (C): pentane 36.06, isopentane 27.83, neopentane 9.5",
+   "values": {
+    "CCCCC": 36.06,
+    "CCC(C)C": 27.83,
+    "CC(C)(C)C": 9.5
+   },
+   "tie_tolerance_note": "Score differences are real (8 and 18 C).",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-30",
+   "category": "physical",
+   "title": "Lighter hydrogen-bonded alcohol outboils heavier alkane and ether",
+   "source_ids": [
+    "pc_bp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Molecular weights run 86 (hexane) > 74 (ether) > 60 (propanol) > 58 (acetone), the opposite of the boiling-point order for propanol/ether.",
+   "mode_id": "boilingPoint",
+   "smiles": [
+    "CCCO",
+    "CCCCCC",
+    "CC(C)=O",
+    "CCOCC"
+   ],
+   "expected_order": [
+    [
+     "CCCO"
+    ],
+    [
+     "CCCCCC"
+    ],
+    [
+     "CC(C)=O"
+    ],
+    [
+     "CCOCC"
+    ]
+   ],
+   "basis": "normal boiling points (C): 1-propanol 97.2, hexane 68.73, acetone 56.08, diethyl ether 34.6",
+   "values": {
+    "CCCO": 97.2,
+    "CCCCCC": 68.73,
+    "CC(C)=O": 56.08,
+    "CCOCC": 34.6
+   },
+   "tie_tolerance_note": "",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-31",
+   "category": "physical",
+   "title": "Amide > carboxylic acid > ester > formate ester",
+   "source_ids": [
+    "pc_bp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "mode_id": "boilingPoint",
+   "smiles": [
+    "CC(N)=O",
+    "CC(=O)O",
+    "CCOC(C)=O",
+    "COC=O"
+   ],
+   "expected_order": [
+    [
+     "CC(N)=O"
+    ],
+    [
+     "CC(=O)O"
+    ],
+    [
+     "CCOC(C)=O"
+    ],
+    [
+     "COC=O"
+    ]
+   ],
+   "basis": "normal boiling points (C): acetamide 222, acetic acid 117.9, ethyl acetate 77.1, methyl formate 31.5",
+   "values": {
+    "CC(N)=O": 222,
+    "CC(=O)O": 117.9,
+    "CCOC(C)=O": 77.1,
+    "COC=O": 31.5
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-32",
+   "category": "physical",
+   "title": "Near-tie: cis- and trans-2-butene",
+   "source_ids": [
+    "pc_bp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Only 2.9 C between cis and trans (and 1.4 C between trans-2-butene and butane); PubChem's trans-2-butene record lists a first value (3.73) mislabelled as the cis isomer; the trans values used are 0.88/0.9.",
+   "mode_id": "boilingPoint",
+   "smiles": [
+    "C/C=C\\C",
+    "C/C=C/C",
+    "CCCC"
+   ],
+   "expected_order": [
+    [
+     "C/C=C\\C"
+    ],
+    [
+     "C/C=C/C"
+    ],
+    [
+     "CCCC"
+    ]
+   ],
+   "basis": "normal boiling points (C): cis-2-butene 3.73, trans-2-butene 0.88, butane -0.5",
+   "values": {
+    "C/C=C\\C": 3.73,
+    "C/C=C/C": 0.88,
+    "CCCC": -0.5
+   },
+   "tie_tolerance_note": "A tolerance of ~3 C would merge cis-2-butene with trans-2-butene.",
+   "case_type": [
+    "near_tie"
+   ]
+  },
+  {
+   "id": "RK-33",
+   "category": "physical",
+   "title": "Dichlorobenzene isomers: ortho highest, meta/para nearly tied",
+   "source_ids": [
+    "pc_bp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "para and meta differ by 0.9 C (PubChem also lists a range 173-180.5 for para).",
+   "mode_id": "boilingPoint",
+   "smiles": [
+    "Clc1ccccc1Cl",
+    "Clc1ccc(Cl)cc1",
+    "Clc1cccc(Cl)c1"
+   ],
+   "expected_order": [
+    [
+     "Clc1ccccc1Cl"
+    ],
+    [
+     "Clc1ccc(Cl)cc1",
+     "Clc1cccc(Cl)c1"
+    ]
+   ],
+   "basis": "normal boiling points (C): o-dichlorobenzene 180.1, p-dichlorobenzene 173.9, m-dichlorobenzene 173",
+   "values": {
+    "Clc1ccccc1Cl": 180.1,
+    "Clc1ccc(Cl)cc1": 173.9,
+    "Clc1cccc(Cl)c1": 173
+   },
+   "tie_tolerance_note": "m/p tie.",
+   "case_type": [
+    "near_tie"
+   ]
+  },
+  {
+   "id": "RK-34",
+   "category": "physical",
+   "title": "Enantiomers tie; branching and hydrogen bonding order the butanols",
+   "source_ids": [
+    "pc_bp"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "PubChem's bp is for 2-butanol (unspecified/racemic); the identity of enantiomer boiling points is a physical-law inference rather than a quoted value.",
+   "mode_id": "boilingPoint",
+   "smiles": [
+    "CCCCO",
+    "C[C@H](O)CC",
+    "C[C@@H](O)CC",
+    "CC(C)(C)O"
+   ],
+   "expected_order": [
+    [
+     "CCCCO"
+    ],
+    [
+     "C[C@H](O)CC",
+     "C[C@@H](O)CC"
+    ],
+    [
+     "CC(C)(C)O"
+    ]
+   ],
+   "basis": "normal boiling points (C): 1-butanol 117.7, 2-butanol 99.5, tert-butanol 82.3; enantiomers have identical boiling points",
+   "values": {
+    "CCCCO": 117.7,
+    "C[C@H](O)CC": 99.5,
+    "C[C@@H](O)CC": 99.5,
+    "CC(C)(C)O": 82.3
+   },
+   "tie_tolerance_note": "(R)- and (S)-2-butanol must share a group.",
+   "case_type": [
+    "tie"
+   ]
+  },
+  {
+   "id": "RK-35",
+   "category": "physical",
+   "title": "Alkane chain length, ring and iodoalkane",
+   "source_ids": [
+    "pc_bp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Iodomethane (MW 142) boils below hexane (MW 86): heavy-atom mass is not the driver.",
+   "mode_id": "boilingPoint",
+   "smiles": [
+    "CCCCCCC",
+    "C1CCCCC1",
+    "CCCCCC",
+    "CI",
+    "CCCCC"
+   ],
+   "expected_order": [
+    [
+     "CCCCCCC"
+    ],
+    [
+     "C1CCCCC1"
+    ],
+    [
+     "CCCCCC"
+    ],
+    [
+     "CI"
+    ],
+    [
+     "CCCCC"
+    ]
+   ],
+   "basis": "normal boiling points (C): heptane 98.38, cyclohexane 80.7, hexane 68.73, iodomethane 42.5, pentane 36.06",
+   "values": {
+    "CCCCCCC": 98.38,
+    "C1CCCCC1": 80.7,
+    "CCCCCC": 68.73,
+    "CI": 42.5,
+    "CCCCC": 36.06
+   },
+   "tie_tolerance_note": "",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-36",
+   "category": "physical",
+   "title": "Symmetry: para-dichlorobenzene melts far higher than ortho/meta",
+   "source_ids": [
+    "pc_mp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "ortho and meta differ by only ~8 C.",
+   "mode_id": "meltingPoint",
+   "smiles": [
+    "Clc1ccc(Cl)cc1",
+    "Clc1ccccc1Cl",
+    "Clc1cccc(Cl)c1"
+   ],
+   "expected_order": [
+    [
+     "Clc1ccc(Cl)cc1"
+    ],
+    [
+     "Clc1ccccc1Cl"
+    ],
+    [
+     "Clc1cccc(Cl)c1"
+    ]
+   ],
+   "basis": "melting points (C): p 53, o -17, m -24.8",
+   "values": {
+    "Clc1ccc(Cl)cc1": 53,
+    "Clc1ccccc1Cl": -17,
+    "Clc1cccc(Cl)c1": -24.8
+   },
+   "tie_tolerance_note": "Boiling-point order for the same set differs (o > p > m), so a single polarity score cannot satisfy both.",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-37",
+   "category": "physical",
+   "title": "Neopentane (spherical) melts far above its linear and branched isomers",
+   "source_ids": [
+    "pc_mp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Branching lowers the boiling point but raises the melting point only for the highly symmetric isomer; isopentane melts below pentane.",
+   "mode_id": "meltingPoint",
+   "smiles": [
+    "CC(C)(C)C",
+    "CCCCC",
+    "CCC(C)C"
+   ],
+   "expected_order": [
+    [
+     "CC(C)(C)C"
+    ],
+    [
+     "CCCCC"
+    ],
+    [
+     "CCC(C)C"
+    ]
+   ],
+   "basis": "melting points (C): neopentane -16.6, pentane -129.67, isopentane -159.8",
+   "values": {
+    "CC(C)(C)C": -16.6,
+    "CCCCC": -129.67,
+    "CCC(C)C": -159.8
+   },
+   "tie_tolerance_note": "",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-38",
+   "category": "physical",
+   "title": "Water solubility of C4-C6 alcohols and alkanes",
+   "source_ids": [
+    "pc_sol"
+   ],
+   "evidence": "verified",
+   "uncertainty": "tert-butanol is miscible; 1000 g/L is a nominal stand-in.",
+   "mode_id": "solubility",
+   "smiles": [
+    "CC(C)(C)O",
+    "CCCCO",
+    "CCCCC",
+    "CCCCCC"
+   ],
+   "expected_order": [
+    [
+     "CC(C)(C)O"
+    ],
+    [
+     "CCCCO"
+    ],
+    [
+     "CCCCC"
+    ],
+    [
+     "CCCCCC"
+    ]
+   ],
+   "basis": "water solubility (g/L, 25 C): tert-butanol miscible (1000 mg/mL), 1-butanol 68, pentane 0.038, hexane 0.0095",
+   "values": {
+    "CC(C)(C)O": 1000,
+    "CCCCO": 68,
+    "CCCCC": 0.038,
+    "CCCCCC": 0.0095
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-39",
+   "category": "physical",
+   "title": "Two fully miscible liquids tie above ethyl acetate and hexane",
+   "source_ids": [
+    "pc_sol"
+   ],
+   "evidence": "verified",
+   "uncertainty": "'Miscible' values have no numeric g/L (null). Ethyl acetate listed as 64 g/L and 80 g/L in different records (mid-value 70 shown).",
+   "mode_id": "solubility",
+   "smiles": [
+    "CC(=O)O",
+    "CCNCC",
+    "CCOC(C)=O",
+    "CCCCCC"
+   ],
+   "expected_order": [
+    [
+     "CC(=O)O",
+     "CCNCC"
+    ],
+    [
+     "CCOC(C)=O"
+    ],
+    [
+     "CCCCCC"
+    ]
+   ],
+   "basis": "water solubility: acetic acid miscible, diethylamine infinitely soluble, ethyl acetate 64-80 g/L, hexane 9.5 mg/L",
+   "values": {
+    "CC(=O)O": null,
+    "CCNCC": null,
+    "CCOC(C)=O": 70,
+    "CCCCCC": 0.0095
+   },
+   "tie_tolerance_note": "Acetic acid and diethylamine must share the top group.",
+   "case_type": [
+    "tie"
+   ]
+  },
+  {
+   "id": "RK-40",
+   "category": "physical",
+   "title": "Experimental log Kow across alkane, alcohol, ether, ketone and polyol",
+   "source_ids": [
+    "pc_logp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Mode says RDKit logP when available; this ordering uses experimental log Kow, and a Crippen logP may deviate for individual molecules.",
+   "mode_id": "lipophilicity",
+   "smiles": [
+    "CCCCCC",
+    "CCCCCO",
+    "CCOCC",
+    "CC(C)=O",
+    "OCC(O)CO"
+   ],
+   "expected_order": [
+    [
+     "CCCCCC"
+    ],
+    [
+     "CCCCCO"
+    ],
+    [
+     "CCOCC"
+    ],
+    [
+     "CC(C)=O"
+    ],
+    [
+     "OCC(O)CO"
+    ]
+   ],
+   "basis": "experimental log Kow: hexane 3.90, 1-pentanol 1.51, diethyl ether 0.89, acetone -0.24, glycerol -1.76",
+   "values": {
+    "CCCCCC": 3.9,
+    "CCCCCO": 1.51,
+    "CCOCC": 0.89,
+    "CC(C)=O": -0.24,
+    "OCC(O)CO": -1.76
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  },
+  {
+   "id": "RK-41",
+   "category": "physical",
+   "title": "Near-tie: diethyl ether and 1-butanol",
+   "source_ids": [
+    "pc_logp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Ether and butanol differ by 0.01 and the ether value is flagged 'calculated' in one record; ethyl acetate is only 0.15 lower.",
+   "mode_id": "lipophilicity",
+   "smiles": [
+    "CCOCC",
+    "CCCCO",
+    "CCOC(C)=O",
+    "CCCO",
+    "CC(=O)O"
+   ],
+   "expected_order": [
+    [
+     "CCOCC",
+     "CCCCO"
+    ],
+    [
+     "CCOC(C)=O"
+    ],
+    [
+     "CCCO"
+    ],
+    [
+     "CC(=O)O"
+    ]
+   ],
+   "basis": "experimental log Kow: diethyl ether 0.89 (0.89 calculated per PubChem), 1-butanol 0.88, ethyl acetate 0.73, 1-propanol 0.25, acetic acid -0.17",
+   "values": {
+    "CCOCC": 0.89,
+    "CCCCO": 0.88,
+    "CCOC(C)=O": 0.73,
+    "CCCO": 0.25,
+    "CC(=O)O": -0.17
+   },
+   "tie_tolerance_note": "Treat |delta logP| < 0.1 as a tie.",
+   "case_type": [
+    "near_tie"
+   ]
+  },
+  {
+   "id": "RK-42",
+   "category": "physical",
+   "title": "Hexane, cyclohexane and pentane cluster; iodomethane is lower",
+   "source_ids": [
+    "pc_logp"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Cyclohexane (3.44) and pentane (3.39) differ by 0.05, within measurement scatter (PubChem also lists 3.23 for pentane).",
+   "mode_id": "lipophilicity",
+   "smiles": [
+    "CCCCCC",
+    "C1CCCCC1",
+    "CCCCC",
+    "CI"
+   ],
+   "expected_order": [
+    [
+     "CCCCCC"
+    ],
+    [
+     "C1CCCCC1",
+     "CCCCC"
+    ],
+    [
+     "CI"
+    ]
+   ],
+   "basis": "experimental log Kow: hexane 3.90, cyclohexane 3.44, pentane 3.39, iodomethane 1.51",
+   "values": {
+    "CCCCCC": 3.9,
+    "C1CCCCC1": 3.44,
+    "CCCCC": 3.39,
+    "CI": 1.51
+   },
+   "tie_tolerance_note": "Cyclohexane/pentane tie.",
+   "case_type": [
+    "near_tie"
+   ]
+  },
+  {
+   "id": "RK-43",
+   "category": "mass spectrometry",
+   "title": "Heavy-atom mass beats carbon count: CH3I outweighs heptane",
+   "source_ids": [
+    "pc_mass"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Molecular ion of the all-12C/1H/16O/127I species; heptane and ether molecular ions are weak in real EI spectra though the m/z is defined.",
+   "mode_id": "molecularIonMz",
+   "smiles": [
+    "CI",
+    "CCCCCCC",
+    "C1CCCCC1",
+    "CCOCC"
+   ],
+   "expected_order": [
+    [
+     "CI"
+    ],
+    [
+     "CCCCCCC"
+    ],
+    [
+     "C1CCCCC1"
+    ],
+    [
+     "CCOCC"
+    ]
+   ],
+   "basis": "monoisotopic masses (m/z of M+.): CH3I 141.93, heptane 100.13, cyclohexane 84.09, diethyl ether 74.07",
+   "values": {
+    "CI": 141.93,
+    "CCCCCCC": 100.13,
+    "C1CCCCC1": 84.09,
+    "CCOCC": 74.07
+   },
+   "tie_tolerance_note": "",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-44",
+   "category": "mass spectrometry",
+   "title": "Constitutional isomers share the same molecular-ion m/z",
+   "source_ids": [
+    "pc_mass"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "mode_id": "molecularIonMz",
+   "smiles": [
+    "CCCCCC",
+    "CCCCC",
+    "CCC(C)C",
+    "CCCC"
+   ],
+   "expected_order": [
+    [
+     "CCCCCC"
+    ],
+    [
+     "CCCCC",
+     "CCC(C)C"
+    ],
+    [
+     "CCCC"
+    ]
+   ],
+   "basis": "monoisotopic masses: hexane 86.11, pentane = isopentane 72.09, butane 58.08",
+   "values": {
+    "CCCCCC": 86.11,
+    "CCCCC": 72.09,
+    "CCC(C)C": 72.09,
+    "CCCC": 58.08
+   },
+   "tie_tolerance_note": "Pentane and isopentane are identical (C5H12) and must tie.",
+   "case_type": [
+    "tie"
+   ]
+  },
+  {
+   "id": "RK-45",
+   "category": "mass spectrometry",
+   "title": "Isomeric C4H8O and acetic acid versus acetone",
+   "source_ids": [
+    "pc_mass"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "mode_id": "molecularIonMz",
+   "smiles": [
+    "CCOC(C)=O",
+    "CCC(C)=O",
+    "C1CCOC1",
+    "CC(=O)O",
+    "CC(C)=O"
+   ],
+   "expected_order": [
+    [
+     "CCOC(C)=O"
+    ],
+    [
+     "CCC(C)=O",
+     "C1CCOC1"
+    ],
+    [
+     "CC(=O)O"
+    ],
+    [
+     "CC(C)=O"
+    ]
+   ],
+   "basis": "monoisotopic masses: ethyl acetate 88.05, butanone = THF 72.06, acetic acid 60.02, acetone 58.04",
+   "values": {
+    "CCOC(C)=O": 88.05,
+    "CCC(C)=O": 72.06,
+    "C1CCOC1": 72.06,
+    "CC(=O)O": 60.02,
+    "CC(C)=O": 58.04
+   },
+   "tie_tolerance_note": "Butanone and THF are isomers (C4H8O) and must tie; acetic acid vs acetone differ by 2 Da.",
+   "case_type": [
+    "tie"
+   ]
+  },
+  {
+   "id": "RK-46",
+   "category": "13C NMR",
+   "title": "Number of distinct carbon environments by symmetry",
+   "source_ids": [],
+   "evidence": "inferred",
+   "uncertainty": "Symmetry-derived counts, not a quoted spectrum; no fetched source lists these specific spectra.",
+   "mode_id": "carbonSignalCount",
+   "smiles": [
+    "CC1CCCCC1",
+    "CCC",
+    "C1CCCCC1",
+    "C1CCCC1"
+   ],
+   "expected_order": [
+    [
+     "CC1CCCCC1"
+    ],
+    [
+     "CCC"
+    ],
+    [
+     "C1CCCCC1",
+     "C1CCCC1"
+    ]
+   ],
+   "basis": "counted from molecular symmetry (proton-decoupled 13C, fast ring flip): methylcyclohexane 5, propane 2, cyclohexane 1, cyclopentane 1",
+   "values": {
+    "CC1CCCCC1": 5,
+    "CCC": 2,
+    "C1CCCCC1": 1,
+    "C1CCCC1": 1
+   },
+   "tie_tolerance_note": "Cyclohexane and cyclopentane both show one signal.",
+   "case_type": [
+    "tie"
+   ]
+  },
+  {
+   "id": "RK-47",
+   "category": "13C NMR",
+   "title": "Xylene isomers all have eight carbons but different signal counts",
+   "source_ids": [],
+   "evidence": "inferred",
+   "uncertainty": "Symmetry-derived counts; no fetched source lists these spectra.",
+   "mode_id": "carbonSignalCount",
+   "smiles": [
+    "Cc1cccc(C)c1",
+    "Cc1ccccc1C",
+    "Cc1ccc(C)cc1"
+   ],
+   "expected_order": [
+    [
+     "Cc1cccc(C)c1"
+    ],
+    [
+     "Cc1ccccc1C"
+    ],
+    [
+     "Cc1ccc(C)cc1"
+    ]
+   ],
+   "basis": "counted from symmetry: m-xylene 5, o-xylene 4, p-xylene 3",
+   "values": {
+    "Cc1cccc(C)c1": 5,
+    "Cc1ccccc1C": 4,
+    "Cc1ccc(C)cc1": 3
+   },
+   "tie_tolerance_note": "A carbon-count heuristic ties all three.",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-48",
+   "category": "13C NMR",
+   "title": "Pentane isomers",
+   "source_ids": [],
+   "evidence": "inferred",
+   "uncertainty": "Symmetry-derived counts; no fetched source lists these spectra.",
+   "mode_id": "carbonSignalCount",
+   "smiles": [
+    "CCC(C)C",
+    "CCCCC",
+    "CC(C)(C)C"
+   ],
+   "expected_order": [
+    [
+     "CCC(C)C"
+    ],
+    [
+     "CCCCC"
+    ],
+    [
+     "CC(C)(C)C"
+    ]
+   ],
+   "basis": "counted from symmetry: isopentane 4, pentane 3, neopentane 2",
+   "values": {
+    "CCC(C)C": 4,
+    "CCCCC": 3,
+    "CC(C)(C)C": 2
+   },
+   "tie_tolerance_note": "",
+   "case_type": [
+    "naive_wrong"
+   ]
+  },
+  {
+   "id": "RK-49",
+   "category": "1H NMR",
+   "title": "Distinct proton environments, ignoring splitting",
+   "source_ids": [],
+   "evidence": "inferred",
+   "uncertainty": "Symmetry-derived counts; no fetched source lists these spectra. Cyclohexane at low temperature shows axial/equatorial signals; room-temperature fast exchange assumed.",
+   "mode_id": "protonSignalCount",
+   "smiles": [
+    "CCC(C)C",
+    "CCCCC",
+    "CC(C)(C)C",
+    "C1CCCCC1"
+   ],
+   "expected_order": [
+    [
+     "CCC(C)C"
+    ],
+    [
+     "CCCCC"
+    ],
+    [
+     "CC(C)(C)C",
+     "C1CCCCC1"
+    ]
+   ],
+   "basis": "counted from symmetry: isopentane 4 (two equivalent CH3 + CH + CH2 + CH3), pentane 3, neopentane 1, cyclohexane 1 (fast ring flip)",
+   "values": {
+    "CCC(C)C": 4,
+    "CCCCC": 3,
+    "CC(C)(C)C": 1,
+    "C1CCCCC1": 1
+   },
+   "tie_tolerance_note": "Neopentane and cyclohexane both show a single signal.",
+   "case_type": [
+    "tie"
+   ]
+  },
+  {
+   "id": "RK-50",
+   "category": "physical",
+   "title": "Hydrogen-bond donor plus acceptor counts",
+   "source_ids": [],
+   "evidence": "inferred",
+   "uncertainty": "Structural count (Lipinski-style HBD+HBA), not a measured quantity; no fetched source.",
+   "mode_id": "hydrogenBonding",
+   "smiles": [
+    "OCC(O)CO",
+    "CCCCO",
+    "CCOCC",
+    "CCCCCC"
+   ],
+   "expected_order": [
+    [
+     "OCC(O)CO"
+    ],
+    [
+     "CCCCO"
+    ],
+    [
+     "CCOCC"
+    ],
+    [
+     "CCCCCC"
+    ]
+   ],
+   "basis": "O-H count (donors) plus oxygen lone-pair acceptor sites: glycerol 3+3, 1-butanol 1+1, diethyl ether 0+1, hexane 0",
+   "values": {
+    "OCC(O)CO": 6,
+    "CCCCO": 2,
+    "CCOCC": 1,
+    "CCCCCC": 0
+   },
+   "tie_tolerance_note": "",
+   "case_type": []
+  }
+ ]
+}

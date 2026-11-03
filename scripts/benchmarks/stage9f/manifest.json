@@ -1,0 +1,1077 @@
+{
+ "files": {
+  "nomenclature": {
+   "path": "cases/nomenclature.json",
+   "sha256": "4864ba9e30fb6909ca8a4c62a805882d1e2705ef03ae5467f35cbb3ea2d690bf",
+   "cases": 70,
+   "authored": 70
+  },
+  "properties": {
+   "path": "cases/properties.json",
+   "sha256": "70d7234fa05786540c8db4d340ba3f4c0d13f2ace0007b51bcb31ba7fae5e684",
+   "cases": 30,
+   "authored": 30
+  },
+  "ranking": {
+   "path": "cases/ranking.json",
+   "sha256": "353d6e61b7ccfcd11d2844b89c3afc539747d120a92ca6f4303021110cd4ceed",
+   "cases": 50,
+   "authored": 50
+  },
+  "reactions": {
+   "path": "cases/reactions.json",
+   "sha256": "6596ac2046b0e5add8dcdd38da4ff0ff0ac33546b576d58307d46a54bc3e6f2b",
+   "cases": 48,
+   "authored": 48
+  },
+  "spectroscopy": {
+   "path": "cases/spectroscopy.json",
+   "sha256": "71e98db7e5246e9b0bc3459adf74ac30acc96a779ed211016f51eaa1990405d4",
+   "cases": 56,
+   "authored": 56
+  },
+  "synthesis": {
+   "path": "cases/synthesis.json",
+   "sha256": "734ce8236045c7411b58276556305e9643a663efe98e617680b147807915a195",
+   "cases": 24,
+   "authored": 24
+  }
+ },
+ "split": {
+  "NM-01": "dev",
+  "NM-02": "holdout",
+  "NM-03": "dev",
+  "NM-04": "dev",
+  "NM-05": "holdout",
+  "NM-06": "holdout",
+  "NM-07": "holdout",
+  "NM-08": "holdout",
+  "NM-09": "holdout",
+  "NM-10": "holdout",
+  "NM-11": "holdout",
+  "NM-12": "holdout",
+  "NM-13": "dev",
+  "NM-14": "dev",
+  "NM-15": "dev",
+  "NM-16": "dev",
+  "NM-17": "holdout",
+  "NM-18": "dev",
+  "NM-19": "dev",
+  "NM-20": "dev",
+  "NM-21": "dev",
+  "NM-22": "holdout",
+  "NM-23": "dev",
+  "NM-24": "holdout",
+  "NM-25": "dev",
+  "NM-26": "dev",
+  "NM-27": "dev",
+  "NM-28": "dev",
+  "NM-29": "dev",
+  "NM-30": "dev",
+  "NM-31": "dev",
+  "NM-32": "holdout",
+  "NM-33": "dev",
+  "NM-34": "holdout",
+  "NM-35": "dev",
+  "NM-36": "holdout",
+  "NM-37": "dev",
+  "NM-38": "dev",
+  "NM-39": "holdout",
+  "NM-40": "dev",
+  "NM-41": "holdout",
+  "NM-42": "holdout",
+  "NM-43": "holdout",
+  "NM-44": "holdout",
+  "NM-45": "holdout",
+  "NM-46": "dev",
+  "NM-47": "holdout",
+  "NM-48": "holdout",
+  "NM-49": "dev",
+  "NM-50": "dev",
+  "NM-51": "dev",
+  "NM-52": "dev",
+  "NM-53": "holdout",
+  "NM-54": "dev",
+  "NM-55": "dev",
+  "NM-56": "dev",
+  "NM-57": "dev",
+  "NM-58": "dev",
+  "NM-59": "holdout",
+  "NM-60": "dev",
+  "NM-61": "holdout",
+  "NM-62": "holdout",
+  "NM-63": "dev",
+  "NM-64": "dev",
+  "NM-65": "dev",
+  "NM-66": "holdout",
+  "NM-67": "dev",
+  "NM-68": "dev",
+  "NM-69": "dev",
+  "NM-70": "dev",
+  "PR-01": "holdout",
+  "PR-02": "holdout",
+  "PR-03": "holdout",
+  "PR-04": "holdout",
+  "PR-05": "dev",
+  "PR-06": "holdout",
+  "PR-07": "holdout",
+  "PR-08": "holdout",
+  "PR-09": "dev",
+  "PR-10": "dev",
+  "PR-11": "holdout",
+  "PR-12": "dev",
+  "PR-13": "holdout",
+  "PR-14": "dev",
+  "PR-15": "holdout",
+  "PR-16": "holdout",
+  "PR-17": "holdout",
+  "PR-18": "holdout",
+  "PR-19": "dev",
+  "PR-20": "dev",
+  "PR-21": "holdout",
+  "PR-22": "dev",
+  "PR-23": "dev",
+  "PR-24": "dev",
+  "PR-25": "holdout",
+  "PR-26": "holdout",
+  "PR-27": "dev",
+  "PR-28": "dev",
+  "PR-29": "holdout",
+  "PR-30": "holdout",
+  "RK-01": "holdout",
+  "RK-02": "holdout",
+  "RK-03": "holdout",
+  "RK-04": "holdout",
+  "RK-05": "holdout",
+  "RK-06": "dev",
+  "RK-07": "dev",
+  "RK-08": "dev",
+  "RK-09": "dev",
+  "RK-10": "holdout",
+  "RK-11": "dev",
+  "RK-12": "dev",
+  "RK-13": "dev",
+  "RK-14": "holdout",
+  "RK-15": "holdout",
+  "RK-16": "holdout",
+  "RK-17": "holdout",
+  "RK-18": "holdout",
+  "RK-19": "dev",
+  "RK-20": "holdout",
+  "RK-21": "holdout",
+  "RK-22": "holdout",
+  "RK-23": "holdout",
+  "RK-24": "holdout",
+  "RK-25": "holdout",
+  "RK-26": "dev",
+  "RK-27": "dev",
+  "RK-28": "holdout",
+  "RK-29": "holdout",
+  "RK-30": "dev",
+  "RK-31": "dev",
+  "RK-32": "dev",
+  "RK-33": "holdout",
+  "RK-34": "dev",
+  "RK-35": "holdout",
+  "RK-36": "holdout",
+  "RK-37": "dev",
+  "RK-38": "dev",
+  "RK-39": "holdout",
+  "RK-40": "holdout",
+  "RK-41": "dev",
+  "RK-42": "holdout",
+  "RK-43": "dev",
+  "RK-44": "holdout",
+  "RK-45": "dev",
+  "RK-46": "holdout",
+  "RK-47": "dev",
+  "RK-48": "holdout",
+  "RK-49": "dev",
+  "RK-50": "dev",
+  "RX-01": "holdout",
+  "RX-02": "dev",
+  "RX-03": "dev",
+  "RX-04": "dev",
+  "RX-05": "holdout",
+  "RX-06": "holdout",
+  "RX-07": "holdout",
+  "RX-08": "dev",
+  "RX-09": "holdout",
+  "RX-10": "dev",
+  "RX-11": "holdout",
+  "RX-12": "holdout",
+  "RX-13": "holdout",
+  "RX-14": "dev",
+  "RX-15": "dev",
+  "RX-16": "dev",
+  "RX-17": "holdout",
+  "RX-18": "holdout",
+  "RX-19": "holdout",
+  "RX-20": "dev",
+  "RX-21": "dev",
+  "RX-22": "dev",
+  "RX-23": "dev",
+  "RX-24": "dev",
+  "RX-25": "dev",
+  "RX-26": "dev",
+  "RX-27": "dev",
+  "RX-28": "holdout",
+  "RX-29": "dev",
+  "RX-30": "dev",
+  "RX-31": "holdout",
+  "RX-32": "dev",
+  "RX-33": "dev",
+  "RX-34": "holdout",
+  "RX-35": "holdout",
+  "RX-36": "holdout",
+  "RX-37": "dev",
+  "RX-38": "holdout",
+  "RX-39": "dev",
+  "RX-40": "dev",
+  "RX-41": "dev",
+  "RX-42": "dev",
+  "RX-43": "dev",
+  "RX-44": "dev",
+  "RX-45": "dev",
+  "RX-46": "dev",
+  "RX-47": "dev",
+  "RX-48": "holdout",
+  "SP-01": "dev",
+  "SP-02": "holdout",
+  "SP-03": "holdout",
+  "SP-04": "holdout",
+  "SP-05": "holdout",
+  "SP-06": "dev",
+  "SP-07": "holdout",
+  "SP-08": "holdout",
+  "SP-09": "holdout",
+  "SP-10": "dev",
+  "SP-11": "holdout",
+  "SP-12": "dev",
+  "SP-13": "dev",
+  "SP-14": "dev",
+  "SP-15": "holdout",
+  "SP-16": "holdout",
+  "SP-17": "dev",
+  "SP-18": "holdout",
+  "SP-19": "holdout",
+  "SP-20": "dev",
+  "SP-21": "holdout",
+  "SP-22": "dev",
+  "SP-23": "dev",
+  "SP-24": "holdout",
+  "SP-25": "dev",
+  "SP-26": "dev",
+  "SP-27": "holdout",
+  "SP-28": "holdout",
+  "SP-29": "holdout",
+  "SP-30": "dev",
+  "SP-31": "dev",
+  "SP-32": "dev",
+  "SP-33": "holdout",
+  "SP-34": "dev",
+  "SP-35": "holdout",
+  "SP-36": "dev",
+  "SP-37": "dev",
+  "SP-38": "dev",
+  "SP-39": "dev",
+  "SP-40": "holdout",
+  "SP-41": "holdout",
+  "SP-42": "dev",
+  "SP-43": "dev",
+  "SP-44": "dev",
+  "SP-45": "dev",
+  "SP-46": "dev",
+  "SP-47": "dev",
+  "SP-48": "dev",
+  "SP-49": "holdout",
+  "SP-50": "dev",
+  "SP-51": "dev",
+  "SP-52": "dev",
+  "SP-53": "holdout",
+  "SP-54": "dev",
+  "SP-55": "holdout",
+  "SP-56": "holdout",
+  "SY-01": "dev",
+  "SY-02": "dev",
+  "SY-03": "dev",
+  "SY-04": "dev",
+  "SY-05": "dev",
+  "SY-06": "holdout",
+  "SY-07": "dev",
+  "SY-08": "dev",
+  "SY-09": "dev",
+  "SY-10": "dev",
+  "SY-11": "dev",
+  "SY-12": "dev",
+  "SY-13": "dev",
+  "SY-14": "holdout",
+  "SY-15": "dev",
+  "SY-16": "holdout",
+  "SY-17": "dev",
+  "SY-18": "holdout",
+  "SY-19": "dev",
+  "SY-20": "dev",
+  "SY-21": "holdout",
+  "SY-22": "holdout",
+  "SY-23": "dev",
+  "SY-24": "holdout"
+ },
+ "snapshots": {
+  "nm-pubchem-names": {
+   "file": "snapshots/nm-pubchem-names.txt",
+   "sha256": "496e550de19fbac5c9a381104c1a95b30d60e69c17c5a0dde04fd79a91bd2b8c",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName/JSON"
+  },
+  "nm-pubchem-synonyms": {
+   "file": "snapshots/nm-pubchem-synonyms.txt",
+   "sha256": "6c0e82965c59a8917b57225ca966dc5d2a643176b7922ee19d36980387984295",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/synonyms/JSON"
+  },
+  "nm-pubchem-props": {
+   "file": "snapshots/nm-pubchem-props.txt",
+   "sha256": "f6f505bb0187dba1d5779e7f0763488391b7c95b805eca278bda4ef55751c527",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/MolecularFormula,MolecularWeight,ExactMass,Charge/JSON"
+  },
+  "pka_pka-compilation-williams": {
+   "file": "snapshots/rk-pka_pka-compilation-williams.txt",
+   "sha256": "5f629863b043bdb7555409f28ac45762134d4ceaaa1d84df3cebe85955261bd1",
+   "url": "https://organicchemistrydata.org/hansreich/resources/pka/pka_data/pka-compilation-williams.pdf"
+  },
+  "pc_pka": {
+   "file": "snapshots/rk-pc_pka.txt",
+   "sha256": "4138c5ed6eb97fc53dfaad380430db1831a519cc26ebf566447a63763afc62ee",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/"
+  },
+  "pc_pka2": {
+   "file": "snapshots/rk-pc_pka2.txt",
+   "sha256": "807aa84937801e3305879786c227e2175015e6e335579991f20dd44002fcaaf6",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/"
+  },
+  "pc_bp": {
+   "file": "snapshots/rk-pc_bp.txt",
+   "sha256": "c08fb9833e8e1063d9b66d69f8744b6af4a94033b76c2abc14a2242b80d066d5",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/"
+  },
+  "pc_mp": {
+   "file": "snapshots/rk-pc_mp.txt",
+   "sha256": "b02f6aa09828d574f189c56adaf04fe5fc11c5dcea7095cd05c4ff026db1afac",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/"
+  },
+  "pc_logp": {
+   "file": "snapshots/rk-pc_logp.txt",
+   "sha256": "113777453cd4f2175832821064f3284bcd5328485e8c36f9f5399bf4082e49dc",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/"
+  },
+  "pc_sol": {
+   "file": "snapshots/rk-pc_sol.txt",
+   "sha256": "6691853c2a8b12eed97fb92f12711c2a245c8f0518767ac12a1146ced10c0c69",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/"
+  },
+  "pc_mass": {
+   "file": "snapshots/rk-pc_mass.txt",
+   "sha256": "a2a7dcb898532d7eec8480e43970ccf2987694efa914757da801f2addac51812",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/"
+  },
+  "wiki_carbenium": {
+   "file": "snapshots/rk-wiki_carbenium.txt",
+   "sha256": "fd681327141e444060950387241bc74d0b782961a4cd524ab7e6c922c0ccc2b4",
+   "url": "https://en.wikipedia.org/wiki/Carbenium_ion"
+  },
+  "wiki_bde": {
+   "file": "snapshots/rk-wiki_bde.txt",
+   "sha256": "7bd48ce8bb660846c728b81e637d8dfd70cef2a9f5bcf72f1f601a48c413db44",
+   "url": "https://en.wikipedia.org/wiki/Bond-dissociation_energy"
+  },
+  "lt_alkstab": {
+   "file": "snapshots/rk-lt_alkstab.txt",
+   "sha256": "bccefeaed513c52305a90aedd0ed9ceb90713f213254b14636719e7fbe62e1ca",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(OpenStax)/07%3A_Alkenes-_Structure_and_Reactivity/7.06%3A_Stability_of_Alkenes"
+  },
+  "os_sn2": {
+   "file": "snapshots/rk-os_sn2.txt",
+   "sha256": "a867d30eb67e69ac99fc5c3ef0726e0a3ebd9d5145e3bbbc29c4a385ad2506b6",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(OpenStax)/11%3A_Reactions_of_Alkyl_Halides-_Nucleophilic_Substitutions_and_Eliminations/11.03%3A_Characteristics_of_the_SN2_Reaction"
+  },
+  "os_sn1": {
+   "file": "snapshots/rk-os_sn1.txt",
+   "sha256": "f8a454cbf90ade3e0ee2e6af6ecc9392cd4f3a4494dc9ce9da9f036cf394011f",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(OpenStax)/11%3A_Reactions_of_Alkyl_Halides-_Nucleophilic_Substitutions_and_Eliminations/11.05%3A_Characteristics_of_the_SN1_Reaction"
+  },
+  "wiki_lg": {
+   "file": "snapshots/rk-wiki_lg.txt",
+   "sha256": "1586ac343affa2204e3efba8f13b7791228f9e25af31cca4146e6800072f481e",
+   "url": "https://en.wikipedia.org/wiki/Leaving_group"
+  },
+  "lt_carbonylrx": {
+   "file": "snapshots/rk-lt_carbonylrx.txt",
+   "sha256": "2239baed721b84293c9307017974cb31ce03efb5365ef1bf08d4330abb555119",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(Morsch_et_al.)/21%3A_Carboxylic_Acid_Derivatives-_Nucleophilic_Acyl_Substitution_Reactions/21.02%3A_Nucleophilic_Acyl_Substitution_Reactions"
+  },
+  "wiki_carbonyl": {
+   "file": "snapshots/rk-wiki_carbonyl.txt",
+   "sha256": "a1ebb39c0da658a74765859ba49603db301ca261269f7e7876f87641d0c9136a",
+   "url": "https://en.wikipedia.org/wiki/Carbonyl_group"
+  },
+  "wiki_hydrate": {
+   "file": "snapshots/rk-wiki_hydrate.txt",
+   "sha256": "c52c9a2b2ce77b8c77ae537472a9cfbd4ffeac835dff54e232f44e1909b2b7bd",
+   "url": "https://en.wikipedia.org/wiki/Geminal_diol"
+  },
+  "pmc_nitration": {
+   "file": "snapshots/rk-pmc_nitration.txt",
+   "sha256": "d8530360b56fc8c33e2bd31f9ab7623f9c8b14e179ea07ce4e642cd3cc48ed6a",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8928515/table/tbl3"
+  },
+  "wiki_hammett": {
+   "file": "snapshots/rk-wiki_hammett.txt",
+   "sha256": "d14cb480609e306918b020d80b27cc37cdc9a777adccbec6da53f58305417bdf",
+   "url": "https://en.wikipedia.org/wiki/Hammett_equation"
+  },
+  "epox_morsch": {
+   "file": "snapshots/rx-epox_morsch.txt",
+   "sha256": "f9d8c9826940900e5ff583336111b62cb386232efae4b72304468bacd15c81a3",
+   "url": "https://chem.libretexts.org/Courses/University_of_Illinois_Springfield/CHE_267%3A_Organic_Chemistry_I_(Morsch)/Chapters/Chapter_09%3A_Alcohols_Ethers_and_Epoxides/9.15%3A_Reactions_of_Epoxides"
+  },
+  "epox_wade": {
+   "file": "snapshots/rx-epox_wade.txt",
+   "sha256": "11aab93fbac1f803c9648fb9e561b06b4d8f1daa43a0705a6f0bdc365d98e608",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Wade)_Complete_and_Semesters_I_and_II/Map%3A_Organic_Chemistry_(Wade)/15%3A_Ethers_Epoxides_and_Thioethers/15.08%3A_Opening_of_Epoxides"
+  },
+  "epox_chan": {
+   "file": "snapshots/rx-epox_chan.txt",
+   "sha256": "5519abacdfa4a3a4cbc70ac0b686cd26a7d5a1f841841d36ed0662130fa5777a",
+   "url": "https://chem.libretexts.org/Courses/University_of_Illinois_UrbanaChampaign/Chem_2363A_Fundamental_Organic_Chemistry_I_(Chan)/11%3A_The_Chemistry_of_Ethers_Epoxides_Glycols_and_Sulfides/11.04%3A_Opening_of_Epoxides"
+  },
+  "epox_ssu": {
+   "file": "snapshots/rx-epox_ssu.txt",
+   "sha256": "26be18905698826d6083a482c51c542d9173dd76417c82993225dfec44c52288",
+   "url": "https://chem.libretexts.org/Courses/Sonoma_State_University/SSU_Chem_335A/Material_Since_Exam_3_for_the_Final/Unit_18_Ethers_and_Epoxides%3B_Thiols_and_Sulfides/18.6_Reactions_of_Epoxides%3A_Ring-opening"
+  },
+  "epox_grig": {
+   "file": "snapshots/rx-epox_grig.txt",
+   "sha256": "f242766296aa179cd4386618bdc9a734651bf2ab46a56a20c5d100e21c2efda7",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Wade)_Complete_and_Semesters_I_and_II/Map%3A_Organic_Chemistry_(Wade)/15%3A_Ethers_Epoxides_and_Thioethers/15.09%3A_Reactions_of_Epoxides_with_Grignard_and_Organolithium_Reagents"
+  },
+  "e2_cyclohexane": {
+   "file": "snapshots/rx-e2_cyclohexane.txt",
+   "sha256": "2b7d05cf0b624943bae9ad44cd8ee1ae4e10e45a19b6a54d91a94eaf4fc6c6f9",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(OpenStax)/11%3A_Reactions_of_Alkyl_Halides-_Nucleophilic_Substitutions_and_Eliminations/11.09%3A_The_E2_Reaction_and_Cyclohexane__Conformation"
+  },
+  "mom_e2": {
+   "file": "snapshots/rx-mom_e2.txt",
+   "sha256": "2bace92d565df87e15855cecbb74e3f359a6e89154148de5b1d74381ca551833",
+   "url": "https://www.masterorganicchemistry.com/2012/10/18/the-e2-reaction-and-cyclohexane-rings/"
+  },
+  "wiki_zaitsev": {
+   "file": "snapshots/rx-wiki_zaitsev.txt",
+   "sha256": "e9b02e770d84bc79a24897a0741212ff0f7c853b49369f44aef57eeaaf8642af",
+   "url": "https://en.wikipedia.org/wiki/Zaitsev%27s_rule"
+  },
+  "hofmann_wiki": {
+   "file": "snapshots/rx-hofmann_wiki.txt",
+   "sha256": "c769334ef41d2af330847d6a4ad2353fe6bc01de96971020ce1b04515f214492",
+   "url": "https://en.wikipedia.org/wiki/Hofmann_elimination"
+  },
+  "eas_uis": {
+   "file": "snapshots/rx-eas_uis.txt",
+   "sha256": "67d77b53b08ab36ca948b6bea705c7cc7059f1940243190afe4c60d2a49c83d1",
+   "url": "https://chem.libretexts.org/Courses/University_of_Illinois_Springfield/UIS%3A_CHE_269_(Morsch_and_Andrews)/Chapters/Chapter_18%3A_Electrophilic_Aromatic_Substitution/18.07_EAS_of_Substituted_Benzenes"
+  },
+  "eas_poly": {
+   "file": "snapshots/rx-eas_poly.txt",
+   "sha256": "ddd9f31f7fb04412f86c2e46a0af193d832247a6ff1fe79defd06f075bf6502f",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(McMurry)/16%3A_Chemistry_of_Benzene_-_Electrophilic_Aromatic_Substitution/16.06%3A_Trisubstituted_Benzenes_-_Additivity_of_Effects"
+  },
+  "fc_limits": {
+   "file": "snapshots/rx-fc_limits.txt",
+   "sha256": "83ebac36954cbcd9ce3108db90f34499b11194e7f1e3227971b2a8f374b0dd0a",
+   "url": "https://chem.libretexts.org/Courses/Sonoma_State_University/SSU_Chem_335B/Material_for_Exam_3/Chapter_18%3A_Electrophilic_Aromatic_Substitution/18.10_Limitations_on_Electrophilic_Substitution_Reactions_with_Substituted_Benzenes"
+  },
+  "wiki_nitr": {
+   "file": "snapshots/rx-wiki_nitr.txt",
+   "sha256": "69330d5c063db84ec125179f42dea96122e83f6013c29ecb0d4d996a72590b96",
+   "url": "https://en.wikipedia.org/wiki/Aromatic_nitration"
+  },
+  "cation_morsch": {
+   "file": "snapshots/rx-cation_morsch.txt",
+   "sha256": "dbd900fe14bf8f0dca071e18ca841399e972da8b518975534f13435f92712a55",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(Morsch_et_al.)/07%3A_Alkenes-_Structure_and_Reactivity/7.12%3A_Evidence_for_the_Mechanism_of_Electrophilic_Additions_-_Carbocation_Rearrangements"
+  },
+  "cation_alc": {
+   "file": "snapshots/rx-cation_alc.txt",
+   "sha256": "3125526eb259096fc34de00c35f1c041f6f7e56cde4b3529541ed0efc8560609",
+   "url": "https://chem.libretexts.org/Courses/University_of_Illinois_Springfield/CHE_267:_Organic_Chemistry_I_(Morsch)/Chapters/Chapter_09:_Alcohols_Ethers_and_Epoxides/9.09:_Carbocation_Rearrangements"
+  },
+  "wiki_wm": {
+   "file": "snapshots/rx-wiki_wm.txt",
+   "sha256": "97fa436c0db36f7496b62f182951775ea18d3326db2980d6beddbfb2505b5580",
+   "url": "https://en.wikipedia.org/wiki/Wagner%E2%80%93Meerwein_rearrangement"
+  },
+  "wiki_pinacol": {
+   "file": "snapshots/rx-wiki_pinacol.txt",
+   "sha256": "79cd2e91adee92face91d9fb36ff89db87205b3cdf85774cec52e268363bf7ff",
+   "url": "https://en.wikipedia.org/wiki/Pinacol_rearrangement"
+  },
+  "wiki_hbo": {
+   "file": "snapshots/rx-wiki_hbo.txt",
+   "sha256": "b11127d688e40f83d92acf81404f9f3bcc524dbf8f64e7d9e15e988403df3bf2",
+   "url": "https://en.wikipedia.org/wiki/Hydroboration%E2%80%93oxidation_reaction"
+  },
+  "br2_liu": {
+   "file": "snapshots/rx-br2_liu.txt",
+   "sha256": "108fd8efa694738e1adb7169f56680c418f72f084b132de44ff2be05416f0658",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_I_(Liu)/10%3A_Alkenes_and_Alkynes/10.04%3A_Reactions_of_Alkenes-_Addition_of_Bromine_and_Chlorine_to_Alkenes"
+  },
+  "prilezhaev": {
+   "file": "snapshots/rx-prilezhaev.txt",
+   "sha256": "266521d34c7ebbd352ae56f47d69fe1ec9f7fa126fb75c6dd9a224959f6f11c7",
+   "url": "https://en.wikipedia.org/wiki/Prilezhaev_reaction"
+  },
+  "sn2_roberts": {
+   "file": "snapshots/rx-sn2_roberts.txt",
+   "sha256": "59693b6a370396b40dbfed1fe9695ea488d1cb05c81768b4c66d407a169c9bdf",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Basic_Principles_of_Organic_Chemistry_(Roberts_and_Caserio)/08%3A_Nucleophilic_Substitution_and_Elimination_Reactions/8.06%3A_Stereochemistry_of_(S_N2)_Reactions"
+  },
+  "sn2_wade": {
+   "file": "snapshots/rx-sn2_wade.txt",
+   "sha256": "665bf922982de04fc4247ab9f4a67480236320c2b55cb339b875cb6301641a39",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Wade)_Complete_and_Semesters_I_and_II/Map%3A_Organic_Chemistry_(Wade)/07%3A_Alkyl_Halides-_Nucleophilic_Substitution_and_Elimination/7.07%3A_Stereochemistry_of_the_SN2_Reaction"
+  },
+  "wiki_halohydrin": {
+   "file": "snapshots/rx-wiki_halohydrin.txt",
+   "sha256": "87e4a782268df815161e4f29d8dfda9f1c80c28dd76c09fbb97e51f45dbcb56f",
+   "url": "https://en.wikipedia.org/wiki/Halohydrin"
+  },
+  "da_smith": {
+   "file": "snapshots/rx-da_smith.txt",
+   "sha256": "b50c4f3b333f26aea43c11ba2cb667e6a9b23604c77b0dac51e87927c41d74ae",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Smith)/14%3A_Conjugation_Resonance_and_Dienes/14.13%3A_Specific_Rules_Governing_the_DielsAlder_Reaction"
+  },
+  "ucla_chemosel": {
+   "file": "snapshots/rx-ucla_chemosel.txt",
+   "sha256": "9690d16b28c4b01dbe49b23523b6dc571210386a9d7b1dce14e22b2b0e5fe80b",
+   "url": "https://www.chem.ucla.edu/~harding/IGOC/C/chemoselective.html"
+  },
+  "wiki_carbred": {
+   "file": "snapshots/rx-wiki_carbred.txt",
+   "sha256": "164600e4499ebfbe3792bc5a672c4d4dd4706dca43d7db3f3b34e63e9a747204",
+   "url": "https://en.wikipedia.org/wiki/Carbonyl_reduction"
+  },
+  "acetal_vs": {
+   "file": "snapshots/rx-acetal_vs.txt",
+   "sha256": "d11e762cd0ee4a9b88032fe1915e73a69ad6c474f2329dcd6b43f62e876b8602",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Vollhardt_and_Schore)/17%3A_Aldehydes_and_Ketones_-_The_Carbonyl_Group/17.08%3A_Acetals__as_Protecting_Groups"
+  },
+  "conj_kenyon": {
+   "file": "snapshots/rx-conj_kenyon.txt",
+   "sha256": "b82b10496d39f12216fc29c9a8a305ec36e234325fe661c3e71bfe606278e2e2",
+   "url": "https://chem.libretexts.org/Courses/Kenyon_College/Chemistry_231_and_232_-_Kenyon_College_(Getzler_Hofferberth_and_Hunsen)/18%3A_Enols_Enolates_and_the_Aldol_Condensation%3A_ab-Unsaturated_Aldehydes_and_Ketones/18.10%3A_12-_and__14-Additions_of_Organometallic_Reagents"
+  },
+  "smith_unsat": {
+   "file": "snapshots/rx-smith_unsat.txt",
+   "sha256": "9793d8f2afbacdca70e49e3ad16290b536d88bcd18f20d3af0d02e2a5558a4fe",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Smith)/18%3A_Introduction_to_Carbonyl_Chemistry_Organometallic_Reagents_Oxidation_and_Reduction/18.15%3A_-Unsaturated_Carbonyl_Compounds"
+  },
+  "reusch_enolate": {
+   "file": "snapshots/rx-reusch_enolate.txt",
+   "sha256": "e3d97f4e3714b9b2ee6f27673ce8c9a09a9cca78788f1709d14e07db82456e1c",
+   "url": "https://organicchemistrydata.org/reusch/virtualtext/reactions-of-enolate-like-species/"
+  },
+  "wiki_claisen": {
+   "file": "snapshots/rx-wiki_claisen.txt",
+   "sha256": "5be01149566663d84d57f4341d1c6679cec560fd31c6c138d6e9686f892c2fae",
+   "url": "https://en.wikipedia.org/wiki/Claisen_rearrangement"
+  },
+  "wiki_cope": {
+   "file": "snapshots/rx-wiki_cope.txt",
+   "sha256": "8709f089edee999cdded7b0de00833cc0e63ac17523b7bda114d0b93b02402e0",
+   "url": "https://en.wikipedia.org/wiki/Cope_rearrangement"
+  },
+  "rad_uis": {
+   "file": "snapshots/rx-rad_uis.txt",
+   "sha256": "042272fdda272428dabd5bdbcc6ca576d9f68237d0ce8549388de2dc7bcb0769",
+   "url": "https://chem.libretexts.org/Courses/University_of_Illinois_Springfield/UIS%3A_CHE_269_(Morsch_and_Andrews)/Chapters/Chapter_15%3A_Radical_Reactions/15.06_Chlorination_versus_Bromination"
+  },
+  "sp-ir-libretexts-table": {
+   "file": "snapshots/sp-ir-libretexts-table.txt",
+   "sha256": "06425d0ef5cefd52049c5cf58a761becdfbcf970f48081212776c71751d75016",
+   "url": "https://chem.libretexts.org/Ancillary_Materials/Reference/Reference_Tables/Spectroscopic_Parameters/Infrared_Spectroscopy_Absorption_Table"
+  },
+  "sp-1h-shift-morsch": {
+   "file": "snapshots/sp-1h-shift-morsch.txt",
+   "sha256": "28cc7d1981abe3e79f0bfc57ce7133c896e177c8f09ac2b07d67853efe6b7f33",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(Morsch_et_al.)/13:_Structure_Determination_-_Nuclear_Magnetic_Resonance_Spectroscopy/13.03:_Chemical_Shifts_in_H_NMR__Spectroscopy"
+  },
+  "sp-13c-shift-morsch": {
+   "file": "snapshots/sp-13c-shift-morsch.txt",
+   "sha256": "94cea58352f9171554e8720e0f8d5f992579355973ff5436c9a6578e0c660a6d",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(Morsch_et_al.)/13:_Structure_Determination_-_Nuclear_Magnetic_Resonance_Spectroscopy/13.10:_Characteristics_of_C_NMR_Spectroscopy"
+  },
+  "sp-nist-67641": {
+   "file": "snapshots/sp-nist-67641.txt",
+   "sha256": "a1e411e18acf27e26ccde92bf9dc2ae79202685a7300753ccd34cc496105a8f1",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C67641&Index=0&Type=Mass"
+  },
+  "sp-nist-78933": {
+   "file": "snapshots/sp-nist-78933.txt",
+   "sha256": "b3aef75270052ab572b874de9e85168087763134fed1613e5ea909d5d191bcc2",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C78933&Index=0&Type=Mass"
+  },
+  "sp-nist-108941": {
+   "file": "snapshots/sp-nist-108941.txt",
+   "sha256": "3f696c6d6c387b5291c832281bdca8ddc9da93780c666c5ae85382af02b56e8c",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108941&Index=0&Type=Mass"
+  },
+  "sp-nist-120923": {
+   "file": "snapshots/sp-nist-120923.txt",
+   "sha256": "82d8b79da061bff2369948492978676ad9758a277079869e4c177684e766a32d",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C120923&Index=0&Type=Mass"
+  },
+  "sp-nist-100527": {
+   "file": "snapshots/sp-nist-100527.txt",
+   "sha256": "c1d957af81744e643addebdf2a3a14273133bdfb2cb307cb053cb3a32510484f",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C100527&Index=0&Type=Mass"
+  },
+  "sp-nist-123728": {
+   "file": "snapshots/sp-nist-123728.txt",
+   "sha256": "6df4dd9381786a095e6fec1d9432e3d0f0d7a9eb75124164a67ae378794477e0",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C123728&Index=0&Type=Mass"
+  },
+  "sp-nist-79094": {
+   "file": "snapshots/sp-nist-79094.txt",
+   "sha256": "6011f9b5def53a320e9c5b57a462fa7b6f2153fd75b1c7517776953d33d25799",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C79094&Index=0&Type=Mass"
+  },
+  "sp-nist-65850": {
+   "file": "snapshots/sp-nist-65850.txt",
+   "sha256": "783f525ac15e5b504326b638ef4b5ef439e2c13668b820360151df90fe9f002d",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C65850&Index=0&Type=Mass"
+  },
+  "sp-nist-141786": {
+   "file": "snapshots/sp-nist-141786.txt",
+   "sha256": "fc996eb8f4abc75368bde0ad00eef3bb570057c9d12b32b94097db4798359f4f",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C141786&Index=0&Type=Mass"
+  },
+  "sp-nist-93583": {
+   "file": "snapshots/sp-nist-93583.txt",
+   "sha256": "ccadef94038e4fdfaeaae633b10ffb6c6275a127e5a32185825aef38a4b9ab1a",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C93583&Index=0&Type=Mass"
+  },
+  "sp-nist-60355": {
+   "file": "snapshots/sp-nist-60355.txt",
+   "sha256": "beb6c0b7453f1598a7a3610d75761d51f36ef3ce8a69c6228ca02cdb0794cb2a",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C60355&Index=0&Type=Mass"
+  },
+  "sp-nist-68122": {
+   "file": "snapshots/sp-nist-68122.txt",
+   "sha256": "7b14861f0f587c8470a61575b9ed8d86b2c80af514905fc55fb55dc29e361b5e",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C68122&Index=0&Type=Mass"
+  },
+  "sp-nist-62533": {
+   "file": "snapshots/sp-nist-62533.txt",
+   "sha256": "89a880d94355767311c72c57eeddb9037d1f6a4a4fc6496cb7c8dfb89d193967",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C62533&Index=0&Type=Mass"
+  },
+  "sp-nist-109897": {
+   "file": "snapshots/sp-nist-109897.txt",
+   "sha256": "9ce1591c0c777d3e5387a25e1e7d930751047e1e4f71a37da13ffce7bdf2c40e",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109897&Index=0&Type=Mass"
+  },
+  "sp-nist-121448": {
+   "file": "snapshots/sp-nist-121448.txt",
+   "sha256": "7eb36bea259353912bed780a813097c74f9349d2a4cf5b17fff0b8e4a7a9850f",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C121448&Index=0&Type=Mass"
+  },
+  "sp-nist-75058": {
+   "file": "snapshots/sp-nist-75058.txt",
+   "sha256": "4938d3300a6f6b4fa8920d8823ae8a9b2661a31a3e9d7b0dc713e4d74cc13ee3",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75058&Index=0&Type=Mass"
+  },
+  "sp-nist-100470": {
+   "file": "snapshots/sp-nist-100470.txt",
+   "sha256": "7b511bb8fffab607fd0beceddd9d88358d81ff70734870441d3f12abedc49969",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C100470&Index=0&Type=Mass"
+  },
+  "sp-nist-629050": {
+   "file": "snapshots/sp-nist-629050.txt",
+   "sha256": "a0f677caa43844d186d5a33f9cc9c1f73a6982f84f432b3b27b9d65148e068ce",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C629050&Index=0&Type=Mass"
+  },
+  "sp-nist-592767": {
+   "file": "snapshots/sp-nist-592767.txt",
+   "sha256": "73c4b2621393b57b644ea53d3de6cd52e689d20df48ee04ef2e713430edab802",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C592767&Index=0&Type=Mass"
+  },
+  "sp-nist-110838": {
+   "file": "snapshots/sp-nist-110838.txt",
+   "sha256": "a107bde7faf20abab650b80252ada997eab984b3bc04642f67aa0a91d39daa8f",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110838&Index=0&Type=Mass"
+  },
+  "sp-nist-64175": {
+   "file": "snapshots/sp-nist-64175.txt",
+   "sha256": "5fd8da04c5239421729a3ba94694370d89482c266d998698ebf0af6786d41a15",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C64175&Index=0&Type=Mass"
+  },
+  "sp-nist-67630": {
+   "file": "snapshots/sp-nist-67630.txt",
+   "sha256": "7b487b8be6e27f1d3390e301730070016b80bd194d8a39006d9090d8bea73385",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C67630&Index=0&Type=Mass"
+  },
+  "sp-nist-108952": {
+   "file": "snapshots/sp-nist-108952.txt",
+   "sha256": "52fae9c115809bc6139c72ba00e8759b4a002fd9879c9dff12595e9ff5132cff",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108952&Index=0&Type=Mass"
+  },
+  "sp-nist-75650": {
+   "file": "snapshots/sp-nist-75650.txt",
+   "sha256": "c13b33bc061806051da13fe3ea5e1e8f259e9b36ea953c8e4d669a92bed023a4",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75650&Index=0&Type=Mass"
+  },
+  "sp-nist-60297": {
+   "file": "snapshots/sp-nist-60297.txt",
+   "sha256": "6e7e0c8bb58821f88d088880f6a0b119ec062bb7e851b3b9e62c373d77115cf6",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C60297&Index=0&Type=Mass"
+  },
+  "sp-nist-100663": {
+   "file": "snapshots/sp-nist-100663.txt",
+   "sha256": "8b9039dd10431ba3691f2eb58749a8cfb682699fd05dcaaeb61ab3e5ac2e8e5d",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C100663&Index=0&Type=Mass"
+  },
+  "sp-nist-109999": {
+   "file": "snapshots/sp-nist-109999.txt",
+   "sha256": "466d4523f1c26d2f07fe9d015f096c73044005e2d0278c40e129001cfe0e3c45",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109999&Index=0&Type=Mass"
+  },
+  "sp-nist-108907": {
+   "file": "snapshots/sp-nist-108907.txt",
+   "sha256": "87ee2b5193b61b55bfeca6eef063c9246d75b1ec5d68da2d9a2c45ac92ce25b9",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108907&Index=0&Type=Mass"
+  },
+  "sp-nist-74964": {
+   "file": "snapshots/sp-nist-74964.txt",
+   "sha256": "747cf159e82c4b463c1c09cd8b2f74ffc1ff02697c24a23f99498b3f471f5317",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C74964&Index=0&Type=Mass"
+  },
+  "sp-nist-109693": {
+   "file": "snapshots/sp-nist-109693.txt",
+   "sha256": "23d4e519b785e31b3e62eccbfeeecf892238d362d15d3c66781690f2fcf2120c",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109693&Index=0&Type=Mass"
+  },
+  "sp-nist-75263": {
+   "file": "snapshots/sp-nist-75263.txt",
+   "sha256": "00b4fa3ed39701af146475d42c3e141481de84e197de9e2e90f3fe8e44aeca59",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75263&Index=0&Type=Mass"
+  },
+  "sp-nist-75092": {
+   "file": "snapshots/sp-nist-75092.txt",
+   "sha256": "f5e46668e75715712c134a9acd8ddc4d28cf62a9db503b2b6f1d61d03445981c",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75092&Index=0&Type=Mass"
+  },
+  "sp-nist-107062": {
+   "file": "snapshots/sp-nist-107062.txt",
+   "sha256": "6f8e764e7261b3d24fe74b0e3b787808549a8c30b52946210331d623813befef",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107062&Index=0&Type=Mass"
+  },
+  "sp-nist-67663": {
+   "file": "snapshots/sp-nist-67663.txt",
+   "sha256": "129e4c883b31996cfce0adc4ff795ea46c76cd477c9dda4ce785dfa19fc290ee",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C67663&Index=0&Type=Mass"
+  },
+  "sp-nist-98953": {
+   "file": "snapshots/sp-nist-98953.txt",
+   "sha256": "4ca455c6d220521cbba18f4e324a781de083196dfeafb26d0832137aeff3a8c2",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C98953&Index=0&Type=Mass"
+  },
+  "sp-nist-75525": {
+   "file": "snapshots/sp-nist-75525.txt",
+   "sha256": "6f8d06bee4f537d0fd668d1e963156c96ef472c06eb7bf458c62b45bc4410b67",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75525&Index=0&Type=Mass"
+  },
+  "sp-nist-95476": {
+   "file": "snapshots/sp-nist-95476.txt",
+   "sha256": "6c8239bd31085190d85a0d388fa57165baede0e6574b07fb8860862ad549b8f4",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C95476&Index=0&Type=Mass"
+  },
+  "sp-nist-108383": {
+   "file": "snapshots/sp-nist-108383.txt",
+   "sha256": "8fabbd98a97e21d631167569c2a03133a61abd5b8c232cb77d2e6415fa03a836",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108383&Index=0&Type=Mass"
+  },
+  "sp-nist-106423": {
+   "file": "snapshots/sp-nist-106423.txt",
+   "sha256": "80b7516fc83434d24c1665b1e7b5e275eea1aadcabd8018378efabb8f02b4737",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C106423&Index=0&Type=Mass"
+  },
+  "sp-nist-108883": {
+   "file": "snapshots/sp-nist-108883.txt",
+   "sha256": "3617c50ccd4d25df958658550bcc4b6dfe8d293d1ddf42030e5306f6db842e61",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108883&Index=0&Type=Mass"
+  },
+  "sp-nist-100414": {
+   "file": "snapshots/sp-nist-100414.txt",
+   "sha256": "6ba1d2629be15dd79b6f31ddfa9d654877584466851dae23a6257416eb565227",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C100414&Index=0&Type=Mass"
+  },
+  "sp-nist-108678": {
+   "file": "snapshots/sp-nist-108678.txt",
+   "sha256": "82e522b1c02b97242bc61d3d2f0e110ac68708cd008ad2a6098e47f018ef1c5f",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108678&Index=0&Type=Mass"
+  },
+  "sp-nist-108247": {
+   "file": "snapshots/sp-nist-108247.txt",
+   "sha256": "5c21937e11ce7d5d652106758fb977cea21fa1d72a2a968a3bd9adc926a87109",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108247&Index=0&Type=Mass"
+  },
+  "sp-nist-98884": {
+   "file": "snapshots/sp-nist-98884.txt",
+   "sha256": "f828189132daa0d2b4b770ca3f1a4a7d64cabddc25ca3ebf19bf4ce1fb9cb95f",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C98884&Index=0&Type=Mass"
+  },
+  "sp-nist-78944": {
+   "file": "snapshots/sp-nist-78944.txt",
+   "sha256": "096889be7f95d3f9cc8f09c485859d45c316abf4ca972cc4b64b861d9b4e60b5",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C78944&Index=0&Type=Mass"
+  },
+  "sp-nist-107879": {
+   "file": "snapshots/sp-nist-107879.txt",
+   "sha256": "6d28a69d1129874026b67838fbabe014af6781568d3ec399f2efabae6deb7b14",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107879&Index=0&Type=Mass"
+  },
+  "sp-nist-96220": {
+   "file": "snapshots/sp-nist-96220.txt",
+   "sha256": "d3ca8c81458c13dca62fa5b8817cb9c315b73fca1124e736e41ff02c85708aa6",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C96220&Index=0&Type=Mass"
+  },
+  "sp-nist-98828": {
+   "file": "snapshots/sp-nist-98828.txt",
+   "sha256": "5bd8c504efbe7542bfa883b9b0eba283c39af94683e2dcd509d3a7cedff3d6ad",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C98828&Index=0&Type=Mass"
+  },
+  "sp-nist-91203": {
+   "file": "snapshots/sp-nist-91203.txt",
+   "sha256": "c422aa30a1647a35ed756674243d385debbc6bb488e1338f29ada7cd1b392b08",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C91203&Index=0&Type=Mass"
+  },
+  "sp-nist-110861": {
+   "file": "snapshots/sp-nist-110861.txt",
+   "sha256": "bc2236697375db3ad368bff0d52f28e5994bc4be6c908ae9d85142b15b60428a",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110861&Index=0&Type=Mass"
+  },
+  "sp-nist-123911": {
+   "file": "snapshots/sp-nist-123911.txt",
+   "sha256": "cf3fe0610c7bf25587c5cfd7ac6f4210e044389ca012f9fd35d5cb9d176c5ceb",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C123911&Index=0&Type=Mass"
+  },
+  "sp-nist-107028": {
+   "file": "snapshots/sp-nist-107028.txt",
+   "sha256": "9c347019f2fe2b47442404acb0dffc39bd38ec23b43e952619bd3ca61dedaa60",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107028&Index=0&Type=Mass"
+  },
+  "sp-nist-115071": {
+   "file": "snapshots/sp-nist-115071.txt",
+   "sha256": "ef44b5b29bfa867451a5d83b5e46ce319d4babf087ed8150ce833dc466cd8242",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C115071&Index=0&Type=Mass"
+  },
+  "sp-nist-119619": {
+   "file": "snapshots/sp-nist-119619.txt",
+   "sha256": "729a370d5b4ebbcbe2e3f1fbfab5d8171f841d3932938b689383c1022d066ccc",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C119619&Index=0&Type=Mass"
+  },
+  "sp-nist-109739": {
+   "file": "snapshots/sp-nist-109739.txt",
+   "sha256": "1f9df10b53dff713d8078be23eabb1a34b80b7fab3d682ff685a2e58533f265b",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109739&Index=0&Type=Mass"
+  },
+  "sp-nist-64197": {
+   "file": "snapshots/sp-nist-64197.txt",
+   "sha256": "fcf3e87bb83063f63c3bad1a48a087e45b6ead5d423032af75bed25ee524e9df",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C64197&Index=0&Type=Mass"
+  },
+  "orgsyn_cv1p0018": {
+   "file": "snapshots/rk-orgsyn_cv1p0018.txt",
+   "sha256": "ede8862eb4d71b0226dc1ee87d38cb8412f421ebf30ab6f25270a794c0f4ba55",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0018.pdf"
+  },
+  "orgsyn_cv1p0087": {
+   "file": "snapshots/rk-orgsyn_cv1p0087.txt",
+   "sha256": "850596bc8c57e6ba3edc22fc86c051d5496bd92d83cc9f6b9721e517a34585db",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0087.pdf"
+  },
+  "orgsyn_cv1p0089": {
+   "file": "snapshots/rk-orgsyn_cv1p0089.txt",
+   "sha256": "a6d6a90b3caa24583e54da3e5351251b905c24c93d62f5ef8096c89525a60502",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0089.pdf"
+  },
+  "orgsyn_cv1p0107": {
+   "file": "snapshots/rk-orgsyn_cv1p0107.txt",
+   "sha256": "d1cc01ee6642e7daceb7505e39cd3157b6e8fe878f4792aa358b7372bd78113e",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0107.pdf"
+  },
+  "orgsyn_cv1p0170": {
+   "file": "snapshots/rk-orgsyn_cv1p0170.txt",
+   "sha256": "f70ea028d4a1b8161633fb22ecb7cf83a9c075d15e52aa6e73ae61e687124253",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0170.pdf"
+  },
+  "orgsyn_cv1p0199": {
+   "file": "snapshots/rk-orgsyn_cv1p0199.txt",
+   "sha256": "ef962c8907e98b7ed9e2b994205e61df8402e9267f39cac8f20f57be3c97a742",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0199.pdf"
+  },
+  "orgsyn_cv1p0235": {
+   "file": "snapshots/rk-orgsyn_cv1p0235.txt",
+   "sha256": "72fc3f491fcb1aa849e2638f13d3a80f3bf3c7104b712ca99cc88b58aa6c60bf",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0235.pdf"
+  },
+  "orgsyn_cv1p0345": {
+   "file": "snapshots/rk-orgsyn_cv1p0345.txt",
+   "sha256": "3240ebc0b274bf56ab6b3ee661d34e7616c4406fef0579eae0cd736d2ff7ebcf",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0345.pdf"
+  },
+  "orgsyn_cv1p0436": {
+   "file": "snapshots/rk-orgsyn_cv1p0436.txt",
+   "sha256": "a4823d5fcd357d0f4f0ef20d12a4ada38073d7901744890a56cc316e32169e2b",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0436.pdf"
+  },
+  "orgsyn_cv1p0459": {
+   "file": "snapshots/rk-orgsyn_cv1p0459.txt",
+   "sha256": "da2da36ab41e002f6bdea43eb61ad802f9bb61356328d6552695a79bc45e9104",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0459.pdf"
+  },
+  "orgsyn_cv1p0462": {
+   "file": "snapshots/rk-orgsyn_cv1p0462.txt",
+   "sha256": "2a51b9c02ad52998c281f4e30ef6e1f7055bd0d12b76c22a36bf9d815321197c",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0462.pdf"
+  },
+  "wiki_aspirin": {
+   "file": "snapshots/rk-wiki_aspirin.txt",
+   "sha256": "9e863ee4289486f8277b73010e5c5dcf99734cc4529f0241380446da7ef022e3",
+   "url": "https://en.wikipedia.org/wiki/Aspirin"
+  },
+  "wiki_adipic": {
+   "file": "snapshots/rk-wiki_adipic.txt",
+   "sha256": "f7086aaefcc7f8a0f3c01e17ec7d1c55633b037c0191288a7b92a0dfd54b2f40",
+   "url": "https://en.wikipedia.org/wiki/Adipic_acid"
+  },
+  "wiki_cyclopentanone": {
+   "file": "snapshots/rk-wiki_cyclopentanone.txt",
+   "sha256": "160d5c24844a8276cbe77ab7171633a39e21430eb87aaeaf3e41844f45b0839e",
+   "url": "https://en.wikipedia.org/wiki/Cyclopentanone"
+  },
+  "wiki_paracetamol": {
+   "file": "snapshots/rk-wiki_paracetamol.txt",
+   "sha256": "ee8c2ee68870f26a36a28bf54979de6f3c25797cf0ae16e16163c9874ca0a630",
+   "url": "https://en.wikipedia.org/wiki/Paracetamol"
+  },
+  "wiki_phenacetin": {
+   "file": "snapshots/rk-wiki_phenacetin.txt",
+   "sha256": "3ee28d7d2846732b3bec3873997d24dd8791b5cb3fe5292644ee98ca974ad5b2",
+   "url": "https://en.wikipedia.org/wiki/Phenacetin"
+  },
+  "wiki_nitroaniline": {
+   "file": "snapshots/rk-wiki_nitroaniline.txt",
+   "sha256": "680cf626f551dfbb220353eeb32b8d65be4609d7b65f885a89e3de507ea2dcc8",
+   "url": "https://en.wikipedia.org/wiki/4-Nitroaniline"
+  },
+  "wiki_acetanilide": {
+   "file": "snapshots/rk-wiki_acetanilide.txt",
+   "sha256": "2820861c32d3eabb52ba1b0201315c44c7d345bb50992dc648b2cd3ae2589fd9",
+   "url": "https://en.wikipedia.org/wiki/Acetanilide"
+  },
+  "wiki_lidocaine": {
+   "file": "snapshots/rk-wiki_lidocaine.txt",
+   "sha256": "533b514796b8e785efef4133b9c88ca3a0310ec41a1954fd775fb66566f10707",
+   "url": "https://en.wikipedia.org/wiki/Lidocaine"
+  },
+  "wiki_mibk": {
+   "file": "snapshots/rk-wiki_mibk.txt",
+   "sha256": "0f2d77ac9b275d5029b8712fe68a90f43c3f77418fe8174d51bac9992fd100ff",
+   "url": "https://en.wikipedia.org/wiki/Methyl_isobutyl_ketone"
+  },
+  "wiki_dimedone": {
+   "file": "snapshots/rk-wiki_dimedone.txt",
+   "sha256": "c43791e444ef812ed8e09a7c2d659ba9d28552f935cf47e92c78ce9850cd2600",
+   "url": "https://en.wikipedia.org/wiki/Dimedone"
+  },
+  "wiki_aeester": {
+   "file": "snapshots/rk-wiki_aeester.txt",
+   "sha256": "3dd28b2deabc6d4d9c3574df1ab0887708da1663c2de2f0be5f131f18047438e",
+   "url": "https://en.wikipedia.org/wiki/Acetoacetic_ester_synthesis"
+  },
+  "wiki_grignard": {
+   "file": "snapshots/rk-wiki_grignard.txt",
+   "sha256": "d2a7df41422654db0fd698bf2391943c549c4cf3c4f91ab9f6d1b2a0343f07bb",
+   "url": "https://en.wikipedia.org/wiki/Grignard_reaction"
+  },
+  "wiki_protgroup": {
+   "file": "snapshots/rk-wiki_protgroup.txt",
+   "sha256": "87435b5211ff6b9e985579473869fb5000be58e42317bf075e258664224494d7",
+   "url": "https://en.wikipedia.org/wiki/Protecting_group"
+  },
+  "wiki_sandmeyer": {
+   "file": "snapshots/rk-wiki_sandmeyer.txt",
+   "sha256": "3e807686695d4246417e855b780a6d7bc9be8a584d37c4c91028d041ce34aa1c",
+   "url": "https://en.wikipedia.org/wiki/Sandmeyer_reaction"
+  },
+  "orgsyn_cv1p0008": {
+   "file": null,
+   "sha256": null,
+   "url": "http://www.orgsyn.org/demo.aspx?prep=CV1P0008",
+   "note": "not fetched or snapshot missing"
+  },
+  "orgsyn_cv2p0200": {
+   "file": null,
+   "sha256": null,
+   "url": "https://orgsyn.org/demo.aspx?prep=cv2p0200",
+   "note": "not fetched or snapshot missing"
+  },
+  "orgsyn_cv1p0248_cv1p0351": {
+   "file": null,
+   "sha256": null,
+   "url": "http://www.orgsyn.org/demo.aspx?prep=CV1P0351",
+   "note": "not fetched or snapshot missing"
+  }
+ },
+ "problems": [],
+ "splitRule": "holdout iff parseInt(sha256('stage9f-v1|'+id).slice(0,8),16) % 5 < 2",
+ "engineCommitAtFreeze": "42b21575f5c807df167cf405a2dd854ea7143681",
+ "frozenOn": "2026-11-03T21:15:09.311Z",
+ "counts": {
+  "nomenclature": {
+   "dev": 42,
+   "holdout": 28,
+   "verified": 67,
+   "inferred": 3
+  },
+  "properties": {
+   "dev": 12,
+   "holdout": 18,
+   "verified": 30,
+   "inferred": 0
+  },
+  "ranking": {
+   "dev": 22,
+   "holdout": 28,
+   "verified": 42,
+   "inferred": 8
+  },
+  "reactions": {
+   "dev": 30,
+   "holdout": 18,
+   "verified": 35,
+   "inferred": 13
+  },
+  "spectroscopy": {
+   "dev": 31,
+   "holdout": 25,
+   "verified": 56,
+   "inferred": 0
+  },
+  "synthesis": {
+   "dev": 17,
+   "holdout": 7,
+   "verified": 16,
+   "inferred": 8
+  }
+ }
+}

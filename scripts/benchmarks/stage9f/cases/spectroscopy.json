@@ -1,0 +1,4587 @@
+{
+ "capability": "spectroscopy",
+ "authored_on": "2026-11-03",
+ "sources": {
+  "sp-ir-libretexts-table": {
+   "cite": "LibreTexts: Infrared Spectroscopy Absorption Table",
+   "url": "https://chem.libretexts.org/Ancillary_Materials/Reference/Reference_Tables/Spectroscopic_Parameters/Infrared_Spectroscopy_Absorption_Table",
+   "snapshot": "sp-ir-libretexts-table.txt",
+   "fetched": true,
+   "says": "Characteristic IR absorption ranges by bond and functional group."
+  },
+  "sp-1h-shift-morsch": {
+   "cite": "LibreTexts (Morsch et al.) 13.3 Chemical Shifts in 1H NMR Spectroscopy, Table 1",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(Morsch_et_al.)/13:_Structure_Determination_-_Nuclear_Magnetic_Resonance_Spectroscopy/13.03:_Chemical_Shifts_in_H_NMR__Spectroscopy",
+   "snapshot": "sp-1h-shift-morsch.txt",
+   "fetched": true,
+   "says": "Common 1H chemical shifts: RCH3 0.9-1.0, ArCH3 2.2-2.4, ROCH3 3.7-3.9, ArH 6.0-8.7 ppm."
+  },
+  "sp-13c-shift-morsch": {
+   "cite": "LibreTexts (Morsch et al.) 13.10 Characteristics of 13C NMR Spectroscopy",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(Morsch_et_al.)/13:_Structure_Determination_-_Nuclear_Magnetic_Resonance_Spectroscopy/13.10:_Characteristics_of_C_NMR_Spectroscopy",
+   "snapshot": "sp-13c-shift-morsch.txt",
+   "fetched": true,
+   "says": "13C signals for carbonyl carbons are generally the furthest downfield (170-220 ppm)."
+  },
+  "sp-nist-67641": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Acetone",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C67641&Index=0&Type=Mass",
+   "snapshot": "sp-nist-67641.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-78933": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of 2-Butanone",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C78933&Index=0&Type=Mass",
+   "snapshot": "sp-nist-78933.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-108941": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Cyclohexanone",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108941&Index=0&Type=Mass",
+   "snapshot": "sp-nist-108941.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-120923": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Cyclopentanone",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C120923&Index=0&Type=Mass",
+   "snapshot": "sp-nist-120923.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-100527": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Benzaldehyde",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C100527&Index=0&Type=Mass",
+   "snapshot": "sp-nist-100527.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-123728": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Butanal",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C123728&Index=0&Type=Mass",
+   "snapshot": "sp-nist-123728.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-79094": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Propanoic acid",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C79094&Index=0&Type=Mass",
+   "snapshot": "sp-nist-79094.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-65850": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Benzoic acid",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C65850&Index=0&Type=Mass",
+   "snapshot": "sp-nist-65850.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-141786": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Ethyl Acetate",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C141786&Index=0&Type=Mass",
+   "snapshot": "sp-nist-141786.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-93583": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Benzoic acid, methyl ester",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C93583&Index=0&Type=Mass",
+   "snapshot": "sp-nist-93583.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-60355": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Acetamide",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C60355&Index=0&Type=Mass",
+   "snapshot": "sp-nist-60355.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-68122": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Formamide, N,N-dimethyl-",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C68122&Index=0&Type=Mass",
+   "snapshot": "sp-nist-68122.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-62533": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Aniline",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C62533&Index=0&Type=Mass",
+   "snapshot": "sp-nist-62533.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-109897": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Ethanamine, N-ethyl-",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109897&Index=0&Type=Mass",
+   "snapshot": "sp-nist-109897.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-121448": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Triethylamine",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C121448&Index=0&Type=Mass",
+   "snapshot": "sp-nist-121448.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-75058": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Acetonitrile",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75058&Index=0&Type=Mass",
+   "snapshot": "sp-nist-75058.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-100470": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Benzonitrile",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C100470&Index=0&Type=Mass",
+   "snapshot": "sp-nist-100470.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-629050": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of 1-Octyne",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C629050&Index=0&Type=Mass",
+   "snapshot": "sp-nist-629050.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-592767": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of 1-Heptene",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C592767&Index=0&Type=Mass",
+   "snapshot": "sp-nist-592767.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-110838": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Cyclohexene",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110838&Index=0&Type=Mass",
+   "snapshot": "sp-nist-110838.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-64175": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Ethanol",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C64175&Index=0&Type=Mass",
+   "snapshot": "sp-nist-64175.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-67630": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Isopropyl Alcohol",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C67630&Index=0&Type=Mass",
+   "snapshot": "sp-nist-67630.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-108952": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Phenol",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108952&Index=0&Type=Mass",
+   "snapshot": "sp-nist-108952.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-75650": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of 2-Propanol, 2-methyl-",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75650&Index=0&Type=Mass",
+   "snapshot": "sp-nist-75650.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-60297": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Ethyl ether",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C60297&Index=0&Type=Mass",
+   "snapshot": "sp-nist-60297.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-100663": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Anisole",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C100663&Index=0&Type=Mass",
+   "snapshot": "sp-nist-100663.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-109999": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Tetrahydrofuran",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109999&Index=0&Type=Mass",
+   "snapshot": "sp-nist-109999.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-108907": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Benzene, chloro-",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108907&Index=0&Type=Mass",
+   "snapshot": "sp-nist-108907.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-74964": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Ethyl bromide",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C74964&Index=0&Type=Mass",
+   "snapshot": "sp-nist-74964.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-109693": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Butane, 1-chloro-",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109693&Index=0&Type=Mass",
+   "snapshot": "sp-nist-109693.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-75263": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Propane, 2-bromo-",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75263&Index=0&Type=Mass",
+   "snapshot": "sp-nist-75263.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-75092": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Methylene chloride",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75092&Index=0&Type=Mass",
+   "snapshot": "sp-nist-75092.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-107062": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Ethane, 1,2-dichloro-",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107062&Index=0&Type=Mass",
+   "snapshot": "sp-nist-107062.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-67663": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Trichloromethane",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C67663&Index=0&Type=Mass",
+   "snapshot": "sp-nist-67663.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-98953": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Benzene, nitro-",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C98953&Index=0&Type=Mass",
+   "snapshot": "sp-nist-98953.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-75525": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Methane, nitro-",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75525&Index=0&Type=Mass",
+   "snapshot": "sp-nist-75525.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-95476": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of o-Xylene",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C95476&Index=0&Type=Mass",
+   "snapshot": "sp-nist-95476.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-108383": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Benzene, 1,3-dimethyl-",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108383&Index=0&Type=Mass",
+   "snapshot": "sp-nist-108383.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-106423": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of p-Xylene",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C106423&Index=0&Type=Mass",
+   "snapshot": "sp-nist-106423.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-108883": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Toluene",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108883&Index=0&Type=Mass",
+   "snapshot": "sp-nist-108883.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-100414": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Ethylbenzene",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C100414&Index=0&Type=Mass",
+   "snapshot": "sp-nist-100414.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-108678": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Mesitylene",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108678&Index=0&Type=Mass",
+   "snapshot": "sp-nist-108678.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-108247": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Acetic anhydride",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108247&Index=0&Type=Mass",
+   "snapshot": "sp-nist-108247.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-98884": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Benzoyl chloride",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C98884&Index=0&Type=Mass",
+   "snapshot": "sp-nist-98884.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-78944": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Methyl vinyl ketone",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C78944&Index=0&Type=Mass",
+   "snapshot": "sp-nist-78944.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-107879": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of 2-Pentanone",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107879&Index=0&Type=Mass",
+   "snapshot": "sp-nist-107879.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-96220": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of 3-Pentanone",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C96220&Index=0&Type=Mass",
+   "snapshot": "sp-nist-96220.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-98828": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Benzene, (1-methylethyl)-",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C98828&Index=0&Type=Mass",
+   "snapshot": "sp-nist-98828.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-91203": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Naphthalene",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C91203&Index=0&Type=Mass",
+   "snapshot": "sp-nist-91203.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-110861": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Pyridine",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110861&Index=0&Type=Mass",
+   "snapshot": "sp-nist-110861.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-123911": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of 1,4-Dioxane",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C123911&Index=0&Type=Mass",
+   "snapshot": "sp-nist-123911.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-107028": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of 2-Propenal",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107028&Index=0&Type=Mass",
+   "snapshot": "sp-nist-107028.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-115071": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Propene",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C115071&Index=0&Type=Mass",
+   "snapshot": "sp-nist-115071.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-119619": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Benzophenone",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C119619&Index=0&Type=Mass",
+   "snapshot": "sp-nist-119619.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-109739": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of 1-Butanamine",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109739&Index=0&Type=Mass",
+   "snapshot": "sp-nist-109739.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  },
+  "sp-nist-64197": {
+   "cite": "NIST Chemistry WebBook, mass spectrum (electron ionization) of Acetic acid",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C64197&Index=0&Type=Mass",
+   "snapshot": "sp-nist-64197.txt",
+   "fetched": true,
+   "says": "EI mass spectrum peak table (m/z, relative intensity)."
+  }
+ },
+ "cases": [
+  {
+   "id": "SP-01",
+   "category": "spectroscopy-carbonyl",
+   "title": "acetone",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-67641"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CC(C)=O",
+   "ir": {
+    "present": [
+     {
+      "label": "aliphatic ketone C=O stretch (table: 1725-1705)",
+      "range_cm1": [
+       1705,
+       1725
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 1,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 58,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-02",
+   "category": "spectroscopy-carbonyl",
+   "title": "2-butanone",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-78933"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCC(C)=O",
+   "ir": {
+    "present": [
+     {
+      "label": "aliphatic ketone C=O stretch (table: 1725-1705)",
+      "range_cm1": [
+       1705,
+       1725
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 4,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 72,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-03",
+   "category": "spectroscopy-carbonyl",
+   "title": "cyclohexanone",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-108941"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "O=C1CCCCC1",
+   "ir": {
+    "present": [
+     {
+      "label": "cyclohexanone C=O stretch (table row: aliphatic ketone or cyclohexanone 1725-1705)",
+      "range_cm1": [
+       1705,
+       1725
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 4,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 98,
+    "base_peak_mz": 55,
+    "key_fragments": [
+     {
+      "mz": 55,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 42,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 41,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 39,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-04",
+   "category": "spectroscopy-carbonyl",
+   "title": "cyclopentanone",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-120923"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "O=C1CCCC1",
+   "ir": {
+    "present": [
+     {
+      "label": "cyclopentanone C=O stretch (table: 1745)",
+      "range_cm1": [
+       1735,
+       1755
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 3,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 84,
+    "base_peak_mz": 55,
+    "key_fragments": [
+     {
+      "mz": 55,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 28,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 41,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 56,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-05",
+   "category": "spectroscopy-carbonyl",
+   "title": "benzaldehyde",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-100527"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "O=Cc1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "conjugated aldehyde C=O stretch (table: 1710-1685)",
+      "range_cm1": [
+       1685,
+       1710
+      ]
+     },
+     {
+      "label": "aldehyde C-H stretch (table: 2830-2695)",
+      "range_cm1": [
+       2695,
+       2830
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 4,
+    "c_environments": 5,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 106,
+    "base_peak_mz": 77,
+    "key_fragments": [
+     {
+      "mz": 77,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 105,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 51,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 50,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-06",
+   "category": "spectroscopy-carbonyl",
+   "title": "butanal",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-123728"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCCC=O",
+   "ir": {
+    "present": [
+     {
+      "label": "aldehyde C=O stretch (table: 1740-1720)",
+      "range_cm1": [
+       1720,
+       1740
+      ]
+     },
+     {
+      "label": "aldehyde C-H stretch (table: 2830-2695)",
+      "range_cm1": [
+       2695,
+       2830
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 4,
+    "c_environments": 4,
+    "h_signals": [
+     {
+      "range_ppm": [
+       0.9,
+       1
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "RCH3 (table: 0.9-1.0)"
+     }
+    ],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 72,
+    "base_peak_mz": 44,
+    "key_fragments": [
+     {
+      "mz": 44,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 41,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 27,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-07",
+   "category": "spectroscopy-carbonyl",
+   "title": "propanoic acid",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-79094"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCC(=O)O",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "carboxylic acid O-H stretch (table: 3300-2500)",
+      "range_cm1": [
+       2500,
+       3300
+      ]
+     },
+     {
+      "label": "carboxylic acid dimer C=O stretch (table: 1720-1706)",
+      "range_cm1": [
+       1706,
+       1720
+      ]
+     }
+    ],
+    "absent": []
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 3,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 74,
+    "base_peak_mz": 74,
+    "key_fragments": [
+     {
+      "mz": 28,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 45,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 29,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 73,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-08",
+   "category": "spectroscopy-carbonyl",
+   "title": "benzoic acid",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-65850"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "OC(=O)c1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "carboxylic acid O-H stretch (table: 3300-2500)",
+      "range_cm1": [
+       2500,
+       3300
+      ]
+     }
+    ],
+    "absent": []
+   },
+   "nmr": {
+    "h_environments": 4,
+    "c_environments": 5,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 122,
+    "base_peak_mz": 105,
+    "key_fragments": [
+     {
+      "mz": 105,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 77,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 51,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-09",
+   "category": "spectroscopy-carbonyl",
+   "title": "ethyl acetate",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-141786"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCOC(C)=O",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 4,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 88,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-10",
+   "category": "spectroscopy-carbonyl",
+   "title": "methyl benzoate",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-93583"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "COC(=O)c1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 4,
+    "c_environments": 6,
+    "h_signals": [
+     {
+      "range_ppm": [
+       3.7,
+       3.9
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ROCH3 (table: 3.7-3.9)"
+     },
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 136,
+    "base_peak_mz": 105,
+    "key_fragments": [
+     {
+      "mz": 105,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 77,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 51,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-11",
+   "category": "spectroscopy-carbonyl",
+   "title": "acetamide",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-60355"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CC(N)=O",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "primary amine N-H stretch (table: 3500-3400 / 3400-3300)",
+      "range_cm1": [
+       3300,
+       3500
+      ]
+     }
+    ],
+    "absent": []
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 59,
+    "base_peak_mz": 59,
+    "key_fragments": [
+     {
+      "mz": 44,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 42,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-12",
+   "category": "spectroscopy-carbonyl",
+   "title": "N,N-dimethylformamide",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-68122"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CN(C)C=O",
+   "ir": {
+    "present": [
+     {
+      "label": "aldehyde C-H stretch (table: 2830-2695)",
+      "range_cm1": [
+       2695,
+       2830
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 73,
+    "base_peak_mz": 73,
+    "key_fragments": [
+     {
+      "mz": 44,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 42,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 28,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 30,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-13",
+   "category": "spectroscopy-other",
+   "title": "aniline",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-62533"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "Nc1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "primary amine N-H stretch (table: 3500-3400 / 3400-3300)",
+      "range_cm1": [
+       3300,
+       3500
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 4,
+    "c_environments": 4,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 93,
+    "base_peak_mz": 93,
+    "key_fragments": [
+     {
+      "mz": 66,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 65,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-14",
+   "category": "spectroscopy-other",
+   "title": "diethylamine",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-109897"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCNCC",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "secondary amine N-H stretch (table: 3350-3310)",
+      "range_cm1": [
+       3310,
+       3350
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 73,
+    "base_peak_mz": 58,
+    "key_fragments": [
+     {
+      "mz": 58,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 30,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 44,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-15",
+   "category": "spectroscopy-other",
+   "title": "triethylamine",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-121448"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCN(CC)CC",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 101,
+    "base_peak_mz": 86,
+    "key_fragments": [
+     {
+      "mz": 86,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 58,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-16",
+   "category": "spectroscopy-other",
+   "title": "acetonitrile",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-75058"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CC#N",
+   "ir": {
+    "present": [
+     {
+      "label": "nitrile C#N stretch (table: 2260-2222)",
+      "range_cm1": [
+       2222,
+       2260
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 1,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 41,
+    "base_peak_mz": 41,
+    "key_fragments": [
+     {
+      "mz": 40,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-17",
+   "category": "spectroscopy-other",
+   "title": "benzonitrile",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-100470"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "N#Cc1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "nitrile C#N stretch (table: 2260-2222)",
+      "range_cm1": [
+       2222,
+       2260
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 5,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 103,
+    "base_peak_mz": 103,
+    "key_fragments": [
+     {
+      "mz": 76,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-18",
+   "category": "spectroscopy-other",
+   "title": "1-octyne",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-629050"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCCCCCC#C",
+   "ir": {
+    "present": [
+     {
+      "label": "terminal alkyne C-H stretch (table: 3333-3267)",
+      "range_cm1": [
+       3267,
+       3333
+      ]
+     },
+     {
+      "label": "monosubstituted alkyne C#C stretch (table: 2140-2100)",
+      "range_cm1": [
+       2100,
+       2140
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 7,
+    "c_environments": 8,
+    "h_signals": [
+     {
+      "range_ppm": [
+       0.9,
+       1
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "RCH3 (table: 0.9-1.0)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 110,
+    "base_peak_mz": 81,
+    "key_fragments": [
+     {
+      "mz": 81,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 41,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 67,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-19",
+   "category": "spectroscopy-other",
+   "title": "1-heptene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-592767"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "C=CCCCCC",
+   "ir": {
+    "present": [
+     {
+      "label": "alkene =C-H stretch (table: 3100-3000)",
+      "range_cm1": [
+       3000,
+       3100
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "alkene C=C stretch, monosubstituted (table: 1648-1638)",
+      "range_cm1": [
+       1638,
+       1648
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 7,
+    "c_environments": 7,
+    "h_signals": [
+     {
+      "range_ppm": [
+       0.9,
+       1
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "RCH3 (table: 0.9-1.0)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 98,
+    "base_peak_mz": 56,
+    "key_fragments": [
+     {
+      "mz": 56,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 41,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 55,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 29,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-20",
+   "category": "spectroscopy-other",
+   "title": "cyclohexene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-110838"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "C1=CCCCC1",
+   "ir": {
+    "present": [
+     {
+      "label": "alkene =C-H stretch (table: 3100-3000)",
+      "range_cm1": [
+       3000,
+       3100
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 3,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 82,
+    "base_peak_mz": 67,
+    "key_fragments": [
+     {
+      "mz": 67,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 54,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 39,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 41,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-21",
+   "category": "spectroscopy-other",
+   "title": "ethanol",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-64175"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCO",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "alcohol O-H stretch, hydrogen bonded (table: 3550-3200)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "primary alcohol C-O stretch (table: 1085-1050)",
+      "range_cm1": [
+       1050,
+       1085
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 46,
+    "base_peak_mz": 31,
+    "key_fragments": [
+     {
+      "mz": 31,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 45,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 29,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 27,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-22",
+   "category": "spectroscopy-other",
+   "title": "2-propanol",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-67630"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CC(C)O",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "alcohol O-H stretch, hydrogen bonded (table: 3550-3200)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "secondary alcohol C-O stretch (table: 1124-1087)",
+      "range_cm1": [
+       1087,
+       1124
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 60,
+    "base_peak_mz": 45,
+    "key_fragments": [
+     {
+      "mz": 45,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-23",
+   "category": "spectroscopy-other",
+   "title": "phenol",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-108952"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "Oc1ccccc1",
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 4,
+    "c_environments": 4,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 94,
+    "base_peak_mz": 94,
+    "key_fragments": [
+     {
+      "mz": 66,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 65,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 39,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-24",
+   "category": "spectroscopy-other",
+   "title": "tert-butanol",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-75650"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CC(C)(C)O",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "alcohol O-H stretch, hydrogen bonded (table: 3550-3200)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "tertiary alcohol C-O stretch (table: 1205-1124)",
+      "range_cm1": [
+       1124,
+       1205
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": null,
+    "base_peak_mz": 59,
+    "key_fragments": [
+     {
+      "mz": 59,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 41,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 31,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-25",
+   "category": "spectroscopy-other",
+   "title": "diethyl ether",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-60297"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCOCC",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "aliphatic ether C-O stretch (table: 1150-1085)",
+      "range_cm1": [
+       1085,
+       1150
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 74,
+    "base_peak_mz": 31,
+    "key_fragments": [
+     {
+      "mz": 31,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 59,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 45,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 29,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-26",
+   "category": "spectroscopy-other",
+   "title": "anisole",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-100663"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "COc1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 4,
+    "c_environments": 5,
+    "h_signals": [
+     {
+      "range_ppm": [
+       3.7,
+       3.9
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ROCH3 (table: 3.7-3.9)"
+     },
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 108,
+    "base_peak_mz": 108,
+    "key_fragments": [
+     {
+      "mz": 78,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 65,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 39,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 77,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-27",
+   "category": "spectroscopy-other",
+   "title": "tetrahydrofuran",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-109999"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "C1CCOC1",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "aliphatic ether C-O stretch (table: 1150-1085)",
+      "range_cm1": [
+       1085,
+       1150
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 72,
+    "base_peak_mz": 42,
+    "key_fragments": [
+     {
+      "mz": 42,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 41,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 71,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-28",
+   "category": "spectroscopy-halide",
+   "title": "chlorobenzene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-108907"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "Clc1ccccc1",
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 4,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 112,
+    "base_peak_mz": 112,
+    "key_fragments": [
+     {
+      "mz": 77,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 114,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "Cl",
+    "m_plus_2_ratio": 0.329
+   }
+  },
+  {
+   "id": "SP-29",
+   "category": "spectroscopy-halide",
+   "title": "bromoethane",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-74964"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCBr",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 108,
+    "base_peak_mz": 29,
+    "key_fragments": [
+     {
+      "mz": 29,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 27,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 110,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 26,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "Br",
+    "m_plus_2_ratio": 0.98
+   }
+  },
+  {
+   "id": "SP-30",
+   "category": "spectroscopy-halide",
+   "title": "1-chlorobutane",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-109693"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCCCCl",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 4,
+    "c_environments": 4,
+    "h_signals": [
+     {
+      "range_ppm": [
+       0.9,
+       1
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "RCH3 (table: 0.9-1.0)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 92,
+    "base_peak_mz": 56,
+    "key_fragments": [
+     {
+      "mz": 56,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 41,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "Cl",
+    "m_plus_2_ratio": 0.25
+   }
+  },
+  {
+   "id": "SP-31",
+   "category": "spectroscopy-halide",
+   "title": "2-bromopropane",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-75263"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CC(C)Br",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 122,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 41,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 27,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "Br",
+    "m_plus_2_ratio": 0.966
+   }
+  },
+  {
+   "id": "SP-32",
+   "category": "spectroscopy-halide",
+   "title": "dichloromethane",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-75092"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "ClCCl",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 1,
+    "c_environments": 1,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 84,
+    "base_peak_mz": 49,
+    "key_fragments": [
+     {
+      "mz": 49,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 86,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 51,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "Cl",
+    "m_plus_2_ratio": 0.655
+   }
+  },
+  {
+   "id": "SP-33",
+   "category": "spectroscopy-halide",
+   "title": "1,2-dichloroethane",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-107062"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "ClCCCl",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 1,
+    "c_environments": 1,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 98,
+    "base_peak_mz": 62,
+    "key_fragments": [
+     {
+      "mz": 62,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 64,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 27,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 49,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "Cl",
+    "m_plus_2_ratio": 0.642
+   }
+  },
+  {
+   "id": "SP-34",
+   "category": "spectroscopy-halide",
+   "title": "chloroform",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-67663"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "ClC(Cl)Cl",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 1,
+    "c_environments": 1,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 118,
+    "base_peak_mz": 83,
+    "key_fragments": [
+     {
+      "mz": 83,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 85,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 47,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "Cl",
+    "m_plus_2_ratio": 0.96
+   }
+  },
+  {
+   "id": "SP-35",
+   "category": "spectroscopy-other",
+   "title": "nitrobenzene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-98953"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "O=[N+]([O-])c1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "nitro N-O stretch (table: 1550-1500)",
+      "range_cm1": [
+       1500,
+       1550
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 4,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 123,
+    "base_peak_mz": 77,
+    "key_fragments": [
+     {
+      "mz": 77,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 51,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-36",
+   "category": "spectroscopy-other",
+   "title": "nitromethane",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-75525"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "C[N+](=O)[O-]",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "nitro N-O stretch (table: 1550-1500)",
+      "range_cm1": [
+       1500,
+       1550
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 1,
+    "c_environments": 1,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 61,
+    "base_peak_mz": 30,
+    "key_fragments": [
+     {
+      "mz": 30,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 15,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 46,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-37",
+   "category": "spectroscopy-other",
+   "title": "o-xylene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-95476"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "Cc1ccccc1C",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 4,
+    "h_signals": [
+     {
+      "range_ppm": [
+       2.2,
+       2.4
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArCH3 (table: 2.2-2.4)"
+     },
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 106,
+    "base_peak_mz": 91,
+    "key_fragments": [
+     {
+      "mz": 91,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 105,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-38",
+   "category": "spectroscopy-other",
+   "title": "m-xylene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-108383"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "Cc1cccc(C)c1",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 4,
+    "c_environments": 5,
+    "h_signals": [
+     {
+      "range_ppm": [
+       2.2,
+       2.4
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArCH3 (table: 2.2-2.4)"
+     },
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 106,
+    "base_peak_mz": 91,
+    "key_fragments": [
+     {
+      "mz": 91,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 105,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-39",
+   "category": "spectroscopy-other",
+   "title": "p-xylene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-106423"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "Cc1ccc(C)cc1",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 3,
+    "h_signals": [
+     {
+      "range_ppm": [
+       2.2,
+       2.4
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArCH3 (table: 2.2-2.4)"
+     },
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 106,
+    "base_peak_mz": 91,
+    "key_fragments": [
+     {
+      "mz": 91,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 105,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-40",
+   "category": "spectroscopy-other",
+   "title": "toluene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-108883"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "Cc1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 4,
+    "c_environments": 5,
+    "h_signals": [
+     {
+      "range_ppm": [
+       2.2,
+       2.4
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArCH3 (table: 2.2-2.4)"
+     },
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 92,
+    "base_peak_mz": 91,
+    "key_fragments": [
+     {
+      "mz": 91,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-41",
+   "category": "spectroscopy-other",
+   "title": "ethylbenzene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-100414"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCc1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 5,
+    "c_environments": 6,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 106,
+    "base_peak_mz": 91,
+    "key_fragments": [
+     {
+      "mz": 91,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-42",
+   "category": "spectroscopy-other",
+   "title": "mesitylene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-108678"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "Cc1cc(C)cc(C)c1",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 3,
+    "h_signals": [
+     {
+      "range_ppm": [
+       2.2,
+       2.4
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArCH3 (table: 2.2-2.4)"
+     },
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 120,
+    "base_peak_mz": 105,
+    "key_fragments": [
+     {
+      "mz": 105,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-43",
+   "category": "spectroscopy-carbonyl",
+   "title": "acetic anhydride",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-108247"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CC(=O)OC(C)=O",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 1,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": null,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-44",
+   "category": "spectroscopy-carbonyl",
+   "title": "benzoyl chloride",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-98884"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "O=C(Cl)c1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "acid halide C=O stretch (table: 1800-1770 conjugated)",
+      "range_cm1": [
+       1770,
+       1800
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 5,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 140,
+    "base_peak_mz": 105,
+    "key_fragments": [
+     {
+      "mz": 105,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 77,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 51,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 50,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "Cl",
+    "m_plus_2_ratio": 0.326
+   }
+  },
+  {
+   "id": "SP-45",
+   "category": "spectroscopy-carbonyl",
+   "title": "methyl vinyl ketone",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-78944"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "C=CC(C)=O",
+   "ir": {
+    "present": [
+     {
+      "label": "conjugated ketone C=O stretch (table: 1685-1666)",
+      "range_cm1": [
+       1666,
+       1685
+      ]
+     },
+     {
+      "label": "alkene =C-H stretch (table: 3100-3000)",
+      "range_cm1": [
+       3000,
+       3100
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 4,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 70,
+    "base_peak_mz": 55,
+    "key_fragments": [
+     {
+      "mz": 55,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 27,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-46",
+   "category": "spectroscopy-carbonyl",
+   "title": "2-pentanone",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-107879"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCCC(C)=O",
+   "ir": {
+    "present": [
+     {
+      "label": "aliphatic ketone C=O stretch (table: 1725-1705)",
+      "range_cm1": [
+       1705,
+       1725
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 4,
+    "c_environments": 5,
+    "h_signals": [
+     {
+      "range_ppm": [
+       0.9,
+       1
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "RCH3 (table: 0.9-1.0)"
+     }
+    ],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 86,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-47",
+   "category": "spectroscopy-carbonyl",
+   "title": "3-pentanone",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-96220"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCC(=O)CC",
+   "ir": {
+    "present": [
+     {
+      "label": "aliphatic ketone C=O stretch (table: 1725-1705)",
+      "range_cm1": [
+       1705,
+       1725
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 3,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 86,
+    "base_peak_mz": 57,
+    "key_fragments": [
+     {
+      "mz": 57,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 29,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-48",
+   "category": "spectroscopy-other",
+   "title": "cumene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-98828"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CC(C)c1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 5,
+    "c_environments": 6,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 120,
+    "base_peak_mz": 105,
+    "key_fragments": [
+     {
+      "mz": 105,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 77,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-49",
+   "category": "spectroscopy-other",
+   "title": "naphthalene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-91203"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "c1ccc2ccccc2c1",
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 3,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 128,
+    "base_peak_mz": 128,
+    "key_fragments": [],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-50",
+   "category": "spectroscopy-other",
+   "title": "pyridine",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-110861"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "c1ccncc1",
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 3,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 79,
+    "base_peak_mz": 79,
+    "key_fragments": [
+     {
+      "mz": 52,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 51,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-51",
+   "category": "spectroscopy-other",
+   "title": "1,4-dioxane",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-123911"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "C1COCCO1",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "aliphatic ether C-O stretch (table: 1150-1085)",
+      "range_cm1": [
+       1085,
+       1150
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 1,
+    "c_environments": 1,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 88,
+    "base_peak_mz": 28,
+    "key_fragments": [
+     {
+      "mz": 28,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 29,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 58,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-52",
+   "category": "spectroscopy-carbonyl",
+   "title": "acrolein",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-107028"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "C=CC=O",
+   "ir": {
+    "present": [
+     {
+      "label": "conjugated aldehyde C=O stretch (table: 1710-1685)",
+      "range_cm1": [
+       1685,
+       1710
+      ]
+     },
+     {
+      "label": "aldehyde C-H stretch (table: 2830-2695)",
+      "range_cm1": [
+       2695,
+       2830
+      ]
+     },
+     {
+      "label": "alkene =C-H stretch (table: 3100-3000)",
+      "range_cm1": [
+       3000,
+       3100
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 3,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 56,
+    "base_peak_mz": 56,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 26,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 55,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 29,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-53",
+   "category": "spectroscopy-other",
+   "title": "propene",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-115071"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CC=C",
+   "ir": {
+    "present": [
+     {
+      "label": "alkene =C-H stretch (table: 3100-3000)",
+      "range_cm1": [
+       3000,
+       3100
+      ]
+     },
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "alkene C=C stretch, monosubstituted (table: 1648-1638)",
+      "range_cm1": [
+       1638,
+       1648
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     },
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 3,
+    "h_signals": [],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 42,
+    "base_peak_mz": 41,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 39,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 27,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 40,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-54",
+   "category": "spectroscopy-carbonyl",
+   "title": "acetophenone-free: benzophenone",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-119619"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "O=C(c1ccccc1)c1ccccc1",
+   "ir": {
+    "present": [
+     {
+      "label": "conjugated ketone C=O stretch (table: 1685-1666)",
+      "range_cm1": [
+       1666,
+       1685
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no O-H or N-H stretch (no such group in the structure)",
+      "range_cm1": [
+       3200,
+       3550
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 3,
+    "c_environments": 5,
+    "h_signals": [
+     {
+      "range_ppm": [
+       6,
+       8.7
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "ArH (table: 6.0-8.7)"
+     }
+    ],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 182,
+    "base_peak_mz": 105,
+    "key_fragments": [
+     {
+      "mz": 105,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 77,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 51,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-55",
+   "category": "spectroscopy-other",
+   "title": "butylamine",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-109739"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CCCCN",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "primary amine N-H stretch (table: 3500-3400 / 3400-3300)",
+      "range_cm1": [
+       3300,
+       3500
+      ]
+     }
+    ],
+    "absent": [
+     {
+      "label": "no C=O stretch (no carbonyl in the structure)",
+      "range_cm1": [
+       1700,
+       1800
+      ]
+     }
+    ]
+   },
+   "nmr": {
+    "h_environments": 5,
+    "c_environments": 4,
+    "h_signals": [
+     {
+      "range_ppm": [
+       0.9,
+       1
+      ],
+      "proton_count": null,
+      "multiplicity": null,
+      "label": "RCH3 (table: 0.9-1.0)"
+     }
+    ],
+    "c_signals": []
+   },
+   "ms": {
+    "molecular_ion_mz": 73,
+    "base_peak_mz": 30,
+    "key_fragments": [
+     {
+      "mz": 30,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  },
+  {
+   "id": "SP-56",
+   "category": "spectroscopy-carbonyl",
+   "title": "acetic acid",
+   "source_ids": [
+    "sp-ir-libretexts-table",
+    "sp-1h-shift-morsch",
+    "sp-13c-shift-morsch",
+    "sp-nist-64197"
+   ],
+   "evidence": "verified",
+   "uncertainty": "MS from NIST EI data (mechanically extracted: M+, base peak, up to 4 peaks >=20% of base). IR/NMR ranges are textbook correlation-table rows; environment counts are RDKit topological symmetry classes (diastereotopic and conformational effects ignored).",
+   "smiles": "CC(=O)O",
+   "ir": {
+    "present": [
+     {
+      "label": "alkane C-H stretch (table: 3000-2840)",
+      "range_cm1": [
+       2840,
+       3000
+      ]
+     },
+     {
+      "label": "carboxylic acid O-H stretch (table: 3300-2500)",
+      "range_cm1": [
+       2500,
+       3300
+      ]
+     },
+     {
+      "label": "carboxylic acid dimer C=O stretch (table: 1720-1706)",
+      "range_cm1": [
+       1706,
+       1720
+      ]
+     }
+    ],
+    "absent": []
+   },
+   "nmr": {
+    "h_environments": 2,
+    "c_environments": 2,
+    "h_signals": [],
+    "c_signals": [
+     {
+      "range_ppm": [
+       170,
+       220
+      ],
+      "label": "carbonyl carbon of a ketone, aldehyde, acid or ester (text: 170-220 ppm)"
+     }
+    ]
+   },
+   "ms": {
+    "molecular_ion_mz": 60,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 43,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     },
+     {
+      "mz": 45,
+      "assignment": "among the strongest peaks in the NIST EI spectrum"
+     }
+    ],
+    "isotope": "none",
+    "m_plus_2_ratio": null
+   }
+  }
+ ]
+}

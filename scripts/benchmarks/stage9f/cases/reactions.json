@@ -1,0 +1,2070 @@
+{
+ "capability": "reactions",
+ "authored_on": "2026-11-03",
+ "sources": {
+  "epox_morsch": {
+   "cite": "Soderberg, Organic Chemistry with a Biological Emphasis, via LibreTexts 9.15 Reactions of Epoxides (Morsch, UIS CHE 267)",
+   "url": "https://chem.libretexts.org/Courses/University_of_Illinois_Springfield/CHE_267%3A_Organic_Chemistry_I_(Morsch)/Chapters/Chapter_09%3A_Alcohols_Ethers_and_Epoxides/9.15%3A_Reactions_of_Epoxides",
+   "snapshot": "rx-epox_morsch.txt",
+   "fetched": true,
+   "says": "Basic/alkoxide opening is SN2 at the least hindered epoxide carbon; acid-catalysed opening has SN1 character and attack is at the more substituted carbon; both with backside attack."
+  },
+  "epox_wade": {
+   "cite": "Wade, Organic Chemistry, via LibreTexts 15.08 Opening of Epoxides",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Wade)_Complete_and_Semesters_I_and_II/Map%3A_Organic_Chemistry_(Wade)/15%3A_Ethers_Epoxides_and_Thioethers/15.08%3A_Opening_of_Epoxides",
+   "snapshot": "rx-epox_wade.txt",
+   "fetched": true,
+   "says": "Anhydrous HX gives trans halohydrins; halide attacks the less substituted carbon if both are primary/secondary but the tertiary carbon if one carbon is tertiary; aqueous acid gives glycols by anti opening."
+  },
+  "epox_chan": {
+   "cite": "LibreTexts 11.4 Opening of Epoxides (Chan, UIUC Chem 2363A)",
+   "url": "https://chem.libretexts.org/Courses/University_of_Illinois_UrbanaChampaign/Chem_2363A_Fundamental_Organic_Chemistry_I_(Chan)/11%3A_The_Chemistry_of_Ethers_Epoxides_Glycols_and_Sulfides/11.04%3A_Opening_of_Epoxides",
+   "snapshot": "rx-epox_chan.txt",
+   "fetched": true,
+   "says": "Same text as Wade: HX opens epoxides to trans halohydrins with attack at tertiary carbon when present."
+  },
+  "epox_ssu": {
+   "cite": "LibreTexts 18.6 Reactions of Epoxides: Ring-opening (SSU Chem 335A)",
+   "url": "https://chem.libretexts.org/Courses/Sonoma_State_University/SSU_Chem_335A/Material_Since_Exam_3_for_the_Final/Unit_18_Ethers_and_Epoxides%3B_Thiols_and_Sulfides/18.6_Reactions_of_Epoxides%3A_Ring-opening",
+   "snapshot": "rx-epox_ssu.txt",
+   "fetched": true,
+   "says": "Aqueous-acid cleavage of epoxides gives trans glycols; HX gives trans halohydrins with tertiary-carbon attack."
+  },
+  "epox_grig": {
+   "cite": "Wade, LibreTexts 15.09 Reactions of Epoxides with Grignard and Organolithium Reagents",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Wade)_Complete_and_Semesters_I_and_II/Map%3A_Organic_Chemistry_(Wade)/15%3A_Ethers_Epoxides_and_Thioethers/15.09%3A_Reactions_of_Epoxides_with_Grignard_and_Organolithium_Reagents",
+   "snapshot": "rx-epox_grig.txt",
+   "fetched": true,
+   "says": "Grignard opening of epoxides follows the same SN2 mechanism as base-promoted opening (strong nucleophile and base), with inversion."
+  },
+  "e2_cyclohexane": {
+   "cite": "OpenStax Organic Chemistry 11.9 via LibreTexts: The E2 Reaction and Cyclohexane Conformation",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(OpenStax)/11%3A_Reactions_of_Alkyl_Halides-_Nucleophilic_Substitutions_and_Eliminations/11.09%3A_The_E2_Reaction_and_Cyclohexane__Conformation",
+   "snapshot": "rx-e2_cyclohexane.txt",
+   "fetched": true,
+   "says": "Neomenthyl chloride gives 3-menthene and eliminates 200x faster than menthyl chloride, which must ring-flip and gives 2-menthene (non-Zaitsev) via its only trans-diaxial hydrogen."
+  },
+  "mom_e2": {
+   "cite": "Master Organic Chemistry, The E2 Reaction and Cyclohexane Rings",
+   "url": "https://www.masterorganicchemistry.com/2012/10/18/the-e2-reaction-and-cyclohexane-rings/",
+   "snapshot": "rx-mom_e2.txt",
+   "fetched": true,
+   "says": "Neomenthyl chloride gives 78% 3-menthene and 22% 2-menthene with EtO- in ethanol (Hughes/Ingold/Rose, JACS 1955); E2 needs axial leaving group and axial anti H."
+  },
+  "wiki_zaitsev": {
+   "cite": "Wikipedia, Zaitsev's rule (flagged: Wikipedia)",
+   "url": "https://en.wikipedia.org/wiki/Zaitsev%27s_rule",
+   "snapshot": "rx-wiki_zaitsev.txt",
+   "fetched": true,
+   "says": "2-Bromo-2-methylbutane with NaOEt gives the Zaitsev product; bulky bases such as KOtBu favour the Hofmann product."
+  },
+  "hofmann_wiki": {
+   "cite": "Wikipedia, Hofmann elimination (flagged: Wikipedia)",
+   "url": "https://en.wikipedia.org/wiki/Hofmann_elimination",
+   "snapshot": "rx-hofmann_wiki.txt",
+   "fetched": true,
+   "says": "Heating a quaternary ammonium hydroxide gives the less substituted (Hofmann) alkene as major product."
+  },
+  "eas_uis": {
+   "cite": "LibreTexts 18.07 EAS of Substituted Benzenes (Morsch and Andrews, UIS CHE 269)",
+   "url": "https://chem.libretexts.org/Courses/University_of_Illinois_Springfield/UIS%3A_CHE_269_(Morsch_and_Andrews)/Chapters/Chapter_18%3A_Electrophilic_Aromatic_Substitution/18.07_EAS_of_Substituted_Benzenes",
+   "snapshot": "rx-eas_uis.txt",
+   "fetched": true,
+   "says": "Nitration of tert-butylbenzene gives 16% ortho, 8% meta, 75% para (steric hindrance at ortho); toluene gives 58.5% o, 37% p, 4.5% m."
+  },
+  "eas_poly": {
+   "cite": "McMurry, LibreTexts 16.6 Trisubstituted Benzenes - Additivity of Effects",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(McMurry)/16%3A_Chemistry_of_Benzene_-_Electrophilic_Aromatic_Substitution/16.06%3A_Trisubstituted_Benzenes_-_Additivity_of_Effects",
+   "snapshot": "rx-eas_poly.txt",
+   "fetched": true,
+   "says": "Reinforcing (cooperative) directing groups give the summed result; when directing effects oppose, the substituent with a lone pair on the ring atom normally controls the site."
+  },
+  "fc_limits": {
+   "cite": "LibreTexts 18.10 Limitations on Electrophilic Substitution Reactions with Substituted Benzenes (SSU Chem 335B)",
+   "url": "https://chem.libretexts.org/Courses/Sonoma_State_University/SSU_Chem_335B/Material_for_Exam_3/Chapter_18%3A_Electrophilic_Aromatic_Substitution/18.10_Limitations_on_Electrophilic_Substitution_Reactions_with_Substituted_Benzenes",
+   "snapshot": "rx-fc_limits.txt",
+   "fetched": true,
+   "says": "Friedel-Crafts fails on strongly deactivated rings such as nitrobenzene; acetanilide nitrates at low temperature to give the para-nitro product in high yield."
+  },
+  "wiki_nitr": {
+   "cite": "Wikipedia, Aromatic nitration (flagged: Wikipedia)",
+   "url": "https://en.wikipedia.org/wiki/Aromatic_nitration",
+   "snapshot": "rx-wiki_nitr.txt",
+   "fetched": true,
+   "says": "Direct nitration of aniline with HNO3/H2SO4 gives, per one source, a roughly 50/50 mixture of para and meta isomers (anilinium formation, plus oxidation)."
+  },
+  "cation_morsch": {
+   "cite": "Morsch et al., LibreTexts 7.12 Evidence for the Mechanism of Electrophilic Additions: Carbocation Rearrangements",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(Morsch_et_al.)/07%3A_Alkenes-_Structure_and_Reactivity/7.12%3A_Evidence_for_the_Mechanism_of_Electrophilic_Additions_-_Carbocation_Rearrangements",
+   "snapshot": "rx-cation_morsch.txt",
+   "fetched": true,
+   "says": "HBr adds to 3-methyl-1-butene to give mainly 2-bromo-2-methylbutane via hydride shift, not the Markovnikov 2-bromo-3-methylbutane."
+  },
+  "cation_alc": {
+   "cite": "LibreTexts 9.9 Carbocation Rearrangements (Morsch, UIS CHE 267)",
+   "url": "https://chem.libretexts.org/Courses/University_of_Illinois_Springfield/CHE_267:_Organic_Chemistry_I_(Morsch)/Chapters/Chapter_09:_Alcohols_Ethers_and_Epoxides/9.09:_Carbocation_Rearrangements",
+   "snapshot": "rx-cation_alc.txt",
+   "fetched": true,
+   "says": "Because alcohol ionisation proceeds through carbocations, hydride or alkyl shifts relocate the cation to a more stable position."
+  },
+  "wiki_wm": {
+   "cite": "Wikipedia, Wagner-Meerwein rearrangement (flagged: Wikipedia)",
+   "url": "https://en.wikipedia.org/wiki/Wagner%E2%80%93Meerwein_rearrangement",
+   "snapshot": "rx-wiki_wm.txt",
+   "fetched": true,
+   "says": "Acid-promoted dehydration of isoborneol gives camphene via Wagner-Meerwein shift."
+  },
+  "wiki_pinacol": {
+   "cite": "Wikipedia, Pinacol rearrangement (flagged: Wikipedia)",
+   "url": "https://en.wikipedia.org/wiki/Pinacol_rearrangement",
+   "snapshot": "rx-wiki_pinacol.txt",
+   "fetched": true,
+   "says": "Under acid, pinacol (a 1,2-diol) rearranges to pinacolone."
+  },
+  "wiki_hbo": {
+   "cite": "Wikipedia, Hydroboration-oxidation reaction (flagged: Wikipedia)",
+   "url": "https://en.wikipedia.org/wiki/Hydroboration%E2%80%93oxidation_reaction",
+   "snapshot": "rx-wiki_hbo.txt",
+   "fetched": true,
+   "says": "Hydroboration-oxidation is syn addition of H and OH, anti-Markovnikov, OH on the less substituted carbon."
+  },
+  "br2_liu": {
+   "cite": "Liu, LibreTexts 10.4 Addition of Bromine and Chlorine to Alkenes",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_I_(Liu)/10%3A_Alkenes_and_Alkynes/10.04%3A_Reactions_of_Alkenes-_Addition_of_Bromine_and_Chlorine_to_Alkenes",
+   "snapshot": "rx-br2_liu.txt",
+   "fetched": true,
+   "says": "Br2 adds anti: (E)-2-butene gives meso (2R,3S)-2,3-dibromobutane; (Z)-2-butene gives the racemic (2S,3S)/(2R,3R) pair."
+  },
+  "prilezhaev": {
+   "cite": "Wikipedia, Prilezhaev reaction (flagged: Wikipedia)",
+   "url": "https://en.wikipedia.org/wiki/Prilezhaev_reaction",
+   "snapshot": "rx-prilezhaev.txt",
+   "fetched": true,
+   "says": "Peracid epoxidation transfers alkene geometry with fidelity: trans-2-butene gives trans-2,3-epoxybutane."
+  },
+  "sn2_roberts": {
+   "cite": "Roberts and Caserio, LibreTexts 8.6 Stereochemistry of SN2 Reactions",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Basic_Principles_of_Organic_Chemistry_(Roberts_and_Caserio)/08%3A_Nucleophilic_Substitution_and_Elimination_Reactions/8.06%3A_Stereochemistry_of_(S_N2)_Reactions",
+   "snapshot": "rx-sn2_roberts.txt",
+   "fetched": true,
+   "says": "SN2 proceeds by back-side attack with inversion of configuration (hydroxide on 2-chlorobutane gives inverted 2-butanol)."
+  },
+  "sn2_wade": {
+   "cite": "Wade, LibreTexts 7.7 Stereochemistry of the SN2 Reaction",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Wade)_Complete_and_Semesters_I_and_II/Map%3A_Organic_Chemistry_(Wade)/07%3A_Alkyl_Halides-_Nucleophilic_Substitution_and_Elimination/7.07%3A_Stereochemistry_of_the_SN2_Reaction",
+   "snapshot": "rx-sn2_wade.txt",
+   "fetched": true,
+   "says": "All SN2 reactions proceed with inversion of configuration."
+  },
+  "wiki_halohydrin": {
+   "cite": "Wikipedia, Halohydrin (flagged: Wikipedia)",
+   "url": "https://en.wikipedia.org/wiki/Halohydrin",
+   "snapshot": "rx-wiki_halohydrin.txt",
+   "fetched": true,
+   "says": "Halohydrin formation from alkenes is anti addition leaving X and OH trans."
+  },
+  "da_smith": {
+   "cite": "Smith, LibreTexts 14.13 Specific Rules Governing the Diels-Alder Reaction",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Smith)/14%3A_Conjugation_Resonance_and_Dienes/14.13%3A_Specific_Rules_Governing_the_DielsAlder_Reaction",
+   "snapshot": "rx-da_smith.txt",
+   "fetched": true,
+   "says": "Diels-Alder reactions with cyclic dienes favour bicyclic products with substituents endo; cyclopentadiene is a locked s-cis diene that reacts rapidly."
+  },
+  "ucla_chemosel": {
+   "cite": "UCLA Illustrated Glossary of Organic Chemistry, chemoselective",
+   "url": "https://www.chem.ucla.edu/~harding/IGOC/C/chemoselective.html",
+   "snapshot": "rx-ucla_chemosel.txt",
+   "fetched": true,
+   "says": "NaBH4 reduces a ketone but leaves an ester unchanged (chemoselective); LiAlH4 reduces both ketone and ester."
+  },
+  "wiki_carbred": {
+   "cite": "Wikipedia, Carbonyl reduction (flagged: Wikipedia)",
+   "url": "https://en.wikipedia.org/wiki/Carbonyl_reduction",
+   "snapshot": "rx-wiki_carbred.txt",
+   "fetched": true,
+   "says": "Esters require stronger hydride reagents than aldehydes/ketones; hydrides generally do not attack C=C."
+  },
+  "acetal_vs": {
+   "cite": "Vollhardt and Schore, LibreTexts 17.8 Acetals as Protecting Groups",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Vollhardt_and_Schore)/17%3A_Aldehydes_and_Ketones_-_The_Carbonyl_Group/17.08%3A_Acetals__as_Protecting_Groups",
+   "snapshot": "rx-acetal_vs.txt",
+   "fetched": true,
+   "says": "Acetals/ketals are unreactive in neutral to strongly basic media (inert to nucleophiles/organometallics) and are cleaved by aqueous acid; used to protect a ketone while an ester reacts."
+  },
+  "conj_kenyon": {
+   "cite": "Kenyon College LibreTexts 18.10 1,2- and 1,4-Additions of Organometallic Reagents",
+   "url": "https://chem.libretexts.org/Courses/Kenyon_College/Chemistry_231_and_232_-_Kenyon_College_(Getzler_Hofferberth_and_Hunsen)/18%3A_Enols_Enolates_and_the_Aldol_Condensation%3A_ab-Unsaturated_Aldehydes_and_Ketones/18.10%3A_12-_and__14-Additions_of_Organometallic_Reagents",
+   "snapshot": "rx-conj_kenyon.txt",
+   "fetched": true,
+   "says": "Grignard reagents add irreversibly and kinetically, giving predominantly 1,2-addition to enones; Gilman (cuprate) reagents give 1,4-conjugate addition."
+  },
+  "smith_unsat": {
+   "cite": "Smith, LibreTexts 18.15 alpha,beta-Unsaturated Carbonyl Compounds",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Smith)/18%3A_Introduction_to_Carbonyl_Chemistry_Organometallic_Reagents_Oxidation_and_Reduction/18.15%3A_-Unsaturated_Carbonyl_Compounds",
+   "snapshot": "rx-smith_unsat.txt",
+   "fetched": true,
+   "says": "Organocuprates (Gilman reagents) add to alpha,beta-unsaturated carbonyls in a 1,4 (conjugate) fashion."
+  },
+  "reusch_enolate": {
+   "cite": "Reusch, Virtual Textbook of Organic Chemistry: Reactions of Enolate-like Species",
+   "url": "https://organicchemistrydata.org/reusch/virtualtext/reactions-of-enolate-like-species/",
+   "snapshot": "rx-reusch_enolate.txt",
+   "fetched": true,
+   "says": "2-Methylcyclohexanone under equilibrating (thermodynamic) enolate conditions with MeI gives mainly 2,2-dimethylcyclohexanone with poly-alkylation and ~20% SM; the kinetic (amide-base) route gives 2,6-dimethylcyclohexanone as chief product."
+  },
+  "wiki_claisen": {
+   "cite": "Wikipedia, Claisen rearrangement (flagged: Wikipedia)",
+   "url": "https://en.wikipedia.org/wiki/Claisen_rearrangement",
+   "snapshot": "rx-wiki_claisen.txt",
+   "fetched": true,
+   "says": "Heating allyl phenyl ether gives the 2-allylphenol (ortho) via [3,3] shift and tautomerisation; para product only when both ortho positions are blocked."
+  },
+  "wiki_cope": {
+   "cite": "Wikipedia, Cope rearrangement (flagged: Wikipedia)",
+   "url": "https://en.wikipedia.org/wiki/Cope_rearrangement",
+   "snapshot": "rx-wiki_cope.txt",
+   "fetched": true,
+   "says": "3-Methylhexa-1,5-diene heated to 300 C yields hepta-1,5-diene."
+  },
+  "rad_uis": {
+   "cite": "LibreTexts 15.6 Chlorination versus Bromination (Morsch and Andrews, UIS CHE 269)",
+   "url": "https://chem.libretexts.org/Courses/University_of_Illinois_Springfield/UIS%3A_CHE_269_(Morsch_and_Andrews)/Chapters/Chapter_15%3A_Radical_Reactions/15.06_Chlorination_versus_Bromination",
+   "snapshot": "rx-rad_uis.txt",
+   "fetched": true,
+   "says": "Light-induced bromination of propane at 25 C gives 97% 2-bromopropane (radical bromination is highly selective for the more substituted C-H); chlorination is much less selective."
+  }
+ },
+ "cases": [
+  {
+   "id": "RX-01",
+   "category": "epoxide opening (acid, tertiary carbon)",
+   "title": "2-Methyl-2,3-epoxybutane with anhydrous HCl: chloride at the tertiary carbon",
+   "source_ids": [
+    "epox_wade",
+    "epox_chan",
+    "epox_ssu"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source states the rule for HX opening of epoxides with a tertiary carbon generally; this exact substrate is not shown. Product racemic.",
+   "reactants": [
+    "CC1OC1(C)C"
+   ],
+   "reagents": "HCl (anhydrous, Et2O)",
+   "reagent_tokens": [
+    "hcl",
+    "hydrochloric",
+    "hydrogen chloride",
+    "hx"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(O)C(C)(C)Cl",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CC(Cl)C(C)(C)O"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "mechanism": "acid-promoted epoxide opening, SN1-like at tertiary carbon"
+  },
+  {
+   "id": "RX-02",
+   "category": "epoxide opening (base)",
+   "title": "2-Methyl-2,3-epoxybutane with NaOMe/MeOH: methoxide at the secondary (less hindered) carbon",
+   "source_ids": [
+    "epox_morsch"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source demonstrates the rule on an unrelated asymmetric epoxide.",
+   "reactants": [
+    "CC1OC1(C)C"
+   ],
+   "reagents": "NaOMe, MeOH",
+   "reagent_tokens": [
+    "naome",
+    "methoxide",
+    "sodium methoxide",
+    "meoh"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(OC)C(C)(C)O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CC(O)C(C)(C)OC"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "mechanism": "SN2 epoxide opening at less hindered carbon"
+  },
+  {
+   "id": "RX-03",
+   "category": "epoxide opening (base, benzylic epoxide)",
+   "title": "Styrene oxide with NaOMe/MeOH: methoxide at the terminal CH2 despite the benzylic alternative",
+   "source_ids": [
+    "epox_morsch"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source rule is 'least hindered carbon under SN2'; styrene oxide itself is not shown and some benzylic attack is conceivable with other nucleophiles.",
+   "reactants": [
+    "C1OC1c1ccccc1"
+   ],
+   "reagents": "NaOMe, MeOH",
+   "reagent_tokens": [
+    "naome",
+    "methoxide",
+    "sodium methoxide",
+    "meoh"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "COCC(O)c1ccccc1",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "COC(CO)c1ccccc1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry"
+   ],
+   "mechanism": "SN2 epoxide opening at primary carbon"
+  },
+  {
+   "id": "RX-04",
+   "category": "epoxide opening (acid, benzylic epoxide)",
+   "title": "Styrene oxide with catalytic H2SO4 in MeOH: methanol attacks the benzylic carbon",
+   "source_ids": [
+    "epox_morsch"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Fetched source says attack at the more substituted carbon under acid but does not discuss aryl epoxides; benzylic cation stabilisation is textbook knowledge. Minor terminal attack possible.",
+   "reactants": [
+    "C1OC1c1ccccc1"
+   ],
+   "reagents": "MeOH, cat. H2SO4",
+   "reagent_tokens": [
+    "h2so4",
+    "sulfuric",
+    "acid",
+    "meoh",
+    "methanol",
+    "h+"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "COC(CO)c1ccccc1",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "COCC(O)c1ccccc1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "conditions"
+   ],
+   "mechanism": "acid-catalysed epoxide solvolysis, SN1-like at benzylic carbon"
+  },
+  {
+   "id": "RX-05",
+   "category": "epoxide opening (acid, cyclic, trans)",
+   "title": "1-Methylcyclohexene oxide with HCl: tertiary-carbon chloride, trans halohydrin",
+   "source_ids": [
+    "epox_wade",
+    "epox_ssu"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source states trans halohydrin and tertiary attack in general; product is the racemic trans pair.",
+   "reactants": [
+    "CC12CCCCC1O2"
+   ],
+   "reagents": "HCl (anhydrous, Et2O)",
+   "reagent_tokens": [
+    "hcl",
+    "hydrochloric",
+    "hydrogen chloride"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C[C@@]1(Cl)CCCC[C@H]1O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "C[C@]1(Cl)CCCC[C@H]1O",
+     "CC1(O)CCCCC1Cl"
+    ],
+    "stereo": "racemic"
+   },
+   "criteria": [
+    "regiochemistry",
+    "stereochemistry"
+   ],
+   "mechanism": "acid epoxide opening, anti (trans-diaxial)"
+  },
+  {
+   "id": "RX-06",
+   "category": "epoxide opening (Grignard)",
+   "title": "1,2-Epoxyhexane with EtMgBr then H3O+: ethyl adds at the terminal carbon",
+   "source_ids": [
+    "epox_grig"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source states SN2 mechanism analogous to basic opening, so least-hindered attack is entailed; regiochemistry for this substrate is not shown.",
+   "reactants": [
+    "CCCCC1CO1"
+   ],
+   "reagents": "1) EtMgBr, Et2O; 2) H3O+ workup",
+   "reagent_tokens": [
+    "etmgbr",
+    "grignard",
+    "ethylmagnesium",
+    "mgbr"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCCCC(O)CCC",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CCCCC(CC)CO"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "mechanism": "Grignard SN2 epoxide opening"
+  },
+  {
+   "id": "RX-07",
+   "category": "epoxide opening (hydride)",
+   "title": "1,2-Epoxy-2-methylhexane with LiAlH4: hydride at the CH2, giving the tertiary alcohol",
+   "source_ids": [
+    "epox_morsch"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "No fetched source states LiAlH4 regiochemistry; extrapolated from the SN2 least-hindered rule for strong nucleophiles.",
+   "reactants": [
+    "CCCCC1(C)CO1"
+   ],
+   "reagents": "1) LiAlH4, THF; 2) H3O+",
+   "reagent_tokens": [
+    "lialh4",
+    "lah",
+    "lithium aluminum hydride",
+    "lithium aluminium hydride",
+    "hydride"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCCCC(C)(C)O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CCCCC(C)CO"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry"
+   ],
+   "mechanism": "hydride SN2 epoxide opening"
+  },
+  {
+   "id": "RX-08",
+   "category": "epoxide opening (allylic / vinyl epoxide)",
+   "title": "Butadiene monoxide with NaOMe: SN2 at CH2 versus SN2' competition",
+   "source_ids": [],
+   "evidence": "inferred",
+   "uncertainty": "No fetched source covers vinyl epoxides; nucleophile/condition-dependent SN2 vs SN2' mixtures are expected from general knowledge, so no single winner is asserted.",
+   "reactants": [
+    "C=CC1CO1"
+   ],
+   "reagents": "NaOMe, MeOH",
+   "reagent_tokens": [
+    "naome",
+    "methoxide",
+    "sodium methoxide",
+    "meoh"
+   ],
+   "expected": {
+    "outcome": "ambiguous",
+    "products": [
+     {
+      "smiles": "C=CC(O)COC",
+      "role": "formed"
+     },
+     {
+      "smiles": "COCC=CCO",
+      "role": "formed"
+     }
+    ],
+    "forbidden": [
+     "COC(C=C)CO"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry"
+   ],
+   "mechanism": "SN2 vs SN2' opening of vinyl epoxide"
+  },
+  {
+   "id": "RX-09",
+   "category": "epoxide opening (aqueous acid, stereo)",
+   "title": "cis-2,3-Epoxybutane (meso) with dilute aqueous acid: anti opening gives racemic (2R,3R)/(2S,3S)-butane-2,3-diol",
+   "source_ids": [
+    "epox_ssu",
+    "epox_wade"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source states anti opening and a diastereomeric relationship to syn-dihydroxylation; assigning the dl pair follows from that.",
+   "reactants": [
+    "C[C@H]1O[C@H]1C"
+   ],
+   "reagents": "H3O+ (dil. H2SO4), H2O",
+   "reagent_tokens": [
+    "h3o",
+    "h2so4",
+    "aqueous acid",
+    "h2o",
+    "acid"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C[C@@H](O)[C@@H](C)O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "C[C@@H](O)[C@H](C)O"
+    ],
+    "stereo": "racemic"
+   },
+   "criteria": [
+    "stereochemistry"
+   ],
+   "mechanism": "acid epoxide hydrolysis, anti"
+  },
+  {
+   "id": "RX-10",
+   "category": "E2 (Zaitsev)",
+   "title": "2-Bromo-2-methylbutane with NaOEt/EtOH: Zaitsev alkene",
+   "source_ids": [
+    "wiki_zaitsev"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source says 'moderate selectivity'; the minor Hofmann alkene is not listed as a product here. Some SN1 ether is a minor possibility.",
+   "reactants": [
+    "CCC(C)(C)Br"
+   ],
+   "reagents": "NaOEt, EtOH, heat",
+   "reagent_tokens": [
+    "naoet",
+    "ethoxide",
+    "sodium ethoxide",
+    "etoh"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC=C(C)C",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CCC(C)(C)OCC"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "ranking"
+   ],
+   "mechanism": "E2 Zaitsev"
+  },
+  {
+   "id": "RX-11",
+   "category": "E2 (Hofmann, bulky base)",
+   "title": "2-Bromo-2-methylpentane with KOtBu/tBuOH: Hofmann alkene favoured",
+   "source_ids": [
+    "wiki_zaitsev"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Source gives the rule and the 2-bromo-2-methylbutane example; ratio not stated and this homologue is not shown.",
+   "reactants": [
+    "CC(C)(Br)CCC"
+   ],
+   "reagents": "KOtBu, tBuOH",
+   "reagent_tokens": [
+    "kotbu",
+    "tert-butoxide",
+    "t-buok",
+    "potassium tert-butoxide",
+    "bulky"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C=C(C)CCC",
+      "role": "major"
+     },
+     {
+      "smiles": "CC(C)=CCC",
+      "role": "minor"
+     }
+    ],
+    "forbidden": [
+     "CC(C)(OC(C)(C)C)CCC"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "ranking"
+   ],
+   "mechanism": "E2 Hofmann with hindered base",
+   "audit": "downgraded before freeze: the cited page gives the bulky-base rule and a homologous example, not this substrate or a ratio"
+  },
+  {
+   "id": "RX-12",
+   "category": "E2 (ring, anti-periplanar)",
+   "title": "Neomenthyl chloride with NaOEt/EtOH: 3-menthene major, 2-menthene minor",
+   "source_ids": [
+    "e2_cyclohexane",
+    "mom_e2"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Two sources agree on 3-menthene as major; 78:22 from Master Organic Chemistry citing JACS 1955 (secondary citation). Reactant stereo SMILES constructed by us (CIP 1S,2S,5R).",
+   "reactants": [
+    "C[C@@H]1CC[C@H]([C@H](C1)Cl)C(C)C"
+   ],
+   "reagents": "NaOEt, EtOH",
+   "reagent_tokens": [
+    "naoet",
+    "ethoxide",
+    "etoh",
+    "sodium ethoxide"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(C)C1=CC[C@H](C)CC1",
+      "role": "major"
+     },
+     {
+      "smiles": "CC(C)[C@H]1C=C[C@H](C)CC1",
+      "role": "minor"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "specific"
+   },
+   "criteria": [
+    "regiochemistry",
+    "ranking",
+    "stereochemistry"
+   ],
+   "mechanism": "E2, axial Cl with anti-periplanar axial H on the isopropyl carbon"
+  },
+  {
+   "id": "RX-13",
+   "category": "E2 (ring, anti-periplanar, non-Zaitsev)",
+   "title": "Menthyl chloride with NaOEt/EtOH: only the non-Zaitsev 2-menthene via ring-flipped conformer",
+   "source_ids": [
+    "e2_cyclohexane"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source says the non-Zaitsev product 2-menthene forms from the only trans-diaxial hydrogen. Reactant stereo SMILES built by us (CIP 1R,2S,5R).",
+   "reactants": [
+    "C[C@@H]1CC[C@H]([C@@H](C1)Cl)C(C)C"
+   ],
+   "reagents": "NaOEt, EtOH",
+   "reagent_tokens": [
+    "naoet",
+    "ethoxide",
+    "etoh",
+    "sodium ethoxide"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(C)[C@H]1C=C[C@H](C)CC1",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC(C)C1=CC[C@H](C)CC1"
+    ],
+    "stereo": "specific"
+   },
+   "criteria": [
+    "regiochemistry",
+    "stereochemistry"
+   ],
+   "mechanism": "E2 requiring ring flip to the diaxial conformer"
+  },
+  {
+   "id": "RX-14",
+   "category": "SN2 / E2 competition",
+   "title": "2-Bromobutane with NaOEt/EtOH: mixture of SN2 ether and E2 butenes, no single product",
+   "source_ids": [],
+   "evidence": "inferred",
+   "uncertainty": "No fetched source gives ratios for this system; a condition-dependent mixture is asserted from general secondary-halide behaviour.",
+   "reactants": [
+    "CCC(C)Br"
+   ],
+   "reagents": "NaOEt, EtOH, heat",
+   "reagent_tokens": [
+    "naoet",
+    "ethoxide",
+    "etoh",
+    "sodium ethoxide"
+   ],
+   "expected": {
+    "outcome": "ambiguous",
+    "products": [
+     {
+      "smiles": "CC=CC",
+      "role": "formed"
+     },
+     {
+      "smiles": "C=CCC",
+      "role": "formed"
+     },
+     {
+      "smiles": "CCOC(C)CC",
+      "role": "formed"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "ranking",
+    "conditions"
+   ],
+   "mechanism": "SN2 vs E2 competition of a secondary halide"
+  },
+  {
+   "id": "RX-15",
+   "category": "Hofmann elimination",
+   "title": "sec-Butyltrimethylammonium hydroxide on heating: 1-butene (Hofmann) major",
+   "source_ids": [
+    "hofmann_wiki"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source states the Hofmann (less substituted) rule; substrate-specific ratio not given.",
+   "reactants": [
+    "CCC(C)[N+](C)(C)C"
+   ],
+   "reagents": "Ag2O, H2O, then heat",
+   "reagent_tokens": [
+    "hofmann",
+    "ag2o",
+    "silver oxide",
+    "quaternary ammonium",
+    "trimethylammonium"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C=CCC",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC=CC"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "ranking"
+   ],
+   "mechanism": "Hofmann E2 of quaternary ammonium"
+  },
+  {
+   "id": "RX-16",
+   "category": "EAS (halobenzene)",
+   "title": "Chlorobenzene nitration: ortho/para directing despite deactivation",
+   "source_ids": [
+    "eas_uis"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Fetched source gives relative-rate data only in a figure; ortho/para direction of halogens is textbook knowledge. Ortho:para ratio not asserted beyond para > ortho.",
+   "reactants": [
+    "Clc1ccccc1"
+   ],
+   "reagents": "HNO3, H2SO4",
+   "reagent_tokens": [
+    "hno3",
+    "nitric",
+    "h2so4",
+    "nitration",
+    "nitrating"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "Clc1ccc([N+](=O)[O-])cc1",
+      "role": "major"
+     },
+     {
+      "smiles": "Clc1ccccc1[N+](=O)[O-]",
+      "role": "minor"
+     }
+    ],
+    "forbidden": [
+     "Clc1cccc([N+](=O)[O-])c1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "ranking"
+   ],
+   "mechanism": "electrophilic aromatic nitration"
+  },
+  {
+   "id": "RX-17",
+   "category": "EAS (steric ortho blocking)",
+   "title": "tert-Butylbenzene nitration: para dominates (75%) over ortho (16%) and meta (8%)",
+   "source_ids": [
+    "eas_uis"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Percentages as given in the source for the tert-butyl case.",
+   "reactants": [
+    "CC(C)(C)c1ccccc1"
+   ],
+   "reagents": "HNO3, H2SO4",
+   "reagent_tokens": [
+    "hno3",
+    "nitric",
+    "h2so4",
+    "nitration"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(C)(C)c1ccc([N+](=O)[O-])cc1",
+      "role": "major"
+     },
+     {
+      "smiles": "CC(C)(C)c1ccccc1[N+](=O)[O-]",
+      "role": "minor"
+     },
+     {
+      "smiles": "CC(C)(C)c1cccc([N+](=O)[O-])c1",
+      "role": "minor"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "ranking"
+   ],
+   "mechanism": "electrophilic aromatic nitration, steric control"
+  },
+  {
+   "id": "RX-18",
+   "category": "EAS (amide-protected aniline)",
+   "title": "Acetanilide nitration: para-nitroacetanilide in high yield",
+   "source_ids": [
+    "fc_limits"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source says nitration at low temperature gives the para product in high yield.",
+   "reactants": [
+    "CC(=O)Nc1ccccc1"
+   ],
+   "reagents": "HNO3, H2SO4, 0 C",
+   "reagent_tokens": [
+    "hno3",
+    "nitric",
+    "h2so4",
+    "nitration"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(=O)Nc1ccc([N+](=O)[O-])cc1",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC(=O)Nc1cccc([N+](=O)[O-])c1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry"
+   ],
+   "mechanism": "electrophilic aromatic nitration of an anilide"
+  },
+  {
+   "id": "RX-19",
+   "category": "EAS (anilinium / condition dependent)",
+   "title": "Direct nitration of aniline with HNO3/H2SO4: para/meta mixture (anilinium) with oxidation, no single product",
+   "source_ids": [
+    "wiki_nitr"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Wikipedia only (flagged), citing one source for ~50:50 para:meta; real outcome depends on acidity and temperature and tar formation is common.",
+   "reactants": [
+    "Nc1ccccc1"
+   ],
+   "reagents": "HNO3, H2SO4",
+   "reagent_tokens": [
+    "hno3",
+    "nitric",
+    "h2so4",
+    "nitration"
+   ],
+   "expected": {
+    "outcome": "ambiguous",
+    "products": [
+     {
+      "smiles": "Nc1ccc([N+](=O)[O-])cc1",
+      "role": "formed"
+     },
+     {
+      "smiles": "Nc1cccc([N+](=O)[O-])c1",
+      "role": "formed"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "conditions"
+   ],
+   "mechanism": "nitration of protonated vs free amine"
+  },
+  {
+   "id": "RX-20",
+   "category": "EAS (competing directors)",
+   "title": "4-Methylanisole bromination: Br ortho to OMe (stronger donor), not ortho to CH3",
+   "source_ids": [
+    "eas_poly"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source rule: the substituent with a lone pair normally controls when directing effects oppose.",
+   "reactants": [
+    "COc1ccc(C)cc1"
+   ],
+   "reagents": "Br2, FeBr3",
+   "reagent_tokens": [
+    "br2",
+    "bromine",
+    "febr3",
+    "bromination"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "COc1ccc(C)cc1Br",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "COc1ccc(C)c(Br)c1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry"
+   ],
+   "mechanism": "electrophilic aromatic bromination, competing donors"
+  },
+  {
+   "id": "RX-21",
+   "category": "EAS (cooperative donor/acceptor)",
+   "title": "4-Nitroanisole bromination: Br ortho to OMe (and meta to NO2)",
+   "source_ids": [
+    "eas_poly"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source: cooperative orientation gives the summed result; the strongly deactivated ring may need forcing conditions.",
+   "reactants": [
+    "COc1ccc([N+](=O)[O-])cc1"
+   ],
+   "reagents": "Br2, FeBr3",
+   "reagent_tokens": [
+    "br2",
+    "bromine",
+    "febr3",
+    "bromination"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "COc1ccc([N+](=O)[O-])cc1Br",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "COc1ccc([N+](=O)[O-])c(Br)c1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry"
+   ],
+   "mechanism": "electrophilic aromatic bromination, reinforcing groups"
+  },
+  {
+   "id": "RX-22",
+   "category": "EAS (heteroaromatic)",
+   "title": "Thiophene Friedel-Crafts acetylation: 2-acetylthiophene",
+   "source_ids": [],
+   "evidence": "inferred",
+   "uncertainty": "No source fetched (a Wikipedia thiophene snapshot was unusable and discarded). C2 selectivity of thiophene acylation is general textbook knowledge.",
+   "reactants": [
+    "c1ccsc1"
+   ],
+   "reagents": "Ac2O, SnCl4 (or AcCl, AlCl3)",
+   "reagent_tokens": [
+    "ac2o",
+    "acetyl",
+    "sncl4",
+    "alcl3",
+    "friedel",
+    "acylation"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(=O)c1cccs1",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC(=O)c1ccsc1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry"
+   ],
+   "mechanism": "Friedel-Crafts acylation of a five-membered heteroarene"
+  },
+  {
+   "id": "RX-23",
+   "category": "negative control (EAS on strongly deactivated ring)",
+   "title": "1,3-Dinitrobenzene with CH3Cl/AlCl3: no Friedel-Crafts alkylation",
+   "source_ids": [
+    "fc_limits"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source states Friedel-Crafts fails on strongly deactivated rings such as nitrobenzene; dinitrobenzene is more deactivated (directly entailed).",
+   "reactants": [
+    "O=[N+]([O-])c1cccc([N+](=O)[O-])c1"
+   ],
+   "reagents": "CH3Cl, AlCl3",
+   "reagent_tokens": [
+    "ch3cl",
+    "methyl chloride",
+    "alcl3",
+    "friedel",
+    "alkylation"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [],
+    "forbidden": [
+     "Cc1cc([N+](=O)[O-])cc([N+](=O)[O-])c1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "conditions"
+   ],
+   "mechanism": "Friedel-Crafts alkylation fails on a deactivated ring"
+  },
+  {
+   "id": "RX-24",
+   "category": "carbocation rearrangement (hydride shift, alkene + HX)",
+   "title": "3-Methyl-1-butene + HBr: rearranged tertiary bromide",
+   "source_ids": [
+    "cation_morsch"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Direct example in source.",
+   "reactants": [
+    "C=CC(C)C"
+   ],
+   "reagents": "HBr",
+   "reagent_tokens": [
+    "hbr",
+    "hydrobromic",
+    "hydrogen bromide"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCC(C)(C)Br",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC(Br)C(C)C"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "mechanism": "Markovnikov protonation then 1,2-hydride shift"
+  },
+  {
+   "id": "RX-25",
+   "category": "carbocation rearrangement (alcohol + HX)",
+   "title": "3-Methyl-2-butanol + conc. HBr: rearranged tertiary bromide via hydride shift",
+   "source_ids": [
+    "cation_alc"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Fetched source states that alcohol-derived cations undergo hydride/alkyl shifts but this exact substrate is not shown in retrievable text.",
+   "reactants": [
+    "CC(O)C(C)C"
+   ],
+   "reagents": "conc. HBr",
+   "reagent_tokens": [
+    "hbr",
+    "hydrobromic",
+    "hydrogen bromide"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCC(C)(C)Br",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC(Br)C(C)C"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "mechanism": "SN1 with 1,2-hydride shift"
+  },
+  {
+   "id": "RX-26",
+   "category": "Wagner-Meerwein (bicyclic)",
+   "title": "Isoborneol with acid: rearrangement to camphene",
+   "source_ids": [
+    "wiki_wm"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Wikipedia only (flagged). Stereo omitted; the bicyclic stereocentres are not specified in the SMILES.",
+   "reactants": [
+    "CC1(C)C2CCC1(C)C(O)C2"
+   ],
+   "reagents": "H2SO4 (acid), heat",
+   "reagent_tokens": [
+    "h2so4",
+    "acid",
+    "h+",
+    "dehydration"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C=C1C2CCC(C2)C1(C)C",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC1(C)C2CCC1(C)C=C2"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "mechanism": "carbocation Wagner-Meerwein 1,2-alkyl shift then E1"
+  },
+  {
+   "id": "RX-27",
+   "category": "pinacol rearrangement",
+   "title": "Pinacol with H2SO4: pinacolone (methyl shift)",
+   "source_ids": [
+    "wiki_pinacol"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Wikipedia only (flagged); source gives the name reaction and migration order only.",
+   "reactants": [
+    "CC(C)(O)C(C)(C)O"
+   ],
+   "reagents": "H2SO4 (conc.), heat",
+   "reagent_tokens": [
+    "h2so4",
+    "acid",
+    "h+",
+    "pinacol"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(=O)C(C)(C)C",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "C=C(C)C(C)=C"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "mechanism": "pinacol rearrangement"
+  },
+  {
+   "id": "RX-28",
+   "category": "hydroboration (syn, cyclic)",
+   "title": "1-Methylcyclopentene + BH3 then H2O2/NaOH: trans-2-methylcyclopentanol (racemic)",
+   "source_ids": [
+    "wiki_hbo"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source states syn H/OH addition, anti-Markovnikov; the trans relationship is derived by us from that.",
+   "reactants": [
+    "CC1=CCCC1"
+   ],
+   "reagents": "1) BH3-THF; 2) H2O2, NaOH",
+   "reagent_tokens": [
+    "bh3",
+    "borane",
+    "hydroboration",
+    "h2o2",
+    "thf"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C[C@@H]1CCC[C@H]1O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CC1(O)CCCC1",
+     "C[C@H]1CCC[C@H]1O"
+    ],
+    "stereo": "racemic"
+   },
+   "criteria": [
+    "regiochemistry",
+    "stereochemistry"
+   ],
+   "mechanism": "hydroboration-oxidation, syn"
+  },
+  {
+   "id": "RX-29",
+   "category": "halogen addition (anti, racemic)",
+   "title": "(Z)-2-Butene + Br2: racemic (2R,3R)/(2S,3S)-2,3-dibromobutane",
+   "source_ids": [
+    "br2_liu"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Explicit in source.",
+   "reactants": [
+    "C/C=C\\C"
+   ],
+   "reagents": "Br2, CH2Cl2",
+   "reagent_tokens": [
+    "br2",
+    "bromine",
+    "bromination"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C[C@@H](Br)[C@@H](C)Br",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "C[C@@H](Br)[C@H](C)Br"
+    ],
+    "stereo": "racemic"
+   },
+   "criteria": [
+    "stereochemistry"
+   ],
+   "mechanism": "anti addition via bromonium ion"
+  },
+  {
+   "id": "RX-30",
+   "category": "halogen addition (anti, meso)",
+   "title": "(E)-2-Butene + Br2: meso-2,3-dibromobutane",
+   "source_ids": [
+    "br2_liu"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Explicit in source.",
+   "reactants": [
+    "C/C=C/C"
+   ],
+   "reagents": "Br2, CH2Cl2",
+   "reagent_tokens": [
+    "br2",
+    "bromine",
+    "bromination"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C[C@@H](Br)[C@H](C)Br",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "C[C@@H](Br)[C@@H](C)Br"
+    ],
+    "stereo": "specific"
+   },
+   "criteria": [
+    "stereochemistry"
+   ],
+   "mechanism": "anti addition via bromonium ion"
+  },
+  {
+   "id": "RX-31",
+   "category": "epoxidation (syn, stereospecific)",
+   "title": "trans-2-Butene + mCPBA: trans-2,3-epoxybutane (racemic)",
+   "source_ids": [
+    "prilezhaev"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Wikipedia only (flagged).",
+   "reactants": [
+    "C/C=C/C"
+   ],
+   "reagents": "mCPBA, CH2Cl2",
+   "reagent_tokens": [
+    "mcpba",
+    "peracid",
+    "peroxy",
+    "epoxidation"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C[C@H]1O[C@@H]1C",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "C[C@H]1O[C@H]1C"
+    ],
+    "stereo": "racemic"
+   },
+   "criteria": [
+    "stereochemistry"
+   ],
+   "mechanism": "concerted epoxidation, geometry retained"
+  },
+  {
+   "id": "RX-32",
+   "category": "SN2 inversion",
+   "title": "(S)-2-Chlorobutane + NaN3 in DMF: (R)-2-azidobutane with inversion",
+   "source_ids": [
+    "sn2_roberts",
+    "sn2_wade"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Sources state inversion for SN2 (hydroxide example); azide is extrapolated; the CIP descriptor flips because priorities are unchanged. Competing E2 is minor with azide.",
+   "reactants": [
+    "CC[C@H](C)Cl"
+   ],
+   "reagents": "NaN3, DMF",
+   "reagent_tokens": [
+    "nan3",
+    "azide",
+    "dmf"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC[C@@H](C)N=[N+]=[N-]",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CC[C@H](C)N=[N+]=[N-]"
+    ],
+    "stereo": "specific"
+   },
+   "criteria": [
+    "stereochemistry"
+   ],
+   "mechanism": "SN2 with inversion"
+  },
+  {
+   "id": "RX-33",
+   "category": "halohydrin formation (anti, Markovnikov)",
+   "title": "1-Methylcyclopentene + Br2/H2O: trans-2-bromo-1-methylcyclopentanol (racemic)",
+   "source_ids": [
+    "wiki_halohydrin"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Source states anti addition only; OH at the more substituted carbon is textbook knowledge not found in the fetched text.",
+   "reactants": [
+    "CC1=CCCC1"
+   ],
+   "reagents": "Br2, H2O",
+   "reagent_tokens": [
+    "br2",
+    "h2o",
+    "bromine water",
+    "halohydrin",
+    "nbs"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C[C@@]1(O)CCC[C@H]1Br",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CC1(Br)CCCC1O",
+     "C[C@]1(O)CCC[C@H]1Br"
+    ],
+    "stereo": "racemic"
+   },
+   "criteria": [
+    "regiochemistry",
+    "stereochemistry"
+   ],
+   "mechanism": "bromonium opening by water at the more substituted carbon, anti"
+  },
+  {
+   "id": "RX-34",
+   "category": "Diels-Alder (endo rule)",
+   "title": "Cyclopentadiene + maleimide: endo adduct",
+   "source_ids": [
+    "da_smith"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source states endo preference for cyclic dienes in general; maleimide is not named. The endo product is meso (achiral).",
+   "reactants": [
+    "C1=CC=CC1",
+    "O=C1C=CC(=O)N1"
+   ],
+   "reagents": "heat, room temp.",
+   "reagent_tokens": [
+    "diels",
+    "alder",
+    "heat",
+    "cycloaddition"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "O=C1NC(=O)[C@@H]2[C@H]1[C@@H]1C=C[C@H]2C1",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "O=C1NC(=O)[C@H]2[C@@H]1[C@@H]1C=C[C@H]2C1"
+    ],
+    "stereo": "specific"
+   },
+   "criteria": [
+    "stereochemistry"
+   ],
+   "mechanism": "[4+2] cycloaddition, endo"
+  },
+  {
+   "id": "RX-35",
+   "category": "chemoselective reduction",
+   "title": "Ethyl acetoacetate + NaBH4/EtOH: ketone reduced, ester untouched",
+   "source_ids": [
+    "ucla_chemosel",
+    "wiki_carbred"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Glossary shows the chemoselectivity for a ketone/ester substrate; product racemic.",
+   "reactants": [
+    "CCOC(=O)CC(C)=O"
+   ],
+   "reagents": "NaBH4, EtOH, 0 C",
+   "reagent_tokens": [
+    "nabh4",
+    "sodium borohydride",
+    "borohydride"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCOC(=O)CC(C)O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CC(O)CCO"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "conditions"
+   ],
+   "mechanism": "hydride reduction of ketone"
+  },
+  {
+   "id": "RX-36",
+   "category": "chemoselective reduction",
+   "title": "Ethyl acetoacetate + LiAlH4: both carbonyls reduced to butane-1,3-diol",
+   "source_ids": [
+    "ucla_chemosel"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Glossary states LiAlH4 reduces both ketone and ester.",
+   "reactants": [
+    "CCOC(=O)CC(C)=O"
+   ],
+   "reagents": "1) LiAlH4, THF; 2) H3O+",
+   "reagent_tokens": [
+    "lialh4",
+    "lah",
+    "lithium aluminum hydride",
+    "lithium aluminium hydride"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(O)CCO",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CCOC(=O)CC(C)O"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "conditions"
+   ],
+   "mechanism": "hydride reduction of ketone and ester"
+  },
+  {
+   "id": "RX-37",
+   "category": "protecting-group logic",
+   "title": "Ketal-protected ethyl 4-oxopentanoate + LiAlH4: ester reduced, ketal intact",
+   "source_ids": [
+    "acetal_vs"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source: acetals are inert to strongly basic/nucleophilic reagents and cleaved only by aqueous acid; LiAlH4 not named explicitly. Workup must be non-acidic.",
+   "reactants": [
+    "CCOC(=O)CCC1(C)OCCO1"
+   ],
+   "reagents": "1) LiAlH4, THF; 2) H2O (neutral/basic workup)",
+   "reagent_tokens": [
+    "lialh4",
+    "lah",
+    "lithium aluminum hydride",
+    "ketal",
+    "acetal"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "OCCCC1(C)OCCO1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CC(=O)CCCO",
+     "CC(O)CCCO"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "conditions"
+   ],
+   "mechanism": "ester reduction with acetal protection"
+  },
+  {
+   "id": "RX-38",
+   "category": "conjugate addition (cuprate)",
+   "title": "Cyclopent-2-enone + Me2CuLi: 1,4-addition to 3-methylcyclopentanone",
+   "source_ids": [
+    "conj_kenyon",
+    "smith_unsat"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Both sources state cuprates give conjugate addition; product racemic.",
+   "reactants": [
+    "O=C1C=CCC1"
+   ],
+   "reagents": "1) Me2CuLi, Et2O; 2) H3O+",
+   "reagent_tokens": [
+    "me2culi",
+    "gilman",
+    "cuprate",
+    "cu"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC1CCC(=O)C1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CC1(O)C=CCC1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "conditions"
+   ],
+   "mechanism": "organocuprate 1,4-addition"
+  },
+  {
+   "id": "RX-39",
+   "category": "1,2- vs 1,4-addition (Grignard)",
+   "title": "Cyclopent-2-enone + MeMgBr (no Cu): 1,2-addition to the tertiary allylic alcohol",
+   "source_ids": [
+    "conj_kenyon"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source says Grignard additions are irreversible/kinetic with predominance of 1,2-products; exceptions exist for some enones.",
+   "reactants": [
+    "O=C1C=CCC1"
+   ],
+   "reagents": "1) MeMgBr, Et2O; 2) H3O+",
+   "reagent_tokens": [
+    "mgbr",
+    "grignard",
+    "methylmagnesium",
+    "ch3mgbr"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC1(O)C=CCC1",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC1CCC(=O)C1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "conditions"
+   ],
+   "mechanism": "Grignard 1,2-addition"
+  },
+  {
+   "id": "RX-40",
+   "category": "kinetic enolate alkylation",
+   "title": "2-Methylcyclohexanone, LDA/THF -78 C then MeI: 2,6-dimethylcyclohexanone",
+   "source_ids": [
+    "reusch_enolate"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source says 2,6-dimethylcyclohexanone is the chief product of the kinetic route; cis/trans not specified. Conditions text (LDA, -78 C) is the standard kinetic protocol; source's exact base for that example is an amide base.",
+   "reactants": [
+    "CC1CCCCC1=O"
+   ],
+   "reagents": "1) LDA, THF, -78 C; 2) MeI",
+   "reagent_tokens": [
+    "lda",
+    "lithium diisopropylamide",
+    "kinetic",
+    "-78",
+    "mei",
+    "iodomethane"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC1CCCC(C)C1=O",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC1(C)CCCCC1=O"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "conditions"
+   ],
+   "mechanism": "kinetic enolate alkylation"
+  },
+  {
+   "id": "RX-41",
+   "category": "thermodynamic enolate alkylation",
+   "title": "2-Methylcyclohexanone, NaOEt/EtOH (equilibrating) then MeI: 2,2-dimethylcyclohexanone major with polyalkylation",
+   "source_ids": [
+    "reusch_enolate"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source reports 2,2-dimethyl as major but with di/trimethylation and ~20% unreacted SM, so a clean single product is not expected.",
+   "reactants": [
+    "CC1CCCCC1=O"
+   ],
+   "reagents": "1) NaOEt or NaH, EtOH/THF, rt; 2) MeI",
+   "reagent_tokens": [
+    "naoet",
+    "nah",
+    "thermodynamic",
+    "equilibrat",
+    "mei",
+    "iodomethane"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC1(C)CCCCC1=O",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC1CCCC(C)C1=O"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "conditions",
+    "ranking"
+   ],
+   "mechanism": "thermodynamic enolate alkylation"
+  },
+  {
+   "id": "RX-42",
+   "category": "Claisen rearrangement",
+   "title": "Allyl phenyl ether, heat: 2-allylphenol",
+   "source_ids": [
+    "wiki_claisen"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Wikipedia only (flagged).",
+   "reactants": [
+    "C=CCOc1ccccc1"
+   ],
+   "reagents": "heat (~200 C)",
+   "reagent_tokens": [
+    "heat",
+    "claisen",
+    "thermal",
+    "pericyclic"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C=CCc1ccccc1O",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "C=CCc1ccc(O)cc1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "mechanism": "[3,3]-sigmatropic rearrangement"
+  },
+  {
+   "id": "RX-43",
+   "category": "Cope rearrangement",
+   "title": "3-Methylhexa-1,5-diene, heat: hepta-1,5-diene",
+   "source_ids": [
+    "wiki_cope"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Wikipedia only (flagged); alkene E/Z not stated so left unspecified.",
+   "reactants": [
+    "C=CC(C)CC=C"
+   ],
+   "reagents": "heat (300 C)",
+   "reagent_tokens": [
+    "heat",
+    "cope",
+    "thermal",
+    "pericyclic"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC=CCCC=C",
+      "role": "major"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "mechanism": "[3,3]-sigmatropic rearrangement"
+  },
+  {
+   "id": "RX-44",
+   "category": "radical halogenation (selectivity)",
+   "title": "2-Methylbutane + Br2, hv: tertiary bromide",
+   "source_ids": [
+    "rad_uis"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Source gives propane 97% secondary for bromination; the tertiary preference for isopentane is extrapolated.",
+   "reactants": [
+    "CCC(C)C"
+   ],
+   "reagents": "Br2, hv (light)",
+   "reagent_tokens": [
+    "br2",
+    "bromine",
+    "hv",
+    "light",
+    "radical"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCC(C)(C)Br",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC(C)CCBr"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "regiochemistry",
+    "ranking"
+   ],
+   "mechanism": "free-radical bromination"
+  },
+  {
+   "id": "RX-45",
+   "category": "asymmetric catalysis (honest abstention)",
+   "title": "(E)-Hex-2-en-1-ol, Sharpless asymmetric epoxidation: enantioenriched trans epoxy alcohol",
+   "source_ids": [],
+   "evidence": "inferred",
+   "uncertainty": "No source fetched; general knowledge that Ti/tartrate/TBHP epoxidises allylic alcohols enantioselectively. Tool likely cannot model ligand-controlled enantioselectivity; absolute configuration deliberately not asserted (trans relative configuration only).",
+   "reactants": [
+    "CCC/C=C/CO"
+   ],
+   "reagents": "Ti(OiPr)4, (+)-DET, TBHP, CH2Cl2, -20 C",
+   "reagent_tokens": [
+    "sharpless",
+    "ti(oipr)4",
+    "tbhp",
+    "det",
+    "tartrate"
+   ],
+   "expected": {
+    "outcome": "unsupported-expected",
+    "products": [
+     {
+      "smiles": "CCC[C@H]1O[C@@H]1CO",
+      "role": "formed"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "relative-only"
+   },
+   "criteria": [
+    "stereochemistry",
+    "conditions"
+   ],
+   "mechanism": "Sharpless asymmetric epoxidation"
+  },
+  {
+   "id": "RX-46",
+   "category": "cross-coupling (honest abstention)",
+   "title": "Iodobenzene + methyl acrylate, Heck: methyl (E)-cinnamate",
+   "source_ids": [],
+   "evidence": "inferred",
+   "uncertainty": "No source fetched; general knowledge. Organometallic cross-coupling is likely outside an undergraduate predictor.",
+   "reactants": [
+    "Ic1ccccc1",
+    "C=CC(=O)OC"
+   ],
+   "reagents": "Pd(OAc)2, PPh3, Et3N, DMF, heat",
+   "reagent_tokens": [
+    "pd",
+    "heck",
+    "pd(oac)2",
+    "palladium",
+    "et3n"
+   ],
+   "expected": {
+    "outcome": "unsupported-expected",
+    "products": [
+     {
+      "smiles": "COC(=O)/C=C/c1ccccc1",
+      "role": "formed"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "conditions"
+   ],
+   "mechanism": "Mizoroki-Heck coupling"
+  },
+  {
+   "id": "RX-47",
+   "category": "negative control (no reduction)",
+   "title": "Methyl pentanoate + NaBH4/MeOH, rt: no reaction",
+   "source_ids": [
+    "ucla_chemosel",
+    "wiki_carbred"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Sources: NaBH4 leaves esters unchanged; esters need stronger hydrides. Slow reduction under forcing conditions is possible but not at rt.",
+   "reactants": [
+    "CCCCC(=O)OC"
+   ],
+   "reagents": "NaBH4, MeOH, rt",
+   "reagent_tokens": [
+    "nabh4",
+    "sodium borohydride",
+    "borohydride"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [],
+    "forbidden": [
+     "CCCCCO"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "conditions"
+   ],
+   "mechanism": "no reaction (ester inert to NaBH4)"
+  },
+  {
+   "id": "RX-48",
+   "category": "negative control (unactivated aryl halide)",
+   "title": "4-Chlorotoluene + NaOMe/MeOH, reflux: no nucleophilic aromatic substitution",
+   "source_ids": [],
+   "evidence": "inferred",
+   "uncertainty": "No source fetched; general knowledge that unactivated aryl halides do not undergo SNAr with methoxide.",
+   "reactants": [
+    "Cc1ccc(Cl)cc1"
+   ],
+   "reagents": "NaOMe, MeOH, reflux",
+   "reagent_tokens": [
+    "naome",
+    "methoxide",
+    "sodium methoxide",
+    "snar"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [],
+    "forbidden": [
+     "COc1ccc(C)cc1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "conditions"
+   ],
+   "mechanism": "no reaction (SNAr requires activation)"
+  }
+ ]
+}

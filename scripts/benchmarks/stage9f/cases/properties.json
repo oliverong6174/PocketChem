@@ -1,0 +1,711 @@
+{
+ "capability": "properties",
+ "authored_on": "2026-11-03",
+ "sources": {
+  "nm-pubchem-props": {
+   "cite": "PubChem compound records: computed properties and experimental sections (PUG REST, PUG-View)",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/MolecularFormula,MolecularWeight,ExactMass,Charge/JSON",
+   "snapshot": "nm-pubchem-props.txt",
+   "fetched": true,
+   "says": "Gives molecular formula, molecular weight, monoisotopic mass, charge, and cited experimental log Kow and boiling points."
+  }
+ },
+ "cases": [
+  {
+   "id": "PR-01",
+   "category": "properties",
+   "title": "Properties of acetate",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "dbe uses the formula convention (2C+2+N+P-H-X)/2 with H adjusted by minus the charge; S=O and P=O are not counted, a structure-based count would differ.",
+   "smiles": "CC(=O)[O-]",
+   "reference": {
+    "formula": "C2H3O2-",
+    "molecular_weight": 59.04,
+    "exact_mass": 59.013304,
+    "dbe": 1,
+    "ring_count": 0,
+    "formal_charge": -1
+   }
+  },
+  {
+   "id": "PR-02",
+   "category": "properties",
+   "title": "Properties of azanium",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "dbe uses the formula convention (2C+2+N+P-H-X)/2 with H adjusted by minus the charge; S=O and P=O are not counted, a structure-based count would differ.",
+   "smiles": "[NH4+]",
+   "reference": {
+    "formula": "H4N+",
+    "molecular_weight": 18.039,
+    "exact_mass": 18.034374,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 1
+   }
+  },
+  {
+   "id": "PR-03",
+   "category": "properties",
+   "title": "Properties of sulfate",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "dbe uses the formula convention (2C+2+N+P-H-X)/2 with H adjusted by minus the charge; S=O and P=O are not counted, a structure-based count would differ.",
+   "smiles": "[O-]S(=O)(=O)[O-]",
+   "reference": {
+    "formula": "O4S2-",
+    "molecular_weight": 96.07,
+    "exact_mass": 95.95173,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": -2
+   }
+  },
+  {
+   "id": "PR-04",
+   "category": "properties",
+   "title": "Properties of tetrachloromethane",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "exact_mass is the true monoisotopic mass (lightest isotopes, e.g. 35Cl/79Br) computed from the formula with RDKit isotope table; PubChem's Exact Mass field lists 153.872461 for this record (most-abundant-isotope convention for Cl/Br), which is not monoisotopic.",
+   "smiles": "ClC(Cl)(Cl)Cl",
+   "reference": {
+    "formula": "CCl4",
+    "molecular_weight": 153.8,
+    "exact_mass": 151.875411,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": 2.83,
+    "note": "experimental octanol-water log Kow; Hansch & Leo 1995 via PubChem"
+   },
+   "bp_c": {
+    "value": 76.7,
+    "pressure": "760 mmHg",
+    "note": "converted from degrees F at 760 mmHg (NTP 1992 / USCG 1999 via PubChem)"
+   }
+  },
+  {
+   "id": "PR-05",
+   "category": "properties",
+   "title": "Properties of bromoform",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "exact_mass is the true monoisotopic mass (lightest isotopes, e.g. 35Cl/79Br) computed from the formula with RDKit isotope table; PubChem's Exact Mass field lists 251.76079 for this record (most-abundant-isotope convention for Cl/Br), which is not monoisotopic.",
+   "smiles": "BrC(Br)Br",
+   "reference": {
+    "formula": "CHBr3",
+    "molecular_weight": 252.73,
+    "exact_mass": 249.762836,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": 2.4,
+    "note": "experimental octanol-water log Kow; CITI Japan 1992 via PubChem"
+   },
+   "bp_c": {
+    "value": 149.5,
+    "pressure": "760 mmHg",
+    "note": "converted from degrees F at 760 mmHg (NTP 1992 / USCG 1999 via PubChem)"
+   }
+  },
+  {
+   "id": "PR-06",
+   "category": "properties",
+   "title": "Properties of trifluoromethylbenzene",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "FC(F)(F)c1ccccc1",
+   "reference": {
+    "formula": "C7H5F3",
+    "molecular_weight": 146.11,
+    "exact_mass": 146.034335,
+    "dbe": 4,
+    "ring_count": 1,
+    "formal_charge": 0
+   },
+   "bp_c": {
+    "value": 103.46,
+    "pressure": "760 mmHg",
+    "note": "handbook value via PubChem (Merck Index / PubChem record); pressure assumed normal"
+   }
+  },
+  {
+   "id": "PR-07",
+   "category": "properties",
+   "title": "Properties of methylsulfanylmethane",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "dbe uses the formula convention (2C+2+N+P-H-X)/2 with H adjusted by minus the charge; S=O and P=O are not counted, a structure-based count would differ.",
+   "smiles": "CSC",
+   "reference": {
+    "formula": "C2H6S",
+    "molecular_weight": 62.14,
+    "exact_mass": 62.019021,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "bp_c": {
+    "value": 37.2,
+    "pressure": "760 mmHg",
+    "note": "converted from degrees F at 760 mmHg (NTP 1992 / USCG 1999 via PubChem)"
+   }
+  },
+  {
+   "id": "PR-08",
+   "category": "properties",
+   "title": "Properties of methylsulfinylmethane",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "dbe uses the formula convention (2C+2+N+P-H-X)/2 with H adjusted by minus the charge; S=O and P=O are not counted, a structure-based count would differ.",
+   "smiles": "CS(C)=O",
+   "reference": {
+    "formula": "C2H6OS",
+    "molecular_weight": 78.14,
+    "exact_mass": 78.013936,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": -1.35,
+    "note": "experimental octanol-water log Kow; Hansch & Leo 1995 via PubChem"
+   },
+   "bp_c": {
+    "value": 188.9,
+    "pressure": "760 mmHg",
+    "note": "converted from degrees F at 760 mmHg (NTP 1992 / USCG 1999 via PubChem)"
+   }
+  },
+  {
+   "id": "PR-09",
+   "category": "properties",
+   "title": "Properties of triphenylphosphane",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "dbe uses the formula convention (2C+2+N+P-H-X)/2 with H adjusted by minus the charge; S=O and P=O are not counted, a structure-based count would differ.",
+   "smiles": "c1ccc(cc1)P(c1ccccc1)c1ccccc1",
+   "reference": {
+    "formula": "C18H15P",
+    "molecular_weight": 262.3,
+    "exact_mass": 262.091137,
+    "dbe": 12,
+    "ring_count": 3,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": 5.69,
+    "note": "experimental octanol-water log Kow; PubChem experimental LogP, reference not stated"
+   }
+  },
+  {
+   "id": "PR-10",
+   "category": "properties",
+   "title": "Properties of trimethyl phosphate",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "dbe uses the formula convention (2C+2+N+P-H-X)/2 with H adjusted by minus the charge; S=O and P=O are not counted, a structure-based count would differ.",
+   "smiles": "COP(=O)(OC)OC",
+   "reference": {
+    "formula": "C3H9O4P",
+    "molecular_weight": 140.07,
+    "exact_mass": 140.023846,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": -0.52,
+    "note": "experimental octanol-water log Kow; Hansch & Leo 1995 via PubChem; record also lists -0.78"
+   },
+   "bp_c": {
+    "value": 197.2,
+    "pressure": "760 mmHg",
+    "note": "converted from degrees F at 760 mmHg (NTP 1992 / USCG 1999 via PubChem)"
+   }
+  },
+  {
+   "id": "PR-11",
+   "category": "properties",
+   "title": "Properties of carbane",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Isotopically labelled: formula written with [nX] species; MW and exact mass use isotope masses (PubChem values).",
+   "smiles": "[13CH4]",
+   "reference": {
+    "formula": "[13C]H4",
+    "molecular_weight": 17.035,
+    "exact_mass": 17.034655,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 0
+   }
+  },
+  {
+   "id": "PR-12",
+   "category": "properties",
+   "title": "Properties of trichloro(deuterio)methane",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Isotopically labelled: formula written with [nX] species; MW and exact mass use isotope masses (PubChem values).",
+   "smiles": "[2H]C(Cl)(Cl)Cl",
+   "reference": {
+    "formula": "C[2H]Cl3",
+    "molecular_weight": 120.38,
+    "exact_mass": 118.92066,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "bp_c": {
+    "value": 60.9,
+    "pressure": "760 mmHg",
+    "note": "handbook value via PubChem (Merck Index / PubChem record); pressure assumed normal"
+   }
+  },
+  {
+   "id": "PR-13",
+   "category": "properties",
+   "title": "Properties of acetic acid",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Isotopically labelled: formula written with [nX] species; MW and exact mass use isotope masses (PubChem values).",
+   "smiles": "[13CH3]C(=O)O",
+   "reference": {
+    "formula": "C[13C]H4O2",
+    "molecular_weight": 61.045,
+    "exact_mass": 61.024484,
+    "dbe": 1,
+    "ring_count": 0,
+    "formal_charge": 0
+   }
+  },
+  {
+   "id": "PR-14",
+   "category": "properties",
+   "title": "Properties of deuterated water",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Isotopically labelled: formula written with [nX] species; MW and exact mass use isotope masses (PubChem values).",
+   "smiles": "[2H]O[2H]",
+   "reference": {
+    "formula": "[2H]2O",
+    "molecular_weight": 20.028,
+    "exact_mass": 20.023118,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "bp_c": {
+    "value": 101.42,
+    "pressure": "760 mmHg",
+    "note": "handbook value via PubChem (Merck Index / PubChem record); pressure assumed normal"
+   }
+  },
+  {
+   "id": "PR-15",
+   "category": "properties",
+   "title": "Properties of 1,3,7-trimethylpurine-2,6-dione",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "Cn1cnc2c1c(=O)n(C)c(=O)n2C",
+   "reference": {
+    "formula": "C8H10N4O2",
+    "molecular_weight": 194.19,
+    "exact_mass": 194.080376,
+    "dbe": 6,
+    "ring_count": 2,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": -0.07,
+    "note": "experimental octanol-water log Kow; Hansch & Leo 1995 via PubChem"
+   }
+  },
+  {
+   "id": "PR-16",
+   "category": "properties",
+   "title": "Properties of 2-acetyloxybenzoic acid",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+   "reference": {
+    "formula": "C9H8O4",
+    "molecular_weight": 180.16,
+    "exact_mass": 180.042259,
+    "dbe": 6,
+    "ring_count": 1,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": 1.19,
+    "note": "experimental octanol-water log Kow; Hansch & Leo 1995 via PubChem"
+   }
+  },
+  {
+   "id": "PR-17",
+   "category": "properties",
+   "title": "Properties of 2-[4-(2-methylpropyl)phenyl]propanoic acid",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(C)Cc1ccc(cc1)C(C)C(=O)O",
+   "reference": {
+    "formula": "C13H18O2",
+    "molecular_weight": 206.28,
+    "exact_mass": 206.13068,
+    "dbe": 5,
+    "ring_count": 1,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": 3.97,
+    "note": "experimental octanol-water log Kow; Avdeef 1997 via PubChem"
+   }
+  },
+  {
+   "id": "PR-18",
+   "category": "properties",
+   "title": "Properties of (3S,8S,9S,10R,13R,14S,17R)-10,13-dimethyl-17-[(2R)-6-methylheptan-2-yl]-2,3,4,7,8,9,11,12,14,15,16,17-dodecahydro-1H-cyclopenta[a]phenanthren-3-ol",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(C)CCC[C@@H](C)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C",
+   "reference": {
+    "formula": "C27H46O",
+    "molecular_weight": 386.7,
+    "exact_mass": 386.354866,
+    "dbe": 5,
+    "ring_count": 4,
+    "formal_charge": 0
+   }
+  },
+  {
+   "id": "PR-19",
+   "category": "properties",
+   "title": "Properties of (8S,9S,10R,13S,14S,17S)-17-acetyl-10,13-dimethyl-1,2,6,7,8,9,11,12,14,15,16,17-dodecahydrocyclopenta[a]phenanthren-3-one",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(=O)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CCC4=CC(=O)CC[C@]34C)C",
+   "reference": {
+    "formula": "C21H30O2",
+    "molecular_weight": 314.5,
+    "exact_mass": 314.22458,
+    "dbe": 7,
+    "ring_count": 4,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": 3.87,
+    "note": "experimental octanol-water log Kow; Hansch & Leo 1995 via PubChem"
+   }
+  },
+  {
+   "id": "PR-20",
+   "category": "properties",
+   "title": "Properties of 2,6,10,15,19,23-hexamethyltetracosa-2,6,10,14,18,22-hexaene",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(C)=CCCC(C)=CCCC(C)=CCCC=C(C)CCC=C(C)CCC=C(C)C",
+   "reference": {
+    "formula": "C30H50",
+    "molecular_weight": 410.7,
+    "exact_mass": 410.391252,
+    "dbe": 6,
+    "ring_count": 0,
+    "formal_charge": 0
+   }
+  },
+  {
+   "id": "PR-21",
+   "category": "properties",
+   "title": "Properties of icosane",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CCCCCCCCCCCCCCCCCCCC",
+   "reference": {
+    "formula": "C20H42",
+    "molecular_weight": 282.5,
+    "exact_mass": 282.328651,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "bp_c": {
+    "value": 342.7,
+    "pressure": "760 mmHg",
+    "note": "converted from degrees F at 760 mmHg (NTP 1992 / USCG 1999 via PubChem)"
+   }
+  },
+  {
+   "id": "PR-22",
+   "category": "properties",
+   "title": "Properties of 2-[4-[(Z)-1,2-diphenylbut-1-enyl]phenoxy]-N,N-dimethylethanamine",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC/C(=C(\\c1ccccc1)/c1ccc(OCCN(C)C)cc1)/c1ccccc1",
+   "reference": {
+    "formula": "C26H29NO",
+    "molecular_weight": 371.5,
+    "exact_mass": 371.224915,
+    "dbe": 13,
+    "ring_count": 3,
+    "formal_charge": 0
+   }
+  },
+  {
+   "id": "PR-23",
+   "category": "properties",
+   "title": "Properties of ethanethiol",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "dbe uses the formula convention (2C+2+N+P-H-X)/2 with H adjusted by minus the charge; S=O and P=O are not counted, a structure-based count would differ.",
+   "smiles": "CCS",
+   "reference": {
+    "formula": "C2H6S",
+    "molecular_weight": 62.14,
+    "exact_mass": 62.019021,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "bp_c": {
+    "value": 34.4,
+    "pressure": "760 mmHg",
+    "note": "converted from degrees F at 760 mmHg (NTP 1992 / USCG 1999 via PubChem)"
+   }
+  },
+  {
+   "id": "PR-24",
+   "category": "properties",
+   "title": "Properties of thiophene",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "dbe uses the formula convention (2C+2+N+P-H-X)/2 with H adjusted by minus the charge; S=O and P=O are not counted, a structure-based count would differ.",
+   "smiles": "c1ccsc1",
+   "reference": {
+    "formula": "C4H4S",
+    "molecular_weight": 84.14,
+    "exact_mass": 84.003371,
+    "dbe": 3,
+    "ring_count": 1,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": 1.81,
+    "note": "experimental octanol-water log Kow; Hansch & Leo 1995 via PubChem"
+   },
+   "bp_c": {
+    "value": 84.4,
+    "pressure": "760 mmHg",
+    "note": "converted from degrees F at 760 mmHg (NTP 1992 / USCG 1999 via PubChem)"
+   }
+  },
+  {
+   "id": "PR-25",
+   "category": "properties",
+   "title": "Properties of chlorobenzene",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "Clc1ccccc1",
+   "reference": {
+    "formula": "C6H5Cl",
+    "molecular_weight": 112.55,
+    "exact_mass": 112.007978,
+    "dbe": 4,
+    "ring_count": 1,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": 2.84,
+    "note": "experimental octanol-water log Kow; Sangster LOGKOW via PubChem"
+   },
+   "bp_c": {
+    "value": 132.2,
+    "pressure": "760 mmHg",
+    "note": "converted from degrees F at 760 mmHg (NTP 1992 / USCG 1999 via PubChem)"
+   }
+  },
+  {
+   "id": "PR-26",
+   "category": "properties",
+   "title": "Properties of nitromethane",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C[N+](=O)[O-]",
+   "reference": {
+    "formula": "CH3NO2",
+    "molecular_weight": 61.04,
+    "exact_mass": 61.016378,
+    "dbe": 1,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": -0.35,
+    "note": "experimental octanol-water log Kow; Hansch & Leo 1995 via PubChem"
+   },
+   "bp_c": {
+    "value": 101.2,
+    "pressure": "760 mmHg",
+    "note": "converted from degrees F at 760 mmHg (NTP 1992 / USCG 1999 via PubChem)"
+   }
+  },
+  {
+   "id": "PR-27",
+   "category": "properties",
+   "title": "Properties of 6-(hydroxymethyl)oxane-2,3,4,5-tetrol",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Drawn without stereo as a generic hexopyranose; PubChem ring-form record.",
+   "smiles": "C(C1C(C(C(C(O1)O)O)O)O)O",
+   "reference": {
+    "formula": "C6H12O6",
+    "molecular_weight": 180.16,
+    "exact_mass": 180.063388,
+    "dbe": 1,
+    "ring_count": 1,
+    "formal_charge": 0
+   }
+  },
+  {
+   "id": "PR-28",
+   "category": "properties",
+   "title": "Properties of iodoform",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C(I)(I)I",
+   "reference": {
+    "formula": "CHI3",
+    "molecular_weight": 393.732,
+    "exact_mass": 393.7212,
+    "dbe": 0,
+    "ring_count": 0,
+    "formal_charge": 0
+   }
+  },
+  {
+   "id": "PR-29",
+   "category": "properties",
+   "title": "Properties of urea",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "NC(N)=O",
+   "reference": {
+    "formula": "CH4N2O",
+    "molecular_weight": 60.056,
+    "exact_mass": 60.032363,
+    "dbe": 1,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": -2.11,
+    "note": "experimental octanol-water log Kow; Hansch & Leo 1995 via PubChem"
+   }
+  },
+  {
+   "id": "PR-30",
+   "category": "properties",
+   "title": "Properties of octadecanoic acid",
+   "source_ids": [
+    "nm-pubchem-props"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CCCCCCCCCCCCCCCCCC(=O)O",
+   "reference": {
+    "formula": "C18H36O2",
+    "molecular_weight": 284.5,
+    "exact_mass": 284.27153,
+    "dbe": 1,
+    "ring_count": 0,
+    "formal_charge": 0
+   },
+   "logp_exp": {
+    "value": 8.23,
+    "note": "experimental octanol-water log Kow; Sangster 1993 via PubChem"
+   },
+   "bp_c": {
+    "value": 382.8,
+    "pressure": "760 mmHg",
+    "note": "converted from degrees F at 760 mmHg (NTP 1992 / USCG 1999 via PubChem)"
+   }
+  }
+ ]
+}

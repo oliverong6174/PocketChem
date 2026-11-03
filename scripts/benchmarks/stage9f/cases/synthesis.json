@@ -1,0 +1,1050 @@
+{
+ "capability": "synthesis",
+ "authored_on": "2026-11-03",
+ "sources": {
+  "orgsyn_cv1p0018": {
+   "cite": "Organic Syntheses, Adipic acid: Org. Synth. Coll. Vol. 1, p.18 (1941); Vol. 5, p.9 (1925)",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0018.pdf",
+   "snapshot": "rk-orgsyn_cv1p0018.txt",
+   "fetched": true,
+   "says": "Cyclohexanol (5 mol) is oxidised with 50% nitric acid and 1 g ammonium vanadate (catalyst) to adipic acid."
+  },
+  "orgsyn_cv1p0087": {
+   "cite": "Organic Syntheses, Benzil: Org. Synth. Coll. Vol. 1, p.87 (1941); Vol. 6, p.6 (1926)",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0087.pdf",
+   "snapshot": "rk-orgsyn_cv1p0087.txt",
+   "fetched": true,
+   "says": "Benzoin is oxidised to benzil with copper sulfate in aqueous pyridine, the copper being reoxidised by air."
+  },
+  "orgsyn_cv1p0089": {
+   "cite": "Organic Syntheses, Benzilic acid: Org. Synth. Coll. Vol. 1, p.89 (1941); Vol. 1, p.29 (1921)",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0089.pdf",
+   "snapshot": "rk-orgsyn_cv1p0089.txt",
+   "fetched": true,
+   "says": "Benzoin is converted directly by NaOH/NaBrO3 (benzil formed in situ, then benzilic acid rearrangement) and acidified to benzilic acid; benzohydrol is a removed by-product."
+  },
+  "orgsyn_cv1p0107": {
+   "cite": "Organic Syntheses, Benzyl cyanide: Org. Synth. Coll. Vol. 1, p.107 (1941); Vol. 2, p.9 (1922)",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0107.pdf",
+   "snapshot": "rk-orgsyn_cv1p0107.txt",
+   "fetched": true,
+   "says": "Benzyl chloride with sodium cyanide in aqueous alcohol, 4 h reflux, gives benzyl cyanide."
+  },
+  "orgsyn_cv1p0170": {
+   "cite": "Organic Syntheses, o- and p-Chlorotoluene: Org. Synth. Coll. Vol. 1, p.170 (1941); Vol. 3, p.33 (1923)",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0170.pdf",
+   "snapshot": "rk-orgsyn_cv1p0170.txt",
+   "fetched": true,
+   "says": "o-Toluidine hydrochloride is diazotised with NaNO2 and the diazonium solution is added to a cuprous chloride solution to give o-chlorotoluene."
+  },
+  "orgsyn_cv1p0199": {
+   "cite": "Organic Syntheses, Diacetone alcohol: Org. Synth. Coll. Vol. 1, p.199 (1941); Vol. 1, p.45 (1921)",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0199.pdf",
+   "snapshot": "rk-orgsyn_cv1p0199.txt",
+   "fetched": true,
+   "says": "Acetone is condensed over barium hydroxide in a Soxhlet extractor (95-120 h) to diacetone alcohol."
+  },
+  "orgsyn_cv1p0235": {
+   "cite": "Organic Syntheses, Ethyl acetoacetate: Org. Synth. Coll. Vol. 1, p.235 (1941); Vol. 6, p.36 (1926)",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0235.pdf",
+   "snapshot": "rk-orgsyn_cv1p0235.txt",
+   "fetched": true,
+   "says": "Ethyl acetate with sodium (giving sodium ethoxide) undergoes Claisen condensation; acidification with acetic acid gives ethyl acetoacetate."
+  },
+  "orgsyn_cv1p0345": {
+   "cite": "Organic Syntheses, Mesityl oxide: Org. Synth. Coll. Vol. 1, p.345 (1941); Vol. 1, p.53 (1921)",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0345.pdf",
+   "snapshot": "rk-orgsyn_cv1p0345.txt",
+   "fetched": true,
+   "says": "Diacetone alcohol is distilled with a trace of iodine to give mesityl oxide."
+  },
+  "orgsyn_cv1p0436": {
+   "cite": "Organic Syntheses, Phenylacetic acid: Org. Synth. Coll. Vol. 1, p.436 (1941); Vol. 2, p.63 (1922)",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0436.pdf",
+   "snapshot": "rk-orgsyn_cv1p0436.txt",
+   "fetched": true,
+   "says": "Benzyl cyanide is hydrolysed with aqueous sulfuric acid (3 h reflux) to phenylacetic acid."
+  },
+  "orgsyn_cv1p0459": {
+   "cite": "Organic Syntheses, Pinacol hydrate: Org. Synth. Coll. Vol. 1, p.459 (1941); Vol. 5, p.87 (1925)",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0459.pdf",
+   "snapshot": "rk-orgsyn_cv1p0459.txt",
+   "fetched": true,
+   "says": "Magnesium and mercuric chloride in acetone/benzene give magnesium pinacolate, hydrolysed to pinacol hydrate."
+  },
+  "orgsyn_cv1p0462": {
+   "cite": "Organic Syntheses, Pinacolone: Org. Synth. Coll. Vol. 1, p.462 (1941); Vol. 5, p.91 (1925)",
+   "url": "https://orgsyn.org/Content/pdfs/procedures/cv1p0462.pdf",
+   "snapshot": "rk-orgsyn_cv1p0462.txt",
+   "fetched": true,
+   "says": "Pinacol hydrate is distilled with 6 N sulfuric acid to give pinacolone."
+  },
+  "wiki_aspirin": {
+   "cite": "Wikipedia, 'Aspirin' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Aspirin",
+   "snapshot": "rk-wiki_aspirin.txt",
+   "fetched": true,
+   "says": "Salicylic acid is treated with acetic anhydride (small amount of sulfuric/phosphoric acid catalyst) to give aspirin and acetic acid.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_adipic": {
+   "cite": "Wikipedia, 'Adipic acid' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Adipic_acid",
+   "snapshot": "rk-wiki_adipic.txt",
+   "fetched": true,
+   "says": "Adipic acid with barium hydroxide at elevated temperature undergoes ketonization to cyclopentanone.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_cyclopentanone": {
+   "cite": "Wikipedia, 'Cyclopentanone' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Cyclopentanone",
+   "snapshot": "rk-wiki_cyclopentanone.txt",
+   "fetched": true,
+   "says": "Ketonic decarboxylation of adipic acid gives cyclopentanone, at elevated temperature with barium hydroxide.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_paracetamol": {
+   "cite": "Wikipedia, 'Paracetamol' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Paracetamol",
+   "snapshot": "rk-wiki_paracetamol.txt",
+   "fetched": true,
+   "says": "Classical route: nitration of phenol gives 4-nitrophenol, reduced to 4-aminophenol by hydrogenation over Raney nickel, then acetylated with acetic anhydride.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_phenacetin": {
+   "cite": "Wikipedia, 'Phenacetin' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Phenacetin",
+   "snapshot": "rk-wiki_phenacetin.txt",
+   "fetched": true,
+   "says": "Phenacetin is made by Williamson ether synthesis: ethyl iodide, paracetamol and anhydrous K2CO3 in 2-butanone.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_nitroaniline": {
+   "cite": "Wikipedia, '4-Nitroaniline' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/4-Nitroaniline",
+   "snapshot": "rk-wiki_nitroaniline.txt",
+   "fetched": true,
+   "says": "Laboratory synthesis from aniline: acetyl protection is required before nitration because protonated aniline is meta-directing; some 2-nitroaniline also forms.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_acetanilide": {
+   "cite": "Wikipedia, 'Acetanilide' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Acetanilide",
+   "snapshot": "rk-wiki_acetanilide.txt",
+   "fetched": true,
+   "says": "Acetanilide is produced by reacting acetic anhydride with aniline.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_lidocaine": {
+   "cite": "Wikipedia, 'Lidocaine' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Lidocaine",
+   "snapshot": "rk-wiki_lidocaine.txt",
+   "fetched": true,
+   "says": "Lidocaine may be synthesised from 2,6-xylidine and chloroacetyl chloride (the page text gives only this; the scheme is an image).",
+   "last_resort_wikipedia": true
+  },
+  "wiki_mibk": {
+   "cite": "Wikipedia, 'Methyl isobutyl ketone' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Methyl_isobutyl_ketone",
+   "snapshot": "rk-wiki_mibk.txt",
+   "fetched": true,
+   "says": "At laboratory scale MIBK is made in three steps from acetone: aldol to diacetone alcohol, dehydration to mesityl oxide, then hydrogenation.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_dimedone": {
+   "cite": "Wikipedia, 'Dimedone' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Dimedone",
+   "snapshot": "rk-wiki_dimedone.txt",
+   "fetched": true,
+   "says": "Dimedone is prepared from mesityl oxide and diethyl malonate via a Michael addition.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_aeester": {
+   "cite": "Wikipedia, 'Acetoacetic ester synthesis' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Acetoacetic_ester_synthesis",
+   "snapshot": "rk-wiki_aeester.txt",
+   "fetched": true,
+   "says": "Ethyl acetoacetate is deprotonated, alkylated at the alpha carbon, then hydrolysed and decarboxylated with heat/aqueous acid to a methyl ketone.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_grignard": {
+   "cite": "Wikipedia, 'Grignard reaction' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Grignard_reaction",
+   "snapshot": "rk-wiki_grignard.txt",
+   "fetched": true,
+   "says": "Organic halide plus magnesium gives the Grignard reagent, which adds to aldehydes and ketones to give alcohols.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_protgroup": {
+   "cite": "Wikipedia, 'Protecting group' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Protecting_group",
+   "snapshot": "rk-wiki_protgroup.txt",
+   "fetched": true,
+   "says": "Figure caption: ethylene glycol protects a ketone as an acetal during an ester reduction, versus unprotected reduction to a diol.",
+   "last_resort_wikipedia": true
+  },
+  "wiki_sandmeyer": {
+   "cite": "Wikipedia, 'Sandmeyer reaction' (last resort)",
+   "url": "https://en.wikipedia.org/wiki/Sandmeyer_reaction",
+   "snapshot": "rk-wiki_sandmeyer.txt",
+   "fetched": true,
+   "says": "Aryl diazonium salts are converted to aryl chlorides with CuCl.",
+   "last_resort_wikipedia": true
+  },
+  "orgsyn_cv1p0008": {
+   "cite": "Organic Syntheses, p-Acetaminobenzenesulfonyl chloride, Coll. Vol. 1, p.8",
+   "url": "http://www.orgsyn.org/demo.aspx?prep=CV1P0008",
+   "snapshot": "rk-orgsyn_cv1p0008.txt",
+   "fetched": false,
+   "says": "Acetanilide plus excess chlorosulfonic acid (60 C, 2 h) gives 4-acetamidobenzenesulfonyl chloride (known only from a search-result excerpt; direct fetch was blocked with HTTP 403)."
+  },
+  "orgsyn_cv2p0200": {
+   "cite": "Organic Syntheses, Dimedone (methone), Coll. Vol. 2, p.200",
+   "url": "https://orgsyn.org/demo.aspx?prep=cv2p0200",
+   "snapshot": "rk-orgsyn_cv2p0200.txt",
+   "fetched": false,
+   "says": "Dimedone from sodium ethoxide, diethyl malonate and mesityl oxide then KOH hydrolysis and acidification (known only from a search-result excerpt; direct fetch was blocked with HTTP 403)."
+  },
+  "orgsyn_cv1p0248_cv1p0351": {
+   "cite": "Organic Syntheses, ethyl n-butylacetoacetate (Coll. Vol. 1, p.248) and methyl n-amyl ketone (Coll. Vol. 1, p.351)",
+   "url": "http://www.orgsyn.org/demo.aspx?prep=CV1P0351",
+   "snapshot": "rk-orgsyn_cv1p0248_cv1p0351.txt",
+   "fetched": false,
+   "says": "Ethyl acetoacetate is alkylated with n-butyl bromide, then ketonic hydrolysis gives 2-heptanone (known only from search-result excerpts; direct fetch was blocked with HTTP 403)."
+  }
+ },
+ "cases": [
+  {
+   "id": "SY-01",
+   "category": "oxidative cleavage",
+   "title": "Cyclohexanol to adipic acid",
+   "source_ids": [
+    "orgsyn_cv1p0018"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Nitric acid is the stoichiometric oxidant; vanadate is the catalyst.",
+   "start": "OC1CCCCC1",
+   "target": "OC(=O)CCCCC(=O)O",
+   "literature_steps": [
+    {
+     "transformation": "Oxidative ring opening of the secondary alcohol",
+     "reagents": "50% HNO3, NH4VO3 (cat.), 55-60 C then cooling",
+     "product": "OC(=O)CCCCC(=O)O",
+     "catalytic": true
+    }
+   ],
+   "n_steps_min": 1,
+   "n_steps_max": 2,
+   "route_must_avoid": [],
+   "notes": "One OrgSyn procedure. A two-stage description (alcohol to ketone to ring-opened diacid) is also chemically reasonable but is not isolated. 'catalytic' is true only where a substoichiometric catalyst is the key reagent of the step. Target MW 146.1."
+  },
+  {
+   "id": "SY-02",
+   "category": "nucleophilic substitution",
+   "title": "Benzyl chloride to benzyl cyanide",
+   "source_ids": [
+    "orgsyn_cv1p0107"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "start": "ClCc1ccccc1",
+   "target": "N#CCc1ccccc1",
+   "literature_steps": [
+    {
+     "transformation": "SN2 displacement of chloride by cyanide",
+     "reagents": "NaCN, H2O/EtOH, reflux 4 h",
+     "product": "N#CCc1ccccc1",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 1,
+   "n_steps_max": 1,
+   "route_must_avoid": [
+    "[C-]#[N+]Cc1ccccc1",
+    "OCc1ccccc1"
+   ],
+   "notes": "Avoid list: isonitrile (wrong nucleophilic atom) and benzyl alcohol (hydrolysis). Target MW 117.2."
+  },
+  {
+   "id": "SY-03",
+   "category": "carbonyl condensation (Claisen)",
+   "title": "Ethyl acetate to ethyl acetoacetate",
+   "source_ids": [
+    "orgsyn_cv1p0235"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "start": "CCOC(C)=O",
+   "target": "CCOC(=O)CC(C)=O",
+   "literature_steps": [
+    {
+     "transformation": "Claisen self-condensation",
+     "reagents": "Na metal (forms NaOEt), then 50% AcOH to neutralise",
+     "product": "CCOC(=O)CC(C)=O",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 1,
+   "n_steps_max": 1,
+   "route_must_avoid": [],
+   "notes": "Reaction class (Claisen condensation) is normally taught in the second semester. Needs one full equivalent of base. Target MW 130.1."
+  },
+  {
+   "id": "SY-04",
+   "category": "aldol",
+   "title": "Acetone to diacetone alcohol",
+   "source_ids": [
+    "orgsyn_cv1p0199"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Equilibrium-limited; Soxhlet keeps catalyst separate from product.",
+   "start": "CC(C)=O",
+   "target": "CC(=O)CC(C)(C)O",
+   "literature_steps": [
+    {
+     "transformation": "Base-catalysed aldol addition",
+     "reagents": "Ba(OH)2 (Soxhlet, acetone reflux 95-120 h)",
+     "product": "CC(=O)CC(C)(C)O",
+     "catalytic": true
+    }
+   ],
+   "n_steps_min": 1,
+   "n_steps_max": 1,
+   "route_must_avoid": [
+    "CC(C)=CC(C)=O"
+   ],
+   "notes": "Avoid list: mesityl oxide (dehydration, over-reaction). Target MW 116.2."
+  },
+  {
+   "id": "SY-05",
+   "category": "rearrangement (pinacol)",
+   "title": "Pinacol to pinacolone",
+   "source_ids": [
+    "orgsyn_cv1p0462"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Acid is used in large excess as aqueous medium; classed catalytic by mechanism.",
+   "start": "CC(C)(O)C(C)(C)O",
+   "target": "CC(=O)C(C)(C)C",
+   "literature_steps": [
+    {
+     "transformation": "Acid-catalysed pinacol rearrangement with distillation",
+     "reagents": "6 N H2SO4, distil",
+     "product": "CC(=O)C(C)(C)C",
+     "catalytic": true
+    }
+   ],
+   "n_steps_min": 1,
+   "n_steps_max": 1,
+   "route_must_avoid": [
+    "C=C(C)C(C)=C"
+   ],
+   "notes": "Reaction class not in a typical first-semester course. The OrgSyn text uses pinacol hydrate. Avoid list: 2,3-dimethylbutadiene (dehydration by-product). 'catalytic' is true only where a substoichiometric catalyst is the key reagent of the step. Target MW 100.2."
+  },
+  {
+   "id": "SY-06",
+   "category": "esterification",
+   "title": "Salicylic acid and acetic anhydride to aspirin",
+   "source_ids": [
+    "wiki_aspirin"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source is Wikipedia; conditions are standard teaching-lab practice.",
+   "start": "OC(=O)c1ccccc1O.CC(=O)OC(C)=O",
+   "target": "CC(=O)Oc1ccccc1C(=O)O",
+   "literature_steps": [
+    {
+     "transformation": "O-Acetylation of the phenol",
+     "reagents": "acetic anhydride, H2SO4 or H3PO4 (cat.), warm",
+     "product": "CC(=O)Oc1ccccc1C(=O)O",
+     "catalytic": true
+    }
+   ],
+   "n_steps_min": 1,
+   "n_steps_max": 1,
+   "route_must_avoid": [],
+   "notes": "Convergent (two starting materials); acetic acid is the by-product. 'catalytic' is true only where a substoichiometric catalyst is the key reagent of the step. Target MW 180.2."
+  },
+  {
+   "id": "SY-07",
+   "category": "oxidation then rearrangement",
+   "title": "Benzoin to benzilic acid",
+   "source_ids": [
+    "orgsyn_cv1p0087",
+    "orgsyn_cv1p0089"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Benzoin-to-benzil oxidant differs between the two OrgSyn procedures (Cu(II)/pyridine vs bromate).",
+   "start": "O=C(c1ccccc1)C(O)c1ccccc1",
+   "target": "OC(=O)C(O)(c1ccccc1)c1ccccc1",
+   "literature_steps": [
+    {
+     "transformation": "Oxidation of the alpha-hydroxy ketone to the 1,2-diketone",
+     "reagents": "CuSO4, pyridine/H2O, heat, air to reoxidise Cu",
+     "product": "O=C(c1ccccc1)C(=O)c1ccccc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Benzilic acid rearrangement",
+     "reagents": "NaOH (aq), heat, then H2SO4",
+     "product": "OC(=O)C(O)(c1ccccc1)c1ccccc1",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 1,
+   "n_steps_max": 2,
+   "route_must_avoid": [
+    "OC(c1ccccc1)c1ccccc1"
+   ],
+   "notes": "The OrgSyn benzilic acid procedure starts from benzoin and oxidises with NaOH/NaBrO3 in the same pot (min 1 step). Avoid list: benzohydrol (reduction by-product). Target MW 228.2."
+  },
+  {
+   "id": "SY-08",
+   "category": "nitrile hydrolysis",
+   "title": "Benzyl chloride to phenylacetic acid",
+   "source_ids": [
+    "orgsyn_cv1p0107",
+    "orgsyn_cv1p0436"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "start": "ClCc1ccccc1",
+   "target": "OC(=O)Cc1ccccc1",
+   "literature_steps": [
+    {
+     "transformation": "Cyanide displacement",
+     "reagents": "NaCN, aq. EtOH, reflux",
+     "product": "N#CCc1ccccc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Acid hydrolysis of the nitrile",
+     "reagents": "H2SO4/H2O (about 1:1.4 by volume), reflux 3 h",
+     "product": "OC(=O)Cc1ccccc1",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 2,
+   "n_steps_max": 2,
+   "route_must_avoid": [
+    "OCc1ccccc1"
+   ],
+   "notes": "Avoid list: benzyl alcohol (hydrolysis of the halide). Target MW 136.1."
+  },
+  {
+   "id": "SY-09",
+   "category": "pinacol coupling / rearrangement",
+   "title": "Acetone to pinacolone",
+   "source_ids": [
+    "orgsyn_cv1p0459",
+    "orgsyn_cv1p0462"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Original procedure uses benzene and mercury salts.",
+   "start": "CC(C)=O",
+   "target": "CC(=O)C(C)(C)C",
+   "literature_steps": [
+    {
+     "transformation": "Reductive pinacol coupling",
+     "reagents": "Mg, HgCl2, acetone/benzene, then water (pinacol hydrate)",
+     "product": "CC(C)(O)C(C)(C)O",
+     "catalytic": false
+    },
+    {
+     "transformation": "Pinacol rearrangement",
+     "reagents": "6 N H2SO4, distil",
+     "product": "CC(=O)C(C)(C)C",
+     "catalytic": true
+    }
+   ],
+   "n_steps_min": 2,
+   "n_steps_max": 2,
+   "route_must_avoid": [
+    "CC(C)O"
+   ],
+   "notes": "Reaction classes not in a typical first-semester course. Avoid list: isopropanol (simple reduction of acetone). Target MW 100.2."
+  },
+  {
+   "id": "SY-10",
+   "category": "aldol / dehydration",
+   "title": "Acetone to mesityl oxide",
+   "source_ids": [
+    "orgsyn_cv1p0199",
+    "orgsyn_cv1p0345"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Overall yield about 65% based on acetone consumed.",
+   "start": "CC(C)=O",
+   "target": "CC(C)=CC(C)=O",
+   "literature_steps": [
+    {
+     "transformation": "Aldol addition",
+     "reagents": "Ba(OH)2 (cat.), acetone reflux",
+     "product": "CC(=O)CC(C)(C)O",
+     "catalytic": true
+    },
+    {
+     "transformation": "Dehydration",
+     "reagents": "I2 (trace, cat.), fractional distillation",
+     "product": "CC(C)=CC(C)=O",
+     "catalytic": true
+    }
+   ],
+   "n_steps_min": 2,
+   "n_steps_max": 2,
+   "route_must_avoid": [
+    "C=C(C)CC(C)=O"
+   ],
+   "notes": "Avoid list: isomesityl oxide (beta,gamma-unsaturated isomer). 'catalytic' is true only where a substoichiometric catalyst is the key reagent of the step. Target MW 98.1."
+  },
+  {
+   "id": "SY-11",
+   "category": "diazonium / Sandmeyer",
+   "title": "o-Toluidine to o-chlorotoluene",
+   "source_ids": [
+    "orgsyn_cv1p0170",
+    "wiki_sandmeyer"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "start": "Cc1ccccc1N",
+   "target": "Cc1ccccc1Cl",
+   "literature_steps": [
+    {
+     "transformation": "Diazotisation",
+     "reagents": "NaNO2, conc. HCl, ice cooling",
+     "product": "Cc1ccccc1[N+]#N",
+     "catalytic": false
+    },
+    {
+     "transformation": "Sandmeyer chlorination",
+     "reagents": "CuCl in HCl, warm",
+     "product": "Cc1ccccc1Cl",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 2,
+   "n_steps_max": 2,
+   "route_must_avoid": [
+    "Cc1ccccc1O"
+   ],
+   "notes": "Reaction class (diazonium chemistry) is normally second-semester. Avoid list: o-cresol (phenol formation from the diazonium salt). Target MW 126.6."
+  },
+  {
+   "id": "SY-12",
+   "category": "organometallic",
+   "title": "1-Bromobutane and CO2 to pentanoic acid",
+   "source_ids": [
+    "wiki_grignard"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "No fetched procedure for this exact substrate.",
+   "start": "CCCCBr.O=C=O",
+   "target": "CCCCC(=O)O",
+   "literature_steps": [
+    {
+     "transformation": "Grignard reagent formation",
+     "reagents": "Mg turnings, dry Et2O",
+     "product": "CCCC[Mg]Br",
+     "catalytic": false
+    },
+    {
+     "transformation": "Carboxylation then protonation",
+     "reagents": "CO2 (dry ice), then H3O+",
+     "product": "CCCCC(=O)O",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 2,
+   "n_steps_max": 2,
+   "route_must_avoid": [
+    "CCCCCCCC"
+   ],
+   "notes": "Convergent (halide plus CO2). Avoid list: octane (Wurtz coupling by-product). The fetched source covers only the Grignard reagent and its carbonyl additions generally, so this case is evidenced as a textbook-standard route, not by a specific fetched procedure. Target MW 102.1."
+  },
+  {
+   "id": "SY-13",
+   "category": "oxidation then ketonization",
+   "title": "Cyclohexanol to cyclopentanone via adipic acid",
+   "source_ids": [
+    "orgsyn_cv1p0018",
+    "wiki_adipic",
+    "wiki_cyclopentanone"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Step 2 conditions from Wikipedia only.",
+   "start": "OC1CCCCC1",
+   "target": "O=C1CCCC1",
+   "literature_steps": [
+    {
+     "transformation": "Oxidative ring opening",
+     "reagents": "50% HNO3, NH4VO3 (cat.)",
+     "product": "OC(=O)CCCCC(=O)O",
+     "catalytic": true
+    },
+    {
+     "transformation": "Ketonic decarboxylation (Dieckmann-type ring closure)",
+     "reagents": "Ba(OH)2 (cat.), heat ~290-300 C, distil",
+     "product": "O=C1CCCC1",
+     "catalytic": true
+    }
+   ],
+   "n_steps_min": 2,
+   "n_steps_max": 2,
+   "route_must_avoid": [],
+   "notes": "Step 2 is supported only by Wikipedia pages (the OrgSyn procedure for cyclopentanone, Coll. Vol. 1 p.192, was cited but could not be fetched). 'catalytic' is true only where a substoichiometric catalyst is the key reagent of the step. Target MW 84.1."
+  },
+  {
+   "id": "SY-14",
+   "category": "acylation / SN2 (convergent)",
+   "title": "2,6-Xylidine, chloroacetyl chloride and diethylamine to lidocaine",
+   "source_ids": [
+    "wiki_lidocaine"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Second step and conditions not in fetched text.",
+   "start": "Cc1cccc(C)c1N.ClCC(=O)Cl",
+   "target": "CCN(CC)CC(=O)Nc1c(C)cccc1C",
+   "literature_steps": [
+    {
+     "transformation": "N-Acylation of the aniline (amide formation)",
+     "reagents": "ClCH2COCl, AcOH/NaOAc",
+     "product": "Cc1cccc(C)c1NC(=O)CCl",
+     "catalytic": false
+    },
+    {
+     "transformation": "SN2 displacement of the alpha-chloride by diethylamine",
+     "reagents": "HNEt2 (excess), toluene, reflux",
+     "product": "CCN(CC)CC(=O)Nc1c(C)cccc1C",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 2,
+   "n_steps_max": 2,
+   "route_must_avoid": [
+    "CCN(CC)C(=O)CCl"
+   ],
+   "notes": "Convergent. Avoid list: N,N-diethylchloroacetamide (diethylamine acylated first, the wrong order). Wikipedia states only xylidine + chloroacetyl chloride; second step (diethylamine) is the standard teaching-lab route but not stated in fetched text. Target MW 234.3."
+  },
+  {
+   "id": "SY-15",
+   "category": "aromatic nitration / reduction / acylation",
+   "title": "Phenol to paracetamol",
+   "source_ids": [
+    "wiki_paracetamol"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Source is Wikipedia (industrial route).",
+   "start": "Oc1ccccc1",
+   "target": "CC(=O)Nc1ccc(O)cc1",
+   "literature_steps": [
+    {
+     "transformation": "Electrophilic nitration (para major)",
+     "reagents": "dil. HNO3",
+     "product": "Oc1ccc([N+](=O)[O-])cc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Nitro reduction",
+     "reagents": "H2, Raney Ni",
+     "product": "Nc1ccc(O)cc1",
+     "catalytic": true
+    },
+    {
+     "transformation": "Chemoselective N-acetylation",
+     "reagents": "acetic anhydride",
+     "product": "CC(=O)Nc1ccc(O)cc1",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 3,
+   "n_steps_max": 3,
+   "route_must_avoid": [
+    "Oc1ccccc1[N+](=O)[O-]",
+    "CC(=O)Nc1ccc(OC(C)=O)cc1"
+   ],
+   "notes": "Avoid list: 2-nitrophenol (wrong regioisomer carried forward) and the O,N-diacetyl compound. 'catalytic' is true only where a substoichiometric catalyst is the key reagent of the step. Target MW 151.2."
+  },
+  {
+   "id": "SY-16",
+   "category": "protecting group / EAS",
+   "title": "Aniline to 4-nitroaniline via acetanilide",
+   "source_ids": [
+    "wiki_nitroaniline",
+    "wiki_acetanilide"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Reagent details for hydrolysis are standard practice, not stated in the fetched page.",
+   "start": "Nc1ccccc1",
+   "target": "Nc1ccc([N+](=O)[O-])cc1",
+   "literature_steps": [
+    {
+     "transformation": "Amine protection (N-acetylation)",
+     "reagents": "acetic anhydride",
+     "product": "CC(=O)Nc1ccccc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Para-selective nitration",
+     "reagents": "HNO3/H2SO4",
+     "product": "CC(=O)Nc1ccc([N+](=O)[O-])cc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Deprotection (amide hydrolysis)",
+     "reagents": "aq. acid or base, heat",
+     "product": "Nc1ccc([N+](=O)[O-])cc1",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 3,
+   "n_steps_max": 3,
+   "route_must_avoid": [
+    "Nc1cccc([N+](=O)[O-])c1"
+   ],
+   "notes": "Order matters: direct nitration of aniline in strong acid gives meta product via anilinium. Avoid list: 3-nitroaniline. Some 2-nitro isomer also forms and must be separated. Target MW 138.1."
+  },
+  {
+   "id": "SY-17",
+   "category": "Claisen / acetoacetic ester synthesis (convergent)",
+   "title": "Ethyl acetate and 1-bromobutane to 2-heptanone",
+   "source_ids": [
+    "orgsyn_cv1p0235",
+    "wiki_aeester",
+    "orgsyn_cv1p0248_cv1p0351"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Steps 2-3 supported only by a generic Wikipedia description and unfetched OrgSyn citations.",
+   "start": "CCOC(C)=O.CCCCBr",
+   "target": "CCCCCC(C)=O",
+   "literature_steps": [
+    {
+     "transformation": "Claisen condensation",
+     "reagents": "Na / NaOEt",
+     "product": "CCOC(=O)CC(C)=O",
+     "catalytic": false
+    },
+    {
+     "transformation": "C-Alkylation of the enolate",
+     "reagents": "NaOEt, EtOH, then n-BuBr",
+     "product": "CCCCC(C(C)=O)C(=O)OCC",
+     "catalytic": false
+    },
+    {
+     "transformation": "Ester hydrolysis and decarboxylation",
+     "reagents": "aq. NaOH, then H3O+, heat",
+     "product": "CCCCCC(C)=O",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 3,
+   "n_steps_max": 4,
+   "route_must_avoid": [
+    "CCCCC(CCCC)(C(C)=O)C(=O)OCC"
+   ],
+   "notes": "Convergent. Avoid list: dialkylated acetoacetate. n_steps_max 4 if hydrolysis and decarboxylation are counted separately. Only the Claisen step was verified from a fetched OrgSyn text; the alkylation/ketonic-hydrolysis OrgSyn procedures (CV1 p.248, p.351) could not be fetched. Target MW 114.2."
+  },
+  {
+   "id": "SY-18",
+   "category": "Grignard (convergent)",
+   "title": "1-Butanol and acetone to 2-methyl-2-hexanol",
+   "source_ids": [
+    "wiki_grignard"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "No fetched procedure for this specific substrate.",
+   "start": "CCCCO.CC(C)=O",
+   "target": "CCCCC(C)(C)O",
+   "literature_steps": [
+    {
+     "transformation": "Conversion of alcohol to bromide",
+     "reagents": "48% HBr, H2SO4, reflux",
+     "product": "CCCCBr",
+     "catalytic": false
+    },
+    {
+     "transformation": "Grignard reagent formation",
+     "reagents": "Mg, dry Et2O",
+     "product": "CCCC[Mg]Br",
+     "catalytic": false
+    },
+    {
+     "transformation": "Addition to ketone then aqueous workup",
+     "reagents": "acetone, then NH4Cl or H3O+",
+     "product": "CCCCC(C)(C)O",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 3,
+   "n_steps_max": 3,
+   "route_must_avoid": [
+    "CCCCCCCC",
+    "CCCCC(C)=O"
+   ],
+   "notes": "Convergent. Avoid list: octane (Wurtz) and 2-hexanone (wrong oxidation level). Evidenced only by a generic Grignard description; no fetched procedure for this substrate. Target MW 116.2."
+  },
+  {
+   "id": "SY-19",
+   "category": "protecting group (acetal)",
+   "title": "Ethyl 5-oxohexanoate to 6-hydroxyhexan-2-one via ketal",
+   "source_ids": [
+    "wiki_protgroup"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Specific substrate not named in the fetched text; standard concept.",
+   "start": "CCOC(=O)CCCC(C)=O",
+   "target": "CC(=O)CCCCO",
+   "literature_steps": [
+    {
+     "transformation": "Ketone protection as cyclic ketal",
+     "reagents": "ethylene glycol, TsOH (cat.), Dean-Stark",
+     "product": "CCOC(=O)CCCC1(C)OCCO1",
+     "catalytic": true
+    },
+    {
+     "transformation": "Ester reduction",
+     "reagents": "LiAlH4, Et2O, then workup",
+     "product": "OCCCCC1(C)OCCO1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Ketal deprotection",
+     "reagents": "aq. acid (H3O+)",
+     "product": "CC(=O)CCCCO",
+     "catalytic": true
+    }
+   ],
+   "n_steps_min": 3,
+   "n_steps_max": 3,
+   "route_must_avoid": [
+    "CC(O)CCCCO"
+   ],
+   "notes": "Order matters: without protection, LiAlH4 reduces both carbonyls. Avoid list: hexane-1,5-diol. The fetched source only has a generic keto-ester protecting-group figure caption, so this specific substrate is an inference. 'catalytic' is true only where a substoichiometric catalyst is the key reagent of the step. Target MW 116.2."
+  },
+  {
+   "id": "SY-20",
+   "category": "aldol / dehydration / hydrogenation",
+   "title": "Acetone to methyl isobutyl ketone",
+   "source_ids": [
+    "orgsyn_cv1p0199",
+    "orgsyn_cv1p0345",
+    "wiki_mibk"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Hydrogenation conditions from Wikipedia only.",
+   "start": "CC(C)=O",
+   "target": "CC(C)CC(C)=O",
+   "literature_steps": [
+    {
+     "transformation": "Aldol addition",
+     "reagents": "Ba(OH)2 (cat.)",
+     "product": "CC(=O)CC(C)(C)O",
+     "catalytic": true
+    },
+    {
+     "transformation": "Dehydration",
+     "reagents": "I2 (cat.), distil",
+     "product": "CC(C)=CC(C)=O",
+     "catalytic": true
+    },
+    {
+     "transformation": "Chemoselective C=C hydrogenation",
+     "reagents": "H2, Pd catalyst",
+     "product": "CC(C)CC(C)=O",
+     "catalytic": true
+    }
+   ],
+   "n_steps_min": 3,
+   "n_steps_max": 3,
+   "route_must_avoid": [
+    "CC(C)CC(C)O"
+   ],
+   "notes": "Avoid list: 4-methyl-2-pentanol (over-reduction of the ketone). 'catalytic' is true only where a substoichiometric catalyst is the key reagent of the step. Target MW 100.2."
+  },
+  {
+   "id": "SY-21",
+   "category": "protecting-group order / Williamson",
+   "title": "Phenol to phenacetin",
+   "source_ids": [
+    "wiki_paracetamol",
+    "wiki_phenacetin"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Both sources are Wikipedia; the two routes are joined at paracetamol.",
+   "start": "Oc1ccccc1",
+   "target": "CCOc1ccc(NC(C)=O)cc1",
+   "literature_steps": [
+    {
+     "transformation": "Nitration",
+     "reagents": "HNO3",
+     "product": "Oc1ccc([N+](=O)[O-])cc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Nitro reduction",
+     "reagents": "H2, Raney Ni",
+     "product": "Nc1ccc(O)cc1",
+     "catalytic": true
+    },
+    {
+     "transformation": "N-Acetylation (protects the amine before alkylation)",
+     "reagents": "Ac2O",
+     "product": "CC(=O)Nc1ccc(O)cc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Williamson ether synthesis",
+     "reagents": "EtI, anhydrous K2CO3, 2-butanone, reflux",
+     "product": "CCOc1ccc(NC(C)=O)cc1",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 4,
+   "n_steps_max": 4,
+   "route_must_avoid": [
+    "CCNc1ccc(O)cc1",
+    "CCNc1ccc(OCC)cc1"
+   ],
+   "notes": "Order matters: acetylate nitrogen before ethylation of oxygen. Avoid list: N-ethyl compounds from alkylating the free aminophenol. 'catalytic' is true only where a substoichiometric catalyst is the key reagent of the step. Target MW 179.2."
+  },
+  {
+   "id": "SY-22",
+   "category": "aldol / Michael / Dieckmann (convergent)",
+   "title": "Acetone and diethyl malonate to dimedone",
+   "source_ids": [
+    "orgsyn_cv1p0199",
+    "orgsyn_cv1p0345",
+    "wiki_dimedone",
+    "orgsyn_cv2p0200"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Steps 3-4 intermediate and conditions not in fetched text.",
+   "start": "CC(C)=O.CCOC(=O)CC(=O)OCC",
+   "target": "CC1(C)CC(=O)CC(=O)C1",
+   "literature_steps": [
+    {
+     "transformation": "Aldol addition",
+     "reagents": "Ba(OH)2 (cat.)",
+     "product": "CC(=O)CC(C)(C)O",
+     "catalytic": true
+    },
+    {
+     "transformation": "Dehydration",
+     "reagents": "I2 (cat.), distil",
+     "product": "CC(C)=CC(C)=O",
+     "catalytic": true
+    },
+    {
+     "transformation": "Michael addition then Dieckmann-type cyclisation",
+     "reagents": "CH2(CO2Et)2, NaOEt, EtOH, reflux",
+     "product": "CCOC(=O)C1C(=O)CC(C)(C)CC1=O",
+     "catalytic": false
+    },
+    {
+     "transformation": "Saponification and decarboxylation",
+     "reagents": "KOH (aq), then HCl, heat",
+     "product": "CC1(C)CC(=O)CC(=O)C1",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 4,
+   "n_steps_max": 4,
+   "route_must_avoid": [
+    "C=C(C)CC(C)=O"
+   ],
+   "notes": "Convergent; reaction classes (Michael, Dieckmann) are second-semester. Steps 1-2 verified from OrgSyn; steps 3-4 rest on a one-line Wikipedia statement and an unfetched OrgSyn dimedone procedure (CV2 p.200). Avoid list: isomesityl oxide. 'catalytic' is true only where a substoichiometric catalyst is the key reagent of the step. Target MW 140.2."
+  },
+  {
+   "id": "SY-23",
+   "category": "protecting group / EAS / Sandmeyer",
+   "title": "Aniline to 1-chloro-4-nitrobenzene",
+   "source_ids": [
+    "wiki_nitroaniline",
+    "wiki_acetanilide",
+    "orgsyn_cv1p0170",
+    "wiki_sandmeyer"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Composite of separately sourced steps; para-nitroaniline diazotisation not demonstrated in a fetched text.",
+   "start": "Nc1ccccc1",
+   "target": "Clc1ccc([N+](=O)[O-])cc1",
+   "literature_steps": [
+    {
+     "transformation": "N-Acetylation (protection)",
+     "reagents": "Ac2O",
+     "product": "CC(=O)Nc1ccccc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Para-nitration",
+     "reagents": "HNO3/H2SO4",
+     "product": "CC(=O)Nc1ccc([N+](=O)[O-])cc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Hydrolysis (deprotection)",
+     "reagents": "aq. acid, heat",
+     "product": "Nc1ccc([N+](=O)[O-])cc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Diazotisation and Sandmeyer chlorination",
+     "reagents": "NaNO2/HCl, 0-5 C; then CuCl",
+     "product": "Clc1ccc([N+](=O)[O-])cc1",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 4,
+   "n_steps_max": 4,
+   "route_must_avoid": [
+    "Nc1cccc([N+](=O)[O-])c1"
+   ],
+   "notes": "Order matters: protect before nitration, install Cl last via the amine. Avoid list: 3-nitroaniline. Steps 1-3 from Wikipedia, step 4 from OrgSyn/Wikipedia analogies (o-toluidine); the full sequence is a composite, not a single fetched route. Target MW 157.6."
+  },
+  {
+   "id": "SY-24",
+   "category": "protecting group / chlorosulfonation",
+   "title": "Aniline to sulfanilamide via acetanilide",
+   "source_ids": [
+    "wiki_acetanilide",
+    "orgsyn_cv1p0008"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Steps 2-4 rest on an unfetched OrgSyn procedure and standard teaching-lab knowledge.",
+   "start": "Nc1ccccc1",
+   "target": "Nc1ccc(S(N)(=O)=O)cc1",
+   "literature_steps": [
+    {
+     "transformation": "N-Acetylation (protection)",
+     "reagents": "Ac2O",
+     "product": "CC(=O)Nc1ccccc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Chlorosulfonation",
+     "reagents": "excess ClSO3H, 60 C",
+     "product": "CC(=O)Nc1ccc(S(=O)(=O)Cl)cc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Sulfonamide formation",
+     "reagents": "NH3 (aq)",
+     "product": "CC(=O)Nc1ccc(S(N)(=O)=O)cc1",
+     "catalytic": false
+    },
+    {
+     "transformation": "Deprotection (amide hydrolysis)",
+     "reagents": "aq. HCl, heat",
+     "product": "Nc1ccc(S(N)(=O)=O)cc1",
+     "catalytic": false
+    }
+   ],
+   "n_steps_min": 4,
+   "n_steps_max": 4,
+   "route_must_avoid": [
+    "Nc1ccc(S(=O)(=O)Cl)cc1"
+   ],
+   "notes": "Reaction class (chlorosulfonation) not in a typical first-semester course. Avoid list: free aniline sulfonyl chloride (self-condensation; aniline cannot be chlorosulfonated directly). The chlorosulfonation OrgSyn procedure could not be fetched (HTTP 403) and the fetched Wikipedia sulfanilamide page contains no synthesis text; only acetylation (step 1) is supported by a fetched source. Target MW 172.2."
+  }
+ ]
+}
