@@ -393,6 +393,7 @@ type AromaticSubstituentClass =
   | "alkyl"
   | "carbonyl-withdrawing"
   | "nitrile-withdrawing"
+  | "nitro-withdrawing"
   | "halogen"
   | "alpha-heteroalkyl"
   | "other";
@@ -405,7 +406,14 @@ function aromaticSubstituentClass(
   if (!atom) return "other";
 
   if (atom.element === "O") return "oxygen-donor";
-  if (atom.element === "N") return "nitrogen-donor";
+  if (atom.element === "N") {
+    // A nitro group is bonded through N+ with two oxygens: a strong withdrawer, not an amine-type donor.
+    const oxygens = (graph.adjacency.get(externalAtomIndex) ?? []).filter(
+      (bond) => graph.atoms[getOtherAtom(bond, externalAtomIndex)]?.element === "O",
+    ).length;
+    if (oxygens >= 2) return "nitro-withdrawing";
+    return "nitrogen-donor";
+  }
   if (["F", "Cl", "Br", "I"].includes(atom.element)) return "halogen";
 
   if (atom.element === "C") {
@@ -445,6 +453,8 @@ function aromaticSubstituentContribution(
     alkyl: { ortho: -0.08, meta: 0, para: -0.05, remote: 0 },
     "carbonyl-withdrawing": { ortho: 0.55, meta: 0.25, para: 0.38, remote: 0 },
     "nitrile-withdrawing": { ortho: 0.45, meta: 0.22, para: 0.34, remote: 0 },
+    // Nitrobenzene: ortho 8.2, meta 7.5, para 7.65 ppm against 7.26 (substituent increments of about +0.95, +0.26, +0.38).
+    "nitro-withdrawing": { ortho: 0.95, meta: 0.26, para: 0.38, remote: 0 },
     halogen: { ortho: 0.08, meta: 0.03, para: 0.02, remote: 0 },
     // Keep the proton model conservative for now; the stronger distinction is
     // needed in the 13C model below.
@@ -515,6 +525,12 @@ function aromaticCarbonSubstituentContribution(
     if (ringDistance === 2) return 1;
     if (ringDistance === 3) return 2;
   }
+  if (substituentClass === "nitro-withdrawing") {
+    // Nitrobenzene 13C: ortho 123.5, meta 129.4, para 134.7 ppm against benzene 128.5 (ipso 148.3 is set in aromaticCarbonShiftCenter).
+    if (ringDistance === 1) return -5;
+    if (ringDistance === 2) return 1;
+    if (ringDistance === 3) return 6;
+  }
   if (substituentClass === "halogen") {
     if (ringDistance === 1) return -2;
     if (ringDistance === 2) return 1;
@@ -545,6 +561,7 @@ function aromaticCarbonShiftCenter(
       .map((neighbor) => aromaticSubstituentClass(graph, neighbor));
 
     let directBase = directClasses.includes("oxygen-donor") ? 155
+      : directClasses.includes("nitro-withdrawing") ? 148
       : directClasses.includes("nitrogen-donor") ? 150
         : directClasses.includes("alpha-heteroalkyl") ? 138
           : directClasses.includes("alkyl") ? 138

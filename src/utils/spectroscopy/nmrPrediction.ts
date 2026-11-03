@@ -24,6 +24,20 @@ export async function predictStructureNMR(smilesOrMolfile: string): Promise<{
   try {
     const graph = parseMolBlock(mol.get_molblock());
     const aromaticAtoms = aromaticAtomSet(graph);
+    // The Kekule form in a mol block can hide a ring from the alternation test (one ring of naphthalene was read as an alkene), so the
+    // aromatic atoms RDKit perceives from the input are added. Atom indices of the mol block equal those of the molecule.
+    {
+      const query = RDKit.get_qmol("[a]");
+      try {
+        if (query) {
+          const parsed = JSON.parse(mol.get_substruct_matches(query));
+          const list: Array<{ atoms: number[] }> = Array.isArray(parsed) ? parsed : parsed?.atoms ? [parsed] : [];
+          for (const match of list) for (const atom of match.atoms) aromaticAtoms.add(atom);
+        }
+      } finally {
+        query?.delete?.();
+      }
+    }
     const fingerprints = iterativeFingerprints(graph, aromaticAtoms);
     const environments = graph.atoms
       .filter((atom) => atom.element === "C")
@@ -64,6 +78,30 @@ export async function predictStructureNMR(smilesOrMolfile: string): Promise<{
     const protonGroups = new Map<string, CarbonEnvironment[]>();
     const aromaticGroupWasCollapsed = new Map<string, boolean>();
 
+    // A monosubstituted ring shows one overlapping aryl multiplet only while the substituent barely perturbs the ring protons. When the
+    // predicted ortho/meta/para shifts spread by more than this, they are separate signals (phenol, aniline, anisole, nitrobenzene,
+    // benzonitrile, benzoate esters), so the ring is not collapsed. Toluene and other alkylbenzenes stay one multiplet.
+    const AROMATIC_COLLAPSE_SPREAD_PPM = 0.2;
+    const aromaticSpread = new Map<number, number>();
+    // Identical rings (benzophenone, biphenyl) share one signal set: a collapsed ring is keyed by the sorted fingerprints of its CH atoms.
+    const aromaticSignature = new Map<number, string>();
+    {
+      const centers = new Map<number, number[]>();
+      const fingerprintsByComponent = new Map<number, string[]>();
+      for (const environment of environments.filter((item) => item.proton?.label === "aromatic C–H")) {
+        const component = aromaticComponentAtoms(graph, environment.atomIndex, aromaticAtoms);
+        const componentId = component.size > 0 ? Math.min(...component) : environment.atomIndex;
+        const list = centers.get(componentId) ?? [];
+        list.push(environment.proton!.shiftCenter);
+        centers.set(componentId, list);
+        const prints = fingerprintsByComponent.get(componentId) ?? [];
+        prints.push(String(environment.fingerprint));
+        fingerprintsByComponent.set(componentId, prints);
+      }
+      for (const [componentId, prints] of fingerprintsByComponent) aromaticSignature.set(componentId, [...prints].sort().join(","));
+      for (const [componentId, list] of centers) aromaticSpread.set(componentId, Math.max(...list) - Math.min(...list));
+    }
+
     for (const environment of environments.filter((item) => item.proton !== null)) {
       const proton = environment.proton!;
 
@@ -76,11 +114,11 @@ export async function predictStructureNMR(smilesOrMolfile: string): Promise<{
         // several heavily overlapping aryl lines.  Keep those as one teaching-level
         // multiplet, but retain distinct graph-equivalent classes for disubstituted
         // and more substituted rings so A2B2 patterns resolve correctly.
-        const collapseComponent = attachmentCount === 1
+        const collapseComponent = (attachmentCount === 1 && (aromaticSpread.get(componentId) ?? 0) < AROMATIC_COLLAPSE_SPREAD_PPM)
           || aromaticComponentHasExternalBridge(graph, component);
         const key = collapseComponent
-          ? `aromatic-component-${componentId}`
-          : `aromatic-${componentId}|${environment.fingerprint}`;
+          ? `aromatic-component|${aromaticSignature.get(componentId) ?? componentId}`
+          : `aromatic|${environment.fingerprint}`;
         const group = protonGroups.get(key) ?? [];
         group.push(environment);
         protonGroups.set(key, group);
