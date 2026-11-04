@@ -79,6 +79,10 @@ export function applyPhysicalMetrics(
         `${solubility.tendency} · score ${solubility.waterSolubilityScore.toFixed(1)}`,
         solubility.explanation,
         solubility.factors,
+        // The coarse score decides first; equal scores fall back to hydrophobicity (lower Crippen logP = more water-soluble, the
+        // continuous predictor behind ESOL-type solubility models), which separates n-butanol from tert-butanol-class isomers and
+        // pentane from hexane.
+        solubility.logP === null ? undefined : [solubility.waterSolubilityScore, -Math.round(solubility.logP * 100) / 100, -wienerIndex(graph)],
       )
     : emptyMetric("Water-solubility tendency could not be estimated.");
 

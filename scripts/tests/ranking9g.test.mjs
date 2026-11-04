@@ -70,3 +70,10 @@ describe("alkene stability geometry", () => {
     assert.deepEqual(r, [1, 2, 3]);
   });
 });
+
+describe("water solubility ties", () => {
+  test("tert-butanol > 1-butanol > pentane > hexane (miscible, 68 g/L, 0.038 g/L, 0.0095 g/L)", async () => {
+    const r = await ranks("solubility", ["CC(C)(C)O", "CCCCO", "CCCCC", "CCCCCC"]);
+    assert.deepEqual(r, [1, 2, 3, 4]);
+  });
+});
