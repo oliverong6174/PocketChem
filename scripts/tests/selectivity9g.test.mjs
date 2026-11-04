@@ -63,3 +63,12 @@ describe("kinetic versus thermodynamic enolate alkylation", () => {
     assert.equal((await run("enolate-alkylation-thermodynamic", "CC(C)=O.CI")).filter((p) => p.productSmiles).length, 0);
   });
 });
+
+describe("Hofmann elimination of a preformed quaternary ammonium", () => {
+  test("sec-butyltrimethylammonium gives 1-butene (least substituted alkene)", async () => {
+    assert.deepEqual((await run("quaternary-ammonium-hofmann-elimination", "CCC(C)[N+](C)(C)C")).map((p) => p.productSmiles), ["C=CCC"]);
+  });
+  test("a neutral hydrocarbon is not offered the rule", async () => {
+    assert.equal((await run("quaternary-ammonium-hofmann-elimination", "CCCCC")).filter((p) => p.productSmiles).length, 0);
+  });
+});

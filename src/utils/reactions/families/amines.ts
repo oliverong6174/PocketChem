@@ -146,6 +146,31 @@ export const amineReactionRules: ReactionRule[] = [
   },
 
   {
+    id: "quaternary-ammonium-hofmann-elimination",
+    family: "amines",
+    reactionType: "elimination",
+    title: "Hofmann Elimination of a Quaternary Ammonium Hydroxide",
+    reagents: "Ag₂O, H₂O (to the hydroxide), then heat",
+    reagentNote: "Quaternary ammonium hydroxide eliminates to the least substituted alkene",
+    productHint: "Alkene (Hofmann orientation)",
+    explanation:
+      "A quaternary ammonium salt is converted to its hydroxide with moist silver oxide. On heating, hydroxide removes a beta hydrogen in an E2 step that expels a neutral tertiary amine; the bulky leaving group makes the least substituted alkene the major product (Hofmann rule).",
+    trigger: { includeSmarts: ["[N+;X4]-[C;X4;H1,H2,H3]-[C;H1,H2,H3]"] },
+    transform: {
+      type: "customHandler",
+      handler: "elimination",
+      options: { mode: "hofmannAmine", leavingGroup: "amine", preference: "hofmann", maxProducts: 8 },
+    },
+    productStatus: "computed",
+    mechanism: "E2 (Hofmann elimination)",
+    selectivity: [
+      "The least substituted accessible alkene is favored (Hofmann orientation); the more substituted alkene is a minor product that is not listed.",
+      "At least one alkyl group on nitrogen must carry a beta hydrogen.",
+    ],
+    limitations: ["Product ratios are not modeled; the amine leaving group (trimethylamine here) is not drawn as a product."],
+    priority: 1731,
+  },
+  {
     id: "amine-diazotization",
     family: "amines",
     reactionType: "substitution",
