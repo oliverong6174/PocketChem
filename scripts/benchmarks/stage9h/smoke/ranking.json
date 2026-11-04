@@ -1,0 +1,1 @@
+{"cases":[{"id":"SMK-RK","category":"smoke","evidence":"smoke","mode_id":"boilingPoint","smiles":["CCCC","CCCCCC"],"expected_order":[["CCCCCC"],["CCCC"]]}]}

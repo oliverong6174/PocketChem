@@ -1,0 +1,316 @@
+{
+ "cases": [
+  {
+   "id": "SY-01",
+   "capability": "synthesis",
+   "category": "multi-step",
+   "title": "Acetylene and 1-bromopropane to 2-bromopentane",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00111",
+     "title": "OpenStax Organic Chemistry, module m00111: An Introduction to Organic Synthesis",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00111/index.cnxml",
+     "snapshot": "snapshots/openstax/m00111.cnxml",
+     "sha256": "5b4d8cd179928744b41b111913c310e718ad1efd65007fe5696a52497f176808",
+     "quote": "The desired product can be synthesized in four steps from acetylene and 1-bromopropane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "start": "C#C.CCCBr",
+   "target": "CCCC(C)Br",
+   "copies": 1,
+   "documented_steps": 4,
+   "n_steps_min": 3,
+   "n_steps_max": 4,
+   "route_must_avoid": [],
+   "notes": "Step count depends on whether deprotonation/alkylation or reduction/addition are counted as one step; 3-4 accepted before the run.",
+   "nameChecks": [],
+   "uncertainty": "Route and step count follow the quoted textbook worked example; textbook, not primary literature."
+  },
+  {
+   "id": "SY-02",
+   "capability": "synthesis",
+   "category": "multi-step",
+   "title": "Acetylene and 1-bromo-3-methylbutane to 5-methylhexan-1-ol",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00111",
+     "title": "OpenStax Organic Chemistry, module m00111: An Introduction to Organic Synthesis",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00111/index.cnxml",
+     "snapshot": "snapshots/openstax/m00111.cnxml",
+     "sha256": "5b4d8cd179928744b41b111913c310e718ad1efd65007fe5696a52497f176808",
+     "quote": "The synthesis can be completed in four steps from acetylene and 1-bromo-3-methylbutane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "start": "C#C.CC(C)CCBr",
+   "target": "OCCCCC(C)C",
+   "copies": 1,
+   "documented_steps": 4,
+   "n_steps_min": 3,
+   "n_steps_max": 4,
+   "route_must_avoid": [],
+   "notes": "Terminal alkene must be hydrated anti-Markovnikov (hydroboration-oxidation); a Markovnikov hydration would give the isomeric secondary alcohol 5-methylhexan-2-ol, which is not the target.",
+   "nameChecks": [],
+   "uncertainty": "Route and step count follow the quoted textbook worked example; textbook, not primary literature."
+  },
+  {
+   "id": "SY-03",
+   "capability": "synthesis",
+   "category": "multi-step",
+   "title": "Diethyl malonate and 1-bromopentane to heptanoic acid",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00263",
+     "title": "OpenStax Organic Chemistry, module m00263: Alkylation of Enolate Ions",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00263/index.cnxml",
+     "snapshot": "snapshots/openstax/m00263.cnxml",
+     "sha256": "003a746a4ee4b041917e3c4204f39cdcae8d0f4929a866f36bf8bd9eb535bb4b",
+     "quote": "A malonic ester synthesis converts an alkyl halide into a carboxylic acid having two more carbons. Thus, a seven-carbon acid chain must be derived from the five-carbon alkyl halide 1-bromopentane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "start": "CCOC(=O)CC(=O)OCC.CCCCCBr",
+   "target": "CCCCCCC(=O)O",
+   "copies": 1,
+   "documented_steps": 3,
+   "n_steps_min": 1,
+   "n_steps_max": 3,
+   "route_must_avoid": [],
+   "notes": "Alkylation, hydrolysis, decarboxylation; counted as 1-3 steps depending on step granularity.",
+   "nameChecks": [],
+   "uncertainty": "Route and step count follow the quoted textbook worked example; textbook, not primary literature."
+  },
+  {
+   "id": "SY-04",
+   "capability": "synthesis",
+   "category": "multi-step",
+   "title": "Pyruvic acid and ammonia to alanine",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00320",
+     "title": "OpenStax Organic Chemistry, module m00320: Synthesis of Amino Acids",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00320/index.cnxml",
+     "snapshot": "snapshots/openstax/m00320.cnxml",
+     "sha256": "db54682714e5fc925b701d6dcf68c43f395b8b1a62b354cadc607c51f55ddb8c",
+     "quote": "Alanine, for instance, is prepared by treatment of pyruvic acid with ammonia in the presence of NaBH 4",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "start": "CC(=O)C(=O)O.N",
+   "target": "CC(N)C(=O)O",
+   "copies": 1,
+   "documented_steps": 1,
+   "n_steps_min": 1,
+   "n_steps_max": 1,
+   "route_must_avoid": [],
+   "notes": "Reductive amination; racemic product.",
+   "nameChecks": [],
+   "uncertainty": "Route and step count follow the quoted textbook worked example; textbook, not primary literature."
+  },
+  {
+   "id": "SY-05",
+   "capability": "synthesis",
+   "category": "multi-step",
+   "title": "Benzene to 4-bromo-2-nitrotoluene",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00198",
+     "title": "OpenStax Organic Chemistry, module m00198: Synthesis of Polysubstituted Benzenes",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00198/index.cnxml",
+     "snapshot": "snapshots/openstax/m00198.cnxml",
+     "sha256": "976da128a1eaf3c16d220fd6c01a74354b4da72529993acf4e4b3d3700c74cd8",
+     "quote": "The best precursor of the desired product is probably p -bromotoluene, which can be nitrated ortho to the activating methyl group to give a single product",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "start": "c1ccccc1",
+   "target": "Cc1ccc(Br)cc1[N+](=O)[O-]",
+   "copies": 1,
+   "documented_steps": 3,
+   "n_steps_min": 3,
+   "n_steps_max": 3,
+   "route_must_avoid": [
+    "O=[N+]([O-])c1ccccc1"
+   ],
+   "notes": "Order matters: nitrobenzene cannot be methylated (Friedel-Crafts fails on deactivated rings), so nitrobenzene is a forbidden intermediate. Reagents CH3Cl/AlCl3, Br2/FeBr3, HNO3/H2SO4 per the source.",
+   "nameChecks": [],
+   "uncertainty": "Route and step count follow the quoted textbook worked example; textbook, not primary literature."
+  },
+  {
+   "id": "SY-06",
+   "capability": "synthesis",
+   "category": "multi-step",
+   "title": "Cyclohexanone, pyrrolidine and 3-buten-2-one to 2-(3-oxobutyl)cyclohexanone (Stork enamine)",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00286",
+     "title": "OpenStax Organic Chemistry, module m00286: Carbonyl Condensations with Enamines: The Stork Enamine Reaction",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00286/index.cnxml",
+     "snapshot": "snapshots/openstax/m00286.cnxml",
+     "sha256": "cc5d7f911c769c65b69993b065465bfd6dc211fdb35db6af9e8e17eba8d2ba18",
+     "quote": "cyclohexanone reacts with the cyclic amine pyrrolidine to yield an enamine; further reaction with an enone such as 3-buten-2-one yields a Michael adduct; and aqueous hydrolysis completes the sequence to give a 1,5-diketone",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "start": "O=C1CCCCC1.C1CCNC1.C=CC(C)=O",
+   "target": "CC(=O)CCC1CCCCC1=O",
+   "copies": 1,
+   "documented_steps": 3,
+   "n_steps_min": 3,
+   "n_steps_max": 3,
+   "route_must_avoid": [],
+   "notes": "The 1,5-diketone is named only generically in the source; the specific diketone is the product of the described sequence on the named substrates.",
+   "nameChecks": [],
+   "uncertainty": "Route and step count follow the quoted textbook worked example; textbook, not primary literature."
+  },
+  {
+   "id": "SY-07",
+   "capability": "synthesis",
+   "category": "multi-step",
+   "title": "Ethyl acetoacetate and 1-bromopropane to 2-hexanone",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00263",
+     "title": "OpenStax Organic Chemistry, module m00263: Alkylation of Enolate Ions",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00263/index.cnxml",
+     "snapshot": "snapshots/openstax/m00263.cnxml",
+     "sha256": "003a746a4ee4b041917e3c4204f39cdcae8d0f4929a866f36bf8bd9eb535bb4b",
+     "quote": "the acetoacetic ester synthesis converts an alkyl halide into a methyl ketone having three more carbons",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "start": "CCOC(=O)CC(C)=O.CCCBr",
+   "target": "CCCCC(C)=O",
+   "copies": 1,
+   "documented_steps": 3,
+   "n_steps_min": 1,
+   "n_steps_max": 3,
+   "route_must_avoid": [],
+   "notes": "Rule application by the author.",
+   "nameChecks": [],
+   "uncertainty": "Rule application by the author; provisional."
+  },
+  {
+   "id": "SY-08",
+   "capability": "synthesis",
+   "category": "multi-step",
+   "title": "1-Bromobutane and phthalimide to butylamine (Gabriel)",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00294",
+     "title": "OpenStax Organic Chemistry, module m00294: Synthesis of Amines",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00294/index.cnxml",
+     "snapshot": "snapshots/openstax/m00294.cnxml",
+     "sha256": "741fbb2b9843890b89221236772e2b8e80f5a976b5015fb3c013244bec59e651",
+     "quote": "Another alternative for preparing a primary amine from an alkyl halide is the Gabriel amine synthesis , which uses a phthalimide alkylation",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "start": "CCCCBr.O=C1NC(=O)c2ccccc12",
+   "target": "CCCCN",
+   "copies": 1,
+   "documented_steps": 2,
+   "n_steps_min": 1,
+   "n_steps_max": 2,
+   "route_must_avoid": [],
+   "notes": "Rule application by the author.",
+   "nameChecks": [],
+   "uncertainty": "Rule application by the author; provisional."
+  },
+  {
+   "id": "SY-09",
+   "capability": "synthesis",
+   "category": "multi-step",
+   "title": "Propanoic acid to alanine via Hell-Volhard-Zelinskii bromination and amination",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00320",
+     "title": "OpenStax Organic Chemistry, module m00320: Synthesis of Amino Acids",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00320/index.cnxml",
+     "snapshot": "snapshots/openstax/m00320.cnxml",
+     "sha256": "db54682714e5fc925b701d6dcf68c43f395b8b1a62b354cadc607c51f55ddb8c",
+     "quote": "One of the oldest methods of α -amino acid synthesis begins with α bromination of a carboxylic acid by treatment with Br 2 and PBr 3 (the Hell–Volhard–Zelinskii reaction",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "start": "CCC(=O)O.N",
+   "target": "CC(N)C(=O)O",
+   "copies": 1,
+   "documented_steps": 2,
+   "n_steps_min": 2,
+   "n_steps_max": 2,
+   "route_must_avoid": [],
+   "notes": "Rule application by the author; the amination step is implied, not quoted.",
+   "nameChecks": [],
+   "uncertainty": "Rule application by the author; provisional."
+  },
+  {
+   "id": "SY-10",
+   "capability": "synthesis",
+   "category": "multi-step",
+   "title": "Aniline to 4-bromoaniline via the acetamide",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00296",
+     "title": "OpenStax Organic Chemistry, module m00296: Reactions of Arylamines",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00296/index.cnxml",
+     "snapshot": "snapshots/openstax/m00296.cnxml",
+     "sha256": "078f319dae229ecf5153e735d167ed72ce8313284e060d1b71b18867aef8b1ad",
+     "quote": "bromination of an N -arylamide occurs cleanly to give a monobromo product, and hydrolysis of the amide with aqueous base then gives the free amine",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "start": "Nc1ccccc1.CC(=O)OC(C)=O",
+   "target": "Nc1ccc(Br)cc1",
+   "copies": 1,
+   "documented_steps": 3,
+   "n_steps_min": 3,
+   "n_steps_max": 3,
+   "route_must_avoid": [],
+   "notes": "Rule application by the author; para selectivity is not stated in the quoted sentence.",
+   "nameChecks": [],
+   "uncertainty": "Rule application by the author; provisional."
+  }
+ ]
+}

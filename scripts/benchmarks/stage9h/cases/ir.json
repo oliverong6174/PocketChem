@@ -1,0 +1,3195 @@
+{
+ "cases": [
+  {
+   "id": "IR-01",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "1-butanethiol",
+   "evidence": "reference-database",
+   "smiles": "CCCCS",
+   "source": {
+    "id": "C109795",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C109795&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109795&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/1-butanethiol.json",
+    "sha256": "5d2967f8e56ee4e6f7c608f4b0124b3dfbb4b871684375000c08f09a8ccb08f4",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.018
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.014
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.013
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.012
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.011
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.014
+     },
+     {
+      "label": "alkene C=C",
+      "range_cm1": [
+       1645,
+       1645
+      ],
+      "measured_ratio": 0.012
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.09 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-02",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "1-heptyne",
+   "evidence": "reference-database",
+   "smiles": "CCCCCC#C",
+   "source": {
+    "id": "C628717",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C628717&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C628717&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/1-heptyne.json",
+    "sha256": "1994a7c82b2630f6cfbce411127bdc550ba4b040dbd0309e3f1005d654cd50c5",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.318
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.008
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.006
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.015
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "alkene C=C",
+      "range_cm1": [
+       1645,
+       1645
+      ],
+      "measured_ratio": 0.004
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.06 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-03",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "1-hexene",
+   "evidence": "reference-database",
+   "smiles": "CCCCC=C",
+   "source": {
+    "id": "C592416",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C592416&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C592416&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/1-hexene.json",
+    "sha256": "cea21db48cd81b1c421ed4f1a8ff5bfed0a907341b1c99d8e7d9c5eb1960e2c0",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.005
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.005
+     }
+    ],
+    "excluded": [
+     {
+      "label": "carbonyl C=O",
+      "why": "group absent but reference ratio 0.095 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.063 > 0.03"
+     },
+     {
+      "label": "alkene C=C",
+      "why": "group present but reference ratio 0.111 < 0.12"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-04",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "1-hexyne",
+   "evidence": "reference-database",
+   "smiles": "CCCCC#C",
+   "source": {
+    "id": "C693027",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C693027&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C693027&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/1-hexyne.json",
+    "sha256": "f784b4170ba8b5118279ba90088ae97640cc2580d1373e9f97a86e601d6a22f4",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.417
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.004
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.004
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.011
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "alkene C=C",
+      "range_cm1": [
+       1645,
+       1645
+      ],
+      "measured_ratio": 0.004
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.071 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-05",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "1-nitrobutane",
+   "evidence": "reference-database",
+   "smiles": "CCCC[N+](=O)[O-]",
+   "source": {
+    "id": "C627054",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C627054&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C627054&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/1-nitrobutane.json",
+    "sha256": "2a508ba972137b8a28d3231fb3f451e62d3ffd5e3b4548b41394eb15f14d1f88",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "range_cm1": [
+       1520,
+       1540
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.001
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.015
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.009
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.001
+     }
+    ],
+    "excluded": [
+     {
+      "label": "alkene C=C",
+      "why": "group absent but reference ratio 0.058 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-06",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "1-octene",
+   "evidence": "reference-database",
+   "smiles": "CCCCCCC=C",
+   "source": {
+    "id": "C111660",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C111660&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111660&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/1-octene.json",
+    "sha256": "cd70f47132a21236c8c6cc8e7bbec8fd88259cbb8a4b2a6889baf175654b12b3",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.012
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.01
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.007
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.005
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.005
+     }
+    ],
+    "excluded": [
+     {
+      "label": "carbonyl C=O",
+      "why": "group absent but reference ratio 0.032 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.061 > 0.03"
+     },
+     {
+      "label": "alkene C=C",
+      "why": "group present but reference ratio 0.033 < 0.12"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-07",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "1-pentyne",
+   "evidence": "reference-database",
+   "smiles": "CCCC#C",
+   "source": {
+    "id": "C627190",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C627190&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C627190&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/1-pentyne.json",
+    "sha256": "7ee99ab2fc1abe7a4dfa23a18024b856b83bd28274092a99d23ede349bd895da",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.594
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.008
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.006
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.018
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.004
+     },
+     {
+      "label": "alkene C=C",
+      "range_cm1": [
+       1645,
+       1645
+      ],
+      "measured_ratio": 0.005
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.088 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-08",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "2-nitropropane",
+   "evidence": "reference-database",
+   "smiles": "CC(C)[N+](=O)[O-]",
+   "source": {
+    "id": "C79469",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C79469&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C79469&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/2-nitropropane.json",
+    "sha256": "692ce1ba5e9193f3bfdf011b9fd6a76fe67a18dd1b39a20a042932d07fc7c774",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "range_cm1": [
+       1520,
+       1540
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.021
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.005
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.003
+     }
+    ],
+    "excluded": [
+     {
+      "label": "alkene C=C",
+      "why": "group absent but reference ratio 0.036 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-09",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "3-hexanone",
+   "evidence": "reference-database",
+   "smiles": "CCCC(=O)CC",
+   "source": {
+    "id": "C589388",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C589388&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C589388&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/3-hexanone.json",
+    "sha256": "24c975cfd7f22fe6c84cd4b9d5a16c8e75eefe50452e8fa7d32c92471caee5d6",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.013
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.019
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.027
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.005
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.007
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.125 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-10",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "3-methylphenol",
+   "evidence": "reference-database",
+   "smiles": "CC1=CC(=CC=C1)O",
+   "source": {
+    "id": "C108394",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C108394&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108394&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/3-methylphenol.json",
+    "sha256": "9f6a358618fd2dceebdec0cc55f014deb1a0a72fb984db74d21912cd6319823d",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.628
+     }
+    ],
+    "absent": [
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.007
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.008
+     }
+    ],
+    "excluded": [
+     {
+      "label": "carbonyl C=O",
+      "why": "group absent but reference ratio 0.032 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.421 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-11",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "3-nitrotoluene",
+   "evidence": "reference-database",
+   "smiles": "CC1=CC(=CC=C1)[N+](=O)[O-]",
+   "source": {
+    "id": "C99081",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C99081&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C99081&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/3-nitrotoluene.json",
+    "sha256": "50353fa55fca496cf0d7c74052b21296a0357e9a6c57af8cfb067e7a637bc693",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "range_cm1": [
+       1520,
+       1540
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.004
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.004
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.004
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.016
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.003
+     }
+    ],
+    "excluded": []
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-12",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "4-nitrotoluene",
+   "evidence": "reference-database",
+   "smiles": "CC1=CC=C(C=C1)[N+](=O)[O-]",
+   "source": {
+    "id": "C99990",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C99990&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C99990&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/4-nitrotoluene.json",
+    "sha256": "9a22dc52646559ade1eb9841ff71012d75e7ac3a8299b17f5a26cc6bd978708d",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "range_cm1": [
+       1520,
+       1540
+      ],
+      "measured_ratio": 0.918
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.005
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.002
+     }
+    ],
+    "excluded": [
+     {
+      "label": "carbonyl C=O",
+      "why": "group absent but reference ratio 0.034 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-13",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "acetyl chloride",
+   "evidence": "reference-database",
+   "smiles": "CC(=O)Cl",
+   "source": {
+    "id": "C75365",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C75365&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75365&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/acetyl-chloride.json",
+    "sha256": "62bb790026a524a7a8aaed062c6d76e7d4be66fc8e6467b74b69e43f7623e46d",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.98
+     }
+    ],
+    "absent": [],
+    "excluded": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "why": "group absent but reference ratio 0.975 > 0.03"
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "why": "group absent but reference ratio 0.967 > 0.03"
+     },
+     {
+      "label": "primary amine N-H",
+      "why": "group absent but reference ratio 0.967 > 0.03"
+     },
+     {
+      "label": "nitrile C#N",
+      "why": "group absent but reference ratio 0.925 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.897 > 0.03"
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "why": "group absent but reference ratio 0.962 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-14",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "acrylic acid",
+   "evidence": "reference-database",
+   "smiles": "C=CC(=O)O",
+   "source": {
+    "id": "C79107",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C79107&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C79107&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/acrylic-acid.json",
+    "sha256": "01e26cc42674d0cbca580c2680b351fc701ca1689d63f25bf451acc0e1a7032e",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.266
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.013
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "range_cm1": [
+       1520,
+       1540
+      ],
+      "measured_ratio": 0.027
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.01
+     }
+    ],
+    "excluded": [
+     {
+      "label": "alkene C=C",
+      "why": "group present but reference ratio 0.079 < 0.12"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-15",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "acrylonitrile",
+   "evidence": "reference-database",
+   "smiles": "C=CC#N",
+   "source": {
+    "id": "C107131",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C107131&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107131&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/acrylonitrile.json",
+    "sha256": "dd8a14d779ec484c97cc3bd0a28b450867f8e962dc201fe8bfbdc79a176aa24a",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.007
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.005
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.005
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "range_cm1": [
+       1520,
+       1540
+      ],
+      "measured_ratio": 0.024
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.005
+     }
+    ],
+    "excluded": [
+     {
+      "label": "carbonyl C=O",
+      "why": "group absent but reference ratio 0.05 > 0.03"
+     },
+     {
+      "label": "nitrile C#N",
+      "why": "group present but reference ratio 0.017 < 0.12"
+     },
+     {
+      "label": "alkene C=C",
+      "why": "group present but reference ratio 0.107 < 0.12"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-16",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "allyl alcohol",
+   "evidence": "reference-database",
+   "smiles": "C=CCO",
+   "source": {
+    "id": "C107186",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C107186&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107186&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/allyl-alcohol.json",
+    "sha256": "0de153e9d381074c3459e6294580a3003ba164e883f4d93362551e4d9013ed44",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.185
+     }
+    ],
+    "absent": [
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.002
+     }
+    ],
+    "excluded": [
+     {
+      "label": "carbonyl C=O",
+      "why": "group absent but reference ratio 0.047 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.05 > 0.03"
+     },
+     {
+      "label": "alkene C=C",
+      "why": "group present but reference ratio 0.049 < 0.12"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-17",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "butanoic acid",
+   "evidence": "reference-database",
+   "smiles": "CCCC(=O)O",
+   "source": {
+    "id": "C107926",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C107926&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107926&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/butanoic-acid.json",
+    "sha256": "f71c4bbfe9d410849a7aaced8a10cc5b33a74d6d977e3d0825907b77317120ec",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.311
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.006
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.045 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-18",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "butyl acetate",
+   "evidence": "reference-database",
+   "smiles": "CCCCOC(=O)C",
+   "source": {
+    "id": "C123864",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C123864&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C123864&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/butyl-acetate.json",
+    "sha256": "8acf85ff28c21c62a92d1ec05970fdbe04df854671edfa336d3b02eab2ac52c5",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.58
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.008
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.008
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.003
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.041 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-19",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "crotonaldehyde",
+   "evidence": "reference-database",
+   "smiles": "C/C=C/C=O",
+   "source": {
+    "id": "C4170303",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C4170303&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C4170303&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/crotonaldehyde.json",
+    "sha256": "df1d47cfeb1895225b8164e301076ebe552a9f3d94d88fc249f982b9d19d88af",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 1
+     },
+     {
+      "label": "alkene C=C",
+      "range_cm1": [
+       1645,
+       1645
+      ],
+      "measured_ratio": 0.143
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.001
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.004
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.019
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "range_cm1": [
+       1520,
+       1540
+      ],
+      "measured_ratio": 0.022
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.002
+     }
+    ],
+    "excluded": []
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-20",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "dibutyl ether",
+   "evidence": "reference-database",
+   "smiles": "CCCCOCCCC",
+   "source": {
+    "id": "C142961",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C142961&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C142961&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/dibutyl-ether.json",
+    "sha256": "af40edcb88d1d5e41abb73520e3b0d5e33cbd0e36af4bbf4c56469da513309c5",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.016
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.011
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.012
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.02
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.011
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.009
+     },
+     {
+      "label": "alkene C=C",
+      "range_cm1": [
+       1645,
+       1645
+      ],
+      "measured_ratio": 0.02
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.11 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-21",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "diethyl carbonate",
+   "evidence": "reference-database",
+   "smiles": "CCOC(=O)OCC",
+   "source": {
+    "id": "C105588",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C105588&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C105588&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/diethyl-carbonate.json",
+    "sha256": "1fb7ed4e88cc03d73ba49ee0a1edccbd0fbe0c3bb15624ec5c73e60945557d37",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.273
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.002
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.038 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-22",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "ethyl acrylate",
+   "evidence": "reference-database",
+   "smiles": "CCOC(=O)C=C",
+   "source": {
+    "id": "C140885",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C140885&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C140885&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/ethyl-acrylate.json",
+    "sha256": "578953d6ed9865823231c6f6d9c2c234f85416957a3a900c6b972da87726ec78",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.565
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.006
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.011
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.011
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.005
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.006
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.043 > 0.03"
+     },
+     {
+      "label": "alkene C=C",
+      "why": "group present but reference ratio 0.059 < 0.12"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-23",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "ethylene glycol",
+   "evidence": "reference-database",
+   "smiles": "C(CO)O",
+   "source": {
+    "id": "C107211",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C107211&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107211&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/ethylene-glycol.json",
+    "sha256": "a2f2558e57bf68c631b0b0946e8184d9d9a8c70ba1273517e504512553ed7f62",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.24
+     }
+    ],
+    "absent": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.008
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.004
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.01
+     },
+     {
+      "label": "alkene C=C",
+      "range_cm1": [
+       1645,
+       1645
+      ],
+      "measured_ratio": 0.004
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.077 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-24",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "formamide",
+   "evidence": "reference-database",
+   "smiles": "C(=O)N",
+   "source": {
+    "id": "C75127",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C75127&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75127&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/formamide.json",
+    "sha256": "eb1d9b84f943bc7f4fcc0d7722392a48f807e24abb189e694493205f1fea0c50",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.005
+     }
+    ],
+    "excluded": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "why": "group absent but reference ratio 0.064 > 0.03"
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "why": "group absent but reference ratio 0.07 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.083 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-25",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "hexan-1-ol",
+   "evidence": "reference-database",
+   "smiles": "CCCCCCO",
+   "source": {
+    "id": "C111273",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C111273&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111273&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/hexan-1-ol.json",
+    "sha256": "e752a39e51648c7aae2a421fe80a061d1fdc20576b08666eecc57f229e4c0fa2",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.016
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.013
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.014
+     },
+     {
+      "label": "alkene C=C",
+      "range_cm1": [
+       1645,
+       1645
+      ],
+      "measured_ratio": 0.016
+     }
+    ],
+    "excluded": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "why": "group present but reference ratio 0.095 < 0.12"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.081 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-26",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "hexanal",
+   "evidence": "reference-database",
+   "smiles": "CCCCCC=O",
+   "source": {
+    "id": "C66251",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C66251&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C66251&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/hexanal.json",
+    "sha256": "15f363deff51f9cec1c33e0c4550500373123f94aa86d475196a4fcada2832cf",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.817
+     }
+    ],
+    "absent": [
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.018
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.007
+     }
+    ],
+    "excluded": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "why": "group absent but reference ratio 0.033 > 0.03"
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "why": "group absent but reference ratio 0.033 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.067 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-27",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "hexanoic acid",
+   "evidence": "reference-database",
+   "smiles": "CCCCCC(=O)O",
+   "source": {
+    "id": "C142621",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C142621&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C142621&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/hexanoic-acid.json",
+    "sha256": "ac1d5d3d786162e5bc28bded9a8b5ca2b321cf3aa12d4db6465b185e1616e186",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.371
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.006
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.006
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.046 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-28",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "isobutyric acid",
+   "evidence": "reference-database",
+   "smiles": "CC(C)C(=O)O",
+   "source": {
+    "id": "C79312",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C79312&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C79312&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/isobutyric-acid.json",
+    "sha256": "ca69212e2df4671e5652f50f5351cc3455c2ba4fe5f5d450e1750829fffe1d9d",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.306
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.011
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.087 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-29",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "isopropylamine",
+   "evidence": "reference-database",
+   "smiles": "CC(C)N",
+   "source": {
+    "id": "C75310",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C75310&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75310&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/isopropylamine.json",
+    "sha256": "3be56f9f8288abbcede7be2a2faca7477dd7d8ebc60527e17f7e14db7d0b1026",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.01
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.005
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.002
+     }
+    ],
+    "excluded": [
+     {
+      "label": "primary amine N-H",
+      "why": "group present but reference ratio 0.007 < 0.12"
+     },
+     {
+      "label": "carbonyl C=O",
+      "why": "group absent but reference ratio 0.065 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.068 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-30",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "m-cresol",
+   "evidence": "reference-database",
+   "smiles": "CC1=CC(=CC=C1)O",
+   "source": {
+    "id": "C108394",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C108394&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108394&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/m-cresol.json",
+    "sha256": "b0557f03186a92b220c4d62e9b7f00fcc5a021201f828b446a8374d98a70d80a",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.628
+     }
+    ],
+    "absent": [
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.007
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.008
+     }
+    ],
+    "excluded": [
+     {
+      "label": "carbonyl C=O",
+      "why": "group absent but reference ratio 0.032 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.421 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-31",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "methyl methacrylate",
+   "evidence": "reference-database",
+   "smiles": "CC(=C)C(=O)OC",
+   "source": {
+    "id": "C80626",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C80626&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C80626&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/methyl-methacrylate.json",
+    "sha256": "ceec509576e9489ec00a00faae0ce668a14f7c606c759f7e3e28ae459df20712",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.829
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.018
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.025
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.025
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.019
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.018
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.076 > 0.03"
+     },
+     {
+      "label": "alkene C=C",
+      "why": "group present but reference ratio 0.105 < 0.12"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-32",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "methyl propanoate",
+   "evidence": "reference-database",
+   "smiles": "CCC(=O)OC",
+   "source": {
+    "id": "C554121",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C554121&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C554121&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/methyl-propanoate.json",
+    "sha256": "463d83fd6dc55ca4a44dc3b9c3246981d9c14f0a320d69770d03168cd3349f95",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.005
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.014
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.014
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.006
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.005
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.106 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-33",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "N-methylacetamide",
+   "evidence": "reference-database",
+   "smiles": "CC(=O)NC",
+   "source": {
+    "id": "C79163",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C79163&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C79163&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/n-methylacetamide.json",
+    "sha256": "e8e4c3881e9b1cc91928d516c5a965cb44f0b718b3d8e3b82bff63072e9ac920",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.013
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.003
+     }
+    ],
+    "excluded": [
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "why": "group absent but reference ratio 0.073 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.543 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-34",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "N-methylaniline",
+   "evidence": "reference-database",
+   "smiles": "CNC1=CC=CC=C1",
+   "source": {
+    "id": "C100618",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C100618&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C100618&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/n-methylaniline.json",
+    "sha256": "3cd9c7dacd6d1b428c12149a36c79b5ebe321c3fa94df134c91d32cd42a33485",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.013
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.027
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.003
+     }
+    ],
+    "excluded": [
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "why": "group absent but reference ratio 0.081 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 1 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-35",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "N,N-dimethylacetamide",
+   "evidence": "reference-database",
+   "smiles": "CC(=O)N(C)C",
+   "source": {
+    "id": "C127195",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C127195&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C127195&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/n-n-dimethylacetamide.json",
+    "sha256": "fc2130d730de32683e259cb014035dcf3e8ca7e205492d3a3fbe963aa238f85b",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.008
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.004
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.122 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-36",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "nitroethane",
+   "evidence": "reference-database",
+   "smiles": "CC[N+](=O)[O-]",
+   "source": {
+    "id": "C79243",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C79243&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C79243&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/nitroethane.json",
+    "sha256": "1e415b1399694491edfc72c9b8cb12e14df57700d6e33a3da25b03a14455af8a",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "range_cm1": [
+       1520,
+       1540
+      ],
+      "measured_ratio": 0.978
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.014
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.014
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.013
+     },
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.023
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.013
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.013
+     }
+    ],
+    "excluded": [
+     {
+      "label": "alkene C=C",
+      "why": "group absent but reference ratio 0.057 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-37",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "octan-1-ol",
+   "evidence": "reference-database",
+   "smiles": "CCCCCCCCO",
+   "source": {
+    "id": "C111875",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C111875&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111875&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/octan-1-ol.json",
+    "sha256": "d537c54b9963127ac1def3fae45c99da4702e032c55b7c3434e5d40f8dd0a77f",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.004
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "alkene C=C",
+      "range_cm1": [
+       1645,
+       1645
+      ],
+      "measured_ratio": 0.003
+     }
+    ],
+    "excluded": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "why": "group present but reference ratio 0.057 < 0.12"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.05 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-38",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "pentanal",
+   "evidence": "reference-database",
+   "smiles": "CCCCC=O",
+   "source": {
+    "id": "C110623",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C110623&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110623&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/pentanal.json",
+    "sha256": "6929f29dac8bbcf870570510e25e3e203e75b2ca7cebc154c2fd527e654b1bc5",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.889
+     }
+    ],
+    "absent": [],
+    "excluded": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "why": "group absent but reference ratio 0.073 > 0.03"
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "why": "group absent but reference ratio 0.073 > 0.03"
+     },
+     {
+      "label": "primary amine N-H",
+      "why": "group absent but reference ratio 0.063 > 0.03"
+     },
+     {
+      "label": "nitrile C#N",
+      "why": "group absent but reference ratio 0.044 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.12 > 0.03"
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "why": "group absent but reference ratio 0.049 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-39",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "propargyl alcohol",
+   "evidence": "reference-database",
+   "smiles": "C#CCO",
+   "source": {
+    "id": "C107197",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C107197&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107197&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/propargyl-alcohol.json",
+    "sha256": "cfa9714fea4796f43e772f32ac561551347b69392d5c46affd7b66c6463d753e",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.158
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.447
+     }
+    ],
+    "absent": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.017
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "range_cm1": [
+       1520,
+       1540
+      ],
+      "measured_ratio": 0.02
+     },
+     {
+      "label": "alkene C=C",
+      "range_cm1": [
+       1645,
+       1645
+      ],
+      "measured_ratio": 0.009
+     }
+    ],
+    "excluded": []
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-40",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "propionaldehyde",
+   "evidence": "reference-database",
+   "smiles": "CCC=O",
+   "source": {
+    "id": "C123386",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C123386&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C123386&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/propionaldehyde.json",
+    "sha256": "793bf837a2b6553ffa5c341413adee9ba280814248e03985d3a06a85ac18bb31",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.892
+     }
+    ],
+    "absent": [],
+    "excluded": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "why": "group absent but reference ratio 0.987 > 0.03"
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "why": "group absent but reference ratio 0.989 > 0.03"
+     },
+     {
+      "label": "primary amine N-H",
+      "why": "group absent but reference ratio 0.993 > 0.03"
+     },
+     {
+      "label": "nitrile C#N",
+      "why": "group absent but reference ratio 0.981 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.942 > 0.03"
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "why": "group absent but reference ratio 1 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-41",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "propyl acetate",
+   "evidence": "reference-database",
+   "smiles": "CCCOC(=O)C",
+   "source": {
+    "id": "C109604",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C109604&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109604&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/propyl-acetate.json",
+    "sha256": "847a9456302a234e78014bd18a9a650555eac92fbb07ab774499aabe57cfcfab",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.521
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.004
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.006
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.006
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.003
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.004
+     }
+    ],
+    "excluded": [
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.039 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-42",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "propylamine",
+   "evidence": "reference-database",
+   "smiles": "CCCN",
+   "source": {
+    "id": "C107108",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C107108&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107108&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/propylamine.json",
+    "sha256": "937452df33f07f5baf55cf00825f78a9cad9e4c9a863d36ffb81d0da9b21c3ec",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.021
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.02
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.004
+     }
+    ],
+    "excluded": [
+     {
+      "label": "primary amine N-H",
+      "why": "group present but reference ratio 0.012 < 0.12"
+     },
+     {
+      "label": "carbonyl C=O",
+      "why": "group absent but reference ratio 0.102 > 0.03"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.128 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-43",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "salicylaldehyde",
+   "evidence": "reference-database",
+   "smiles": "C1=CC=C(C(=C1)C=O)O",
+   "source": {
+    "id": "C90028",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C90028&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C90028&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/salicylaldehyde.json",
+    "sha256": "a99a988ea99eb4557bba33111b401620d13775140e25d7f5d52ad2394df0a5e4",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 1
+     }
+    ],
+    "absent": [
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.003
+     }
+    ],
+    "excluded": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "why": "group present but reference ratio 0.004 < 0.12"
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "why": "group absent but reference ratio 0.19 > 0.03"
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "why": "group absent but reference ratio 0.038 > 0.03"
+     }
+    ]
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  },
+  {
+   "id": "IR-44",
+   "capability": "ir",
+   "category": "infrared",
+   "title": "vinyl acetate",
+   "evidence": "reference-database",
+   "smiles": "CC(=O)OC=C",
+   "source": {
+    "id": "C108054",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C108054&Units=SI&Type=IR-SPEC&Index=0#IR-SPEC",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108054&Index=0&Type=IR",
+    "snapshot": "snapshots/nist-ir/vinyl-acetate.json",
+    "sha256": "68aa5a5d5c91df5ec8a5d9e3546259f93fc2e9815ebcb64530a0ea048c0fd0ed",
+    "bandTable": "snapshots/wikipedia/Infrared_spectroscopy_correlation_table.wikitext",
+    "bandTableSha256": "6874bbdfe5a4bbb422f563d11ab42aca19a1785a00d49736294ef974a0ac6fb3",
+    "inspected": "NIST gas-phase JCAMP spectrum fetched and saved; absorbance maxima in each window computed programmatically"
+   },
+   "ir": {
+    "present": [
+     {
+      "label": "carbonyl C=O",
+      "range_cm1": [
+       1685,
+       1750
+      ],
+      "measured_ratio": 0.496
+     },
+     {
+      "label": "alkene C=C",
+      "range_cm1": [
+       1645,
+       1645
+      ],
+      "measured_ratio": 0.168
+     }
+    ],
+    "absent": [
+     {
+      "label": "alcohol/phenol O-H (low concentration)",
+      "range_cm1": [
+       3610,
+       3670
+      ],
+      "measured_ratio": 0.006
+     },
+     {
+      "label": "carboxylic acid O-H (low concentration)",
+      "range_cm1": [
+       3500,
+       3560
+      ],
+      "measured_ratio": 0.006
+     },
+     {
+      "label": "primary amine N-H",
+      "range_cm1": [
+       3400,
+       3500
+      ],
+      "measured_ratio": 0.002
+     },
+     {
+      "label": "nitrile C#N",
+      "range_cm1": [
+       2230,
+       2250
+      ],
+      "measured_ratio": 0.004
+     },
+     {
+      "label": "nitro N-O (asym/sym)",
+      "range_cm1": [
+       1520,
+       1540
+      ],
+      "measured_ratio": 0.012
+     },
+     {
+      "label": "terminal alkyne C-H",
+      "range_cm1": [
+       3290,
+       3310
+      ],
+      "measured_ratio": 0.001
+     }
+    ],
+    "excluded": []
+   },
+   "uncertainty": "Gas-phase NIST spectrum; band windows are from a secondary correlation table. Present = functional group present by SMARTS and window maximum >= 12% of the spectrum maximum; absent = group and obvious overlapping groups absent and window maximum <= 3%."
+  }
+ ]
+}

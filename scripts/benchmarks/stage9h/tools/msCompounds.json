@@ -1,0 +1,105 @@
+{
+ "alkyl halide": [
+  "1-bromobutane",
+  "2-bromobutane",
+  "2-chloro-2-methylpropane",
+  "1-iodopropane",
+  "2-iodopropane",
+  "1-chloropentane",
+  "bromocyclohexane",
+  "2-bromo-2-methylpropane"
+ ],
+ "ether": [
+  "dipropyl ether",
+  "isopropyl ether",
+  "anisole",
+  "ethyl vinyl ether",
+  "tetrahydropyran"
+ ],
+ "ester": [
+  "propyl acetate",
+  "methyl butanoate",
+  "isobutyl acetate",
+  "ethyl benzoate",
+  "vinyl acetate"
+ ],
+ "ketone": [
+  "2-hexanone",
+  "3-hexanone",
+  "cyclopentanone",
+  "propiophenone",
+  "4-methyl-2-pentanone"
+ ],
+ "aldehyde": [
+  "pentanal",
+  "2-methylpropanal",
+  "phenylacetaldehyde",
+  "hexanal"
+ ],
+ "alcohol": [
+  "1-hexanol",
+  "2-pentanol",
+  "cyclohexanol",
+  "3-methyl-1-butanol",
+  "2-methyl-2-butanol"
+ ],
+ "amine": [
+  "butylamine",
+  "dipropylamine",
+  "N,N-dimethylaniline",
+  "cyclohexylamine",
+  "benzylamine"
+ ],
+ "nitrile": [
+  "butyronitrile",
+  "valeronitrile",
+  "phenylacetonitrile",
+  "adiponitrile"
+ ],
+ "nitro": [
+  "1-nitropropane",
+  "2-nitropropane",
+  "3-nitrotoluene"
+ ],
+ "substituted benzene": [
+  "p-cresol",
+  "4-chlorophenol",
+  "4-chloroaniline",
+  "4-bromotoluene",
+  "4-methoxytoluene",
+  "4-methylbenzonitrile",
+  "4-methylbenzaldehyde",
+  "4-methylbenzoic acid",
+  "3-chlorotoluene",
+  "1-bromo-4-chlorobenzene",
+  "4-fluorotoluene",
+  "4-chlorobenzaldehyde"
+ ],
+ "cyclic / other": [
+  "cyclohexane",
+  "methylcyclohexane",
+  "tetralin",
+  "indane",
+  "1,4-dioxane",
+  "morpholine",
+  "thiophene",
+  "N-methylpyrrolidone",
+  "butyrolactone",
+  "decalin"
+ ],
+ "acid": [
+  "pentanoic acid",
+  "isobutyric acid",
+  "phenylacetic acid"
+ ],
+ "alkyl halide (second batch)": [
+  "3-bromopentane",
+  "2-chlorobutane",
+  "1-bromo-2-methylpropane",
+  "2-bromo-2-methylbutane",
+  "1-bromohexane",
+  "bromocyclopentane",
+  "1-chloro-2-methylpropane",
+  "2-chloropentane"
+ ]
+}

@@ -1,0 +1,1 @@
+{"cases":[{"id":"SMK-IR","category":"smoke","evidence":"smoke","smiles":"CC(C)=O","ir":{"present":[{"label":"carbonyl","range_cm1":[1685,1750]}],"absent":[{"label":"OH","range_cm1":[3610,3670]}]}}]}

@@ -1,0 +1,1 @@
+{"cases":[{"id":"SMK-MS","category":"smoke","evidence":"smoke","smiles":"CCCCO","expected":{"molecular_ion_mz":74,"base_peak_mz":31,"key_fragments":[{"mz":41}],"m_plus_2_ratio":null}}]}
