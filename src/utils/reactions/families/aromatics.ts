@@ -138,6 +138,26 @@ export const aromaticReactionRules: ReactionRule[] = [
       "For a monosubstituted alkyl/benzylic ring both ortho and para products are formed (toluene nitration is reported as about 58% ortho, 4% meta, 38% para); PocketChem lists both and does not rank them.",
     ],
     ...easModelNotes,
+    productPreferences: [
+      {
+        id: "nitration-halobenzene-para",
+        whenReactantSmarts: ["[Cl,Br]c1[cH][cH][cH][cH][cH]1"],
+        productSmarts: "[Cl,Br]c1ccc([N+](=O)[O-])cc1",
+        level: "major",
+        basis:
+          "Chloro- and bromobenzene nitrate mainly para: measured isomer distributions are about 30% ortho / 1% meta / 69% para for chlorobenzene and 37% / 1% / 62% for bromobenzene.",
+        references: ["Caltech-hosted 1954 J. Am. Chem. Soc. nitration isomer study (authors.library.caltech.edu/61405)", "LibreTexts/SUNY MCC, The Effect of Substituents on Orientation"],
+      },
+      {
+        id: "nitration-halobenzene-ortho",
+        whenReactantSmarts: ["[Cl,Br]c1[cH][cH][cH][cH][cH]1"],
+        productSmarts: "[Cl,Br]c1ccccc1[N+](=O)[O-]",
+        level: "minor",
+        basis:
+          "The ortho isomer is the smaller of the two ortho/para products for chloro- and bromobenzene (about 30% and 37%) but is formed in substantial amount.",
+        references: ["Caltech-hosted 1954 J. Am. Chem. Soc. nitration isomer study (authors.library.caltech.edu/61405)"],
+      },
+    ],
     planningCost: 72,
     retrosynthesis: { tier: "preferred", group: "aryl-nitration" },
     priority: 1800,
