@@ -119,7 +119,7 @@ export function assessNameConsistency(
       if (isChainVocabulary(name)) return `the molecule has ${rings} ring(s) but the generated name "${result.estimatedName}" contains no ring`;
       return null; // an unfamiliar (for example retained) name: the ring test cannot judge it
     }
-    const multiplied = /(?:^|[^a-z])(?:di|tri|tetra|bis|tris)[a-z(]/.test(name) || /bi[a-z]*(?:cyclo|phenyl)/.test(name);
+    const multiplied = /(?:^|[^a-z])(?:di|tri|tetra|bis|tris)[a-z(]/.test(name) || /\bbi[a-z]*(?:cyclo|phenyl)/.test(name);
     if (!multiplied) {
       let weight = 0;
       weight += (name.match(/bicyclo/g) ?? []).length * 2 + (name.match(/tricyclo/g) ?? []).length * 3;
