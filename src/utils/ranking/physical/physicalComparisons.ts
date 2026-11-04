@@ -20,6 +20,32 @@ export type PhysicalSummary = {
   rigidityScore: number;
 };
 
+/**
+ * Wiener index of the heavy-atom skeleton: the sum of shortest-path lengths over all atom pairs. For isomers it falls as the skeleton becomes
+ * more compact (n-butanol 20, sec-butanol 18, tert-butanol 16), the trend that boiling points follow because compact molecules have less
+ * surface for dispersion contact.
+ */
+function wienerIndex(graph: ParsedMol): number {
+  const atoms = graph.atoms.filter((atom) => atom.element !== "H").map((atom) => atom.atomIndex);
+  const inSkeleton = new Set(atoms);
+  let total = 0;
+  for (const start of atoms) {
+    const distance = new Map<number, number>([[start, 0]]);
+    const queue = [start];
+    while (queue.length) {
+      const current = queue.shift() as number;
+      for (const bond of graph.adjacency.get(current) ?? []) {
+        const next = bond.atomA === current ? bond.atomB : bond.atomA;
+        if (!inSkeleton.has(next) || distance.has(next)) continue;
+        distance.set(next, (distance.get(current) ?? 0) + 1);
+        queue.push(next);
+      }
+    }
+    for (const value of distance.values()) total += value;
+  }
+  return total / 2;
+}
+
 export function applyPhysicalMetrics(
   metrics: Record<ComparisonModeId, ComparisonMetric>,
   graph: ParsedMol,
@@ -37,6 +63,9 @@ export function applyPhysicalMetrics(
         `${boiling.tendency} · score ${boiling.boilingPointScore.toFixed(1)}`,
         boiling.explanation,
         boiling.factors,
+        // The qualitative score decides first. Ties (isomers, or molecules the coarse bins cannot separate) fall back to molecular mass and then
+        // to skeleton compactness, so n-butanol > sec-butanol > tert-butanol and ethyl acetate > methyl formate.
+        [boiling.boilingPointScore, Math.round(boiling.molecularWeight ?? 0), wienerIndex(graph)],
       )
     : emptyMetric("Boiling-point tendency could not be estimated.");
   metrics.solubility = solubility
