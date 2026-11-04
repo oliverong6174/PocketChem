@@ -1,5 +1,5 @@
 // Stage 9F: boiling-point ranking separates isomers and molecules the coarse score ties. Order from experimental boiling points that are
-// textbook facts: n-butanol 117.7 > sec-butanol 99.5 > tert-butanol 82.4 degC; ethyl acetate 77 > methyl formate 32 degC; octane > heptane.
+// textbook facts: n-butanol 117.7 > sec-butanol 99.5 > tert-butanol 82.4 degC; pentane 36.1 > isopentane 27.8 > neopentane 9.5 degC; pentane > butane (-0.5 degC).
 import { after, before, describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { closeEngine, loadEngine, loadModule } from "./engine.mjs";
@@ -30,9 +30,13 @@ describe("boiling point ranking", () => {
     const [n, s, t] = await ranks("boilingPoint", ["CCCCO", "CCC(C)O", "CC(C)(C)O"]);
     assert.ok(n < s && s < t, `ranks ${n} ${s} ${t}`);
   });
-  test("ethyl acetate > methyl formate (molecular mass breaks the tie)", async () => {
-    const [ea, mf] = await ranks("boilingPoint", ["CCOC(C)=O", "COC=O"]);
-    assert.ok(ea < mf);
+  test("pentane > butane (same qualitative score; molecular mass breaks the tie)", async () => {
+    const [pentane, butane] = await ranks("boilingPoint", ["CCCCC", "CCCC"]);
+    assert.ok(pentane < butane);
+  });
+  test("pentane > isopentane > neopentane (compactness)", async () => {
+    const [n, i, neo] = await ranks("boilingPoint", ["CCCCC", "CCC(C)C", "CC(C)(C)C"]);
+    assert.ok(n < i && i < neo, `ranks ${n} ${i} ${neo}`);
   });
   test("negative control: unrelated molecules keep the qualitative order (an alcohol outranks an alkane of lower mass)", async () => {
     const [ol, ane] = await ranks("boilingPoint", ["CCCCO", "CCCC"]);
