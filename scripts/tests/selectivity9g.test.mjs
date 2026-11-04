@@ -47,3 +47,19 @@ describe("[3,3]-sigmatropic rearrangements", () => {
     assert.equal((await run("cope-rearrangement", "CC=CC")).length, 0);
   });
 });
+
+describe("kinetic versus thermodynamic enolate alkylation", () => {
+  const products = async (id, reactants) => Promise.all((await run(id, reactants)).map((p) => key(p.productSmiles)));
+  test("2-methylcyclohexanone + MeI: LDA gives 2,6-dimethyl, equilibrating base gives 2,2-dimethyl", async () => {
+    assert.deepEqual(await products("enolate-alkylation-kinetic", "CC1CCCCC1=O.CI"), [await key("CC1CCCC(C)C1=O")]);
+    assert.deepEqual(await products("enolate-alkylation-thermodynamic", "CC1CCCCC1=O.CI"), [await key("CC1(C)CCCCC1=O")]);
+  });
+  test("butan-2-one + MeI: kinetic alkylation at the methyl (pentan-3-one), thermodynamic at the methylene (3-methylbutan-2-one)", async () => {
+    assert.deepEqual(await products("enolate-alkylation-kinetic", "CCC(C)=O.CI"), [await key("CCC(=O)CC")]);
+    assert.deepEqual(await products("enolate-alkylation-thermodynamic", "CCC(C)=O.CI"), [await key("CC(=O)C(C)C")]);
+  });
+  test("a symmetric ketone has no kinetic/thermodynamic distinction and is not offered either rule", async () => {
+    assert.equal((await run("enolate-alkylation-kinetic", "CC(C)=O.CI")).filter((p) => p.productSmiles).length, 0);
+    assert.equal((await run("enolate-alkylation-thermodynamic", "CC(C)=O.CI")).filter((p) => p.productSmiles).length, 0);
+  });
+});
