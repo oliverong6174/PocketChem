@@ -63,7 +63,7 @@ describe("epoxide + HX: benzylic and allylic carbons are attacked like tertiary 
     // A plain template carries the reactant chirality tags through, i.e. retention at the attacked carbon.
     const retained = await reaction.runReactionSmarts([epoxide], "[O:1]1[C;$(C-a):2][C:3]1>>[OH:1][C:3][C:2]Br", 4);
     assert.equal(retained.length, 1);
-    const mirror = (smiles) => smiles.replace(/@@/g, "").replace(/@/g, "@@").replace(//g, "@");
+    const mirror = (smiles) => smiles.replace(/@@/g, "#").replace(/@/g, "@@").replace(/#/g, "@");
     const iso = async (smiles) => (await stereo.canonicalizeStereoStructure(smiles)).isomeric;
     const got = await iso(out[0].productSmiles);
     assert.notEqual(got, await iso(retained[0]));
