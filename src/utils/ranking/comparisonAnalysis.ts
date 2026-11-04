@@ -234,6 +234,17 @@ export async function analyzeComparisonMolecule(
       radicalModule.getBestCarbonRadicalStabilityResult(radicalResults),
     );
 
+    // A cis (Z) 1,2-dialkyl alkene is less stable than its trans isomer (heats of hydrogenation: trans-2-butene -115, cis-2-butene
+    // -119 kJ/mol) because of steric strain between the two alkyl groups. The substitution score cannot see geometry, so it only
+    // breaks ties between otherwise equal scores.
+    const alkeneMetric = metrics.alkeneStability;
+    if (alkeneMetric.score !== null) {
+      alkeneMetric.sortVector = [
+        alkeneMetric.score,
+        -boilingModule.countCisDialkylAlkenes(mol as never, graph),
+      ];
+    }
+
     const { leavingGroup, carbonyl } = applySubstitutionMetrics(
       metrics,
       graph,

@@ -29,7 +29,7 @@ export type BoilingPointRankingResult = {
   cisAlkeneCount: number;
 };
 
-function countCisDialkylAlkenes(
+export function countCisDialkylAlkenes(
   mol: { get_stereo_tags?: () => string },
   parsedMol: ReturnType<typeof parseMolBlock>
 ): number {

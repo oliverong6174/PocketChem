@@ -63,3 +63,10 @@ describe("Hammett sigma-p substituent strength (Hansch, Leo & Taft 1991)", () =>
     assert.equal(m.score, null);
   });
 });
+
+describe("alkene stability geometry", () => {
+  test("trans-2-butene > cis-2-butene > propene (heats of hydrogenation -115, -119, -125 kJ/mol)", async () => {
+    const r = await ranks("alkeneStability", ["C/C=C/C", "C/C=C" + String.fromCharCode(92) + "C", "C=CC"]);
+    assert.deepEqual(r, [1, 2, 3]);
+  });
+});
