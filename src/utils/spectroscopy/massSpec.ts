@@ -105,6 +105,10 @@ const FRAGMENT_REACTIONS = {
   // Keep Br/Cl separate so the surviving carbon skeleton has no fake isotope
   // label attached to it.
   arylBromineLoss: "[c:1]-[Br:2]>>[c+:1]",
+  // Heterolysis of a C-Br or C-I bond that leaves a SECONDARY or TERTIARY carbocation is the dominant EI channel of such halides (isopropyl
+  // bromide m/z 43, tert-butyl bromide m/z 57; McLafferty & Turecek, Interpretation of Mass Spectra). Primary halides do not lose X as readily.
+  alkylBromineLoss: "[C;X4;H0,H1:1]-[Br:2]>>[C+:1]",
+  alkylIodineLoss: "[C;X4;H0,H1:1]-[I:2]>>[C+:1]",
   arylChlorineLoss: "[c:1]-[Cl:2]>>[c+:1]",
 } as const;
 
@@ -682,6 +686,59 @@ async function reactionFragmentPeaks(
   return peaks;
 }
 
+/**
+ * Aromatic compounds whose only substituents are OH, NH2, OCH3, C#N or a halogen give an intense molecular ion that is usually the base peak:
+ * benzene, halobenzenes, phenol, aniline, anisole, benzonitrile and fused aromatic hydrocarbons (McLafferty & Turecek, Interpretation of Mass
+ * Spectra: the molecular ion is strong for aromatic rings, and there is no weak benzylic or alpha bond to cleave). Substituents that fragment
+ * readily (alkyl, carbonyl, nitro, ethoxy and larger ethers) are deliberately excluded.
+ */
+async function hasStableAromaticMolecularIon(parentSmiles: string | null): Promise<boolean> {
+  if (!parentSmiles) return false;
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(parentSmiles);
+  if (!mol) return false;
+  try {
+    const heavy = mol.get_num_atoms?.() ?? 0;
+    if (!heavy) return false;
+    const claimed = new Set<number>();
+    const patterns = ["c", "[OX2H1]c", "[NX3H2]c", "[F,Cl,Br,I]c", "[CX2](#[NX1])c", "[CH3][OX2]c"];
+    for (const smarts of patterns) {
+      const query = rdkit.get_qmol(smarts);
+      if (!query) continue;
+      try {
+        const parsed: unknown = JSON.parse(mol.get_substruct_matches?.(query) ?? "[]");
+        for (const entry of Array.isArray(parsed) ? parsed : []) {
+          const atoms: number[] = Array.isArray(entry) ? entry : entry?.atoms ?? [];
+          // the substituent atoms are the leading ones; the ring carbon is the last atom of each pattern
+          const members = smarts === "c" ? atoms : smarts.endsWith("c") ? atoms.slice(0, atoms.length - 1) : atoms;
+          members.forEach((atom) => claimed.add(atom));
+        }
+      } finally {
+        query.delete?.();
+      }
+    }
+    return claimed.size === heavy && claimed.size > 0;
+  } catch {
+    return false;
+  } finally {
+    mol.delete?.();
+  }
+}
+
+/** Raises the molecular ion (and its isotope companions) just above the strongest fragment, then renormalizes so the base peak is 100. */
+function promoteMolecularIon(peaks: MassSpectrumPeak[]): MassSpectrumPeak[] {
+  const molecular = peaks.find((peak) => peak.kind === "molecular-ion");
+  if (!molecular) return peaks;
+  const strongestOther = Math.max(0, ...peaks.filter((peak) => peak.kind !== "molecular-ion" && peak.kind !== "isotope").map((peak) => peak.relativeIntensity));
+  const factor = Math.max(1, (1.15 * strongestOther) / Math.max(molecular.relativeIntensity, 1e-9));
+  if (factor === 1) return peaks;
+  const scaled = peaks.map((peak) =>
+    peak.kind === "molecular-ion" || peak.kind === "isotope" ? { ...peak, relativeIntensity: peak.relativeIntensity * factor } : peak,
+  );
+  const top = Math.max(...scaled.map((peak) => peak.relativeIntensity));
+  return scaled.map((peak) => ({ ...peak, relativeIntensity: Number(((peak.relativeIntensity / top) * 100).toFixed(1)) }));
+}
+
 export async function predictMassSpectrum(
   formula: string,
   exactMass: number | null,
@@ -828,6 +885,26 @@ export async function predictMassSpectrum(
       ));
     }
 
+    if ((counts.Br ?? 0) > 0) {
+      peaks.push(...await reactionFragmentPeaks(
+        parentSmiles,
+        FRAGMENT_REACTIONS.alkylBromineLoss,
+        "M − Br• (sec/tert alkyl)",
+        "A secondary or tertiary alkyl bromide readily loses Br• to give a stabilized carbocation, usually the base peak.",
+        90,
+      ));
+    }
+
+    if ((counts.I ?? 0) > 0) {
+      peaks.push(...await reactionFragmentPeaks(
+        parentSmiles,
+        FRAGMENT_REACTIONS.alkylIodineLoss,
+        "M − I• (sec/tert alkyl)",
+        "A secondary or tertiary alkyl iodide readily loses I• to give a stabilized carbocation, usually the base peak.",
+        90,
+      ));
+    }
+
     if ((counts.Cl ?? 0) > 0) {
       peaks.push(...await reactionFragmentPeaks(
         parentSmiles,
@@ -871,7 +948,8 @@ export async function predictMassSpectrum(
   if ((counts.Br ?? 0) > 0) notes.push("Bromine gives a diagnostic M:M+2 isotope pattern of roughly 1:1 for one Br atom.");
   if ((counts.N ?? 0) % 2 === 1 && nominal !== null) notes.push("Nitrogen rule: an odd nominal molecular mass is consistent with an odd number of nitrogens for typical closed-shell organic molecules.");
 
-  const finalPeaks = mergeAndNormalizePeaks(peaks);
+  let finalPeaks = mergeAndNormalizePeaks(peaks);
+  if (await hasStableAromaticMolecularIon(parentSmiles)) finalPeaks = promoteMolecularIon(finalPeaks);
   const basePeak = finalPeaks.reduce<MassSpectrumPeak | null>((best, peak) => !best || peak.relativeIntensity > best.relativeIntensity ? peak : best, null);
 
   return {
