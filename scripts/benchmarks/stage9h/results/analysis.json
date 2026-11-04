@@ -1,0 +1,572 @@
+{
+ "engineCommit": "03460be1a9d424250588f7ad9006159d75c7da35",
+ "engineSrcTree": "767acf31bf8b20bd1b3ae26b8e301fa5d8e55e28",
+ "ranAt": "2026-11-04T23:22:55.565Z",
+ "capabilities": {
+  "nomenclature": {
+   "name": {
+    "n": 52,
+    "correct": 26,
+    "statuses": {
+     "correct": 26,
+     "wrong-confident": 6,
+     "wrong-flagged": 13,
+     "abstained": 7
+    },
+    "interval95": [
+     0.3688563855796992,
+     0.6311436144203008
+    ]
+   },
+   "constitutionName": {
+    "n": 52,
+    "correct": 26,
+    "statuses": {
+     "correct": 26,
+     "wrong": 19,
+     "abstained": 7
+    },
+    "interval95": [
+     0.3688563855796992,
+     0.6311436144203008
+    ]
+   },
+   "systematicName": {
+    "n": 52,
+    "correct": 23,
+    "statuses": {
+     "correct": 23,
+     "wrong-confident": 7,
+     "wrong-flagged": 15,
+     "abstained": 7
+    },
+    "interval95": [
+     0.3159484718858809,
+     0.5766047500848361
+    ]
+   },
+   "name (stereo-specified)": {
+    "n": 9,
+    "correct": 1,
+    "statuses": {
+     "wrong-flagged": 8,
+     "correct": 1
+    },
+    "interval95": [
+     0.019890371327130518,
+     0.4350062147680602
+    ]
+   },
+   "name (no stereo)": {
+    "n": 43,
+    "correct": 25,
+    "statuses": {
+     "correct": 25,
+     "wrong-confident": 6,
+     "wrong-flagged": 5,
+     "abstained": 7
+    },
+    "interval95": [
+     0.4332831575571177,
+     0.7161566566251476
+    ]
+   },
+   "confidentWrong": [
+    "acetophenone -> acetylbenzene",
+    "anthracene -> 2,3-ditridec-1,3,5,7,9,11-en-1-ylnaphthalene",
+    "phenylacetylene -> (eth-1-yn-1-yl)benzene",
+    "sodium acetate -> ethanoate (acetate)",
+    "styrene -> (eth-1-en-1-yl)benzene",
+    "succinic anhydride -> oxolan-2,5-dione"
+   ]
+  },
+  "properties": {
+   "formula": {
+    "n": 52,
+    "correct": 48,
+    "statuses": {
+     "correct": 48,
+     "wrong": 4
+    },
+    "interval95": [
+     0.8182618931787534,
+     0.9696811457026541
+    ]
+   },
+   "molecularWeight": {
+    "n": 52,
+    "correct": 52,
+    "statuses": {
+     "correct": 52
+    },
+    "interval95": [
+     0.9312054095871177,
+     1
+    ]
+   },
+   "exactMass": {
+    "n": 52,
+    "correct": 52,
+    "statuses": {
+     "correct": 52
+    },
+    "interval95": [
+     0.9312054095871177,
+     1
+    ]
+   },
+   "formalCharge": {
+    "n": 52,
+    "correct": 52,
+    "statuses": {
+     "correct": 52
+    },
+    "interval95": [
+     0.9312054095871177,
+     1
+    ]
+   },
+   "logP (+-1.0)": {
+    "n": 38,
+    "correct": 34,
+    "statuses": {
+     "correct": 34,
+     "wrong": 4
+    },
+    "interval95": [
+     0.7586916879980553,
+     0.9582981020673341
+    ]
+   }
+  },
+  "ranking": {
+   "order (all)": {
+    "n": 30,
+    "correct": 22,
+    "statuses": {
+     "correct": 22,
+     "wrong": 6,
+     "abstained": 2
+    },
+    "interval95": [
+     0.5555169795568831,
+     0.8581750444608938
+    ]
+   },
+   "order [boilingPoint]": {
+    "n": 16,
+    "correct": 14,
+    "statuses": {
+     "correct": 14,
+     "wrong": 2
+    },
+    "interval95": [
+     0.6397666856325172,
+     0.9650232506629429
+    ]
+   },
+   "order [acidity]": {
+    "n": 5,
+    "correct": 1,
+    "statuses": {
+     "wrong": 3,
+     "abstained": 1,
+     "correct": 1
+    },
+    "interval95": [
+     0.036223160969787456,
+     0.6244717358814612
+    ]
+   },
+   "order [basicity]": {
+    "n": 1,
+    "correct": 0,
+    "statuses": {
+     "wrong": 1
+    },
+    "interval95": [
+     0,
+     0.7934567085261071
+    ]
+   },
+   "order [lipophilicity]": {
+    "n": 2,
+    "correct": 2,
+    "statuses": {
+     "correct": 2
+    },
+    "interval95": [
+     0.3423719528896193,
+     1
+    ]
+   },
+   "order [ewgStrength]": {
+    "n": 3,
+    "correct": 3,
+    "statuses": {
+     "correct": 3
+    },
+    "interval95": [
+     0.4384939195509822,
+     1
+    ]
+   },
+   "order [edgStrength]": {
+    "n": 3,
+    "correct": 2,
+    "statuses": {
+     "correct": 2,
+     "abstained": 1
+    },
+    "interval95": [
+     0.20765495512648788,
+     0.9385096847238393
+    ]
+   },
+   "pairwise": {
+    "pairs": 180,
+    "right": 165,
+    "wrong": 9,
+    "abstained": 6
+   }
+  },
+  "ms": {
+   "molecularIon": {
+    "n": 30,
+    "correct": 30,
+    "statuses": {
+     "correct": 30
+    },
+    "interval95": [
+     0.886482908609522,
+     1
+    ]
+   },
+   "basePeak": {
+    "n": 48,
+    "correct": 16,
+    "statuses": {
+     "wrong": 32,
+     "correct": 16
+    },
+    "interval95": [
+     0.21676601370896784,
+     0.4746015366752795
+    ]
+   },
+   "fragments": {
+    "n": 44,
+    "correct": 5,
+    "statuses": {
+     "wrong": 39,
+     "correct": 5
+    },
+    "interval95": [
+     0.04952707589567494,
+     0.23979435148133582
+    ]
+   },
+   "isotopeM2": {
+    "n": 5,
+    "correct": 5,
+    "statuses": {
+     "correct": 5
+    },
+    "interval95": [
+     0.565508505247919,
+     1
+    ]
+   },
+   "fragmentRecall": {
+    "listed": 124,
+    "present": 44
+   },
+   "basePeak [alkyl halide]": {
+    "n": 8,
+    "correct": 3,
+    "statuses": {
+     "wrong": 5,
+     "correct": 3
+    },
+    "interval95": [
+     0.13684175946152105,
+     0.6942621454161982
+    ]
+   },
+   "basePeak [substituted benzene]": {
+    "n": 8,
+    "correct": 4,
+    "statuses": {
+     "correct": 4,
+     "wrong": 4
+    },
+    "interval95": [
+     0.2152125268244419,
+     0.7847874731755581
+    ]
+   },
+   "basePeak [alcohol]": {
+    "n": 4,
+    "correct": 0,
+    "statuses": {
+     "wrong": 4
+    },
+    "interval95": [
+     0,
+     0.48990002040399916
+    ]
+   },
+   "basePeak [nitro]": {
+    "n": 3,
+    "correct": 1,
+    "statuses": {
+     "wrong": 2,
+     "correct": 1
+    },
+    "interval95": [
+     0.061490315276160515,
+     0.7923450448735121
+    ]
+   },
+   "basePeak [aldehyde]": {
+    "n": 4,
+    "correct": 1,
+    "statuses": {
+     "wrong": 3,
+     "correct": 1
+    },
+    "interval95": [
+     0.045586062644636216,
+     0.6993639475573634
+    ]
+   },
+   "basePeak [ketone]": {
+    "n": 2,
+    "correct": 1,
+    "statuses": {
+     "wrong": 1,
+     "correct": 1
+    },
+    "interval95": [
+     0.09452865480086611,
+     0.905471345199134
+    ]
+   },
+   "basePeak [nitrile]": {
+    "n": 3,
+    "correct": 0,
+    "statuses": {
+     "wrong": 3
+    },
+    "interval95": [
+     0,
+     0.5615060804490177
+    ]
+   },
+   "basePeak [amine]": {
+    "n": 2,
+    "correct": 1,
+    "statuses": {
+     "wrong": 1,
+     "correct": 1
+    },
+    "interval95": [
+     0.09452865480086611,
+     0.905471345199134
+    ]
+   },
+   "basePeak [cyclic / other]": {
+    "n": 4,
+    "correct": 1,
+    "statuses": {
+     "wrong": 3,
+     "correct": 1
+    },
+    "interval95": [
+     0.045586062644636216,
+     0.6993639475573634
+    ]
+   },
+   "basePeak [ether]": {
+    "n": 4,
+    "correct": 0,
+    "statuses": {
+     "wrong": 4
+    },
+    "interval95": [
+     0,
+     0.48990002040399916
+    ]
+   },
+   "basePeak [ester]": {
+    "n": 5,
+    "correct": 4,
+    "statuses": {
+     "correct": 4,
+     "wrong": 1
+    },
+    "interval95": [
+     0.37552826411853885,
+     0.9637768390302125
+    ]
+   },
+   "basePeak [acid]": {
+    "n": 1,
+    "correct": 0,
+    "statuses": {
+     "wrong": 1
+    },
+    "interval95": [
+     0,
+     0.7934567085261071
+    ]
+   }
+  },
+  "ir": {
+   "irPresent": {
+    "n": 34,
+    "correct": 19,
+    "statuses": {
+     "correct": 19,
+     "wrong": 15
+    },
+    "interval95": [
+     0.3945361778918369,
+     0.7111675978470325
+    ]
+   },
+   "irAbsent": {
+    "n": 41,
+    "correct": 41,
+    "statuses": {
+     "correct": 41
+    },
+    "interval95": [
+     0.9143295511310926,
+     1
+    ]
+   },
+   "irPresentBands": {
+    "listed": 41,
+    "ok": 26
+   },
+   "irAbsentBands": {
+    "listed": 171,
+    "ok": 171
+   }
+  },
+  "reactions": {
+   "connectivity": {
+    "n": 36,
+    "correct": 30,
+    "statuses": {
+     "correct": 30,
+     "wrong": 4,
+     "abstained": 2
+    },
+    "interval95": [
+     0.6810888526532568,
+     0.921296593714359
+    ]
+   },
+   "regiochemistry": {
+    "n": 13,
+    "correct": 7,
+    "statuses": {
+     "correct": 7,
+     "abstained": 3,
+     "wrong": 1,
+     "unclaimed-abstained": 2
+    },
+    "interval95": [
+     0.29143432431832045,
+     0.7679424569851186
+    ]
+   },
+   "ranking": {
+    "n": 5,
+    "correct": 0,
+    "statuses": {
+     "abstained": 5
+    },
+    "interval95": [
+     0,
+     0.43449149475208104
+    ]
+   },
+   "ambiguity": {
+    "n": 3,
+    "correct": 3,
+    "statuses": {
+     "correct": 3
+    },
+    "interval95": [
+     0.4384939195509822,
+     1
+    ]
+   },
+   "stereochemistry": {
+    "n": 3,
+    "correct": 1,
+    "statuses": {
+     "incomplete": 2,
+     "correct": 1
+    },
+    "interval95": [
+     0.061490315276160515,
+     0.7923450448735121
+    ]
+   }
+  },
+  "reactions (provisional)": {
+   "connectivity": {
+    "n": 8,
+    "correct": 8,
+    "statuses": {
+     "correct": 8
+    },
+    "interval95": [
+     0.6755843804891231,
+     1
+    ]
+   },
+   "regiochemistry": {
+    "n": 2,
+    "correct": 2,
+    "statuses": {
+     "correct": 2
+    },
+    "interval95": [
+     0.3423719528896193,
+     1
+    ]
+   }
+  },
+  "synthesis": {
+   "routeDiscovery": {
+    "n": 6,
+    "correct": 6,
+    "statuses": {
+     "found": 6
+    },
+    "interval95": [
+     0.6096569663469354,
+     1
+    ]
+   }
+  },
+  "synthesis (provisional)": {
+   "routeDiscovery": {
+    "n": 4,
+    "correct": 4,
+    "statuses": {
+     "found": 4
+    },
+    "interval95": [
+     0.5100999795960008,
+     1
+    ]
+   }
+  }
+ }
+}
