@@ -48,3 +48,18 @@ describe("Joback boiling-point estimate", () => {
     assert.match(m.detail, /amide/);
   });
 });
+
+describe("Hammett sigma-p substituent strength (Hansch, Leo & Taft 1991)", () => {
+  test("EWG order nitrobenzene (0.78) > benzonitrile (0.66) > acetophenone (0.50) > chlorobenzene (0.23) > toluene (none)", async () => {
+    const r = await ranks("ewgStrength", ["O=[N+]([O-])c1ccccc1", "N#Cc1ccccc1", "CC(=O)c1ccccc1", "Clc1ccccc1"]);
+    assert.deepEqual(r, [1, 2, 3, 4]);
+  });
+  test("EDG order dimethylaniline (-0.83) > aniline (-0.66) > anisole (-0.27) > toluene (-0.17)", async () => {
+    const r = await ranks("edgStrength", ["CN(C)c1ccccc1", "Nc1ccccc1", "COc1ccccc1", "Cc1ccccc1"]);
+    assert.deepEqual(r, [1, 2, 3, 4]);
+  });
+  test("a molecule with no tabulated donor is unranked, not given a zero", async () => {
+    const m = (await profileOf("O=[N+]([O-])c1ccccc1")).metrics.edgStrength;
+    assert.equal(m.score, null);
+  });
+});

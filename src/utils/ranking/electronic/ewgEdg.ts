@@ -1,5 +1,6 @@
 import type { ComparisonMetric, ComparisonModeId } from "../comparisonTypes";
 import { metric, strongestNamedEffect, type NamedEffect } from "../comparisonUtils";
+import { GROUP_SIGMA_P, type AromaticHammettEffects, type HammettEffect } from "./hammett";
 
 const EWG_WEIGHTS: Record<string, number> = {
   "Quaternary ammonium": 5,
@@ -59,23 +60,39 @@ export type DonorAcceptorEffects = {
 export function applyEwgEdgMetrics(
   metrics: Record<ComparisonModeId, ComparisonMetric>,
   names: string[],
+  aromatic: AromaticHammettEffects | null = null,
 ): DonorAcceptorEffects {
   const strongestEwg = strongestNamedEffect(names, EWG_WEIGHTS);
   const strongestEdg = strongestNamedEffect(names, EDG_WEIGHTS);
 
+  // One scale for both modes: Hammett sigma_p (Hansch, Leo & Taft 1991). Tabulated ring substituents decide when the molecule has any; otherwise
+  // the recognised functional groups are mapped to the sigma_p of the matching substituent. The 0-5 weights above stay for the other modes.
+  let withdrawing: HammettEffect | null = null;
+  let donating: HammettEffect | null = null;
+  if (aromatic?.found) {
+    withdrawing = aromatic.strongestWithdrawing;
+    donating = aromatic.strongestDonating;
+  } else {
+    for (const name of names) {
+      const sigma = GROUP_SIGMA_P[name];
+      if (sigma === undefined) continue;
+      if (sigma > 0 && (!withdrawing || sigma > withdrawing.sigmaP)) withdrawing = { name, sigmaP: sigma };
+      if (sigma < 0 && (!donating || sigma < donating.sigmaP)) donating = { name, sigmaP: sigma };
+    }
+  }
+  const basis = aromatic?.found
+    ? "Hammett sigma_p of the ring substituent (Hansch, Leo & Taft, Chem. Rev. 1991)."
+    : "Functional group mapped to the sigma_p of the matching substituent (an approximation for non-aromatic groups).";
+
   metrics.ewgStrength = metric(
-    strongestEwg.score || null,
-    strongestEwg.name
-      ? `${strongestEwg.name} · ${strongestEwg.score.toFixed(1)}/5`
-      : "No strong EWG detected",
-    "This is the strongest detected substituent-level withdrawing effect, not a single whole-molecule Hammett constant.",
+    withdrawing ? withdrawing.sigmaP : null,
+    withdrawing ? `${withdrawing.name} · σp +${withdrawing.sigmaP.toFixed(2)}` : "No tabulated electron-withdrawing substituent",
+    `Strongest withdrawing substituent by ${basis}`,
   );
   metrics.edgStrength = metric(
-    strongestEdg.score || null,
-    strongestEdg.name
-      ? `${strongestEdg.name} · ${strongestEdg.score.toFixed(1)}/5`
-      : "No strong EDG detected",
-    "This is the strongest detected substituent-level donating effect.",
+    donating ? -donating.sigmaP : null,
+    donating ? `${donating.name} · σp ${donating.sigmaP.toFixed(2)}` : "No tabulated electron-donating substituent",
+    `Strongest donating substituent by ${basis}`,
   );
 
   return { strongestEwg, strongestEdg };

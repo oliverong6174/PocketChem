@@ -12,6 +12,7 @@ import {
   groupNames,
 } from "./comparisonUtils";
 import { applyEwgEdgMetrics } from "./electronic/ewgEdg";
+import { aromaticHammettEffects } from "./electronic/hammett";
 import { applyInductiveMetrics } from "./electronic/inductiveEffects";
 import { applyResonanceEffectMetrics } from "./electronic/resonanceEffects";
 import { applyStabilityMetrics } from "./stability/stabilityComparisons";
@@ -214,7 +215,11 @@ export async function analyzeComparisonMolecule(
     ]);
 
     const metrics = createEmptyMetrics();
-    const { strongestEwg, strongestEdg } = applyEwgEdgMetrics(metrics, names);
+    const { strongestEwg, strongestEdg } = applyEwgEdgMetrics(
+      metrics,
+      names,
+      aromaticHammettEffects(RDKit as never, mol as never),
+    );
     const strongestInductive = applyInductiveMetrics(metrics, names);
     const { strongestResDonor, strongestResWithdrawer } =
       applyResonanceEffectMetrics(metrics, names);
