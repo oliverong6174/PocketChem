@@ -13,7 +13,7 @@
 import type { SpectroscopyResult } from "../spectroscopy/types";
 
 /** Bump when the shape or meaning of saved spectroscopy results changes. */
-export const SPECTROSCOPY_ENGINE_VERSION = 1;
+export const SPECTROSCOPY_ENGINE_VERSION = 2;
 
 export type SpectroscopyTabId = "proton" | "carbon" | "ir" | "mass";
 

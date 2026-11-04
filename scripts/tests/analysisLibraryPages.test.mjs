@@ -76,7 +76,8 @@ const validators = () => ({
 const makeLibrary = (backend = new store.MemoryBackend(), options = {}) => new lib.AnalysisLibrary(backend, { validators: validators(), newId, ...options });
 const ok = (result) => { assert.equal(result.ok, true, result.ok ? "" : JSON.stringify(result.error)); return result.value; };
 const failed = (result, code) => { assert.equal(result.ok, false); assert.equal(result.error.code, code, result.error.message); };
-const envelope = (data, extra = {}) => ({ computedAt: "2026-10-29T09:00:00.000Z", engineVersion: 1, stale: false, status: "complete", data, ...extra });
+// Results saved by the CURRENT engine of the page they belong to (Stage 9G raised the ranking and spectroscopy versions to 2).
+const envelope = (data, extra = {}) => ({ computedAt: "2026-10-29T09:00:00.000Z", engineVersion: "spectra" in data || "result" in data ? spectroWs.SPECTROSCOPY_ENGINE_VERSION : rankingWs.RANKING_ENGINE_VERSION, stale: false, status: "complete", data, ...extra });
 
 const descMode = () => modes.COMPARISON_MODES.find((mode) => mode.direction === "desc").id;
 const noneMode = () => modes.COMPARISON_MODES.find((mode) => mode.direction === "none").id;

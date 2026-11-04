@@ -13,8 +13,8 @@
 import { COMPARISON_CATEGORIES, COMPARISON_MODES } from "../ranking/comparisonModes";
 import type { ComparisonCategory, ComparisonMetric, ComparisonModeId, ComparisonProfile } from "../ranking/comparisonTypes";
 
-/** Bump when the shape or meaning of saved ranking profiles changes. */
-export const RANKING_ENGINE_VERSION = 1;
+/** Bump when the shape or meaning of saved ranking profiles changes. 2: Stage 9G (Joback boiling points, Hammett sigma-p EWG/EDG scale, solubility and alkene tie-breaks). */
+export const RANKING_ENGINE_VERSION = 2;
 export const MAX_RANKING_MOLECULES = 5;
 
 export type RankingWorkspaceInputs = {
