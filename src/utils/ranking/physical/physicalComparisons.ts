@@ -57,17 +57,22 @@ export function applyPhysicalMetrics(
   boiling: BoilingPointRankingResult | null,
   solubility: SolubilityRankingResult | null,
 ): PhysicalSummary {
-  metrics.boilingPoint = boiling
-    ? metric(
-        boiling.boilingPointScore,
-        `${boiling.tendency} · score ${boiling.boilingPointScore.toFixed(1)}`,
-        boiling.explanation,
-        boiling.factors,
-        // The qualitative score decides first. Ties (isomers, or molecules the coarse bins cannot separate) fall back to molecular mass and then
-        // to skeleton compactness, so n-butanol > sec-butanol > tert-butanol and ethyl acetate > methyl formate.
-        [boiling.boilingPointScore, Math.round(boiling.molecularWeight ?? 0), wienerIndex(graph)],
-      )
-    : emptyMetric("Boiling-point tendency could not be estimated.");
+  metrics.boilingPoint =
+    boiling && boiling.jobackBoilingPointK !== null
+      ? metric(
+          boiling.jobackBoilingPointK,
+          `Joback estimate ≈ ${Math.round(boiling.jobackBoilingPointK - 273.15)} °C (${boiling.tendency} tendency)`,
+          "Group-contribution estimate (Joback & Reid 1987; typical error about 12 K, larger for strongly hydrogen-bonded or unusual structures). It orders the molecules; it is not a measured boiling point.",
+          boiling.factors,
+          // Estimate in kelvin decides first. Equal estimates (branching and stereoisomers that the additive groups cannot see) fall back to
+          // cis-alkene dipole, then molecular mass, then skeleton compactness.
+          [Math.round(boiling.jobackBoilingPointK), boiling.cisAlkeneCount, Math.round(boiling.molecularWeight ?? 0), wienerIndex(graph)],
+        )
+      : emptyMetric(
+          boiling?.jobackUnavailableReason
+            ? `Boiling point not ranked: the structure ${boiling.jobackUnavailableReason}.`
+            : "Boiling-point tendency could not be estimated.",
+        );
   metrics.solubility = solubility
     ? metric(
         solubility.waterSolubilityScore,
