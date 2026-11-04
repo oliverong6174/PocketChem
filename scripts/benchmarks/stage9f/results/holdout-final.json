@@ -1,0 +1,5058 @@
+{
+ "meta": {
+  "set": "holdout",
+  "engineCommit": "5023678412937cfc88fec9a13b6598a9e3fb9824",
+  "dirtySrc": false,
+  "runAt": "2026-11-04T14:11:21.098Z",
+  "node": "v24.21.0",
+  "peakRssMB": 372,
+  "cases": 124,
+  "manifestHash": "b9c9e29f16de38390515b7dfdecdcda760b71fc97d6890809dc8b32119113c31"
+ },
+ "summary": {
+  "nomenclature": {
+   "name [inferred]": {
+    "correct": 1
+   },
+   "constitutionName [inferred]": {
+    "correct": 1
+   },
+   "systematicName [inferred]": {
+    "correct": 1
+   },
+   "name [verified]": {
+    "correct": 17,
+    "wrong-flagged": 6,
+    "wrong-confident": 3,
+    "abstained": 1
+   },
+   "constitutionName [verified]": {
+    "correct": 18,
+    "wrong": 8,
+    "abstained": 1
+   },
+   "systematicName [verified]": {
+    "correct": 21,
+    "wrong-flagged": 2,
+    "wrong-confident": 3,
+    "abstained": 1
+   }
+  },
+  "properties": {
+   "formula [verified]": {
+    "correct": 17,
+    "wrong": 1
+   },
+   "molecularWeight [verified]": {
+    "correct": 18
+   },
+   "exactMass [verified]": {
+    "correct": 18
+   },
+   "dbe [verified]": {
+    "correct": 18
+   },
+   "ringCount [verified]": {
+    "correct": 18
+   },
+   "formalCharge [verified]": {
+    "correct": 18
+   },
+   "logP [verified]": {
+    "correct": 6,
+    "wrong": 3
+   }
+  },
+  "reactions": {
+   "connectivity [verified]": {
+    "correct": 11,
+    "wrong": 4
+   },
+   "regiochemistry [verified]": {
+    "correct": 4,
+    "abstained": 5,
+    "wrong": 3
+   },
+   "stereochemistry [verified]": {
+    "incomplete": 2,
+    "correct": 5
+   },
+   "ranking [verified]": {
+    "abstained": 6
+   },
+   "connectivity [inferred]": {
+    "abstained": 1,
+    "correct": 2
+   },
+   "regiochemistry [inferred]": {
+    "correct": 1
+   },
+   "ranking [inferred]": {
+    "abstained": 1
+   },
+   "ambiguity [verified]": {
+    "correct": 1
+   }
+  },
+  "ranking": {
+   "order [verified]": {
+    "wrong": 14,
+    "correct": 7,
+    "abstained": 3
+   },
+   "order [inferred]": {
+    "wrong": 1,
+    "abstained": 1,
+    "correct": 2
+   }
+  },
+  "synthesis": {
+   "routeDiscovery [verified]": {
+    "found": 2,
+    "timeout": 1
+   },
+   "routeVerification [verified]": {
+    "verified": 2
+   },
+   "routeLength [verified]": {
+    "within-range": 1,
+    "shorter": 1
+   },
+   "avoidance [verified]": {
+    "correct": 2
+   },
+   "routeDiscovery [inferred]": {
+    "timeout": 3,
+    "found": 1
+   },
+   "routeVerification [inferred]": {
+    "verified": 1
+   },
+   "routeLength [inferred]": {
+    "within-range": 1
+   },
+   "avoidance [inferred]": {
+    "correct": 1
+   }
+  },
+  "spectroscopy": {
+   "irPresent [verified]": {
+    "correct": 23
+   },
+   "irAbsent [verified]": {
+    "correct": 19,
+    "wrong": 2
+   },
+   "hCount [verified]": {
+    "correct": 22,
+    "wrong": 3
+   },
+   "cCount [verified]": {
+    "correct": 25
+   },
+   "cShifts [verified]": {
+    "correct": 9
+   },
+   "molecularIon [verified]": {
+    "correct": 24
+   },
+   "basePeak [verified]": {
+    "wrong": 14,
+    "correct": 11
+   },
+   "fragments [verified]": {
+    "correct": 7,
+    "wrong": 17
+   },
+   "hShifts [verified]": {
+    "correct": 10
+   },
+   "isotopeM2 [verified]": {
+    "correct": 3
+   }
+  }
+ },
+ "records": [
+  {
+   "id": "NM-02",
+   "capability": "nomenclature",
+   "category": "acyclic",
+   "evidence": "inferred",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "(3S,4R)-3,4-dimethylhexane"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "(3S,4R)-3,4-dimethylhexane"
+    }
+   },
+   "engine": {
+    "displayName": "(3S,4R)-3,4-dimethylhexane",
+    "estimatedName": "(3S,4R)-3,4-dimethylhexane",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 220
+  },
+  {
+   "id": "NM-05",
+   "capability": "nomenclature",
+   "category": "acyclic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "4,4-dimethylpent-2-yne"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "4,4-dimethylpent-2-yne"
+    }
+   },
+   "engine": {
+    "displayName": "4,4-dimethylpent-2-yne",
+    "estimatedName": "4,4-dimethylpent-2-yne",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 30
+  },
+  {
+   "id": "NM-06",
+   "capability": "nomenclature",
+   "category": "acyclic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "2-methylbuta-1,3-diene"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "2-methylbuta-1,3-diene"
+    }
+   },
+   "engine": {
+    "displayName": "2-methylbuta-1,3-diene",
+    "estimatedName": "2-methylbuta-1,3-diene",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 10
+  },
+  {
+   "id": "NM-07",
+   "capability": "nomenclature",
+   "category": "acyclic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "2-methylhex-3-yne"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "2-methylhex-3-yne"
+    }
+   },
+   "engine": {
+    "displayName": "2-methylhex-3-yne",
+    "estimatedName": "2-methylhex-3-yne",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 9
+  },
+  {
+   "id": "NM-08",
+   "capability": "nomenclature",
+   "category": "acyclic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "(R)-3-methylpent-1-ene"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "(R)-3-methylpent-1-ene"
+    }
+   },
+   "engine": {
+    "displayName": "(R)-3-methylpent-1-ene",
+    "estimatedName": "(R)-3-methylpent-1-ene",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 11
+  },
+  {
+   "id": "NM-09",
+   "capability": "nomenclature",
+   "category": "acyclic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "(2E,4E)-hexa-2,4-diene"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "(2E,4E)-hexa-2,4-diene"
+    }
+   },
+   "engine": {
+    "displayName": "(2E,4E)-hexa-2,4-diene",
+    "estimatedName": "(2E,4E)-hexa-2,4-diene",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 8
+  },
+  {
+   "id": "NM-10",
+   "capability": "nomenclature",
+   "category": "acyclic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "2,2,5,5-tetramethylhex-3-yne"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "2,2,5,5-tetramethylhex-3-yne"
+    }
+   },
+   "engine": {
+    "displayName": "2,2,5,5-tetramethylhex-3-yne",
+    "estimatedName": "2,2,5,5-tetramethylhex-3-yne",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 9
+  },
+  {
+   "id": "NM-11",
+   "capability": "nomenclature",
+   "category": "acyclic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "wrong-flagged",
+     "detail": "pent-4-en-1-yne (Medium) vs pent-1-en-4-yne"
+    },
+    "constitutionName": {
+     "status": "wrong",
+     "detail": "pent-4-en-1-yne"
+    },
+    "systematicName": {
+     "status": "wrong-flagged",
+     "detail": "pent-4-en-1-yne (Medium) vs pent-1-en-4-yne"
+    }
+   },
+   "engine": {
+    "displayName": "pent-4-en-1-yne",
+    "estimatedName": "pent-4-en-1-yne",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 7
+  },
+  {
+   "id": "NM-12",
+   "capability": "nomenclature",
+   "category": "acyclic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "4-ethylheptane"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "4-ethylheptane"
+    }
+   },
+   "engine": {
+    "displayName": "4-ethylheptane",
+    "estimatedName": "4-ethylheptane",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 7
+  },
+  {
+   "id": "NM-17",
+   "capability": "nomenclature",
+   "category": "cycloalkene",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "wrong-flagged",
+     "detail": "methylcyclopent-3-ene (Medium) vs 4-methylcyclopentene"
+    },
+    "constitutionName": {
+     "status": "wrong",
+     "detail": "methylcyclopent-3-ene"
+    },
+    "systematicName": {
+     "status": "wrong-flagged",
+     "detail": "methylcyclopent-3-ene (Medium) vs 4-methylcyclopentene"
+    }
+   },
+   "engine": {
+    "displayName": "methylcyclopent-3-ene",
+    "estimatedName": "methylcyclopent-3-ene",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 14
+  },
+  {
+   "id": "NM-22",
+   "capability": "nomenclature",
+   "category": "cycloalkane",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "(2-methylpropan-2-yl)cyclohexane"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "(2-methylpropan-2-yl)cyclohexane"
+    }
+   },
+   "engine": {
+    "displayName": "(2-methylpropan-2-yl)cyclohexane",
+    "estimatedName": "(2-methylpropan-2-yl)cyclohexane",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 10
+  },
+  {
+   "id": "NM-24",
+   "capability": "nomenclature",
+   "category": "epoxide",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "wrong-confident",
+     "detail": "2,3-dimethyloxirane (High) vs (2R,3S)-2,3-dimethyloxirane"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "wrong-confident",
+     "detail": "2,3-dimethyloxirane (High) vs (2R,3S)-2,3-dimethyloxirane"
+    }
+   },
+   "engine": {
+    "displayName": "2,3-dimethyloxirane",
+    "estimatedName": "2,3-dimethyloxirane",
+    "status": "retained",
+    "confidence": "High"
+   },
+   "ms": 7
+  },
+  {
+   "id": "NM-32",
+   "capability": "nomenclature",
+   "category": "epoxide",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "wrong-confident",
+     "detail": "(R)-2-1-chloromethyloxirane (High) vs (2R)-2-(chloromethyl)oxirane"
+    },
+    "constitutionName": {
+     "status": "wrong",
+     "detail": "(R)-2-1-chloromethyloxirane"
+    },
+    "systematicName": {
+     "status": "wrong-confident",
+     "detail": "(R)-2-1-chloromethyloxirane (High) vs (2R)-2-(chloromethyl)oxirane"
+    }
+   },
+   "engine": {
+    "displayName": "(R)-2-1-chloromethyloxirane",
+    "estimatedName": "(R)-2-1-chloromethyloxirane",
+    "status": "retained",
+    "confidence": "High"
+   },
+   "ms": 7
+  },
+  {
+   "id": "NM-34",
+   "capability": "nomenclature",
+   "category": "polyfunctional",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "ethyl 3-oxobutanoate"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "ethyl 3-oxobutanoate"
+    }
+   },
+   "engine": {
+    "displayName": "ethyl 3-oxobutanoate",
+    "estimatedName": "ethyl 3-oxobutanoate",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 8
+  },
+  {
+   "id": "NM-36",
+   "capability": "nomenclature",
+   "category": "polyfunctional",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "3-hydroxypropanamide"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "3-hydroxypropanamide"
+    }
+   },
+   "engine": {
+    "displayName": "3-hydroxypropanamide",
+    "estimatedName": "3-hydroxypropanamide",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 8
+  },
+  {
+   "id": "NM-39",
+   "capability": "nomenclature",
+   "category": "polyfunctional",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "wrong-flagged",
+     "detail": "(S)-2-amino-3-methylbutanoic acid (valine) (Medium) vs (2S)-2-amino-3-methylbutanoic acid"
+    },
+    "constitutionName": {
+     "status": "wrong",
+     "detail": "(S)-2-amino-3-methylbutanoic acid (valine)"
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "(S)-2-amino-3-methylbutanoic acid"
+    }
+   },
+   "engine": {
+    "displayName": "(S)-2-amino-3-methylbutanoic acid (valine)",
+    "estimatedName": "(S)-2-amino-3-methylbutanoic acid",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 9
+  },
+  {
+   "id": "NM-41",
+   "capability": "nomenclature",
+   "category": "polyfunctional",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "wrong-confident",
+     "detail": "(E)-acrylic acid (High) vs (2E)-but-2-enedioic acid"
+    },
+    "constitutionName": {
+     "status": "wrong",
+     "detail": "(E)-acrylic acid"
+    },
+    "systematicName": {
+     "status": "wrong-confident",
+     "detail": "(E)-acrylic acid (High) vs (2E)-but-2-enedioic acid"
+    }
+   },
+   "engine": {
+    "displayName": "(E)-acrylic acid",
+    "estimatedName": "(E)-acrylic acid",
+    "status": "retained",
+    "confidence": "High"
+   },
+   "ms": 8
+  },
+  {
+   "id": "NM-42",
+   "capability": "nomenclature",
+   "category": "polyfunctional",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "wrong-flagged",
+     "detail": "propane-1,2,3-triol (glycerol) (Medium) vs propane-1,2,3-triol"
+    },
+    "constitutionName": {
+     "status": "wrong",
+     "detail": "propane-1,2,3-triol (glycerol)"
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "propane-1,2,3-triol"
+    }
+   },
+   "engine": {
+    "displayName": "propane-1,2,3-triol (glycerol)",
+    "estimatedName": "propane-1,2,3-triol",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 4
+  },
+  {
+   "id": "NM-43",
+   "capability": "nomenclature",
+   "category": "polyfunctional",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "4-hydroxy-4-methylpentan-2-one"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "4-hydroxy-4-methylpentan-2-one"
+    }
+   },
+   "engine": {
+    "displayName": "4-hydroxy-4-methylpentan-2-one",
+    "estimatedName": "4-hydroxy-4-methylpentan-2-one",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 5
+  },
+  {
+   "id": "NM-44",
+   "capability": "nomenclature",
+   "category": "polyfunctional",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "ethyl 4-chloro-3-hydroxybutanoate"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "ethyl 4-chloro-3-hydroxybutanoate"
+    }
+   },
+   "engine": {
+    "displayName": "ethyl 4-chloro-3-hydroxybutanoate",
+    "estimatedName": "ethyl 4-chloro-3-hydroxybutanoate",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 6
+  },
+  {
+   "id": "NM-45",
+   "capability": "nomenclature",
+   "category": "aromatic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "1,3,5-trimethylbenzene"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "1,3,5-trimethylbenzene"
+    }
+   },
+   "engine": {
+    "displayName": "1,3,5-trimethylbenzene",
+    "estimatedName": "1,3,5-trimethylbenzene",
+    "status": "systematic",
+    "confidence": "High"
+   },
+   "ms": 11
+  },
+  {
+   "id": "NM-47",
+   "capability": "nomenclature",
+   "category": "aromatic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "4-aminobenzoic acid"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "4-aminobenzoic acid"
+    }
+   },
+   "engine": {
+    "displayName": "4-aminobenzoic acid",
+    "estimatedName": "4-aminobenzoic acid",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 10
+  },
+  {
+   "id": "NM-48",
+   "capability": "nomenclature",
+   "category": "heteroaromatic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "2-chloro-5-methylpyridine"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "2-chloro-5-methylpyridine"
+    }
+   },
+   "engine": {
+    "displayName": "2-chloro-5-methylpyridine",
+    "estimatedName": "2-chloro-5-methylpyridine",
+    "status": "retained",
+    "confidence": "High"
+   },
+   "ms": 4
+  },
+  {
+   "id": "NM-53",
+   "capability": "nomenclature",
+   "category": "bicyclic",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "bicyclo[2.2.1]heptane"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "bicyclo[2.2.1]heptane"
+    }
+   },
+   "engine": {
+    "displayName": "bicyclo[2.2.1]heptane",
+    "estimatedName": "bicyclo[2.2.1]heptane",
+    "status": "systematic",
+    "confidence": "High"
+   },
+   "ms": 9
+  },
+  {
+   "id": "NM-59",
+   "capability": "nomenclature",
+   "category": "stereo",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "wrong-flagged",
+     "detail": "(2R,3R)-2,3-dihydroxybutanedioic acid (tartaric acid) (Medium) vs (2R,3R)-2,3-dihydroxybutanedioic acid"
+    },
+    "constitutionName": {
+     "status": "wrong",
+     "detail": "(2R,3R)-2,3-dihydroxybutanedioic acid (tartaric acid)"
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "(2R,3R)-2,3-dihydroxybutanedioic acid"
+    }
+   },
+   "engine": {
+    "displayName": "(2R,3R)-2,3-dihydroxybutanedioic acid (tartaric acid)",
+    "estimatedName": "(2R,3R)-2,3-dihydroxybutanedioic acid",
+    "status": "systematic",
+    "confidence": "Medium"
+   },
+   "ms": 6
+  },
+  {
+   "id": "NM-61",
+   "capability": "nomenclature",
+   "category": "stereo",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "wrong-flagged",
+     "detail": "(2S,3R)-2-amino-3-hydroxybutanoic acid (threonine) (Low) vs (2S,3R)-2-amino-3-hydroxybutanoic acid"
+    },
+    "constitutionName": {
+     "status": "wrong",
+     "detail": "(2S,3R)-2-amino-3-hydroxybutanoic acid (threonine)"
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "(2S,3R)-2-amino-3-hydroxybutanoic acid"
+    }
+   },
+   "engine": {
+    "displayName": "(2S,3R)-2-amino-3-hydroxybutanoic acid (threonine)",
+    "estimatedName": "(2S,3R)-2-amino-3-hydroxybutanoic acid",
+    "status": "systematic",
+    "confidence": "Low"
+   },
+   "ms": 10
+  },
+  {
+   "id": "NM-62",
+   "capability": "nomenclature",
+   "category": "stereo",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "correct",
+     "detail": "(E)-cinnamic acid"
+    },
+    "constitutionName": {
+     "status": "correct",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "correct",
+     "detail": "(E)-cinnamic acid"
+    }
+   },
+   "engine": {
+    "displayName": "(E)-cinnamic acid",
+    "estimatedName": "(E)-cinnamic acid",
+    "status": "retained",
+    "confidence": "High"
+   },
+   "ms": 12
+  },
+  {
+   "id": "NM-66",
+   "capability": "nomenclature",
+   "category": "difficult",
+   "evidence": "verified",
+   "dimensions": {
+    "name": {
+     "status": "abstained",
+     "detail": "status unsupported: Name not available (unsupported structure)"
+    },
+    "constitutionName": {
+     "status": "abstained",
+     "detail": ""
+    },
+    "systematicName": {
+     "status": "abstained",
+     "detail": "status unsupported: Name not available (unsupported structure)"
+    }
+   },
+   "engine": {
+    "displayName": "Name not available (unsupported structure)",
+    "estimatedName": "Name not available (unsupported structure)",
+    "status": "unsupported",
+    "confidence": "Low"
+   },
+   "ms": 14
+  },
+  {
+   "id": "PR-01",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "formula": "C2H3O2",
+    "mw": "59.04",
+    "exactMass": "59.0138",
+    "dbe": 1,
+    "rings": 0,
+    "charge": -1,
+    "logP": "-1.24"
+   },
+   "ms": 9
+  },
+  {
+   "id": "PR-02",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "formula": "H4N",
+    "mw": "18.04",
+    "exactMass": "18.0338",
+    "dbe": 0,
+    "rings": 0,
+    "charge": 1,
+    "logP": "0.38"
+   },
+   "ms": 5
+  },
+  {
+   "id": "PR-03",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "wrong",
+     "detail": "O4S vs O4S2-"
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "formula": "O4S",
+    "mw": "96.06",
+    "exactMass": "95.9528",
+    "dbe": 0,
+    "rings": 0,
+    "charge": -2,
+    "logP": "-1.34"
+   },
+   "ms": 6
+  },
+  {
+   "id": "PR-04",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    },
+    "logP": {
+     "status": "correct",
+     "detail": "2.55 vs 2.83"
+    }
+   },
+   "engine": {
+    "formula": "CCl4",
+    "mw": "153.82",
+    "exactMass": "151.8754",
+    "dbe": 0,
+    "rings": 0,
+    "charge": 0,
+    "logP": "2.55"
+   },
+   "ms": 8
+  },
+  {
+   "id": "PR-06",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "formula": "C7H5F3",
+    "mw": "146.11",
+    "exactMass": "146.0343",
+    "dbe": 4,
+    "rings": 1,
+    "charge": 0,
+    "logP": "2.71"
+   },
+   "ms": 18
+  },
+  {
+   "id": "PR-07",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "formula": "C2H6S",
+    "mw": "62.14",
+    "exactMass": "62.0190",
+    "dbe": 0,
+    "rings": 0,
+    "charge": 0,
+    "logP": "0.98"
+   },
+   "ms": 13
+  },
+  {
+   "id": "PR-08",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    },
+    "logP": {
+     "status": "wrong",
+     "detail": "-0.01 vs -1.35"
+    }
+   },
+   "engine": {
+    "formula": "C2H6OS",
+    "mw": "78.14",
+    "exactMass": "78.0139",
+    "dbe": 0,
+    "rings": 0,
+    "charge": 0,
+    "logP": "-0.01"
+   },
+   "ms": 10
+  },
+  {
+   "id": "PR-11",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "formula": "[13C]H4",
+    "mw": "17.04",
+    "exactMass": "17.0346",
+    "dbe": 0,
+    "rings": 0,
+    "charge": 0,
+    "logP": "0.64"
+   },
+   "ms": 6
+  },
+  {
+   "id": "PR-13",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "formula": "C[13C]H4O2",
+    "mw": "61.04",
+    "exactMass": "61.0245",
+    "dbe": 1,
+    "rings": 0,
+    "charge": 0,
+    "logP": "0.09"
+   },
+   "ms": 4
+  },
+  {
+   "id": "PR-15",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    },
+    "logP": {
+     "status": "correct",
+     "detail": "-1.03 vs -0.07"
+    }
+   },
+   "engine": {
+    "formula": "C8H10N4O2",
+    "mw": "194.19",
+    "exactMass": "194.0804",
+    "dbe": 6,
+    "rings": 2,
+    "charge": 0,
+    "logP": "-1.03"
+   },
+   "ms": 10
+  },
+  {
+   "id": "PR-16",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    },
+    "logP": {
+     "status": "correct",
+     "detail": "1.31 vs 1.19"
+    }
+   },
+   "engine": {
+    "formula": "C9H8O4",
+    "mw": "180.16",
+    "exactMass": "180.0422",
+    "dbe": 6,
+    "rings": 1,
+    "charge": 0,
+    "logP": "1.31"
+   },
+   "ms": 8
+  },
+  {
+   "id": "PR-17",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    },
+    "logP": {
+     "status": "correct",
+     "detail": "3.07 vs 3.97"
+    }
+   },
+   "engine": {
+    "formula": "C13H18O2",
+    "mw": "206.28",
+    "exactMass": "206.1307",
+    "dbe": 5,
+    "rings": 1,
+    "charge": 0,
+    "logP": "3.07"
+   },
+   "ms": 11
+  },
+  {
+   "id": "PR-18",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "formula": "C27H46O",
+    "mw": "386.66",
+    "exactMass": "386.3549",
+    "dbe": 5,
+    "rings": 4,
+    "charge": 0,
+    "logP": "7.39"
+   },
+   "ms": 74
+  },
+  {
+   "id": "PR-21",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "formula": "C20H42",
+    "mw": "282.56",
+    "exactMass": "282.3286",
+    "dbe": 0,
+    "rings": 0,
+    "charge": 0,
+    "logP": "8.05"
+   },
+   "ms": 8
+  },
+  {
+   "id": "PR-25",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    },
+    "logP": {
+     "status": "correct",
+     "detail": "2.34 vs 2.84"
+    }
+   },
+   "engine": {
+    "formula": "C6H5Cl",
+    "mw": "112.56",
+    "exactMass": "112.0080",
+    "dbe": 4,
+    "rings": 1,
+    "charge": 0,
+    "logP": "2.34"
+   },
+   "ms": 5
+  },
+  {
+   "id": "PR-26",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    },
+    "logP": {
+     "status": "correct",
+     "detail": "-0.11 vs -0.35"
+    }
+   },
+   "engine": {
+    "formula": "CH3NO2",
+    "mw": "61.04",
+    "exactMass": "61.0164",
+    "dbe": 1,
+    "rings": 0,
+    "charge": 0,
+    "logP": "-0.11"
+   },
+   "ms": 4
+  },
+  {
+   "id": "PR-29",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    },
+    "logP": {
+     "status": "wrong",
+     "detail": "-0.98 vs -2.11"
+    }
+   },
+   "engine": {
+    "formula": "CH4N2O",
+    "mw": "60.06",
+    "exactMass": "60.0324",
+    "dbe": 1,
+    "rings": 0,
+    "charge": 0,
+    "logP": "-0.98"
+   },
+   "ms": 4
+  },
+  {
+   "id": "PR-30",
+   "capability": "properties",
+   "category": "properties",
+   "evidence": "verified",
+   "dimensions": {
+    "formula": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularWeight": {
+     "status": "correct",
+     "detail": ""
+    },
+    "exactMass": {
+     "status": "correct",
+     "detail": ""
+    },
+    "dbe": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ringCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "formalCharge": {
+     "status": "correct",
+     "detail": ""
+    },
+    "logP": {
+     "status": "wrong",
+     "detail": "6.33 vs 8.23"
+    }
+   },
+   "engine": {
+    "formula": "C18H36O2",
+    "mw": "284.48",
+    "exactMass": "284.2715",
+    "dbe": 1,
+    "rings": 0,
+    "charge": 0,
+    "logP": "6.33"
+   },
+   "ms": 9
+  },
+  {
+   "id": "RX-01",
+   "capability": "reactions",
+   "category": "epoxide opening (acid, tertiary carbon)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "epoxide-hx-opening-hcl"
+    ],
+    "offered": [
+     "CC(O)C(C)(C)Cl"
+    ],
+    "levels": [
+     "CC(O)C(C)(C)Cl:none"
+    ]
+   },
+   "ms": 296
+  },
+  {
+   "id": "RX-05",
+   "capability": "reactions",
+   "category": "epoxide opening (acid, cyclic, trans)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "correct",
+     "detail": ""
+    },
+    "stereochemistry": {
+     "status": "incomplete",
+     "detail": "stereochemistry unspecified"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "epoxide-hx-opening-hcl"
+    ],
+    "offered": [
+     "CC1(Cl)CCCCC1O"
+    ],
+    "levels": [
+     "CC1(Cl)CCCCC1O:none"
+    ]
+   },
+   "ms": 338
+  },
+  {
+   "id": "RX-06",
+   "capability": "reactions",
+   "category": "epoxide opening (Grignard)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": [
+     "CC[Mg]Br"
+    ],
+    "claimingRules": [
+     "epoxide-grignard-opening"
+    ],
+    "offered": [
+     "CCCCC(O)CCC"
+    ],
+    "levels": [
+     "CCCCC(O)CCC:none"
+    ]
+   },
+   "ms": 333
+  },
+  {
+   "id": "RX-07",
+   "capability": "reactions",
+   "category": "epoxide opening (hydride)",
+   "evidence": "inferred",
+   "dimensions": {
+    "connectivity": {
+     "status": "abstained",
+     "detail": "no rule claims reagents lialh4/lah/lithiumaluminumhydride/lithiumaluminiumhydride/hydride"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 688
+  },
+  {
+   "id": "RX-09",
+   "capability": "reactions",
+   "category": "epoxide opening (aqueous acid, stereo)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "stereochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "ether-cleavage-hbr",
+     "ether-cleavage-hi",
+     "epoxide-acid-water-opening",
+     "epoxide-base-hydroxide-opening",
+     "epoxide-hx-opening-hbr",
+     "epoxide-hx-opening-hcl",
+     "epoxide-hx-opening-hi"
+    ],
+    "offered": [
+     "C[CH]Br",
+     "C[CH]O",
+     "C[CH]I",
+     "C[C@@H](O)[C@@H](C)O",
+     "C[C@H](O)[C@H](C)O",
+     "C[C@@H](O)[C@@H](C)Br",
+     "C[C@H](O)[C@H](C)Br",
+     "C[C@@H](O)[C@@H](C)Cl",
+     "C[C@H](O)[C@H](C)Cl",
+     "C[C@@H](O)[C@@H](C)I",
+     "C[C@H](O)[C@H](C)I"
+    ],
+    "levels": [
+     "C[CH]Br.C[CH]O:none",
+     "C[CH]I.C[CH]O:none",
+     "C[C@@H](O)[C@@H](C)O:none",
+     "C[C@@H](O)[C@@H](C)O:none",
+     "C[C@@H](O)[C@@H](C)Br:none",
+     "C[C@@H](O)[C@@H](C)Cl:none",
+     "C[C@@H](O)[C@@H](C)I:none"
+    ]
+   },
+   "ms": 468
+  },
+  {
+   "id": "RX-11",
+   "capability": "reactions",
+   "category": "E2 (Hofmann, bulky base)",
+   "evidence": "inferred",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "haloalkane-e2-hofmann"
+    ],
+    "offered": [
+     "C=C(C)CCC",
+     "CCC=C(C)C"
+    ],
+    "levels": [
+     "C=C(C)CCC:major",
+     "CCC=C(C)C:competitive"
+    ]
+   },
+   "ms": 253
+  },
+  {
+   "id": "RX-12",
+   "capability": "reactions",
+   "category": "E2 (ring, anti-periplanar)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    },
+    "stereochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "haloalkane-e2-hydroxide",
+     "haloalkane-e2-zaitsev"
+    ],
+    "offered": [
+     "CC(C)C1=CC[C@H](C)CC1",
+     "CC(C)[C@H]1C=C[C@H](C)CC1"
+    ],
+    "levels": [
+     "CC(C)C1=CC[C@H](C)CC1:none",
+     "CC(C)[C@H]1C=C[C@H](C)CC1:none",
+     "CC(C)C1=CC[C@H](C)CC1:none",
+     "CC(C)[C@H]1C=C[C@H](C)CC1:none"
+    ]
+   },
+   "ms": 1483
+  },
+  {
+   "id": "RX-13",
+   "capability": "reactions",
+   "category": "E2 (ring, anti-periplanar, non-Zaitsev)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    },
+    "stereochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "haloalkane-e2-hydroxide",
+     "haloalkane-e2-zaitsev"
+    ],
+    "offered": [
+     "CC(C)C1=CC[C@H](C)CC1",
+     "CC(C)[C@H]1C=C[C@H](C)CC1"
+    ],
+    "levels": [
+     "CC(C)C1=CC[C@H](C)CC1:none",
+     "CC(C)[C@H]1C=C[C@H](C)CC1:none",
+     "CC(C)C1=CC[C@H](C)CC1:none",
+     "CC(C)[C@H]1C=C[C@H](C)CC1:none"
+    ]
+   },
+   "ms": 917
+  },
+  {
+   "id": "RX-17",
+   "capability": "reactions",
+   "category": "EAS (steric ortho blocking)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "aromatic-nitration",
+     "aromatic-sulfonation",
+     "aromatic-halogenation-iodination"
+    ],
+    "offered": [
+     "CC(C)(C)c1ccccc1[N+](=O)[O-]",
+     "CC(C)(C)c1ccc([N+](=O)[O-])cc1",
+     "CC(C)(C)c1ccccc1S(=O)(=O)O",
+     "CC(C)(C)c1ccc(S(=O)(=O)O)cc1",
+     "CC(C)(C)c1ccccc1I",
+     "CC(C)(C)c1ccc(I)cc1"
+    ],
+    "levels": [
+     "CC(C)(C)c1ccccc1[N+](=O)[O-]:none",
+     "CC(C)(C)c1ccc([N+](=O)[O-])cc1:none",
+     "CC(C)(C)c1ccccc1S(=O)(=O)O:none",
+     "CC(C)(C)c1ccc(S(=O)(=O)O)cc1:none",
+     "CC(C)(C)c1ccccc1I:none",
+     "CC(C)(C)c1ccc(I)cc1:none"
+    ]
+   },
+   "ms": 201
+  },
+  {
+   "id": "RX-18",
+   "capability": "reactions",
+   "category": "EAS (amide-protected aniline)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "aromatic-nitration",
+     "aromatic-sulfonation",
+     "aromatic-halogenation-iodination"
+    ],
+    "offered": [
+     "CC(=O)Nc1ccccc1[N+](=O)[O-]",
+     "CC(=O)Nc1ccc([N+](=O)[O-])cc1",
+     "CC(=O)Nc1ccccc1S(=O)(=O)O",
+     "CC(=O)Nc1ccc(S(=O)(=O)O)cc1",
+     "CC(=O)Nc1ccccc1I",
+     "CC(=O)Nc1ccc(I)cc1"
+    ],
+    "levels": [
+     "CC(=O)Nc1ccccc1[N+](=O)[O-]:none",
+     "CC(=O)Nc1ccc([N+](=O)[O-])cc1:none",
+     "CC(=O)Nc1ccccc1S(=O)(=O)O:none",
+     "CC(=O)Nc1ccc(S(=O)(=O)O)cc1:none",
+     "CC(=O)Nc1ccccc1I:none",
+     "CC(=O)Nc1ccc(I)cc1:none"
+    ]
+   },
+   "ms": 205
+  },
+  {
+   "id": "RX-19",
+   "capability": "reactions",
+   "category": "EAS (anilinium / condition dependent)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "wrong",
+     "detail": "missing Nc1cccc([N+](=O)[O-])c1; offered Nc1ccccc1[N+](=O)[O-], Nc1ccc([N+](=O)[O-])cc1, Nc1ccccc1S(=O)(=O)O, Nc1ccc(S(=O)(=O)O)cc1, Nc1ccccc1I, Nc1ccc(I)cc1"
+    },
+    "ambiguity": {
+     "status": "correct",
+     "detail": "no single winner declared"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "aromatic-nitration",
+     "aromatic-sulfonation",
+     "aromatic-halogenation-iodination"
+    ],
+    "offered": [
+     "Nc1ccccc1[N+](=O)[O-]",
+     "Nc1ccc([N+](=O)[O-])cc1",
+     "Nc1ccccc1S(=O)(=O)O",
+     "Nc1ccc(S(=O)(=O)O)cc1",
+     "Nc1ccccc1I",
+     "Nc1ccc(I)cc1"
+    ],
+    "levels": [
+     "Nc1ccccc1[N+](=O)[O-]:none",
+     "Nc1ccc([N+](=O)[O-])cc1:none",
+     "Nc1ccccc1S(=O)(=O)O:none",
+     "Nc1ccc(S(=O)(=O)O)cc1:none",
+     "Nc1ccccc1I:none",
+     "Nc1ccc(I)cc1:none"
+    ]
+   },
+   "ms": 225
+  },
+  {
+   "id": "RX-28",
+   "capability": "reactions",
+   "category": "hydroboration (syn, cyclic)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "wrong",
+     "detail": "offers forbidden CC1(O)CCCC1"
+    },
+    "regiochemistry": {
+     "status": "wrong",
+     "detail": "offers the forbidden regioisomer"
+    },
+    "stereochemistry": {
+     "status": "incomplete",
+     "detail": "stereochemistry unspecified"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alkene-hydroboration-oxidation",
+     "alkene-oxymercuration-demercuration",
+     "alkene-syn-dihydroxylation",
+     "alkene-ozonolysis-oxidative"
+    ],
+    "offered": [
+     "CC1CCCC1O",
+     "CC1(O)CCCC1",
+     "C[C@]1(O)CCC[C@H]1O",
+     "C[C@@]1(O)CCC[C@@H]1O",
+     "CCCC(=O)O",
+     "CCCC(C)=O"
+    ],
+    "levels": [
+     "CC1CCCC1O:none",
+     "CC1(O)CCCC1:none",
+     "C[C@]1(O)CCC[C@H]1O:none",
+     "CCCC(=O)O.CCCC(C)=O:none"
+    ]
+   },
+   "ms": 704
+  },
+  {
+   "id": "RX-31",
+   "capability": "reactions",
+   "category": "epoxidation (syn, stereospecific)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "stereochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alkene-epoxidation",
+     "alkene-anti-dihydroxylation"
+    ],
+    "offered": [
+     "C[C@@H]1O[C@H]1C",
+     "C[C@H]1O[C@@H]1C",
+     "C[C@H](O)[C@@H](C)O"
+    ],
+    "levels": [
+     "C[C@@H]1O[C@H]1C:none",
+     "C[C@H](O)[C@@H](C)O:none"
+    ]
+   },
+   "ms": 360
+  },
+  {
+   "id": "RX-34",
+   "capability": "reactions",
+   "category": "Diels-Alder (endo rule)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    },
+    "stereochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "diene-diels-alder",
+     "alkene-photochemical-2plus2"
+    ],
+    "offered": [
+     "O=C1NC(=O)[C@H]2[C@@H]1[C@H]1C=C[C@@H]2C1",
+     "O=C1NC(=O)C2C3CC=CC3C12"
+    ],
+    "levels": [
+     "O=C1NC(=O)[C@H]2[C@@H]1[C@H]1C=C[C@@H]2C1:none",
+     "O=C1NC(=O)C2C3CC=CC3C12:none"
+    ]
+   },
+   "ms": 193
+  },
+  {
+   "id": "RX-35",
+   "capability": "reactions",
+   "category": "chemoselective reduction",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "ketone-reduction"
+    ],
+    "offered": [
+     "CCOC(O)CC(C)=O",
+     "CCOC(=O)CC(C)O"
+    ],
+    "levels": [
+     "CCOC(O)CC(C)=O:none",
+     "CCOC(=O)CC(C)O:none"
+    ]
+   },
+   "ms": 236
+  },
+  {
+   "id": "RX-36",
+   "capability": "reactions",
+   "category": "chemoselective reduction",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "wrong",
+     "detail": "offers forbidden CCOC(=O)CC(C)O"
+    },
+    "regiochemistry": {
+     "status": "wrong",
+     "detail": "offers the forbidden regioisomer"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "ketone-reduction",
+     "ester-lah-reduction"
+    ],
+    "offered": [
+     "CCOC(O)CC(C)=O",
+     "CCOC(=O)CC(C)O",
+     "CC(=O)CCO",
+     "CCO"
+    ],
+    "levels": [
+     "CCOC(O)CC(C)=O:none",
+     "CCOC(=O)CC(C)O:none",
+     "CC(=O)CCO.CCO:none"
+    ]
+   },
+   "ms": 230
+  },
+  {
+   "id": "RX-38",
+   "capability": "reactions",
+   "category": "conjugate addition (cuprate)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "wrong",
+     "detail": "missing CC1CCC(=O)C1; offered O=C1CCCC1O, O=C1CCC(O)C1, O=C1CCC2CC12"
+    },
+    "regiochemistry": {
+     "status": "wrong",
+     "detail": "expected regioisomer missing"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alkene-oxymercuration-demercuration",
+     "alkene-simmons-smith"
+    ],
+    "offered": [
+     "O=C1CCCC1O",
+     "O=C1CCC(O)C1",
+     "O=C1CC[C@@H]2C[C@H]12",
+     "O=C1CC[C@H]2C[C@@H]12"
+    ],
+    "levels": [
+     "O=C1CCCC1O:none",
+     "O=C1CCC(O)C1:none",
+     "O=C1CC[C@@H]2C[C@H]12:none"
+    ]
+   },
+   "ms": 637
+  },
+  {
+   "id": "RX-48",
+   "capability": "reactions",
+   "category": "negative control (unactivated aryl halide)",
+   "evidence": "inferred",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": "no rule claims these reagents; nothing forbidden offered"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": [
+     "[O-]C",
+     "CO"
+    ],
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 661
+  },
+  {
+   "id": "RK-01",
+   "capability": "ranking",
+   "category": "acid-base",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "5/6 pairs right, 1 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":5,\"wrong\":1,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "OC(=O)C(F)(F)F=1",
+     "OC(=O)CCl=2",
+     "OC=O=3",
+     "CC(=O)O=3"
+    ],
+    "headlines": [
+     "pKa ≈ ~4.4",
+     "pKa ≈ ~4.6",
+     "pKa ≈ ~4.8",
+     "pKa ≈ ~4.8"
+    ]
+   },
+   "ms": 283
+  },
+  {
+   "id": "RK-02",
+   "capability": "ranking",
+   "category": "acid-base",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "4/6 pairs right, 2 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":4,\"wrong\":2,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "Sc1ccccc1=2",
+     "Oc1ccccc1=1",
+     "CCS=2",
+     "CC(C)O=4"
+    ],
+    "headlines": [
+     "pKa ≈ ~10.5",
+     "pKa ≈ ~10.0",
+     "pKa ≈ ~10.5",
+     "pKa ≈ ~17.0"
+    ]
+   },
+   "ms": 58
+  },
+  {
+   "id": "RK-03",
+   "capability": "ranking",
+   "category": "acid-base",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "1/10 pairs right, 9 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":10,\"right\":1,\"wrong\":9,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "O=[N+]([O-])c1ccc(O)cc1=1",
+     "Clc1ccc(O)cc1=1",
+     "Oc1ccccc1=1",
+     "COc1ccc(O)cc1=1",
+     "Cc1ccc(O)cc1=1"
+    ],
+    "headlines": [
+     "pKa ≈ ~10.0",
+     "pKa ≈ ~10.0",
+     "pKa ≈ ~10.0",
+     "pKa ≈ ~10.0",
+     "pKa ≈ ~10.0"
+    ]
+   },
+   "ms": 93
+  },
+  {
+   "id": "RK-04",
+   "capability": "ranking",
+   "category": "acid-base",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "5/6 pairs right, 1 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":5,\"wrong\":1,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CC(=O)CC(C)=O=1",
+     "C[N+](=O)[O-]=2",
+     "CC(C)O=2",
+     "CC(C)=O=4"
+    ],
+    "headlines": [
+     "pKa ≈ ~9.0",
+     "pKa ≈ ~17.0",
+     "pKa ≈ ~17.0",
+     "pKa ≈ ~20.0"
+    ]
+   },
+   "ms": 45
+  },
+  {
+   "id": "RK-05",
+   "capability": "ranking",
+   "category": "acid-base",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "correct",
+     "detail": "6/6 pairs right, 0 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":6,\"wrong\":0,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "C1CCNCC1=1",
+     "N=2",
+     "c1ccncc1=3",
+     "Nc1ccccc1=4"
+    ],
+    "headlines": [
+     "conjugate-acid pKa ≈ ~11.1",
+     "conjugate-acid pKa ≈ ~9.3",
+     "conjugate-acid pKa ≈ ~5.2",
+     "conjugate-acid pKa ≈ ~4.6"
+    ]
+   },
+   "ms": 69
+  },
+  {
+   "id": "RK-10",
+   "capability": "ranking",
+   "category": "stability",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "abstained",
+     "detail": "0/6 pairs right, 0 wrong, 6 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":0,\"wrong\":0,\"abstained\":6}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CC(C)C=unranked",
+     "CCC=unranked",
+     "CC=unranked",
+     "C=unranked"
+    ],
+    "headlines": [
+     "Not detected",
+     "Not detected",
+     "Not detected",
+     "Not detected"
+    ]
+   },
+   "ms": 32
+  },
+  {
+   "id": "RK-14",
+   "capability": "ranking",
+   "category": "substitution",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "correct",
+     "detail": "6/6 pairs right, 0 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":6,\"wrong\":0,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CI=1",
+     "CCI=2",
+     "CC(C)I=3",
+     "CC(C)(C)I=4"
+    ],
+    "headlines": [
+     "I leaving group at C1 (0 carbon substituents)",
+     "I leaving group at C2 (1 carbon substituent)",
+     "I leaving group at C2 (2 carbon substituents)",
+     "I leaving group at C2 (3 carbon substituents)"
+    ]
+   },
+   "ms": 26
+  },
+  {
+   "id": "RK-15",
+   "capability": "ranking",
+   "category": "substitution",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "correct",
+     "detail": "6/6 pairs right, 0 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":6,\"wrong\":0,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CC(C)(C)Cl=1",
+     "CC(C)Cl=2",
+     "CCCl=3",
+     "CCl=4"
+    ],
+    "headlines": [
+     "Cl leaving group at C2 (3 carbon substituents)",
+     "Cl leaving group at C2 (2 carbon substituents)",
+     "Cl leaving group at C2 (1 carbon substituent)",
+     "Cl leaving group at C1 (0 carbon substituents)"
+    ]
+   },
+   "ms": 36
+  },
+  {
+   "id": "RK-16",
+   "capability": "ranking",
+   "category": "substitution",
+   "evidence": "inferred",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "5/6 pairs right, 1 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":5,\"wrong\":1,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "C=CC(C)Cl=1",
+     "CC=CCCl=2",
+     "CC(C)Cl=3",
+     "CCCl=4"
+    ],
+    "headlines": [
+     "Cl leaving group at C3 (2 carbon substituents)",
+     "Cl leaving group at C4 (1 carbon substituent)",
+     "Cl leaving group at C2 (2 carbon substituents)",
+     "Cl leaving group at C2 (1 carbon substituent)"
+    ]
+   },
+   "ms": 62
+  },
+  {
+   "id": "RK-17",
+   "capability": "ranking",
+   "category": "substitution",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "3/6 pairs right, 3 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":3,\"wrong\":3,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "COS(=O)(=O)C(F)(F)F=2",
+     "COS(=O)(=O)c1ccc(C)cc1=2",
+     "CI=1",
+     "CCl=4"
+    ],
+    "headlines": [
+     "sulfonate ester · 4.8/5",
+     "sulfonate ester · 4.8/5",
+     "I leaving group · 5.0/5",
+     "Cl leaving group · 3.0/5"
+    ]
+   },
+   "ms": 67
+  },
+  {
+   "id": "RK-18",
+   "capability": "ranking",
+   "category": "substitution",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "correct",
+     "detail": "1/1 pairs right, 0 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":1,\"right\":1,\"wrong\":0,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CCI=1",
+     "CCCl=3",
+     "CCOS(=O)(=O)c1ccc(C)cc1=2"
+    ],
+    "headlines": [
+     "I leaving group · 5.0/5",
+     "Cl leaving group · 3.0/5",
+     "sulfonate ester · 4.8/5"
+    ]
+   },
+   "ms": 50
+  },
+  {
+   "id": "RK-20",
+   "capability": "ranking",
+   "category": "substitution",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "2/6 pairs right, 1 wrong, 3 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":2,\"wrong\":1,\"abstained\":3}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "[Cl-]=unranked",
+     "N=2",
+     "CC(=O)[O-]=1",
+     "O=3"
+    ],
+    "headlines": [
+     "No strong nucleophile detected",
+     "N at atom 1 · score 3.4",
+     "O at atom 4 · score 5.8",
+     "O at atom 1 · score 2.8"
+    ]
+   },
+   "ms": 21
+  },
+  {
+   "id": "RK-21",
+   "capability": "ranking",
+   "category": "substitution",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "1/6 pairs right, 2 wrong, 3 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":1,\"wrong\":2,\"abstained\":3}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "[C-]#N=3",
+     "[SH-]=1",
+     "[I-]=unranked",
+     "[OH-]=2"
+    ],
+    "headlines": [
+     "C at atom 1 · score 5.2",
+     "S at atom 1 · score 6.8",
+     "No strong nucleophile detected",
+     "O at atom 1 · score 5.8"
+    ]
+   },
+   "ms": 57
+  },
+  {
+   "id": "RK-22",
+   "capability": "ranking",
+   "category": "carbonyl",
+   "evidence": "inferred",
+   "dimensions": {
+    "order": {
+     "status": "abstained",
+     "detail": "3/6 pairs right, 0 wrong, 3 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":3,\"wrong\":0,\"abstained\":3}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CCC(=O)Cl=1",
+     "CC(=O)OC(C)=O=2",
+     "CCOC(C)=O=3",
+     "CC(N)=O=unranked"
+    ],
+    "headlines": [
+     "Acyl halide · 6.0/6",
+     "Acid anhydride · 5.5/6",
+     "Ester · 3.0/6",
+     "No reactive carbonyl detected"
+    ]
+   },
+   "ms": 41
+  },
+  {
+   "id": "RK-23",
+   "capability": "ranking",
+   "category": "carbonyl",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "2/6 pairs right, 1 wrong, 3 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":2,\"wrong\":1,\"abstained\":3}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "FC(F)(F)C(=O)C(F)(F)F=1",
+     "CC(C)=O=1",
+     "CCOC(C)=O=3",
+     "CC(N)=O=unranked"
+    ],
+    "headlines": [
+     "Ketone · 4.2/6",
+     "Ketone · 4.2/6",
+     "Ester · 3.0/6",
+     "No reactive carbonyl detected"
+    ]
+   },
+   "ms": 72
+  },
+  {
+   "id": "RK-24",
+   "capability": "ranking",
+   "category": "aromatic",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "abstained",
+     "detail": "0/6 pairs right, 0 wrong, 6 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":0,\"wrong\":0,\"abstained\":6}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "Fc1ccccc1=unranked",
+     "Ic1ccccc1=unranked",
+     "Clc1ccccc1=unranked",
+     "Brc1ccccc1=unranked"
+    ],
+    "headlines": [
+     "No aromatic ring detected",
+     "No aromatic ring detected",
+     "No aromatic ring detected",
+     "No aromatic ring detected"
+    ]
+   },
+   "ms": 63
+  },
+  {
+   "id": "RK-25",
+   "capability": "ranking",
+   "category": "aromatic",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "abstained",
+     "detail": "0/10 pairs right, 0 wrong, 10 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":10,\"right\":0,\"wrong\":0,\"abstained\":10}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "Cc1ccc(C)c(C)c1C=unranked",
+     "Cc1cc(C)cc(C)c1=unranked",
+     "Cc1ccccc1C=unranked",
+     "CC(C)(C)c1ccccc1=unranked",
+     "Fc1ccccc1=unranked"
+    ],
+    "headlines": [
+     "No aromatic ring detected",
+     "No aromatic ring detected",
+     "No aromatic ring detected",
+     "No aromatic ring detected",
+     "No aromatic ring detected"
+    ]
+   },
+   "ms": 93
+  },
+  {
+   "id": "RK-28",
+   "capability": "ranking",
+   "category": "physical",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "2/3 pairs right, 1 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":3,\"right\":2,\"wrong\":1,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CCCCO=2",
+     "CCCC=O=1",
+     "CCCC=3"
+    ],
+    "headlines": [
+     "Low · score 2.5",
+     "Medium · score 3.5",
+     "Very low · score 1.0"
+    ]
+   },
+   "ms": 40
+  },
+  {
+   "id": "RK-29",
+   "capability": "ranking",
+   "category": "physical",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "correct",
+     "detail": "3/3 pairs right, 0 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":3,\"right\":3,\"wrong\":0,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CCCCC=1",
+     "CCC(C)C=2",
+     "CC(C)(C)C=3"
+    ],
+    "headlines": [
+     "Very low · score 1.0",
+     "Very low · score 1.0",
+     "Very low · score 0.0"
+    ]
+   },
+   "ms": 32
+  },
+  {
+   "id": "RK-33",
+   "capability": "ranking",
+   "category": "physical",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "0/3 pairs right, 3 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":3,\"right\":0,\"wrong\":3,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "Clc1ccccc1Cl=3",
+     "Clc1ccc(Cl)cc1=1",
+     "Clc1cccc(Cl)c1=2"
+    ],
+    "headlines": [
+     "Low · score 2.0",
+     "Low · score 2.0",
+     "Low · score 2.0"
+    ]
+   },
+   "ms": 85
+  },
+  {
+   "id": "RK-35",
+   "capability": "ranking",
+   "category": "physical",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "6/10 pairs right, 4 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":10,\"right\":6,\"wrong\":4,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CCCCCCC=2",
+     "C1CCCCC1=4",
+     "CCCCCC=3",
+     "CI=1",
+     "CCCCC=5"
+    ],
+    "headlines": [
+     "Low · score 2.0",
+     "Very low · score 1.0",
+     "Very low · score 1.0",
+     "Low · score 2.0",
+     "Very low · score 1.0"
+    ]
+   },
+   "ms": 49
+  },
+  {
+   "id": "RK-36",
+   "capability": "ranking",
+   "category": "physical",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "0/3 pairs right, 3 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":3,\"right\":0,\"wrong\":3,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "Clc1ccc(Cl)cc1=1",
+     "Clc1ccccc1Cl=1",
+     "Clc1cccc(Cl)c1=1"
+    ],
+    "headlines": [
+     "packing tendency 5.4",
+     "packing tendency 5.4",
+     "packing tendency 5.4"
+    ]
+   },
+   "ms": 71
+  },
+  {
+   "id": "RK-39",
+   "capability": "ranking",
+   "category": "physical",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "5/6 pairs right, 1 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":5,\"wrong\":1,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CC(=O)O=1",
+     "CCNCC=2",
+     "CCOC(C)=O=3",
+     "CCCCCC=4"
+    ],
+    "headlines": [
+     "High · score 6.5",
+     "Medium · score 3.5",
+     "Low · score 2.5",
+     "Very low · score 1.0"
+    ]
+   },
+   "ms": 52
+  },
+  {
+   "id": "RK-40",
+   "capability": "ranking",
+   "category": "physical",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "correct",
+     "detail": "10/10 pairs right, 0 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":10,\"right\":10,\"wrong\":0,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CCCCCC=1",
+     "CCCCCO=2",
+     "CCOCC=3",
+     "CC(C)=O=4",
+     "OCC(O)CO=5"
+    ],
+    "headlines": [
+     "logP 2.59",
+     "logP 1.17",
+     "logP 1.04",
+     "logP 0.60",
+     "logP -1.67"
+    ]
+   },
+   "ms": 80
+  },
+  {
+   "id": "RK-42",
+   "capability": "ranking",
+   "category": "physical",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "wrong",
+     "detail": "5/6 pairs right, 1 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":5,\"wrong\":1,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CCCCCC=1",
+     "C1CCCCC1=2",
+     "CCCCC=3",
+     "CI=4"
+    ],
+    "headlines": [
+     "logP 2.59",
+     "logP 2.34",
+     "logP 2.20",
+     "logP 1.05"
+    ]
+   },
+   "ms": 37
+  },
+  {
+   "id": "RK-44",
+   "capability": "ranking",
+   "category": "mass spectrometry",
+   "evidence": "verified",
+   "dimensions": {
+    "order": {
+     "status": "correct",
+     "detail": "6/6 pairs right, 0 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":6,\"wrong\":0,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CCCCCC=1",
+     "CCCCC=2",
+     "CCC(C)C=2",
+     "CCCC=4"
+    ],
+    "headlines": [
+     "m/z 86.109",
+     "m/z 72.094",
+     "m/z 72.094",
+     "m/z 58.078"
+    ]
+   },
+   "ms": 43
+  },
+  {
+   "id": "RK-46",
+   "capability": "ranking",
+   "category": "13C NMR",
+   "evidence": "inferred",
+   "dimensions": {
+    "order": {
+     "status": "correct",
+     "detail": "6/6 pairs right, 0 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":6,\"right\":6,\"wrong\":0,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CC1CCCCC1=1",
+     "CCC=2",
+     "C1CCCCC1=3",
+     "C1CCCC1=3"
+    ],
+    "headlines": [
+     "5 distinct predicted signals",
+     "2 distinct predicted signals",
+     "1 distinct predicted signal",
+     "1 distinct predicted signal"
+    ]
+   },
+   "ms": 49
+  },
+  {
+   "id": "RK-48",
+   "capability": "ranking",
+   "category": "13C NMR",
+   "evidence": "inferred",
+   "dimensions": {
+    "order": {
+     "status": "correct",
+     "detail": "3/3 pairs right, 0 wrong, 0 unranked"
+    },
+    "pairs": {
+     "status": "count",
+     "detail": "{\"pairs\":3,\"right\":3,\"wrong\":0,\"abstained\":0}"
+    }
+   },
+   "engine": {
+    "ranks": [
+     "CCC(C)C=1",
+     "CCCCC=2",
+     "CC(C)(C)C=3"
+    ],
+    "headlines": [
+     "4 distinct predicted signals",
+     "3 distinct predicted signals",
+     "2 distinct predicted signals"
+    ]
+   },
+   "ms": 28
+  },
+  {
+   "id": "SY-06",
+   "capability": "synthesis",
+   "category": "esterification",
+   "evidence": "verified",
+   "dimensions": {
+    "routeDiscovery": {
+     "status": "found",
+     "detail": ""
+    },
+    "routeVerification": {
+     "status": "verified",
+     "detail": ""
+    },
+    "routeLength": {
+     "status": "within-range",
+     "detail": "1 steps"
+    },
+    "avoidance": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "outcome": "found",
+    "rules": [
+     "anhydride-alcoholysis"
+    ],
+    "ms": 1621
+   },
+   "ms": 1665
+  },
+  {
+   "id": "SY-14",
+   "capability": "synthesis",
+   "category": "acylation / SN2 (convergent)",
+   "evidence": "inferred",
+   "dimensions": {
+    "routeDiscovery": {
+     "status": "timeout",
+     "detail": "no-route-within-budget"
+    }
+   },
+   "engine": {
+    "outcome": "no-route-within-budget",
+    "rules": [],
+    "ms": 15015
+   },
+   "ms": 15015
+  },
+  {
+   "id": "SY-16",
+   "capability": "synthesis",
+   "category": "protecting group / EAS",
+   "evidence": "verified",
+   "dimensions": {
+    "routeDiscovery": {
+     "status": "found",
+     "detail": ""
+    },
+    "routeVerification": {
+     "status": "verified",
+     "detail": ""
+    },
+    "routeLength": {
+     "status": "shorter",
+     "detail": "1 steps"
+    },
+    "avoidance": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "outcome": "found",
+    "rules": [
+     "aromatic-nitration"
+    ],
+    "ms": 1484
+   },
+   "ms": 1484
+  },
+  {
+   "id": "SY-18",
+   "capability": "synthesis",
+   "category": "Grignard (convergent)",
+   "evidence": "inferred",
+   "dimensions": {
+    "routeDiscovery": {
+     "status": "found",
+     "detail": ""
+    },
+    "routeVerification": {
+     "status": "verified",
+     "detail": ""
+    },
+    "routeLength": {
+     "status": "within-range",
+     "detail": "3 steps"
+    },
+    "avoidance": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "outcome": "found",
+    "rules": [
+     "alcohol-hbr-substitution-primary",
+     "haloalkane-grignard-formation-bromide",
+     "ketone-organometallic-addition"
+    ],
+    "ms": 2318
+   },
+   "ms": 2318
+  },
+  {
+   "id": "SY-21",
+   "capability": "synthesis",
+   "category": "protecting-group order / Williamson",
+   "evidence": "verified",
+   "dimensions": {
+    "routeDiscovery": {
+     "status": "timeout",
+     "detail": "no-route-within-budget"
+    }
+   },
+   "engine": {
+    "outcome": "no-route-within-budget",
+    "rules": [],
+    "ms": 15078
+   },
+   "ms": 15078
+  },
+  {
+   "id": "SY-22",
+   "capability": "synthesis",
+   "category": "aldol / Michael / Dieckmann (convergent)",
+   "evidence": "inferred",
+   "dimensions": {
+    "routeDiscovery": {
+     "status": "timeout",
+     "detail": "no-route-within-budget"
+    }
+   },
+   "engine": {
+    "outcome": "no-route-within-budget",
+    "rules": [],
+    "ms": 15019
+   },
+   "ms": 15020
+  },
+  {
+   "id": "SY-24",
+   "capability": "synthesis",
+   "category": "protecting group / chlorosulfonation",
+   "evidence": "inferred",
+   "dimensions": {
+    "routeDiscovery": {
+     "status": "timeout",
+     "detail": "no-route-within-budget"
+    }
+   },
+   "engine": {
+    "outcome": "no-route-within-budget",
+    "rules": [],
+    "ms": 15008
+   },
+   "ms": 15008
+  },
+  {
+   "id": "SP-02",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-carbonyl",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "57 vs 43"
+    },
+    "fragments": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "irCenters": [
+     2960,
+     2927,
+     2870,
+     2854,
+     1715,
+     1460,
+     1450,
+     1375,
+     1354,
+     1338,
+     998,
+     983,
+     981,
+     906
+    ],
+    "hSignals": 3,
+    "cSignals": 4,
+    "ms": {
+     "molecularIon": 72.0575,
+     "basePeak": 57,
+     "fragmentRecall": "1/1"
+    }
+   },
+   "ms": 29
+  },
+  {
+   "id": "SP-03",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-carbonyl",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "98.073 vs 55"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 55, 42, 41, 39 (0/4 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     2927,
+     2854,
+     1715,
+     1460,
+     1420,
+     1268,
+     1238,
+     1213,
+     1027,
+     1007,
+     999,
+     917,
+     720,
+     656
+    ],
+    "hSignals": 3,
+    "cSignals": 4,
+    "ms": {
+     "molecularIon": 98.0732,
+     "basePeak": 98.073,
+     "fragmentRecall": "0/4"
+    }
+   },
+   "ms": 12
+  },
+  {
+   "id": "SP-04",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-carbonyl",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "84.058 vs 55"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 55, 28, 41 (1/4 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     2927,
+     2854,
+     1745,
+     1460,
+     1212,
+     1180,
+     1136,
+     922,
+     866,
+     826,
+     822,
+     768,
+     720
+    ],
+    "hSignals": 2,
+    "cSignals": 3,
+    "ms": {
+     "molecularIon": 84.0575,
+     "basePeak": 84.058,
+     "fragmentRecall": "1/4"
+    }
+   },
+   "ms": 8
+  },
+  {
+   "id": "SP-05",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-carbonyl",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "29 vs 77"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 105, 51, 50 (1/4 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3070,
+     2820,
+     2720,
+     1705,
+     1600,
+     1580,
+     1500,
+     1450,
+     1376,
+     1349,
+     1074,
+     1031,
+     975,
+     975,
+     909,
+     881,
+     658
+    ],
+    "hSignals": 4,
+    "cSignals": 5,
+    "ms": {
+     "molecularIon": 106.0419,
+     "basePeak": 29,
+     "fragmentRecall": "1/4"
+    }
+   },
+   "ms": 14
+  },
+  {
+   "id": "SP-07",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-carbonyl",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "n/a",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "57 vs 74"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 28, 73 (2/4 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     2960,
+     2927,
+     2920,
+     2870,
+     2854,
+     1710,
+     1460,
+     1450,
+     1388,
+     1375,
+     1310,
+     1253,
+     1208,
+     941,
+     862,
+     799
+    ],
+    "hSignals": 3,
+    "cSignals": 3,
+    "ms": {
+     "molecularIon": 74.0368,
+     "basePeak": 57,
+     "fragmentRecall": "2/4"
+    }
+   },
+   "ms": 11
+  },
+  {
+   "id": "SP-08",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-carbonyl",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "n/a",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "45 vs 105"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 51 (2/3 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3070,
+     2920,
+     1710,
+     1600,
+     1580,
+     1500,
+     1450,
+     1291,
+     1232,
+     1197,
+     976,
+     853,
+     816,
+     792,
+     726,
+     600,
+     561
+    ],
+    "hSignals": 4,
+    "cSignals": 5,
+    "ms": {
+     "molecularIon": 122.0368,
+     "basePeak": 45,
+     "fragmentRecall": "2/3"
+    }
+   },
+   "ms": 23
+  },
+  {
+   "id": "SP-09",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-carbonyl",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "irCenters": [
+     2960,
+     2927,
+     2870,
+     2854,
+     1740,
+     1460,
+     1450,
+     1375,
+     1240,
+     1204,
+     1199,
+     1120,
+     1087,
+     1046,
+     1004,
+     960,
+     861,
+     724
+    ],
+    "hSignals": 3,
+    "cSignals": 4,
+    "ms": {
+     "molecularIon": 88.0524,
+     "basePeak": 43,
+     "fragmentRecall": "1/1"
+    }
+   },
+   "ms": 16
+  },
+  {
+   "id": "SP-11",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-carbonyl",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "n/a",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "43 vs 59"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 42 (2/3 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3350,
+     3180,
+     2960,
+     2870,
+     1660,
+     1545,
+     1450,
+     1375,
+     1313,
+     1218,
+     1083,
+     1029,
+     965,
+     960,
+     658
+    ],
+    "hSignals": 2,
+    "cSignals": 2,
+    "ms": {
+     "molecularIon": 59.0371,
+     "basePeak": 43,
+     "fragmentRecall": "2/3"
+    }
+   },
+   "ms": 11
+  },
+  {
+   "id": "SP-15",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 58 (1/2 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     2960,
+     2927,
+     2870,
+     2854,
+     1460,
+     1450,
+     1375,
+     1267,
+     1200,
+     822,
+     713,
+     709,
+     704,
+     676,
+     671
+    ],
+    "hSignals": 2,
+    "cSignals": 2,
+    "ms": {
+     "molecularIon": 101.1204,
+     "basePeak": 86,
+     "fragmentRecall": "1/2"
+    }
+   },
+   "ms": 10
+  },
+  {
+   "id": "SP-16",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 40 (0/1 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     2960,
+     2870,
+     2245,
+     1450,
+     1375,
+     1334,
+     1261,
+     1146,
+     1074,
+     1041,
+     858
+    ],
+    "hSignals": 1,
+    "cSignals": 2,
+    "ms": {
+     "molecularIon": 41.0265,
+     "basePeak": 41.026,
+     "fragmentRecall": "0/1"
+    }
+   },
+   "ms": 5
+  },
+  {
+   "id": "SP-18",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "wrong",
+     "detail": "claims no O-H or N-H stretch (no such group in the structure)"
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "110.109 vs 81"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41 (3/4 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3300,
+     2960,
+     2927,
+     2870,
+     2854,
+     2120,
+     1460,
+     1450,
+     1375,
+     1287,
+     1210,
+     1024,
+     720
+    ],
+    "hSignals": 7,
+    "cSignals": 8,
+    "ms": {
+     "molecularIon": 110.1095,
+     "basePeak": 110.109,
+     "fragmentRecall": "3/4"
+    }
+   },
+   "ms": 11
+  },
+  {
+   "id": "SP-19",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "98.109 vs 56"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 56 (3/4 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3070,
+     2960,
+     2927,
+     2870,
+     2854,
+     1645,
+     1460,
+     1450,
+     1375,
+     1202,
+     1176,
+     720
+    ],
+    "hSignals": 7,
+    "cSignals": 7,
+    "ms": {
+     "molecularIon": 98.1095,
+     "basePeak": 98.109,
+     "fragmentRecall": "3/4"
+    }
+   },
+   "ms": 10
+  },
+  {
+   "id": "SP-21",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 45, 27 (2/4 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3375,
+     2960,
+     2927,
+     2870,
+     2854,
+     1460,
+     1450,
+     1375,
+     1117,
+     1050,
+     994,
+     989,
+     911,
+     907,
+     751
+    ],
+    "hSignals": 3,
+    "cSignals": 2,
+    "ms": {
+     "molecularIon": 46.0419,
+     "basePeak": 31,
+     "fragmentRecall": "2/4"
+    }
+   },
+   "ms": 10
+  },
+  {
+   "id": "SP-24",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41, 31, 43 (1/4 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3375,
+     2960,
+     2870,
+     1450,
+     1409,
+     1375,
+     1150,
+     1107,
+     1092,
+     1088,
+     1061,
+     761
+    ],
+    "hSignals": 2,
+    "cSignals": 2,
+    "ms": {
+     "molecularIon": 74.0732,
+     "basePeak": 59,
+     "fragmentRecall": "1/4"
+    }
+   },
+   "ms": 18
+  },
+  {
+   "id": "SP-27",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "72.058 vs 42"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 42, 41, 71 (0/3 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     2927,
+     2854,
+     1460,
+     1439,
+     1422,
+     1143,
+     1100,
+     869,
+     848,
+     839,
+     720,
+     678,
+     677
+    ],
+    "hSignals": 2,
+    "cSignals": 2,
+    "ms": {
+     "molecularIon": 72.0575,
+     "basePeak": 72.058,
+     "fragmentRecall": "0/3"
+    }
+   },
+   "ms": 7
+  },
+  {
+   "id": "SP-28",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-halide",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "n/a",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "wrong",
+     "detail": "1 vs 3"
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "77 vs 112"
+    },
+    "fragments": {
+     "status": "correct",
+     "detail": ""
+    },
+    "isotopeM2": {
+     "status": "correct",
+     "detail": "0.32"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3070,
+     1600,
+     1580,
+     1500,
+     1450,
+     1386,
+     1115,
+     974,
+     962,
+     897,
+     877,
+     857,
+     700,
+     670,
+     534
+    ],
+    "hSignals": 1,
+    "cSignals": 4,
+    "ms": {
+     "molecularIon": 112.008,
+     "basePeak": 77,
+     "fragmentRecall": "2/2"
+    }
+   },
+   "ms": 22
+  },
+  {
+   "id": "SP-29",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-halide",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "107.957 vs 29"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 27, 26 (2/4 present)"
+    },
+    "isotopeM2": {
+     "status": "correct",
+     "detail": "0.97"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     2960,
+     2927,
+     2870,
+     2854,
+     1460,
+     1450,
+     1375,
+     1253,
+     1136,
+     1130,
+     1041,
+     958,
+     881,
+     575
+    ],
+    "hSignals": 2,
+    "cSignals": 2,
+    "ms": {
+     "molecularIon": 107.9575,
+     "basePeak": 107.957,
+     "fragmentRecall": "2/4"
+    }
+   },
+   "ms": 11
+  },
+  {
+   "id": "SP-33",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-halide",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "97.969 vs 62"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 62, 64, 27 (1/4 present)"
+    },
+    "isotopeM2": {
+     "status": "correct",
+     "detail": "0.64"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     2927,
+     2854,
+     1460,
+     1271,
+     1241,
+     1231,
+     1205,
+     1120,
+     1035,
+     911,
+     700
+    ],
+    "hSignals": 1,
+    "cSignals": 1,
+    "ms": {
+     "molecularIon": 97.969,
+     "basePeak": 97.969,
+     "fragmentRecall": "1/4"
+    }
+   },
+   "ms": 13
+  },
+  {
+   "id": "SP-35",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "wrong",
+     "detail": "claims no O-H or N-H stretch (no such group in the structure)"
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 51 (1/2 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3375,
+     3070,
+     1600,
+     1580,
+     1530,
+     1500,
+     1450,
+     1388,
+     1350,
+     1265,
+     1251,
+     1194,
+     1176,
+     1167,
+     1156,
+     1114,
+     1076,
+     1066,
+     893
+    ],
+    "hSignals": 3,
+    "cSignals": 4,
+    "ms": {
+     "molecularIon": 123.032,
+     "basePeak": 77,
+     "fragmentRecall": "1/2"
+    }
+   },
+   "ms": 19
+  },
+  {
+   "id": "SP-40",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "wrong",
+     "detail": "2 vs 4"
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3070,
+     2960,
+     2870,
+     1600,
+     1580,
+     1500,
+     1450,
+     1450,
+     1413,
+     1375,
+     1123,
+     1119,
+     1005,
+     843,
+     819,
+     688,
+     625
+    ],
+    "hSignals": 2,
+    "cSignals": 5,
+    "ms": {
+     "molecularIon": 92.0626,
+     "basePeak": 91,
+     "fragmentRecall": "1/1"
+    }
+   },
+   "ms": 16
+  },
+  {
+   "id": "SP-41",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "wrong",
+     "detail": "3 vs 5"
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3070,
+     2960,
+     2927,
+     2870,
+     2854,
+     1600,
+     1580,
+     1500,
+     1460,
+     1450,
+     1450,
+     1437,
+     1375,
+     1297,
+     1253,
+     1015,
+     1006,
+     953,
+     764,
+     753
+    ],
+    "hSignals": 3,
+    "cSignals": 6,
+    "ms": {
+     "molecularIon": 106.0782,
+     "basePeak": 91,
+     "fragmentRecall": "1/1"
+    }
+   },
+   "ms": 15
+  },
+  {
+   "id": "SP-49",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "n/a",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3070,
+     1600,
+     1580,
+     1500,
+     1450,
+     1274,
+     1171,
+     1111,
+     1055,
+     1016,
+     1001,
+     986,
+     976,
+     934,
+     715
+    ],
+    "hSignals": 2,
+    "cSignals": 3,
+    "ms": {
+     "molecularIon": 128.0626,
+     "basePeak": 128.063
+    }
+   },
+   "ms": 14
+  },
+  {
+   "id": "SP-53",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "42.047 vs 41"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41, 39, 40 (1/4 present)"
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3070,
+     2960,
+     2870,
+     1645,
+     1450,
+     1375,
+     548
+    ],
+    "hSignals": 3,
+    "cSignals": 3,
+    "ms": {
+     "molecularIon": 42.047,
+     "basePeak": 42.047,
+     "fragmentRecall": "1/4"
+    }
+   },
+   "ms": 8
+  },
+  {
+   "id": "SP-55",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-other",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "hShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "irCenters": [
+     3430,
+     3350,
+     2960,
+     2927,
+     2870,
+     2854,
+     1615,
+     1460,
+     1450,
+     1375,
+     1227,
+     1200,
+     982,
+     879,
+     873,
+     676,
+     656
+    ],
+    "hSignals": 5,
+    "cSignals": 4,
+    "ms": {
+     "molecularIon": 73.0891,
+     "basePeak": 30,
+     "fragmentRecall": "1/1"
+    }
+   },
+   "ms": 8
+  },
+  {
+   "id": "SP-56",
+   "capability": "spectroscopy",
+   "category": "spectroscopy-carbonyl",
+   "evidence": "verified",
+   "dimensions": {
+    "irPresent": {
+     "status": "correct",
+     "detail": ""
+    },
+    "irAbsent": {
+     "status": "n/a",
+     "detail": ""
+    },
+    "hCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cCount": {
+     "status": "correct",
+     "detail": ""
+    },
+    "cShifts": {
+     "status": "correct",
+     "detail": ""
+    },
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "irCenters": [
+     2960,
+     2920,
+     2870,
+     1710,
+     1450,
+     1375,
+     1188,
+     1153,
+     1092,
+     994,
+     984,
+     879,
+     695
+    ],
+    "hSignals": 2,
+    "cSignals": 2,
+    "ms": {
+     "molecularIon": 60.0211,
+     "basePeak": 43,
+     "fragmentRecall": "2/2"
+    }
+   },
+   "ms": 9
+  }
+ ]
+}
