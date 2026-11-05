@@ -3,6 +3,7 @@ import { getRDKit } from "../rdkit";
 import type { MassSpectrumPeak, MassSpectrumResult } from "./types";
 import { predictGeneralFragmentation } from "./massSpec/fragmentationEngine";
 import { mergeAndNormalizePeaks } from "./massSpec/peakNormalization";
+import { predictMcLaffertyPeaks } from "./massSpec/mclafferty";
 
 type Isotope = { shift: number; abundance: number };
 
@@ -571,6 +572,11 @@ async function alcoholAlphaCleavagePeaks(
     fragmentSets.push(...await runFragmentReactionSets(parentSmiles, reactionSmarts));
   }
   const peaksByMass = new Map<number, MassSpectrumPeak>();
+  let maxLoss = 0;
+  for (const fragmentSet of fragmentSets) {
+    const mzCandidate = fragmentSet[0] ? await nominalMzForFragment(fragmentSet[0]) : null;
+    if (mzCandidate !== null && parentNominalMass !== null && mzCandidate > 10) maxLoss = Math.max(maxLoss, parentNominalMass - mzCandidate);
+  }
 
   for (const fragmentSet of fragmentSets) {
     const fragmentSmiles = fragmentSet[0];
@@ -595,9 +601,11 @@ async function alcoholAlphaCleavagePeaks(
       ? `Alcohol α-cleavage breaks a C–C bond directly adjacent to the carbinol carbon. The oxygen-containing side retains the charge and is displayed in the course-style carbocation form R₂C(+)-OH so the drawing matches the fragment assignment typically written by hand. The complementary neutral radical responsible for the mass difference (${neutralLossMass}) is shown alongside the ion fragment; its radical dot is retained at the bond-cleavage site.`
       : "Alcohol α-cleavage breaks a C–C bond directly adjacent to the carbinol carbon. The oxygen-containing side retains the charge and is displayed in the course-style carbocation form R₂C(+)-OH; the complementary neutral partner is a radical. Symmetry-equivalent cleavages are merged.";
 
+    // Alpha cleavage preferentially expels the LARGEST alkyl radical (Stevenson-type rule; McLafferty & Turecek): the ion left after losing
+    // the heaviest neutral is the strongest, others are weaker.
     const peak: MassSpectrumPeak = {
       mz,
-      relativeIntensity: 65,
+      relativeIntensity: neutralLossMass !== null && neutralLossMass >= maxLoss ? 65 : 30,
       label: `m/z ${mz} · α-cleavage`,
       kind: "fragment",
       explanation,
@@ -739,6 +747,59 @@ function promoteMolecularIon(peaks: MassSpectrumPeak[]): MassSpectrumPeak[] {
   return scaled.map((peak) => ({ ...peak, relativeIntensity: Number(((peak.relativeIntensity / top) * 100).toFixed(1)) }));
 }
 
+/**
+ * Separates fragment generation from intensity ranking. Only structure classes with a dominant, textbook channel are `supported`;
+ * saturated aliphatic compounds (spectra built from CnH2n+1+/CnH2n-1+ families and H-rearrangements) are `unreliable`.
+ */
+async function classifyBasePeak(
+  parentSmiles: string | null,
+  peaks: MassSpectrumPeak[],
+  basePeak: MassSpectrumPeak | null,
+): Promise<{ basePeakCertainty?: "supported" | "heuristic" | "unreliable"; basePeakCandidates?: number[]; basePeakBasis?: string }> {
+  if (!parentSmiles || !basePeak) return {};
+  const candidates = [...peaks]
+    .filter((peak) => peak.kind !== "isotope")
+    .sort((a, b) => b.relativeIntensity - a.relativeIntensity)
+    .slice(0, 3)
+    .map((peak) => Math.round(peak.mz));
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(parentSmiles);
+  if (!mol) return { basePeakCandidates: candidates };
+  const has = (smarts: string) => {
+    const q = rdkit.get_qmol(smarts);
+    if (!q) return false;
+    try {
+      const m = JSON.parse(mol.get_substruct_matches(q));
+      return Array.isArray(m) && m.length > 0;
+    } finally {
+      q.delete?.();
+    }
+  };
+  try {
+    const aromatic = has("[a]");
+    const supportedBasis =
+      (aromatic && (has("c[CX4;!R]") || has("c[CX3](=O)[#6,#8]"))) ? "Aromatic ring with a benzylic or aroyl site: the benzyl/tropylium or aroyl ion is the established dominant channel." :
+      (aromatic && !has("[CX3]=O") && !has("[CX4]") ) ? "Aromatic compound with no readily cleaved side chain: the molecular ion is usually the base peak." :
+      has("[CX4;H0]([CH3])([CH3])([CH3])[Br,I,Cl]") ? "Tertiary alkyl halide: loss of X• gives the tert-butyl-type cation." :
+      has("[NX3;!$(N-C=O)]-[CX4]") ? "Aliphatic amine: α-cleavage to the iminium ion dominates." :
+      has("[CH3][CX3](=O)[#6]") ? "Methyl ketone: the acetyl ion m/z 43 is characteristic." :
+      has("[CH3][CX3](=O)O[#6]") ? "Acetate ester: the acetyl ion m/z 43 is characteristic." :
+      null;
+    if (supportedBasis) return { basePeakCertainty: "supported", basePeakCandidates: candidates, basePeakBasis: supportedBasis };
+    const saturatedAliphatic = !aromatic && !has("[#6]=,#[#6,#8,#7]") ;
+    if (saturatedAliphatic) {
+      return {
+        basePeakCertainty: "unreliable",
+        basePeakCandidates: candidates,
+        basePeakBasis: "Saturated aliphatic compound: the spectrum is dominated by alkyl/alkenyl ion families and hydrogen rearrangements whose relative abundances this engine does not model quantitatively. The m/z set is informative; the single base peak is not.",
+      };
+    }
+    return { basePeakCertainty: "heuristic", basePeakCandidates: candidates, basePeakBasis: "Top ion among several comparable predicted channels; abundances are class-based heuristics." };
+  } finally {
+    mol.delete?.();
+  }
+}
+
 export async function predictMassSpectrum(
   formula: string,
   exactMass: number | null,
@@ -811,6 +872,7 @@ export async function predictMassSpectrum(
     }
 
     peaks.push(...generalFragmentation.peaks);
+    peaks.push(...await predictMcLaffertyPeaks(parentSmiles));
 
     const fragments: Array<MassSpectrumPeak | null> = [];
 
@@ -952,11 +1014,13 @@ export async function predictMassSpectrum(
   if (await hasStableAromaticMolecularIon(parentSmiles)) finalPeaks = promoteMolecularIon(finalPeaks);
   const basePeak = finalPeaks.reduce<MassSpectrumPeak | null>((best, peak) => !best || peak.relativeIntensity > best.relativeIntensity ? peak : best, null);
 
+  const certainty = await classifyBasePeak(parentSmiles, finalPeaks, basePeak);
   return {
     formula,
     molecularIonMz: molecularIon === null ? null : Number(molecularIon.toFixed(4)),
     nominalMass: nominal,
     basePeakMz: basePeak?.mz ?? null,
+    ...certainty,
     peaks: finalPeaks,
     notes,
   };

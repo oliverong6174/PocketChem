@@ -2114,7 +2114,7 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
                 <div className="mass-summary-grid">
                   <div><span>Molecular ion</span><strong>{result.massSpec.molecularIonMz ?? "—"}</strong></div>
                   <div><span>Nominal mass</span><strong>{result.massSpec.nominalMass ?? "—"}</strong></div>
-                  <div><span>Predicted base peak</span><strong>{result.massSpec.basePeakMz ?? "—"}</strong></div>
+                  <div><span>Predicted base peak{result.massSpec.basePeakCertainty && result.massSpec.basePeakCertainty !== "supported" ? ` (${result.massSpec.basePeakCertainty})` : ""}</span><strong>{result.massSpec.basePeakMz ?? "—"}</strong>{result.massSpec.basePeakCandidates && result.massSpec.basePeakCertainty !== "supported" && <small title={result.massSpec.basePeakBasis}> candidates: {result.massSpec.basePeakCandidates.join(", ")}</small>}</div>
                 </div>
                 {selectedMassPeak && (
                   <div id="spectroscopy-selected-assignment" className="selected-assignment-card">
