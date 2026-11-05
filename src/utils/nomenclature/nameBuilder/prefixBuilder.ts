@@ -162,6 +162,9 @@ function shouldOmitSubstituentLocants(
   totalSubstituentOccurrences: number
 ) {
   if (!parent) return false;
+  // A one-carbon parent has a single possible position, so no substituent carries a locant (dichloromethane, diphenylmethanone,
+  // bromochloromethane), however many substituents there are (IUPAC 2013 P-14.3.4.2).
+  if (parent.kind === "chain" && parent.carbonCount === 1) return true;
   if (totalSubstituentOccurrences !== 1) return false;
   if (group.locants.length !== 1) return false;
 
@@ -261,7 +264,9 @@ export function sortPrefixEntries(entries: PrefixEntry[]) {
 }
 
 function renderPrefixEntries(entries: PrefixEntry[]) {
+  // Prefixes are separated by a hyphen only where the next one opens with a locant (2-chloro-1-methyl...); locant-free prefixes run
+  // together (bromochlorofluoromethane).
   return sortPrefixEntries(entries)
     .map((entry) => entry.text)
-    .join("-");
+    .reduce((joined, text, index) => (index === 0 ? text : `${joined}${/^(\d|[A-Za-z](?:,[A-Za-z])*'?-)/.test(text) ? "-" : ""}${text}`), "");
 }

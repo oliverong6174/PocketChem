@@ -1446,6 +1446,9 @@ export function getBestAcylParentDescriptor(
   // of an ester.  The old single-ring shortcut could inspect the wrong ring
   // first and fall back to names such as "...methanoate" for benzoates.
   for (const carbonylIndex of carbonylCarbons) {
+    // A ketone is named by its own chain (1-phenylethan-1-one, diphenylmethanone), never as an acyl-substituted ring: only the
+    // acid/ester/amide/halide/aldehyde carbons have a retained aromatic parent (benzoic acid, benzamide, benzaldehyde).
+    const retainedAcyl = isRetainedAromaticAcylCarbon(parsedMol, carbonylIndex);
     for (const bond of parsedMol.adjacency.get(carbonylIndex) ?? []) {
       if (bond.bondOrder !== 1) continue;
       const neighbor = getOtherAtom(bond, carbonylIndex);
@@ -1453,6 +1456,8 @@ export function getBestAcylParentDescriptor(
 
       const aromaticRing = findBenzeneLikeRingContainingAtom(parsedMol, neighbor);
       if (!aromaticRing) continue;
+      // An exocyclic ketone is not a retained acyl parent; a ring ketone (the C=O is a ring member) keeps its ring.
+      if (!retainedAcyl && !aromaticRing.ringAtoms.includes(carbonylIndex)) continue;
 
       const aromaticParent = buildRingParentDescriptor(parsedMol, aromaticRing);
       if (aromaticParent?.aromaticRing) return aromaticParent;

@@ -56,6 +56,12 @@ export function assessNamingSupport(
     return "the structure carries isotopic labels, which PocketChem's names do not express (the name would describe the unlabelled compound)";
   }
 
+  // Several disconnected components: the builders name one of them and silently drop the rest (a sodium cation beside a neutral acid, a
+  // solvent beside a solute). Simple salts are named separately (saltNames.ts) before this check; anything else is withheld.
+  if (canonicalSmiles && canonicalSmiles.includes(".") && result.namingStatus !== "unsupported") {
+    return "the input has several separate components, and PocketChem names single molecules and simple salts only (naming one component would drop the others)";
+  }
+
   // Names recognised from the whole structure (retained heterocycles, common names) are trusted as before.
   if (result.namingStatus === "retained" || result.namingStatus === "common" || result.namingStatus === "unsupported") return null;
 
@@ -89,10 +95,21 @@ const CHAIN_VOCABULARY = new RegExp(
 );
 const isChainVocabulary = (name: string) => CHAIN_VOCABULARY.test(name.replace(/[^a-z]/g, ""));
 
-const ALKENE_WORDS = /(?:^|[^a-z])[a-z]*?en(?:oic|oate|amide|nitrile|one|al|ol|yl|e|o)?(?![a-z])|ylidene|vinyl|allyl|styren/;
-const ALKYNE_WORDS = /yn(?:oic|oate|e|yl)?(?![a-z])/;
+const ALKENE_WORDS = /(?:^|[^a-z])[a-z]*?en(?:oic|oate|amide|nitrile|one|al|ol|yl|e|o)?(?![a-z])|ylidene|vinyl|allyl|styren|ethenyl/;
+const ALKYNE_WORDS = /yn(?:oic|oate|e|yl)?(?![a-z])|ethynyl/;
 const HALOGEN_WORDS = /fluor|chlor|bromo|iod|halo/;
 const NITROGEN_WORDS = /amin|amid|nitr|imin|aza|azi|pyr(?:id|rol|az|im)|ind|quin|azol|pip|morph|cyan|carbamo|anilin|hydrazin|oxim|diazo|purin|urea|aniline/;
+const NN_WORDS = /hydrazin|hydrazon|azo|diazo|diazen|azid|triazen|triazol|tetrazol|pyrazol|pyrazin|pyridazin|indazol|benzotriazol|purin|semicarbaz|carbazat|carbonohydraz|hydrazide|nitrosamin|azoxy|triazin|tetrazin|pteridin|phthalazin|cinnolin|quinoxalin|oxadiazol|thiadiazol|diazin|diazol/;
+const CARBONYL_WORDS = /one|al|oyl|oic|oate|ate|oxo|acyl|acetyl|formyl|carbonyl|carboxy|anhydride|amide|imide|urea|lactam|lactone|acid|ald|quinone|uracil|ide/;
+
+/** Number of multiple bonds a name asserts through explicit locant lists such as "hepta-2,4,6-trien" or "pent-1-en-3-yne". */
+function assertedUnsaturationCount(name: string): number {
+  let total = 0;
+  for (const match of name.matchAll(/(\d+(?:,\d+)*)-(?:di|tri|tetra|penta|hexa)?(?:en|yn)(?![a-z]*an)/g)) total += match[1].split(",").length;
+  return total;
+}
+
+const AROMATIC_HETERO_WORDS = /pyr|furan|thiophen|imidazol|azol|azin|azep|indol|quinol|purin|pteridin|acridin|carbazol|oxin|thiin|thiaz|oxaz|aza|oxa|thia|benzofuran|benzothio|pyran|phosphin|phosphol|siline|borin/;
 const SULFUR_WORDS = /thi|sulf|mercapt/;
 
 /**
@@ -133,10 +150,24 @@ export function assessNameConsistency(
       }
     }
   }
+  // A carbonyl (C=O) that the name never expresses: a retained heterocycle or ring builder that reads "CC(=O)CCc1cccnc1" as 3-butylpyridine
+  // silently drops the oxygen.
+  if (countMatches(RDKit, mol, "[#6]=[OX1]") > 0 && !CARBONYL_WORDS.test(name)) return `the molecule has a C=O group that the generated name "${result.estimatedName}" does not express`;
+  // Unsaturation the structure does not have: a chain builder that walks through the Kekulé bonds of an aromatic ring writes
+  // "1-phenylhepta-2,4,6-trien-1-ol" for diphenylmethanol.
+  if (!retained) {
+    const asserted = assertedUnsaturationCount(name);
+    if (asserted > 0 && asserted > countMatches(RDKit, mol, "[C,N;!a]=,#[C,N;!a]")) return `the generated name "${result.estimatedName}" describes more multiple bonds than the molecule has`;
+  }
+  // An aromatic heteroatom that the name never mentions (1,3,5-triazine matched as "benzene").
+  if (countMatches(RDKit, mol, "[a;!#6]") > 0 && !AROMATIC_HETERO_WORDS.test(name)) return `the molecule has an aromatic heteroatom that the generated name "${result.estimatedName}" does not express`;
   if (retained) return null;
   if (countMatches(RDKit, mol, "[C;!a]=[C;!a]") > 0 && !ALKENE_WORDS.test(name)) return `the molecule has a C=C bond that the generated name "${result.estimatedName}" does not express`;
   if (countMatches(RDKit, mol, "[C]#[C]") > 0 && !ALKYNE_WORDS.test(name)) return `the molecule has a C#C bond that the generated name "${result.estimatedName}" does not express`;
   if (countMatches(RDKit, mol, "[F,Cl,Br,I]") > 0 && !HALOGEN_WORDS.test(name)) return `the molecule contains a halogen that the generated name "${result.estimatedName}" omits`;
+  // A bond between two nitrogens (hydrazine, azo, azide, diazo, N-N heterocycle) is a feature a name must express; a name built from an
+  // amine/aniline reading silently drops a whole nitrogen (phenylhydrazine read as "aniline").
+  if (countMatches(RDKit, mol, "[#7]~[#7]") > 0 && !NN_WORDS.test(name)) return `the molecule has an N–N bond that the generated name "${result.estimatedName}" does not express (a nitrogen would be dropped)`;
   if (countMatches(RDKit, mol, "[#7]") > 0 && !NITROGEN_WORDS.test(name)) return `the molecule contains nitrogen that the generated name "${result.estimatedName}" omits`;
   if (countMatches(RDKit, mol, "[#16]") > 0 && !SULFUR_WORDS.test(name)) return `the molecule contains sulfur that the generated name "${result.estimatedName}" omits`;
   return null;

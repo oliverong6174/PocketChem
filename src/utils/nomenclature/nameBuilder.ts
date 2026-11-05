@@ -29,6 +29,7 @@ import {
 
 import { constructName } from "./nameBuilder/nameConstructor";
 import { getPrimaryFunctionalGroup } from "./nameBuilder/primaryGroup";
+import { getAcyclicPolycarboxylicAcidName } from "./nameBuilder/polycarboxylicAcids";
 import { getParentStrategy } from "./nameBuilder/parentStrategy";
 
 import {
@@ -437,6 +438,26 @@ const preferredParentAtoms = getParentCandidateAtomsForPrimaryGroup(
     ? exoticParent
     : carbonDefaultParent;
 
+  const chainPolyacid = getAcyclicPolycarboxylicAcidName(parsedMol);
+  if (chainPolyacid) {
+    return {
+      estimatedName: chainPolyacid.name,
+      confidence: "high",
+      status: "systematic",
+      reason: "Three or more carboxylic-acid groups cannot all lie in one -dioic acid chain, so IUPAC names them as -carboxylic acids on the carbon skeleton that carries them (the largest number of principal characteristic groups).",
+      parent: chainPolyacid.parent,
+      features: neutralFeatures,
+      primaryFeature: {
+        type: "carboxylicAcid",
+        locants: chainPolyacid.acidLocants,
+        suffix: "carboxylic acid",
+        prefix: "carboxy",
+        priority: 1,
+      },
+      substituents: [],
+    };
+  }
+
   const benzenePolyacidName = getSimpleBenzenePolycarboxylicAcidName(parsedMol, defaultParent);
   if (benzenePolyacidName) {
     return {
@@ -463,8 +484,16 @@ const preferredParentAtoms = getParentCandidateAtomsForPrimaryGroup(
   primaryGroup
 );
 
+// A ring ketone (the C=O is a member of the ring parent) is named with the suffix on the ring (cyclohexanone, cyclohex-2-en-1-one);
+// the acyclic acyl-chain route would read the ring atoms as a chain ("hexan-1-one").
+const carbonylIsRingMember =
+  (namingIntent.featureType === "ketone" || namingIntent.featureType === "thioketone") &&
+  defaultParent.kind === "ring" &&
+  preferredParentAtoms.some((atomIndex) => defaultParent.path.includes(atomIndex));
+
 const shouldUseAcylParent =
   !shouldUseExoticParent &&
+  !carbonylIsRingMember &&
   getParentStrategy(primaryGroup) === "acyl" &&
   preferredParentAtoms.length > 0;
 

@@ -519,6 +519,9 @@ function getSimpleCarbonSideChainName(
     return `${prefix}an-${attachmentLocant}-yl`;
   }
 
+  if (path.length === 2 && tripleLocants.length === 0 && doubleLocants.length > 0) return "ethenyl";
+  if (path.length === 2 && doubleLocants.length === 0 && tripleLocants.length > 0) return "ethynyl";
+
   if (doubleLocants.length > 0 && tripleLocants.length === 0) {
     return `${prefix}-${doubleLocants.join(",")}-en-${attachmentLocant}-yl`;
   }

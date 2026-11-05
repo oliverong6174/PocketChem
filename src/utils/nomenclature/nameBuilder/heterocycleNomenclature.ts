@@ -417,6 +417,36 @@ function ringNumberings(parsedMol: ParsedMol, atoms: number[]): number[][] {
   return out.length ? out : [atoms];
 }
 
+/**
+ * True when some part of the molecule outside the matched template is joined to it at two or more template atoms. That part is a further
+ * fused or bridged ring, not a substituent, so the template cannot be the whole parent: naphthalene matched inside anthracene was named
+ * "2,3-ditridec-1,3,5,7,9,11-en-1-ylnaphthalene" because the third ring was read as two chain substituents.
+ */
+function extendsTemplateRingSystem(parsedMol: ParsedMol, templateAtoms: number[]): boolean {
+  const inTemplate = new Set(templateAtoms);
+  const seen = new Set<number>();
+  for (const atom of parsedMol.atoms) {
+    if (inTemplate.has(atom.atomIndex) || seen.has(atom.atomIndex)) continue;
+    const attachments = new Set<number>();
+    const stack = [atom.atomIndex];
+    seen.add(atom.atomIndex);
+    while (stack.length > 0) {
+      const current = stack.pop() as number;
+      for (const bond of parsedMol.adjacency.get(current) ?? []) {
+        const other = bond.atomA === current ? bond.atomB : bond.atomA;
+        if (inTemplate.has(other)) {
+          attachments.add(other);
+        } else if (!seen.has(other)) {
+          seen.add(other);
+          stack.push(other);
+        }
+      }
+    }
+    if (attachments.size >= 2) return true;
+  }
+  return false;
+}
+
 function findHeterocycleMatch(
   RDKit: RDKitModule,
   mol: RDKitMol,
@@ -449,6 +479,7 @@ function findHeterocycleMatch(
       const matches = parseMatchArray(mol.get_substruct_matches(query))
         .filter((atoms) => atoms.length === template.locants.length)
         .filter((atoms) => !(monocyclic && atoms.some((atom) => sharedRingAtoms.has(atom))))
+        .filter((atoms) => !extendsTemplateRingSystem(parsedMol, atoms))
         .filter((atoms) => {
           const unsaturated = countInternalUnsaturatedBonds(parsedMol, atoms);
           if (
@@ -630,6 +661,17 @@ function getOxygenPrefix(parsedMol: ParsedMol, oxygenIndex: number, parentAtom: 
   }
 
   return "oxy";
+}
+
+/**
+ * IUPAC P-16.7.1: the final "e" of a parent name is elided before a suffix that starts with a vowel and kept before one that starts with a
+ * consonant, so oxolan-2-one but oxolane-2,5-dione (the "d" of "dione") and oxolane-2-thione. Templates store the stem without the "e".
+ */
+function stemBeforeSuffix(template: { name: string; stem: string }, suffixStartsWithConsonant: boolean): string {
+  if (!suffixStartsWithConsonant) return template.stem;
+  return template.name.endsWith("e") && template.name.slice(0, -1) === template.stem
+    ? template.stem + "e"
+    : template.stem;
 }
 
 function getMultiplier(count: number) {
@@ -815,11 +857,11 @@ export function getHeterocycleNomenclature(
   // heterocycle -one/-dione rather than selecting an acyclic "imine" chain.
   if (!suffixBase && oxoLocants.length > 0) {
     const locants = [...oxoLocants].sort((a, b) => locantSortValue(a) - locantSortValue(b));
-    suffixBase = `${match.template.stem}-${locants.join(",")}-${getMultiplier(locants.length)}one`;
+    suffixBase = `${stemBeforeSuffix(match.template, getMultiplier(locants.length) !== "")}-${locants.join(",")}-${getMultiplier(locants.length)}one`;
     mainSuffix = locants.length > 1 ? `-${getMultiplier(locants.length)}one` : "-one";
   } else if (!suffixBase && thioxoLocants.length > 0) {
     const locants = [...thioxoLocants].sort((a, b) => locantSortValue(a) - locantSortValue(b));
-    suffixBase = `${match.template.stem}-${locants.join(",")}-${getMultiplier(locants.length)}thione`;
+    suffixBase = `${stemBeforeSuffix(match.template, true)}-${locants.join(",")}-${getMultiplier(locants.length)}thione`;
     mainSuffix = locants.length > 1 ? `-${getMultiplier(locants.length)}thione` : "-thione";
   }
 

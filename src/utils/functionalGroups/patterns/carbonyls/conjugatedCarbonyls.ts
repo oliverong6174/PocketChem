@@ -39,7 +39,7 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     suffix: "-enal",
     prefix: "formylvinyl",
     equivalentNames: ["propenal", "acrylaldehyde"],
-    smarts: "C=CC=O",
+    smarts: "C=C[CX3H1]=O",
     mcatNote:
       "Acrolein is propenal, the simplest α,β-unsaturated aldehyde. It is a highly reactive Michael acceptor.",
     displaySmarts: "C=CC=O",
@@ -67,7 +67,7 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     suffix: "acrylic acid",
     prefix: "carboxyvinyl",
     equivalentNames: ["propenoic acid"],
-    smarts: "C=CC(=O)[OX2H]",
+    smarts: "[CH2]=[CH]C(=O)[OX2H]",
     mcatNote:
       "Acrylic acid is propenoic acid, the simplest α,β-unsaturated carboxylic acid.",
     displaySmarts: "C=CC(=O)[OX2H]",
@@ -95,7 +95,7 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     suffix: "crotonic acid",
     prefix: "carboxypropenyl",
     equivalentNames: ["but-2-enoic acid"],
-    smarts: "CC=CC(=O)[OX2H]",
+    smarts: "[CH3][CH]=[CH]C(=O)[OX2H]",
     mcatNote:
       "Crotonic acid is but-2-enoic acid, a methyl-substituted α,β-unsaturated carboxylic acid.",
     displaySmarts: "CC=CC(=O)[OX2H]",
@@ -109,7 +109,7 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     suffix: "-enal",
     prefix: "formylpropenyl",
     equivalentNames: ["but-2-enal"],
-    smarts: "CC=CC=O",
+    smarts: "CC=C[CX3H1]=O",
     mcatNote:
       "Crotonaldehyde is but-2-enal, a methyl-substituted α,β-unsaturated aldehyde.",
     displaySmarts: "CC=CC=O",
@@ -123,7 +123,7 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     suffix: "cinnamic acid",
     prefix: "carboxystyryl",
     equivalentNames: ["phenylpropenoic acid"],
-    smarts: "c1ccccc1C=CC(=O)[OX2H]",
+    smarts: "c1ccccc1[CH]=[CH]C(=O)[OX2H]",
     mcatNote:
       "Cinnamic acid contains a phenyl-substituted α,β-unsaturated carboxylic acid system.",
     displaySmarts: "c1ccccc1C=CC(=O)[OX2H]",
@@ -137,7 +137,7 @@ export const conjugatedCarbonyls: FunctionalGroupPattern[] = [
     suffix: "-enal",
     prefix: "formylstyryl",
     equivalentNames: ["phenylpropenal"],
-    smarts: "c1ccccc1C=CC=O",
+    smarts: "c1ccccc1C=C[CX3H1]=O",
     mcatNote:
       "Cinnamaldehyde contains a phenyl-substituted α,β-unsaturated aldehyde system and is the main flavor compound in cinnamon.",
     displaySmarts: "c1ccccc1C=CC=O",

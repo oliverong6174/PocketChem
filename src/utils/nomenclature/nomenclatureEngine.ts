@@ -34,6 +34,7 @@ import {
 } from "./displayName";
 
 import { getCommonNameMatch } from "./nameBuilder/commonNames";
+import { getSimpleSaltName } from "./nameBuilder/saltNames";
 import { getHeterocycleNomenclature } from "./nameBuilder/heterocycleNomenclature";
 
 import {
@@ -148,6 +149,21 @@ type NomenclatureArgs = Parameters<typeof estimateNomenclatureCore>;
 function estimateNomenclature(...args: NomenclatureArgs): NomenclatureResult {
   const result = estimateNomenclatureCore(...args);
   const [RDKit, mol, parsedMol, , , canonicalSmiles] = args;
+  const salt = getSimpleSaltName(canonicalSmiles, result);
+  if (salt) {
+    return {
+      ...result,
+      estimatedName: salt.name,
+      commonName: salt.commonName,
+      displayName: formatDisplayName(salt.name, salt.commonName),
+      namingStatus: "functional-class",
+      namingConfidence: "Medium",
+      parentChain: null,
+      parentChainLength: 0,
+      explanation: "Named as a salt: cation first, then anion (IUPAC 2013 P-73). Only monatomic or ammonium cations with monatomic anions, or with one organic anion named by the ordinary builders, are handled.",
+      limitations: [...result.limitations, "Ionic compounds are named from their written ions; solvates, hydrates and lattice stoichiometry are not described."],
+    };
+  }
   const reason =
     assessNamingSupport(RDKit, mol, parsedMol, canonicalSmiles, result) ?? assessNameConsistency(RDKit, mol, parsedMol, result);
   if (!reason) return result;
