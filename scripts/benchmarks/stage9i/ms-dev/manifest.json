@@ -1,0 +1,21 @@
+{
+ "builtAt": "2026-11-05T01:11:54.527Z",
+ "hashes": {
+  "cases.json": "a9671aef701f00c5fc48220d9bdfdd7607daa45f758559f6751ea503bba14bf2",
+  "snapshots/1-bromooctane.json": "878eb470b79baae50b1f6b115ac9a9d7bf76e059c8b5608b6685211e1c7d0385",
+  "snapshots/1-bromopentane.json": "01036fde64718b0191887aa3bb9b5527065a24f5d22c14f39093443314a13a59",
+  "snapshots/1-iodobutane.json": "a1f387b7ef19baa1f7a4f409b8f3a705e41c65afc4f954b6fe05e8ae7189c3be",
+  "snapshots/1-octanol.json": "98fa68c76c7c09f9358cdb887b178e46373dac6c66affd16d9d62ebb6249ba86",
+  "snapshots/2-methyl-2-pentanol.json": "2f87b3b0b1300c2044f80ba4d96df84648b5b75a8a24d6680adfec88282d74e1",
+  "snapshots/3-chloropentane.json": "07467d0b897310468fc77fede83c7c4354ab308221600d8cb1c5db604f3584f4",
+  "snapshots/3-pentanol.json": "2ee6eba8cb2572d2b1902b9771e7b7f1c3eddaa809de6598f3d3e9d676a3e1b4",
+  "snapshots/butanoic-acid.json": "e451d00f603ef5217215712cbb96e376d60bb18f56978ec29c29c8e49ec34af3",
+  "snapshots/butyl-acetate.json": "49d38c29036f1650b2c1796eb270a813ec01bb96cb8266ead92a223857a64930",
+  "snapshots/dibutyl-ether.json": "097662268475df802603f8f66969a5779c9b8c0d0ecbd47e447717a52638c238",
+  "snapshots/heptanal.json": "f3bce4addc1931a4eb9a9624e3e8ebabcd48817bbb47ef6d8a7d9fd6153d2aad",
+  "snapshots/hexanenitrile.json": "2899d00f8120cecfced951040736a424b7dd3bc6753ba243a4ee6c5e4b2ee83f",
+  "snapshots/hexanoic-acid.json": "99e68b8cff609af34ec9be0f0ea8e6d1cfee821d306cba8436b2f594fd93ff8c",
+  "snapshots/methyl-hexanoate.json": "05abcc26007c5fdb23dd78182a8c1d7ef09195b505e226ac7c09ff6cb80c602f",
+  "snapshots/methyl-tert-butyl-ether.json": "48c427a44accfb4df66ff823129898cae5ad40a472b68184653ec842aecf4e13"
+ }
+}
