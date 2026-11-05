@@ -17,6 +17,7 @@ import { predictReactionPathwaysFromRules } from "./reactionEngine";
 import { predictRetrosynthesisPathwaysFromRules } from "./retroSynthesis";
 import { verifyMultistepRoute } from "./routeVerification";
 import { assessRouteSelectivity } from "./selectivityAssessment";
+import { assessRouteQuality } from "./routeQuality";
 import {
   assessRouteCompatibility,
   assessStepCompatibility,
@@ -2503,6 +2504,7 @@ export async function searchLinearSynthesisRoutes(
         };
         replayed.compatibility = await assessRouteCompatibility(replayed, rules);
         replayed.selectivity = await assessRouteSelectivity(replayed, rules);
+        replayed.quality = await assessRouteQuality(replayed, rules);
         replayedRoutes.push(replayed);
         if (replayed.verification.status !== "failed") {
           try {

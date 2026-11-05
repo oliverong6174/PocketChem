@@ -29,6 +29,7 @@ import {
 } from "./speciesPool";
 import { verifyMultistepRoute } from "./routeVerification";
 import { assessRouteSelectivity } from "./selectivityAssessment";
+import { assessRouteQuality } from "./routeQuality";
 import { assessRouteCompatibility } from "./compatibility";
 import {
   RETRO_DEFAULTS,
@@ -569,6 +570,7 @@ export async function searchConvergentRoutesCore(args: ConvergentSearchArgs): Pr
       compatibility: await assessRouteCompatibility(route, rules),
       selectivity: await assessRouteSelectivity(route, rules),
     };
+    accepted.quality = await assessRouteQuality(accepted, rules);
     found.push(accepted);
     try {
       args.onRouteFound?.(accepted);

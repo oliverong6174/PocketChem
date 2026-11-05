@@ -10,7 +10,7 @@
 import type { MultistepSynthesisRoute } from "../reactions/reactionTypes";
 
 /** Bump when the shape or meaning of saved synthesis results changes. */
-export const SYNTHESIS_ENGINE_VERSION = 1;
+export const SYNTHESIS_ENGINE_VERSION = 2;
 
 export type SynthesisWorkspaceInputs = {
   reactantKet: string | null;
@@ -120,6 +120,12 @@ function isRestorableRoute(route: unknown): route is MultistepSynthesisRoute {
     if (verification.leftovers !== undefined && !Array.isArray(verification.leftovers)) return false;
   }
   if (route.compatibility !== undefined && !isObject(route.compatibility)) return false;
+  const quality = route.quality;
+  if (quality !== undefined) {
+    // Saved before Stage 9I: absent. Present: the page reads tier and findings directly.
+    if (!isObject(quality) || !isString(quality.tier) || !Array.isArray(quality.findings)) return false;
+    if (!quality.findings.every((item) => isObject(item) && isString(item.code) && isString(item.level) && isString(item.message))) return false;
+  }
   return true;
 }
 

@@ -606,6 +606,47 @@ export type RouteSelectivity = {
   counts: Record<StepSelectivityClass, number>;
 };
 
+/**
+ * Conservative chemical-quality tier for a route (Stage 9I). It is separate from structural
+ * replay (`verification`): a route can replay exactly and still be chemically questionable.
+ * No yields or probabilities are implied; every finding cites the declared rule metadata or the
+ * textbook principle it rests on.
+ *
+ *  - structure-verified: replay passed, but no chemical assessment was available.
+ *  - chemically-supported: every step was assessed (declared conditions, one unambiguous outcome)
+ *    and nothing contradicted or worried the assessment. Still a model check, not validation.
+ *  - plausible-incomplete: nothing contradicted or worrying was found, but some steps could not be
+ *    assessed (no declared conditions, selectivity not established, unused steps).
+ *  - known-concern: at least one documented selectivity, condition or stability concern.
+ *  - contradicted: a declared model constraint is violated, atoms have no source, or replay failed.
+ */
+export type RouteQualityTier =
+  | "structure-verified"
+  | "chemically-supported"
+  | "plausible-incomplete"
+  | "known-concern"
+  | "contradicted";
+
+export type RouteQualityFindingLevel = "contradiction" | "concern" | "incomplete" | "support" | "info";
+
+export type RouteQualityFinding = {
+  /** Null for route-level findings. */
+  stepNumber: number | null;
+  /** Stable machine id, for example "eas-overhalogenation". */
+  code: string;
+  level: RouteQualityFindingLevel;
+  message: string;
+};
+
+export type RouteQuality = {
+  /** Bumped when the assessment rules change, so saved results are not read as current. */
+  assessmentVersion: number;
+  /** Structural replay status, reported unchanged. */
+  structural: RouteVerificationStatus | "not-run";
+  tier: RouteQualityTier;
+  findings: RouteQualityFinding[];
+};
+
 export type ReactionRule = {
   id: string;
   /** Declared reaction conditions; see RuleConditions. */
@@ -989,6 +1030,8 @@ export type MultistepSynthesisRoute = {
   compatibility?: RouteCompatibility;
   /** Advisory product-selectivity summary; absent on routes saved before it existed. */
   selectivity?: RouteSelectivity;
+  /** Conservative chemical-quality tier; absent on routes saved before Stage 9I. */
+  quality?: RouteQuality;
 };
 
 /**

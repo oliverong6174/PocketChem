@@ -14,6 +14,7 @@
  */
 import type { MultistepSynthesisProgress, MultistepSynthesisRoute, ReactionRule } from "../reactionTypes";
 import type { RankedRoute } from "./routeBook";
+import { routeQualityLabel } from "./routeQuality";
 import { createEngineLanes } from "./searchLanes";
 import {
   describeAdaptiveOutcome,
@@ -147,7 +148,8 @@ export function describeFoundRoutes(routes: MultistepSynthesisRoute[]): string {
   if (!best) return "";
   if (best.steps.length === 0) return "A supplied starting material already matches the target product.";
   const confirmed = best.verification?.status === "verified" ? "Structure-verified" : "Connectivity-verified";
-  return `${confirmed} route found: ${best.steps.length} ${plural(best.steps.length, "step", "steps")}.`;
+  const quality = best.quality ? ` Chemical quality: ${routeQualityLabel(best.quality.tier).toLowerCase()}.` : "";
+  return `${confirmed} route found: ${best.steps.length} ${plural(best.steps.length, "step", "steps")}.${quality}`;
 }
 
 export class SearchRunController {

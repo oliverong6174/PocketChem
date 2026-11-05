@@ -27,6 +27,7 @@ import {
   type SearchRunState,
 } from "../utils/reactions/engine/synthesisSearchRun";
 import { describeRouteStructure } from "../utils/reactions/engine/routePresentation";
+import { routeQualityLabel } from "../utils/reactions/engine/routeQuality";
 import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
 import { DebouncedTask } from "../utils/persistence/debouncedTask";
 import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
@@ -1699,6 +1700,32 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
                   ? "Connectivity verified"
                   : "Not replay-verified"}
             </span>
+          </div>
+
+          <div className={`reaction-detail synthesis-quality synthesis-quality-${route.quality?.tier ?? "unassessed"}`} data-testid="route-quality">
+            <p>
+              <strong>Chemical quality (advisory, separate from structure verification):</strong>{" "}
+              {route.quality ? routeQualityLabel(route.quality.tier) : "Not assessed. This route was saved before chemical-quality assessment existed and has not been recomputed."}
+            </p>
+            {route.quality && route.quality.tier !== "chemically-supported" && route.quality.tier !== "structure-verified" && (
+              <ul>
+                {route.quality.findings
+                  .filter((item) => item.level === "contradiction" || item.level === "concern" || item.level === "incomplete")
+                  .map((item, index) => (
+                    <li key={`${item.code}-${item.stepNumber}-${index}`}>
+                      {item.stepNumber ? `Step ${item.stepNumber}: ` : ""}
+                      <strong>
+                        {item.level === "contradiction" ? "contradicted" : item.level === "concern" ? "known concern" : "not fully assessed"}
+                      </strong>{" "}
+                      — {item.message}
+                    </li>
+                  ))}
+              </ul>
+            )}
+            <p className="reaction-note">
+              A route replayed from its starting materials is not thereby chemically sound. This tier uses declared rule
+              metadata and a few textbook-level checks; it gives no yield or probability, and no finding is not evidence of success.
+            </p>
           </div>
 
           {route.verification && route.verification.status !== "verified" && (
