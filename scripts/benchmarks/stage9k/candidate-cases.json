@@ -1,0 +1,2175 @@
+{
+  "cases": [
+    {
+      "id": "NM-01",
+      "kind": "nomenclature",
+      "title": "2,3-dimethylpentane",
+      "smiles": "CCC(C)C(C)C",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "2,3-dimethylpentane",
+        "accepted_names": [
+          "2,3-dimethylpentane"
+        ],
+        "formula": "C7H16"
+      },
+      "source": {
+        "file": "references/pubchem-2-3-dimethylpentane.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/11260",
+        "sha256": "6f7f13120af9f422003f9c70ce95c33198a3abd149788dbfbe818aaa744d500e",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-02",
+      "kind": "nomenclature",
+      "title": "3-ethylhexane",
+      "smiles": "CCCC(CC)CC",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "3-ethylhexane",
+        "accepted_names": [
+          "3-ethylhexane"
+        ],
+        "formula": "C8H18"
+      },
+      "source": {
+        "file": "references/pubchem-3-ethylhexane.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/12096",
+        "sha256": "b131e84fa8fb2e98e81de1f230dd2ce8b3e95716bd7f65ebc66ced584158c5f0",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-03",
+      "kind": "nomenclature",
+      "title": "2,2,4-trimethylpentane",
+      "smiles": "CC(C)CC(C)(C)C",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "2,2,4-trimethylpentane",
+        "accepted_names": [
+          "2,2,4-trimethylpentane"
+        ],
+        "formula": "C8H18"
+      },
+      "source": {
+        "file": "references/pubchem-2-2-4-trimethylpentane.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/10907",
+        "sha256": "97366d8cd27258ed0669c81f05c3dba28c9a2efe6b34574cdf93a4396a737c89",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-04",
+      "kind": "nomenclature",
+      "title": "3-methylhexan-2-one",
+      "smiles": "CCCC(C)C(=O)C",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "3-methylhexan-2-one",
+        "accepted_names": [
+          "3-methylhexan-2-one"
+        ],
+        "formula": "C7H14O"
+      },
+      "source": {
+        "file": "references/pubchem-3-methylhexan-2-one.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/102846",
+        "sha256": "c9563815edd7c5eafb95fae34983327967015d8f069be7fff64c869bb52a8646",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-05",
+      "kind": "nomenclature",
+      "title": "4-methylhexan-2-one",
+      "smiles": "CCC(C)CC(=O)C",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "4-methylhexan-2-one",
+        "accepted_names": [
+          "4-methylhexan-2-one"
+        ],
+        "formula": "C7H14O"
+      },
+      "source": {
+        "file": "references/pubchem-4-methylhexan-2-one.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7754",
+        "sha256": "ef8f40ae98256da74479a45d6e9f7d90cdfc2c7491f75a2cf843f6e1088f0834",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-06",
+      "kind": "nomenclature",
+      "title": "2,2-dimethylbutanoic acid",
+      "smiles": "CCC(C)(C)C(=O)O",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "2,2-dimethylbutanoic acid",
+        "accepted_names": [
+          "2,2-dimethylbutanoic acid"
+        ],
+        "formula": "C6H12O2"
+      },
+      "source": {
+        "file": "references/pubchem-2-2-dimethylbutanoic-acid.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/11684",
+        "sha256": "ff7a09dd63891c012ccb3bebba8812681e257096db21cd55cde57f9370a1529f",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-07",
+      "kind": "nomenclature",
+      "title": "3,3-dimethylbutanoic acid",
+      "smiles": "CC(C)(C)CC(=O)O",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "3,3-dimethylbutanoic acid",
+        "accepted_names": [
+          "3,3-dimethylbutanoic acid"
+        ],
+        "formula": "C6H12O2"
+      },
+      "source": {
+        "file": "references/pubchem-3-3-dimethylbutanoic-acid.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/14057",
+        "sha256": "cc73978428e1e9b1c93bc8b5fabde57fc31e32788208ba875413494e58757195",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-08",
+      "kind": "nomenclature",
+      "title": "2-ethylbutanoic acid",
+      "smiles": "CCC(CC)C(=O)O",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "2-ethylbutanoic acid",
+        "accepted_names": [
+          "2-ethylbutanoic acid"
+        ],
+        "formula": "C6H12O2"
+      },
+      "source": {
+        "file": "references/pubchem-2-ethylbutanoic-acid.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6915",
+        "sha256": "eb8052ddc426d2dd861e469a0cb5a9e4403a817a4da4def4c09b09b85b7f3187",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-09",
+      "kind": "nomenclature",
+      "title": "ethyl 2-methylbutanoate",
+      "smiles": "CCC(C)C(=O)OCC",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "ethyl 2-methylbutanoate",
+        "accepted_names": [
+          "ethyl 2-methylbutanoate"
+        ],
+        "formula": "C7H14O2"
+      },
+      "source": {
+        "file": "references/pubchem-ethyl-2-methylbutanoate.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/24020",
+        "sha256": "f72cea724913d14c0b8864b2d17755bf4f2294f6751e338a8883982d607bad88",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-10",
+      "kind": "nomenclature",
+      "title": "methyl 3-methylpentanoate",
+      "smiles": "CCC(C)CC(=O)OC",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "methyl 3-methylpentanoate",
+        "accepted_names": [
+          "methyl 3-methylpentanoate"
+        ],
+        "formula": "C7H14O2"
+      },
+      "source": {
+        "file": "references/pubchem-methyl-3-methylpentanoate.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/519891",
+        "sha256": "5b0546edc2b1e759216a420360cf47924a0d03590c568940c2930aceb4255de8",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-11",
+      "kind": "nomenclature",
+      "title": "N-ethylpropanamide",
+      "smiles": "CCC(=O)NCC",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "N-ethylpropanamide",
+        "accepted_names": [
+          "N-ethylpropanamide"
+        ],
+        "formula": "C5H11NO"
+      },
+      "source": {
+        "file": "references/pubchem-n-ethylpropanamide.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/521324",
+        "sha256": "79a8f3769addc59613dacdf61b1eb99b898d57f958db016b2ceb5c524c710940",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-12",
+      "kind": "nomenclature",
+      "title": "N,N-dimethylbenzamide",
+      "smiles": "CN(C)C(=O)C1=CC=CC=C1",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "N,N-dimethylbenzamide",
+        "accepted_names": [
+          "N,N-dimethylbenzamide"
+        ],
+        "formula": "C9H11NO"
+      },
+      "source": {
+        "file": "references/pubchem-n-n-dimethylbenzamide.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/11916",
+        "sha256": "46c82be9201b6453ffa0ce76929a72ebb6c2c8f1dcb5e729642e74894fc0b46a",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-13",
+      "kind": "nomenclature",
+      "title": "3-bromobenzoic acid",
+      "smiles": "C1=CC(=CC(=C1)Br)C(=O)O",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "3-bromobenzoic acid",
+        "accepted_names": [
+          "3-bromobenzoic acid"
+        ],
+        "formula": "C7H5BrO2"
+      },
+      "source": {
+        "file": "references/pubchem-3-bromobenzoic-acid.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/11456",
+        "sha256": "2677fd3662b6d371388b844aa0b5079b256632e77882390887ad40b770d2e4b9",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-14",
+      "kind": "nomenclature",
+      "title": "4-chlorobenzaldehyde",
+      "smiles": "C1=CC(=CC=C1C=O)Cl",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "4-chlorobenzaldehyde",
+        "accepted_names": [
+          "4-chlorobenzaldehyde"
+        ],
+        "formula": "C7H5ClO"
+      },
+      "source": {
+        "file": "references/pubchem-4-chlorobenzaldehyde.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7726",
+        "sha256": "2a84ba7c25a81756acd6f9e5d50fe01d1052e83e1150197958a0fc0689356111",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-15",
+      "kind": "nomenclature",
+      "title": "3-methoxybenzoic acid",
+      "smiles": "COC1=CC=CC(=C1)C(=O)O",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "3-methoxybenzoic acid",
+        "accepted_names": [
+          "3-methoxybenzoic acid"
+        ],
+        "formula": "C8H8O3"
+      },
+      "source": {
+        "file": "references/pubchem-3-methoxybenzoic-acid.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/11461",
+        "sha256": "abb7f23d5749b9031a09b6f993ea1449459151c6121ae1e6978f903ccaa7563d",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-16",
+      "kind": "nomenclature",
+      "title": "2-aminobutan-1-ol",
+      "smiles": "CCC(CO)N",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "2-aminobutan-1-ol",
+        "accepted_names": [
+          "2-aminobutan-1-ol"
+        ],
+        "formula": "C4H11NO"
+      },
+      "source": {
+        "file": "references/pubchem-2-aminobutan-1-ol.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/22129",
+        "sha256": "b1c4af7fe22bac91cd92fee38bcb5924189692154518095d60c9671a5eaa3c53",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-17",
+      "kind": "nomenclature",
+      "title": "(S)-2-chloropentane",
+      "smiles": "CCC[C@H](C)Cl",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "(2S)-2-chloropentane",
+        "accepted_names": [
+          "(2S)-2-chloropentane",
+          "(S)-2-chloropentane"
+        ],
+        "formula": "C5H11Cl"
+      },
+      "source": {
+        "file": "references/pubchem-s-2-chloropentane.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/24884244",
+        "sha256": "173b69d51e3b96f0a1d5e3e70b91080577185c90ebcf96c629f118ff17dba326",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature",
+        "stereochemistry"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-18",
+      "kind": "nomenclature",
+      "title": "(E)-hept-3-ene",
+      "smiles": "CCC/C=C/CC",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "(E)-hept-3-ene",
+        "accepted_names": [
+          "(E)-hept-3-ene"
+        ],
+        "formula": "C7H14"
+      },
+      "source": {
+        "file": "references/pubchem-e-hept-3-ene.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/5357259",
+        "sha256": "998346eda660a84645b24ef2bc508459b4c8aa61728b38984ee001f0b0ab587a",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature",
+        "stereochemistry"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "NM-19",
+      "kind": "nomenclature",
+      "title": "(Z)-hept-3-ene",
+      "smiles": "CCC/C=C\\CC",
+      "conditions": "Molecular identity as specified; no reaction",
+      "expected": {
+        "name": "(Z)-hept-3-ene",
+        "accepted_names": [
+          "(Z)-hept-3-ene"
+        ],
+        "formula": "C7H14"
+      },
+      "source": {
+        "file": "references/pubchem-z-hept-3-ene.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/5357258",
+        "sha256": "c79b2830f1a8bb9217d98030dab22473e0f1ef39fd19fff23c96641be3dfc77f",
+        "quality": "A: exact database name/structure pair (computed Lexichem name, not an IUPAC ruling)"
+      },
+      "criteria": [
+        "molecularIdentity",
+        "nomenclature",
+        "stereochemistry"
+      ],
+      "uncertainties": "Other valid systematic names may be missed by a finite lexical list. No synonym may erase or contradict specified stereochemistry. Identity is an end-to-end name-to-structure database cross-check, not an experimental assay."
+    },
+    {
+      "id": "MS-01",
+      "kind": "ms",
+      "title": "thiophene",
+      "smiles": "C1=CSC=C1",
+      "formula": "C4H4S",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 84,
+        "molecular_ion_reference_intensity": 100.0,
+        "base_peaks_mz": [
+          84
+        ],
+        "key_fragments": [
+          {
+            "mz": 58,
+            "relativeIntensity": 72.9973
+          },
+          {
+            "mz": 45,
+            "relativeIntensity": 37.8038
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-thiophene.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110021&Index=0&Type=Mass",
+        "sha256": "be71d0ec45049cb939ac6a3273b9af3b5abdec02b648420d057d1914495d43c1",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-thiophene.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8030",
+        "sha256": "a07a443c96d6b6d1e34581b4d92d6f16f6ce6e776fe1ee47d9498abfeaca2752",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-02",
+      "kind": "ms",
+      "title": "pyrrole",
+      "smiles": "C1=CNC=C1",
+      "formula": "C4H5N",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 67,
+        "molecular_ion_reference_intensity": 100.0,
+        "base_peaks_mz": [
+          67
+        ],
+        "key_fragments": [
+          {
+            "mz": 39,
+            "relativeIntensity": 67.8068
+          },
+          {
+            "mz": 41,
+            "relativeIntensity": 63.0063
+          },
+          {
+            "mz": 40,
+            "relativeIntensity": 53.8054
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-pyrrole.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109977&Index=0&Type=Mass",
+        "sha256": "ec0d48b3cd9947f304dbe83ca4cb70d55768e309df88f3797fa2637f4bb8522c",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-pyrrole.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8027",
+        "sha256": "cf91e22c5099749785d58ad949e0e7324a5dc177d82600e1a3b2f8e34b348957",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-03",
+      "kind": "ms",
+      "title": "furan",
+      "smiles": "C1=COC=C1",
+      "formula": "C4H4O",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 68,
+        "molecular_ion_reference_intensity": 100.0,
+        "base_peaks_mz": [
+          68
+        ],
+        "key_fragments": [
+          {
+            "mz": 39,
+            "relativeIntensity": 95.9996
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-furan.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110009&Index=0&Type=Mass",
+        "sha256": "958e0539a5cbfb2008df3d7ecaf1b6220dd2ae820068553f8d58aad59cbae838",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-furan.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8029",
+        "sha256": "3e539ccb60940bb2d3ef8697d26b6a3424f95c4c83ef8d575af697ab7b846a0f",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-04",
+      "kind": "ms",
+      "title": "pyridazine",
+      "smiles": "C1=CC=NN=C1",
+      "formula": "C4H4N2",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 80,
+        "molecular_ion_reference_intensity": 100.0,
+        "base_peaks_mz": [
+          80
+        ],
+        "key_fragments": [
+          {
+            "mz": 51,
+            "relativeIntensity": 41.0941
+          },
+          {
+            "mz": 52,
+            "relativeIntensity": 36.3936
+          },
+          {
+            "mz": 26,
+            "relativeIntensity": 23.3923
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-pyridazine.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C289805&Index=0&Type=Mass",
+        "sha256": "15847805cfef1bdcfad756a0795d587d63333c973f681893f7e5ce65dbf6f78d",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-pyridazine.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/9259",
+        "sha256": "a4f9c55dcaa438b740d7b9c72344004d6fdb4ffe4cafa6188f5a00482fbf08de",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-05",
+      "kind": "ms",
+      "title": "pyrimidine",
+      "smiles": "C1=CN=CN=C1",
+      "formula": "C4H4N2",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 80,
+        "molecular_ion_reference_intensity": 100.0,
+        "base_peaks_mz": [
+          80
+        ],
+        "key_fragments": [
+          {
+            "mz": 53,
+            "relativeIntensity": 38.2938
+          },
+          {
+            "mz": 26,
+            "relativeIntensity": 27.4927
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-pyrimidine.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C289952&Index=0&Type=Mass",
+        "sha256": "3b9fd558cc96e99c5a4a22cebc05ad8d56c4cc868c52016257ce634f52c0aacd",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-pyrimidine.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/9260",
+        "sha256": "db155ef3c6313c47b5804b8c3a55b9326fef89b2a23414b116ace389d2baec3f",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-06",
+      "kind": "ms",
+      "title": "pyrazine",
+      "smiles": "C1=CN=CC=N1",
+      "formula": "C4H4N2",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 80,
+        "molecular_ion_reference_intensity": 100.0,
+        "base_peaks_mz": [
+          80
+        ],
+        "key_fragments": [
+          {
+            "mz": 53,
+            "relativeIntensity": 45.2945
+          },
+          {
+            "mz": 26,
+            "relativeIntensity": 42.2942
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-pyrazine.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C290379&Index=0&Type=Mass",
+        "sha256": "72624dbecec5b553382c63762a937375d4fe8a50f73a72dae5e2b282ce780f41",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-pyrazine.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/9261",
+        "sha256": "f1892d76eeee69cf28c327673279107fcb394e91a17bfcbbf6f941673ff66677",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-07",
+      "kind": "ms",
+      "title": "cycloheptanone",
+      "smiles": "C1CCCC(=O)CC1",
+      "formula": "C7H12O",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 112,
+        "molecular_ion_reference_intensity": 42.8942894289429,
+        "base_peaks_mz": [
+          68
+        ],
+        "key_fragments": [
+          {
+            "mz": 55,
+            "relativeIntensity": 95.1995
+          },
+          {
+            "mz": 41,
+            "relativeIntensity": 88.9989
+          },
+          {
+            "mz": 56,
+            "relativeIntensity": 58.2958
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-cycloheptanone.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C502421&Index=0&Type=Mass",
+        "sha256": "5d2d77e05ffb18773bfabb2750407e5d6d55448d4b91100eb0541fa83128228f",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-cycloheptanone.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/10400",
+        "sha256": "5ffa4e7a1a74c947cf9fc7860ba7468cb7502b9d03ef1a0a0a5663505b2d3612",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-08",
+      "kind": "ms",
+      "title": "cyclopentanone",
+      "smiles": "C1CCC(=O)C1",
+      "formula": "C5H8O",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 84,
+        "molecular_ion_reference_intensity": 42.014201420142015,
+        "base_peaks_mz": [
+          55
+        ],
+        "key_fragments": [
+          {
+            "mz": 28,
+            "relativeIntensity": 50.025
+          },
+          {
+            "mz": 41,
+            "relativeIntensity": 37.7038
+          },
+          {
+            "mz": 56,
+            "relativeIntensity": 28.9729
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-cyclopentanone.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C120923&Index=0&Type=Mass",
+        "sha256": "aba2ba45718d2ec0d828ab54e23c9a5d8f543705fa45ad9ff3d7ad976cc5d374",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-cyclopentanone.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8452",
+        "sha256": "38266ec03207f349d0878bcc8e61cffed3fafd7eeba63bf80fe2dab3e6b2bef3",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-09",
+      "kind": "ms",
+      "title": "2-nonanone",
+      "smiles": "CCCCCCCC(=O)C",
+      "formula": "C9H18O",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 142,
+        "molecular_ion_reference_intensity": 7.15071507150715,
+        "base_peaks_mz": [
+          43
+        ],
+        "key_fragments": [
+          {
+            "mz": 58,
+            "relativeIntensity": 91.1791
+          },
+          {
+            "mz": 41,
+            "relativeIntensity": 29.2129
+          },
+          {
+            "mz": 57,
+            "relativeIntensity": 22.3922
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-2-nonanone.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C821556&Index=0&Type=Mass",
+        "sha256": "e73475670b02bd4237b72f9d89c1188ecffa90b05d92ea9e5fc1fb58f8337a50",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-2-nonanone.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/13187",
+        "sha256": "bf5f9cea5f1de1c07fe5e20d308cf5714172634d4d7d00c8a74e25f96a6d73ef",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-10",
+      "kind": "ms",
+      "title": "nonanal",
+      "smiles": "CCCCCCCCC=O",
+      "formula": "C9H18O",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": null,
+        "molecular_ion_reference_intensity": 0.4000400040004,
+        "base_peaks_mz": [
+          57
+        ],
+        "key_fragments": [
+          {
+            "mz": 41,
+            "relativeIntensity": 89.3989
+          },
+          {
+            "mz": 43,
+            "relativeIntensity": 87.9988
+          },
+          {
+            "mz": 56,
+            "relativeIntensity": 79.798
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-nonanal.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C124196&Index=0&Type=Mass",
+        "sha256": "d744db43c6b2f47932d727e402dfc4213a6e965780a0976e1c0bb35a3f11aa7e",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-nonanal.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/31289",
+        "sha256": "fa017f1f6ef636fc76f67a7acc9033c817736ff7b46cecbf86541c0a9845b96f",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-11",
+      "kind": "ms",
+      "title": "methyl heptanoate",
+      "smiles": "CCCCCCC(=O)OC",
+      "formula": "C8H16O2",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": null,
+        "molecular_ion_reference_intensity": 0.7000700070007001,
+        "base_peaks_mz": [
+          74
+        ],
+        "key_fragments": [
+          {
+            "mz": 87,
+            "relativeIntensity": 50.9551
+          },
+          {
+            "mz": 43,
+            "relativeIntensity": 34.7335
+          },
+          {
+            "mz": 113,
+            "relativeIntensity": 27.1227
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-methyl-heptanoate.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C106730&Index=0&Type=Mass",
+        "sha256": "d70b5f9a2a1d7d7cd48e6cc08a6700923e7db51bcab56b06b6821ced8295d164",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-methyl-heptanoate.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7826",
+        "sha256": "21547985b1f77ebab6f5a451064834e6136fd80317dda1bc24085455c1a92113",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-12",
+      "kind": "ms",
+      "title": "ethyl heptanoate",
+      "smiles": "CCCCCCC(=O)OCC",
+      "formula": "C9H18O2",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 158,
+        "molecular_ion_reference_intensity": 1.2001200120012,
+        "base_peaks_mz": [
+          88
+        ],
+        "key_fragments": [
+          {
+            "mz": 113,
+            "relativeIntensity": 45.6446
+          },
+          {
+            "mz": 101,
+            "relativeIntensity": 33.4333
+          },
+          {
+            "mz": 43,
+            "relativeIntensity": 29.633
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-ethyl-heptanoate.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C106309&Index=0&Type=Mass",
+        "sha256": "e2c8712f5274a828c664a1b0f09b65357a6d602c483ec9b720d9bc9c293948c3",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-ethyl-heptanoate.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7797",
+        "sha256": "559d4582c9cdc1d9e195f115708a8358dd2373548a0cd5c31b651da542b976ec",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-13",
+      "kind": "ms",
+      "title": "heptanoic acid",
+      "smiles": "CCCCCCC(=O)O",
+      "formula": "C7H14O2",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": null,
+        "molecular_ion_reference_intensity": 0.1000100010001,
+        "base_peaks_mz": [
+          60
+        ],
+        "key_fragments": [
+          {
+            "mz": 73,
+            "relativeIntensity": 46.9047
+          },
+          {
+            "mz": 41,
+            "relativeIntensity": 31.6032
+          },
+          {
+            "mz": 43,
+            "relativeIntensity": 31.5032
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-heptanoic-acid.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111148&Index=0&Type=Mass",
+        "sha256": "6a4b13c57e0230c07018365cb367be8f6d100d77e51c8daa83f78ff17a6f95bd",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-heptanoic-acid.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8094",
+        "sha256": "3d939ff5b745de18442d4cb3bbde10d56f6749b95e3f198e7f59b9f99e014c9d",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-14",
+      "kind": "ms",
+      "title": "nonanenitrile",
+      "smiles": "CCCCCCCCC#N",
+      "formula": "C9H17N",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": null,
+        "molecular_ion_reference_intensity": 0.4000400040004,
+        "base_peaks_mz": [
+          41
+        ],
+        "key_fragments": [
+          {
+            "mz": 82,
+            "relativeIntensity": 86.5987
+          },
+          {
+            "mz": 96,
+            "relativeIntensity": 84.5985
+          },
+          {
+            "mz": 69,
+            "relativeIntensity": 80.6981
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-nonanenitrile.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C2243278&Index=0&Type=Mass",
+        "sha256": "9d799b98c47f1d3ed54bd0d62714914240107f2dd8b2a83e3b6f2013fc629b2a",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-nonanenitrile.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/16715",
+        "sha256": "c01e24441b277f0edb0330339cc5d93b0984d6db9b730d5f52b51a3d64e434b0",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-15",
+      "kind": "ms",
+      "title": "1-decanol",
+      "smiles": "CCCCCCCCCCO",
+      "formula": "C10H22O",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": null,
+        "molecular_ion_reference_intensity": 0,
+        "base_peaks_mz": [
+          70
+        ],
+        "key_fragments": [
+          {
+            "mz": 55,
+            "relativeIntensity": 98.7999
+          },
+          {
+            "mz": 56,
+            "relativeIntensity": 85.9886
+          },
+          {
+            "mz": 69,
+            "relativeIntensity": 82.3782
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-1-decanol.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C112301&Index=0&Type=Mass",
+        "sha256": "55cbd147c78f738ec2343ce46060e8412b64012ce672ee1ded3e3410240ca4d3",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-1-decanol.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8174",
+        "sha256": "800efcaf3e18a1b76386bacac7d1b02da537eb7dda7027ae0af6bdc668ac1bf2",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-16",
+      "kind": "ms",
+      "title": "dipropylamine",
+      "smiles": "CCCNCCC",
+      "formula": "C6H15N",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 101,
+        "molecular_ion_reference_intensity": 16.29162916291629,
+        "base_peaks_mz": [
+          72
+        ],
+        "key_fragments": [
+          {
+            "mz": 30,
+            "relativeIntensity": 65.2965
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-dipropylamine.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C142847&Index=0&Type=Mass",
+        "sha256": "7c114aa083d347c647a6f83c3eb1551ac276f3d2e79a9480195f70798bf0b173",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-dipropylamine.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8902",
+        "sha256": "652780479c22700d4bfe0de6aef7242a849b7a03d236a564e2bbc2a7634c874b",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-17",
+      "kind": "ms",
+      "title": "tripropylamine",
+      "smiles": "CCCN(CCC)CCC",
+      "formula": "C9H21N",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 143,
+        "molecular_ion_reference_intensity": 8.310831083108312,
+        "base_peaks_mz": [
+          114
+        ],
+        "key_fragments": []
+      },
+      "source": {
+        "file": "references/nist-tripropylamine.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C102692&Index=0&Type=Mass",
+        "sha256": "e24997922f29ed38d60e8d25876f8e84eb7d7ceb8ef3166e337ff5d273b1d1af",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-tripropylamine.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7616",
+        "sha256": "73854eb9b8296893e31e74c211207444d3dfd6d28f7975cd454f56792e00575a",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "MS-18",
+      "kind": "ms",
+      "title": "ethoxybenzene",
+      "smiles": "CCOC1=CC=CC=C1",
+      "formula": "C8H10O",
+      "conditions": "NIST WebBook EI library spectrum, Index=0. Electron energy is not provided by these downloaded JCAMP records; no 70 eV claim.",
+      "expected": {
+        "molecular_ion_mz": 122,
+        "molecular_ion_reference_intensity": 38.853885388538856,
+        "base_peaks_mz": [
+          94
+        ],
+        "key_fragments": [
+          {
+            "mz": 66,
+            "relativeIntensity": 30.213
+          },
+          {
+            "mz": 39,
+            "relativeIntensity": 20.7821
+          }
+        ]
+      },
+      "source": {
+        "file": "references/nist-ethoxybenzene.jdx",
+        "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C103731&Index=0&Type=Mass",
+        "sha256": "59e54bc29e0acd6c2480a90f1c1863a5a8ce7b1490bb2dd9a6d492321cf4340a",
+        "quality": "A: exact NIST library peak table"
+      },
+      "identity_source": {
+        "file": "references/pubchem-ethoxybenzene.json",
+        "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7674",
+        "sha256": "943f86e22ebba56b1424c906f86bfc2aee089508243f8a4c861d30cc22461150",
+        "quality": "A: independent formula/structure cross-check"
+      },
+      "criteria": [
+        "molecularIon",
+        "basePeak",
+        "keyFragments"
+      ],
+      "uncertainties": "Single library spectrum; relative intensities depend on instrument and EI energy. Molecular ion is scored only if at least 1% relative abundance; this tests m/z, not observability or intensity. Key peaks are the three strongest non-parent/non-parent-isotope/non-base peaks >=20%, all required within 0.5 m/z."
+    },
+    {
+      "id": "RX-01",
+      "kind": "reaction",
+      "title": "non-1-ene ionic HBr",
+      "reactants": [
+        "C=CCCCCCCC"
+      ],
+      "conditions": "HBr, no peroxides, inert solvent, ambient",
+      "family": "hbr",
+      "adapter_rule_hint": "",
+      "expected": {
+        "products": [
+          {
+            "smiles": "CC(Br)CCCCCCC",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [
+          "BrCCCCCCCCC"
+        ],
+        "minor": [],
+        "stereo": null
+      },
+      "source": {
+        "file": "references/openstax-7-8-orientation-of-electrophilic-additions-markovnikovs-rule.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/7-8-orientation-of-electrophilic-additions-markovnikovs-rule",
+        "sha256": "979b6406c208dd323154c2d407b777ee8da7c8662261ebc12989baf0637e0c37",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "regiochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-02",
+      "kind": "reaction",
+      "title": "dec-1-ene hydroboration",
+      "reactants": [
+        "C=CCCCCCCCC"
+      ],
+      "conditions": "1 BH3/THF; 2 H2O2/NaOH",
+      "family": "hydroboration",
+      "adapter_rule_hint": "",
+      "expected": {
+        "products": [
+          {
+            "smiles": "OCCCCCCCCCC",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [
+          "CC(O)CCCCCCCC"
+        ],
+        "minor": [],
+        "stereo": null
+      },
+      "source": {
+        "file": "references/openstax-8-5-hydration-of-alkenes-addition-of-h2o-by-hydroboration.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/8-5-hydration-of-alkenes-addition-of-h2o-by-hydroboration",
+        "sha256": "eacb267e4edf49b3d6b78f494eafdd9499a71707c859a197c92f34fda8502033",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "regiochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-03",
+      "kind": "reaction",
+      "title": "vinylcyclopentane hydroboration",
+      "reactants": [
+        "C=CC1CCCC1"
+      ],
+      "conditions": "1 BH3/THF; 2 H2O2/NaOH",
+      "family": "hydroboration",
+      "adapter_rule_hint": "",
+      "expected": {
+        "products": [
+          {
+            "smiles": "OCCC1CCCC1",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [
+          "CC(O)C1CCCC1"
+        ],
+        "minor": [],
+        "stereo": null
+      },
+      "source": {
+        "file": "references/openstax-8-5-hydration-of-alkenes-addition-of-h2o-by-hydroboration.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/8-5-hydration-of-alkenes-addition-of-h2o-by-hydroboration",
+        "sha256": "eacb267e4edf49b3d6b78f494eafdd9499a71707c859a197c92f34fda8502033",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "regiochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-04",
+      "kind": "reaction",
+      "title": "undec-1-ene ionic HBr",
+      "reactants": [
+        "C=CCCCCCCCCC"
+      ],
+      "conditions": "HBr, no peroxides, inert solvent, ambient",
+      "family": "hbr",
+      "adapter_rule_hint": "",
+      "expected": {
+        "products": [
+          {
+            "smiles": "CC(Br)CCCCCCCCC",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [
+          "BrCCCCCCCCCCC"
+        ],
+        "minor": [],
+        "stereo": null
+      },
+      "source": {
+        "file": "references/openstax-7-8-orientation-of-electrophilic-additions-markovnikovs-rule.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/7-8-orientation-of-electrophilic-additions-markovnikovs-rule",
+        "sha256": "979b6406c208dd323154c2d407b777ee8da7c8662261ebc12989baf0637e0c37",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "regiochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-05",
+      "kind": "reaction",
+      "title": "cycloheptene anti bromination",
+      "reactants": [
+        "C1=CCCCCC1"
+      ],
+      "conditions": "Br2, dry CH2Cl2, ambient, no light",
+      "family": "bromination",
+      "adapter_rule_hint": "",
+      "expected": {
+        "products": [
+          {
+            "smiles": "Br[C@H]1[C@H](Br)CCCCC1",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [],
+        "minor": [],
+        "stereo": "racemic"
+      },
+      "source": {
+        "file": "references/openstax-8-2-halogenation-of-alkenes-addition-of-x2.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/8-2-halogenation-of-alkenes-addition-of-x2",
+        "sha256": "175e7726e784273fa4ffaaa2370980e30f993c18d361e49e45f3314a83aa8037",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "stereochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-06",
+      "kind": "reaction",
+      "title": "cyclooctene anti bromination",
+      "reactants": [
+        "C1=CCCCCCC1"
+      ],
+      "conditions": "Br2, dry CH2Cl2, ambient, no light",
+      "family": "bromination",
+      "adapter_rule_hint": "",
+      "expected": {
+        "products": [
+          {
+            "smiles": "Br[C@H]1[C@H](Br)CCCCCC1",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [],
+        "minor": [],
+        "stereo": "racemic"
+      },
+      "source": {
+        "file": "references/openstax-8-2-halogenation-of-alkenes-addition-of-x2.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/8-2-halogenation-of-alkenes-addition-of-x2",
+        "sha256": "175e7726e784273fa4ffaaa2370980e30f993c18d361e49e45f3314a83aa8037",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "stereochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-07",
+      "kind": "reaction",
+      "title": "1,2-dimethylcycloheptene syn hydrogenation",
+      "reactants": [
+        "CC1=C(C)CCCCC1"
+      ],
+      "conditions": "H2, Pd/C, ambient",
+      "family": "hydrogenation",
+      "adapter_rule_hint": "",
+      "expected": {
+        "products": [
+          {
+            "smiles": "C[C@H]1[C@@H](C)CCCCC1",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [],
+        "minor": [],
+        "stereo": "racemic"
+      },
+      "source": {
+        "file": "references/openstax-8-6-reduction-of-alkenes-hydrogenation.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/8-6-reduction-of-alkenes-hydrogenation",
+        "sha256": "80891bd4073e696f05dbdbcc38c9befe1207d594c0872d3eabc385c8d61754be",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "stereochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-08",
+      "kind": "reaction",
+      "title": "oct-3-yne Lindlar reduction",
+      "reactants": [
+        "CCC#CCCCC"
+      ],
+      "conditions": "H2, Lindlar catalyst (poisoned Pd), ambient",
+      "family": "lindlar",
+      "adapter_rule_hint": "",
+      "expected": {
+        "products": [
+          {
+            "smiles": "CC/C=C\\CCCC",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [],
+        "minor": [],
+        "stereo": "exact"
+      },
+      "source": {
+        "file": "references/openstax-9-5-reduction-of-alkynes.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/9-5-reduction-of-alkynes",
+        "sha256": "8db744b88e1e2c919c8b8aa2b754294e48d23b83700801fc82ccc2bb6885ac4e",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "stereochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-09",
+      "kind": "reaction",
+      "title": "oct-3-yne dissolving metal reduction",
+      "reactants": [
+        "CCC#CCCCC"
+      ],
+      "conditions": "Na, liquid NH3, low temperature",
+      "family": "dissolving-metal",
+      "adapter_rule_hint": "",
+      "expected": {
+        "products": [
+          {
+            "smiles": "CC/C=C/CCCC",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [],
+        "minor": [],
+        "stereo": "exact"
+      },
+      "source": {
+        "file": "references/openstax-9-5-reduction-of-alkynes.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/9-5-reduction-of-alkynes",
+        "sha256": "8db744b88e1e2c919c8b8aa2b754294e48d23b83700801fc82ccc2bb6885ac4e",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "stereochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-10",
+      "kind": "reaction",
+      "title": "chiral 2-bromohexane cyanide inversion",
+      "reactants": [
+        "C[C@H](Br)CCCC"
+      ],
+      "conditions": "NaCN, DMSO, ambient; score SN2 product",
+      "family": "sn2-cyanide",
+      "adapter_rule_hint": "haloalkane-sn2-cyanide",
+      "expected": {
+        "products": [
+          {
+            "smiles": "C[C@@H](C#N)CCCC",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [],
+        "minor": [],
+        "stereo": "exact"
+      },
+      "source": {
+        "file": "references/openstax-11-2-the-sn2-reaction.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/11-2-the-sn2-reaction",
+        "sha256": "1696107791af1f4f43e46f4795c86ee53e7835bf9865199353c7c094bc7704a0",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "stereochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-11",
+      "kind": "reaction",
+      "title": "chiral 2-bromoheptane iodide inversion",
+      "reactants": [
+        "C[C@@H](Br)CCCCC"
+      ],
+      "conditions": "NaI, acetone, ambient; score SN2 product",
+      "family": "sn2-iodide",
+      "adapter_rule_hint": "haloalkane-sn2-iodide",
+      "expected": {
+        "products": [
+          {
+            "smiles": "C[C@H](I)CCCCC",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [],
+        "minor": [],
+        "stereo": "exact"
+      },
+      "source": {
+        "file": "references/openstax-11-2-the-sn2-reaction.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/11-2-the-sn2-reaction",
+        "sha256": "1696107791af1f4f43e46f4795c86ee53e7835bf9865199353c7c094bc7704a0",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "stereochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-12",
+      "kind": "reaction",
+      "title": "2-bromooctane small-base E2",
+      "reactants": [
+        "CC(Br)CCCCCC"
+      ],
+      "conditions": "NaOEt, ethanol, heat; compare E2 constitutional products only",
+      "family": "e2-ethoxide",
+      "adapter_rule_hint": "haloalkane-e2-ethoxide",
+      "expected": {
+        "products": [
+          {
+            "smiles": "CC=CCCCCC",
+            "role": "major"
+          }
+        ],
+        "forbidden": [],
+        "minor": [
+          "C=CCCCCCC"
+        ],
+        "stereo": null
+      },
+      "source": {
+        "file": "references/openstax-11-7-elimination-reactions-zaitsevs-rule.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/11-7-elimination-reactions-zaitsevs-rule",
+        "sha256": "bc3a0762069d2a9e704dd467d027814e2e878ade1a8d51afd17ec11406715658",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "regiochemistry",
+        "majorMinorRanking"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-13",
+      "kind": "reaction",
+      "title": "2-bromononane small-base E2",
+      "reactants": [
+        "CC(Br)CCCCCCC"
+      ],
+      "conditions": "NaOEt, ethanol, heat; compare E2 constitutional products only",
+      "family": "e2-ethoxide",
+      "adapter_rule_hint": "haloalkane-e2-ethoxide",
+      "expected": {
+        "products": [
+          {
+            "smiles": "CC=CCCCCCC",
+            "role": "major"
+          }
+        ],
+        "forbidden": [],
+        "minor": [
+          "C=CCCCCCCC"
+        ],
+        "stereo": null
+      },
+      "source": {
+        "file": "references/openstax-11-7-elimination-reactions-zaitsevs-rule.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/11-7-elimination-reactions-zaitsevs-rule",
+        "sha256": "bc3a0762069d2a9e704dd467d027814e2e878ade1a8d51afd17ec11406715658",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "regiochemistry",
+        "majorMinorRanking"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-14",
+      "kind": "reaction",
+      "title": "1-bromoheptane cyanide homologation",
+      "reactants": [
+        "CCCCCCCBr"
+      ],
+      "conditions": "NaCN, DMSO, ambient",
+      "family": "sn2-cyanide",
+      "adapter_rule_hint": "haloalkane-sn2-cyanide",
+      "expected": {
+        "products": [
+          {
+            "smiles": "CCCCCCCC#N",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [],
+        "minor": [],
+        "stereo": null
+      },
+      "source": {
+        "file": "references/openstax-11-2-the-sn2-reaction.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/11-2-the-sn2-reaction",
+        "sha256": "1696107791af1f4f43e46f4795c86ee53e7835bf9865199353c7c094bc7704a0",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-15",
+      "kind": "reaction",
+      "title": "hept-1-yne mercury hydration",
+      "reactants": [
+        "C#CCCCCC"
+      ],
+      "conditions": "HgSO4, H2SO4, water",
+      "family": "alkyne-hydration",
+      "adapter_rule_hint": "",
+      "expected": {
+        "products": [
+          {
+            "smiles": "CCCCCC(=O)C",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [
+          "CCCCCCC=O"
+        ],
+        "minor": [],
+        "stereo": null
+      },
+      "source": {
+        "file": "references/openstax-9-4-hydration-of-alkynes.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/9-4-hydration-of-alkynes",
+        "sha256": "9b190bf61c796b435a10061ece3bd2f53425774b897eeeefa2bc3086b5b0e40d",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "regiochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RX-16",
+      "kind": "reaction",
+      "title": "oct-1-yne hydroboration oxidation",
+      "reactants": [
+        "C#CCCCCCC"
+      ],
+      "conditions": "1 disiamylborane; 2 H2O2/NaOH",
+      "family": "alkyne-hydroboration",
+      "adapter_rule_hint": "",
+      "expected": {
+        "products": [
+          {
+            "smiles": "CCCCCCCC=O",
+            "role": "expected"
+          }
+        ],
+        "forbidden": [
+          "CCCCCCC(=O)C"
+        ],
+        "minor": [],
+        "stereo": null
+      },
+      "source": {
+        "file": "references/openstax-9-4-hydration-of-alkynes.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/9-4-hydration-of-alkynes",
+        "sha256": "9b190bf61c796b435a10061ece3bd2f53425774b897eeeefa2bc3086b5b0e40d",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "connectivity",
+        "regiochemistry"
+      ],
+      "uncertainties": "Exact-molecule application of a textbook rule, separately scored as B (rule-derived); not a direct experimental product distribution. Conditions are fixed; no numerical yield or ratio inferred. Racemic mirrors are acceptable when appropriate."
+    },
+    {
+      "id": "RQ-01",
+      "kind": "route",
+      "title": "decanal reduction",
+      "conditions": "NaBH4, methanol, ambient; aqueous workup",
+      "expected": {
+        "label": "clear",
+        "rationale": "Standard aldehyde to primary alcohol"
+      },
+      "steps": [
+        {
+          "rule": "aldehyde-reduction",
+          "reactants": [
+            "CCCCCCCCCC=O"
+          ],
+          "product": "CCCCCCCCCCO"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-17-4-alcohols-from-carbonyl-compounds-reduction.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/17-4-alcohols-from-carbonyl-compounds-reduction",
+        "sha256": "0d86b1a264d6598458cdc606571c6ce0287bfb613ba26de4fd06f35c684d76e2",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSpecificity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    },
+    {
+      "id": "RQ-02",
+      "kind": "route",
+      "title": "branched ketone reduction",
+      "conditions": "NaBH4, methanol, ambient; aqueous workup",
+      "expected": {
+        "label": "clear",
+        "rationale": "Standard ketone to secondary alcohol; stereo unspecified"
+      },
+      "steps": [
+        {
+          "rule": "ketone-reduction",
+          "reactants": [
+            "CC(=O)CC(C)CC"
+          ],
+          "product": "CC(O)CC(C)CC"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-17-4-alcohols-from-carbonyl-compounds-reduction.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/17-4-alcohols-from-carbonyl-compounds-reduction",
+        "sha256": "0d86b1a264d6598458cdc606571c6ce0287bfb613ba26de4fd06f35c684d76e2",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSpecificity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    },
+    {
+      "id": "RQ-03",
+      "kind": "route",
+      "title": "methyl nonanoate full reduction",
+      "conditions": "1 excess LiAlH4, dry ether; 2 aqueous workup",
+      "expected": {
+        "label": "clear",
+        "rationale": "Simple ester to primary alcohol and methanol"
+      },
+      "steps": [
+        {
+          "rule": "ester-lah-reduction",
+          "reactants": [
+            "CCCCCCCCC(=O)OC"
+          ],
+          "product": "CCCCCCCCCO.CO"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-21-6-chemistry-of-esters.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/21-6-chemistry-of-esters",
+        "sha256": "c02b9c93357e6edddd0576c289368342075235c5bde4b6cfd1835c88d3ec08e5",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSpecificity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    },
+    {
+      "id": "RQ-04",
+      "kind": "route",
+      "title": "ortho-toluic acid esterification",
+      "conditions": "Excess methanol, catalytic H2SO4, reflux",
+      "expected": {
+        "label": "clear",
+        "rationale": "Fischer esterification; no conversion/yield claim"
+      },
+      "steps": [
+        {
+          "rule": "fischer-esterification",
+          "reactants": [
+            "Cc1ccccc1C(=O)O",
+            "CO"
+          ],
+          "product": "Cc1ccccc1C(=O)OC"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-21-6-chemistry-of-esters.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/21-6-chemistry-of-esters",
+        "sha256": "c02b9c93357e6edddd0576c289368342075235c5bde4b6cfd1835c88d3ec08e5",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSpecificity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    },
+    {
+      "id": "RQ-05",
+      "kind": "route",
+      "title": "primary nonyl cyanide substitution",
+      "conditions": "NaCN, DMSO, ambient",
+      "expected": {
+        "label": "clear",
+        "rationale": "Primary alkyl bromide SN2 with cyanide"
+      },
+      "steps": [
+        {
+          "rule": "haloalkane-sn2-cyanide",
+          "reactants": [
+            "CCCCCCCCCBr",
+            "[C-]#N"
+          ],
+          "product": "CCCCCCCCCC#N"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-11-2-the-sn2-reaction.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/11-2-the-sn2-reaction",
+        "sha256": "1696107791af1f4f43e46f4795c86ee53e7835bf9865199353c7c094bc7704a0",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSpecificity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    },
+    {
+      "id": "RQ-06",
+      "kind": "route",
+      "title": "ethyl decanoate full reduction",
+      "conditions": "1 excess LiAlH4, dry ether; 2 aqueous workup",
+      "expected": {
+        "label": "clear",
+        "rationale": "Simple ester to decanol and ethanol"
+      },
+      "steps": [
+        {
+          "rule": "ester-lah-reduction",
+          "reactants": [
+            "CCCCCCCCCC(=O)OCC"
+          ],
+          "product": "CCCCCCCCCCO.CCO"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-21-6-chemistry-of-esters.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/21-6-chemistry-of-esters",
+        "sha256": "c02b9c93357e6edddd0576c289368342075235c5bde4b6cfd1835c88d3ec08e5",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSpecificity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    },
+    {
+      "id": "RQ-07",
+      "kind": "route",
+      "title": "unprotected bromopropanol Grignard",
+      "conditions": "Mg, dry ether, no OH protection",
+      "expected": {
+        "label": "flag",
+        "rationale": "Free OH quenches organomagnesium"
+      },
+      "steps": [
+        {
+          "rule": "haloalkane-grignard-formation-bromide",
+          "reactants": [
+            "OCCCBr"
+          ],
+          "product": "OCCC[Mg]Br"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-17-8-protection-of-alcohols.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/17-8-protection-of-alcohols",
+        "sha256": "2f40d5811c129ec1540a9e5af65421087d0dff59c373fcbdfe48bfd5a8bf0209",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSensitivity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    },
+    {
+      "id": "RQ-08",
+      "kind": "route",
+      "title": "unprotected bromobutanol Grignard",
+      "conditions": "Mg, dry ether, no OH protection",
+      "expected": {
+        "label": "flag",
+        "rationale": "Free OH quenches organomagnesium"
+      },
+      "steps": [
+        {
+          "rule": "haloalkane-grignard-formation-bromide",
+          "reactants": [
+            "OCCCCBr"
+          ],
+          "product": "OCCCC[Mg]Br"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-17-8-protection-of-alcohols.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/17-8-protection-of-alcohols",
+        "sha256": "2f40d5811c129ec1540a9e5af65421087d0dff59c373fcbdfe48bfd5a8bf0209",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSensitivity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    },
+    {
+      "id": "RQ-09",
+      "kind": "route",
+      "title": "keto ester LAH retains ketone",
+      "conditions": "1 excess LiAlH4, dry ether; 2 aqueous workup",
+      "expected": {
+        "label": "flag",
+        "rationale": "LAH also reduces the ketone; drawn selectivity is implausible"
+      },
+      "steps": [
+        {
+          "rule": "ester-lah-reduction",
+          "reactants": [
+            "CCC(=O)CCC(=O)OCC"
+          ],
+          "product": "CCC(=O)CCCO.CCO"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-17-4-alcohols-from-carbonyl-compounds-reduction.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/17-4-alcohols-from-carbonyl-compounds-reduction",
+        "sha256": "0d86b1a264d6598458cdc606571c6ce0287bfb613ba26de4fd06f35c684d76e2",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSensitivity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    },
+    {
+      "id": "RQ-10",
+      "kind": "route",
+      "title": "long keto ester LAH retains ketone",
+      "conditions": "1 excess LiAlH4, dry ether; 2 aqueous workup",
+      "expected": {
+        "label": "flag",
+        "rationale": "LAH also reduces the ketone; drawn selectivity is implausible"
+      },
+      "steps": [
+        {
+          "rule": "ester-lah-reduction",
+          "reactants": [
+            "CCC(=O)CCCC(=O)OC"
+          ],
+          "product": "CCC(=O)CCCCO.CO"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-17-4-alcohols-from-carbonyl-compounds-reduction.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/17-4-alcohols-from-carbonyl-compounds-reduction",
+        "sha256": "0d86b1a264d6598458cdc606571c6ce0287bfb613ba26de4fd06f35c684d76e2",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSensitivity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    },
+    {
+      "id": "RQ-11",
+      "kind": "route",
+      "title": "nitrotoluene Friedel Crafts acylation",
+      "conditions": "Propanoyl chloride, AlCl3, dry CH2Cl2",
+      "expected": {
+        "label": "flag",
+        "rationale": "Nitro substituted ring is too deactivated for conventional Friedel Crafts"
+      },
+      "steps": [
+        {
+          "rule": "aromatic-friedel-crafts-acylation",
+          "reactants": [
+            "Cc1ccc([N+](=O)[O-])cc1",
+            "CCC(=O)Cl"
+          ],
+          "product": "CCC(=O)c1cc(C)ccc1[N+](=O)[O-]"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-16-3-alkylation-and-acylation-of-aromatic-rings-the-friedel-crafts-reaction.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/16-3-alkylation-and-acylation-of-aromatic-rings-the-friedel-crafts-reaction",
+        "sha256": "ecfcf6085ae3561004b8ec35025ad3326214c36992d5a9e7ae62f1ebfee77725",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSensitivity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    },
+    {
+      "id": "RQ-12",
+      "kind": "route",
+      "title": "aminobenzoate Friedel Crafts acylation",
+      "conditions": "Acetyl chloride, AlCl3, dry CH2Cl2; unprotected NH2",
+      "expected": {
+        "label": "flag",
+        "rationale": "Basic amine binds Lewis acid; ester further deactivates ring"
+      },
+      "steps": [
+        {
+          "rule": "aromatic-friedel-crafts-acylation",
+          "reactants": [
+            "COC(=O)c1ccc(N)cc1",
+            "CC(=O)Cl"
+          ],
+          "product": "COC(=O)c1cc(C(C)=O)c(N)cc1"
+        }
+      ],
+      "source": {
+        "file": "references/openstax-16-3-alkylation-and-acylation-of-aromatic-rings-the-friedel-crafts-reaction.html",
+        "url": "https://openstax.org/books/organic-chemistry/pages/16-3-alkylation-and-acylation-of-aromatic-rings-the-friedel-crafts-reaction",
+        "sha256": "ecfcf6085ae3561004b8ec35025ad3326214c36992d5a9e7ae62f1ebfee77725",
+        "quality": "B: explicit general textbook rule; exact substrate/product is an evaluator extrapolation, not experimental exact-case validation"
+      },
+      "criteria": [
+        "routeSensitivity"
+      ],
+      "uncertainties": "Seeded one-step route assessment, not route search or optimality. Exact molecule extrapolated from explicit textbook incompatibility/standard transformation. Report quality-assessor findings separately from structural replay failures."
+    }
+  ]
+}

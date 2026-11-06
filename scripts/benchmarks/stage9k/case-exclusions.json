@@ -1,0 +1,144 @@
+[
+  {
+    "id": "NM-03",
+    "primary": "CC(C)CC(C)(C)C",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9f/cases/nomenclature.json"
+    ],
+    "productOverlaps": []
+  },
+  {
+    "id": "NM-14",
+    "primary": "C1=CC(=CC=C1C=O)Cl",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9h/cases/ms.json",
+      "scripts/benchmarks/stage9h/snapshots/nist-ms/4-chlorobenzaldehyde.json"
+    ],
+    "productOverlaps": []
+  },
+  {
+    "id": "MS-01",
+    "primary": "C1=CSC=C1",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9f/cases/properties.json",
+      "scripts/benchmarks/stage9f/cases/reactions.json",
+      "scripts/benchmarks/stage9h/snapshots/nist-ms/thiophene.json",
+      "scripts/benchmarks/stage9h/snapshots/pubchem/thiophene.json"
+    ],
+    "productOverlaps": []
+  },
+  {
+    "id": "MS-02",
+    "primary": "C1=CNC=C1",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9f/cases/ranking.json",
+      "scripts/benchmarks/stage9f/cases/ranking.json"
+    ],
+    "productOverlaps": []
+  },
+  {
+    "id": "MS-03",
+    "primary": "C1=COC=C1",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9h/cases/nomenclature.json",
+      "scripts/benchmarks/stage9h/cases/properties.json",
+      "scripts/benchmarks/stage9h/snapshots/pubchem/furan.json"
+    ],
+    "productOverlaps": []
+  },
+  {
+    "id": "MS-08",
+    "primary": "C1CCC(=O)C1",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9f/cases/spectroscopy.json",
+      "scripts/benchmarks/stage9f/cases/synthesis.json",
+      "scripts/benchmarks/stage9f/cases/synthesis.json",
+      "scripts/benchmarks/stage9h/snapshots/nist-ir/cyclopentanone.json",
+      "scripts/benchmarks/stage9h/snapshots/nist-ms/cyclopentanone.json"
+    ],
+    "productOverlaps": []
+  },
+  {
+    "id": "MS-13",
+    "primary": "CCCCCCC(=O)O",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9h/cases/synthesis.json"
+    ],
+    "productOverlaps": []
+  },
+  {
+    "id": "MS-16",
+    "primary": "CCCNCCC",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9h/cases/ms.json",
+      "scripts/benchmarks/stage9h/snapshots/nist-ms/dipropylamine.json"
+    ],
+    "productOverlaps": []
+  },
+  {
+    "id": "MS-18",
+    "primary": "CCOC1=CC=CC=C1",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9h/cases/ranking.json",
+      "scripts/benchmarks/stage9h/cases/ranking.json"
+    ],
+    "productOverlaps": []
+  },
+  {
+    "id": "RX-05",
+    "primary": "C1=CCCCCC1",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9f/cases/nomenclature.json"
+    ],
+    "productOverlaps": []
+  },
+  {
+    "id": "RX-15",
+    "primary": "C#CCCCCC",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9h/cases/ir.json",
+      "scripts/benchmarks/stage9h/snapshots/nist-ir/1-heptyne.json"
+    ],
+    "productOverlaps": [
+      {
+        "smiles": "CCCCCC(=O)C",
+        "files": [
+          "scripts/benchmarks/stage9f/cases/synthesis.json",
+          "scripts/benchmarks/stage9f/cases/synthesis.json",
+          "scripts/benchmarks/stage9i/ms-dev/snapshots/2-heptanone.json"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "RX-16",
+    "primary": "C#CCCCCCC",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9f/cases/spectroscopy.json"
+    ],
+    "productOverlaps": []
+  },
+  {
+    "id": "RQ-11",
+    "primary": "Cc1ccc([N+](=O)[O-])cc1",
+    "invalid": [],
+    "primaryOverlap": [
+      "scripts/benchmarks/stage9h/cases/ir.json",
+      "scripts/benchmarks/stage9h/snapshots/nist-ir/4-nitrotoluene.json",
+      "scripts/benchmarks/stage9j/route-quality/cases.json"
+    ],
+    "productOverlaps": []
+  }
+]

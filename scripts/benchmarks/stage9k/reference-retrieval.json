@@ -1,0 +1,522 @@
+[
+  {
+    "file": "references/pubchem-2-3-dimethylpentane.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2%2C3-dimethylpentane/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 296,
+    "sha256": "6f7f13120af9f422003f9c70ce95c33198a3abd149788dbfbe818aaa744d500e",
+    "retrievedUTC": "2026-11-06T17:10:02.479249+00:00"
+  },
+  {
+    "file": "references/pubchem-3-ethylhexane.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/3-ethylhexane/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 288,
+    "sha256": "b131e84fa8fb2e98e81de1f230dd2ce8b3e95716bd7f65ebc66ced584158c5f0",
+    "retrievedUTC": "2026-11-06T17:10:02.450716+00:00"
+  },
+  {
+    "file": "references/pubchem-2-2-4-trimethylpentane.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2%2C2%2C4-trimethylpentane/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 305,
+    "sha256": "97366d8cd27258ed0669c81f05c3dba28c9a2efe6b34574cdf93a4396a737c89",
+    "retrievedUTC": "2026-11-06T17:10:02.495250+00:00"
+  },
+  {
+    "file": "references/pubchem-3-methylhexan-2-one.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/3-methylhexan-2-one/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 302,
+    "sha256": "c9563815edd7c5eafb95fae34983327967015d8f069be7fff64c869bb52a8646",
+    "retrievedUTC": "2026-11-06T17:10:02.749970+00:00"
+  },
+  {
+    "file": "references/pubchem-4-methylhexan-2-one.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/4-methylhexan-2-one/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 300,
+    "sha256": "ef8f40ae98256da74479a45d6e9f7d90cdfc2c7491f75a2cf843f6e1088f0834",
+    "retrievedUTC": "2026-11-06T17:10:02.958555+00:00"
+  },
+  {
+    "file": "references/pubchem-2-2-dimethylbutanoic-acid.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2%2C2-dimethylbutanoic%20acid/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 312,
+    "sha256": "ff7a09dd63891c012ccb3bebba8812681e257096db21cd55cde57f9370a1529f",
+    "retrievedUTC": "2026-11-06T17:10:02.889564+00:00"
+  },
+  {
+    "file": "references/pubchem-3-3-dimethylbutanoic-acid.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/3%2C3-dimethylbutanoic%20acid/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 312,
+    "sha256": "cc73978428e1e9b1c93bc8b5fabde57fc31e32788208ba875413494e58757195",
+    "retrievedUTC": "2026-11-06T17:10:03.106407+00:00"
+  },
+  {
+    "file": "references/pubchem-2-ethylbutanoic-acid.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2-ethylbutanoic%20acid/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 302,
+    "sha256": "eb8052ddc426d2dd861e469a0cb5a9e4403a817a4da4def4c09b09b85b7f3187",
+    "retrievedUTC": "2026-11-06T17:10:03.277009+00:00"
+  },
+  {
+    "file": "references/pubchem-ethyl-2-methylbutanoate.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/ethyl%202-methylbutanoate/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 308,
+    "sha256": "f72cea724913d14c0b8864b2d17755bf4f2294f6751e338a8883982d607bad88",
+    "retrievedUTC": "2026-11-06T17:10:03.400679+00:00"
+  },
+  {
+    "file": "references/pubchem-methyl-3-methylpentanoate.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/methyl%203-methylpentanoate/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 311,
+    "sha256": "5b0546edc2b1e759216a420360cf47924a0d03590c568940c2930aceb4255de8",
+    "retrievedUTC": "2026-11-06T17:10:03.467317+00:00"
+  },
+  {
+    "file": "references/pubchem-n-ethylpropanamide.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/N-ethylpropanamide/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 296,
+    "sha256": "79a8f3769addc59613dacdf61b1eb99b898d57f958db016b2ceb5c524c710940",
+    "retrievedUTC": "2026-11-06T17:10:03.521958+00:00"
+  },
+  {
+    "file": "references/pubchem-n-n-dimethylbenzamide.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/N%2CN-dimethylbenzamide/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": "error",
+    "error": "HTTP Error 503: PUGREST.ServerBusy"
+  },
+  {
+    "file": "references/pubchem-3-bromobenzoic-acid.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/3-bromobenzoic%20acid/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 319,
+    "sha256": "2677fd3662b6d371388b844aa0b5079b256632e77882390887ad40b770d2e4b9",
+    "retrievedUTC": "2026-11-06T17:10:03.805658+00:00"
+  },
+  {
+    "file": "references/pubchem-4-chlorobenzaldehyde.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/4-chlorobenzaldehyde/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": "error",
+    "error": "HTTP Error 503: PUGREST.ServerBusy"
+  },
+  {
+    "file": "references/pubchem-3-methoxybenzoic-acid.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/3-methoxybenzoic%20acid/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 319,
+    "sha256": "abb7f23d5749b9031a09b6f993ea1449459151c6121ae1e6978f903ccaa7563d",
+    "retrievedUTC": "2026-11-06T17:10:04.035420+00:00"
+  },
+  {
+    "file": "references/pubchem-2-aminobutan-1-ol.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2-aminobutan-1-ol/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": "error",
+    "error": "HTTP Error 503: PUGREST.ServerBusy"
+  },
+  {
+    "file": "references/pubchem-r-2-chloropentane.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/%28R%29-2-chloropentane/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": "error",
+    "error": "HTTP Error 404: PUGREST.NotFound"
+  },
+  {
+    "file": "references/pubchem-s-2-chloropentane.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/%28S%29-2-chloropentane/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 300,
+    "sha256": "173b69d51e3b96f0a1d5e3e70b91080577185c90ebcf96c629f118ff17dba326",
+    "retrievedUTC": "2026-11-06T17:10:04.035559+00:00"
+  },
+  {
+    "file": "references/pubchem-e-hept-3-ene.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/%28E%29-hept-3-ene/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 288,
+    "sha256": "998346eda660a84645b24ef2bc508459b4c8aa61728b38984ee001f0b0ab587a",
+    "retrievedUTC": "2026-11-06T17:10:04.319439+00:00"
+  },
+  {
+    "file": "references/pubchem-z-hept-3-ene.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/%28Z%29-hept-3-ene/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 289,
+    "sha256": "c79b2830f1a8bb9217d98030dab22473e0f1ef39fd19fff23c96641be3dfc77f",
+    "retrievedUTC": "2026-11-06T17:10:04.640245+00:00"
+  },
+  {
+    "file": "references/pubchem-thiophene.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/thiophene/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 279,
+    "sha256": "a07a443c96d6b6d1e34581b4d92d6f16f6ce6e776fe1ee47d9498abfeaca2752",
+    "retrievedUTC": "2026-11-06T17:10:04.620416+00:00"
+  },
+  {
+    "file": "references/pubchem-pyrrole.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/pyrrole/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 281,
+    "sha256": "cf91e22c5099749785d58ad949e0e7324a5dc177d82600e1a3b2f8e34b348957",
+    "retrievedUTC": "2026-11-06T17:10:04.550617+00:00"
+  },
+  {
+    "file": "references/pubchem-furan.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/furan/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": "error",
+    "error": "HTTP Error 503: PUGREST.ServerBusy"
+  },
+  {
+    "file": "references/pubchem-pyridazine.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/pyridazine/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 286,
+    "sha256": "a4f9c55dcaa438b740d7b9c72344004d6fdb4ffe4cafa6188f5a00482fbf08de",
+    "retrievedUTC": "2026-11-06T17:10:04.887110+00:00"
+  },
+  {
+    "file": "references/pubchem-pyrimidine.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/pyrimidine/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 286,
+    "sha256": "db155ef3c6313c47b5804b8c3a55b9326fef89b2a23414b116ace389d2baec3f",
+    "retrievedUTC": "2026-11-06T17:10:04.912197+00:00"
+  },
+  {
+    "file": "references/pubchem-pyrazine.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/pyrazine/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 284,
+    "sha256": "f1892d76eeee69cf28c327673279107fcb394e91a17bfcbbf6f941673ff66677",
+    "retrievedUTC": "2026-11-06T17:10:04.887517+00:00"
+  },
+  {
+    "file": "references/pubchem-cycloheptanone.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/cycloheptanone/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 296,
+    "sha256": "5ffa4e7a1a74c947cf9fc7860ba7468cb7502b9d03ef1a0a0a5663505b2d3612",
+    "retrievedUTC": "2026-11-06T17:10:05.143755+00:00"
+  },
+  {
+    "file": "references/pubchem-cyclopentanone.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/cyclopentanone/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 289,
+    "sha256": "38266ec03207f349d0878bcc8e61cffed3fafd7eeba63bf80fe2dab3e6b2bef3",
+    "retrievedUTC": "2026-11-06T17:10:05.248342+00:00"
+  },
+  {
+    "file": "references/pubchem-2-nonanone.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2-nonanone/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 293,
+    "sha256": "bf5f9cea5f1de1c07fe5e20d308cf5714172634d4d7d00c8a74e25f96a6d73ef",
+    "retrievedUTC": "2026-11-06T17:10:05.259932+00:00"
+  },
+  {
+    "file": "references/pubchem-nonanal.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/nonanal/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 285,
+    "sha256": "fa017f1f6ef636fc76f67a7acc9033c817736ff7b46cecbf86541c0a9845b96f",
+    "retrievedUTC": "2026-11-06T17:10:05.443710+00:00"
+  },
+  {
+    "file": "references/pubchem-methyl-heptanoate.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/methyl%20heptanoate/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 299,
+    "sha256": "21547985b1f77ebab6f5a451064834e6136fd80317dda1bc24085455c1a92113",
+    "retrievedUTC": "2026-11-06T17:10:05.550784+00:00"
+  },
+  {
+    "file": "references/pubchem-ethyl-heptanoate.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/ethyl%20heptanoate/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 300,
+    "sha256": "559d4582c9cdc1d9e195f115708a8358dd2373548a0cd5c31b651da542b976ec",
+    "retrievedUTC": "2026-11-06T17:10:05.508519+00:00"
+  },
+  {
+    "file": "references/pubchem-heptanoic-acid.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/heptanoic%20acid/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 294,
+    "sha256": "3d939ff5b745de18442d4cb3bbde10d56f6749b95e3f198e7f59b9f99e014c9d",
+    "retrievedUTC": "2026-11-06T17:10:05.729337+00:00"
+  },
+  {
+    "file": "references/pubchem-nonanenitrile.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/nonanenitrile/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 291,
+    "sha256": "c01e24441b277f0edb0330339cc5d93b0984d6db9b730d5f52b51a3d64e434b0",
+    "retrievedUTC": "2026-11-06T17:10:05.919473+00:00"
+  },
+  {
+    "file": "references/pubchem-1-decanol.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/1-decanol/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 288,
+    "sha256": "800efcaf3e18a1b76386bacac7d1b02da537eb7dda7027ae0af6bdc668ac1bf2",
+    "retrievedUTC": "2026-11-06T17:10:06.168931+00:00"
+  },
+  {
+    "file": "references/pubchem-dipropylamine.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/dipropylamine/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 291,
+    "sha256": "652780479c22700d4bfe0de6aef7242a849b7a03d236a564e2bbc2a7634c874b",
+    "retrievedUTC": "2026-11-06T17:10:05.959297+00:00"
+  },
+  {
+    "file": "references/pubchem-tripropylamine.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/tripropylamine/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 305,
+    "sha256": "73854eb9b8296893e31e74c211207444d3dfd6d28f7975cd454f56792e00575a",
+    "retrievedUTC": "2026-11-06T17:10:06.170323+00:00"
+  },
+  {
+    "file": "references/pubchem-ethoxybenzene.json",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/ethoxybenzene/property/IUPACName,CanonicalSMILES,IsomericSMILES,MolecularFormula,MonoisotopicMass/JSON",
+    "status": 200,
+    "bytes": 296,
+    "sha256": "943f86e22ebba56b1424c906f86bfc2aee089508243f8a4c861d30cc22461150",
+    "retrievedUTC": "2026-11-06T17:10:06.290242+00:00"
+  },
+  {
+    "file": "references/nist-thiophene.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110021&Index=0&Type=Mass",
+    "status": 200,
+    "bytes": 856,
+    "sha256": "be71d0ec45049cb939ac6a3273b9af3b5abdec02b648420d057d1914495d43c1",
+    "retrievedUTC": "2026-11-06T17:10:06.545775+00:00"
+  },
+  {
+    "file": "references/nist-pyrrole.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109977&Index=0&Type=Mass",
+    "status": 200,
+    "bytes": 812,
+    "sha256": "ec0d48b3cd9947f304dbe83ca4cb70d55768e309df88f3797fa2637f4bb8522c",
+    "retrievedUTC": "2026-11-06T17:10:06.545431+00:00"
+  },
+  {
+    "file": "references/nist-furan.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110009&Index=0&Type=Mass",
+    "status": 200,
+    "bytes": 753,
+    "sha256": "958e0539a5cbfb2008df3d7ecaf1b6220dd2ae820068553f8d58aad59cbae838",
+    "retrievedUTC": "2026-11-06T17:10:06.570390+00:00"
+  },
+  {
+    "file": "references/nist-pyridazine.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C289805&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-pyrimidine.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C289952&Index=0&Type=Mass",
+    "status": 200,
+    "bytes": 748,
+    "sha256": "3b9fd558cc96e99c5a4a22cebc05ad8d56c4cc868c52016257ce634f52c0aacd",
+    "retrievedUTC": "2026-11-06T17:10:06.676004+00:00"
+  },
+  {
+    "file": "references/nist-pyrazine.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C290379&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-cycloheptanone.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C502421&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-cyclopentanone.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C120923&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-2-nonanone.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C821556&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-nonanal.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C124196&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-methyl-heptanoate.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C106730&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-ethyl-heptanoate.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C106309&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-heptanoic-acid.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111148&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-nonanenitrile.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C2243278&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-1-decanol.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C112301&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-dipropylamine.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C142847&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-tripropylamine.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C102692&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/nist-ethoxybenzene.jdx",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C103731&Index=0&Type=Mass",
+    "status": "error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "file": "references/openstax-8-2-halogenation-of-alkenes-addition-of-x2.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/8-2-halogenation-of-alkenes-addition-of-x2",
+    "status": 200,
+    "bytes": 387810,
+    "sha256": "175e7726e784273fa4ffaaa2370980e30f993c18d361e49e45f3314a83aa8037",
+    "retrievedUTC": "2026-11-06T17:10:07.632291+00:00"
+  },
+  {
+    "file": "references/openstax-8-5-hydration-of-alkenes-addition-of-h2o-by-hydroboration.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/8-5-hydration-of-alkenes-addition-of-h2o-by-hydroboration",
+    "status": 200,
+    "bytes": 402114,
+    "sha256": "eacb267e4edf49b3d6b78f494eafdd9499a71707c859a197c92f34fda8502033",
+    "retrievedUTC": "2026-11-06T17:10:07.675827+00:00"
+  },
+  {
+    "file": "references/openstax-8-6-reduction-of-alkenes-hydrogenation.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/8-6-reduction-of-alkenes-hydrogenation",
+    "status": 200,
+    "bytes": 396016,
+    "sha256": "80891bd4073e696f05dbdbcc38c9befe1207d594c0872d3eabc385c8d61754be",
+    "retrievedUTC": "2026-11-06T17:10:07.687317+00:00"
+  },
+  {
+    "file": "references/openstax-9-5-hydration-of-alkynes.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/9-5-hydration-of-alkynes",
+    "status": "error",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "file": "references/openstax-11-2-the-sn2-reaction.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/11-2-the-sn2-reaction",
+    "status": 200,
+    "bytes": 388994,
+    "sha256": "1696107791af1f4f43e46f4795c86ee53e7835bf9865199353c7c094bc7704a0",
+    "retrievedUTC": "2026-11-06T17:10:07.768055+00:00"
+  },
+  {
+    "file": "references/openstax-11-8-the-e2-reaction-and-the-deuterium-isotope-effect.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/11-8-the-e2-reaction-and-the-deuterium-isotope-effect",
+    "status": 200,
+    "bytes": 391251,
+    "sha256": "4d602b8c911f0372c91e4904b1c1010275c5032ad3fb52d4e1ffbe76ff3e5f10",
+    "retrievedUTC": "2026-11-06T17:10:07.789776+00:00"
+  },
+  {
+    "file": "references/openstax-11-12-a-summary-of-reactivity-sn1-sn2-e1-e1cb-and-e2.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/11-12-a-summary-of-reactivity-sn1-sn2-e1-e1cb-and-e2",
+    "status": 200,
+    "bytes": 385799,
+    "sha256": "d92dcea44967d7d7e5b6ce3ffc93c9ca94196f33a26d259e09aa532586052717",
+    "retrievedUTC": "2026-11-06T17:10:07.860122+00:00"
+  },
+  {
+    "file": "references/openstax-16-3-alkylation-and-acylation-of-aromatic-rings-the-friedel-crafts-reaction.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/16-3-alkylation-and-acylation-of-aromatic-rings-the-friedel-crafts-reaction",
+    "status": 200,
+    "bytes": 405894,
+    "sha256": "ecfcf6085ae3561004b8ec35025ad3326214c36992d5a9e7ae62f1ebfee77725",
+    "retrievedUTC": "2026-11-06T17:10:07.890245+00:00"
+  },
+  {
+    "file": "references/openstax-17-4-alcohols-from-carbonyl-compounds-reduction.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/17-4-alcohols-from-carbonyl-compounds-reduction",
+    "status": 200,
+    "bytes": 403156,
+    "sha256": "0d86b1a264d6598458cdc606571c6ce0287bfb613ba26de4fd06f35c684d76e2",
+    "retrievedUTC": "2026-11-06T17:10:07.938536+00:00"
+  },
+  {
+    "file": "references/openstax-17-8-protection-of-alcohols.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/17-8-protection-of-alcohols",
+    "status": 200,
+    "bytes": 382365,
+    "sha256": "2f40d5811c129ec1540a9e5af65421087d0dff59c373fcbdfe48bfd5a8bf0209",
+    "retrievedUTC": "2026-11-06T17:10:08.187669+00:00"
+  },
+  {
+    "file": "references/openstax-19-7-nucleophilic-addition-of-hydride-and-grignard-reagents-alcohol-formation.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/19-7-nucleophilic-addition-of-hydride-and-grignard-reagents-alcohol-formation",
+    "status": 200,
+    "bytes": 381721,
+    "sha256": "4d34ae97a95ba529664c977408dd363347f86d499e784adbc58bd9baeab436f7",
+    "retrievedUTC": "2026-11-06T17:10:08.404678+00:00"
+  },
+  {
+    "file": "references/openstax-21-6-chemistry-of-esters.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/21-6-chemistry-of-esters",
+    "status": 200,
+    "bytes": 413660,
+    "sha256": "c02b9c93357e6edddd0576c289368342075235c5bde4b6cfd1835c88d3ec08e5",
+    "retrievedUTC": "2026-11-06T17:10:08.278624+00:00"
+  },
+  {
+    "file": "references/openstax-14-5-characteristics-of-the-diels-alder-reaction.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/14-5-characteristics-of-the-diels-alder-reaction",
+    "status": 200,
+    "bytes": 406347,
+    "sha256": "c19d286e284e141deda0f184a471e9aea358527e3ef2a0fee68ae7936d17199b",
+    "retrievedUTC": "2026-11-06T17:10:08.307388+00:00"
+  },
+  {
+    "file": "references/openstax-7-8-orientation-of-electrophilic-additions-markovnikovs-rule.html",
+    "url": "https://openstax.org/books/organic-chemistry/pages/7-8-orientation-of-electrophilic-additions-markovnikovs-rule",
+    "status": 200,
+    "bytes": 399919,
+    "sha256": "979b6406c208dd323154c2d407b777ee8da7c8662261ebc12989baf0637e0c37",
+    "retrievedUTC": "2026-11-06T17:10:08.387059+00:00"
+  }
+]
