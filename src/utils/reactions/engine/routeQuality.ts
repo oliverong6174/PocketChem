@@ -266,7 +266,10 @@ async function checkStepChemistry(step: SynthesisStep, rule: ReactionRule, out: 
   }
 
   const baseMediated = Boolean(rule.conditions?.base) || Boolean(rule.conditions?.organometallic);
-  if (baseMediated && rule.id.includes("alkylation")) {
+  // Strong-base haloalkane substitution/elimination rules declare their reagent class (Stage 9J metadata); a beta-halo carbonyl under them
+  // eliminates just as it does under an enolate alkylation, so they get the same check.
+  const strongBaseHaloalkane = ["hydroxide", "alkoxide", "bulky-base"].includes(rule.selectivityProfile?.substitutionElimination?.reagent ?? "");
+  if ((baseMediated && rule.id.includes("alkylation")) || strongBaseHaloalkane) {
     if (await matches(reactants, BETA_HALO_CARBONYL)) {
       out.push(
         finding(

@@ -15,6 +15,10 @@ const verifyMod = await loadModule("/src/utils/reactions/engine/routeVerificatio
 const compat = await loadModule("/src/utils/reactions/engine/compatibility.ts");
 const selectivity = await loadModule("/src/utils/reactions/engine/selectivityAssessment.ts");
 const quality = await loadModule("/src/utils/reactions/engine/routeQuality.ts");
+const planner = await loadModule("/src/utils/reactions/engine/multistepSynthesis.ts");
+// Harness v2 (Stage 9J): steps are built with the planner's own forwardStepFromPathway so dynamic selectivityAssessment, limitations
+// and metadata reach the assessor exactly as in a real search. Harness v1 used a test fixture that dropped them (see ERRATA-9J.md).
+const HARNESS = process.env.HARNESS ?? "v2";
 
 function manualStep(n, ruleId, reactants, product) {
   const r = registry.find((x) => x.id === ruleId);
@@ -27,6 +31,7 @@ function manualStep(n, ruleId, reactants, product) {
 }
 
 const records = [];
+console.log("harness", HARNESS);
 for (const c of cases) {
   const rec = { id: c.id, label: c.label, built: "engine", tier: null, codes: [], note: "" };
   try {
@@ -36,7 +41,8 @@ for (const c of cases) {
       const reactants = s.reactants;
       const pathway = c.fabricated ? null : await H.pathwayGiving(s.rule, reactants, s.product.split("."));
       if (pathway) {
-        steps.push({ ...H.stepFromPathway(pathway), id: `s${i + 1}`, stepNumber: i + 1, source: "forward" });
+        const planned = HARNESS === "v2" ? planner.forwardStepFromPathway(pathway) : H.stepFromPathway(pathway);
+        steps.push({ ...planned, id: `s${i + 1}`, stepNumber: i + 1, source: "forward" });
       } else {
         if (!c.fabricated) rec.built = "manual (engine did not produce this product)";
         else rec.built = "manual (fabricated)";
@@ -48,13 +54,14 @@ for (const c of cases) {
     const first = c.steps[0].reactants;
     const startingSmiles = first.concat(c.steps.slice(1).flatMap((s) => s.reactants.filter((r) => !c.steps.slice(0, c.steps.indexOf(s)).some((p) => p.product.split(".").includes(r))))).join(".");
     const route = {
-      id: c.id, startingSmiles, targetSmiles: c.steps[c.steps.length - 1].product, steps, confidence: "verified", score: 0,
+      id: c.id, startingSmiles, targetSmiles: c.steps[c.steps.length - 1].product.split(".").sort((a, b) => b.length - a.length)[0], steps, confidence: "verified", score: 0,
     };
     route.verification = await verifyMod.verifyMultistepRoute(route, registry);
     route.compatibility = await compat.assessRouteCompatibility(route, registry);
     route.selectivity = await selectivity.assessRouteSelectivity(route, registry);
     const q = await quality.assessRouteQuality(route, registry);
     rec.structural = route.verification.status;
+    rec.problems = (route.verification.problems ?? []).slice(0, 2);
     rec.tier = q.tier;
     rec.codes = q.findings.filter((f) => f.level !== "info").map((f) => `${f.level}:${f.code}`);
   } catch (error) {
