@@ -107,10 +107,10 @@ export const epoxideReactionRules: ReactionRule[] = [
     reactionType: "ringOpening",
     title: "Acid-Catalyzed Epoxide Opening with Alcohol",
     reagents: "ROH, H⁺",
-    reagentNote: "Anti opening; OR attacks more substituted carbon",
+    reagentNote: "Anti opening; OR attacks the carbon that best carries positive charge (both regioisomers kept when neither does)",
     productHint: "Alkoxy alcohol",
     explanation:
-      "An alcohol opens a protonated epoxide. The supplied OR group attacks the more substituted epoxide carbon and the original epoxide oxygen becomes OH.",
+      "An alcohol opens a protonated epoxide. The supplied OR group attacks the epoxide carbon that better carries positive charge (tertiary, benzylic or allylic); when neither does, both regioisomers are given because the opening has mixed SN1/SN2 character. The original epoxide oxygen becomes OH.",
     trigger: epoxideTrigger,
     additionalReactants: [
       { label: "alcohol", trigger: { includeSmarts: ["[O;H1][#6]"] } },
@@ -121,7 +121,7 @@ export const epoxideReactionRules: ReactionRule[] = [
       options: {
         mode: "epoxideNucleophileOpening",
         nucleophile: "alcohol",
-        attackPreference: "more-substituted",
+        attackPreference: "cation-stabilized-else-both",
       },
     },
     productStatus: "computed",

@@ -207,6 +207,17 @@ export const enolateReactionRules: ReactionRule[] = [
       maxProducts: 16,
     },
     productStatus: "representative",
+    productPreferences: [
+      {
+        id: "aldol-ketone-electrophile-disfavored",
+        whenReactantSmarts: ["[CX3H1](=O)[#6]", "[CX3;H0]([#6])([#6])=O"],
+        productSmarts: "[CX4;H0]([OX2H])([#6])([#6])[CX4][CX3]=O",
+        level: "minor",
+        basis:
+          "When an aldehyde is present beside a ketone, addition to the ketone carbonyl is the less favorable aldol: ketones are less electrophilic and their aldol adducts are less stable, so the equilibrium lies toward the aldehyde adduct. This marks only the ketone-electrophile product as minor; it does NOT make the aldehyde-electrophile product major, because self-aldol of the more acidic and more electrophilic aldehyde competes and is not enumerated here.",
+        references: ["Clayden, Greeves and Warren, Organic Chemistry 2nd ed., ch. 26 (crossed aldol: aldehydes as electrophiles, ketone adducts disfavored); not re-read in this stage."],
+      },
+    ],
     limitations: ["Crossed aldol reactions can give multiple donor/electrophile and alpha-site combinations; the engine enumerates constitutional products but does not rank them."],
     mechanism: "Enolate addition",
     priority: 1840,

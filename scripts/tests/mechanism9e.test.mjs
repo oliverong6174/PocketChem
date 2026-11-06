@@ -217,7 +217,10 @@ describe("epoxide opening by hydrogen halides follows the sourced regiochemistry
   });
   test("other openings are unchanged: methoxide still attacks the less substituted carbon, acid/methanol the more substituted one", async () => {
     assert.deepEqual(await constitutions(await run("epoxide-base-alkoxide-opening", "CC1CO1.[O-]C")), await wanted("COCC(C)O"));
-    assert.deepEqual(await constitutions(await run("epoxide-acid-alcohol-opening", "CC1CO1.CO")), await wanted("COC(C)CO"));
+    // Stage 9J correction: propylene oxide has neither a tertiary, benzylic nor allylic carbon, so acid/methanol opening has mixed SN1/SN2
+    // character and both regioisomers are kept (the Stage 9E assertion, a single product, over-claimed). See stage9j/ERRATA-9J.md.
+    assert.deepEqual(await constitutions(await run("epoxide-acid-alcohol-opening", "CC1CO1.CO")), await wanted("COC(C)CO", "COCC(C)O"));
+    assert.deepEqual(await constitutions(await run("epoxide-acid-alcohol-opening", "CC1(C)CO1.CO")), await wanted("COC(C)(C)CO"));
     assert.deepEqual(await constitutions(await run("epoxide-acid-water-opening", "CC1(C)CO1")), await wanted("CC(C)(O)CO"));
   });
   test("the rule text no longer claims the more substituted carbon is attacked", () => {

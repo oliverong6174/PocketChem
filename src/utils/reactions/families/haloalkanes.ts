@@ -247,6 +247,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "sn2", reagent: "hydroxide" },
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
@@ -279,6 +280,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "sn2", reagent: "nucleophile" },
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
@@ -382,6 +384,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "sn2", reagent: "nucleophile" },
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
@@ -413,6 +416,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "sn2", reagent: "nucleophile" },
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
@@ -716,6 +720,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "E2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "e2", reagent: "hydroxide" },
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
@@ -756,6 +761,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "E2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "e2", reagent: "alkoxide" },
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
@@ -796,6 +802,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "E2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "e2", reagent: "bulky-base" },
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "hofmann", regioselective: true },
       mixture: "possible",
@@ -835,6 +842,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "E2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "e2", reagent: "bulky-base" },
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",

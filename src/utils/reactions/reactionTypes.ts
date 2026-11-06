@@ -421,6 +421,13 @@ export type ReactionSelectivityProfile = {
    */
   keepConstitutionalAlternatives?: boolean;
   allowsRearrangement?: boolean;
+  /**
+   * Marks a haloalkane substitution/elimination rule so the two pathways can be compared on the same substrate:
+   * "pathway" is what this rule does; "reagent" is the nucleophile/base class that decides the competition
+   * (nucleophile = weakly basic good nucleophile such as cyanide, azide or iodide; hydroxide; alkoxide = small
+   * alkoxide; bulky-base = tert-butoxide or an amide base). Used only for qualitative ranking.
+   */
+  substitutionElimination?: { pathway: "sn2" | "e2"; reagent: "nucleophile" | "hydroxide" | "alkoxide" | "bulky-base" };
 };
 
 /** How PocketChem generates the product structure. */
