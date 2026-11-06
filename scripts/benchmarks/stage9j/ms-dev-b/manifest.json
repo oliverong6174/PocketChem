@@ -1,0 +1,14 @@
+{
+ "builtAt": "2026-11-06T04:12:33.272Z",
+ "hashes": {
+  "cases.json": "2bafa3bbdf8b754be532b2d31fd85189f48513edcc058f38cb4c91771031a31b",
+  "snapshots/2-octanone.json": "acc0845f7aa4dfe4405074aa21eaa2c5d586f7ffafdab77c60bb19e8bf3a9d0b",
+  "snapshots/butylbenzene.json": "ba929fc831ce1d9b12156818077f8526eeb3fa254a9c555dbab9bcfb3e7e17f5",
+  "snapshots/dibutylamine.json": "db6fab3c5a2e4e02f2e0940dfa034a042bd3ba1248f8f3f07b1e3a812e791bf9",
+  "snapshots/ethyl-butanoate.json": "4b41e1baf2c4c7f160462a99929c3f952405751b1bbc33b99399efb6671d4c89",
+  "snapshots/ethyl-hexanoate.json": "0cbf9b43b4642e114964cdb4db5c684da8b7e1a3c502b409626d0ccd5564f639",
+  "snapshots/octanenitrile.json": "6b6be9b48aac7bf36cbb161a64dc56c001a11a72eed32ec799520429fdd90a4f",
+  "snapshots/octanoic-acid.json": "99b51c5b537774b78a9aa0ccf87682b65f121e89a50b76809fe1cd130df0a55b",
+  "snapshots/propylbenzene.json": "53c6f5004e2cba5d6eced533884cefdf7a1d9f2113797e4d4be1375dec7961e0"
+ }
+}
