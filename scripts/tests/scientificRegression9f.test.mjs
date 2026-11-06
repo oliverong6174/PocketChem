@@ -25,11 +25,10 @@ describe("in-source scientific regression suites", () => {
     assert.deepEqual(failedIds(results), []);
   });
 
-  test("mechanistic stereo regression suite: only the documented depiction defect fails", async () => {
+  test("mechanistic stereo regression suite passes completely (Stage 9J fixed the endo/exo Diels-Alder defect it used to document)", async () => {
     const results = await engine.stereoRegression.runMechanisticStereoRegressionSuite();
     assert.ok(results.length >= 10);
-    // Known: the Diels-Alder drawing of the dimethyl-diene/acrylate adduct uses 2 wedges + 1 dash where the suite expects 3 dashes (depiction only).
-    assert.deepEqual(failedIds(results), ["DA-dimethyl-diene-acrylate-three-dashes"]);
+    assert.deepEqual(failedIds(results), []);
   });
 
   test("nomenclature regression suite: only the documented defects fail", async () => {
