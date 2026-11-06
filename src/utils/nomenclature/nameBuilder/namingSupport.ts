@@ -136,12 +136,15 @@ export function assessNameConsistency(
       if (isChainVocabulary(name)) return `the molecule has ${rings} ring(s) but the generated name "${result.estimatedName}" contains no ring`;
       return null; // an unfamiliar (for example retained) name: the ring test cannot judge it
     }
-    const multiplied = /(?:^|[^a-z])(?:di|tri|tetra|bis|tris)[a-z(]/.test(name) || /\bbi[a-z]*(?:cyclo|phenyl)/.test(name);
+    // A multiplier only hides the ring count when it multiplies a ring word ("dicyclohexyl", "bis(pyridinyl)"); "diamino" does not.
+    const multiplied = /(?:^|[^a-z])(?:di|tri|tetra|bis|tris)\(?[a-z]{0,3}\(?(?:cyclo|benz|phen|naphth|pyr|furan|thiophen|imidazol|indol|quinol|piper|morph|oxol|azol|azin)/.test(name) || /\bbi[a-z]*(?:cyclo|phenyl)/.test(name);
     if (!multiplied) {
       let weight = 0;
       weight += (name.match(/bicyclo/g) ?? []).length * 2 + (name.match(/tricyclo/g) ?? []).length * 3;
       const scrubbed = name.replace(/bicyclo|tricyclo/g, "");
       weight += (scrubbed.match(/cyclo|benz|phen|naphth|indol|quinol|purin|spiro/g) ?? []).length;
+      // heterocycle stems (pyridine, pyrrolidine, furan, ...); a stem inside a longer ring stem is not counted twice
+      weight += (scrubbed.match(/pyridin|pyrrolidin|pyrrol(?!idin)|piperidin|piperazin|morpholin|furan|oxolan|oxan(?!e)|thiophen|thiolan|imidazol|pyrimidin|pyrazin|pyrazol|oxazol|thiazol|azetidin|azepan/g) ?? []).length;
       weight += (scrubbed.match(/naphth|indol|quinol|purin/g) ?? []).length;
       // retained benzo-fused heterocycles are two-ring names (benzimidazole, benzofuran, ...)
       weight += (scrubbed.match(/benz(?:imidazol|oxazol|thiazol|ofuran|othiophen|odioxol|otriazol)/g) ?? []).length;

@@ -1,0 +1,62 @@
+{
+ "9I-dev (15, tuned-on)": {
+  "unreliable": {
+   "n": 9,
+   "baseCorrect": 2,
+   "fragCorrect": 0,
+   "fragN": 9
+  },
+  "heuristic": {
+   "n": 5,
+   "baseCorrect": 1,
+   "fragCorrect": 3,
+   "fragN": 5
+  },
+  "supported": {
+   "n": 1,
+   "baseCorrect": 1,
+   "fragCorrect": 0,
+   "fragN": 1
+  }
+ },
+ "9J-B (8, not tuned-on)": {
+  "supported": {
+   "n": 4,
+   "baseCorrect": 4,
+   "fragCorrect": 0,
+   "fragN": 3
+  },
+  "heuristic": {
+   "n": 4,
+   "baseCorrect": 1,
+   "fragCorrect": 0,
+   "fragN": 4
+  }
+ },
+ "pooled": {
+  "unreliable": {
+   "n": 9,
+   "ok": 2,
+   "wilson95pct": [
+    6,
+    55
+   ]
+  },
+  "heuristic": {
+   "n": 9,
+   "ok": 2,
+   "wilson95pct": [
+    6,
+    55
+   ]
+  },
+  "supported": {
+   "n": 5,
+   "ok": 5,
+   "wilson95pct": [
+    57,
+    100
+   ]
+  }
+ }
+}

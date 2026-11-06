@@ -172,11 +172,14 @@ export async function runMechanisticStereoRegressionSuite(): Promise<Mechanistic
       0,
     ),
     dielsAlderDepictionCase(
-      "DA-dimethyl-diene-acrylate-three-dashes",
+      // Stage 9J: endo adduct, all three substituents on one face. The earlier expectation (0 wedge / 3 dash) was the mirror-image
+      // projection, but the engine drew 2 wedge / 1 dash, which is a different diastereomer (ester trans to both methyls, the exo adduct);
+      // see scripts/tests/dielsAlder9j.test.mjs for the projection-independent check.
+      "DA-dimethyl-diene-acrylate-all-cis-three-wedges",
       "C/C=C/C=C/C",
       "C=CC(=O)OC",
-      0,
       3,
+      0,
       { activatedDienophile: true },
     ),
   ]);

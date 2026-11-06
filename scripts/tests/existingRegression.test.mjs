@@ -6,12 +6,9 @@ import assert from "node:assert/strict";
 import { closeEngine, loadEngine } from "./engine.mjs";
 
 // id -> reason. Baseline-verified failing on the unmodified `main` tree.
-const PREEXISTING_FAILURES = new Map([
-  [
-    "DA-dimethyl-diene-acrylate-three-dashes",
-    "Diels-Alder stereo-depiction expects 0 wedge / 3 dash but the renderer yields 2 / 1 (fails identically on main)",
-  ],
-]);
+// Stage 9J: the former entry (DA-dimethyl-diene-acrylate-three-dashes) was a real defect, not a presentation quirk: the engine drew the exo adduct
+// for an activated dienophile. Fixed in depictionEngine.ts; the list is intentionally empty now and any failure fails the run.
+const PREEXISTING_FAILURES = new Map([]);
 
 let modules;
 before(async () => {
