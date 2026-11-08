@@ -71,7 +71,9 @@ export async function canonicalizeStereoStructure(
   smiles: string,
 ): Promise<CanonicalStereoStructure | null> {
   const rdkit = await getRDKit();
-  const mol = rdkit.get_mol(smiles);
+  // Atom maps describe reaction provenance, not molecular identity. Normalize
+  // only this comparison copy; the original reactants/products retain maps.
+  const mol = rdkit.get_mol(smiles.replace(/:\d+(?=\])/g, ""));
   if (!mol) return null;
 
   try {
@@ -221,6 +223,9 @@ export async function areCanonicalEnantiomers(
   left: CanonicalStereoStructure,
   right: CanonicalStereoStructure,
 ): Promise<boolean> {
+  // A meso molecule is superposable on its mirror, hence is not an enantiomer
+  // of itself. This also excludes identical members of any purported racemate.
+  if (left.isomeric === right.isomeric) return false;
   if (left.connectivity !== right.connectivity) return false;
   if (!left.hasSpecifiedStereo || !right.hasSpecifiedStereo) return false;
 
