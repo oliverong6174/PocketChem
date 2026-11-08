@@ -168,6 +168,10 @@ export type MassSpectrumPeakKind =
   | "diagnostic";
 
 export type MassSpectrumPeak = {
+  /** Same physical channel described by multiple generators; counted once. */
+  channelKey?: string;
+  /** Keep distinct graph cleavage sites; diagnostics are alternate descriptions. */
+  channelSource?: "graph" | "diagnostic";
   mz: number;
   relativeIntensity: number;
   label: string;
@@ -196,7 +200,19 @@ export type MassSpectrumPeak = {
   }>;
 };
 
+export type MassSpectrumFragmentCandidate = {
+  mz: number;
+  ionFormula: string;
+  charge: 1;
+  /** Total neutral/radical composition lost, possibly in several steps. */
+  neutralLossFormula: string;
+  mechanism: string;
+  explanation: string;
+};
+
 export type MassSpectrumResult = {
+  /** Mechanistic possibilities with no abundance prediction; never chart bars. */
+  fragmentCandidates?: MassSpectrumFragmentCandidate[];
   formula: string;
   molecularIonMz: number | null;
   nominalMass: number | null;

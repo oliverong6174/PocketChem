@@ -4,6 +4,7 @@ import type { MassSpectrumPeak, MassSpectrumResult } from "./types";
 import { predictGeneralFragmentation } from "./massSpec/fragmentationEngine";
 import { mergeAndNormalizePeaks } from "./massSpec/peakNormalization";
 import { predictMcLaffertyPeaks } from "./massSpec/mclafferty";
+import { predictFragmentCandidates } from "./massSpec/fragmentCandidates";
 
 type Isotope = { shift: number; abundance: number };
 
@@ -680,6 +681,8 @@ async function reactionFragmentPeaks(
     const peak: MassSpectrumPeak = {
       mz,
       relativeIntensity: intensity,
+      channelKey: `direct:${fragmentSmiles}`,
+      channelSource: "diagnostic",
       label: `m/z ${mz} · ${label}`,
       kind: "fragment",
       explanation,
@@ -990,7 +993,10 @@ export async function predictMassSpectrum(
       });
     }
 
-    if (hasGroup(functionalGroups, ["Benzene", "Phenol", "Aniline", "Aryl ether", "Aryl halide", "Nitrobenzene"])) {
+    // An aromatic classification alone does not prove a six-carbon ring:
+    // diazines were incorrectly drawn as C6H5+ despite having only four carbons.
+    if (hasGroup(functionalGroups, ["Benzene", "Phenol", "Aniline", "Aryl ether", "Aryl halide", "Nitrobenzene"]) &&
+        (counts.C ?? 0) >= 6 && (counts.H ?? 0) >= 5 && await containsPhenylRing(parentSmiles)) {
       peaks.push({
         mz: 77,
         relativeIntensity: 32,
@@ -1015,7 +1021,14 @@ export async function predictMassSpectrum(
   const basePeak = finalPeaks.reduce<MassSpectrumPeak | null>((best, peak) => !best || peak.relativeIntensity > best.relativeIntensity ? peak : best, null);
 
   const certainty = await classifyBasePeak(parentSmiles, finalPeaks, basePeak);
+  const fragmentCandidates = await predictFragmentCandidates(parentSmiles);
+  if (fragmentCandidates.length && certainty.basePeakCertainty === "supported") {
+    certainty.basePeakCertainty = "heuristic";
+    certainty.basePeakBasis = "Additional competing fragmentation channels have unknown abundance. The chart's strongest ion is a heuristic ranking, not a supported base-peak assignment.";
+  }
+  if (fragmentCandidates.length) notes.push("Additional unranked fragment candidates are listed separately. Their composition follows supported fragmentation channels; their abundance and exact ion connectivity are not predicted, so they are excluded from the intensity plot and base-peak ranking.");
   return {
+    fragmentCandidates,
     formula,
     molecularIonMz: molecularIon === null ? null : Number(molecularIon.toFixed(4)),
     nominalMass: nominal,
@@ -1024,4 +1037,12 @@ export async function predictMassSpectrum(
     peaks: finalPeaks,
     notes,
   };
+}
+
+async function containsPhenylRing(smiles: string | null): Promise<boolean> {
+  if (!smiles) return false;
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(smiles), query = rdkit.get_qmol("c1ccccc1");
+  try { return Boolean(mol && query && JSON.parse(mol.get_substruct_matches(query)).length); }
+  finally { mol?.delete(); query?.delete(); }
 }

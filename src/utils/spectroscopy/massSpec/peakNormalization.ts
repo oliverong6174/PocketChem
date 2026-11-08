@@ -24,6 +24,27 @@ function uniqueAlternatives(peaks: MassSpectrumPeak[]) {
 export function mergeAndNormalizePeaks(peaks: MassSpectrumPeak[]) {
   if (peaks.length === 0) return [];
 
+  // General graph cleavage and a diagnostic SMARTS can describe the same
+  // ion-forming channel. Multiple descriptions are not independent abundance.
+  const channels = new Map<string, MassSpectrumPeak[]>();
+  const independent: MassSpectrumPeak[] = [];
+  for (const peak of peaks) {
+    if (!peak.channelKey) { independent.push(peak); continue; }
+    const key = `${peak.channelKey}|${peak.mz.toFixed(2)}`;
+    channels.set(key, [...(channels.get(key) ?? []), peak]);
+  }
+  for (const descriptions of channels.values()) {
+    const graph = descriptions.filter(p => p.channelSource === "graph");
+    const strongest = descriptions.reduce((a,b) => a.relativeIntensity >= b.relativeIntensity ? a : b);
+    const graphTotal = graph.reduce((sum,p) => sum + p.relativeIntensity,0);
+    // Graph entries enumerate different bonds, including inequivalent sites
+    // yielding the same ion. Retain that multiplicity. A diagnostic description
+    // of their ion competes as an alternate heuristic, not an extra cleavage.
+    if (graph.length && graphTotal >= strongest.relativeIntensity) independent.push(...graph);
+    else independent.push(strongest);
+  }
+  peaks = independent;
+
   const groups = new Map<string, MassSpectrumPeak[]>();
   for (const peak of peaks) {
     if (!Number.isFinite(peak.mz) || !Number.isFinite(peak.relativeIntensity) || peak.relativeIntensity <= 0) continue;

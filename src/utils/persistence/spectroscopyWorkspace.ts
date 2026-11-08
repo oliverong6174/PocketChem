@@ -13,7 +13,7 @@
 import type { SpectroscopyResult } from "../spectroscopy/types";
 
 /** Bump when the shape or meaning of saved spectroscopy results changes. */
-export const SPECTROSCOPY_ENGINE_VERSION = 3;
+export const SPECTROSCOPY_ENGINE_VERSION = 4;
 
 export type SpectroscopyTabId = "proton" | "carbon" | "ir" | "mass";
 
@@ -117,6 +117,13 @@ function validMassPeak(peak: unknown): boolean {
 
 function validMassSpec(spec: unknown): boolean {
   if (!isObject(spec) || !isString(spec.formula)) return false;
+  if (spec.fragmentCandidates !== undefined && (
+    !Array.isArray(spec.fragmentCandidates) || spec.fragmentCandidates.length > MAX_PEAKS ||
+    !spec.fragmentCandidates.every(candidate => isObject(candidate) &&
+      isFiniteNumber(candidate.mz) && candidate.mz > 0 && candidate.charge === 1 &&
+      isString(candidate.ionFormula) && isString(candidate.neutralLossFormula) &&
+      isString(candidate.mechanism) && isString(candidate.explanation))
+  )) return false;
   for (const field of ["molecularIonMz", "nominalMass", "basePeakMz"]) {
     if (spec[field] !== null && !isFiniteNumber(spec[field])) return false;
   }

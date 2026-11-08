@@ -2140,6 +2140,19 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
                   </div>
                 )}
                 <MassTable peaks={result.massSpec.peaks} selectedPeak={selectedMassPeak} onSelectPeak={handleMassPeakSelect} />
+                {Boolean(result.massSpec.fragmentCandidates?.length) && (
+                  <details className="spectroscopy-notes">
+                    <summary>Additional fragment candidates (abundance unknown)</summary>
+                    <p>These are possible fragment compositions. They have no predicted intensity, are excluded from the plot and base-peak ranking, and do not identify a unique ion structure.</p>
+                    <ul>
+                      {result.massSpec.fragmentCandidates!.map((candidate) => (
+                        <li key={`${candidate.ionFormula}-${candidate.mechanism}`}>
+                          <strong>m/z {candidate.mz} · {candidate.ionFormula}⁺</strong>: {candidate.explanation}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
                 <div className="spectroscopy-notes">
                   {result.massSpec.notes.map((note) => <p key={note}>{note}</p>)}
                 </div>
