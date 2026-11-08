@@ -665,6 +665,9 @@ export type ReactionRule = {
 
   title: string;
   reagents: string;
+  /** Elements a declared reagent can supply. An empty array explicitly
+   * supplies no checked atoms. Overrides legacy formula-token inference. */
+  reagentAtomSources?: string[];
   reagentNote: string;
   productHint: string;
   explanation: string;

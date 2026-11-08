@@ -764,6 +764,7 @@ export const alcoholReactionRules: ReactionRule[] = [
     reactionType: "substitution",
     title: "Phosphate Ester Formation",
     reagents: "Activated phosphoric acid derivative",
+    reagentAtomSources: ["P", "O"],
     reagentNote: "O-phosphorylation",
     productHint: "Phosphate monoester",
     explanation:

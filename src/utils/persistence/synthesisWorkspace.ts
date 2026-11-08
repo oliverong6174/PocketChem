@@ -10,7 +10,7 @@
 import type { MultistepSynthesisRoute } from "../reactions/reactionTypes";
 
 /** Bump when the shape or meaning of saved synthesis results changes. */
-export const SYNTHESIS_ENGINE_VERSION = 2;
+export const SYNTHESIS_ENGINE_VERSION = 3;
 
 export type SynthesisWorkspaceInputs = {
   reactantKet: string | null;

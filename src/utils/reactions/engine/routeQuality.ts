@@ -23,8 +23,8 @@ import { getCompiledQuerySync } from "./rdkitCaches";
  *
  * Generic checks, each with its textbook basis:
  *  - atom sourcing: an element in a step's products that appears in neither its reactants, its
- *    rule-supplied reagents nor the rule's reagent text has no documented source (contradiction).
- *    Carbon in excess of the reactants is allowed only when the reagent text names a carbon
+ *    rule-supplied reagents nor structured/recognized reagent sources has no documented source (contradiction).
+ *    Carbon in excess of the reactants is allowed only when a source names a carbon
  *    reagent. Hydrogen and oxygen are not checked (water, acid, oxidants are too varied).
  *  - activated-arene over-substitution: halogenation of a free arylamine or phenol whose product
  *    still has an open ortho/para position (polyhalogenation; Anslyn & Dougherty ch. 11; OpenStax
@@ -40,7 +40,7 @@ import { getCompiledQuerySync } from "./rdkitCaches";
  * unambiguous, so it is deliberately rare.
  */
 
-export const ROUTE_QUALITY_ASSESSMENT_VERSION = 1;
+export const ROUTE_QUALITY_ASSESSMENT_VERSION = 2;
 
 const TIER_LABEL: Record<RouteQualityTier, string> = {
   "structure-verified": "Structure replay only (no chemical assessment)",
@@ -99,9 +99,9 @@ function mergeCounts(into: Map<string, number>, from: Map<string, number>): void
 }
 
 /**
- * Reagent abbreviations and words whose atoms can enter a product but whose letters are not
- * element symbols. Matching is deliberately lenient: it only widens what counts as a documented
- * source, so it can hide an unsourced atom but never invent one.
+ * Legacy chemical abbreviations. Only complete chemical tokens are accepted;
+ * structured reagentAtomSources should be supplied when transferability matters.
+ * Presence in a legacy reagent is documentation, not proof of atom transfer.
  */
 const ABBREVIATIONS: Record<string, string[]> = {
   Me: ["C"], Et: ["C"], Pr: ["C"], iPr: ["C"], Bu: ["C"], tBu: ["C"], Ph: ["C"], Bn: ["C"], Ac: ["C"], Bz: ["C"],
@@ -110,28 +110,27 @@ const ABBREVIATIONS: Record<string, string[]> = {
   NBS: ["Br", "C", "N"], NCS: ["Cl", "C", "N"], NIS: ["I", "C", "N"], DMSO: ["C", "S"], DMF: ["C", "N"],
   DCC: ["C", "N"], DPPA: ["C", "N", "P"], LDA: ["C", "N", "Li"], DIBAL: ["C", "Al"], mCPBA: ["C", "Cl"], PCC: ["C", "Cr", "Cl"],
 };
-const KEYWORDS: Array<[RegExp, string[]]> = [
-  [/phosph/i, ["P"]], [/sulfon|sulfate|sulfur|thio/i, ["S"]], [/tosyl|mesyl/i, ["C", "S"]],
-  [/bromin|bromide|bromo/i, ["Br"]], [/chlorin|chloride|chloro/i, ["Cl"]], [/iodin|iodide|iodo/i, ["I"]], [/fluor/i, ["F"]],
-  [/cyanide|nitrile/i, ["C", "N"]], [/azide|ammonia|nitrite|hydrazine/i, ["N"]],
-  [/carbon dioxide|carbonate/i, ["C"]], [/silyl|silane/i, ["Si"]], [/boron|borane|boryl/i, ["B"]],
-];
-
 /** Element symbols named in a reagent string such as "HgSO₄, H₂SO₄, H₂O" or "1) Ph₃P  2) strong base". */
 function reagentElements(text: string): Set<string> {
   // Triarylphosphine ligands (Ph3P, PPh3) leave as the phosphine oxide; their phenyls never enter the product.
   const normalised = [...text].map((char) => SUBSCRIPTS[char] ?? char).join("").replace(/Ph3P|PPh3/g, "P");
   const found = new Set<string>();
-  for (const word of normalised.match(/[A-Za-z]+/g) ?? []) {
-    for (const element of ABBREVIATIONS[word] ?? []) found.add(element);
-  }
-  for (const [pattern, elements] of KEYWORDS) {
-    if (pattern.test(normalised)) for (const element of elements) found.add(element);
-  }
-  for (const token of normalised.match(/[A-Z][a-z]?/g) ?? []) {
-    if (ELEMENTS.has(token)) found.add(token);
-    else if (ELEMENTS.has(token[0])) found.add(token[0]);
-    for (const element of ABBREVIATIONS[token] ?? []) found.add(element);
+  const abbreviations = Object.keys(ABBREVIATIONS).sort((a,b)=>b.length-a.length).join("|");
+  const unit = new RegExp(`(${abbreviations}|[A-Z][a-z]?)(\\d*)`, "g");
+  for (const word of normalised.match(/[A-Za-z][A-Za-z0-9]*/g) ?? []) {
+    const elements: string[] = [];
+    let cursor = 0, valid = true;
+    for (const match of word.matchAll(unit)) {
+      if (match.index !== cursor) { valid = false; break; }
+      const symbol = match[1];
+      if (ABBREVIATIONS[symbol]) elements.push(...ABBREVIATIONS[symbol]);
+      else if (ELEMENTS.has(symbol)) elements.push(symbol);
+      else { valid = false; break; }
+      cursor = match.index! + match[0].length;
+    }
+    // Reject the ENTIRE token if any letter is not chemical syntax. Never
+    // interpret Catalytic as Ca, Compatible as Co, or Polar as P.
+    if (valid && cursor === word.length) for (const element of elements) found.add(element);
   }
   return found;
 }
@@ -189,7 +188,15 @@ async function checkAtomSourcing(step: SynthesisStep, rule: ReactionRule, out: R
   }
   const products = new Map<string, number>();
   for (const smiles of step.productComponents) mergeCounts(products, smilesElements(smiles));
-  const documented = reagentElements(`${rule.reagents} ${rule.reagentNote ?? ""} ${step.reagentLabel ?? ""}`);
+  // Explanatory prose and saved/user labels are not reagent provenance.
+  const documented = rule.reagentAtomSources !== undefined
+    ? new Set(rule.reagentAtomSources)
+    : reagentElements(rule.reagents);
+  const unresolved = rule.reagentAtomSources === undefined && documented.size === 0 && Boolean(rule.reagents.trim());
+  if (unresolved) {
+    out.push(finding(step.stepNumber, "reagent-source-unresolved", "incomplete",
+      "Reagent atom sources are not declared in structured metadata or recognized complete chemical tokens. Atom provenance is incompletely assessed."));
+  }
 
   const unsourced: string[] = [];
   for (const [element, count] of products) {
@@ -205,7 +212,7 @@ async function checkAtomSourcing(step: SynthesisStep, rule: ReactionRule, out: R
       finding(
         step.stepNumber,
         "unsourced-atoms",
-        "contradiction",
+        unresolved ? "incomplete" : "contradiction",
         `The product contains ${unsourced.join(", ")} that appear${unsourced.length === 1 ? "s" : ""} in neither the step's reactants nor its documented reagents (${rule.reagents}).`,
       ),
     );

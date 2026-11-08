@@ -256,7 +256,7 @@ describe("quality labels", () => {
 describe("saved results", () => {
   test("[quality] a saved route without a quality field still restores, and a malformed quality field is rejected", async () => {
     const persistence = await loadModule("/src/utils/persistence/synthesisWorkspace.ts");
-    assert.equal(persistence.SYNTHESIS_ENGINE_VERSION, 2, "old saved results must be flagged as an earlier engine version");
+    assert.equal(persistence.SYNTHESIS_ENGINE_VERSION, 3, "old saved results must be flagged as an earlier engine version");
     const base = () => ({
       inputKey: "k",
       startingSmiles: "CC=O",

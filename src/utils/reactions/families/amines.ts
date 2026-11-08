@@ -228,6 +228,7 @@ export const amineReactionRules: ReactionRule[] = [
     reactionType: "substitution",
     title: "Hinsberg Test",
     reagents: "Benzenesulfonyl chloride, NaOH",
+    reagentAtomSources: ["C", "S", "O"],
     reagentNote: "Classification test",
     productHint: "Sulfonamide",
     explanation:
