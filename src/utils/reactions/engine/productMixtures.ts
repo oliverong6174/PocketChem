@@ -7,6 +7,7 @@ import type {
 import {
   areCanonicalEnantiomers,
   canonicalizeStereoStructure,
+  stereoSpecification,
   type CanonicalStereoStructure,
 } from "./stereochemistry";
 
@@ -133,6 +134,9 @@ async function mixtureKindForGroup(
   const stereoMode = rule.selectivityProfile?.stereochemistry?.mode;
   const expectedMixture = rule.selectivityProfile?.mixture === "expected";
   if (stereoMode !== "racemization" && !expectedMixture) return null;
+  if ((await Promise.all(members.map(m => stereoSpecification(m.smiles)))).some(s => s.unknown)) {
+    return "stereoisomeric";
+  }
 
   if (
     members.length === 2 &&
@@ -169,11 +173,11 @@ function mixtureLabel(kind: ReactionProductMixtureKind): string {
   return "Stereoisomeric mixture";
 }
 
-function shouldInferAchiralFacePairAsRacemate(
+async function shouldInferAchiralFacePairAsRacemate(
   rule: ReactionRule,
   members: Array<{ smiles: string; structure: CanonicalStereoStructure }>,
   reactantSmiles: string[],
-): boolean {
+): Promise<boolean> {
   if (members.length !== 2) return false;
 
   const stereo = rule.selectivityProfile?.stereochemistry;
@@ -190,6 +194,8 @@ function shouldInferAchiralFacePairAsRacemate(
   // A pre-existing tetrahedral stereocenter makes opposite-face attack
   // diastereomeric rather than enantiomeric, so do not apply this inference.
   if (reactantSmiles.some((smiles) => /@/.test(smiles))) return false;
+  if ((await Promise.all(reactantSmiles.map(stereoSpecification))).some(s => s.unknown || s.atomCenters > 0)) return false;
+  if ((await Promise.all(members.map(m => stereoSpecification(m.smiles)))).some(s => s.unknown)) return false;
 
   return members.every((member) => member.structure.hasSpecifiedStereo);
 }
@@ -252,7 +258,7 @@ export async function classifyReactionProducts(
     // For a stereospecific syn/anti addition to an achiral substrate, exactly
     // two stereodefined products are the two enantiotopic-face products.
     if (
-      shouldInferAchiralFacePairAsRacemate(
+      await shouldInferAchiralFacePairAsRacemate(
         rule,
         groupMembers,
         reactantSmiles,

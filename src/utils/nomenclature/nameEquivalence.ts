@@ -19,16 +19,19 @@ const lexical: Array<[RegExp, string]> = [
 
 function parse(name: string) {
   let text = name.normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/[\u2010-\u2015]/g, "-").replace(/\u2019/g, "'").toLowerCase().trim();
-  for (const [pattern, replacement] of lexical) text = text.replace(pattern, replacement);
+    .replace(/[\u2010-\u2015]/g, "-").replace(/\u2019/g, "'").trim();
   const descriptors: Array<{ locant: string; value: string }> = [];
-  text = text.replace(/\(((?:\d+[a-z]?'?)?[rsez](?:,(?:\d+[a-z]?'?)?[rsez])*)\)-?/g, (_, group: string) => {
+  text = text.replace(/\(((?:\d+[a-z]?'?)?[RSEZrs](?:,(?:\d+[a-z]?'?)?[RSEZrs])*)\)-?/g, (_, group: string) => {
     for (const token of group.split(",")) {
-      const match = /^(.*)([rsez])$/.exec(token)!;
+      const match = /^(.*)([RSEZrs])$/.exec(token)!;
       descriptors.push({ locant: match[1], value: match[2] });
     }
     return "";
   });
+  // Lowercase r/s are pseudoasymmetric descriptors, not spelling variants of
+  // R/S. Only the constitutional name is case-insensitive.
+  text = text.toLowerCase();
+  for (const [pattern, replacement] of lexical) text = text.replace(pattern, replacement);
   const relative = [...text.matchAll(/\b(cis|trans)-?/g)].map(m => m[1]).sort().join(",");
   text = text.replace(/\b(cis|trans)-?/g, "");
   const mixture = [...text.matchAll(/\b(racemic|rac|dl)-?/g)].map(m => m[1] === "racemic" ? "rac" : m[1]).join(",");

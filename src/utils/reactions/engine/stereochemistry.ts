@@ -211,6 +211,38 @@ export function invertTetrahedralSmiles(smiles: string): string {
   return smiles.replace(/@@|@/g, (tag) => (tag === "@" ? "@@" : "@"));
 }
 
+/** Stereo completeness for assertions about a pure enantiomer. Unknown atom
+ * stereo is exposed by RDKit. Potential internal C=C stereo is checked against
+ * assigned E/Z bonds; ordinary endocyclic 3-7 member alkenes are constrained.
+ * Symmetric nonstereogenic internal alkenes can conservatively return unknown.
+ */
+export async function stereoSpecification(smiles: string): Promise<{ unknown: boolean; atomCenters: number }> {
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(smiles);
+  if (!mol) return { unknown: true, atomCenters: 0 };
+  const queries: Array<{ delete: () => void }> = [];
+  try {
+    const descriptors = JSON.parse(mol.get_descriptors());
+    const atomCenters = Number(descriptors.NumAtomStereoCenters);
+    if (!Number.isFinite(atomCenters) || !Number.isFinite(descriptors.NumUnspecifiedAtomStereoCenters)) return { unknown: true, atomCenters: 0 };
+    if (descriptors.NumUnspecifiedAtomStereoCenters > 0) return { unknown: true, atomCenters };
+    const tags = JSON.parse(mol.get_stereo_tags());
+    const bondKey = (a: number,b: number) => [a,b].sort((x,y)=>x-y).join("-");
+    const assigned = new Set<string>((tags.CIP_bonds ?? []).filter((b: unknown[]) => /[EZ]/.test(String(b[2])))
+      .map((b: number[]) => bondKey(b[0],b[1])));
+    const pairs = (smarts: string): number[][] => {
+      const q = rdkit.get_qmol(smarts);
+      if (!q) return [];
+      queries.push(q);
+      return parseSubstructureMatches(mol.get_substruct_matches(q));
+    };
+    const constrained = new Set(pairs("[C;r3,r4,r5,r6,r7]=@[C;r3,r4,r5,r6,r7]").map(p=>bondKey(p[0],p[1])));
+    const unknown = pairs("[C;H0,H1]=[C;H0,H1]").some(p=>!assigned.has(bondKey(p[0],p[1])) && !constrained.has(bondKey(p[0],p[1])));
+    return { unknown, atomCenters };
+  } catch { return { unknown: true, atomCenters: 0 }; }
+  finally { for (const q of queries) q.delete(); mol.delete(); }
+}
+
 /**
  * Test whether two already-canonicalized structures are exact mirror images.
  *
@@ -232,6 +264,8 @@ export async function areCanonicalEnantiomers(
   // Pure E/Z alternatives are geometric isomers, not enantiomers. At least one
   // tetrahedral descriptor must be present before mirroring is meaningful here.
   if (!/@/.test(left.isomeric) || !/@/.test(right.isomeric)) return false;
+  const completeness = await Promise.all([stereoSpecification(left.isomeric), stereoSpecification(right.isomeric)]);
+  if (completeness.some(s => s.unknown)) return false;
 
   const mirrored = await canonicalizeStereoStructure(
     invertTetrahedralSmiles(left.isomeric),

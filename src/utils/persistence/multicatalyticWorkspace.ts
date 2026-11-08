@@ -15,7 +15,7 @@ import type { ReactionWorkspace } from "../reactions/engine/reactionWorkspace";
 import type { RouteCompatibility, RouteSelectivity, RouteVerification } from "../reactions/reactionTypes";
 
 /** Bump when the shape or meaning of saved workspaces changes. */
-export const MULTICATALYTIC_ENGINE_VERSION = 1;
+export const MULTICATALYTIC_ENGINE_VERSION = 2;
 
 export type MulticatalyticAction = ReactionWorkspace["actions"][number];
 

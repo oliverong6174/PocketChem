@@ -19,7 +19,7 @@ import type {
 } from "../reactionUtils";
 
 /** Bump when the shape or meaning of saved reaction results changes. */
-export const REACTIONS_ENGINE_VERSION = 1;
+export const REACTIONS_ENGINE_VERSION = 2;
 export const MAX_SAVED_PATHWAYS = 500;
 
 export type ReactionsAnalysisMode = "forward" | "retrosynthesis";

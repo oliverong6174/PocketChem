@@ -30,6 +30,13 @@ test('a racemic mixture cannot verify a pure synthesis target', async () => {
   assert.equal(stereo.stereochemicalMixtureCanSatisfyTarget('racemic', await key('C[C@H](O)CC')), false);
   assert.equal(stereo.stereochemicalMixtureCanSatisfyTarget('racemic', await key('CC(O)CC')), true);
 });
+test('partially specified tetrahedral or alkene geometry cannot prove an enantiomer pair', async () => {
+  for(const [a,b] of [
+    ['C[C@H](O)C(O)CC','C[C@@H](O)C(O)CC'],
+    ['C[C@H](O)CC=CCC','C[C@@H](O)CC=CCC'],
+  ])assert.equal(await stereo.areCanonicalEnantiomers(await key(a),await key(b)),false);
+  assert.equal(await stereo.areCanonicalEnantiomers(await key('C[C@H](O)C/C=C/CC'),await key('C[C@@H](O)C/C=C/CC')),true);
+});
 test('name comparison retains stereogenic unit locants and relative contradictions', async () => {
   names = await loadModule('/src/utils/nomenclature/nameEquivalence.ts');
   for (const [a,b] of [
@@ -37,6 +44,7 @@ test('name comparison retains stereogenic unit locants and relative contradictio
     ['(2E)-hepta-2,4-diene','(4E)-hepta-2,4-diene'],
     ['cis-(1R,2R)-cyclohexane-1,2-diol','trans-(1R,2R)-cyclohexane-1,2-diol'],
     ['(R)-butan-2-ol','butan-2-ol'],
+    ['(2r)-hexane-2,4-diol','(2R)-hexane-2,4-diol'],
     ['rac-but an-2-ol','but an-2-ol'],
   ]) assert.equal(await names.namesEquivalent(a,b), false, `${a} / ${b}`);
   assert.equal(await names.namesEquivalent('(R)-butan-2-ol','(2R)-butan-2-ol'),true);

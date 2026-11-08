@@ -107,6 +107,7 @@ export const alkeneReactionRules: ReactionRule[] = [
     reactionType: "reduction",
     title: "Alkene Hydrogenation",
     reagents: "H₂, Pd/C",
+    reagentAtomSources: ["H"],
     reagentNote: "Catalytic reduction",
     productHint: "Alkane",
     explanation:
@@ -115,7 +116,26 @@ export const alkeneReactionRules: ReactionRule[] = [
     transform: {
       type: "reactionSmarts",
       smarts: "[C:1]=[C:2]>>[C:1][C:2]",
+      // Fix the entire neighbor order in the PRODUCT template. Two-atom
+      // templates can invert relative parity when equivalent input SMILES
+      // attach unmapped branches in a different order. Ring paths and both
+      // exocyclic neighbors are mapped here; both faces are retained.
+      forwardTemplates: [5, 6, 7].flatMap(size => {
+        const maps = Array.from({ length: size - 2 }, (_, i) => i + 5);
+        const left = `[C;H0;R1;r${size}:1]1([*:3])=[C;H0;R1;r${size}:2]([*:4])${maps.map(i => `[C;X4;R1:${i}]`).join("")}1`;
+        const tail = maps.map(i => `[C:${i}]`).join("");
+        return [
+          { whenAlkene: "unspecified" as const, smarts: `${left}>>[C@H:1]1([*:3])[C@@H:2]([*:4])${tail}1` },
+          { whenAlkene: "unspecified" as const, smarts: `${left}>>[C@@H:1]1([*:3])[C@H:2]([*:4])${tail}1` },
+        ];
+      }),
     },
+    selectivityProfile: {
+      stereochemistry: { mode: "syn-addition", relativeRelationship: "syn", stereospecific: true },
+      mixture: "expected",
+    },
+    selectivity: ["Hydrogen adds syn from the catalyst surface; no numerical face preference is assigned."],
+    limitations: ["Explicit new stereochemical assignments cover tetrasubstituted endocyclic alkenes in ordinary 5–7 member rings. Other configurations, large or bridged rings and diastereofacial preferences are not resolved by this model."],
     priority: 100,
   },
 
