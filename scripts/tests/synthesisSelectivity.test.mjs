@@ -267,13 +267,17 @@ describe("end to end (bounded)", () => {
 });
 
 describe("a route with an unranked step is ranked, not re-searched", () => {
-  test("[engine] 1-octene -> 2-octanone: the selected route is hydration + oxidation, with no unranked step", async () => {
+  // Stage 9M: the Wacker-Tsuji rule is a one-step Markovnikov route to the methyl ketone, so it now outranks hydration + oxidation.
+  // The assertion keeps the point of the test: the selected route has no unranked step and the hydration route (if still found) ranks below it.
+  test("[engine] 1-octene -> 2-octanone: the selected route has no unranked step and outranks hydration + oxidation", async () => {
     const controller = new runModule.SearchRunController({ rules: registry, totalMs: 25000 });
     await controller.start({ startingSmiles: "C=CCCCCCC", targetSmiles: "CC(=O)CCCCCC", copies: 1 });
     const ranked = controller.getState().ranked;
     const ids = ranked.map((entry) => entry.route.steps.map((step) => step.ruleId).join(">"));
-    assert.equal(ids[0], "alkene-acid-hydration>secondary-alcohol-oxidation-pcc", JSON.stringify(ids));
+    assert.equal(ids[0], "wacker-tsuji-oxidation", JSON.stringify(ids));
     assert.equal(ranked[0].unrankedSteps, 0);
+    const hydration = ranked.find((entry) => entry.route.steps.map((step) => step.ruleId).join(">") === "alkene-acid-hydration>secondary-alcohol-oxidation-pcc");
+    if (hydration) assert.equal(hydration.unrankedSteps, 0);
     // Any other route that was found must not outrank it on the documented criteria.
     for (const entry of ranked.slice(1)) assert.ok(book.compareRanked(ranked[0], entry) < 0);
   });
