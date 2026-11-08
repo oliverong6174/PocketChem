@@ -1,0 +1,7 @@
+{
+  "id": "NM-07",
+  "emittedName": "3,3-dimethylbutanoic acid",
+  "startedUTC": "2026-11-06T20:05:52.326717+00:00",
+  "smiles": "CC(C)(C)CC(=O)O",
+  "method": "exact frozen accepted name/structure pair"
+}

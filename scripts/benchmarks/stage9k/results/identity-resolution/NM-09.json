@@ -1,0 +1,7 @@
+{
+  "id": "NM-09",
+  "emittedName": "ethyl 2-methylbutanoate",
+  "startedUTC": "2026-11-06T20:05:52.329484+00:00",
+  "smiles": "CCC(C)C(=O)OCC",
+  "method": "exact frozen accepted name/structure pair"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "NM-15",
+  "emittedName": "3-methoxybenzoic acid",
+  "startedUTC": "2026-11-06T20:05:52.336302+00:00",
+  "smiles": "COC1=CC=CC(=C1)C(=O)O",
+  "method": "exact frozen accepted name/structure pair"
+}

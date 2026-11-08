@@ -1,0 +1,258 @@
+{
+  "id": "RQ-04",
+  "startedUTC": "2026-11-06T18:22:52.478Z",
+  "calls": [
+    "runRule",
+    "verifyMultistepRoute",
+    "assessRouteCompatibility",
+    "assessRouteSelectivity",
+    "assessRouteQuality"
+  ],
+  "pathways": [
+    {
+      "ruleId": "fischer-esterification",
+      "family": "alcohols",
+      "reactionType": "substitution",
+      "title": "Fischer Esterification",
+      "reagentLabel": "Catalytic H₂SO₄, heat",
+      "reagentNote": "Draw an alcohol and a carboxylic acid as disconnected structures",
+      "shortExplanation": "An alcohol and a carboxylic acid equilibrate with an ester and water under acid catalysis.",
+      "course": "ochem-1",
+      "chapter": "Alcohols",
+      "mechanism": "Acid-catalyzed nucleophilic acyl substitution",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [
+        "Reversible; removing water or using excess reactant drives the equilibrium toward ester."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "carboxylic acid",
+          "trigger": {
+            "includeSmarts": [
+              "[CX3](=O)[OX2H1]"
+            ]
+          },
+          "id": "carboxylic-acid",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "id": "fischer-esterification",
+      "reactantSmiles": "CO.Cc1ccccc1C(=O)O",
+      "reactantLabel": "Current intermediate + supplied reactant",
+      "productSmiles": "COC(=O)c1ccccc1C",
+      "productLabel": "Ester",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CO",
+        "Cc1ccccc1C(=O)O"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "construction": "engine-pathway",
+  "route": {
+    "id": "RQ-04",
+    "startingSmiles": "Cc1ccccc1C(=O)O.CO",
+    "targetSmiles": "Cc1ccccc1C(=O)OC",
+    "steps": [
+      {
+        "id": "s1",
+        "stepNumber": 1,
+        "source": "forward",
+        "ruleId": "fischer-esterification",
+        "family": "alcohols",
+        "reactionType": "substitution",
+        "title": "Fischer Esterification",
+        "reactantSmiles": "CO.Cc1ccccc1C(=O)O",
+        "reactantComponents": [
+          "CO",
+          "Cc1ccccc1C(=O)O"
+        ],
+        "reactantLabel": "Current intermediate + supplied reactant",
+        "productSmiles": "COC(=O)c1ccccc1C",
+        "productComponents": [
+          "COC(=O)c1ccccc1C"
+        ],
+        "productLabel": "Ester",
+        "reagentLabel": "Catalytic H₂SO₄, heat",
+        "reagentNote": "Draw an alcohol and a carboxylic acid as disconnected structures",
+        "shortExplanation": "An alcohol and a carboxylic acid equilibrate with an ester and water under acid catalysis.",
+        "course": "ochem-1",
+        "chapter": "Alcohols",
+        "mechanism": "Acid-catalyzed nucleophilic acyl substitution",
+        "reactionClass": null,
+        "purpose": null,
+        "selectivity": [],
+        "selectivityProfile": null,
+        "selectivityAssessment": null,
+        "limitations": [
+          "Reversible; removing water or using excess reactant drives the equilibrium toward ester."
+        ],
+        "retrosynthesisConfidence": null,
+        "productMixture": null,
+        "display": null
+      }
+    ],
+    "confidence": "verified",
+    "score": 0,
+    "verification": {
+      "status": "verified",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "ruleId": "fischer-esterification",
+          "status": "verified",
+          "reactants": [
+            {
+              "smiles": "CO",
+              "origin": "starting-material",
+              "match": "exact",
+              "lotId": "sm1#1",
+              "lineage": [
+                1
+              ]
+            },
+            {
+              "smiles": "Cc1ccccc1C(=O)O",
+              "origin": "starting-material",
+              "match": "exact",
+              "lotId": "sm0#1",
+              "lineage": [
+                0
+              ]
+            }
+          ],
+          "productMatch": "exact",
+          "problems": []
+        }
+      ],
+      "targetMatch": "exact",
+      "coproducts": [],
+      "unusedStartingMaterials": [],
+      "problems": [],
+      "inventory": [
+        {
+          "startIndex": 0,
+          "smiles": "Cc1ccccc1C(=O)O",
+          "copies": 1,
+          "consumed": 1,
+          "lotIds": [
+            "sm0#1"
+          ],
+          "consumedByStep": [
+            1
+          ]
+        },
+        {
+          "startIndex": 1,
+          "smiles": "CO",
+          "copies": 1,
+          "consumed": 1,
+          "lotIds": [
+            "sm1#1"
+          ],
+          "consumedByStep": [
+            1
+          ]
+        }
+      ],
+      "leftovers": [
+        {
+          "lotId": "s1.1",
+          "smiles": "COC(=O)c1ccccc1C",
+          "origin": "earlier-step",
+          "producedByStep": 1,
+          "lineage": [
+            0,
+            1
+          ],
+          "fromMixture": false
+        }
+      ],
+      "stepDependencies": [
+        {
+          "stepNumber": 1,
+          "consumedLotIds": [
+            "sm1#1",
+            "sm0#1"
+          ],
+          "producedLotIds": [
+            "s1.1"
+          ],
+          "dependsOnSteps": []
+        }
+      ],
+      "targetLineage": {
+        "lotId": "s1.1",
+        "startingMaterialIndices": [
+          0,
+          1
+        ],
+        "contributingSteps": [
+          1
+        ],
+        "unusedSteps": [],
+        "longestLinearSequence": 1
+      }
+    },
+    "compatibility": {
+      "warnings": [],
+      "unassessedRuleIds": [],
+      "worst": "none"
+    },
+    "selectivity": {
+      "findings": [
+        {
+          "stepNumber": 1,
+          "ruleId": "fischer-esterification",
+          "representative": false,
+          "limitations": [
+            "Reversible; removing water or using excess reactant drives the equilibrium toward ester."
+          ],
+          "class": "single-outcome",
+          "alternatives": 1,
+          "basis": "The engine offers one constitutional outcome for these reactants; it was not ranked against alternatives."
+        }
+      ],
+      "counts": {
+        "major": 0,
+        "single-outcome": 1,
+        "disfavored": 0,
+        "unranked": 0,
+        "unassessed": 0
+      }
+    }
+  },
+  "quality": {
+    "assessmentVersion": 1,
+    "structural": "verified",
+    "tier": "chemically-supported",
+    "findings": [
+      {
+        "stepNumber": 1,
+        "code": "documented-reagents",
+        "level": "info",
+        "message": "Uses documented reagents (Catalytic H₂SO₄, heat) that are not tracked as structural partners (Ca, S stay out of the product). Their availability is assumed, not replayed."
+      },
+      {
+        "stepNumber": 1,
+        "code": "selectivity-single-outcome",
+        "level": "support",
+        "message": "The engine offers one constitutional outcome for these reactants; it was not ranked against alternatives."
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:22:53.915Z"
+}

@@ -1,0 +1,829 @@
+{
+  "routeInventory": {
+    "total": 29,
+    "counts": {
+      "flag": 12,
+      "not-supported": 2,
+      "clear": 13,
+      "ambiguous": 2
+    }
+  },
+  "routeRuns": {
+    "first-run": {
+      "positiveN": 12,
+      "flagged": 11,
+      "sensitivityWilson95": [
+        0.646120088858883,
+        0.9851349055950829
+      ],
+      "negativeN": 13,
+      "falsePositives": [
+        "C10"
+      ],
+      "falsePositiveWilson95": [
+        0.013710421242556586,
+        0.3331395092109959
+      ],
+      "verifiedPositiveN": 5,
+      "verifiedDetected": 4,
+      "verifiedWilson95": [
+        0.37553462976252533,
+        0.9637758913675698
+      ],
+      "positiveDetails": [
+        {
+          "id": "F01",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-overhalogenation",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-overhalogenation",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F02",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-overhalogenation",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-overhalogenation",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F03",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-nitration-free-arylamine",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-nitration-free-arylamine",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F04",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-friedel-crafts-alkylation",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-friedel-crafts-alkylation",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F05",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "incomplete:conditions-unassessed",
+            "support:selectivity-single-outcome"
+          ]
+        },
+        {
+          "id": "F06",
+          "structural": "verified",
+          "tier": "plausible-incomplete",
+          "nonReplayConcerns": [],
+          "allCodes": [
+            "incomplete:conditions-unassessed",
+            "support:selectivity-single-outcome"
+          ]
+        },
+        {
+          "id": "F07",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "incomplete:conditions-unassessed",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F08",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "contradiction:unsourced-atoms"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "contradiction:unsourced-atoms",
+            "incomplete:conditions-unassessed",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F09",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "contradiction:unsourced-atoms"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "contradiction:unsourced-atoms",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F10",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "concern:eas-friedel-crafts-alkylation"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "concern:eas-friedel-crafts-alkylation",
+            "incomplete:conditions-unassessed",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F11",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "contradiction:compatibility-acid-base-quench"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "contradiction:compatibility-acid-base-quench",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F12",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "concern:compatibility-competing-reactivity"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "concern:compatibility-competing-reactivity",
+            "support:selectivity-single-outcome"
+          ]
+        }
+      ],
+      "tierTotal": 29
+    },
+    "second-run-harness-v2": {
+      "positiveN": 12,
+      "flagged": 11,
+      "sensitivityWilson95": [
+        0.646120088858883,
+        0.9851349055950829
+      ],
+      "negativeN": 13,
+      "falsePositives": [
+        "C10"
+      ],
+      "falsePositiveWilson95": [
+        0.013710421242556586,
+        0.3331395092109959
+      ],
+      "verifiedPositiveN": 5,
+      "verifiedDetected": 4,
+      "verifiedWilson95": [
+        0.37553462976252533,
+        0.9637758913675698
+      ],
+      "positiveDetails": [
+        {
+          "id": "F01",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-overhalogenation",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-overhalogenation",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F02",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-overhalogenation",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-overhalogenation",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F03",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-nitration-free-arylamine",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-nitration-free-arylamine",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F04",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-friedel-crafts-alkylation",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-friedel-crafts-alkylation",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F05",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "incomplete:conditions-unassessed",
+            "support:selectivity-single-outcome"
+          ]
+        },
+        {
+          "id": "F06",
+          "structural": "verified",
+          "tier": "plausible-incomplete",
+          "nonReplayConcerns": [],
+          "allCodes": [
+            "incomplete:conditions-unassessed",
+            "support:selectivity-major"
+          ]
+        },
+        {
+          "id": "F07",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "incomplete:conditions-unassessed",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F08",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "contradiction:unsourced-atoms"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "contradiction:unsourced-atoms",
+            "incomplete:conditions-unassessed",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F09",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "contradiction:unsourced-atoms"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "contradiction:unsourced-atoms",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F10",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "concern:eas-friedel-crafts-alkylation"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "concern:eas-friedel-crafts-alkylation",
+            "incomplete:conditions-unassessed",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F11",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "contradiction:compatibility-acid-base-quench"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "contradiction:compatibility-acid-base-quench",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F12",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "concern:compatibility-competing-reactivity"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "concern:compatibility-competing-reactivity",
+            "support:selectivity-single-outcome"
+          ]
+        }
+      ],
+      "tierTotal": 29
+    },
+    "third-run-harness-v2b": {
+      "positiveN": 12,
+      "flagged": 11,
+      "sensitivityWilson95": [
+        0.646120088858883,
+        0.9851349055950829
+      ],
+      "negativeN": 13,
+      "falsePositives": [],
+      "falsePositiveWilson95": [
+        0,
+        0.22809537235419838
+      ],
+      "verifiedPositiveN": 7,
+      "verifiedDetected": 6,
+      "verifiedWilson95": [
+        0.4868721707256811,
+        0.9743203756552565
+      ],
+      "positiveDetails": [
+        {
+          "id": "F01",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-overhalogenation",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-overhalogenation",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F02",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-overhalogenation",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-overhalogenation",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F03",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-nitration-free-arylamine",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-nitration-free-arylamine",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F04",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:eas-friedel-crafts-alkylation",
+            "concern:selectivity-regioisomers"
+          ],
+          "allCodes": [
+            "concern:eas-friedel-crafts-alkylation",
+            "incomplete:conditions-unassessed",
+            "concern:selectivity-regioisomers"
+          ]
+        },
+        {
+          "id": "F05",
+          "structural": "verified",
+          "tier": "plausible-incomplete",
+          "nonReplayConcerns": [],
+          "allCodes": [
+            "incomplete:conditions-unassessed",
+            "support:selectivity-single-outcome"
+          ]
+        },
+        {
+          "id": "F06",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:base-beta-halo-carbonyl"
+          ],
+          "allCodes": [
+            "concern:base-beta-halo-carbonyl",
+            "incomplete:conditions-unassessed",
+            "support:selectivity-major"
+          ]
+        },
+        {
+          "id": "F07",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "incomplete:conditions-unassessed",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F08",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "contradiction:unsourced-atoms"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "contradiction:unsourced-atoms",
+            "incomplete:conditions-unassessed",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F09",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "contradiction:unsourced-atoms"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "contradiction:unsourced-atoms",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F10",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "concern:eas-friedel-crafts-alkylation"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "concern:eas-friedel-crafts-alkylation",
+            "incomplete:conditions-unassessed",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F11",
+          "structural": "failed",
+          "tier": "contradicted",
+          "nonReplayConcerns": [
+            "contradiction:compatibility-acid-base-quench"
+          ],
+          "allCodes": [
+            "contradiction:replay-failed",
+            "contradiction:compatibility-acid-base-quench",
+            "incomplete:selectivity-unassessed"
+          ]
+        },
+        {
+          "id": "F12",
+          "structural": "verified",
+          "tier": "known-concern",
+          "nonReplayConcerns": [
+            "concern:compatibility-competing-reactivity"
+          ],
+          "allCodes": [
+            "concern:compatibility-competing-reactivity",
+            "support:selectivity-single-outcome"
+          ]
+        }
+      ],
+      "tierTotal": 29
+    }
+  },
+  "massSpec": {
+    "sets": {
+      "scripts/benchmarks/stage9i/ms-dev/results/after-fix.json": {
+        "summary": {
+          "label": "after-fix",
+          "cases": 15,
+          "molecularIon": "6/6",
+          "basePeak": "4/15",
+          "strictFragments": "3/15",
+          "basePeakWhenCommitted": "0/0",
+          "uncertain": 15,
+          "uncertainButCandidateSetHit": 0
+        },
+        "recomputed": {
+          "unreliable": {
+            "n": 9,
+            "baseCorrect": 2,
+            "fragmentN": 9,
+            "fragmentCorrect": 0
+          },
+          "heuristic": {
+            "n": 5,
+            "baseCorrect": 1,
+            "fragmentN": 5,
+            "fragmentCorrect": 3
+          },
+          "supported": {
+            "n": 1,
+            "baseCorrect": 1,
+            "fragmentN": 1,
+            "fragmentCorrect": 0
+          }
+        }
+      },
+      "scripts/benchmarks/stage9j/ms-dev-b/results/baseline.json": {
+        "summary": {
+          "label": "baseline",
+          "cases": 8,
+          "molecularIon": "6/6",
+          "basePeak": "5/8",
+          "strictFragments": "0/7",
+          "basePeakWhenCommitted": "0/0",
+          "uncertain": 8,
+          "uncertainButCandidateSetHit": 0
+        },
+        "recomputed": {
+          "supported": {
+            "n": 4,
+            "baseCorrect": 4,
+            "fragmentN": 3,
+            "fragmentCorrect": 0
+          },
+          "heuristic": {
+            "n": 4,
+            "baseCorrect": 1,
+            "fragmentN": 4,
+            "fragmentCorrect": 0
+          }
+        }
+      }
+    },
+    "pooled": {
+      "unreliable": {
+        "n": 9,
+        "baseCorrect": 2,
+        "fragmentN": 9,
+        "fragmentCorrect": 0,
+        "wilson95": [
+          0.06322510711784671,
+          0.5474110308930111
+        ]
+      },
+      "heuristic": {
+        "n": 9,
+        "baseCorrect": 2,
+        "fragmentN": 9,
+        "fragmentCorrect": 3,
+        "wilson95": [
+          0.06322510711784671,
+          0.5474110308930111
+        ]
+      },
+      "supported": {
+        "n": 5,
+        "baseCorrect": 5,
+        "fragmentN": 4,
+        "fragmentCorrect": 0,
+        "wilson95": [
+          0.5655175352168251,
+          1
+        ]
+      }
+    }
+  },
+  "comparatorProbes": [
+    {
+      "a": "(R)-butan-2-ol",
+      "b": "(S)-butan-2-ol",
+      "expected": false,
+      "actual": false,
+      "parsedA": {
+        "body": "butan-2-ol",
+        "cip": [
+          "r"
+        ],
+        "ringRelative": ""
+      },
+      "parsedB": {
+        "body": "butan-2-ol",
+        "cip": [
+          "s"
+        ],
+        "ringRelative": ""
+      }
+    },
+    {
+      "a": "(E)-hept-3-ene",
+      "b": "(Z)-hept-3-ene",
+      "expected": false,
+      "actual": false,
+      "parsedA": {
+        "body": "hept-3-ene",
+        "cip": [
+          "e"
+        ],
+        "ringRelative": ""
+      },
+      "parsedB": {
+        "body": "hept-3-ene",
+        "cip": [
+          "z"
+        ],
+        "ringRelative": ""
+      }
+    },
+    {
+      "a": "(2R)-hexane-2,4-diol",
+      "b": "(4R)-hexane-2,4-diol",
+      "expected": false,
+      "actual": true,
+      "parsedA": {
+        "body": "hexane-2,4-diol",
+        "cip": [
+          "r"
+        ],
+        "ringRelative": ""
+      },
+      "parsedB": {
+        "body": "hexane-2,4-diol",
+        "cip": [
+          "r"
+        ],
+        "ringRelative": ""
+      }
+    },
+    {
+      "a": "(2E)-hepta-2,4-diene",
+      "b": "(4E)-hepta-2,4-diene",
+      "expected": false,
+      "actual": true,
+      "parsedA": {
+        "body": "hepta-2,4-diene",
+        "cip": [
+          "e"
+        ],
+        "ringRelative": ""
+      },
+      "parsedB": {
+        "body": "hepta-2,4-diene",
+        "cip": [
+          "e"
+        ],
+        "ringRelative": ""
+      }
+    },
+    {
+      "a": "(2R,4S)-hexane-2,4-diol",
+      "b": "(4R,2S)-hexane-2,4-diol",
+      "expected": false,
+      "actual": true,
+      "parsedA": {
+        "body": "hexane-2,4-diol",
+        "cip": [
+          "r",
+          "s"
+        ],
+        "ringRelative": ""
+      },
+      "parsedB": {
+        "body": "hexane-2,4-diol",
+        "cip": [
+          "r",
+          "s"
+        ],
+        "ringRelative": ""
+      }
+    },
+    {
+      "a": "(2R,3S)-butane-2,3-diol",
+      "b": "(2S,3R)-butane-2,3-diol",
+      "expected": true,
+      "actual": false,
+      "parsedA": {
+        "body": "butane-2,3-diol",
+        "cip": [
+          "r",
+          "s"
+        ],
+        "ringRelative": ""
+      },
+      "parsedB": {
+        "body": "butane-2,3-diol",
+        "cip": [
+          "s",
+          "r"
+        ],
+        "ringRelative": ""
+      }
+    },
+    {
+      "a": "cis-(1R,2R)-cyclohexane-1,2-diol",
+      "b": "trans-(1R,2R)-cyclohexane-1,2-diol",
+      "expected": false,
+      "actual": true,
+      "parsedA": {
+        "body": "cyclohexane-1,2-diol",
+        "cip": [
+          "r",
+          "r"
+        ],
+        "ringRelative": "cis"
+      },
+      "parsedB": {
+        "body": "cyclohexane-1,2-diol",
+        "cip": [
+          "r",
+          "r"
+        ],
+        "ringRelative": "trans"
+      }
+    }
+  ],
+  "dielsAlder": {
+    "allCis": "C1[C@H](C)C=C[C@H](C)[C@@H]1C(=O)OC",
+    "exo": "C1[C@@H](C)C=C[C@@H](C)[C@@H]1C(=O)OC",
+    "validAllCis": true,
+    "validExo": true,
+    "distinctDiastereomers": true
+  },
+  "git": {
+    "original": "4218536dd9522d81808957af8d01c048b4ba4b9c",
+    "amended": "7f4cdc021790f1d047f96ff9f2c89352ba4c58ee",
+    "amendDifference": "D\tscripts/browser/stage9fLiveCheck.mjs",
+    "originalFiles": [
+      "scripts/benchmarks/stage9j/ERRATA-9J.md",
+      "scripts/benchmarks/stage9j/HANDOFF-9J.md",
+      "scripts/benchmarks/stage9j/REPORT.md",
+      "scripts/browser/stage9fLiveCheck.mjs",
+      "scripts/tests/scientificRegression9f.test.mjs"
+    ],
+    "amendedFiles": [
+      "scripts/benchmarks/stage9j/ERRATA-9J.md",
+      "scripts/benchmarks/stage9j/HANDOFF-9J.md",
+      "scripts/benchmarks/stage9j/REPORT.md",
+      "scripts/tests/scientificRegression9f.test.mjs"
+    ],
+    "olderArtifactChangesDuring9J": "",
+    "all9JFiles": "A\tscripts/benchmarks/stage9j/ERRATA-9J.md\nA\tscripts/benchmarks/stage9j/HANDOFF-9J.md\nA\tscripts/benchmarks/stage9j/REPORT.md\nA\tscripts/benchmarks/stage9j/ms-dev-b/PROTOCOL.md\nA\tscripts/benchmarks/stage9j/ms-dev-b/calibration.mjs\nA\tscripts/benchmarks/stage9j/ms-dev-b/cases.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/manifest.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/results/baseline.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/results/calibration.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/run.mjs\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/1-hexanol.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/2-butanol.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/2-octanone.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/3-hexanone.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/anisole.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/benzaldehyde.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/benzyl-alcohol.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/butylamine.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/butylbenzene.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/cyclohexanol.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/dibutylamine.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/ethyl-benzoate.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/ethyl-butanoate.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/ethyl-hexanoate.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/hexanal.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/methyl-butanoate.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/octanenitrile.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/octanoic-acid.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/pentanal.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/pentanenitrile.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/pentanoic-acid.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/propyl-acetate.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/propylbenzene.json\nA\tscripts/benchmarks/stage9j/ms-dev-b/snapshots/triethylamine.json\nA\tscripts/benchmarks/stage9j/nameEquivalence.mjs\nA\tscripts/benchmarks/stage9j/nomenclature-run.mjs\nA\tscripts/benchmarks/stage9j/nomenclature-strict.mjs\nA\tscripts/benchmarks/stage9j/results/nomenclature-current.json\nA\tscripts/benchmarks/stage9j/results/nomenclature-strict.json\nA\tscripts/benchmarks/stage9j/route-quality/cases.json\nA\tscripts/benchmarks/stage9j/route-quality/results/first-run.json\nA\tscripts/benchmarks/stage9j/route-quality/results/second-run-harness-v2.json\nA\tscripts/benchmarks/stage9j/route-quality/results/third-run-harness-v2b.json\nA\tscripts/benchmarks/stage9j/route-quality/run.mjs\nA\tscripts/benchmarks/stage9j/tools/msDevSetB.mjs\nA\tscripts/tests/dielsAlder9j.test.mjs\nM\tscripts/tests/existingRegression.test.mjs\nA\tscripts/tests/massSpec9j.test.mjs\nM\tscripts/tests/mechanism9e.test.mjs\nA\tscripts/tests/nameEquivalence9j.test.mjs\nA\tscripts/tests/nomenclature9j.test.mjs\nA\tscripts/tests/routeQuality9j.test.mjs\nM\tscripts/tests/scientificRegression9f.test.mjs\nA\tscripts/tests/selectivity9j.test.mjs\nM\tsrc/utils/nomenclature/nameBuilder/namingSupport.ts\nM\tsrc/utils/reactions/engine/handlers/ring.ts\nM\tsrc/utils/reactions/engine/productSelectivity.ts\nM\tsrc/utils/reactions/engine/routeQuality.ts\nM\tsrc/utils/reactions/families/enolates.ts\nM\tsrc/utils/reactions/families/epoxides.ts\nM\tsrc/utils/reactions/families/haloalkanes.ts\nM\tsrc/utils/reactions/reactionTypes.ts\nM\tsrc/utils/stereochemistry/depictionEngine.ts\nM\tsrc/utils/stereochemistry/regression.ts",
+    "originalBrowserBlob": "e06566f2cb7556fbc9301ec896d8465d356e8207",
+    "currentUntrackedBrowserBlob": "e06566f2cb7556fbc9301ec896d8465d356e8207"
+  },
+  "integrity": {
+    "historicFilesChecked": 740,
+    "historicMismatches": [],
+    "unrelatedMismatches": [],
+    "srcTreeUnchanged": true
+  }
+}

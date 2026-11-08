@@ -1,0 +1,7 @@
+{
+  "id": "NM-10",
+  "emittedName": "methyl 3-methylpentanoate",
+  "startedUTC": "2026-11-06T20:05:52.330423+00:00",
+  "smiles": "CCC(C)CC(=O)OC",
+  "method": "exact frozen accepted name/structure pair"
+}

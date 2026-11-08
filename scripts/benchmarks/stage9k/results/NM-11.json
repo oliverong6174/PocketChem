@@ -1,0 +1,236 @@
+{
+  "id": "NM-11",
+  "startedUTC": "2026-11-06T18:21:42.630Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "N-ethylpropanamide",
+      "commonName": null,
+      "displayName": "N-ethylpropanamide",
+      "namingConfidence": "Medium",
+      "namingStatus": "systematic",
+      "parentChain": "propane",
+      "parentChainLength": 3,
+      "mainSuffix": "-amide",
+      "prefixes": [],
+      "motifs": [],
+      "explanation": "Parent chain contains 3 carbons. amide chosen as highest-priority functional group. Detected 1 substituent(s).",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ]
+    },
+    "properties": {
+      "molecularFormula": "C5H11NO",
+      "exactMass": "101.0841",
+      "molecularWeight": "101.15",
+      "degreesOfUnsaturation": 1,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 5
+        },
+        {
+          "element": "H",
+          "count": 11
+        },
+        {
+          "element": "O",
+          "count": 1
+        },
+        {
+          "element": "N",
+          "count": 1
+        }
+      ],
+      "heavyAtomCount": 7,
+      "hydrogenBondDonors": 1,
+      "hydrogenBondAcceptors": 2,
+      "rotatableBonds": 2,
+      "topologicalPolarSurfaceArea": "29.10",
+      "logP": "0.53",
+      "ringCount": 0,
+      "boilingPointTendency": {
+        "level": "Low",
+        "score": 3,
+        "factors": [
+          "Larger molecular weight raises boiling point.",
+          "Hydrogen-bond donors raise boiling point.",
+          "Hydrogen-bond acceptors increase intermolecular attraction.",
+          "Branching lowers boiling point by reducing surface contact."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Medium",
+        "score": 4,
+        "factors": [
+          "Low TPSA means less polar surface area.",
+          "Low logP means the molecule is fairly water-loving.",
+          "Hydrogen-bond donors increase water solubility.",
+          "Hydrogen-bond acceptors help the molecule interact with water."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "High",
+        "score": 7,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Secondary amide",
+      "priority": 5.91,
+      "nomenclaturePriority": 5.91,
+      "confidence": "High",
+      "suffix": "-amide",
+      "prefix": "carbamoyl",
+      "equivalentNames": [
+        "2° amide"
+      ],
+      "count": 1,
+      "mcatNote": "Secondary amides have a carbonyl attached to NHR. Peptide bonds are usually secondary amides.",
+      "matches": [
+        {
+          "atoms": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "bonds": [
+            2,
+            3,
+            4
+          ]
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            2,
+            3,
+            4
+          ],
+          "bonds": [
+            2,
+            3
+          ]
+        }
+      ],
+      "displaySmarts": "[CX3](=O)[NX3H1]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Secondary amide",
+        "priority": 5.91,
+        "nomenclaturePriority": 5.91,
+        "confidence": "High",
+        "suffix": "-amide",
+        "prefix": "carbamoyl",
+        "equivalentNames": [
+          "2° amide"
+        ],
+        "count": 1,
+        "mcatNote": "Secondary amides have a carbonyl attached to NHR. Peptide bonds are usually secondary amides.",
+        "matches": [
+          {
+            "atoms": [
+              2,
+              3,
+              4,
+              5
+            ],
+            "bonds": [
+              2,
+              3,
+              4
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              2,
+              3,
+              4
+            ],
+            "bonds": [
+              2,
+              3
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3](=O)[NX3H1]",
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Secondary amide",
+        "priority": 5.91,
+        "nomenclaturePriority": 5.91,
+        "confidence": "High",
+        "suffix": "-amide",
+        "prefix": "carbamoyl",
+        "equivalentNames": [
+          "2° amide"
+        ],
+        "count": 1,
+        "mcatNote": "Secondary amides have a carbonyl attached to NHR. Peptide bonds are usually secondary amides.",
+        "matches": [
+          {
+            "atoms": [
+              2,
+              3,
+              4,
+              5
+            ],
+            "bonds": [
+              2,
+              3,
+              4
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              2,
+              3,
+              4
+            ],
+            "bonds": [
+              2,
+              3
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3](=O)[NX3H1]",
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:21:44.008Z"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "NM-13",
+  "emittedName": "3-bromobenzoic acid",
+  "startedUTC": "2026-11-06T20:05:52.335190+00:00",
+  "smiles": "C1=CC(=CC(=C1)Br)C(=O)O",
+  "method": "exact frozen accepted name/structure pair"
+}

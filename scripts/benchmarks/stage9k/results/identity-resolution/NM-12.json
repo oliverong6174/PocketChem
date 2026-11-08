@@ -1,0 +1,7 @@
+{
+  "id": "NM-12",
+  "emittedName": "N,N-dimethylbenzamide",
+  "startedUTC": "2026-11-06T20:05:52.333791+00:00",
+  "smiles": "CN(C)C(=O)C1=CC=CC=C1",
+  "method": "exact frozen accepted name/structure pair"
+}

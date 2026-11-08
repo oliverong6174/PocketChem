@@ -1,0 +1,395 @@
+{
+  "id": "NM-01",
+  "startedUTC": "2026-11-06T18:21:25.999Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "2,3-dimethylpentane",
+      "commonName": null,
+      "displayName": "2,3-dimethylpentane",
+      "namingConfidence": "Medium",
+      "namingStatus": "systematic",
+      "parentChain": "pentane",
+      "parentChainLength": 5,
+      "mainSuffix": "-ane",
+      "prefixes": [],
+      "motifs": [],
+      "explanation": "Parent chain contains 5 carbons. Detected 2 substituent(s).",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ]
+    },
+    "properties": {
+      "molecularFormula": "C7H16",
+      "exactMass": "100.1252",
+      "molecularWeight": "100.20",
+      "degreesOfUnsaturation": 0,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 7
+        },
+        {
+          "element": "H",
+          "count": 16
+        }
+      ],
+      "heavyAtomCount": 7,
+      "hydrogenBondDonors": 0,
+      "hydrogenBondAcceptors": 0,
+      "rotatableBonds": 2,
+      "topologicalPolarSurfaceArea": "0.00",
+      "logP": "2.69",
+      "ringCount": 0,
+      "boilingPointTendency": {
+        "level": "Very low",
+        "score": 1,
+        "factors": [
+          "Larger molecular weight raises boiling point.",
+          "Branching lowers boiling point by reducing surface contact."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Very low",
+        "score": 1,
+        "factors": [
+          "Low TPSA means less polar surface area.",
+          "Moderate logP gives a balance between water and lipid solubility."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "Very high",
+        "score": 9,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Alkane",
+      "priority": 32,
+      "nomenclaturePriority": 23,
+      "confidence": "Medium",
+      "suffix": "-ane",
+      "prefix": "alkyl",
+      "count": 7,
+      "mcatNote": "Alkanes are saturated hydrocarbons with only single bonds. They are nonpolar and relatively unreactive.",
+      "matches": [
+        {
+          "atoms": [
+            0
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            1
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            2
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            3
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            4
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            5
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            6
+          ],
+          "bonds": []
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            0
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            1
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            2
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            3
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            4
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            5
+          ],
+          "bonds": []
+        },
+        {
+          "atoms": [
+            6
+          ],
+          "bonds": []
+        }
+      ],
+      "displaySmarts": "[CX4]-[CX4]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Alkane",
+        "priority": 32,
+        "nomenclaturePriority": 23,
+        "confidence": "Medium",
+        "suffix": "-ane",
+        "prefix": "alkyl",
+        "count": 7,
+        "mcatNote": "Alkanes are saturated hydrocarbons with only single bonds. They are nonpolar and relatively unreactive.",
+        "matches": [
+          {
+            "atoms": [
+              0
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              1
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              2
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              3
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              4
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              6
+            ],
+            "bonds": []
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              0
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              1
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              2
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              3
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              4
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              6
+            ],
+            "bonds": []
+          }
+        ],
+        "displaySmarts": "[CX4]-[CX4]",
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Alkane",
+        "priority": 32,
+        "nomenclaturePriority": 23,
+        "confidence": "Medium",
+        "suffix": "-ane",
+        "prefix": "alkyl",
+        "count": 7,
+        "mcatNote": "Alkanes are saturated hydrocarbons with only single bonds. They are nonpolar and relatively unreactive.",
+        "matches": [
+          {
+            "atoms": [
+              0
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              1
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              2
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              3
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              4
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              6
+            ],
+            "bonds": []
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              0
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              1
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              2
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              3
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              4
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              6
+            ],
+            "bonds": []
+          }
+        ],
+        "displaySmarts": "[CX4]-[CX4]",
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:21:27.649Z"
+}

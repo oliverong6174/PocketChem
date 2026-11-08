@@ -1,0 +1,188 @@
+{
+  "id": "RQ-08",
+  "startedUTC": "2026-11-06T18:22:59.337Z",
+  "calls": [
+    "runRule",
+    "verifyMultistepRoute",
+    "assessRouteCompatibility",
+    "assessRouteSelectivity",
+    "assessRouteQuality"
+  ],
+  "pathways": [],
+  "construction": "manual-submitted-route",
+  "route": {
+    "id": "RQ-08",
+    "startingSmiles": "OCCCCBr",
+    "targetSmiles": "OCCCC[Mg]Br",
+    "steps": [
+      {
+        "ruleId": "haloalkane-grignard-formation-bromide",
+        "family": "haloalkanes",
+        "reactionType": "substitution",
+        "title": "Grignard Reagent Formation",
+        "reactantSmiles": "OCCCCBr",
+        "reactantComponents": [
+          "OCCCCBr"
+        ],
+        "productSmiles": "OCCCC[Mg]Br",
+        "productComponents": [
+          "OCCCC[Mg]Br"
+        ],
+        "reagentLabel": "Mg, dry ether",
+        "reagentNote": "Convert R–Br to RMgBr",
+        "reactantLabel": "",
+        "productLabel": "",
+        "shortExplanation": "",
+        "selectivity": [],
+        "limitations": [],
+        "id": "s1",
+        "stepNumber": 1,
+        "source": "forward"
+      }
+    ],
+    "confidence": "verified",
+    "score": 0,
+    "verification": {
+      "status": "failed",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "ruleId": "haloalkane-grignard-formation-bromide",
+          "status": "failed",
+          "reactants": [
+            {
+              "smiles": "OCCCCBr",
+              "origin": "starting-material",
+              "match": "exact",
+              "lotId": "sm0#1",
+              "lineage": [
+                0
+              ]
+            }
+          ],
+          "productMatch": "none",
+          "problems": [
+            "Replaying \"haloalkane-grignard-formation-bromide\" on the available materials does not produce the recorded product \"OCCCC[Mg]Br\"."
+          ]
+        }
+      ],
+      "targetMatch": "none",
+      "coproducts": [
+        "OCCCC[Mg]Br"
+      ],
+      "unusedStartingMaterials": [],
+      "problems": [
+        "Step 1: Replaying \"haloalkane-grignard-formation-bromide\" on the available materials does not produce the recorded product \"OCCCC[Mg]Br\"."
+      ],
+      "inventory": [
+        {
+          "startIndex": 0,
+          "smiles": "OCCCCBr",
+          "copies": 1,
+          "consumed": 1,
+          "lotIds": [
+            "sm0#1"
+          ],
+          "consumedByStep": [
+            1
+          ]
+        }
+      ],
+      "leftovers": [
+        {
+          "lotId": "s1.1",
+          "smiles": "OCCCC[Mg]Br",
+          "origin": "earlier-step",
+          "producedByStep": 1,
+          "lineage": [
+            0
+          ],
+          "fromMixture": false
+        }
+      ],
+      "stepDependencies": [
+        {
+          "stepNumber": 1,
+          "consumedLotIds": [
+            "sm0#1"
+          ],
+          "producedLotIds": [
+            "s1.1"
+          ],
+          "dependsOnSteps": []
+        }
+      ],
+      "targetLineage": null
+    },
+    "compatibility": {
+      "warnings": [
+        {
+          "ruleId": "haloalkane-grignard-formation-bromide",
+          "severity": "model-constraint",
+          "kind": "acid-base-quench",
+          "group": "alcohol",
+          "condition": "a carbanion reagent",
+          "message": "alcohol OH (1 left unreacted) would be deprotonated (excess reagent or protection needed) under a carbanion reagent.",
+          "stepNumber": 1
+        }
+      ],
+      "unassessedRuleIds": [],
+      "worst": "model-constraint"
+    },
+    "selectivity": {
+      "findings": [
+        {
+          "stepNumber": 1,
+          "ruleId": "haloalkane-grignard-formation-bromide",
+          "representative": false,
+          "limitations": [
+            "Requires rigorously dry ether or THF conditions.",
+            "Incompatible with alcohols, water, carboxylic acids, terminal alkynes, and other sufficiently acidic/protic groups in the same molecule."
+          ],
+          "class": "unassessed",
+          "alternatives": null,
+          "basis": "The step's outcomes could not be reproduced for comparison."
+        }
+      ],
+      "counts": {
+        "major": 0,
+        "single-outcome": 0,
+        "disfavored": 0,
+        "unranked": 0,
+        "unassessed": 1
+      }
+    }
+  },
+  "quality": {
+    "assessmentVersion": 1,
+    "structural": "failed",
+    "tier": "contradicted",
+    "findings": [
+      {
+        "stepNumber": null,
+        "code": "replay-failed",
+        "level": "contradiction",
+        "message": "Structural replay of the route failed."
+      },
+      {
+        "stepNumber": 1,
+        "code": "documented-reagents",
+        "level": "info",
+        "message": "Uses documented reagents (Mg, dry ether) that are not tracked as structural partners (Co stay out of the product). Their availability is assumed, not replayed."
+      },
+      {
+        "stepNumber": 1,
+        "code": "compatibility-acid-base-quench",
+        "level": "contradiction",
+        "message": "alcohol OH (1 left unreacted) would be deprotonated (excess reagent or protection needed) under a carbanion reagent."
+      },
+      {
+        "stepNumber": 1,
+        "code": "selectivity-unassessed",
+        "level": "incomplete",
+        "message": "The step's outcomes could not be reproduced for comparison."
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:23:00.795Z"
+}

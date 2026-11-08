@@ -1,0 +1,204 @@
+{
+  "id": "RQ-12",
+  "startedUTC": "2026-11-06T18:23:04.621Z",
+  "calls": [
+    "runRule",
+    "verifyMultistepRoute",
+    "assessRouteCompatibility",
+    "assessRouteSelectivity",
+    "assessRouteQuality"
+  ],
+  "pathways": [],
+  "construction": "manual-submitted-route",
+  "route": {
+    "id": "RQ-12",
+    "startingSmiles": "COC(=O)c1ccc(N)cc1.CC(=O)Cl",
+    "targetSmiles": "COC(=O)c1cc(C(C)=O)c(N)cc1",
+    "steps": [
+      {
+        "ruleId": "aromatic-friedel-crafts-acylation",
+        "family": "aromatics",
+        "reactionType": "substitution",
+        "title": "Friedel–Crafts Acylation",
+        "reactantSmiles": "COC(=O)c1ccc(N)cc1.CC(=O)Cl",
+        "reactantComponents": [
+          "COC(=O)c1ccc(N)cc1",
+          "CC(=O)Cl"
+        ],
+        "productSmiles": "COC(=O)c1cc(C(C)=O)c(N)cc1",
+        "productComponents": [
+          "COC(=O)c1cc(C(C)=O)c(N)cc1"
+        ],
+        "reagentLabel": "AlCl₃",
+        "reagentNote": "Draw the arene and acyl chloride as disconnected structures",
+        "reactantLabel": "",
+        "productLabel": "",
+        "shortExplanation": "",
+        "selectivity": [],
+        "limitations": [],
+        "id": "s1",
+        "stepNumber": 1,
+        "source": "forward"
+      }
+    ],
+    "confidence": "verified",
+    "score": 0,
+    "verification": {
+      "status": "failed",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "ruleId": "aromatic-friedel-crafts-acylation",
+          "status": "failed",
+          "reactants": [
+            {
+              "smiles": "COC(=O)c1ccc(N)cc1",
+              "origin": "starting-material",
+              "match": "exact",
+              "lotId": "sm0#1",
+              "lineage": [
+                0
+              ]
+            },
+            {
+              "smiles": "CC(=O)Cl",
+              "origin": "starting-material",
+              "match": "exact",
+              "lotId": "sm1#1",
+              "lineage": [
+                1
+              ]
+            }
+          ],
+          "productMatch": "none",
+          "problems": [
+            "Replaying \"aromatic-friedel-crafts-acylation\" on the available materials does not produce the recorded product \"COC(=O)c1cc(C(C)=O)c(N)cc1\"."
+          ]
+        }
+      ],
+      "targetMatch": "none",
+      "coproducts": [
+        "COC(=O)c1cc(C(C)=O)c(N)cc1"
+      ],
+      "unusedStartingMaterials": [],
+      "problems": [
+        "Step 1: Replaying \"aromatic-friedel-crafts-acylation\" on the available materials does not produce the recorded product \"COC(=O)c1cc(C(C)=O)c(N)cc1\"."
+      ],
+      "inventory": [
+        {
+          "startIndex": 0,
+          "smiles": "COC(=O)c1ccc(N)cc1",
+          "copies": 1,
+          "consumed": 1,
+          "lotIds": [
+            "sm0#1"
+          ],
+          "consumedByStep": [
+            1
+          ]
+        },
+        {
+          "startIndex": 1,
+          "smiles": "CC(=O)Cl",
+          "copies": 1,
+          "consumed": 1,
+          "lotIds": [
+            "sm1#1"
+          ],
+          "consumedByStep": [
+            1
+          ]
+        }
+      ],
+      "leftovers": [
+        {
+          "lotId": "s1.1",
+          "smiles": "COC(=O)c1cc(C(C)=O)c(N)cc1",
+          "origin": "earlier-step",
+          "producedByStep": 1,
+          "lineage": [
+            0,
+            1
+          ],
+          "fromMixture": false
+        }
+      ],
+      "stepDependencies": [
+        {
+          "stepNumber": 1,
+          "consumedLotIds": [
+            "sm0#1",
+            "sm1#1"
+          ],
+          "producedLotIds": [
+            "s1.1"
+          ],
+          "dependsOnSteps": []
+        }
+      ],
+      "targetLineage": null
+    },
+    "compatibility": {
+      "warnings": [],
+      "unassessedRuleIds": [
+        "aromatic-friedel-crafts-acylation"
+      ],
+      "worst": "none"
+    },
+    "selectivity": {
+      "findings": [
+        {
+          "stepNumber": 1,
+          "ruleId": "aromatic-friedel-crafts-acylation",
+          "representative": true,
+          "limitations": [
+            "Ring positions are ranked qualitatively by the substituents' directing effects only (simple benzene rings); the ortho/para ratio is not modeled.",
+            "Fails on strongly deactivated rings and often on unprotected amino-substituted rings."
+          ],
+          "class": "unassessed",
+          "alternatives": null,
+          "basis": "The step's outcomes could not be reproduced for comparison."
+        }
+      ],
+      "counts": {
+        "major": 0,
+        "single-outcome": 0,
+        "disfavored": 0,
+        "unranked": 0,
+        "unassessed": 1
+      }
+    }
+  },
+  "quality": {
+    "assessmentVersion": 1,
+    "structural": "failed",
+    "tier": "contradicted",
+    "findings": [
+      {
+        "stepNumber": null,
+        "code": "replay-failed",
+        "level": "contradiction",
+        "message": "Structural replay of the route failed."
+      },
+      {
+        "stepNumber": 1,
+        "code": "documented-reagents",
+        "level": "info",
+        "message": "Uses documented reagents (AlCl₃) that are not tracked as structural partners (Al stay out of the product). Their availability is assumed, not replayed."
+      },
+      {
+        "stepNumber": null,
+        "code": "conditions-unassessed",
+        "level": "incomplete",
+        "message": "No declared reaction conditions for: aromatic-friedel-crafts-acylation. Compatibility with other groups could not be checked."
+      },
+      {
+        "stepNumber": 1,
+        "code": "selectivity-unassessed",
+        "level": "incomplete",
+        "message": "The step's outcomes could not be reproduced for comparison."
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:23:05.998Z"
+}

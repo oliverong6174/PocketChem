@@ -1,0 +1,315 @@
+{
+  "id": "RQ-05",
+  "startedUTC": "2026-11-06T18:22:54.193Z",
+  "calls": [
+    "runRule",
+    "verifyMultistepRoute",
+    "assessRouteCompatibility",
+    "assessRouteSelectivity",
+    "assessRouteQuality"
+  ],
+  "pathways": [
+    {
+      "ruleId": "haloalkane-sn2-cyanide",
+      "family": "haloalkanes",
+      "reactionType": "substitution",
+      "title": "SN2 with Cyanide",
+      "reagentLabel": "Polar aprotic conditions",
+      "reagentNote": "Draw the alkyl halide and cyanide ion as disconnected structures",
+      "shortExplanation": "Cyanide attacks through carbon and displaces the leaving group in an SN2 reaction, extending the carbon skeleton by one carbon.",
+      "course": "ochem-1",
+      "chapter": "Substitution and elimination",
+      "mechanism": "SN2",
+      "reactionClass": "nucleophilic substitution",
+      "purpose": null,
+      "selectivity": [
+        "Backside attack",
+        "Inversion at a reacting stereocenter"
+      ],
+      "selectivityProfile": {
+        "substitutionElimination": {
+          "pathway": "sn2",
+          "reagent": "nucleophile"
+        },
+        "stereochemistry": {
+          "mode": "inversion",
+          "attackMode": "backside",
+          "stereospecific": true
+        },
+        "mixture": "single"
+      },
+      "selectivityAssessment": {
+        "level": "major",
+        "estimatedFraction": null,
+        "planningPenalty": 0,
+        "label": "Major pathway (qualitative)",
+        "basis": "A weakly basic nucleophile on a primary halide favors SN2 over E2. Substitution versus elimination follows the substrate class and the reagent class (Wade, Organic Chemistry, ch. 6-7 summary of SN2/E2 competition; Clayden, Greeves and Warren, ch. 17; not re-read in this stage). It is qualitative: solvent, temperature and the exact base change the ratio, and no fraction is given."
+      },
+      "limitations": [
+        "SN2 inversion is explicitly encoded at a stereogenic reacting carbon.",
+        "Secondary substrates can compete with E2."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "cyanide ion",
+          "trigger": {
+            "includeSmarts": [
+              "[C-]#N"
+            ]
+          },
+          "supplyMode": "auto",
+          "presetSmiles": "[C-]#N",
+          "id": "cyanide",
+          "searchAliases": [
+            "cyanide ion",
+            "cyanide",
+            "CN-",
+            "cyanide anion"
+          ],
+          "contributesToProduct": true,
+          "role": "nucleophile"
+        }
+      ],
+      "id": "haloalkane-sn2-cyanide",
+      "reactantSmiles": "CCCCCCCCCBr.[C-]#N",
+      "reactantLabel": "Current intermediate + supplied reactant",
+      "productSmiles": "CCCCCCCCCC#N",
+      "productLabel": "Nitrile",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCCCCCCCCBr",
+        "[C-]#N"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "construction": "engine-pathway",
+  "route": {
+    "id": "RQ-05",
+    "startingSmiles": "CCCCCCCCCBr.[C-]#N",
+    "targetSmiles": "CCCCCCCCCC#N",
+    "steps": [
+      {
+        "id": "s1",
+        "stepNumber": 1,
+        "source": "forward",
+        "ruleId": "haloalkane-sn2-cyanide",
+        "family": "haloalkanes",
+        "reactionType": "substitution",
+        "title": "SN2 with Cyanide",
+        "reactantSmiles": "CCCCCCCCCBr.[C-]#N",
+        "reactantComponents": [
+          "CCCCCCCCCBr",
+          "[C-]#N"
+        ],
+        "reactantLabel": "Current intermediate + supplied reactant",
+        "productSmiles": "CCCCCCCCCC#N",
+        "productComponents": [
+          "CCCCCCCCCC#N"
+        ],
+        "productLabel": "Nitrile",
+        "reagentLabel": "Polar aprotic conditions",
+        "reagentNote": "Draw the alkyl halide and cyanide ion as disconnected structures",
+        "shortExplanation": "Cyanide attacks through carbon and displaces the leaving group in an SN2 reaction, extending the carbon skeleton by one carbon.",
+        "course": "ochem-1",
+        "chapter": "Substitution and elimination",
+        "mechanism": "SN2",
+        "reactionClass": "nucleophilic substitution",
+        "purpose": null,
+        "selectivity": [
+          "Backside attack",
+          "Inversion at a reacting stereocenter"
+        ],
+        "selectivityProfile": {
+          "substitutionElimination": {
+            "pathway": "sn2",
+            "reagent": "nucleophile"
+          },
+          "stereochemistry": {
+            "mode": "inversion",
+            "attackMode": "backside",
+            "stereospecific": true
+          },
+          "mixture": "single"
+        },
+        "selectivityAssessment": {
+          "level": "major",
+          "estimatedFraction": null,
+          "planningPenalty": 0,
+          "label": "Major pathway (qualitative)",
+          "basis": "A weakly basic nucleophile on a primary halide favors SN2 over E2. Substitution versus elimination follows the substrate class and the reagent class (Wade, Organic Chemistry, ch. 6-7 summary of SN2/E2 competition; Clayden, Greeves and Warren, ch. 17; not re-read in this stage). It is qualitative: solvent, temperature and the exact base change the ratio, and no fraction is given."
+        },
+        "limitations": [
+          "SN2 inversion is explicitly encoded at a stereogenic reacting carbon.",
+          "Secondary substrates can compete with E2."
+        ],
+        "retrosynthesisConfidence": null,
+        "productMixture": null,
+        "display": null
+      }
+    ],
+    "confidence": "verified",
+    "score": 0,
+    "verification": {
+      "status": "verified",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "ruleId": "haloalkane-sn2-cyanide",
+          "status": "verified",
+          "reactants": [
+            {
+              "smiles": "CCCCCCCCCBr",
+              "origin": "starting-material",
+              "match": "exact",
+              "lotId": "sm0#1",
+              "lineage": [
+                0
+              ]
+            },
+            {
+              "smiles": "[C-]#N",
+              "origin": "starting-material",
+              "match": "exact",
+              "lotId": "sm1#1",
+              "lineage": [
+                1
+              ]
+            }
+          ],
+          "productMatch": "exact",
+          "problems": []
+        }
+      ],
+      "targetMatch": "exact",
+      "coproducts": [],
+      "unusedStartingMaterials": [],
+      "problems": [],
+      "inventory": [
+        {
+          "startIndex": 0,
+          "smiles": "CCCCCCCCCBr",
+          "copies": 1,
+          "consumed": 1,
+          "lotIds": [
+            "sm0#1"
+          ],
+          "consumedByStep": [
+            1
+          ]
+        },
+        {
+          "startIndex": 1,
+          "smiles": "[C-]#N",
+          "copies": 1,
+          "consumed": 1,
+          "lotIds": [
+            "sm1#1"
+          ],
+          "consumedByStep": [
+            1
+          ]
+        }
+      ],
+      "leftovers": [
+        {
+          "lotId": "s1.1",
+          "smiles": "CCCCCCCCCC#N",
+          "origin": "earlier-step",
+          "producedByStep": 1,
+          "lineage": [
+            0,
+            1
+          ],
+          "fromMixture": false
+        }
+      ],
+      "stepDependencies": [
+        {
+          "stepNumber": 1,
+          "consumedLotIds": [
+            "sm0#1",
+            "sm1#1"
+          ],
+          "producedLotIds": [
+            "s1.1"
+          ],
+          "dependsOnSteps": []
+        }
+      ],
+      "targetLineage": {
+        "lotId": "s1.1",
+        "startingMaterialIndices": [
+          0,
+          1
+        ],
+        "contributingSteps": [
+          1
+        ],
+        "unusedSteps": [],
+        "longestLinearSequence": 1
+      }
+    },
+    "compatibility": {
+      "warnings": [],
+      "unassessedRuleIds": [
+        "haloalkane-sn2-cyanide"
+      ],
+      "worst": "none"
+    },
+    "selectivity": {
+      "findings": [
+        {
+          "stepNumber": 1,
+          "ruleId": "haloalkane-sn2-cyanide",
+          "representative": true,
+          "limitations": [
+            "SN2 inversion is explicitly encoded at a stereogenic reacting carbon.",
+            "Secondary substrates can compete with E2."
+          ],
+          "class": "major",
+          "alternatives": null,
+          "basis": "Major pathway (qualitative). A weakly basic nucleophile on a primary halide favors SN2 over E2. Substitution versus elimination follows the substrate class and the reagent class (Wade, Organic Chemistry, ch. 6-7 summary of SN2/E2 competition; Clayden, Greeves and Warren, ch. 17; not re-read in this stage). It is qualitative: solvent, temperature and the exact base change the ratio, and no fraction is given."
+        }
+      ],
+      "counts": {
+        "major": 1,
+        "single-outcome": 0,
+        "disfavored": 0,
+        "unranked": 0,
+        "unassessed": 0
+      }
+    }
+  },
+  "quality": {
+    "assessmentVersion": 1,
+    "structural": "verified",
+    "tier": "plausible-incomplete",
+    "findings": [
+      {
+        "stepNumber": 1,
+        "code": "documented-reagents",
+        "level": "info",
+        "message": "Uses documented reagents (Polar aprotic conditions) that are not tracked as structural partners (P stay out of the product). Their availability is assumed, not replayed."
+      },
+      {
+        "stepNumber": null,
+        "code": "conditions-unassessed",
+        "level": "incomplete",
+        "message": "No declared reaction conditions for: haloalkane-sn2-cyanide. Compatibility with other groups could not be checked."
+      },
+      {
+        "stepNumber": 1,
+        "code": "selectivity-major",
+        "level": "support",
+        "message": "Major pathway (qualitative). A weakly basic nucleophile on a primary halide favors SN2 over E2. Substitution versus elimination follows the substrate class and the reagent class (Wade, Organic Chemistry, ch. 6-7 summary of SN2/E2 competition; Clayden, Greeves and Warren, ch. 17; not re-read in this stage). It is qualitative: solvent, temperature and the exact base change the ratio, and no fraction is given."
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:22:55.681Z"
+}

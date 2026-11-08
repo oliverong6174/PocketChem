@@ -1,0 +1,2129 @@
+{
+  "id": "RX-03",
+  "startedUTC": "2026-11-06T18:22:21.897Z",
+  "calls": [
+    "predictReactionPathways"
+  ],
+  "input": "C=CC1CCCC1",
+  "pathways": [
+    {
+      "ruleId": "alkane-radical-bromination",
+      "family": "alkanes",
+      "reactionType": "radical",
+      "title": "Free-Radical Bromination",
+      "reagentLabel": "Br₂, hν or Br₂, Δ",
+      "reagentNote": "Selective radical-chain bromination",
+      "shortExplanation": "Light or heat homolyzes Br₂ and starts a radical-chain substitution. Bromination is strongly selective for the C-H bond whose abstraction gives the most stable carbon radical, although minor constitutional products can still form.",
+      "course": "ochem-1",
+      "chapter": "Radical reactions",
+      "mechanism": "Free-radical substitution",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "3° H ≫ 2° H > 1° H for ordinary bromination",
+        "Symmetry-equivalent C-H sites collapse to one constitutional product"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible",
+        "sitePreference": "most-stable-radical-site"
+      },
+      "selectivityAssessment": {
+        "level": "major",
+        "estimatedFraction": 0.7092198581560284,
+        "planningPenalty": 0,
+        "label": "Major product (~71%)",
+        "basis": "Bromination at a tertiary C-H site; estimated from symmetry/site degeneracy and standard relative radical-abstraction reactivities."
+      },
+      "limitations": [
+        "Minor constitutional products remain available to synthesis planning, but PocketChem now penalizes them according to an approximate substrate-specific radical selectivity model."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkane-radical-bromination",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "C=CC1(Br)CCCC1",
+      "productLabel": "1-bromo-1-ethenylcyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkane-radical-bromination",
+      "family": "alkanes",
+      "reactionType": "radical",
+      "title": "Free-Radical Bromination",
+      "reagentLabel": "Br₂, hν or Br₂, Δ",
+      "reagentNote": "Selective radical-chain bromination",
+      "shortExplanation": "Light or heat homolyzes Br₂ and starts a radical-chain substitution. Bromination is strongly selective for the C-H bond whose abstraction gives the most stable carbon radical, although minor constitutional products can still form.",
+      "course": "ochem-1",
+      "chapter": "Radical reactions",
+      "mechanism": "Free-radical substitution",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "3° H ≫ 2° H > 1° H for ordinary bromination",
+        "Symmetry-equivalent C-H sites collapse to one constitutional product"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible",
+        "sitePreference": "most-stable-radical-site"
+      },
+      "selectivityAssessment": {
+        "level": "minor",
+        "estimatedFraction": 0.1453900709219858,
+        "planningPenalty": 1015,
+        "label": "Minor product (~15%)",
+        "basis": "Bromination at a secondary C-H site; estimated from symmetry/site degeneracy and standard relative radical-abstraction reactivities."
+      },
+      "limitations": [
+        "Minor constitutional products remain available to synthesis planning, but PocketChem now penalizes them according to an approximate substrate-specific radical selectivity model."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 1115,
+      "reactantRequirements": [],
+      "id": "alkane-radical-bromination--2",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "C=CC1CCCC1Br",
+      "productLabel": "2-bromo-1-ethenylcyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkane-radical-bromination",
+      "family": "alkanes",
+      "reactionType": "radical",
+      "title": "Free-Radical Bromination",
+      "reagentLabel": "Br₂, hν or Br₂, Δ",
+      "reagentNote": "Selective radical-chain bromination",
+      "shortExplanation": "Light or heat homolyzes Br₂ and starts a radical-chain substitution. Bromination is strongly selective for the C-H bond whose abstraction gives the most stable carbon radical, although minor constitutional products can still form.",
+      "course": "ochem-1",
+      "chapter": "Radical reactions",
+      "mechanism": "Free-radical substitution",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "3° H ≫ 2° H > 1° H for ordinary bromination",
+        "Symmetry-equivalent C-H sites collapse to one constitutional product"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible",
+        "sitePreference": "most-stable-radical-site"
+      },
+      "selectivityAssessment": {
+        "level": "minor",
+        "estimatedFraction": 0.1453900709219858,
+        "planningPenalty": 1015,
+        "label": "Minor product (~15%)",
+        "basis": "Bromination at a secondary C-H site; estimated from symmetry/site degeneracy and standard relative radical-abstraction reactivities."
+      },
+      "limitations": [
+        "Minor constitutional products remain available to synthesis planning, but PocketChem now penalizes them according to an approximate substrate-specific radical selectivity model."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 1115,
+      "reactantRequirements": [],
+      "id": "alkane-radical-bromination--3",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "C=CC1CCC(Br)C1",
+      "productLabel": "3-bromo-1-ethenylcyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkane-radical-chlorination",
+      "family": "alkanes",
+      "reactionType": "radical",
+      "title": "Free-Radical Chlorination",
+      "reagentLabel": "Cl₂, hν or Cl₂, Δ",
+      "reagentNote": "Radical-chain chlorination",
+      "shortExplanation": "Light or heat homolyzes Cl₂ and starts a radical-chain substitution. Chlorination favors more substituted radical sites but is much less selective than bromination, so constitutional mixtures are common.",
+      "course": "ochem-1",
+      "chapter": "Radical reactions",
+      "mechanism": "Free-radical substitution",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "3° H > 2° H > 1° H, but chlorination is comparatively unselective",
+        "Constitutional mixtures are commonly expected"
+      ],
+      "selectivityProfile": {
+        "mixture": "expected",
+        "sitePreference": "most-stable-radical-site"
+      },
+      "selectivityAssessment": {
+        "level": "minor",
+        "estimatedFraction": 0.14124293785310735,
+        "planningPenalty": 1035,
+        "label": "Minor product (~14%)",
+        "basis": "Chlorination at a tertiary C-H site; estimated from symmetry/site degeneracy and standard relative radical-abstraction reactivities."
+      },
+      "limitations": [
+        "Constitutional products remain available to synthesis planning and are ranked with an approximate substrate-specific radical selectivity model; displayed percentages are planning estimates rather than measured yields."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 1135,
+      "reactantRequirements": [],
+      "id": "alkane-radical-chlorination",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "C=CC1(Cl)CCCC1",
+      "productLabel": "1-chloro-1-ethenylcyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkane-radical-chlorination",
+      "family": "alkanes",
+      "reactionType": "radical",
+      "title": "Free-Radical Chlorination",
+      "reagentLabel": "Cl₂, hν or Cl₂, Δ",
+      "reagentNote": "Radical-chain chlorination",
+      "shortExplanation": "Light or heat homolyzes Cl₂ and starts a radical-chain substitution. Chlorination favors more substituted radical sites but is much less selective than bromination, so constitutional mixtures are common.",
+      "course": "ochem-1",
+      "chapter": "Radical reactions",
+      "mechanism": "Free-radical substitution",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "3° H > 2° H > 1° H, but chlorination is comparatively unselective",
+        "Constitutional mixtures are commonly expected"
+      ],
+      "selectivityProfile": {
+        "mixture": "expected",
+        "sitePreference": "most-stable-radical-site"
+      },
+      "selectivityAssessment": {
+        "level": "competitive",
+        "estimatedFraction": 0.4293785310734463,
+        "planningPenalty": 257,
+        "label": "Competitive product (~43%)",
+        "basis": "Chlorination at a secondary C-H site; estimated from symmetry/site degeneracy and standard relative radical-abstraction reactivities."
+      },
+      "limitations": [
+        "Constitutional products remain available to synthesis planning and are ranked with an approximate substrate-specific radical selectivity model; displayed percentages are planning estimates rather than measured yields."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 357,
+      "reactantRequirements": [],
+      "id": "alkane-radical-chlorination--2",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "C=CC1CCCC1Cl",
+      "productLabel": "2-chloro-1-ethenylcyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkane-radical-chlorination",
+      "family": "alkanes",
+      "reactionType": "radical",
+      "title": "Free-Radical Chlorination",
+      "reagentLabel": "Cl₂, hν or Cl₂, Δ",
+      "reagentNote": "Radical-chain chlorination",
+      "shortExplanation": "Light or heat homolyzes Cl₂ and starts a radical-chain substitution. Chlorination favors more substituted radical sites but is much less selective than bromination, so constitutional mixtures are common.",
+      "course": "ochem-1",
+      "chapter": "Radical reactions",
+      "mechanism": "Free-radical substitution",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "3° H > 2° H > 1° H, but chlorination is comparatively unselective",
+        "Constitutional mixtures are commonly expected"
+      ],
+      "selectivityProfile": {
+        "mixture": "expected",
+        "sitePreference": "most-stable-radical-site"
+      },
+      "selectivityAssessment": {
+        "level": "competitive",
+        "estimatedFraction": 0.4293785310734463,
+        "planningPenalty": 257,
+        "label": "Competitive product (~43%)",
+        "basis": "Chlorination at a secondary C-H site; estimated from symmetry/site degeneracy and standard relative radical-abstraction reactivities."
+      },
+      "limitations": [
+        "Constitutional products remain available to synthesis planning and are ranked with an approximate substrate-specific radical selectivity model; displayed percentages are planning estimates rather than measured yields."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 357,
+      "reactantRequirements": [],
+      "id": "alkane-radical-chlorination--3",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "C=CC1CCC(Cl)C1",
+      "productLabel": "3-chloro-1-ethenylcyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-hydrogenation",
+      "family": "alkenes",
+      "reactionType": "reduction",
+      "title": "Alkene Hydrogenation",
+      "reagentLabel": "H₂, Pd/C",
+      "reagentNote": "Catalytic reduction",
+      "shortExplanation": "Hydrogenation adds H₂ across the C=C bond, reducing the alkene to an alkane.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-hydrogenation",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "CCC1CCCC1",
+      "productLabel": "ethylcyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "deuteration",
+      "family": "alkenes",
+      "reactionType": "reduction",
+      "title": "Catalytic Deuteration",
+      "reagentLabel": "D₂, Pd/C",
+      "reagentNote": "Syn addition of D₂",
+      "shortExplanation": "Catalytic deuteration adds one explicit deuterium (D) to each alkene carbon. PocketChem keeps the isotope atoms in the product structure so the D labels can be drawn.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "D and D add to the same face of the alkene (syn addition)."
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "syn-addition",
+          "relativeRelationship": "syn",
+          "stereospecific": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "deuteration",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "[2H]CC([2H])C1CCCC1",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-hx-addition-hbr",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "HX Addition: Hydrobromination",
+      "reagentLabel": "HBr",
+      "reagentNote": "Hydrohalogenation",
+      "shortExplanation": "Under ordinary ionic conditions, HBr protonates the alkene and bromide attacks the more stable carbocation. For an unsymmetrical alkene this normally places Br on the more substituted carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "For an unsymmetrical alkene, Br is normally placed on the more substituted carbon (Markovnikov orientation).",
+        "Carbocation rearrangements can occur under the ionic mechanism."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "regiochemistry": {
+          "mode": "markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": true
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "When the first-formed carbocation can shift to a clearly more stable one (3,3-dimethylbut-1-ene, 3-methylbut-1-ene) both the direct and the rearranged halide are listed and neither is ranked: textbooks report an approximately equal mixture for HCl + 3,3-dimethylbut-1-ene. Shifts between equally stable cations are not generated."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkene-hx-addition-markovnikov",
+          "variable": "X",
+          "value": "Br"
+        }
+      },
+      "missingReactants": [],
+      "competition": {
+        "group": "hx-addition-conjugation",
+        "specificity": 10
+      },
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-hx-addition-hbr",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "CC(Br)C1CCCC1",
+      "productLabel": "(1-bromoethyl)cyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-hx-addition-hbr",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "HX Addition: Hydrobromination",
+      "reagentLabel": "HBr",
+      "reagentNote": "Hydrohalogenation",
+      "shortExplanation": "Under ordinary ionic conditions, HBr protonates the alkene and bromide attacks the more stable carbocation. For an unsymmetrical alkene this normally places Br on the more substituted carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "For an unsymmetrical alkene, Br is normally placed on the more substituted carbon (Markovnikov orientation).",
+        "Carbocation rearrangements can occur under the ionic mechanism."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "regiochemistry": {
+          "mode": "markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": true
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "When the first-formed carbocation can shift to a clearly more stable one (3,3-dimethylbut-1-ene, 3-methylbut-1-ene) both the direct and the rearranged halide are listed and neither is ranked: textbooks report an approximately equal mixture for HCl + 3,3-dimethylbut-1-ene. Shifts between equally stable cations are not generated."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkene-hx-addition-markovnikov",
+          "variable": "X",
+          "value": "Br"
+        }
+      },
+      "missingReactants": [],
+      "competition": {
+        "group": "hx-addition-conjugation",
+        "specificity": 10
+      },
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-hx-addition-hbr--2",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "CCC1(Br)CCCC1",
+      "productLabel": "1-bromo-1-ethylcyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-hx-addition-hcl",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "HX Addition: Hydrochlorination",
+      "reagentLabel": "HCl",
+      "reagentNote": "Hydrohalogenation",
+      "shortExplanation": "Under ordinary ionic conditions, HCl protonates the alkene and chloride attacks the more stable carbocation. For an unsymmetrical alkene this normally places Cl on the more substituted carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "For an unsymmetrical alkene, Cl is normally placed on the more substituted carbon (Markovnikov orientation).",
+        "Carbocation rearrangements can occur under the ionic mechanism."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "regiochemistry": {
+          "mode": "markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": true
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "When the first-formed carbocation can shift to a clearly more stable one (3,3-dimethylbut-1-ene, 3-methylbut-1-ene) both the direct and the rearranged halide are listed and neither is ranked: textbooks report an approximately equal mixture for HCl + 3,3-dimethylbut-1-ene. Shifts between equally stable cations are not generated."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkene-hx-addition-markovnikov",
+          "variable": "X",
+          "value": "Cl"
+        }
+      },
+      "missingReactants": [],
+      "competition": {
+        "group": "hx-addition-conjugation",
+        "specificity": 10
+      },
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-hx-addition-hcl",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "CC(Cl)C1CCCC1",
+      "productLabel": "(1-chloroethyl)cyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-hx-addition-hcl",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "HX Addition: Hydrochlorination",
+      "reagentLabel": "HCl",
+      "reagentNote": "Hydrohalogenation",
+      "shortExplanation": "Under ordinary ionic conditions, HCl protonates the alkene and chloride attacks the more stable carbocation. For an unsymmetrical alkene this normally places Cl on the more substituted carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "For an unsymmetrical alkene, Cl is normally placed on the more substituted carbon (Markovnikov orientation).",
+        "Carbocation rearrangements can occur under the ionic mechanism."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "regiochemistry": {
+          "mode": "markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": true
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "When the first-formed carbocation can shift to a clearly more stable one (3,3-dimethylbut-1-ene, 3-methylbut-1-ene) both the direct and the rearranged halide are listed and neither is ranked: textbooks report an approximately equal mixture for HCl + 3,3-dimethylbut-1-ene. Shifts between equally stable cations are not generated."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkene-hx-addition-markovnikov",
+          "variable": "X",
+          "value": "Cl"
+        }
+      },
+      "missingReactants": [],
+      "competition": {
+        "group": "hx-addition-conjugation",
+        "specificity": 10
+      },
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-hx-addition-hcl--2",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "CCC1(Cl)CCCC1",
+      "productLabel": "1-chloro-1-ethylcyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-hx-addition-hi",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "HX Addition: Hydroiodination",
+      "reagentLabel": "HI",
+      "reagentNote": "Hydrohalogenation",
+      "shortExplanation": "Under ordinary ionic conditions, HI protonates the alkene and iodide attacks the more stable carbocation. For an unsymmetrical alkene this normally places I on the more substituted carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "For an unsymmetrical alkene, I is normally placed on the more substituted carbon (Markovnikov orientation).",
+        "Carbocation rearrangements can occur under the ionic mechanism."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "regiochemistry": {
+          "mode": "markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": true
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "When the first-formed carbocation can shift to a clearly more stable one (3,3-dimethylbut-1-ene, 3-methylbut-1-ene) both the direct and the rearranged halide are listed and neither is ranked: textbooks report an approximately equal mixture for HCl + 3,3-dimethylbut-1-ene. Shifts between equally stable cations are not generated."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkene-hx-addition-markovnikov",
+          "variable": "X",
+          "value": "I"
+        }
+      },
+      "missingReactants": [],
+      "competition": {
+        "group": "hx-addition-conjugation",
+        "specificity": 10
+      },
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-hx-addition-hi",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "CC(I)C1CCCC1",
+      "productLabel": "(1-iodoethyl)cyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-hx-addition-hi",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "HX Addition: Hydroiodination",
+      "reagentLabel": "HI",
+      "reagentNote": "Hydrohalogenation",
+      "shortExplanation": "Under ordinary ionic conditions, HI protonates the alkene and iodide attacks the more stable carbocation. For an unsymmetrical alkene this normally places I on the more substituted carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "For an unsymmetrical alkene, I is normally placed on the more substituted carbon (Markovnikov orientation).",
+        "Carbocation rearrangements can occur under the ionic mechanism."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "regiochemistry": {
+          "mode": "markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": true
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "When the first-formed carbocation can shift to a clearly more stable one (3,3-dimethylbut-1-ene, 3-methylbut-1-ene) both the direct and the rearranged halide are listed and neither is ranked: textbooks report an approximately equal mixture for HCl + 3,3-dimethylbut-1-ene. Shifts between equally stable cations are not generated."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkene-hx-addition-markovnikov",
+          "variable": "X",
+          "value": "I"
+        }
+      },
+      "missingReactants": [],
+      "competition": {
+        "group": "hx-addition-conjugation",
+        "specificity": 10
+      },
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-hx-addition-hi--2",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "CCC1(I)CCCC1",
+      "productLabel": "1-ethyl-1-iodocyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-hbr-peroxide",
+      "family": "alkenes",
+      "reactionType": "radical",
+      "title": "Hydrobromination (Peroxide Effect)",
+      "reagentLabel": "HBr, ROOR",
+      "reagentNote": "Radical HBr addition",
+      "shortExplanation": "In the presence of peroxides, HBr adds by a radical-chain mechanism and gives the anti-Markovnikov constitutional product.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Br goes to the less substituted alkene carbon (anti-Markovnikov)."
+      ],
+      "selectivityProfile": {
+        "regiochemistry": {
+          "mode": "anti-markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkene-hx-addition-anti-markovnikov",
+          "variable": "X",
+          "value": "Br"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-hbr-peroxide",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "BrCCC1CCCC1",
+      "productLabel": "(2-bromoethyl)cyclopentane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-halogenation-bromine",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "Halogenation",
+      "reagentLabel": "Br₂, CCl₄",
+      "reagentNote": "Anti addition of halogen",
+      "shortExplanation": "Halogenation adds one bromine to each alkene carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Anti addition",
+        "More substituted/electron-rich alkene sites are preferred when several nonequivalent C=C bonds are present."
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "anti-addition",
+          "relativeRelationship": "anti",
+          "stereospecific": true
+        },
+        "sitePreference": "most-substituted-alkene",
+        "mixture": "expected",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-halogenation-bromine",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "BrC[C@@H](Br)C1CCCC1",
+      "productLabel": "(S)-(1,2-dibromoethyl)cyclopentane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": {
+        "kind": "racemic",
+        "groupId": "alkene-halogenation-bromine::racemic::BrCC(Br)C1CCCC1",
+        "label": "Racemic mixture",
+        "memberIndex": 0,
+        "memberCount": 2,
+        "memberSmiles": [
+          "BrC[C@@H](Br)C1CCCC1",
+          "BrC[C@H](Br)C1CCCC1"
+        ],
+        "displayName": null
+      }
+    },
+    {
+      "ruleId": "alkene-halohydrin-formation",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "Halohydrin Formation",
+      "reagentLabel": "Br₂, H₂O",
+      "reagentNote": "Anti addition of Br and OH",
+      "shortExplanation": "The alkene forms a bromonium ion, then water attacks the more substituted carbon. The result is a vicinal bromohydrin with OH on the more substituted carbon and Br on the less substituted carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "OH goes to the more substituted alkene carbon and Br to the less substituted carbon.",
+        "Br and OH add anti through bromonium-ion opening."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "stereochemistry": {
+          "mode": "anti-addition",
+          "relativeRelationship": "anti",
+          "stereospecific": true
+        },
+        "regiochemistry": {
+          "mode": "directed",
+          "regioselective": true
+        },
+        "mixture": "expected",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "The anti relationship is applied for 1,2-disubstituted alkenes drawn as E or Z and for alkenes in 5-7 membered rings. A chiral product of an achiral reaction is shown as both enantiomers (a racemate); an acyclic alkene of undefined geometry, or a tri-/tetrasubstituted one, is left without assigned stereochemistry."
+      ],
+      "display": {
+        "renderer": "generic-halogen"
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-halohydrin-formation",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "O[C@@H](CBr)C1CCCC1",
+      "productLabel": "(R)-2-bromo-1-pentylethanol",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": {
+        "kind": "racemic",
+        "groupId": "alkene-halohydrin-formation::racemic::OC(CBr)C1CCCC1",
+        "label": "Racemic mixture",
+        "memberIndex": 0,
+        "memberCount": 2,
+        "memberSmiles": [
+          "O[C@@H](CBr)C1CCCC1",
+          "O[C@H](CBr)C1CCCC1"
+        ],
+        "displayName": null
+      }
+    },
+    {
+      "ruleId": "alkene-acid-hydration",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "Acid-Catalyzed Hydration",
+      "reagentLabel": "H₂O/H⁺ (e.g. H₂O + dilute H₂SO₄ or H₃PO₄)",
+      "reagentNote": "Acid-catalyzed hydration",
+      "shortExplanation": "Water adds across the alkene under acidic conditions. For an unsymmetrical alkene, protonation favors the more stable carbocation, so OH normally ends up on the more substituted carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "For an unsymmetrical alkene, OH normally forms on the more substituted carbon (Markovnikov orientation).",
+        "Carbocation rearrangements may occur."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "regiochemistry": {
+          "mode": "markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": true
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "When the first-formed carbocation can shift to a clearly more stable one (3,3-dimethylbut-1-ene, 3-methylbut-1-ene) both the direct and the rearranged alcohol are listed and neither is ranked. Shifts between equally stable cations are not generated."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-acid-hydration",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "CC(O)C1CCCC1",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-acid-hydration",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "Acid-Catalyzed Hydration",
+      "reagentLabel": "H₂O/H⁺ (e.g. H₂O + dilute H₂SO₄ or H₃PO₄)",
+      "reagentNote": "Acid-catalyzed hydration",
+      "shortExplanation": "Water adds across the alkene under acidic conditions. For an unsymmetrical alkene, protonation favors the more stable carbocation, so OH normally ends up on the more substituted carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "For an unsymmetrical alkene, OH normally forms on the more substituted carbon (Markovnikov orientation).",
+        "Carbocation rearrangements may occur."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "regiochemistry": {
+          "mode": "markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": true
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "When the first-formed carbocation can shift to a clearly more stable one (3,3-dimethylbut-1-ene, 3-methylbut-1-ene) both the direct and the rearranged alcohol are listed and neither is ranked. Shifts between equally stable cations are not generated."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-acid-hydration--2",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "CCC1(O)CCCC1",
+      "productLabel": "1-ethylcyclopentanol",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-hydroboration-oxidation",
+      "family": "alkenes",
+      "reactionType": "oxidation",
+      "title": "Hydroboration-Oxidation",
+      "reagentLabel": "1) BH₃·THF  2) H₂O₂, NaOH",
+      "reagentNote": "Syn hydration",
+      "shortExplanation": "Hydroboration-oxidation hydrates the alkene with anti-Markovnikov orientation.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Anti-Markovnikov and syn addition"
+      ],
+      "selectivityProfile": {
+        "sitePreference": "least-substituted-alkene",
+        "stereochemistry": {
+          "mode": "syn-addition",
+          "relativeRelationship": "syn",
+          "stereospecific": true
+        },
+        "regiochemistry": {
+          "mode": "anti-markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "The current hydration handler enforces anti-Markovnikov connectivity; syn stereochemistry is not yet assigned explicitly in the product structure."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-hydroboration-oxidation",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "OCCC1CCCC1",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-oxymercuration-demercuration",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "Oxymercuration-Demercuration",
+      "reagentLabel": "1) Hg(OAc)₂, H₂O  2) NaBH₄",
+      "reagentNote": "Hydration without rearrangement",
+      "shortExplanation": "Oxymercuration-demercuration converts an alkene to a Markovnikov alcohol without rearrangement.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Markovnikov orientation without rearrangement"
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "regiochemistry": {
+          "mode": "markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-oxymercuration-demercuration",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "CC(O)C1CCCC1",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-simmons-smith",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "Simmons–Smith Cyclopropanation",
+      "reagentLabel": "CH₂I₂, Zn(Cu)",
+      "reagentNote": "Cyclopropane formation",
+      "shortExplanation": "A methylene carbenoid adds across the double bond to form a cyclopropane while preserving the alkene's relative stereochemistry.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Stereospecific cyclopropanation; alkene geometry is retained in the ring relationship."
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "syn-addition",
+          "relativeRelationship": "syn",
+          "stereospecific": true
+        },
+        "mixture": "expected",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-simmons-smith",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "C1CCC(C2CC2)C1",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-dichlorocyclopropanation",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "Dichlorocyclopropanation",
+      "reagentLabel": "CHCl₃, strong base (e.g. NaOH)",
+      "reagentNote": "Dichlorocarbene cyclopropanation",
+      "shortExplanation": "Base generates dichlorocarbene (:CCl₂) from chloroform. The carbene adds across the alkene to form a cyclopropane bearing two chlorines on the newly inserted carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Carbene addition is stereospecific and preserves the alkene's relative stereochemistry."
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "syn-addition",
+          "relativeRelationship": "syn",
+          "stereospecific": true
+        },
+        "mixture": "expected",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-dichlorocyclopropanation",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "ClC1(Cl)CC1C1CCCC1",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-dibromocyclopropanation",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "Dibromocyclopropanation",
+      "reagentLabel": "CHBr₃, strong base (e.g. NaOH)",
+      "reagentNote": "Dibromocarbene cyclopropanation",
+      "shortExplanation": "Base generates dibromocarbene (:CBr₂) from bromoform. The carbene adds across the alkene to form a cyclopropane bearing two bromines on the newly inserted carbon.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Carbene addition is stereospecific and preserves the alkene's relative stereochemistry."
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "syn-addition",
+          "relativeRelationship": "syn",
+          "stereospecific": true
+        },
+        "mixture": "expected",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-dibromocyclopropanation",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "BrC1(Br)CC1C1CCCC1",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-epoxidation",
+      "family": "alkenes",
+      "reactionType": "oxidation",
+      "title": "Epoxidation",
+      "reagentLabel": "mCPBA; or RCO₃H (peroxyacid)",
+      "reagentNote": "Peroxyacid epoxidation",
+      "shortExplanation": "A peroxyacid converts the alkene into a three-membered epoxide ring.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Stereospecific oxygen transfer",
+        "When several nonequivalent isolated alkenes are present, the more substituted/electron-rich alkene is preferred; exact ties remain as alternatives."
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "syn-addition",
+          "relativeRelationship": "syn",
+          "stereospecific": true
+        },
+        "sitePreference": "most-substituted-alkene",
+        "mixture": "expected",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-epoxidation",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "C1CCC([C@@H]2CO2)C1",
+      "productLabel": "(R)-2-pentyloxirane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": {
+        "kind": "racemic",
+        "groupId": "alkene-epoxidation::racemic::C1CCC(C2CO2)C1",
+        "label": "Racemic mixture",
+        "memberIndex": 0,
+        "memberCount": 2,
+        "memberSmiles": [
+          "C1CCC([C@@H]2CO2)C1",
+          "C1CCC([C@H]2CO2)C1"
+        ],
+        "displayName": null
+      }
+    },
+    {
+      "ruleId": "alkene-syn-dihydroxylation",
+      "family": "alkenes",
+      "reactionType": "oxidation",
+      "title": "Syn Dihydroxylation",
+      "reagentLabel": "OsO₄/H₂O₂; OsO₄/NMO; or KMnO₄/OH⁻, cold/dilute",
+      "reagentNote": "Syn addition of two OH groups",
+      "shortExplanation": "Syn dihydroxylation adds two hydroxyl groups to the same face of the alkene. Common reagent systems are OsO₄ with H₂O₂, OsO₄ with NMO, or cold dilute basic KMnO₄.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": "Syn dihydroxylation",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Both OH groups add to the same face of the alkene (syn addition)."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "stereochemistry": {
+          "mode": "syn-addition",
+          "relativeRelationship": "syn",
+          "stereospecific": true
+        },
+        "mixture": "expected",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": {
+        "renderer": "syn-diol"
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-syn-dihydroxylation",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "OC[C@@H](O)C1CCCC1",
+      "productLabel": "(S)-1-pentylethane-1,2-diol",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": {
+        "kind": "racemic",
+        "groupId": "alkene-syn-dihydroxylation::racemic::OCC(O)C1CCCC1",
+        "label": "Racemic mixture",
+        "memberIndex": 0,
+        "memberCount": 2,
+        "memberSmiles": [
+          "OC[C@@H](O)C1CCCC1",
+          "OC[C@H](O)C1CCCC1"
+        ],
+        "displayName": null
+      }
+    },
+    {
+      "ruleId": "alkene-anti-dihydroxylation",
+      "family": "alkenes",
+      "reactionType": "oxidation",
+      "title": "Anti Dihydroxylation",
+      "reagentLabel": "1) mCPBA  2) H₃O⁺",
+      "reagentNote": "Epoxidation then anti opening",
+      "shortExplanation": "Epoxidation followed by acid-catalyzed ring opening gives an anti vicinal diol.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "The two OH groups end up on opposite faces (anti addition)."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "stereochemistry": {
+          "mode": "anti-addition",
+          "relativeRelationship": "anti",
+          "stereospecific": true
+        },
+        "mixture": "expected",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": {
+        "renderer": "anti-diol"
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-anti-dihydroxylation",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "OC[C@@H](O)C1CCCC1",
+      "productLabel": "(S)-1-pentylethane-1,2-diol",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": {
+        "kind": "racemic",
+        "groupId": "alkene-anti-dihydroxylation::racemic::OCC(O)C1CCCC1",
+        "label": "Racemic mixture",
+        "memberIndex": 0,
+        "memberCount": 2,
+        "memberSmiles": [
+          "OC[C@@H](O)C1CCCC1",
+          "OC[C@H](O)C1CCCC1"
+        ],
+        "displayName": null
+      }
+    },
+    {
+      "ruleId": "alkene-ozonolysis-reductive",
+      "family": "alkenes",
+      "reactionType": "cleavage",
+      "title": "Reductive Ozonolysis",
+      "reagentLabel": "1) O₃  2) (CH₃)₂S or Zn/H₂O",
+      "reagentNote": "Reductive workup",
+      "shortExplanation": "Ozone cleaves the alkene. Dimethyl sulfide or zinc prevents further oxidation, giving aldehydes and ketones.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-ozonolysis-reductive",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "C=O.O=CC1CCCC1",
+      "productLabel": "methanal (formaldehyde) + cyclopentanecarbaldehyde",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-ozonolysis-oxidative",
+      "family": "alkenes",
+      "reactionType": "cleavage",
+      "title": "Oxidative Ozonolysis",
+      "reagentLabel": "1) O₃  2) H₂O₂",
+      "reagentNote": "Oxidative workup",
+      "shortExplanation": "Oxidative workup converts any aldehydes formed during ozonolysis into carboxylic acids while ketones remain ketones.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-ozonolysis-oxidative",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "O=C(O)C1CCCC1.O=C=O",
+      "productLabel": "cyclopentanecarboxylic acid + Name not available (unsupported structure)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-oxidative-cleavage",
+      "family": "alkenes",
+      "reactionType": "cleavage",
+      "title": "Hot Permanganate Oxidative Cleavage",
+      "reagentLabel": "1) KMnO4, OH⁻, heat  2) H₃O⁺",
+      "reagentNote": "Strong oxidative cleavage",
+      "shortExplanation": "Hot permanganate cleaves the alkene. An alkene carbon with no hydrogen gives a ketone, one bearing a hydrogen gives a carboxylic acid, and a terminal CH₂ carbon is oxidized to CO₂.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": "Strong oxidative cleavage",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-oxidative-cleavage",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "O=C(O)C1CCCC1.O=C=O",
+      "productLabel": "cyclopentanecarboxylic acid + Name not available (unsupported structure)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-allylic-bromination",
+      "family": "alkenes",
+      "reactionType": "radical",
+      "title": "Allylic Bromination",
+      "reagentLabel": "NBS, hν or radical initiator",
+      "reagentNote": "Radical substitution at an allylic carbon",
+      "shortExplanation": "NBS replaces an allylic hydrogen with bromine while minimizing direct addition of Br₂ across the double bond.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": "Radical-chain substitution",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Reaction occurs at an allylic C–H bond."
+      ],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [
+        "Resonance-related allylic bromides can form; the engine enumerates local sites but does not rank the product mixture."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-allylic-bromination",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "C=CC1(Br)CCCC1",
+      "productLabel": "1-bromo-1-ethenylcyclopentane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-addition-polymerization",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "Addition Polymerization",
+      "reagentLabel": "radical, cationic, anionic, or coordination initiator",
+      "reagentNote": "Chain-growth polymerization",
+      "shortExplanation": "Many alkenes undergo chain-growth addition polymerization in which the pi bond becomes part of a saturated polymer backbone.",
+      "course": "advanced",
+      "chapter": "Alkenes",
+      "mechanism": "Chain-growth polymerization",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [
+        "A polymer requires repeat-unit, tacticity, end-group, and chain-length representation rather than a finite small-molecule SMILES product."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-addition-polymerization",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": null,
+      "productLabel": "Polyalkene repeat unit",
+      "productStatus": "concept-only",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-haloether-formation",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "Haloether Formation",
+      "reagentLabel": "Br₂, ROH",
+      "reagentNote": "Anti addition of Br and OR",
+      "shortExplanation": "An alcohol opens the bromonium ion formed from the alkene. The alcohol's OR group bonds to the more substituted alkene carbon while Br remains on the less substituted carbon, giving a haloether.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "OR goes to the more substituted alkene carbon and Br to the less substituted carbon.",
+        "Br and OR add anti through bromonium-ion opening."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "stereochemistry": {
+          "mode": "anti-addition",
+          "relativeRelationship": "anti",
+          "stereospecific": true
+        },
+        "regiochemistry": {
+          "mode": "directed",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "The supplied alcohol's actual R group is carried into the ether. Explicit anti stereocenter assignment will be completed in the alkene stereochemistry phase.",
+        "Draw the additional reactant in the same Ketcher canvas: alcohol (ROH)."
+      ],
+      "display": {
+        "renderer": "generic-halogen"
+      },
+      "missingReactants": [
+        {
+          "label": "alcohol (ROH)",
+          "trigger": {
+            "includeSmarts": [
+              "[O;H1][C;X4;!$(C=O)]"
+            ]
+          },
+          "id": "alcohol-roh",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "alcohol (ROH)",
+          "trigger": {
+            "includeSmarts": [
+              "[O;H1][C;X4;!$(C=O)]"
+            ]
+          },
+          "id": "alcohol-roh",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "id": "alkene-haloether-formation",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": null,
+      "productLabel": "Vicinal bromoether",
+      "productStatus": "concept-only",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-alkoxymercuration-demercuration",
+      "family": "alkenes",
+      "reactionType": "addition",
+      "title": "Alkoxymercuration-Demercuration",
+      "reagentLabel": "1) Hg(OAc)₂, ROH  2) NaBH₄",
+      "reagentNote": "Markovnikov ether formation without rearrangement",
+      "shortExplanation": "Alkoxymercuration-demercuration adds OR and H across an alkene. The oxygen of the supplied alcohol becomes bonded to the more substituted alkene carbon, giving a Markovnikov ether without a free carbocation rearrangement.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "OR goes to the more substituted alkene carbon (Markovnikov orientation).",
+        "No carbocation rearrangement is expected."
+      ],
+      "selectivityProfile": {
+        "sitePreference": "most-substituted-alkene",
+        "regiochemistry": {
+          "mode": "markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Draw the additional reactant in the same Ketcher canvas: alcohol (ROH)."
+      ],
+      "display": null,
+      "missingReactants": [
+        {
+          "label": "alcohol (ROH)",
+          "trigger": {
+            "includeSmarts": [
+              "[O;H1][C;X4;!$(C=O)]"
+            ]
+          },
+          "id": "alcohol-roh",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "alcohol (ROH)",
+          "trigger": {
+            "includeSmarts": [
+              "[O;H1][C;X4;!$(C=O)]"
+            ]
+          },
+          "id": "alcohol-roh",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "id": "alkene-alkoxymercuration-demercuration",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": null,
+      "productLabel": "Ether",
+      "productStatus": "concept-only",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-epoxidation-acidic-alcohol-opening",
+      "family": "alkenes",
+      "reactionType": "ringOpening",
+      "title": "Epoxidation Followed by Acidic Alcohol Opening",
+      "reagentLabel": "1) mCPBA or RCO₃H  2) ROH, H⁺",
+      "reagentNote": "Draw the alkene and the alcohol nucleophile as disconnected structures",
+      "shortExplanation": "The alkene is first converted stereospecifically to an epoxide. Under acidic conditions a drawn alcohol opens the protonated epoxide by backside attack at the more substituted epoxide carbon, installing that alcohol's OR group anti to the oxygen-derived OH.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Epoxidation preserves the alkene's relative stereochemistry.",
+        "Acidic epoxide opening is backside/anti.",
+        "Acidic opening favors attack at the more substituted epoxide carbon; equal-substitution cases remain genuine alternatives.",
+        "The OR group is taken from the alcohol actually drawn by the user; methanol therefore gives OMe, ethanol gives OEt, and so on."
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "anti-addition",
+          "relativeRelationship": "anti",
+          "attackMode": "backside",
+          "stereospecific": true
+        },
+        "sitePreference": "most-substituted-alkene",
+        "mixture": "expected",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Draw the additional reactant in the same Ketcher canvas: alcohol nucleophile (ROH)."
+      ],
+      "display": {
+        "renderer": "aligned-stereo",
+        "preserveReactantOrientation": true
+      },
+      "missingReactants": [
+        {
+          "id": "alcohol-nucleophile",
+          "label": "alcohol nucleophile (ROH)",
+          "trigger": {
+            "includeSmarts": [
+              "[#6][O;H1;+0]"
+            ],
+            "excludeSmarts": [
+              "[CX3](=O)[O;H1]"
+            ]
+          },
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "nucleophile",
+          "searchAliases": []
+        }
+      ],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "id": "alcohol-nucleophile",
+          "label": "alcohol nucleophile (ROH)",
+          "trigger": {
+            "includeSmarts": [
+              "[#6][O;H1;+0]"
+            ],
+            "excludeSmarts": [
+              "[CX3](=O)[O;H1]"
+            ]
+          },
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "nucleophile",
+          "searchAliases": []
+        }
+      ],
+      "id": "alkene-epoxidation-acidic-alcohol-opening",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": null,
+      "productLabel": "Anti β-alkoxy alcohol",
+      "productStatus": "concept-only",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-epoxidation-organometallic-opening",
+      "family": "alkenes",
+      "reactionType": "ringOpening",
+      "title": "Epoxidation Followed by Grignard/Organolithium Opening",
+      "reagentLabel": "1) 1 equiv mCPBA or RCO₃H  2) RMgX or RLi  3) H₃O⁺",
+      "reagentNote": "Monoepoxidation, then nucleophilic epoxide opening",
+      "shortExplanation": "One equivalent of peroxyacid converts one alkene into an epoxide. A drawn Grignard or organolithium reagent then opens that epoxide at the less substituted carbon; acidic workup gives the alcohol.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "One equivalent of mCPBA gives monoepoxidation rather than epoxidizing every C=C bond.",
+        "Among nonequivalent isolated alkenes, the more substituted/electron-rich alkene is preferred; exact site-selectivity ties are retained.",
+        "RMgX/RLi attacks the less substituted epoxide carbon by backside opening, so the new C–C bond and OH are anti; one wedge/dash representative is drawn rather than duplicating its mirror image as another regioisomer."
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "anti-addition",
+          "relativeRelationship": "anti",
+          "stereospecific": true
+        },
+        "sitePreference": "most-substituted-alkene",
+        "mixture": "possible",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "When two alkene sites have indistinguishable substitution/electronic ranking, both genuinely competitive sites are retained instead of choosing one arbitrarily.",
+        "Draw the additional reactant in the same Ketcher canvas: Grignard or organolithium reagent."
+      ],
+      "display": null,
+      "missingReactants": [
+        {
+          "label": "Grignard or organolithium reagent",
+          "trigger": {
+            "includeSmarts": [
+              "[#6][Mg,Li]"
+            ]
+          },
+          "id": "grignard-or-organolithium-reagent",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "Grignard or organolithium reagent",
+          "trigger": {
+            "includeSmarts": [
+              "[#6][Mg,Li]"
+            ]
+          },
+          "id": "grignard-or-organolithium-reagent",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "id": "alkene-epoxidation-organometallic-opening",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": null,
+      "productLabel": "Alcohol with a new C–C bond",
+      "productStatus": "concept-only",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-alkyne-photochemical-2plus2",
+      "family": "alkenes",
+      "reactionType": "pericyclic",
+      "title": "Photochemical Alkene–Alkyne [2+2] Cycloaddition",
+      "reagentLabel": "hν (UV light)",
+      "reagentNote": "Photochemical [2+2] between an alkene and an alkyne",
+      "shortExplanation": "An alkene and an alkyne can undergo a photochemical [2+2] cycloaddition. One alkyne π bond and the alkene π bond form two new C–C σ bonds, leaving a cyclobutene double bond.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": "Photochemical pericyclic [2+2] cycloaddition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "This is a photochemical [2+2], not a Diels–Alder [4+2] reaction."
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical alkene/alkyne pairs can have genuine regioselectivity that depends on substituent electronics and is not universally captured by one generic rule.",
+        "Draw the additional reactant in the same Ketcher canvas: alkyne reaction partner."
+      ],
+      "display": null,
+      "missingReactants": [
+        {
+          "label": "alkyne reaction partner",
+          "trigger": {
+            "includeSmarts": [
+              "[C]#[C]"
+            ]
+          },
+          "id": "alkyne-reaction-partner",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "alkyne reaction partner",
+          "trigger": {
+            "includeSmarts": [
+              "[C]#[C]"
+            ]
+          },
+          "id": "alkyne-reaction-partner",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "id": "alkene-alkyne-photochemical-2plus2",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": null,
+      "productLabel": "Cyclobutene derivative",
+      "productStatus": "concept-only",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkene-photochemical-2plus2",
+      "family": "alkenes",
+      "reactionType": "pericyclic",
+      "title": "Photochemical [2+2] Cycloaddition",
+      "reagentLabel": "hν (UV light)",
+      "reagentNote": "Photochemical [2+2] cycloaddition of two alkenes",
+      "shortExplanation": "Under photochemical excitation, two alkene π bonds can undergo a [2+2] cycloaddition. Each C=C becomes a single bond and two new C–C bonds form between the alkene termini, creating a four-membered cyclobutane ring.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": "Photochemical pericyclic [2+2] cycloaddition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Consumes one alkene from each drawn reactant and forms a cyclobutane ring.",
+        "When several C=C atom-map embeddings are possible, PocketChem displays one representative major [2+2] product instead of enumerating every mapping-derived alternative."
+      ],
+      "selectivityProfile": {
+        "mixture": "single",
+        "majorProductOnly": true
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "This rule models intermolecular [2+2] cycloaddition between two disconnected alkene-containing structures.",
+        "If a substrate is known experimentally to give a genuine regioisomeric mixture, a dedicated substrate-specific rule should declare that mixture explicitly rather than relying on generic atom-map enumeration.",
+        "Ordinary thermal alkene [2+2] cycloaddition is not represented by this rule; hν is required.",
+        "Draw the additional reactant in the same Ketcher canvas: alkene reaction partner."
+      ],
+      "display": null,
+      "missingReactants": [
+        {
+          "label": "alkene reaction partner",
+          "trigger": {
+            "anyFunctionalGroups": [
+              "Alkene",
+              "Cycloalkene",
+              "Diene",
+              "Conjugated diene",
+              "Cumulated diene",
+              "Triene",
+              "Enyne",
+              "Enal",
+              "Enone",
+              "Enoic acid",
+              "Enoate",
+              "Chalcone",
+              "Cinnamic acid",
+              "Cinnamaldehyde",
+              "Crotonic acid",
+              "Crotonaldehyde",
+              "Acrylic acid",
+              "Acrolein"
+            ],
+            "includeSmarts": [
+              "[C;!a]=[C;!a]"
+            ]
+          },
+          "id": "alkene-reaction-partner",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "alkene reaction partner",
+          "trigger": {
+            "anyFunctionalGroups": [
+              "Alkene",
+              "Cycloalkene",
+              "Diene",
+              "Conjugated diene",
+              "Cumulated diene",
+              "Triene",
+              "Enyne",
+              "Enal",
+              "Enone",
+              "Enoic acid",
+              "Enoate",
+              "Chalcone",
+              "Cinnamic acid",
+              "Cinnamaldehyde",
+              "Crotonic acid",
+              "Crotonaldehyde",
+              "Acrylic acid",
+              "Acrolein"
+            ],
+            "includeSmarts": [
+              "[C;!a]=[C;!a]"
+            ]
+          },
+          "id": "alkene-reaction-partner",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "id": "alkene-photochemical-2plus2",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": null,
+      "productLabel": "Cyclobutane formed from the two alkene π bonds",
+      "productStatus": "concept-only",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "selected": [
+    {
+      "ruleId": "alkene-hydroboration-oxidation",
+      "family": "alkenes",
+      "reactionType": "oxidation",
+      "title": "Hydroboration-Oxidation",
+      "reagentLabel": "1) BH₃·THF  2) H₂O₂, NaOH",
+      "reagentNote": "Syn hydration",
+      "shortExplanation": "Hydroboration-oxidation hydrates the alkene with anti-Markovnikov orientation.",
+      "course": "ochem-1",
+      "chapter": "Alkenes",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Anti-Markovnikov and syn addition"
+      ],
+      "selectivityProfile": {
+        "sitePreference": "least-substituted-alkene",
+        "stereochemistry": {
+          "mode": "syn-addition",
+          "relativeRelationship": "syn",
+          "stereospecific": true
+        },
+        "regiochemistry": {
+          "mode": "anti-markovnikov",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "The current hydration handler enforces anti-Markovnikov connectivity; syn stereochemistry is not yet assigned explicitly in the product structure."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkene-hydroboration-oxidation",
+      "reactantSmiles": "C=CC1CCCC1",
+      "reactantLabel": "ethenylcyclopentane",
+      "productSmiles": "OCCC1CCCC1",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "C=CC1CCCC1"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "products": [
+    {
+      "smiles": "OCCC1CCCC1",
+      "level": null,
+      "ruleId": "alkene-hydroboration-oxidation",
+      "mixtureKind": null
+    }
+  ],
+  "interfaceLimitation": "Conditions are represented by fixed pathway-family filters and explicit nucleophile/base molecules; engine listing API accepts no solvent/temperature field. No target-dependent fallback.",
+  "finishedUTC": "2026-11-06T18:22:23.983Z"
+}

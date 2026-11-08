@@ -1,0 +1,7 @@
+{
+  "id": "NM-04",
+  "emittedName": "3-methylhexan-2-one",
+  "startedUTC": "2026-11-06T20:05:52.322829+00:00",
+  "smiles": "CCCC(C)C(=O)C",
+  "method": "exact frozen accepted name/structure pair"
+}

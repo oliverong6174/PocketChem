@@ -1,0 +1,7 @@
+{
+  "id": "NM-17",
+  "emittedName": "(S)-2-chloropentane",
+  "startedUTC": "2026-11-06T20:05:52.338942+00:00",
+  "smiles": "CCC[C@H](C)Cl",
+  "method": "exact frozen accepted name/structure pair"
+}

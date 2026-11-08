@@ -1,0 +1,178 @@
+{
+  "id": "RX-11",
+  "startedUTC": "2026-11-06T18:22:38.695Z",
+  "calls": [
+    "predictReactionPathways"
+  ],
+  "input": "C[C@@H](Br)CCCCC.[I-]",
+  "pathways": [
+    {
+      "ruleId": "haloalkane-sn2-iodide",
+      "family": "haloalkanes",
+      "reactionType": "substitution",
+      "title": "Bimolecular SN2 with Iodide Ion",
+      "reagentLabel": "NaI, acetone (or another polar aprotic solvent)",
+      "reagentNote": "Iodide ion is supplied as the nucleophile; classic Finkelstein-type substitution",
+      "shortExplanation": "Iodide is a strong, polarizable nucleophile. It attacks an unhindered alkyl chloride or bromide from the backside in a concerted SN2 step, replacing the leaving group and inverting a stereogenic reacting center.",
+      "course": "ochem-1",
+      "chapter": "Substitution and elimination",
+      "mechanism": "SN2",
+      "reactionClass": "nucleophilic substitution",
+      "purpose": null,
+      "selectivity": [
+        "Backside attack",
+        "Inversion at a reacting stereocenter"
+      ],
+      "selectivityProfile": {
+        "substitutionElimination": {
+          "pathway": "sn2",
+          "reagent": "nucleophile"
+        },
+        "stereochemistry": {
+          "mode": "inversion",
+          "attackMode": "backside",
+          "stereospecific": true
+        },
+        "mixture": "single"
+      },
+      "selectivityAssessment": {
+        "level": "major",
+        "estimatedFraction": null,
+        "planningPenalty": 0,
+        "label": "Major pathway (qualitative)",
+        "basis": "A weakly basic nucleophile on a secondary halide favors SN2 over E2. Substitution versus elimination follows the substrate class and the reagent class (Wade, Organic Chemistry, ch. 6-7 summary of SN2/E2 competition; Clayden, Greeves and Warren, ch. 17; not re-read in this stage). It is qualitative: solvent, temperature and the exact base change the ratio, and no fraction is given."
+      },
+      "limitations": [
+        "Most effective for methyl and primary substrates; secondary substrates are slower and can compete with elimination.",
+        "Tertiary alkyl halides do not undergo clean SN2 substitution with iodide."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "iodide ion",
+          "trigger": {
+            "includeSmarts": [
+              "[I-]"
+            ]
+          },
+          "id": "iodide",
+          "supplyMode": "auto",
+          "presetSmiles": "[I-]",
+          "searchAliases": [
+            "iodide ion",
+            "iodide",
+            "I-",
+            "iodide anion"
+          ],
+          "contributesToProduct": true,
+          "role": "nucleophile"
+        }
+      ],
+      "id": "haloalkane-sn2-iodide",
+      "reactantSmiles": "C[C@@H](Br)CCCCC.[I-]",
+      "reactantLabel": "(R)-2-bromoheptane + iodide",
+      "productSmiles": "CCCCC[C@H](C)I",
+      "productLabel": "(S)-2-iodoheptane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "C[C@@H](Br)CCCCC",
+        "[I-]"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "selected": [
+    {
+      "ruleId": "haloalkane-sn2-iodide",
+      "family": "haloalkanes",
+      "reactionType": "substitution",
+      "title": "Bimolecular SN2 with Iodide Ion",
+      "reagentLabel": "NaI, acetone (or another polar aprotic solvent)",
+      "reagentNote": "Iodide ion is supplied as the nucleophile; classic Finkelstein-type substitution",
+      "shortExplanation": "Iodide is a strong, polarizable nucleophile. It attacks an unhindered alkyl chloride or bromide from the backside in a concerted SN2 step, replacing the leaving group and inverting a stereogenic reacting center.",
+      "course": "ochem-1",
+      "chapter": "Substitution and elimination",
+      "mechanism": "SN2",
+      "reactionClass": "nucleophilic substitution",
+      "purpose": null,
+      "selectivity": [
+        "Backside attack",
+        "Inversion at a reacting stereocenter"
+      ],
+      "selectivityProfile": {
+        "substitutionElimination": {
+          "pathway": "sn2",
+          "reagent": "nucleophile"
+        },
+        "stereochemistry": {
+          "mode": "inversion",
+          "attackMode": "backside",
+          "stereospecific": true
+        },
+        "mixture": "single"
+      },
+      "selectivityAssessment": {
+        "level": "major",
+        "estimatedFraction": null,
+        "planningPenalty": 0,
+        "label": "Major pathway (qualitative)",
+        "basis": "A weakly basic nucleophile on a secondary halide favors SN2 over E2. Substitution versus elimination follows the substrate class and the reagent class (Wade, Organic Chemistry, ch. 6-7 summary of SN2/E2 competition; Clayden, Greeves and Warren, ch. 17; not re-read in this stage). It is qualitative: solvent, temperature and the exact base change the ratio, and no fraction is given."
+      },
+      "limitations": [
+        "Most effective for methyl and primary substrates; secondary substrates are slower and can compete with elimination.",
+        "Tertiary alkyl halides do not undergo clean SN2 substitution with iodide."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "iodide ion",
+          "trigger": {
+            "includeSmarts": [
+              "[I-]"
+            ]
+          },
+          "id": "iodide",
+          "supplyMode": "auto",
+          "presetSmiles": "[I-]",
+          "searchAliases": [
+            "iodide ion",
+            "iodide",
+            "I-",
+            "iodide anion"
+          ],
+          "contributesToProduct": true,
+          "role": "nucleophile"
+        }
+      ],
+      "id": "haloalkane-sn2-iodide",
+      "reactantSmiles": "C[C@@H](Br)CCCCC.[I-]",
+      "reactantLabel": "(R)-2-bromoheptane + iodide",
+      "productSmiles": "CCCCC[C@H](C)I",
+      "productLabel": "(S)-2-iodoheptane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "C[C@@H](Br)CCCCC",
+        "[I-]"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "products": [
+    {
+      "smiles": "CCCCC[C@H](C)I",
+      "level": "major",
+      "ruleId": "haloalkane-sn2-iodide",
+      "mixtureKind": null
+    }
+  ],
+  "interfaceLimitation": "Conditions are represented by fixed pathway-family filters and explicit nucleophile/base molecules; engine listing API accepts no solvent/temperature field. No target-dependent fallback.",
+  "finishedUTC": "2026-11-06T18:22:40.355Z"
+}

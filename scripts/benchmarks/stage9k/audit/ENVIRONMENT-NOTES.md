@@ -1,0 +1,10 @@
+# Execution notes
+
+No dependency installation was required. Node v24.21.0, bundled RDKit WASM and installed Vite/TypeScript dependencies were available. Python RDKit 2026.09.1 supplied the independent depiction/parity checks.
+
+* The first public-reference request was denied by the sandbox network policy. The required retrieval scripts were then run with environment approval. Reference 503/429/404 responses and sequential retrieval followups are preserved; these were pre-prediction reference requests, not chemistry retries.
+* Git index writes required environment approval; only explicit Stage 9K paths were staged. No push was attempted.
+* PowerShell blocks `.ps1` execution, including the `npm` shim. The first `npm run build` launcher failed before building. `npm.cmd` successfully compiled, but PowerShell classified Vite's stderr warning as an error record and the wrapper returned 1. A second native-shell invocation captured the actual exit code: `audit/build-exit.txt` = 0; `audit/build-native.log` preserves compiler output. This is build-infrastructure verification, not a chemistry rerun.
+* The PDF renderer was executed as reviewed inline PowerShell because file-script execution is disabled. Initial diagnostic failures identified an empty PSScriptRoot in inline mode and an IAsyncAction reflection conversion; both were corrected in the audit renderer only. Windows.Data.Pdf then rendered lecture pages 11–18 locally. Page 15 was visually inspected against Stage 9J's product. No chemistry source was changed.
+* The sole chemistry evaluation ran from 2026-11-06T18:21:25.558Z to 18:23:06.039Z, sequentially, 52 unique cases. All process exits were zero, with no timeouts, errors, retry or replacement run. Every child log, complete raw object and call list is saved under `results/`.
+* All 17 emitted names matched frozen accepted names. The predeclared identity-resolution step therefore used the frozen database name/structure pairs and made zero post-prediction network requests.

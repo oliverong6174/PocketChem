@@ -1,0 +1,215 @@
+{
+  "id": "NM-05",
+  "startedUTC": "2026-11-06T18:21:32.705Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "4-methylhexan-2-one",
+      "commonName": null,
+      "displayName": "4-methylhexan-2-one",
+      "namingConfidence": "Medium",
+      "namingStatus": "systematic",
+      "parentChain": "hexane",
+      "parentChainLength": 6,
+      "mainSuffix": "-one",
+      "prefixes": [],
+      "motifs": [],
+      "explanation": "Parent chain contains 6 carbons. ketone chosen as highest-priority functional group. Detected 1 substituent(s).",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ]
+    },
+    "properties": {
+      "molecularFormula": "C7H14O",
+      "exactMass": "114.1045",
+      "molecularWeight": "114.19",
+      "degreesOfUnsaturation": 1,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 7
+        },
+        {
+          "element": "H",
+          "count": 14
+        },
+        {
+          "element": "O",
+          "count": 1
+        }
+      ],
+      "heavyAtomCount": 8,
+      "hydrogenBondDonors": 0,
+      "hydrogenBondAcceptors": 1,
+      "rotatableBonds": 3,
+      "topologicalPolarSurfaceArea": "17.07",
+      "logP": "2.01",
+      "ringCount": 0,
+      "boilingPointTendency": {
+        "level": "Medium",
+        "score": 4.5,
+        "factors": [
+          "Larger molecular weight raises boiling point.",
+          "Polar functional groups increase dipole-dipole attractions.",
+          "Hydrogen-bond acceptors increase intermolecular attraction."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Low",
+        "score": 1.5,
+        "factors": [
+          "Low TPSA means less polar surface area.",
+          "Moderate logP gives a balance between water and lipid solubility.",
+          "Hydrogen-bond acceptors help the molecule interact with water."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "High",
+        "score": 5.5,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Ketone",
+      "priority": 9,
+      "nomenclaturePriority": 9,
+      "confidence": "High",
+      "suffix": "-one",
+      "prefix": "oxo",
+      "count": 1,
+      "mcatNote": "Ketones contain an internal carbonyl. They undergo nucleophilic addition reactions and are less easily oxidized than aldehydes.",
+      "matches": [
+        {
+          "atoms": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "bonds": [
+            4,
+            5,
+            6
+          ]
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            5,
+            6
+          ],
+          "bonds": [
+            5
+          ]
+        }
+      ],
+      "displaySmarts": "[CX3]=[OX1]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Ketone",
+        "priority": 9,
+        "nomenclaturePriority": 9,
+        "confidence": "High",
+        "suffix": "-one",
+        "prefix": "oxo",
+        "count": 1,
+        "mcatNote": "Ketones contain an internal carbonyl. They undergo nucleophilic addition reactions and are less easily oxidized than aldehydes.",
+        "matches": [
+          {
+            "atoms": [
+              4,
+              5,
+              6,
+              7
+            ],
+            "bonds": [
+              4,
+              5,
+              6
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              5,
+              6
+            ],
+            "bonds": [
+              5
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3]=[OX1]",
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Ketone",
+        "priority": 9,
+        "nomenclaturePriority": 9,
+        "confidence": "High",
+        "suffix": "-one",
+        "prefix": "oxo",
+        "count": 1,
+        "mcatNote": "Ketones contain an internal carbonyl. They undergo nucleophilic addition reactions and are less easily oxidized than aldehydes.",
+        "matches": [
+          {
+            "atoms": [
+              4,
+              5,
+              6,
+              7
+            ],
+            "bonds": [
+              4,
+              5,
+              6
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              5,
+              6
+            ],
+            "bonds": [
+              5
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3]=[OX1]",
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:21:34.057Z"
+}

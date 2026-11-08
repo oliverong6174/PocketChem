@@ -1,0 +1,7 @@
+{
+  "id": "NM-08",
+  "emittedName": "2-ethylbutanoic acid",
+  "startedUTC": "2026-11-06T20:05:52.327699+00:00",
+  "smiles": "CCC(CC)C(=O)O",
+  "method": "exact frozen accepted name/structure pair"
+}

@@ -1,0 +1,222 @@
+{
+  "id": "NM-09",
+  "startedUTC": "2026-11-06T18:21:39.272Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "ethyl 2-methylbutanoate",
+      "commonName": null,
+      "displayName": "ethyl 2-methylbutanoate",
+      "namingConfidence": "Medium",
+      "namingStatus": "systematic",
+      "parentChain": "butane",
+      "parentChainLength": 4,
+      "mainSuffix": "-oate",
+      "prefixes": [],
+      "motifs": [],
+      "explanation": "Parent chain contains 4 carbons. ester chosen as highest-priority functional group. Detected 1 substituent(s).",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ]
+    },
+    "properties": {
+      "molecularFormula": "C7H14O2",
+      "exactMass": "130.0994",
+      "molecularWeight": "130.19",
+      "degreesOfUnsaturation": 1,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 7
+        },
+        {
+          "element": "H",
+          "count": 14
+        },
+        {
+          "element": "O",
+          "count": 2
+        }
+      ],
+      "heavyAtomCount": 9,
+      "hydrogenBondDonors": 0,
+      "hydrogenBondAcceptors": 1,
+      "rotatableBonds": 3,
+      "topologicalPolarSurfaceArea": "26.30",
+      "logP": "1.60",
+      "ringCount": 0,
+      "boilingPointTendency": {
+        "level": "Medium",
+        "score": 3.5,
+        "factors": [
+          "Larger molecular weight raises boiling point.",
+          "Polar functional groups increase dipole-dipole attractions.",
+          "Hydrogen-bond acceptors increase intermolecular attraction.",
+          "Branching lowers boiling point by reducing surface contact."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Low",
+        "score": 1.5,
+        "factors": [
+          "Low TPSA means less polar surface area.",
+          "Moderate logP gives a balance between water and lipid solubility.",
+          "Hydrogen-bond acceptors help the molecule interact with water."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "High",
+        "score": 6.5,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Ester",
+      "priority": 4,
+      "nomenclaturePriority": 4,
+      "confidence": "High",
+      "suffix": "-oate",
+      "prefix": "alkoxycarbonyl",
+      "count": 1,
+      "mcatNote": "Esters are carboxylic acid derivatives. They are common in lipids and can undergo hydrolysis.",
+      "matches": [
+        {
+          "atoms": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "bonds": [
+            4,
+            5,
+            6
+          ]
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            4,
+            5,
+            6
+          ],
+          "bonds": [
+            4,
+            5
+          ]
+        }
+      ],
+      "displaySmarts": "[CX3](=[OX1])[OX2]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Ester",
+        "priority": 4,
+        "nomenclaturePriority": 4,
+        "confidence": "High",
+        "suffix": "-oate",
+        "prefix": "alkoxycarbonyl",
+        "count": 1,
+        "mcatNote": "Esters are carboxylic acid derivatives. They are common in lipids and can undergo hydrolysis.",
+        "matches": [
+          {
+            "atoms": [
+              4,
+              5,
+              6,
+              7
+            ],
+            "bonds": [
+              4,
+              5,
+              6
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              4,
+              5,
+              6
+            ],
+            "bonds": [
+              4,
+              5
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3](=[OX1])[OX2]",
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Ester",
+        "priority": 4,
+        "nomenclaturePriority": 4,
+        "confidence": "High",
+        "suffix": "-oate",
+        "prefix": "alkoxycarbonyl",
+        "count": 1,
+        "mcatNote": "Esters are carboxylic acid derivatives. They are common in lipids and can undergo hydrolysis.",
+        "matches": [
+          {
+            "atoms": [
+              4,
+              5,
+              6,
+              7
+            ],
+            "bonds": [
+              4,
+              5,
+              6
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              4,
+              5,
+              6
+            ],
+            "bonds": [
+              4,
+              5
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3](=[OX1])[OX2]",
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:21:40.662Z"
+}

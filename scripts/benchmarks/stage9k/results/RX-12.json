@@ -1,0 +1,430 @@
+{
+  "id": "RX-12",
+  "startedUTC": "2026-11-06T18:22:40.632Z",
+  "calls": [
+    "predictReactionPathways"
+  ],
+  "input": "CC(Br)CCCCCC.CC[O-]",
+  "pathways": [
+    {
+      "ruleId": "haloalkane-williamson-ether",
+      "family": "haloalkanes",
+      "reactionType": "substitution",
+      "title": "Williamson Ether Synthesis",
+      "reagentLabel": "Polar aprotic conditions",
+      "reagentNote": "Draw the alkyl halide and alkoxide as disconnected structures",
+      "shortExplanation": "An alkoxide displaces the leaving group by SN2 to form an ether. Methyl and primary halides are best; secondary halides can undergo competing E2.",
+      "course": "ochem-1",
+      "chapter": "Substitution and elimination",
+      "mechanism": "SN2",
+      "reactionClass": "nucleophilic substitution",
+      "purpose": null,
+      "selectivity": [
+        "Backside attack",
+        "Inversion at a reacting stereocenter"
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "inversion",
+          "attackMode": "backside",
+          "stereospecific": true
+        },
+        "mixture": "single"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Secondary halides can undergo substantial E2; tertiary halides are excluded.",
+        "SN2 inversion is explicitly encoded when the reacting carbon is stereogenic."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "alkoxide ion",
+          "trigger": {
+            "includeSmarts": [
+              "[#6,#0][O-]"
+            ]
+          },
+          "id": "alkoxide-ion",
+          "supplyMode": "user-structure",
+          "contributesToProduct": true,
+          "role": "structural-partner",
+          "searchAliases": []
+        }
+      ],
+      "id": "haloalkane-williamson-ether",
+      "reactantSmiles": "CC(Br)CCCCCC.CC[O-]",
+      "reactantLabel": "2-bromooctane + ethoxide",
+      "productSmiles": "CCCCCCC(C)OCC",
+      "productLabel": "2-ethoxyoctane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CC(Br)CCCCCC",
+        "CC[O-]"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "haloalkane-e2-zaitsev",
+      "family": "haloalkanes",
+      "reactionType": "elimination",
+      "title": "E2 with an Unhindered Alkoxide",
+      "reagentLabel": "NaOEt, EtOH, heat",
+      "reagentNote": "Small, unhindered strong base → Zaitsev-favored E2",
+      "shortExplanation": "A strong, relatively unhindered alkoxide removes a beta hydrogen as the leaving group departs. The more substituted Zaitsev alkene is normally favored.",
+      "course": "ochem-1",
+      "chapter": "Substitution and elimination",
+      "mechanism": "E2",
+      "reactionClass": "beta elimination",
+      "purpose": null,
+      "selectivity": [
+        "Anti-periplanar geometry",
+        "Usually Zaitsev"
+      ],
+      "selectivityProfile": {
+        "substitutionElimination": {
+          "pathway": "e2",
+          "reagent": "alkoxide"
+        },
+        "stereochemistry": {
+          "mode": "e-preferred",
+          "stereoselective": true
+        },
+        "regiochemistry": {
+          "mode": "zaitsev",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "keepConstitutionalAlternatives": true
+      },
+      "selectivityAssessment": {
+        "level": "major",
+        "estimatedFraction": null,
+        "planningPenalty": 0,
+        "label": "Major product (qualitative)",
+        "basis": "Zaitsev rule: with small strong bases (hydroxide, methoxide, ethoxide) E2 gives mainly the more substituted alkene (LibreTexts, Elimination by the E2 mechanism; UCLA Illustrated Glossary of Organic Chemistry, Hofmann's rule: 2-bromo-2-methylbutane with methoxide gives 2-methylbut-2-ene as the major product; Reusch, MSU: 2-bromo-2,3-dimethylbutane with methoxide gives 80% of the tetrasubstituted alkene). This is the more substituted alkene. Qualitative preference, not a measured ratio; E/Z geometry within a constitution is not ranked."
+      },
+      "limitations": [
+        "The handler generates E/Z for common acyclic disubstituted alkenes, but does not yet determine anti-periplanar conformer availability or general trisubstituted/tetrasubstituted alkene geometry.",
+        "Secondary substrates can show competing SN2."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 78,
+      "reactantRequirements": [
+        {
+          "id": "ethoxide",
+          "label": "unhindered alkoxide base",
+          "trigger": {
+            "includeSmarts": [
+              "[C;H1,H2,H3][O-]"
+            ]
+          },
+          "supplyMode": "auto",
+          "presetSmiles": "CC[O-]",
+          "searchAliases": [
+            "unhindered alkoxide base",
+            "ethoxide",
+            "ethoxide ion",
+            "EtO-",
+            "EtO⁻",
+            "NaOEt",
+            "sodium ethoxide"
+          ],
+          "contributesToProduct": false,
+          "role": "base"
+        }
+      ],
+      "id": "haloalkane-e2-zaitsev",
+      "reactantSmiles": "CC(Br)CCCCCC.CC[O-]",
+      "reactantLabel": "2-bromooctane + ethoxide",
+      "productSmiles": "C/C=C/CCCCC",
+      "productLabel": "(E)-oct-2-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CC(Br)CCCCCC",
+        "CC[O-]"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "haloalkane-e2-zaitsev",
+      "family": "haloalkanes",
+      "reactionType": "elimination",
+      "title": "E2 with an Unhindered Alkoxide",
+      "reagentLabel": "NaOEt, EtOH, heat",
+      "reagentNote": "Small, unhindered strong base → Zaitsev-favored E2",
+      "shortExplanation": "A strong, relatively unhindered alkoxide removes a beta hydrogen as the leaving group departs. The more substituted Zaitsev alkene is normally favored.",
+      "course": "ochem-1",
+      "chapter": "Substitution and elimination",
+      "mechanism": "E2",
+      "reactionClass": "beta elimination",
+      "purpose": null,
+      "selectivity": [
+        "Anti-periplanar geometry",
+        "Usually Zaitsev"
+      ],
+      "selectivityProfile": {
+        "substitutionElimination": {
+          "pathway": "e2",
+          "reagent": "alkoxide"
+        },
+        "stereochemistry": {
+          "mode": "e-preferred",
+          "stereoselective": true
+        },
+        "regiochemistry": {
+          "mode": "zaitsev",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "keepConstitutionalAlternatives": true
+      },
+      "selectivityAssessment": {
+        "level": "minor",
+        "estimatedFraction": null,
+        "planningPenalty": 40,
+        "label": "Minor product (qualitative)",
+        "basis": "Zaitsev rule: with small strong bases (hydroxide, methoxide, ethoxide) E2 gives mainly the more substituted alkene (LibreTexts, Elimination by the E2 mechanism; UCLA Illustrated Glossary of Organic Chemistry, Hofmann's rule: 2-bromo-2-methylbutane with methoxide gives 2-methylbut-2-ene as the major product; Reusch, MSU: 2-bromo-2,3-dimethylbutane with methoxide gives 80% of the tetrasubstituted alkene). This is a less substituted alkene. Qualitative preference, not a measured ratio; E/Z geometry within a constitution is not ranked."
+      },
+      "limitations": [
+        "The handler generates E/Z for common acyclic disubstituted alkenes, but does not yet determine anti-periplanar conformer availability or general trisubstituted/tetrasubstituted alkene geometry.",
+        "Secondary substrates can show competing SN2."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 118,
+      "reactantRequirements": [
+        {
+          "id": "ethoxide",
+          "label": "unhindered alkoxide base",
+          "trigger": {
+            "includeSmarts": [
+              "[C;H1,H2,H3][O-]"
+            ]
+          },
+          "supplyMode": "auto",
+          "presetSmiles": "CC[O-]",
+          "searchAliases": [
+            "unhindered alkoxide base",
+            "ethoxide",
+            "ethoxide ion",
+            "EtO-",
+            "EtO⁻",
+            "NaOEt",
+            "sodium ethoxide"
+          ],
+          "contributesToProduct": false,
+          "role": "base"
+        }
+      ],
+      "id": "haloalkane-e2-zaitsev--2",
+      "reactantSmiles": "CC(Br)CCCCCC.CC[O-]",
+      "reactantLabel": "2-bromooctane + ethoxide",
+      "productSmiles": "C=CCCCCCC",
+      "productLabel": "oct-1-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CC(Br)CCCCCC",
+        "CC[O-]"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "selected": [
+    {
+      "ruleId": "haloalkane-e2-zaitsev",
+      "family": "haloalkanes",
+      "reactionType": "elimination",
+      "title": "E2 with an Unhindered Alkoxide",
+      "reagentLabel": "NaOEt, EtOH, heat",
+      "reagentNote": "Small, unhindered strong base → Zaitsev-favored E2",
+      "shortExplanation": "A strong, relatively unhindered alkoxide removes a beta hydrogen as the leaving group departs. The more substituted Zaitsev alkene is normally favored.",
+      "course": "ochem-1",
+      "chapter": "Substitution and elimination",
+      "mechanism": "E2",
+      "reactionClass": "beta elimination",
+      "purpose": null,
+      "selectivity": [
+        "Anti-periplanar geometry",
+        "Usually Zaitsev"
+      ],
+      "selectivityProfile": {
+        "substitutionElimination": {
+          "pathway": "e2",
+          "reagent": "alkoxide"
+        },
+        "stereochemistry": {
+          "mode": "e-preferred",
+          "stereoselective": true
+        },
+        "regiochemistry": {
+          "mode": "zaitsev",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "keepConstitutionalAlternatives": true
+      },
+      "selectivityAssessment": {
+        "level": "major",
+        "estimatedFraction": null,
+        "planningPenalty": 0,
+        "label": "Major product (qualitative)",
+        "basis": "Zaitsev rule: with small strong bases (hydroxide, methoxide, ethoxide) E2 gives mainly the more substituted alkene (LibreTexts, Elimination by the E2 mechanism; UCLA Illustrated Glossary of Organic Chemistry, Hofmann's rule: 2-bromo-2-methylbutane with methoxide gives 2-methylbut-2-ene as the major product; Reusch, MSU: 2-bromo-2,3-dimethylbutane with methoxide gives 80% of the tetrasubstituted alkene). This is the more substituted alkene. Qualitative preference, not a measured ratio; E/Z geometry within a constitution is not ranked."
+      },
+      "limitations": [
+        "The handler generates E/Z for common acyclic disubstituted alkenes, but does not yet determine anti-periplanar conformer availability or general trisubstituted/tetrasubstituted alkene geometry.",
+        "Secondary substrates can show competing SN2."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 78,
+      "reactantRequirements": [
+        {
+          "id": "ethoxide",
+          "label": "unhindered alkoxide base",
+          "trigger": {
+            "includeSmarts": [
+              "[C;H1,H2,H3][O-]"
+            ]
+          },
+          "supplyMode": "auto",
+          "presetSmiles": "CC[O-]",
+          "searchAliases": [
+            "unhindered alkoxide base",
+            "ethoxide",
+            "ethoxide ion",
+            "EtO-",
+            "EtO⁻",
+            "NaOEt",
+            "sodium ethoxide"
+          ],
+          "contributesToProduct": false,
+          "role": "base"
+        }
+      ],
+      "id": "haloalkane-e2-zaitsev",
+      "reactantSmiles": "CC(Br)CCCCCC.CC[O-]",
+      "reactantLabel": "2-bromooctane + ethoxide",
+      "productSmiles": "C/C=C/CCCCC",
+      "productLabel": "(E)-oct-2-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CC(Br)CCCCCC",
+        "CC[O-]"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "haloalkane-e2-zaitsev",
+      "family": "haloalkanes",
+      "reactionType": "elimination",
+      "title": "E2 with an Unhindered Alkoxide",
+      "reagentLabel": "NaOEt, EtOH, heat",
+      "reagentNote": "Small, unhindered strong base → Zaitsev-favored E2",
+      "shortExplanation": "A strong, relatively unhindered alkoxide removes a beta hydrogen as the leaving group departs. The more substituted Zaitsev alkene is normally favored.",
+      "course": "ochem-1",
+      "chapter": "Substitution and elimination",
+      "mechanism": "E2",
+      "reactionClass": "beta elimination",
+      "purpose": null,
+      "selectivity": [
+        "Anti-periplanar geometry",
+        "Usually Zaitsev"
+      ],
+      "selectivityProfile": {
+        "substitutionElimination": {
+          "pathway": "e2",
+          "reagent": "alkoxide"
+        },
+        "stereochemistry": {
+          "mode": "e-preferred",
+          "stereoselective": true
+        },
+        "regiochemistry": {
+          "mode": "zaitsev",
+          "regioselective": true
+        },
+        "mixture": "possible",
+        "keepConstitutionalAlternatives": true
+      },
+      "selectivityAssessment": {
+        "level": "minor",
+        "estimatedFraction": null,
+        "planningPenalty": 40,
+        "label": "Minor product (qualitative)",
+        "basis": "Zaitsev rule: with small strong bases (hydroxide, methoxide, ethoxide) E2 gives mainly the more substituted alkene (LibreTexts, Elimination by the E2 mechanism; UCLA Illustrated Glossary of Organic Chemistry, Hofmann's rule: 2-bromo-2-methylbutane with methoxide gives 2-methylbut-2-ene as the major product; Reusch, MSU: 2-bromo-2,3-dimethylbutane with methoxide gives 80% of the tetrasubstituted alkene). This is a less substituted alkene. Qualitative preference, not a measured ratio; E/Z geometry within a constitution is not ranked."
+      },
+      "limitations": [
+        "The handler generates E/Z for common acyclic disubstituted alkenes, but does not yet determine anti-periplanar conformer availability or general trisubstituted/tetrasubstituted alkene geometry.",
+        "Secondary substrates can show competing SN2."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 118,
+      "reactantRequirements": [
+        {
+          "id": "ethoxide",
+          "label": "unhindered alkoxide base",
+          "trigger": {
+            "includeSmarts": [
+              "[C;H1,H2,H3][O-]"
+            ]
+          },
+          "supplyMode": "auto",
+          "presetSmiles": "CC[O-]",
+          "searchAliases": [
+            "unhindered alkoxide base",
+            "ethoxide",
+            "ethoxide ion",
+            "EtO-",
+            "EtO⁻",
+            "NaOEt",
+            "sodium ethoxide"
+          ],
+          "contributesToProduct": false,
+          "role": "base"
+        }
+      ],
+      "id": "haloalkane-e2-zaitsev--2",
+      "reactantSmiles": "CC(Br)CCCCCC.CC[O-]",
+      "reactantLabel": "2-bromooctane + ethoxide",
+      "productSmiles": "C=CCCCCCC",
+      "productLabel": "oct-1-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CC(Br)CCCCCC",
+        "CC[O-]"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "products": [
+    {
+      "smiles": "C/C=C/CCCCC",
+      "level": "major",
+      "ruleId": "haloalkane-e2-zaitsev",
+      "mixtureKind": null
+    },
+    {
+      "smiles": "C=CCCCCCC",
+      "level": "minor",
+      "ruleId": "haloalkane-e2-zaitsev",
+      "mixtureKind": null
+    }
+  ],
+  "interfaceLimitation": "Conditions are represented by fixed pathway-family filters and explicit nucleophile/base molecules; engine listing API accepts no solvent/temperature field. No target-dependent fallback.",
+  "finishedUTC": "2026-11-06T18:22:42.189Z"
+}

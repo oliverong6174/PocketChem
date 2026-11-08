@@ -1,0 +1,543 @@
+{
+  "executed": 52,
+  "uniqueCaseIDs": 52,
+  "errors": [],
+  "rawFileMismatches": [],
+  "scoreMismatches": [],
+  "fragmentRecall": {
+    "hit": 11,
+    "n": 28
+  },
+  "massSpecConfidence": {
+    "supported": {
+      "n": 5,
+      "baseCorrect": 5,
+      "wilson95": [
+        0.5655175352168251,
+        1
+      ]
+    },
+    "heuristic": {
+      "n": 5,
+      "baseCorrect": 1,
+      "wilson95": [
+        0.03622410863243014,
+        0.6244653702374747
+      ]
+    },
+    "unreliable": {
+      "n": 1,
+      "baseCorrect": 0,
+      "wilson95": [
+        0,
+        0.7934506856227626
+      ]
+    }
+  },
+  "routeRows": [
+    {
+      "id": "RQ-01",
+      "label": "clear",
+      "tier": "plausible-incomplete",
+      "structural": "verified",
+      "construction": "engine-pathway",
+      "chemicalCodes": [],
+      "replayFailure": false,
+      "allCodes": [
+        "info:documented-reagents",
+        "incomplete:conditions-unassessed",
+        "support:selectivity-single-outcome"
+      ]
+    },
+    {
+      "id": "RQ-02",
+      "label": "clear",
+      "tier": "chemically-supported",
+      "structural": "verified",
+      "construction": "engine-pathway",
+      "chemicalCodes": [],
+      "replayFailure": false,
+      "allCodes": [
+        "info:documented-reagents",
+        "support:selectivity-single-outcome"
+      ]
+    },
+    {
+      "id": "RQ-03",
+      "label": "clear",
+      "tier": "chemically-supported",
+      "structural": "verified",
+      "construction": "engine-pathway",
+      "chemicalCodes": [],
+      "replayFailure": false,
+      "allCodes": [
+        "info:documented-reagents",
+        "support:selectivity-single-outcome"
+      ]
+    },
+    {
+      "id": "RQ-04",
+      "label": "clear",
+      "tier": "chemically-supported",
+      "structural": "verified",
+      "construction": "engine-pathway",
+      "chemicalCodes": [],
+      "replayFailure": false,
+      "allCodes": [
+        "info:documented-reagents",
+        "support:selectivity-single-outcome"
+      ]
+    },
+    {
+      "id": "RQ-05",
+      "label": "clear",
+      "tier": "plausible-incomplete",
+      "structural": "verified",
+      "construction": "engine-pathway",
+      "chemicalCodes": [],
+      "replayFailure": false,
+      "allCodes": [
+        "info:documented-reagents",
+        "incomplete:conditions-unassessed",
+        "support:selectivity-major"
+      ]
+    },
+    {
+      "id": "RQ-06",
+      "label": "clear",
+      "tier": "chemically-supported",
+      "structural": "verified",
+      "construction": "engine-pathway",
+      "chemicalCodes": [],
+      "replayFailure": false,
+      "allCodes": [
+        "info:documented-reagents",
+        "support:selectivity-single-outcome"
+      ]
+    },
+    {
+      "id": "RQ-07",
+      "label": "flag",
+      "tier": "contradicted",
+      "structural": "failed",
+      "construction": "manual-submitted-route",
+      "chemicalCodes": [
+        "compatibility-acid-base-quench"
+      ],
+      "replayFailure": true,
+      "allCodes": [
+        "contradiction:replay-failed",
+        "info:documented-reagents",
+        "contradiction:compatibility-acid-base-quench",
+        "incomplete:selectivity-unassessed"
+      ]
+    },
+    {
+      "id": "RQ-08",
+      "label": "flag",
+      "tier": "contradicted",
+      "structural": "failed",
+      "construction": "manual-submitted-route",
+      "chemicalCodes": [
+        "compatibility-acid-base-quench"
+      ],
+      "replayFailure": true,
+      "allCodes": [
+        "contradiction:replay-failed",
+        "info:documented-reagents",
+        "contradiction:compatibility-acid-base-quench",
+        "incomplete:selectivity-unassessed"
+      ]
+    },
+    {
+      "id": "RQ-09",
+      "label": "flag",
+      "tier": "known-concern",
+      "structural": "verified",
+      "construction": "engine-pathway",
+      "chemicalCodes": [
+        "compatibility-competing-reactivity"
+      ],
+      "replayFailure": false,
+      "allCodes": [
+        "info:documented-reagents",
+        "concern:compatibility-competing-reactivity",
+        "support:selectivity-single-outcome"
+      ]
+    },
+    {
+      "id": "RQ-10",
+      "label": "flag",
+      "tier": "known-concern",
+      "structural": "verified",
+      "construction": "engine-pathway",
+      "chemicalCodes": [
+        "compatibility-competing-reactivity"
+      ],
+      "replayFailure": false,
+      "allCodes": [
+        "info:documented-reagents",
+        "concern:compatibility-competing-reactivity",
+        "support:selectivity-single-outcome"
+      ]
+    },
+    {
+      "id": "RQ-12",
+      "label": "flag",
+      "tier": "contradicted",
+      "structural": "failed",
+      "construction": "manual-submitted-route",
+      "chemicalCodes": [],
+      "replayFailure": true,
+      "allCodes": [
+        "contradiction:replay-failed",
+        "info:documented-reagents",
+        "incomplete:conditions-unassessed",
+        "incomplete:selectivity-unassessed"
+      ]
+    }
+  ],
+  "reactionRows": [
+    {
+      "id": "RX-01",
+      "selectedRules": [
+        "alkene-hx-addition-hbr",
+        "alkene-dibromocyclopropanation"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        }
+      }
+    },
+    {
+      "id": "RX-02",
+      "selectedRules": [
+        "alkene-hydroboration-oxidation"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        }
+      }
+    },
+    {
+      "id": "RX-03",
+      "selectedRules": [
+        "alkene-hydroboration-oxidation"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        }
+      }
+    },
+    {
+      "id": "RX-04",
+      "selectedRules": [
+        "alkene-hx-addition-hbr",
+        "alkene-dibromocyclopropanation"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        }
+      }
+    },
+    {
+      "id": "RX-06",
+      "selectedRules": [
+        "alkene-hx-addition-hbr",
+        "alkene-hbr-peroxide",
+        "alkene-halogenation-bromine",
+        "alkene-allylic-bromination"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "stereochemistry": {
+          "status": "incomplete",
+          "detail": "Relative stereochemistry scored; for racemic cases either correct enantiomer depiction accepted. Enantiomer completeness recorded separately."
+        },
+        "enantiomerCompleteness": {
+          "status": "incomplete",
+          "detail": ""
+        }
+      }
+    },
+    {
+      "id": "RX-07",
+      "selectedRules": [
+        "alkene-hydrogenation"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "stereochemistry": {
+          "status": "incomplete",
+          "detail": "Relative stereochemistry scored; for racemic cases either correct enantiomer depiction accepted. Enantiomer completeness recorded separately."
+        },
+        "enantiomerCompleteness": {
+          "status": "incomplete",
+          "detail": ""
+        }
+      }
+    },
+    {
+      "id": "RX-08",
+      "selectedRules": [
+        "alkyne-lindlar-reduction-internal",
+        "alkyne-lindlar-deuteration-internal"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "stereochemistry": {
+          "status": "correct",
+          "detail": "Relative stereochemistry scored; for racemic cases either correct enantiomer depiction accepted. Enantiomer completeness recorded separately."
+        }
+      }
+    },
+    {
+      "id": "RX-09",
+      "selectedRules": [
+        "alkyne-dissolving-metal-reduction-internal",
+        "alkyne-dissolving-metal-deuteration-internal"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "stereochemistry": {
+          "status": "correct",
+          "detail": "Relative stereochemistry scored; for racemic cases either correct enantiomer depiction accepted. Enantiomer completeness recorded separately."
+        }
+      }
+    },
+    {
+      "id": "RX-10",
+      "selectedRules": [
+        "haloalkane-sn2-cyanide"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "stereochemistry": {
+          "status": "correct",
+          "detail": "Relative stereochemistry scored; for racemic cases either correct enantiomer depiction accepted. Enantiomer completeness recorded separately."
+        }
+      }
+    },
+    {
+      "id": "RX-11",
+      "selectedRules": [
+        "haloalkane-sn2-iodide"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "stereochemistry": {
+          "status": "correct",
+          "detail": "Relative stereochemistry scored; for racemic cases either correct enantiomer depiction accepted. Enantiomer completeness recorded separately."
+        }
+      }
+    },
+    {
+      "id": "RX-12",
+      "selectedRules": [
+        "haloalkane-e2-zaitsev"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "majorMinorRanking": {
+          "status": "correct",
+          "detail": "correct,correct"
+        }
+      }
+    },
+    {
+      "id": "RX-13",
+      "selectedRules": [
+        "haloalkane-e2-zaitsev"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "majorMinorRanking": {
+          "status": "correct",
+          "detail": "correct,correct"
+        }
+      }
+    },
+    {
+      "id": "RX-14",
+      "selectedRules": [
+        "haloalkane-sn2-cyanide"
+      ],
+      "dimensions": {
+        "connectivity": {
+          "status": "correct",
+          "detail": "Reference constitutional product present in condition-matched pathways"
+        }
+      }
+    }
+  ],
+  "nameCoverage": {
+    "n": 17,
+    "emitted": 17,
+    "abstained": 0
+  },
+  "reactionFilterContamination": [
+    {
+      "id": "RX-01",
+      "wrongRules": [
+        "alkene-dibromocyclopropanation"
+      ],
+      "interpretation": "Harness over-selection, not an engine reagent-conditioned false prediction. Frozen score retained; no rerun or replacement score."
+    },
+    {
+      "id": "RX-04",
+      "wrongRules": [
+        "alkene-dibromocyclopropanation"
+      ],
+      "interpretation": "Harness over-selection, not an engine reagent-conditioned false prediction. Frozen score retained; no rerun or replacement score."
+    },
+    {
+      "id": "RX-06",
+      "wrongRules": [
+        "alkene-hx-addition-hbr",
+        "alkene-hbr-peroxide",
+        "alkene-allylic-bromination"
+      ],
+      "interpretation": "Harness over-selection, not an engine reagent-conditioned false prediction. Frozen score retained; no rerun or replacement score."
+    },
+    {
+      "id": "RX-08",
+      "wrongRules": [
+        "alkyne-lindlar-deuteration-internal"
+      ],
+      "interpretation": "Harness over-selection, not an engine reagent-conditioned false prediction. Frozen score retained; no rerun or replacement score."
+    },
+    {
+      "id": "RX-09",
+      "wrongRules": [
+        "alkyne-dissolving-metal-deuteration-internal"
+      ],
+      "interpretation": "Harness over-selection, not an engine reagent-conditioned false prediction. Frozen score retained; no rerun or replacement score."
+    }
+  ],
+  "benchmarkErrata": [
+    {
+      "id": "K-01",
+      "cases": [
+        "RX-01",
+        "RX-04",
+        "RX-06",
+        "RX-08",
+        "RX-09"
+      ],
+      "issue": "Frozen regex pathway-family filters match CHBr3 as HBr, hydrobromination as bromination, and D2 pathways under reduction families. Raw allPathways/selected reveal contamination. No frozen files or scores changed."
+    },
+    {
+      "id": "K-02",
+      "cases": [
+        "RX-06"
+      ],
+      "issue": "C1=CCCCCCC1 has unspecified E/Z geometry; cyclooctene can have both cis and trans configurations. The trans vicinal dibromide answer assumes cis substrate. Engine explicitly abstains from relative stereo; do not call this a demonstrated chemical failure. Already excluded from A scoring; retained in frozen B denominator and flagged as underdetermined."
+    },
+    {
+      "id": "K-03",
+      "cases": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-03",
+        "RQ-04",
+        "RQ-05",
+        "RQ-06",
+        "RQ-07",
+        "RQ-08",
+        "RQ-09",
+        "RQ-10",
+        "RQ-12"
+      ],
+      "issue": "Frozen routeQualityOnly.nonInfoFindings annotation uses obsolete replay-code exclusions and includes incomplete/support levels. It is not a chemical-only detection count. This diagnostic file instead classifies concern/contradiction, excluding replay-failed and unsourced-atoms. Primary frozen sensitivity/specificity scores unchanged."
+    },
+    {
+      "id": "K-04",
+      "cases": [
+        "RX-07"
+      ],
+      "issue": "Symmetric cis-1,2-dimethylcycloheptane is meso; the frozen racemic metadata is imprecise. mirror canonical equals target, so relative stereo scoring and completeness set have no duplicated enantiomer. No answer or score changed."
+    }
+  ],
+  "routeBreakdown": {
+    "positiveN": 5,
+    "endToEndFlagged": 5,
+    "chemistryFindingN": 4,
+    "chemistryFindingWilson95": [
+      0.37553462976252533,
+      0.9637758913675698
+    ],
+    "verifiedPositiveN": 2,
+    "verifiedChemicalDetected": 2,
+    "verifiedWilson95": [
+      0.34238022750665303,
+      1
+    ],
+    "replayOnly": [
+      "RQ-12"
+    ],
+    "negativeN": 6
+  },
+  "integrity": {
+    "historicN": 740,
+    "historicMismatches": [],
+    "unrelatedMismatches": [],
+    "frozenMismatches": [],
+    "srcTreeUnchanged": true
+  }
+}

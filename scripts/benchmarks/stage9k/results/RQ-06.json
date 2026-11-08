@@ -1,0 +1,226 @@
+{
+  "id": "RQ-06",
+  "startedUTC": "2026-11-06T18:22:55.975Z",
+  "calls": [
+    "runRule",
+    "verifyMultistepRoute",
+    "assessRouteCompatibility",
+    "assessRouteSelectivity",
+    "assessRouteQuality"
+  ],
+  "pathways": [
+    {
+      "ruleId": "ester-lah-reduction",
+      "family": "esters",
+      "reactionType": "reduction",
+      "title": "LiAlH₄ Reduction of an Ester",
+      "reagentLabel": "1) LiAlH₄  2) H₃O⁺",
+      "reagentNote": "Strong hydride reduction",
+      "shortExplanation": "LiAlH₄ reduces the acyl portion of an ester to a primary alcohol and releases the alkoxy portion as an alcohol.",
+      "course": "ochem-2",
+      "chapter": "Carboxylic acid derivatives",
+      "mechanism": "Hydride addition–elimination and reduction",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "ester-lah-reduction",
+      "reactantSmiles": "CCCCCCCCCC(=O)OCC",
+      "reactantLabel": "Current intermediate",
+      "productSmiles": "CCCCCCCCCCO.CCO",
+      "productLabel": "Two alcohol products",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCCCCCCCCC(=O)OCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "construction": "engine-pathway",
+  "route": {
+    "id": "RQ-06",
+    "startingSmiles": "CCCCCCCCCC(=O)OCC",
+    "targetSmiles": "CCCCCCCCCCO",
+    "steps": [
+      {
+        "id": "s1",
+        "stepNumber": 1,
+        "source": "forward",
+        "ruleId": "ester-lah-reduction",
+        "family": "esters",
+        "reactionType": "reduction",
+        "title": "LiAlH₄ Reduction of an Ester",
+        "reactantSmiles": "CCCCCCCCCC(=O)OCC",
+        "reactantComponents": [
+          "CCCCCCCCCC(=O)OCC"
+        ],
+        "reactantLabel": "Current intermediate",
+        "productSmiles": "CCCCCCCCCCO.CCO",
+        "productComponents": [
+          "CCCCCCCCCCO",
+          "CCO"
+        ],
+        "productLabel": "Two alcohol products",
+        "reagentLabel": "1) LiAlH₄  2) H₃O⁺",
+        "reagentNote": "Strong hydride reduction",
+        "shortExplanation": "LiAlH₄ reduces the acyl portion of an ester to a primary alcohol and releases the alkoxy portion as an alcohol.",
+        "course": "ochem-2",
+        "chapter": "Carboxylic acid derivatives",
+        "mechanism": "Hydride addition–elimination and reduction",
+        "reactionClass": null,
+        "purpose": null,
+        "selectivity": [],
+        "selectivityProfile": null,
+        "selectivityAssessment": null,
+        "limitations": [],
+        "retrosynthesisConfidence": null,
+        "productMixture": null,
+        "display": null
+      }
+    ],
+    "confidence": "verified",
+    "score": 0,
+    "verification": {
+      "status": "verified",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "ruleId": "ester-lah-reduction",
+          "status": "verified",
+          "reactants": [
+            {
+              "smiles": "CCCCCCCCCC(=O)OCC",
+              "origin": "starting-material",
+              "match": "exact",
+              "lotId": "sm0#1",
+              "lineage": [
+                0
+              ]
+            }
+          ],
+          "productMatch": "exact",
+          "problems": []
+        }
+      ],
+      "targetMatch": "exact",
+      "coproducts": [
+        "CCO"
+      ],
+      "unusedStartingMaterials": [],
+      "problems": [],
+      "inventory": [
+        {
+          "startIndex": 0,
+          "smiles": "CCCCCCCCCC(=O)OCC",
+          "copies": 1,
+          "consumed": 1,
+          "lotIds": [
+            "sm0#1"
+          ],
+          "consumedByStep": [
+            1
+          ]
+        }
+      ],
+      "leftovers": [
+        {
+          "lotId": "s1.1",
+          "smiles": "CCCCCCCCCCO",
+          "origin": "earlier-step",
+          "producedByStep": 1,
+          "lineage": [
+            0
+          ],
+          "fromMixture": false
+        },
+        {
+          "lotId": "s1.2",
+          "smiles": "CCO",
+          "origin": "earlier-step",
+          "producedByStep": 1,
+          "lineage": [
+            0
+          ],
+          "fromMixture": false
+        }
+      ],
+      "stepDependencies": [
+        {
+          "stepNumber": 1,
+          "consumedLotIds": [
+            "sm0#1"
+          ],
+          "producedLotIds": [
+            "s1.1",
+            "s1.2"
+          ],
+          "dependsOnSteps": []
+        }
+      ],
+      "targetLineage": {
+        "lotId": "s1.1",
+        "startingMaterialIndices": [
+          0
+        ],
+        "contributingSteps": [
+          1
+        ],
+        "unusedSteps": [],
+        "longestLinearSequence": 1
+      }
+    },
+    "compatibility": {
+      "warnings": [],
+      "unassessedRuleIds": [],
+      "worst": "none"
+    },
+    "selectivity": {
+      "findings": [
+        {
+          "stepNumber": 1,
+          "ruleId": "ester-lah-reduction",
+          "representative": false,
+          "limitations": [],
+          "class": "single-outcome",
+          "alternatives": 1,
+          "basis": "The engine offers one constitutional outcome for these reactants; it was not ranked against alternatives."
+        }
+      ],
+      "counts": {
+        "major": 0,
+        "single-outcome": 1,
+        "disfavored": 0,
+        "unranked": 0,
+        "unassessed": 0
+      }
+    }
+  },
+  "quality": {
+    "assessmentVersion": 1,
+    "structural": "verified",
+    "tier": "chemically-supported",
+    "findings": [
+      {
+        "stepNumber": 1,
+        "code": "documented-reagents",
+        "level": "info",
+        "message": "Uses documented reagents (1) LiAlH₄  2) H₃O⁺) that are not tracked as structural partners (Li, Al, S stay out of the product). Their availability is assumed, not replayed."
+      },
+      {
+        "stepNumber": 1,
+        "code": "selectivity-single-outcome",
+        "level": "support",
+        "message": "The engine offers one constitutional outcome for these reactants; it was not ranked against alternatives."
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:22:57.452Z"
+}

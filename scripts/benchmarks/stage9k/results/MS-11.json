@@ -1,0 +1,650 @@
+{
+  "id": "MS-11",
+  "startedUTC": "2026-11-06T18:22:07.142Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties",
+    "predictMassSpectrum"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "methyl heptanoate",
+      "commonName": null,
+      "displayName": "methyl heptanoate",
+      "namingConfidence": "Medium",
+      "namingStatus": "systematic",
+      "parentChain": "heptane",
+      "parentChainLength": 7,
+      "mainSuffix": "-oate",
+      "prefixes": [],
+      "motifs": [],
+      "explanation": "Parent chain contains 7 carbons. ester chosen as highest-priority functional group.",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ]
+    },
+    "properties": {
+      "molecularFormula": "C8H16O2",
+      "exactMass": "144.1150",
+      "molecularWeight": "144.21",
+      "degreesOfUnsaturation": 1,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 8
+        },
+        {
+          "element": "H",
+          "count": 16
+        },
+        {
+          "element": "O",
+          "count": 2
+        }
+      ],
+      "heavyAtomCount": 10,
+      "hydrogenBondDonors": 0,
+      "hydrogenBondAcceptors": 1,
+      "rotatableBonds": 5,
+      "topologicalPolarSurfaceArea": "26.30",
+      "logP": "2.13",
+      "ringCount": 0,
+      "boilingPointTendency": {
+        "level": "Medium",
+        "score": 4.5,
+        "factors": [
+          "Larger molecular weight raises boiling point.",
+          "Polar functional groups increase dipole-dipole attractions.",
+          "Hydrogen-bond acceptors increase intermolecular attraction."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Low",
+        "score": 1.5,
+        "factors": [
+          "Low TPSA means less polar surface area.",
+          "Moderate logP gives a balance between water and lipid solubility.",
+          "Hydrogen-bond acceptors help the molecule interact with water."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "High",
+        "score": 5.5,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Ester",
+      "priority": 4,
+      "nomenclaturePriority": 4,
+      "confidence": "High",
+      "suffix": "-oate",
+      "prefix": "alkoxycarbonyl",
+      "count": 1,
+      "mcatNote": "Esters are carboxylic acid derivatives. They are common in lipids and can undergo hydrolysis.",
+      "matches": [
+        {
+          "atoms": [
+            6,
+            7,
+            8,
+            9
+          ],
+          "bonds": [
+            6,
+            7,
+            8
+          ]
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            6,
+            7,
+            8
+          ],
+          "bonds": [
+            6,
+            7
+          ]
+        }
+      ],
+      "displaySmarts": "[CX3](=[OX1])[OX2]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Ester",
+        "priority": 4,
+        "nomenclaturePriority": 4,
+        "confidence": "High",
+        "suffix": "-oate",
+        "prefix": "alkoxycarbonyl",
+        "count": 1,
+        "mcatNote": "Esters are carboxylic acid derivatives. They are common in lipids and can undergo hydrolysis.",
+        "matches": [
+          {
+            "atoms": [
+              6,
+              7,
+              8,
+              9
+            ],
+            "bonds": [
+              6,
+              7,
+              8
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              6,
+              7,
+              8
+            ],
+            "bonds": [
+              6,
+              7
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3](=[OX1])[OX2]",
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Ester",
+        "priority": 4,
+        "nomenclaturePriority": 4,
+        "confidence": "High",
+        "suffix": "-oate",
+        "prefix": "alkoxycarbonyl",
+        "count": 1,
+        "mcatNote": "Esters are carboxylic acid derivatives. They are common in lipids and can undergo hydrolysis.",
+        "matches": [
+          {
+            "atoms": [
+              6,
+              7,
+              8,
+              9
+            ],
+            "bonds": [
+              6,
+              7,
+              8
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              6,
+              7,
+              8
+            ],
+            "bonds": [
+              6,
+              7
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3](=[OX1])[OX2]",
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "ms": {
+    "formula": "C8H16O2",
+    "molecularIonMz": 144.115,
+    "nominalMass": 144,
+    "basePeakMz": 113,
+    "basePeakCertainty": "heuristic",
+    "basePeakCandidates": [
+      113,
+      59,
+      74
+    ],
+    "basePeakBasis": "Top ion among several comparable predicted channels; abundances are class-based heuristics.",
+    "peaks": [
+      {
+        "mz": 15,
+        "relativeIntensity": 8,
+        "label": "m/z 15 · O–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the O–C bond forms this charge-retaining fragment and the complementary neutral radical. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity. 2 predicted contributions overlap at this m/z, so their propensities are combined before normalization.",
+        "fragmentSmiles": "[CH3+]",
+        "previewStructure": "[CH3+]",
+        "previewLabel": "m/z 15 · O–C cleavage",
+        "pathwayCount": 2,
+        "contributors": [
+          {
+            "label": "m/z 15 · O–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the O–C bond forms this charge-retaining fragment and the complementary neutral radical. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH3+]"
+          },
+          {
+            "label": "m/z 15 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH3+]"
+          }
+        ],
+        "previewAlternatives": [
+          {
+            "structure": "[CH3+]",
+            "label": "m/z 15 · O–C cleavage"
+          },
+          {
+            "structure": "[CH3+]",
+            "label": "m/z 15 · C–C cleavage"
+          }
+        ],
+        "previewContributorLabels": [
+          "m/z 15 · O–C cleavage",
+          "m/z 15 · C–C cleavage"
+        ]
+      },
+      {
+        "mz": 29,
+        "relativeIntensity": 4.4,
+        "label": "m/z 29 · C–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+        "fragmentSmiles": "[CH2+]C",
+        "previewStructure": "[CH2+]C",
+        "previewLabel": "m/z 29 · C–C cleavage",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 29 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH2+]C"
+          }
+        ]
+      },
+      {
+        "mz": 31,
+        "relativeIntensity": 19.2,
+        "label": "m/z 31 · C–O cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–O bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: charge retention on O. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+        "fragmentSmiles": "C[O+]",
+        "previewStructure": "C[O+]",
+        "previewLabel": "m/z 31 · C–O cleavage",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 31 · C–O cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–O bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: charge retention on O. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "C[O+]"
+          }
+        ]
+      },
+      {
+        "mz": 43,
+        "relativeIntensity": 4.4,
+        "label": "m/z 43 · C–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+        "fragmentSmiles": "[CH2+]CC",
+        "previewStructure": "[CH2+]CC",
+        "previewLabel": "m/z 43 · C–C cleavage",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 43 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH2+]CC"
+          }
+        ]
+      },
+      {
+        "mz": 57,
+        "relativeIntensity": 4.4,
+        "label": "m/z 57 · C–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+        "fragmentSmiles": "[CH2+]CCC",
+        "previewStructure": "[CH2+]CCC",
+        "previewLabel": "m/z 57 · C–C cleavage",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 57 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH2+]CCC"
+          }
+        ]
+      },
+      {
+        "mz": 59,
+        "relativeIntensity": 54.6,
+        "label": "m/z 59 · C–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: secondary carbocation substitution, O lone-pair stabilization adjacent to the charge. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+        "fragmentSmiles": "CO[C+]=O",
+        "previewStructure": "CO[C+]=O",
+        "previewLabel": "m/z 59 · C–C cleavage",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 59 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: secondary carbocation substitution, O lone-pair stabilization adjacent to the charge. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "CO[C+]=O"
+          }
+        ]
+      },
+      {
+        "mz": 71,
+        "relativeIntensity": 5.9,
+        "label": "m/z 71 · C–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+        "fragmentSmiles": "[CH2+]CCCC",
+        "previewStructure": "[CH2+]CCCC",
+        "previewLabel": "m/z 71 · C–C cleavage",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 71 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH2+]CCCC"
+          }
+        ]
+      },
+      {
+        "mz": 73,
+        "relativeIntensity": 15.1,
+        "label": "m/z 73 · C–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution, allylic/conjugative stabilization. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+        "fragmentSmiles": "[CH2+]C(=O)OC",
+        "previewStructure": "[CH2+]C(=O)OC",
+        "previewLabel": "m/z 73 · C–C cleavage",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 73 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution, allylic/conjugative stabilization. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH2+]C(=O)OC"
+          }
+        ]
+      },
+      {
+        "mz": 74,
+        "relativeIntensity": 46,
+        "label": "m/z 74 · McLafferty rearrangement",
+        "kind": "fragment",
+        "explanation": "McLafferty rearrangement: a γ-hydrogen transfers to the carbonyl/nitrile through a six-membered transition state and the Cβ=Cγ alkene is lost, leaving an enol-type radical cation. Its m/z follows from the structure; its abundance is a class-based heuristic, not a calculated value.",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 74 · McLafferty rearrangement",
+            "explanation": "McLafferty rearrangement: a γ-hydrogen transfers to the carbonyl/nitrile through a six-membered transition state and the Cβ=Cγ alkene is lost, leaving an enol-type radical cation. Its m/z follows from the structure; its abundance is a class-based heuristic, not a calculated value."
+          }
+        ]
+      },
+      {
+        "mz": 85,
+        "relativeIntensity": 5,
+        "label": "m/z 85 · C–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+        "fragmentSmiles": "[CH2+]CCCCC",
+        "previewStructure": "[CH2+]CCCCC",
+        "previewLabel": "m/z 85 · C–C cleavage",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 85 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH2+]CCCCC"
+          }
+        ]
+      },
+      {
+        "mz": 87,
+        "relativeIntensity": 4.4,
+        "label": "m/z 87 · C–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+        "fragmentSmiles": "[CH2+]CC(=O)OC",
+        "previewStructure": "[CH2+]CC(=O)OC",
+        "previewLabel": "m/z 87 · C–C cleavage",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 87 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH2+]CC(=O)OC"
+          }
+        ]
+      },
+      {
+        "mz": 101,
+        "relativeIntensity": 4.4,
+        "label": "m/z 101 · C–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+        "fragmentSmiles": "[CH2+]CCC(=O)OC",
+        "previewStructure": "[CH2+]CCC(=O)OC",
+        "previewLabel": "m/z 101 · C–C cleavage",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 101 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH2+]CCC(=O)OC"
+          }
+        ]
+      },
+      {
+        "mz": 113,
+        "relativeIntensity": 100,
+        "label": "m/z 113 · C–O cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–O bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: secondary carbocation substitution, O lone-pair stabilization adjacent to the charge. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity. 2 predicted contributions overlap at this m/z, so their propensities are combined before normalization.",
+        "fragmentSmiles": "CCCCCC[C+]=O",
+        "previewStructure": "CCCCCC[C+]=O",
+        "previewLabel": "m/z 113 · C–O cleavage",
+        "pathwayCount": 2,
+        "contributors": [
+          {
+            "label": "m/z 113 · C–O cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–O bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: secondary carbocation substitution, O lone-pair stabilization adjacent to the charge. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "CCCCCC[C+]=O"
+          },
+          {
+            "label": "m/z 113 · ester acyl cleavage",
+            "explanation": "EI cleavage of the ester C(O)–O bond can retain charge on the acyl side, producing a resonance-stabilized acylium-type ion.",
+            "fragmentSmiles": "CCCCCC[C+]=O"
+          }
+        ],
+        "previewAlternatives": [
+          {
+            "structure": "CCCCCC[C+]=O",
+            "label": "m/z 113 · C–O cleavage"
+          },
+          {
+            "structure": "CCCCCC[C+]=O",
+            "label": "m/z 113 · ester acyl cleavage"
+          }
+        ],
+        "previewContributorLabels": [
+          "m/z 113 · C–O cleavage",
+          "m/z 113 · ester acyl cleavage"
+        ]
+      },
+      {
+        "mz": 115,
+        "relativeIntensity": 4.4,
+        "label": "m/z 115 · C–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+        "fragmentSmiles": "[CH2+]CCCC(=O)OC",
+        "previewStructure": "[CH2+]CCCC(=O)OC",
+        "previewLabel": "m/z 115 · C–C cleavage",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 115 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH2+]CCCC(=O)OC"
+          }
+        ]
+      },
+      {
+        "mz": 129,
+        "relativeIntensity": 18.4,
+        "label": "m/z 129 · O–C cleavage",
+        "kind": "fragment",
+        "explanation": "General EI σ-bond cleavage of the O–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: charge retention on O. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity. 2 predicted contributions overlap at this m/z, so their propensities are combined before normalization.",
+        "fragmentSmiles": "CCCCCCC(=O)[O+]",
+        "previewStructure": "CCCCCCC(=O)[O+]",
+        "previewLabel": "m/z 129 · O–C cleavage",
+        "pathwayCount": 2,
+        "contributors": [
+          {
+            "label": "m/z 129 · O–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the O–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: charge retention on O. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "CCCCCCC(=O)[O+]"
+          },
+          {
+            "label": "m/z 129 · C–C cleavage",
+            "explanation": "General EI σ-bond cleavage of the C–C bond forms this charge-retaining fragment and the complementary neutral radical. Favored features: primary carbocation substitution. Relative abundance is estimated from bond lability, ion stabilization, neutral-radical stability, and pathway multiplicity.",
+            "fragmentSmiles": "[CH2+]CCCCC(=O)OC"
+          }
+        ],
+        "previewAlternatives": [
+          {
+            "structure": "CCCCCCC(=O)[O+]",
+            "label": "m/z 129 · O–C cleavage"
+          },
+          {
+            "structure": "[CH2+]CCCCC(=O)OC",
+            "label": "m/z 129 · C–C cleavage"
+          }
+        ],
+        "previewContributorLabels": [
+          "m/z 129 · O–C cleavage",
+          "m/z 129 · C–C cleavage"
+        ]
+      },
+      {
+        "mz": 144.115,
+        "relativeIntensity": 17.3,
+        "label": "M⁺•",
+        "kind": "molecular-ion",
+        "explanation": "Predicted intact molecular radical cation. The radical/positive charge is generally delocalized, so the preview labels the ion without arbitrarily pinning the charge to one atom.",
+        "previewStructure": "CCCCCCC(=O)OC",
+        "previewLabel": "M⁺•",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "M⁺•",
+            "explanation": "Predicted intact molecular radical cation. The radical/positive charge is generally delocalized, so the preview labels the ion without arbitrarily pinning the charge to one atom."
+          }
+        ]
+      },
+      {
+        "mz": 145.115,
+        "relativeIntensity": 1.5,
+        "label": "M+1",
+        "kind": "isotope",
+        "explanation": "Natural-isotope contribution 1 nominal mass unit above M. The preview shows representative isotopologues that contribute to this same isotope-envelope peak.",
+        "previewStructure": "C[13CH2]CCCCC(=O)OC",
+        "previewLabel": "M+1",
+        "previewContributorLabels": [
+          "one ¹³C",
+          "one ¹⁷O"
+        ],
+        "previewAlternatives": [
+          {
+            "structure": "C[13CH2]CCCCC(=O)OC",
+            "label": "M+1"
+          },
+          {
+            "structure": "C[13CH2]CCCCC(=O)OC",
+            "label": "one ¹³C"
+          },
+          {
+            "structure": "CCCCCCC(=[17O])OC",
+            "label": "one ¹⁷O"
+          }
+        ],
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "M+1",
+            "explanation": "Natural-isotope contribution 1 nominal mass unit above M. The preview shows representative isotopologues that contribute to this same isotope-envelope peak."
+          }
+        ]
+      },
+      {
+        "mz": 146.115,
+        "relativeIntensity": 0.2,
+        "label": "M+2",
+        "kind": "isotope",
+        "explanation": "Natural-isotope contribution 2 nominal mass units above M. The preview shows representative isotopologues that contribute to this same isotope-envelope peak.",
+        "previewStructure": "CCCCCCC(=[18O])OC",
+        "previewLabel": "M+2",
+        "previewContributorLabels": [
+          "one ¹⁸O",
+          "2 × ¹³C"
+        ],
+        "previewAlternatives": [
+          {
+            "structure": "CCCCCCC(=[18O])OC",
+            "label": "M+2"
+          },
+          {
+            "structure": "CCCCCCC(=[18O])OC",
+            "label": "one ¹⁸O"
+          },
+          {
+            "structure": "C[13CH2][13CH2]CCCC(=O)OC",
+            "label": "2 × ¹³C"
+          }
+        ],
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "M+2",
+            "explanation": "Natural-isotope contribution 2 nominal mass units above M. The preview shows representative isotopologues that contribute to this same isotope-envelope peak."
+          }
+        ]
+      }
+    ],
+    "notes": [
+      "Relative abundances are normalized educational EI predictions: the strongest predicted ion is set to 100%. They are not instrument-calibrated/NIST intensities.",
+      "General fragment peaks are generated by graph-level sigma-bond cleavage. Both charge-retaining sides are considered, then scored by bond lability, carbocation/heteroatom/resonance stabilization, complementary-radical stability, and pathway multiplicity.",
+      "Displayed fragment structures are representative ion skeletons; charge/radical localization can be resonance-delocalized in the real gas-phase ion.",
+      "Special diagnostic mechanisms (for example dehydration, carbonyl/ester cleavage, halogen loss, and aromatic ions) are retained as additional competing pathways rather than being the only source of fragments."
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:22:08.881Z"
+}

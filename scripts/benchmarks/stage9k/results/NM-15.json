@@ -1,0 +1,380 @@
+{
+  "id": "NM-15",
+  "startedUTC": "2026-11-06T18:21:47.742Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "3-methoxybenzoic acid",
+      "commonName": null,
+      "displayName": "3-methoxybenzoic acid",
+      "namingConfidence": "High",
+      "namingStatus": "systematic",
+      "parentChain": "benzene",
+      "parentChainLength": 6,
+      "mainSuffix": "-oic acid",
+      "prefixes": [
+        "methoxy"
+      ],
+      "motifs": [
+        "aromatic benzene ring",
+        "anisole / alkoxybenzene motif",
+        "benzoic acid motif"
+      ],
+      "explanation": "Detected benzene-like aromatic ring as the parent structure. carboxylicAcid chosen as highest-priority functional group. Detected 1 substituent(s).",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ]
+    },
+    "properties": {
+      "molecularFormula": "C8H8O3",
+      "exactMass": "152.0473",
+      "molecularWeight": "152.15",
+      "degreesOfUnsaturation": 5,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 8
+        },
+        {
+          "element": "H",
+          "count": 8
+        },
+        {
+          "element": "O",
+          "count": 3
+        }
+      ],
+      "heavyAtomCount": 11,
+      "hydrogenBondDonors": 1,
+      "hydrogenBondAcceptors": 2,
+      "rotatableBonds": 2,
+      "topologicalPolarSurfaceArea": "46.53",
+      "logP": "1.39",
+      "ringCount": 1,
+      "boilingPointTendency": {
+        "level": "Medium",
+        "score": 4,
+        "factors": [
+          "Larger molecular weight raises boiling point.",
+          "Hydrogen-bond donors raise boiling point.",
+          "Hydrogen-bond acceptors increase intermolecular attraction."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Medium",
+        "score": 5,
+        "factors": [
+          "Moderate TPSA increases water interaction.",
+          "Moderate logP gives a balance between water and lipid solubility.",
+          "Hydrogen-bond donors increase water solubility.",
+          "Hydrogen-bond acceptors help the molecule interact with water."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "High",
+        "score": 6,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Benzoic acid",
+      "priority": 1.2,
+      "nomenclaturePriority": 1.2,
+      "confidence": "High",
+      "suffix": "benzoic acid",
+      "prefix": "carboxy",
+      "equivalentNames": [
+        "benzenecarboxylic acid"
+      ],
+      "count": 1,
+      "mcatNote": "Benzoic acid is an aromatic carboxylic acid with a carboxyl group directly attached to a benzene ring: Ph-CO2H.",
+      "matches": [
+        {
+          "atoms": [
+            5,
+            4,
+            3,
+            2,
+            7,
+            6,
+            8,
+            9,
+            10
+          ],
+          "bonds": [
+            4,
+            3,
+            2,
+            10,
+            6,
+            7,
+            8,
+            9,
+            5
+          ]
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            6,
+            8,
+            9,
+            10
+          ],
+          "bonds": [
+            7,
+            8,
+            9
+          ]
+        }
+      ],
+      "displaySmarts": "[cR1][CX3](=[OX1])[OX2H1]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Benzoic acid",
+        "priority": 1.2,
+        "nomenclaturePriority": 1.2,
+        "confidence": "High",
+        "suffix": "benzoic acid",
+        "prefix": "carboxy",
+        "equivalentNames": [
+          "benzenecarboxylic acid"
+        ],
+        "count": 1,
+        "mcatNote": "Benzoic acid is an aromatic carboxylic acid with a carboxyl group directly attached to a benzene ring: Ph-CO2H.",
+        "matches": [
+          {
+            "atoms": [
+              5,
+              4,
+              3,
+              2,
+              7,
+              6,
+              8,
+              9,
+              10
+            ],
+            "bonds": [
+              4,
+              3,
+              2,
+              10,
+              6,
+              7,
+              8,
+              9,
+              5
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              6,
+              8,
+              9,
+              10
+            ],
+            "bonds": [
+              7,
+              8,
+              9
+            ]
+          }
+        ],
+        "displaySmarts": "[cR1][CX3](=[OX1])[OX2H1]",
+        "category": "functionalGroup"
+      },
+      {
+        "name": "Anisole",
+        "priority": 19.4,
+        "nomenclaturePriority": 15.05,
+        "confidence": "High",
+        "suffix": "Never suffix",
+        "prefix": "methoxy",
+        "equivalentNames": [
+          "methoxybenzene"
+        ],
+        "count": 1,
+        "mcatNote": "Anisole is methoxybenzene, containing a methoxy group directly attached to a benzene ring.",
+        "matches": [
+          {
+            "atoms": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              2,
+              1,
+              0
+            ],
+            "bonds": [
+              3,
+              4,
+              5,
+              6,
+              10,
+              1,
+              0,
+              2
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              2,
+              1,
+              0
+            ],
+            "bonds": [
+              1,
+              0
+            ]
+          }
+        ],
+        "displaySmarts": "[cR1][OX2][CH3]",
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Benzoic acid",
+        "priority": 1.2,
+        "nomenclaturePriority": 1.2,
+        "confidence": "High",
+        "suffix": "benzoic acid",
+        "prefix": "carboxy",
+        "equivalentNames": [
+          "benzenecarboxylic acid"
+        ],
+        "count": 1,
+        "mcatNote": "Benzoic acid is an aromatic carboxylic acid with a carboxyl group directly attached to a benzene ring: Ph-CO2H.",
+        "matches": [
+          {
+            "atoms": [
+              5,
+              4,
+              3,
+              2,
+              7,
+              6,
+              8,
+              9,
+              10
+            ],
+            "bonds": [
+              4,
+              3,
+              2,
+              10,
+              6,
+              7,
+              8,
+              9,
+              5
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              6,
+              8,
+              9,
+              10
+            ],
+            "bonds": [
+              7,
+              8,
+              9
+            ]
+          }
+        ],
+        "displaySmarts": "[cR1][CX3](=[OX1])[OX2H1]",
+        "category": "functionalGroup"
+      },
+      {
+        "name": "Anisole",
+        "priority": 19.4,
+        "nomenclaturePriority": 15.05,
+        "confidence": "High",
+        "suffix": "Never suffix",
+        "prefix": "methoxy",
+        "equivalentNames": [
+          "methoxybenzene"
+        ],
+        "count": 1,
+        "mcatNote": "Anisole is methoxybenzene, containing a methoxy group directly attached to a benzene ring.",
+        "matches": [
+          {
+            "atoms": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              2,
+              1,
+              0
+            ],
+            "bonds": [
+              3,
+              4,
+              5,
+              6,
+              10,
+              1,
+              0,
+              2
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              2,
+              1,
+              0
+            ],
+            "bonds": [
+              1,
+              0
+            ]
+          }
+        ],
+        "displaySmarts": "[cR1][OX2][CH3]",
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:21:49.093Z"
+}
