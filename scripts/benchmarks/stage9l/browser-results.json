@@ -1,0 +1,37 @@
+[
+  {
+    "name": "unranked candidates display abundance uncertainty",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "development fragment m/z 70 appears with composition",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "base peak remains explicitly unreliable",
+    "ok": true,
+    "detail": "MOLECULAR ION\n172.1827\nNOMINAL MASS\n172\nPREDICTED BASE PEAK (UNRELIABLE)\n31 candidates: 31, 154, 17"
+  },
+  {
+    "name": "reload restores candidates without recomputation",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "hydrogenation card shows syn mechanism and scope",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "meso hydrogenation product is not labelled racemic",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "no uncaught browser exceptions",
+    "ok": true,
+    "detail": ""
+  }
+]

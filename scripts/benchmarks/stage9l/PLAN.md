@@ -18,25 +18,25 @@ fragment coverage and explicit reagent metadata. Intensities remain heuristic.
 
 ## Tasks (test first, then implement, validate, commit)
 
-- [ ] A: Independently read reports/raw evidence; classify every reported issue;
+- [x] A: Independently read reports/raw evidence; classify every reported issue;
   capture read-only historical hashes and reproduce arithmetic without predictions.
-- [ ] B: Add Stage 9L name comparator preserving descriptor/locant pairs and
+- [x] B: Add Stage 9L name comparator preserving descriptor/locant pairs and
   rejecting contradictory relative labels. Use RDKit identity when supplied
   independently resolved structures; test R/S, E/Z, meso, symmetry, mixtures,
   unspecified stereo and alternate SMILES. Exercise existing production target,
   reaction and saved-result semantics; change production only for proven defects.
-- [ ] C: Trace sigma cleavage, diagnostic channels, rearrangements, merging and
+- [x] C: Trace sigma cleavage, diagnostic channels, rearrangements, merging and
   ranking. Add graph-derived secondary fragmentation/ring channels only with
   mass/charge bookkeeping and mechanism support. Test homologues, negative scope,
   fragment previews and normalization. Record improvements as development evidence.
-- [ ] D: Replace arbitrary English element inference with explicit source
+- [x] D: Replace arbitrary English element inference with explicit source
   metadata and conservative complete chemical-token parsing for legacy rules.
   Test legitimate reagents and misleading prose; distinguish replay, bookkeeping
   and chemical findings in a new saved-record reporting utility.
-- [ ] E: Connect hydrogenation to existing syn machinery if atom mapping and
+- [x] E: Connect hydrogenation to existing syn machinery if atom mapping and
   tests support it; otherwise report explicit stereo limitations. Preserve
   existing centers and avoid assigning an unsupported face preference.
-- [ ] F: Run focused checks, full tests, build, lint, offline-data checks and
+- [x] F: Run focused checks, full tests, build, lint, offline-data checks and
   historical integrity verification. Review changes and record limits/handoff.
 
 ## Review focus
@@ -57,3 +57,17 @@ English prose cannot authorize atoms in products; missing metadata stays explici
   add a versioned Stage 9L comparator rather than silently rewrite old scoring.
 - Audit confirms 9K does not demonstrate a production name-generator failure:
   descriptor/locant loss occurs in Stage 9J's benchmark-only comparator.
+- Ruling: missing abundance evidence is represented by separate unranked
+  fragment compositions, never invented chart intensities or base-peak gains.
+- Fresh review caught source-order-dependent parity, missing face-mixture
+  metadata, partial-stereo purity claims, radical H bookkeeping, phenyl H
+  containment and donor-metadata gaps. Focused failing tests were added and all
+  fixes checked; final reviewer found no remaining important defects.
+- Ruling: new H2 coverage is bounded to fully mapped, saturated, nonfused 5–7
+  member ring paths. Other configurations retain an explicit limitation.
+- Ruling: when reagent syntax is wholly unresolved, unknown sourcing is
+  incomplete rather than a claimed chemical contradiction. Explicit source
+  metadata remains authoritative; prose and saved labels supply no atoms.
+- Final full suite is retained even though three estragole deadline assertions
+  failed. No time budget, deadline or assertion was relaxed; an isolated check
+  and starting-source comparison diagnose the remaining limit.

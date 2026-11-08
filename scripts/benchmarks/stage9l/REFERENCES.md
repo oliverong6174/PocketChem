@@ -13,7 +13,7 @@
   The paper's assignments include HCN and N2 losses and secondary H loss.
   Its 100 eV abundance table is not a quantitative model for other EI conditions.
   [Accessible author-paper copy](https://www.academia.edu/48165257/Electron_impact_ionization_and_cationic_fragmentation_of_the_pyridazine_molecules).
-- Wang et al., [QCEIMS study of purines and pyrimidines](https://pmc.ncbi.nlm.nih.gov/articles/PMC8779335/):
+- [QCEIMS study of purines and pyrimidines](https://pmc.ncbi.nlm.nih.gov/articles/PMC8779335/):
   EI HCN losses and limitations of computational fragment/abundance prediction.
 - [Fingerprinting pyridine/benzonitrile fragments](https://pmc.ncbi.nlm.nih.gov/articles/PMC10510038/):
   direct ion spectroscopy and theory distinguish nominal-loss assignments from

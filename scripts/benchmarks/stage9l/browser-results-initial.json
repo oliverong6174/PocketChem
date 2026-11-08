@@ -1,0 +1,22 @@
+[
+  {
+    "name": "unranked candidates display abundance uncertainty",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "development fragment m/z 70 appears with composition",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "base peak remains explicitly unreliable",
+    "ok": false,
+    "detail": ""
+  },
+  {
+    "name": "browser harness",
+    "ok": false,
+    "detail": "Error: Timed out: restored saved workspace"
+  }
+]
