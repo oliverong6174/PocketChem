@@ -13,6 +13,8 @@ if(raw.some(r=>r.record.error||r.exitCode!==0||r.timedOut))throw Error('Executio
 const diagnostics=read('results/diagnostics.json');if(diagnostics.rawFileMismatches.length||diagnostics.scoreMismatches.length)throw Error('Score/raw discrepancy');
 const status=git('status','--short');
 if(process.argv.includes('--delivery')){
+  const tracked=new Set(git('ls-files','-z','--','scripts/benchmarks/stage9k').split('\0'));
+  for(const f of Object.keys(read('EVIDENCE-HASHES.json')))if(!tracked.has('scripts/benchmarks/stage9k/'+f))throw Error('Evidence not committed: '+f);
   const expected=['?? CLAUDE.md','?? scripts/browser/stage9fLiveCheck.mjs','?? stage5-changes.patch','?? stage5-status.txt'];
   if(JSON.stringify(status.split('\n').sort())!==JSON.stringify(expected.sort()))throw Error('Unexpected final Git status: '+status);
   if(git('diff','--cached','--name-only'))throw Error('Unexpected staged changes');
