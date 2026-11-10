@@ -3,6 +3,11 @@ import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
 import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./SavedAnalysisControls";
 import { ChairDrawing, EnergyGraph, NewmanDrawing, SawhorseDrawing, StructureMap } from "./conformations/views";
+import { easeInOut, morphConformer, prefersReducedMotion } from "./conformations/morph";
+import { Badge, Callout, DiagramFrame, Disclosure, EmptyState, EvidenceBadge, Explanation, Legend, Panel } from "./ui/primitives";
+import { LearningModeSwitch } from "./ui/LearningModeSwitch";
+import { Icon } from "./ui/Icon";
+import "../styles/conformations.css";
 import { getRDKit } from "../utils/rdkit";
 import { readKetcherStructureSnapshot } from "../utils/ketcherSnapshot";
 import { buildConformationGraph, type ConformationGraph, type RdKitLike } from "../utils/conformations/graph";
@@ -13,6 +18,7 @@ import {
   describeChairAvailability,
   findChairCandidates,
   type ChairAnalysis,
+  type ChairConformer,
   type ChairModel,
   type FaceChoices,
 } from "../utils/conformations/chair";
@@ -116,6 +122,8 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
   const [showDiaxial, setShowDiaxial] = useState(true);
   const [showIndices, setShowIndices] = useState(false);
   const [practice, setPractice] = useState(false);
+  const [morph, setMorph] = useState<{ from: ChairConformer; to: ChairConformer; t: number } | null>(null);
+  const morphFrame = useRef<number | null>(null);
   const [answers, setAnswers] = useState<Record<string, { choice: number | null; revealed: boolean }>>({});
   const [notices, setNotices] = useState<WorkspaceNoticeItem[]>([]);
   const [saved, setSaved] = useState<Saved | null>(null);
@@ -254,7 +262,34 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
 
   // ---- state mutations ------------------------------------------------------------------------
   const setMode = (mode: ConformationsMode) => setState((current) => ({ ...current, mode }));
-  const flipChair = () => setState((current) => ({ ...current, chair: { ...current.chair, flipped: !current.chair.flipped } }));
+  const commitFlip = () => setState((current) => ({ ...current, chair: { ...current.chair, flipped: !current.chair.flipped } }));
+  // The flip itself is instant state (shared with undo, save and the stability panel); the animation only
+  // eases between the two computed chairs and is skipped for people who prefer reduced motion.
+  const flipChair = () => {
+    if (morph) return;
+    if (!chairModel || !chairAnalysis || prefersReducedMotion()) {
+      commitFlip();
+      return;
+    }
+    const from = buildConformer(chairModel, state.chair.flipped);
+    const to = buildConformer(chairModel, !state.chair.flipped);
+    const started = performance.now();
+    const duration = 560;
+    const step = (now: number) => {
+      const raw = Math.min(1, (now - started) / duration);
+      if (raw >= 1) {
+        morphFrame.current = null;
+        setMorph(null);
+        commitFlip();
+        return;
+      }
+      setMorph({ from, to, t: easeInOut(raw) });
+      morphFrame.current = requestAnimationFrame(step);
+    };
+    setMorph({ from, to, t: 0 });
+    morphFrame.current = requestAnimationFrame(step);
+  };
+  useEffect(() => () => { if (morphFrame.current !== null) cancelAnimationFrame(morphFrame.current); }, []);
   const setRotation = (value: number, coalesce = "rotate") => setState((current) => ({ ...current, torsion: { ...current.torsion, rotation: wrap180(value) } }), coalesce);
   const chooseBond = (a: number, b: number) => setState((current) => ({ ...current, torsion: { ...current.torsion, front: a, rear: b, frontRef: null, rearRef: null } }));
   const chooseRing = (ring: number[]) => setState((current) => ({ ...current, chair: { ring, flipped: false, choices: {} } }));
@@ -523,6 +558,7 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
 
   const torsionView = state.mode === "newman" || state.mode === "sawhorse";
   const hideAnswers = practice;
+  const correctCount = questions.filter((question) => { const entry = answers[`${question.id}|${signature}`]; return entry?.revealed && entry.choice === question.correct; }).length;
 
   return (
     <div className="conf-page">
@@ -577,21 +613,24 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
       )}
 
       {!graph ? (
-        <section className="card conf-empty">
-          <p>{graphResult && !graphResult.ok ? graphResult.message : "Load a molecule above to analyse its conformations. Try an example, or draw a cyclohexane or a chain such as butane."}</p>
-        </section>
+        <EmptyState icon="conformations" title="No molecule loaded yet">
+          {graphResult && !graphResult.ok ? graphResult.message : "Load a molecule above to analyse its conformations. Try an example, or draw a cyclohexane or a chain such as butane."}
+        </EmptyState>
       ) : (
-        <section className="card conf-main">
+        <section className="conf-main" aria-label="Conformational analysis">
           <div className="conf-toolbar">
             <div className="conf-tabs" role="tablist" aria-label="Projection type">
               {([["chair", "Chair"], ["newman", "Newman"], ["sawhorse", "Sawhorse"]] as Array<[ConformationsMode, string]>).map(([id, label]) => (
                 <button key={id} role="tab" aria-selected={state.mode === id} className={state.mode === id ? "conf-tab active" : "conf-tab"} type="button" onClick={() => setMode(id)}>{label}</button>
               ))}
             </div>
+            <LearningModeSwitch
+              mode={practice ? "practice" : "explore"}
+              onChange={(next) => { setPractice(next === "practice"); setAnswers({}); }}
+            />
             <div className="conf-toolbar-actions">
-              <button className="secondary-button" type="button" onClick={undo} disabled={history.length === 0}>Undo</button>
-              <button className="secondary-button" type="button" onClick={reset}>Reset view</button>
-              <label className="conf-toggle"><input type="checkbox" checked={practice} onChange={(event) => { setPractice(event.target.checked); setAnswers({}); }} /> Practice mode</label>
+              <button className="ghost-button" type="button" onClick={undo} disabled={history.length === 0}>Undo</button>
+              <button className="ghost-button" type="button" onClick={reset}>Reset view</button>
               <button className="secondary-button" type="button" disabled={!liveResults} onClick={() => { setSaveMessage(null); setSaveForm({ name: defaultAnalysisName() }); }}>Save Analysis</button>
             </div>
           </div>
@@ -604,19 +643,20 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
               onSubmit={() => { void saveCurrentAnalysis(saveForm.name).then((ok) => { if (ok) setSaveForm(null); }); }}
             />
           )}
-          <p className="conf-molecule">Molecule: <code>{graph.smiles}</code>{graph.coordsSource === "generated" ? "" : " · drawing coordinates from the editor"}</p>
+          <p className="conf-molecule">
+            <span>Molecule: <code>{graph.smiles}</code>{graph.coordsSource === "generated" ? "" : " · drawing coordinates from the editor"}</span>
+            <EvidenceBadge level="model" />
+          </p>
 
           {state.mode === "chair" && (
             <div className="conf-grid">
               <div className="conf-visual">
                 {!activeRing ? (
-                  <div className="conf-unavailable" role="status">
-                    <strong>No chair analysis for this molecule.</strong>
+                  <Callout tone="warn" title="No chair analysis for this molecule.">
                     <p>{describeChairAvailability(graph)}</p>
-                  </div>
+                  </Callout>
                 ) : chairModel?.status === "needs-choice" ? (
-                  <div className="conf-unavailable" role="status">
-                    <strong>The input does not say which substituents are on the same face of the ring.</strong>
+                  <Callout tone="warn" title="The input does not say which substituents are on the same face of the ring.">
                     <p>PocketChem will not guess. Choose the arrangement below (or enter stereochemistry in the SMILES / draw wedge bonds) to see the chairs.</p>
                     {chairModel.unresolved.map((atom) => {
                       const slot = chairModel.slots.find((s) => s.ringAtom === atom && !s.isHydrogen);
@@ -630,30 +670,48 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
                         </div>
                       );
                     })}
-                  </div>
+                  </Callout>
                 ) : chairModel && chairAnalysis ? (
-                  <>
-                    <h3 className="conf-view-title">{state.chair.flipped ? "Chair B" : "Chair A"}</h3>
-                    <ChairDrawing graph={graph} model={chairModel} conformer={buildConformer(chairModel, state.chair.flipped)} showHydrogens={showHydrogens} showDiaxial={showDiaxial} hideLabels={hideAnswers} showIndices={showIndices} />
-                    <div className="conf-controls">
-                      <button className="primary-button" type="button" onClick={flipChair}>Flip chair</button>
-                      <label className="conf-toggle"><input type="checkbox" checked={showHydrogens} onChange={(e) => setShowHydrogens(e.target.checked)} /> Hydrogens</label>
-                      <label className="conf-toggle"><input type="checkbox" checked={showDiaxial} onChange={(e) => setShowDiaxial(e.target.checked)} disabled={hideAnswers} /> 1,3-diaxial contacts</label>
-                      <label className="conf-toggle"><input type="checkbox" checked={showIndices} onChange={(e) => setShowIndices(e.target.checked)} /> Atom numbers</label>
-                    </div>
-                    {!hideAnswers && <ChairLegend />}
-                  </>
+                  <DiagramFrame
+                    title={<span className="conf-view-title">{morph ? `${morph.from.label} → ${morph.to.label}` : state.chair.flipped ? "Chair B" : "Chair A"}</span>}
+                    toolbar={
+                      <button className="primary-button conf-flip" type="button" onClick={flipChair} disabled={morph !== null}>
+                        <Icon name="flip" size={18} /> Flip chair
+                      </button>
+                    }
+                    legend={hideAnswers ? undefined : <ChairLegend />}
+                    caption={morph ? "Animating between the two computed chairs. The path between them is not modelled, so no axial or equatorial labels are drawn until it finishes." : undefined}
+                    label="Cyclohexane chair"
+                  >
+                    <ChairDrawing
+                      graph={graph}
+                      model={chairModel}
+                      conformer={morph ? morphConformer(morph.from, morph.to, morph.t) : buildConformer(chairModel, state.chair.flipped)}
+                      showHydrogens={showHydrogens}
+                      showDiaxial={showDiaxial && !morph}
+                      hideLabels={hideAnswers || morph !== null}
+                      showIndices={showIndices}
+                    />
+                  </DiagramFrame>
                 ) : null}
-              </div>
-              <div className="conf-side">
-                {candidates.length > 0 && (
-                  <div className="conf-block">
-                    <h3>Ring</h3>
-                    <StructureMap graph={graph} mode="ring" rotatable={rotatable} selectedBond={null} frontAtom={null} rings={candidates} selectedRing={activeRing} showIndices={showIndices} onPickBond={() => undefined} onPickRing={chooseRing} />
-                    {candidates.filter((c) => !c.eligible).map((c) => <p key={c.ring.join("-")} className="conf-warn">Ring {c.ring.join("–")}: {c.eligible ? "" : c.reason}</p>)}
+                {chairModel && chairAnalysis && (
+                  <div className="conf-controls" role="group" aria-label="Chair display options">
+                    <label className="conf-toggle"><input type="checkbox" checked={showHydrogens} onChange={(e) => setShowHydrogens(e.target.checked)} /> Hydrogens</label>
+                    <label className="conf-toggle"><input type="checkbox" checked={showDiaxial} onChange={(e) => setShowDiaxial(e.target.checked)} disabled={hideAnswers} /> 1,3-diaxial contacts</label>
+                    <label className="conf-toggle"><input type="checkbox" checked={showIndices} onChange={(e) => setShowIndices(e.target.checked)} /> Atom numbers</label>
                   </div>
                 )}
+              </div>
+              <div className="conf-side">
                 {chairModel && chairAnalysis && <ChairStability model={chairModel} analysis={chairAnalysis} showing={state.chair.flipped ? "B" : "A"} hidden={hideAnswers} />}
+                {candidates.length > 0 && (
+                  <Panel className="conf-block" title="Ring" subtitle="Choose the ring to analyse.">
+                    <DiagramFrame label="Structure map">
+                      <StructureMap graph={graph} mode="ring" rotatable={rotatable} selectedBond={null} frontAtom={null} rings={candidates} selectedRing={activeRing} showIndices={showIndices} onPickBond={() => undefined} onPickRing={chooseRing} />
+                    </DiagramFrame>
+                    {candidates.filter((c) => !c.eligible).map((c) => <Callout key={c.ring.join("-")} tone="warn">Ring {c.ring.join("–")}: {c.eligible ? "" : c.reason}</Callout>)}
+                  </Panel>
+                )}
               </div>
             </div>
           )}
@@ -662,47 +720,64 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
             <div className="conf-grid">
               <div className="conf-visual">
                 {!setup || !newman || !sawhorse || !cls ? (
-                  <div className="conf-unavailable" role="status">
-                    <strong>{bondCheck && !bondCheck.ok ? "This bond cannot be shown as a rotation." : "Choose a bond to view along."}</strong>
+                  <Callout tone="warn" title={bondCheck && !bondCheck.ok ? "This bond cannot be shown as a rotation." : "Choose a bond to view along."}>
                     <p>{bondCheck && !bondCheck.ok ? bondCheck.reason : "Click an eligible single bond in the structure (or pick it from the list). Double, triple, aromatic and ring bonds are not offered because they do not rotate freely."}</p>
-                  </div>
+                  </Callout>
                 ) : (
                   <>
                     <div className="conf-pair">
-                      <div className="conf-pair-main">
-                        <h3 className="conf-view-title">{state.mode === "newman" ? "Newman projection" : "Sawhorse projection"}</h3>
+                      <DiagramFrame
+                        title={<span className="conf-view-title">{state.mode === "newman" ? "Newman projection" : "Sawhorse projection"}</span>}
+                        toolbar={<span className="conf-dihedral-chip" aria-hidden="true">{Math.round(wrap360(rotation))}°</span>}
+                        legend={state.mode === "newman" ? <NewmanLegend /> : undefined}
+                        label={state.mode === "newman" ? "Newman projection" : "Sawhorse projection"}
+                      >
                         {state.mode === "newman"
                           ? <NewmanDrawing diagram={newman} setup={setup} onRotate={(value) => setRotation(value - 0, "drag")} onPickRef={pickReference} />
                           : <SawhorseDrawing diagram={sawhorse} setup={setup} />}
-                      </div>
-                      <div className="conf-pair-aside">
-                        <h4 className="conf-view-title">{state.mode === "newman" ? "Same conformation, sawhorse" : "Same conformation, Newman"}</h4>
+                      </DiagramFrame>
+                      <DiagramFrame
+                        title={<span className="conf-view-title conf-view-title-aside">{state.mode === "newman" ? "Same conformation, sawhorse" : "Same conformation, Newman"}</span>}
+                        label="Companion projection"
+                      >
                         {state.mode === "newman"
                           ? <SawhorseDrawing diagram={sawhorse} setup={setup} compact />
                           : <NewmanDrawing diagram={newman} setup={setup} onRotate={() => undefined} onPickRef={pickReference} compact />}
+                      </DiagramFrame>
+                    </div>
+                    <Panel className="conf-controls-panel">
+                      <div className="conf-rotation">
+                        <div className="conf-rotation-head">
+                          <label htmlFor="conf-rotation">Rotate the rear carbon</label>
+                          <output aria-live="polite" htmlFor="conf-rotation">{Math.round(wrap360(rotation))}°</output>
+                        </div>
+                        <input id="conf-rotation" type="range" min={0} max={360} step={1} list="conf-rotation-ticks" value={Math.round(wrap360(rotation))} onChange={(event) => setRotation(Number(event.target.value))} aria-valuetext={`${Math.round(wrap360(rotation))} degrees`} />
+                        <datalist id="conf-rotation-ticks">{[0, 60, 120, 180, 240, 300, 360].map((tick) => <option key={tick} value={tick} />)}</datalist>
+                        <div className="conf-rotation-scale" aria-hidden="true">
+                          {[0, 60, 120, 180, 240, 300, 360].map((tick) => <span key={tick}>{tick}°</span>)}
+                        </div>
                       </div>
-                    </div>
-                    <div className="conf-rotation">
-                      <label htmlFor="conf-rotation">Rotate the rear carbon</label>
-                      <input id="conf-rotation" type="range" min={0} max={360} step={1} value={Math.round(wrap360(rotation))} onChange={(event) => setRotation(Number(event.target.value))} aria-valuetext={`${Math.round(wrap360(rotation))} degrees`} />
-                      <output aria-live="polite">{Math.round(wrap360(rotation))}°</output>
-                    </div>
-                    <div className="conf-controls">
-                      <button className="secondary-button" type="button" onClick={() => setRotation(rotation - 60, "step")}>−60°</button>
-                      <button className="secondary-button" type="button" onClick={() => setRotation(rotation + 60, "step")}>+60°</button>
-                      <button className="secondary-button" type="button" onClick={() => snapTo("staggered")}>Snap to staggered</button>
-                      <button className="secondary-button" type="button" onClick={() => snapTo("eclipsed")}>Snap to eclipsed</button>
-                      <button className="secondary-button" type="button" onClick={viewFromOtherEnd}>View from the other end</button>
-                    </div>
-                    <p className="conf-hint">Drag around the Newman circle, drag on the graph, or use the slider. Click a substituent to make it the reference group for the dihedral angle. Viewing along {graph.atoms[setup.front.atom].symbol}{setup.front.atom} → {graph.atoms[setup.rear.atom].symbol}{setup.rear.atom}: the front carbon is the one nearer the viewer.</p>
-                    {setup.warnings.map((warning) => <p key={warning} className="conf-warn">{warning}</p>)}
+                      <div className="conf-controls">
+                        <button className="secondary-button" type="button" onClick={() => setRotation(rotation - 60, "step")}>−60°</button>
+                        <button className="secondary-button" type="button" onClick={() => setRotation(rotation + 60, "step")}>+60°</button>
+                        <button className="secondary-button" type="button" onClick={() => snapTo("staggered")}>Snap to staggered</button>
+                        <button className="secondary-button" type="button" onClick={() => snapTo("eclipsed")}>Snap to eclipsed</button>
+                        <button className="ghost-button" type="button" onClick={viewFromOtherEnd}>View from the other end</button>
+                      </div>
+                      <p className="conf-hint">Drag around the Newman circle (arrow keys also turn it), drag on the graph, or use the slider. Click a substituent to make it the reference group for the dihedral angle. Viewing along {graph.atoms[setup.front.atom].symbol}{setup.front.atom} → {graph.atoms[setup.rear.atom].symbol}{setup.rear.atom}: the front carbon is the one nearer the viewer.</p>
+                    </Panel>
+                    {setup.warnings.map((warning) => <Callout key={warning} tone="warn">{warning}</Callout>)}
                   </>
                 )}
               </div>
               <div className="conf-side">
-                <div className="conf-block">
-                  <h3>Bond</h3>
-                  <StructureMap graph={graph} mode="bond" rotatable={rotatable} selectedBond={state.torsion.front !== null && state.torsion.rear !== null ? [state.torsion.front, state.torsion.rear] : null} frontAtom={state.torsion.front} rings={[]} selectedRing={null} showIndices={showIndices} onPickBond={(bond) => chooseBond(bond.a, bond.b)} onPickRing={() => undefined} />
+                {setup && cls && qualitative && (
+                  <TorsionAssessment graph={graph} setup={setup} rotation={rotation} cls={cls} energyAbs={energyAbs} energyRel={energyRel} qualitative={qualitative} hidden={hideAnswers} />
+                )}
+                <Panel className="conf-block" title="Bond" subtitle="Click a bond in the structure to view along it.">
+                  <DiagramFrame label="Structure map">
+                    <StructureMap graph={graph} mode="bond" rotatable={rotatable} selectedBond={state.torsion.front !== null && state.torsion.rear !== null ? [state.torsion.front, state.torsion.rear] : null} frontAtom={state.torsion.front} rings={[]} selectedRing={null} showIndices={showIndices} onPickBond={(bond) => chooseBond(bond.a, bond.b)} onPickRing={() => undefined} />
+                  </DiagramFrame>
                   <label className="conf-toggle"><input type="checkbox" checked={showIndices} onChange={(e) => setShowIndices(e.target.checked)} /> Atom numbers</label>
                   <label className="conf-select">Or pick a bond
                     <select value={state.torsion.front !== null && state.torsion.rear !== null ? `${state.torsion.front}-${state.torsion.rear}` : ""} onChange={(event) => { const [a, b] = event.target.value.split("-").map(Number); if (Number.isInteger(a) && Number.isInteger(b)) chooseBond(a, b); }}>
@@ -712,21 +787,40 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
                       ))}
                     </select>
                   </label>
-                </div>
-                {setup && cls && qualitative && (
-                  <TorsionAssessment graph={graph} setup={setup} rotation={rotation} cls={cls} energyAbs={energyAbs} energyRel={energyRel} qualitative={qualitative} hidden={hideAnswers} />
-                )}
+                </Panel>
               </div>
               {profile && setup && (
                 <div className="conf-graph-wrap">
-                  <h3>Strain energy against dihedral angle</h3>
                   {profile.supported ? (
-                    <>
-                      <EnergyGraph profile={profile} rotation={rotation} onRotate={(angle) => setRotation(angle, "graph")} />
-                      <p className="conf-hint">Energies are relative to the lowest conformation of this bond. {ENERGY_MODEL.description}</p>
-                    </>
+                    <DiagramFrame
+                      title="Strain energy against dihedral angle"
+                      toolbar={<Badge tone="estimate" icon="warning" title="Teaching model: textbook increments, not a calculation.">Teaching model</Badge>}
+                      legend={<Legend label="Graph legend" items={[
+                        { label: "strain curve", color: "var(--draw-curve)", kind: "line" },
+                        { label: "energy minimum", color: "var(--draw-min)" },
+                        { label: "energy maximum", color: "var(--draw-max)" },
+                        { label: "current rotation", color: "var(--draw-select)", kind: "dashed" },
+                      ]} />}
+                      caption={<>Energies are relative to the lowest conformation of this bond. {ENERGY_MODEL.description}</>}
+                      label="Strain energy graph"
+                    >
+                      <div className="conf-graph-host">
+                        <EnergyGraph profile={profile} rotation={rotation} onRotate={(angle) => setRotation(angle, "graph")} />
+                      </div>
+                      <table className="conf-table conf-feature-table">
+                        <caption className="visually-hidden">Marked conformations on the strain curve</caption>
+                        <thead><tr><th scope="col">Angle</th><th scope="col">Conformation</th><th scope="col">Strain (kJ/mol)</th></tr></thead>
+                        <tbody>
+                          {profile.features.map((feature) => (
+                            <tr key={`${feature.kind}-${feature.angle}`}><td>{feature.angle}°</td><td>{feature.name} <span className="conf-feature-kind">({feature.kind})</span></td><td>{fmt(feature.kJ)}</td></tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </DiagramFrame>
                   ) : (
-                    <p className="conf-unavailable-inline">{profile.reason} No energy curve is drawn rather than inventing one.</p>
+                    <Callout tone="info" title="No energy curve for this bond.">
+                      <p>{profile.reason} No energy curve is drawn rather than inventing one.</p>
+                    </Callout>
                   )}
                 </div>
               )}
@@ -734,42 +828,47 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
           )}
 
           {practice && questions.length > 0 && (
-            <div className="conf-practice" role="region" aria-label="Practice questions">
-              <h3>Practice</h3>
-              {questions.map((question) => {
-                const key = `${question.id}|${signature}`;
-                const entry = answers[key] ?? { choice: null, revealed: false };
-                return (
-                  <fieldset key={key} className="conf-question">
-                    <legend>{question.prompt}</legend>
-                    {question.choices.map((choice, index) => (
-                      <label key={choice} className="conf-radio">
-                        <input type="radio" name={key} checked={entry.choice === index} onChange={() => setAnswers((current) => ({ ...current, [key]: { choice: index, revealed: false } }))} /> {choice}
-                      </label>
-                    ))}
-                    <button className="secondary-button" type="button" disabled={entry.choice === null} onClick={() => setAnswers((current) => ({ ...current, [key]: { ...entry, revealed: true } }))}>Check answer</button>
-                    {entry.revealed && (
-                      <p className={entry.choice === question.correct ? "conf-correct" : "conf-incorrect"} role="status">
-                        {entry.choice === question.correct ? "Correct. " : `Not quite: the answer is ${question.choices[question.correct]}. `}{question.explanation}
-                      </p>
-                    )}
-                  </fieldset>
-                );
-              })}
-            </div>
+            <Panel className="conf-practice" title="Practice" subtitle={`${correctCount} of ${questions.length} answered correctly`}>
+              <div role="region" aria-label="Practice questions" className="conf-questions">
+                {questions.map((question) => {
+                  const key = `${question.id}|${signature}`;
+                  const entry = answers[key] ?? { choice: null, revealed: false };
+                  return (
+                    <fieldset key={key} className="conf-question">
+                      <legend>{question.prompt}</legend>
+                      {question.choices.map((choice, index) => (
+                        <label key={choice} className={`conf-radio${entry.choice === index ? " is-chosen" : ""}`}>
+                          <input type="radio" name={key} checked={entry.choice === index} onChange={() => setAnswers((current) => ({ ...current, [key]: { choice: index, revealed: false } }))} /> {choice}
+                        </label>
+                      ))}
+                      <div>
+                        <button className="secondary-button" type="button" disabled={entry.choice === null} onClick={() => setAnswers((current) => ({ ...current, [key]: { ...entry, revealed: true } }))}>Check answer</button>
+                      </div>
+                      {entry.revealed && (
+                        <Callout tone={entry.choice === question.correct ? "ok" : "info"} className={entry.choice === question.correct ? "conf-correct" : "conf-incorrect"}>
+                          <p>{entry.choice === question.correct ? "Correct. " : `Not quite: the answer is ${question.choices[question.correct]}. `}{question.explanation}</p>
+                        </Callout>
+                      )}
+                    </fieldset>
+                  );
+                })}
+              </div>
+            </Panel>
           )}
           {practice && questions.length === 0 && <p className="conf-hint">No practice question is available for this molecule and view.</p>}
 
           {!practice && guideNotes.length > 0 && (
-            <div className="conf-notes" role="region" aria-label="Explanations">
-              <h3>What you are seeing</h3>
-              {guideNotes.map((note) => (
-                <details key={note.id} open={note.id === "flip" || note.id === "state"}>
-                  <summary>{note.title}</summary>
-                  <p>{note.text}</p>
-                </details>
-              ))}
-            </div>
+            <Panel className="conf-notes" title="What you are seeing">
+              <div role="region" aria-label="Explanations" className="conf-note-list">
+                {guideNotes.map((note) => (
+                  <Disclosure key={note.id} summary={note.title} defaultOpen={note.id === "flip" || note.id === "state"}>
+                    <Explanation>
+                      <p>{note.text}</p>
+                    </Explanation>
+                  </Disclosure>
+                ))}
+              </div>
+            </Panel>
           )}
 
           {saved && <SavedPanel saved={saved} live={liveResults} />}
@@ -802,14 +901,48 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
 
 function ChairLegend() {
   return (
-    <p className="conf-legend">
-      <span className="conf-key conf-axial-key" /> axial (parallel to the ring axis) · <span className="conf-key conf-eq-key" /> equatorial (around the ring's equator) · <span className="conf-key conf-dia-key" /> 1,3-diaxial contact
-    </p>
+    <Legend
+      label="Chair legend"
+      items={[
+        { label: "axial (parallel to the ring axis)", color: "var(--draw-axial)", kind: "line" },
+        { label: "equatorial (around the ring's equator)", color: "var(--draw-equatorial)", kind: "line" },
+        { label: "1,3-diaxial contact", color: "var(--draw-diaxial)", kind: "dashed" },
+      ]}
+    />
+  );
+}
+
+function NewmanLegend() {
+  return (
+    <Legend
+      label="Newman legend"
+      items={[
+        { label: "front carbon (bonds meet at the centre)", color: "var(--draw-ink)", kind: "line" },
+        { label: "rear carbon (bonds start at the circle)", color: "var(--draw-ink-soft)", kind: "line" },
+        { label: "reference group for the dihedral", color: "var(--draw-select)" },
+      ]}
+    />
+  );
+}
+
+function StrainBar({ name, assessment, max, current }: { name: string; assessment: ChairAnalysis["A"]; max: number; current: boolean }) {
+  const kcal = assessment.strainKcal;
+  const width = kcal === null ? 0 : Math.max(2, (kcal / max) * 100);
+  return (
+    <div className={`conf-bar-row${current ? " is-current" : ""}`}>
+      <span className="conf-bar-name">{name}{current ? <span className="conf-bar-now"> (shown)</span> : null}</span>
+      <span aria-hidden="true" className={`conf-bar-track${kcal === null ? " is-unassessed" : ""}`}>
+        <span className="conf-bar-fill" style={{ width: `${width}%` }} />
+      </span>
+      <span className="conf-bar-value">{kcal === null ? "not assessed" : `${fmt(kcal, 2)} kcal/mol${assessment.axialGroups.some((g) => g.lowerBound) ? " ≥" : ""}`}</span>
+    </div>
   );
 }
 
 function ChairStability({ model, analysis, showing, hidden }: { model: ChairModel; analysis: ChairAnalysis; showing: "A" | "B"; hidden: boolean }) {
   const pref = analysis.preference;
+  const numeric = [analysis.A.strainKcal, analysis.B.strainKcal].filter((value): value is number => value !== null);
+  const max = Math.max(0.5, ...numeric);
   const cell = (assessment: ChairAnalysis["A"]) => (
     <>
       <div><strong>Axial:</strong> {assessment.axialGroups.length === 0 ? "none" : assessment.axialGroups.map((g) => `${g.label} (atom ${g.atom})`).join(", ")}</div>
@@ -821,13 +954,17 @@ function ChairStability({ model, analysis, showing, hidden }: { model: ChairMode
     </>
   );
   return (
-    <div className="conf-block">
-      <h3>Stability</h3>
+    <Panel className="conf-block" title="Stability" actions={<EvidenceBadge level="model" />}>
       {hidden ? (
         <p className="conf-hint">Hidden in practice mode. Work out which chair is more stable, then check your answer below.</p>
       ) : (
         <>
           <p className={`conf-verdict conf-verdict-${pref.kind}`} role="status">{pref.summary}</p>
+          <div className="conf-bars" role="group" aria-label="Axial strain of each chair; a shorter bar is more stable in this model">
+            <StrainBar name="Chair A" assessment={analysis.A} max={max} current={showing === "A"} />
+            <StrainBar name="Chair B" assessment={analysis.B} max={max} current={showing === "B"} />
+            <p className="conf-hint">Shorter bar = less axial strain in this additive A-value model.</p>
+          </div>
           {pref.kind === "quantified" && (
             <p className="conf-hint">
               Model-implied population of the favoured chair at 298 K: about {fmt(pref.impliedPreferredPercent, pref.impliedPreferredPercent > 99.9 ? 2 : 1)}% (arithmetic from the energy gap, not a measurement){pref.usesLowerBound ? "; the gap is a lower bound" : ""}{pref.usesApproximate ? "; at least one A-value is approximate" : ""}.
@@ -837,11 +974,13 @@ function ChairStability({ model, analysis, showing, hidden }: { model: ChairMode
             <div className={showing === "A" ? "conf-chair-card current" : "conf-chair-card"}><h4>Chair A</h4>{cell(analysis.A)}</div>
             <div className={showing === "B" ? "conf-chair-card current" : "conf-chair-card"}><h4>Chair B</h4>{cell(analysis.B)}</div>
           </div>
-          <ul className="conf-limits">{analysis.notIncluded.map((text) => <li key={text}>{text}</li>)}</ul>
-          {model.warnings.map((warning) => <p key={warning} className="conf-warn">{warning}</p>)}
+          <Disclosure summary="Not included in this model">
+            <ul className="conf-limits">{analysis.notIncluded.map((text) => <li key={text}>{text}</li>)}</ul>
+          </Disclosure>
+          {model.warnings.map((warning) => <Callout key={warning} tone="warn">{warning}</Callout>)}
         </>
       )}
-    </div>
+    </Panel>
   );
 }
 
@@ -857,8 +996,7 @@ function TorsionAssessment({ graph, setup, rotation, cls, energyAbs, energyRel, 
 }) {
   const label = (atom: number) => (atom >= graph.implicitHydrogenBase || graph.atoms[atom].atomicNumber === 1 ? "H" : `${graph.atoms[atom].symbol}${atom}`);
   return (
-    <div className="conf-block">
-      <h3>Assessment</h3>
+    <Panel className="conf-block" title="Assessment" actions={<EvidenceBadge level="model" />}>
       <p className="conf-readout">Dihedral {label(setup.frontRef)}–{graph.atoms[setup.front.atom].symbol}{setup.front.atom}–{graph.atoms[setup.rear.atom].symbol}{setup.rear.atom}–{label(setup.rearRef)}: <strong>{fmt(dihedralBetween(conformationAt(setup, rotation), setup.frontRef, setup.rearRef), 0)}°</strong></p>
       {hidden ? (
         <p className="conf-hint">The name, interactions and energy are hidden in practice mode.</p>
@@ -870,24 +1008,26 @@ function TorsionAssessment({ graph, setup, rotation, cls, energyAbs, energyRel, 
               Strain: <strong>{fmt(energyRel)} kJ/mol</strong> ({fmt(energyRel / KJ_PER_KCAL, 2)} kcal/mol) above the lowest conformation of this bond. <span className="conf-hint">Parameter-supported approximation (textbook increments), not a calculation.</span>
             </p>
           ) : (
-            <p className="conf-unavailable-inline">No numeric energy: the model only has parameters for hydrogen and methyl groups. Qualitative comparison follows.</p>
+            <Callout tone="info">No numeric energy: the model only has parameters for hydrogen and methyl groups. Qualitative comparison follows.</Callout>
           )}
           <p>{qualitative.staggeredVsEclipsed}</p>
           <p>{qualitative.stericNote}</p>
-          {qualitative.caveats.map((caveat) => <p key={caveat} className="conf-warn">{caveat}</p>)}
+          {qualitative.caveats.map((caveat) => <Callout key={caveat} tone="warn">{caveat}</Callout>)}
           {cls.relations.length > 0 && (
-            <table className="conf-table">
-              <thead><tr><th>Front</th><th>Rear</th><th>Angle</th><th>Relation</th></tr></thead>
-              <tbody>
-                {cls.relations.map((relation) => (
-                  <tr key={`${relation.front}-${relation.rear}`}><td>{label(relation.front)}</td><td>{label(relation.rear)}</td><td>{Math.round(Math.abs(relation.dihedral))}°</td><td>{relation.relation}</td></tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="conf-table-scroll">
+              <table className="conf-table">
+                <thead><tr><th>Front</th><th>Rear</th><th>Angle</th><th>Relation</th></tr></thead>
+                <tbody>
+                  {cls.relations.map((relation) => (
+                    <tr key={`${relation.front}-${relation.rear}`}><td>{label(relation.front)}</td><td>{label(relation.rear)}</td><td>{Math.round(Math.abs(relation.dihedral))}°</td><td>{relation.relation}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </>
       )}
-    </div>
+    </Panel>
   );
 }
 
@@ -903,15 +1043,16 @@ function SavedPanel({ saved, live }: { saved: Saved; live: ConformationsWorkspac
   }
   differs = [...new Set(differs)];
   return (
-    <div className="conf-saved" role="region" aria-label="Saved assessment">
-      <h3>Saved assessment</h3>
-      <p>
-        {saved.origin === "opened" ? `Opened saved analysis “${saved.name}”` : "Restored from your previous session"} (assessed {new Date(saved.computedAt).toLocaleString()}). {describeConformationsAnalysis(r)}.
-      </p>
-      {mismatch && <p className="conf-warn">Saved by another version of the conformation model (v{r.engineVersion}, now v{CONFORMATIONS_ENGINE_VERSION}). The values above are the saved ones and have not been recomputed; the live view uses the current model.</p>}
-      {differs.length > 0 && <p className="conf-warn">The live model now gives a different {differs.join(" and ")} than the saved assessment.</p>}
-      {!mismatch && differs.length === 0 && <p className="conf-hint">The live model reproduces the saved assessment.</p>}
-      <ul className="conf-limits">{r.limits.map((text) => <li key={text}>{text}</li>)}</ul>
-    </div>
+    <Panel className="conf-saved" title="Saved assessment" actions={<Badge tone="neutral" icon="info">Saved result</Badge>}>
+      <div role="region" aria-label="Saved assessment" className="ui-stack">
+        <p>
+          {saved.origin === "opened" ? `Opened saved analysis “${saved.name}”` : "Restored from your previous session"} (assessed {new Date(saved.computedAt).toLocaleString()}). {describeConformationsAnalysis(r)}.
+        </p>
+        {mismatch && <Callout tone="warn">Saved by another version of the conformation model (v{r.engineVersion}, now v{CONFORMATIONS_ENGINE_VERSION}). The values above are the saved ones and have not been recomputed; the live view uses the current model.</Callout>}
+        {differs.length > 0 && <Callout tone="warn">The live model now gives a different {differs.join(" and ")} than the saved assessment.</Callout>}
+        {!mismatch && differs.length === 0 && <p className="conf-hint">The live model reproduces the saved assessment.</p>}
+        <ul className="conf-limits">{r.limits.map((text) => <li key={text}>{text}</li>)}</ul>
+      </div>
+    </Panel>
   );
 }

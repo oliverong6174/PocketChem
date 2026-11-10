@@ -682,7 +682,7 @@ describe("Synthesis and navigation integration", () => {
     assert.match(app, /switchPage\(target, \{ keepOpenRequest: true \}\)/, "the page comes from ANALYSIS_APP_PAGE, where Synthesis maps to multiStep");
     assert.match(app, /onOpenHandled=\{\(requestId\) => setPendingOpen\(\(current\) => \(current\?\.id === requestId \? null : current\)\)\}/);
     assert.match(app, /openRequest=\{pendingOpen\?\.page === "multiStep" \? pendingOpen : null\}/);
-    assert.match(app, /onClick=\{\(\) => switchPage\(page\.id\)\}/, "tabs never keep an open request");
+    assert.match(app, /onSelectTool=\{\(id\) => switchPage\(id as AppPage\)\}/, "tabs (AppShell, Stage 10) never keep an open request");
   });
 
   test("[ui] the library lists name, page, date, summary and status; has Open, Rename, Duplicate and a confirmed Delete; handles empty and error states", () => {

@@ -1236,3 +1236,13 @@ th {
     display: none !important;
   }
 }
+
+/* badges and callouts inside a paper diagram keep ink-on-paper contrast in both themes */
+.ui-diagram .ui-badge {
+  color: var(--ink);
+  background: transparent;
+}
+.ui-diagram .ui-badge.tone-estimate {
+  color: #4b3aa6;
+  background: rgb(108 91 201 / 0.1);
+}

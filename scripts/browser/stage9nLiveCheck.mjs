@@ -121,13 +121,13 @@ async function main() {
     check("stability says Chair A (diequatorial) is favoured, as additive A-values", /Chair A/.test(stability) && /A-value/i.test(stability), stability.slice(0, 120));
     await shot("chair-A");
     check("Flip chair works", await clickButton("Flip chair"));
-    await sleep(300);
+    await sleep(1200);
     check("Chair B is shown after the flip", (await cdp.evaluate(`document.querySelector('.conf-view-title')?.innerText`)) === "Chair B");
     const axialB = await count("svg.conf-svg .conf-sub.conf-axial:not(.conf-h)");
     check("trans-1,4: the two methyls swap from equatorial to axial on the flip", axialA === 0 && axialB === 2, `axial A=${axialA}, B=${axialB}`);
     await shot("chair-B");
     await clickButton("Flip chair");
-    await sleep(300);
+    await sleep(1200);
     check("flipping twice returns to Chair A", (await cdp.evaluate(`document.querySelector('.conf-view-title')?.innerText`)) === "Chair A" && (await count("svg.conf-svg .conf-sub.conf-axial:not(.conf-h)")) === 0);
 
     // cis-1,3: stereo-specified molecule, different pattern
@@ -178,12 +178,12 @@ async function main() {
     check("View from the other end keeps the page alive and swaps the bond direction", (await count("svg.conf-newman")) >= 1);
     // practice mode hides answers
     await clickButton("Newman");
-    await cdp.evaluate(`(() => { const l = [...document.querySelectorAll('label.conf-toggle')].find((x) => /Practice mode/.test(x.innerText)); l.querySelector('input').click(); })()`);
+    await cdp.evaluate(`(() => { const r = [...document.querySelectorAll('.ui-seg-option')].find((x) => x.innerText.trim() === 'Practice'); r.querySelector('input').click(); })()`);
     await sleep(400);
     const practiceText = await text();
     check("practice mode shows questions and hides the energy / names", /Practice/.test(practiceText) && /hidden in practice mode/i.test(practiceText));
     await shot("practice");
-    await cdp.evaluate(`(() => { const l = [...document.querySelectorAll('label.conf-toggle')].find((x) => /Practice mode/.test(x.innerText)); l.querySelector('input').click(); })()`);
+    await cdp.evaluate(`(() => { const r = [...document.querySelectorAll('.ui-seg-option')].find((x) => x.innerText.trim() === 'Explore'); r.querySelector('input').click(); })()`);
     await sleep(300);
     check("turning practice mode off restores the explanations", /What you are seeing/.test(await text()));
 
@@ -213,7 +213,8 @@ async function main() {
     await cdp.evaluate(`(() => { const b = [...document.querySelectorAll('button')].find((x) => /^Save$/.test(x.innerText.trim())); if (b) b.click(); })()`);
     await sleep(1500);
     await clickButton("Saved");
-    await waitFor(async () => /Conformations/.test(await text()), "saved list", 20000).catch(() => undefined);
+    await waitFor(async () => /Conformations of/.test(await text()), "saved list", 20000).catch(() => undefined);
+    await sleep(500);
     check("the saved conformations analysis is listed on the Saved page", /Conformations of/.test(await text()) && /Conformations/.test(await text()));
     await shot("saved");
     const opened = await cdp.evaluate(`(() => { const b = [...document.querySelectorAll('button')].find((x) => /^Open/.test(x.innerText.trim())); if (!b) return false; b.click(); return true; })()`);
