@@ -1,0 +1,383 @@
+/*
+ * PocketChem design tokens (Stage 10).
+ *
+ * Direction: "ink and paper". A deep blue-black ink theme and a warm paper theme share one set of
+ * role names. Structures and spectra are always drawn on a paper-coloured diagram surface so that
+ * RDKit/Ketcher artwork keeps its chemical colours in both themes. One verdigris accent is used for
+ * action and selection; amber, violet, red and green are reserved for meaning (caution, estimate,
+ * error, success) and are never used decoratively.
+ *
+ * Layers
+ *   1. Palette scales  (--n-*, --a-*, --warn-*, --danger-*, --ok-*, --viol-*)  theme-swapped; the legacy
+ *      App.css rules were mapped onto these, so a theme change re-colours every older component.
+ *   2. Semantic roles  (--bg, --surface, --text, --accent, --status-*)         use these in new code.
+ *   3. Scale tokens    (--sp-*, --radius-*, --fs-*, --shadow-*, --dur-*)       theme independent.
+ *
+ * Paper scope: ".on-paper" (and the listed legacy drawing surfaces) always use the ink-on-paper values of the dark
+ * scale (n-50 is near-white there), so chemistry drawings, Ketcher and spectra look identical in BOTH themes.
+ *
+ * Theme selection: <html data-theme="dark|light"> is set before first paint (index.html) and by
+ * src/theme/useTheme.ts. Dark is the fallback when the attribute is missing.
+ */
+
+:root,
+:root[data-theme="dark"],
+.on-paper,
+.drawer-placeholder,
+.ketcher-shell,
+.molecule-preview,
+.highlight-preview,
+.reaction-svg-box,
+.reaction-ketcher-box,
+.acid-base-ketcher-box,
+.acid-base-current-preview,
+.synthesis-ketcher-box,
+.multicatalytic-editor,
+.spectroscopy-structure-preview,
+.ranking-ketcher-box,
+.molecule-name-input-panel,
+.spectrum-plot-shell,
+.reaction-placeholder,
+.reaction-variant-assessment,
+.ketcher-isolated-frame {
+  color-scheme: dark;
+
+  /* neutrals: cool ink, 950 = page .. 50 = strongest text */
+  --n-950: #070b14;
+  --n-900: #0d1320;
+  --n-800: #161f31;
+  --n-700: #26324b;
+  --n-600: #3a4863;
+  --n-500: #8191ac;
+  --n-400: #9ba8c0;
+  --n-300: #b9c3d6;
+  --n-200: #d7deea;
+  --n-100: #e9edf4;
+  --n-50: #f6f8fb;
+  --rgb-n-950: 7 11 20;
+  --rgb-n-900: 13 19 32;
+  --rgb-n-800: 22 31 49;
+  --rgb-n-400: 155 168 192;
+
+  /* accent: verdigris */
+  --a-100: #d4f5ef;
+  --a-200: #a6e9df;
+  --a-300: #78d9cc;
+  --a-400: #4cc4b6;
+  --a-500: #2aa597;
+  --a-600: #1b8a7f;
+  --a-800: #134a46;
+  --a-950: #072a2a;
+  --rgb-a-400: 76 196 182;
+  --rgb-a-500: 42 165 151;
+
+  /* meaning colours: text (300) / mark (400-500) / quiet fill (800-900) */
+  --warn-200: #fbd9a0;
+  --warn-300: #f6c453;
+  --warn-400: #e9a923;
+  --warn-900: #4a3410;
+  --danger-300: #f6a9a2;
+  --danger-500: #e5675f;
+  --danger-700: #b33a33;
+  --danger-900: #4b1f1d;
+  --ok-300: #8fe0b3;
+  --ok-500: #3fb27a;
+  --ok-800: #1c5a3d;
+  --viol-300: #cbbffa;
+  --viol-400: #a99cf0;
+  --viol-500: #8b7bdf;
+  --pink-400: #f08fbf;
+
+  /* diagram surface: structures, spectra and graphs are always drawn on paper */
+  --paper: #fbfaf6;
+  --paper-2: #f1eee6;
+  --paper-line: #d8d3c5;
+  --ink: #161a22;
+  --ink-soft: #4a5263;
+
+  /* semantic roles */
+  --bg: var(--n-950);
+  --bg-grid: rgb(var(--rgb-n-400) / 0.07);
+  --surface: var(--n-900);
+  --surface-raised: var(--n-800);
+  --surface-sunken: #090e19;
+  --border: var(--n-700);
+  --border-strong: var(--n-600);
+  --text: var(--n-100);
+  --text-strong: var(--n-50);
+  --text-muted: var(--n-300);
+  --text-faint: var(--n-500);
+  --accent: var(--a-400);
+  --accent-solid: #1c8d82;
+  --accent-solid-hover: #17776e;
+  --accent-contrast: #ffffff;
+  --accent-soft: rgb(var(--rgb-a-400) / 0.14);
+  --focus: #8fe9dc;
+  --scrim: rgb(2 4 10 / 0.62);
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-2: 0 10px 30px rgb(0 0 0 / 0.35);
+
+  --status-ok: var(--ok-300);
+  --status-ok-bg: rgb(63 178 122 / 0.14);
+  --status-warn: var(--warn-300);
+  --status-warn-bg: rgb(233 169 35 / 0.13);
+  --status-danger: var(--danger-300);
+  --status-danger-bg: rgb(229 103 95 / 0.14);
+  --status-info: var(--a-300);
+  --status-info-bg: rgb(var(--rgb-a-400) / 0.12);
+  --status-estimate: var(--viol-300);
+  --status-estimate-bg: rgb(139 123 223 / 0.15);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* neutrals are reversed: 950 = page paper .. 50 = strongest text */
+  --n-950: #f5f3ee;
+  --n-900: #ffffff;
+  --n-800: #eeebe3;
+  --n-700: #d9d4c7;
+  --n-600: #b7b1a1;
+  --n-500: #6a665b;
+  --n-400: #55524a;
+  --n-300: #3e3c36;
+  --n-200: #292824;
+  --n-100: #1c1b18;
+  --n-50: #100f0d;
+  --rgb-n-950: 245 243 238;
+  --rgb-n-900: 255 255 255;
+  --rgb-n-800: 238 235 227;
+  --rgb-n-400: 85 82 74;
+
+  --a-100: #06353a;
+  --a-200: #084349;
+  --a-300: #0a545b;
+  --a-400: #0b6a72;
+  --a-500: #0d7d85;
+  --a-600: #0b6f77;
+  --a-800: #cfe9e5;
+  --a-950: #e3f3f0;
+  --rgb-a-400: 11 106 114;
+  --rgb-a-500: 13 125 133;
+
+  --warn-200: #6b4300;
+  --warn-300: #7a4e00;
+  --warn-400: #946100;
+  --warn-900: #fbeccb;
+  --danger-300: #9b2c25;
+  --danger-500: #b8362d;
+  --danger-700: #d9847d;
+  --danger-900: #fbdedb;
+  --ok-300: #175c3a;
+  --ok-500: #1f7a4d;
+  --ok-800: #cfeadb;
+  --viol-300: #4b3aa6;
+  --viol-400: #5a49b8;
+  --viol-500: #6c5bc9;
+  --pink-400: #b3326f;
+
+  --paper: #fffefb;
+  --paper-2: #f6f3ea;
+  --paper-line: #dcd6c6;
+
+  --bg: var(--n-950);
+  --bg-grid: rgb(var(--rgb-n-400) / 0.09);
+  --surface: var(--n-900);
+  --surface-raised: var(--n-900);
+  --surface-sunken: var(--n-800);
+  --border: var(--n-700);
+  --border-strong: var(--n-600);
+  --text: var(--n-200);
+  --text-strong: var(--n-50);
+  --text-muted: var(--n-400);
+  --text-faint: var(--n-500);
+  --accent: var(--a-400);
+  --accent-solid: #0b6f77;
+  --accent-solid-hover: #095b62;
+  --accent-contrast: #ffffff;
+  --accent-soft: rgb(var(--rgb-a-400) / 0.1);
+  --focus: #0b6a72;
+  --scrim: rgb(24 22 16 / 0.45);
+  --shadow-1: 0 1px 2px rgb(40 34 20 / 0.08);
+  --shadow-2: 0 12px 32px rgb(40 34 20 / 0.14);
+
+  --status-ok: var(--ok-300);
+  --status-ok-bg: rgb(31 122 77 / 0.1);
+  --status-warn: var(--warn-300);
+  --status-warn-bg: rgb(148 97 0 / 0.1);
+  --status-danger: var(--danger-300);
+  --status-danger-bg: rgb(184 54 45 / 0.09);
+  --status-info: var(--a-300);
+  --status-info-bg: rgb(var(--rgb-a-400) / 0.09);
+  --status-estimate: var(--viol-300);
+  --status-estimate-bg: rgb(108 91 201 / 0.1);
+}
+
+:root {
+  /* typography: system faces only (offline-safe, no webfont request) */
+  --font-body: "Segoe UI Variable Text", "Segoe UI", "Avenir Next", "Helvetica Neue", system-ui, -apple-system, sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, "Charter", Georgia, serif;
+  --font-mono: "Cascadia Code", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-md: 0.9375rem;
+  --fs-lg: 1.0625rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: clamp(1.6rem, 1.2rem + 1.4vw, 2.1rem);
+  --lh-tight: 1.2;
+  --lh-body: 1.55;
+
+  /* spacing (4px base), radii, layout */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  --gutter: clamp(12px, 3vw, 32px);
+  --content-max: 1480px;
+  --touch: 44px;
+
+  /* motion */
+  --dur-fast: 120ms;
+  --dur-med: 220ms;
+  --dur-slow: 420ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* stacking */
+  --z-sticky: 40;
+  --z-menu: 60;
+  --z-dialog: 80;
+  --z-skip: 100;
+
+  font-synthesis: none;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ink-on-paper roles for controls that sit on a paper surface in either theme */
+.on-paper,
+.drawer-placeholder,
+.ketcher-shell,
+.reaction-ketcher-box,
+.acid-base-ketcher-box,
+.synthesis-ketcher-box,
+.multicatalytic-editor,
+.ranking-ketcher-box,
+.molecule-name-input-panel,
+.spectrum-plot-shell {
+  --surface-sunken: #ffffff;
+  --surface-raised: #ffffff;
+  --accent: #0b6a72;
+  --accent-soft: rgb(11 106 114 / 0.1);
+  --text: #0f172a;
+  --text-strong: #020617;
+  --text-muted: #334155;
+  --text-faint: #64748b;
+  --border-strong: #94a3b8;
+  color: #0f172a;
+}
+
+/* ---------- base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  scroll-padding-top: 88px;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--text-strong);
+  line-height: var(--lh-tight);
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+}
+
+.tabular,
+output,
+td,
+th {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: rgb(var(--rgb-a-500) / 0.35);
+}
+
+/* focus is always visible and never clipped */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* scrollbars follow the theme */
+* {
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: Highlight;
+  }
+}

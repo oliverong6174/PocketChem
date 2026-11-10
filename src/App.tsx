@@ -33,6 +33,8 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     type ResonanceResult,
   } from "./utils/resonanceUtils";
   import "./App.css";
+  import "./styles/ui.css";
+  import { AppShell } from "./components/shell/AppShell";
   import {
     analyzeChirality,
     type ChiralityResult,
@@ -1814,41 +1816,13 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
 
   return (
     <main className="app" ref={appShellRef}>
-      <a className="skip-link" href="#page-panel-analysis">
-        Skip to molecule workspace
-      </a>
+      <AppShell
+        activeToolId={activePage}
+        onSelectTool={(id) => switchPage(id as AppPage)}
+        onToolKeyDown={(event, id) => handlePageTabKeyDown(event, id as AppPage)}
+      />
 
-      <header className="hero">
-        <div>
-          <div className="brand-row">
-            <h1>PocketChem</h1>
-            <p className="eyebrow">Organic chemistry workspace</p>
-          </div>
-          <p className="subtitle">
-            Draw, analyze, compare, and predict reactions in one workspace.
-          </p>
-        </div>
-      </header>
-
-      <nav className="page-tabs" aria-label="PocketChem tools" role="tablist">
-        {APP_PAGES.map((page) => (
-          <button
-            aria-controls={`page-panel-${page.id}`}
-            aria-selected={activePage === page.id}
-            className={activePage === page.id ? "page-tab active" : "page-tab"}
-            id={`page-tab-${page.id}`}
-            key={page.id}
-            onClick={() => switchPage(page.id)}
-            onKeyDown={(event) => handlePageTabKeyDown(event, page.id)}
-            role="tab"
-            tabIndex={activePage === page.id ? 0 : -1}
-            type="button"
-          >
-            {page.label}
-          </button>
-        ))}
-      </nav>
-
+      <div id="main-content" tabIndex={-1} className="main-content">
       {activePage === "analysis" ? (
         <section
           aria-labelledby="page-tab-analysis"
@@ -2601,6 +2575,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
           </Suspense>
         </section>
       )}
+    </div>
     </main>
   );
 }
