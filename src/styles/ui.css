@@ -1246,3 +1246,13 @@ th {
   color: #4b3aa6;
   background: rgb(108 91 201 / 0.1);
 }
+
+/* reagent lists: rows keep their full two-line height inside the scrolling list */
+.multicatalytic-condition-option {
+  flex: none;
+  min-height: max-content;
+  line-height: 1.3;
+}
+.multicatalytic-condition-option span {
+  font-weight: 650;
+}
