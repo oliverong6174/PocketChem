@@ -9,6 +9,7 @@ const PAGE_LABELS: Record<string, string> = {
   spectroscopy: "Spectroscopy",
   ranking: "Ranking",
   multicatalytic: "Multi-Catalytic Workspace",
+  conformations: "Conformations",
 };
 
 const STATUS_LABELS: Record<string, string> = {

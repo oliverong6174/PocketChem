@@ -81,6 +81,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   const SavedAnalysesPage = lazy(() => import("./components/SavedAnalysesPage"));
   const MultiCatalyticPage = lazy(() => import("./components/MultiCatalyticPage"));
   const SpectroscopyPage = lazy(() => import("./components/SpectroscopyPage"));
+  const ConformationsPage = lazy(() => import("./components/ConformationsPage"));
 
 
   type AnnotationCarouselItem =
@@ -107,7 +108,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     
 
   type AnalysisPanel = "overview" | "acidBase" | "concepts" | "properties";
-  type AppPage = "analysis" | "acidBase" | "reactions" | "spectroscopy" | "multiStep" | "multiCatalytic" | "saved";
+  type AppPage = "analysis" | "acidBase" | "reactions" | "spectroscopy" | "multiStep" | "multiCatalytic" | "conformations" | "saved";
 
   /** What the page knows about the dashboard results on screen. */
   type PropertiesResultMeta = {
@@ -132,6 +133,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     { id: "spectroscopy", label: "Spectroscopy" },
     { id: "multiStep", label: "Multi-Step" },
     { id: "multiCatalytic", label: "Multi-Catalytic" },
+    { id: "conformations", label: "Conformations" },
     { id: "saved", label: "Saved" },
   ];
 
@@ -2580,6 +2582,13 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
               <SynthesisPage
                 openRequest={pendingOpen?.page === "multiStep" ? pendingOpen : null}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : activePage === "conformations" ? (
+              <ConformationsPage
+                openRequest={pendingOpen?.page === "conformations" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+                handoffSmiles={sanitizeDisplayedSmiles(smiles) || null}
+                handoffMolfile={molfile || null}
               />
             ) : activePage === "saved" ? (
               <SavedAnalysesPage onOpen={openSavedAnalysis} />
