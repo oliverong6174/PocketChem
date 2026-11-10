@@ -708,7 +708,7 @@ describe("page integration", () => {
     for (const file of fs.readdirSync(path.join(root, "src", "components"))) {
       if (file.endsWith(".tsx") && /useWorkspacePersistence/.test(read("src", "components", file))) users.push(file);
     }
-    assert.deepEqual(users.sort(), ["RankingPage.tsx", "ReactionWorkspacePanel.tsx", "ReactionsPage.tsx", "SpectroscopyPage.tsx", "SynthesisPage.tsx"]);
+    assert.deepEqual(users.sort(), ["ConformationsPage.tsx", "RankingPage.tsx", "ReactionWorkspacePanel.tsx", "ReactionsPage.tsx", "SpectroscopyPage.tsx", "SynthesisPage.tsx"]);
     assert.match(app, /useWorkspacePersistence/);
     for (const other of ["MultiCatalyticPage.tsx"]) {
       assert.doesNotMatch(read("src", "components", other), /persistence|indexedDB/i, other);

@@ -384,11 +384,11 @@ describe("the library across all five pages", () => {
   });
 
   test("[routing] every saved type opens on its own page, and the app wires all six (the Multi-Catalytic workspace was added in Stage 9B-2B)", () => {
-    assert.deepEqual({ ...libApp.ANALYSIS_APP_PAGE }, { synthesis: "multiStep", ranking: "acidBase", spectroscopy: "spectroscopy", properties: "analysis", reactions: "reactions", multicatalytic: "multiCatalytic" });
-    assert.deepEqual([...libApp.OPENABLE_ANALYSIS_PAGES].sort(), ["multicatalytic", "properties", "ranking", "reactions", "spectroscopy", "synthesis"]);
+    assert.deepEqual({ ...libApp.ANALYSIS_APP_PAGE }, { synthesis: "multiStep", ranking: "acidBase", spectroscopy: "spectroscopy", properties: "analysis", reactions: "reactions", multicatalytic: "multiCatalytic", conformations: "conformations" });
+    assert.deepEqual([...libApp.OPENABLE_ANALYSIS_PAGES].sort(), ["conformations", "multicatalytic", "properties", "ranking", "reactions", "spectroscopy", "synthesis"]);
     const app = read("src", "App.tsx");
     for (const id of Object.values(libApp.ANALYSIS_APP_PAGE)) assert.match(app, new RegExp(`\\{ id: "${id}", label:`));
-    for (const page of ["acidBase", "spectroscopy", "multiStep", "reactions", "multiCatalytic"]) assert.match(app, new RegExp(`openRequest=\\{pendingOpen\\?\\.page === "${page}" \\? pendingOpen : null\\}`));
+    for (const page of ["acidBase", "spectroscopy", "multiStep", "reactions", "multiCatalytic", "conformations"]) assert.match(app, new RegExp(`openRequest=\\{pendingOpen\\?\\.page === "${page}" \\? pendingOpen : null\\}`));
     assert.match(app, /openRequest: pendingOpen\?\.page === "analysis" \? pendingOpen : null/);
     assert.match(app, /if \(!options\?\.keepOpenRequest\) setPendingOpen\(null\);/);
     assert.match(read("src", "components", "SavedAnalysesPage.tsx"), /OPENABLE_ANALYSIS_PAGES/);
@@ -531,7 +531,7 @@ describe("the library across all five pages", () => {
     for (const file of fs.readdirSync(path.join(root, "src", "components"))) {
       if (file.endsWith(".tsx") && /getAppAnalysisLibrary/.test(read("src", "components", file))) users.push(file);
     }
-    assert.deepEqual(users.sort(), ["RankingPage.tsx", "ReactionWorkspacePanel.tsx", "ReactionsPage.tsx", "SavedAnalysesPage.tsx", "SpectroscopyPage.tsx", "SynthesisPage.tsx"]);
+    assert.deepEqual(users.sort(), ["ConformationsPage.tsx", "RankingPage.tsx", "ReactionWorkspacePanel.tsx", "ReactionsPage.tsx", "SavedAnalysesPage.tsx", "SpectroscopyPage.tsx", "SynthesisPage.tsx"]);
     assert.match(read("src", "App.tsx"), /getAppAnalysisLibrary/, "Properties lives in App.tsx");
     // The Multi-Catalytic page shell and its original ordered-sequence tool still use no library; only the workspace panel does.
     assert.doesNotMatch(read("src", "components", "MultiCatalyticPage.tsx"), /getAppAnalysisLibrary|SavedAnalysisControls/);
