@@ -3,6 +3,7 @@
  * Synthesis (Stage 8B-3A), Ranking and Spectroscopy (Stage 8B-3B-1), Properties and Reactions
  * (Stage 8B-3B-2), and the Multi-Catalytic workspace (Stage 9B-2B).
  */
+import { CONFORMATIONS_ENGINE_VERSION, validateConformationsInputs, validateConformationsResults } from "./conformationsWorkspace";
 import { getAnalysisLibrary, registerAnalysisValidators, type AnalysisLibrary } from "./analysisLibrary";
 import {
   MULTICATALYTIC_ENGINE_VERSION,
@@ -20,7 +21,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -30,6 +31,7 @@ export const ANALYSIS_APP_PAGE = {
   properties: "analysis",
   reactions: "reactions",
   multicatalytic: "multiCatalytic",
+  conformations: "conformations",
 } as const;
 
 let registered = false;
@@ -61,6 +63,11 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
         engineVersion: REACTIONS_ENGINE_VERSION,
         validateInputs: validateReactionsInputs,
         validateResults: validateReactionsResults,
+      },
+      conformations: {
+        engineVersion: CONFORMATIONS_ENGINE_VERSION,
+        validateInputs: validateConformationsInputs,
+        validateResults: validateConformationsResults,
       },
       multicatalytic: {
         engineVersion: MULTICATALYTIC_ENGINE_VERSION,

@@ -430,12 +430,21 @@ export type NewmanDiagram = {
   rear: Array<Labelled & { angle: number }>;
 };
 
-export function atomLabel(graph: ConformationGraph, atom: number): string {
+const SUBSCRIPT = ["₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉"];
+
+/**
+ * Short display label of a substituent: "H", "D", "CH₃", "OH", "Cl", "CH₂…" (an ellipsis marks a larger group
+ * that continues beyond this atom; the legend gives its full identity).
+ */
+export function atomLabel(graph: ConformationGraph, atom: number, parent?: number): string {
   if (atom >= graph.implicitHydrogenBase) return "H";
   const info = graph.atoms[atom];
   if (info.atomicNumber === 1) return info.isotope === 2 ? "D" : info.isotope === 3 ? "T" : "H";
-  // A one-atom group is named by its element; a larger group by its first atom (the full name appears in the legend).
-  return `${info.isotope ? info.isotope : ""}${info.symbol}`;
+  const mass = info.isotope ? String(info.isotope) : "";
+  const onward = info.neighbors.filter((other) => other !== parent).length;
+  const hydrogens = info.hydrogenCount;
+  const h = hydrogens === 0 ? "" : hydrogens === 1 ? "H" : `H${SUBSCRIPT[hydrogens] ?? hydrogens}`;
+  return `${mass}${info.symbol}${h}${onward > 0 && info.atomicNumber === 6 ? "…" : onward > 0 ? "–" : ""}`;
 }
 
 export function newmanDiagram(graph: ConformationGraph, setup: TorsionSetup, rotation: number): NewmanDiagram {
@@ -444,8 +453,8 @@ export function newmanDiagram(graph: ConformationGraph, setup: TorsionSetup, rot
     frontAtom: setup.front.atom,
     rearAtom: setup.rear.atom,
     rotation: conf.rotation,
-    front: conf.front.map((item) => ({ ...item, label: atomLabel(graph, item.atom) })),
-    rear: conf.rear.map((item) => ({ ...item, label: atomLabel(graph, item.atom) })),
+    front: conf.front.map((item) => ({ ...item, label: atomLabel(graph, item.atom, setup.front.atom) })),
+    rear: conf.rear.map((item) => ({ ...item, label: atomLabel(graph, item.atom, setup.rear.atom) })),
   };
 }
 
