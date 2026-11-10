@@ -33,22 +33,19 @@ export function applyTheme(theme: ResolvedTheme) {
  */
 export function useTheme() {
   const [preference, setPreferenceState] = useState<ThemePreference>(readStoredPreference);
-  const [resolved, setResolved] = useState<ResolvedTheme>(() => resolveTheme(readStoredPreference()));
+  const [system, setSystem] = useState<ResolvedTheme>(systemTheme);
+  const resolved: ResolvedTheme = preference === "system" ? system : preference;
 
   useEffect(() => {
-    const next = resolveTheme(preference);
-    setResolved(next);
-    applyTheme(next);
-    if (preference !== "system") return undefined;
     const query = window.matchMedia("(prefers-color-scheme: light)");
-    const onChange = () => {
-      const updated = resolveTheme("system");
-      setResolved(updated);
-      applyTheme(updated);
-    };
+    const onChange = () => setSystem(query.matches ? "light" : "dark");
     query.addEventListener("change", onChange);
     return () => query.removeEventListener("change", onChange);
-  }, [preference]);
+  }, []);
+
+  useEffect(() => {
+    applyTheme(resolved);
+  }, [resolved]);
 
   const setPreference = useCallback((value: ThemePreference) => {
     setPreferenceState(value);

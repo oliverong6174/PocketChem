@@ -38,7 +38,7 @@ function useInverseScale<T extends SVGSVGElement>(viewBoxWidth: number) {
     observer.observe(node);
     return () => observer.disconnect();
   }, [viewBoxWidth]);
-  return { ref, style: { "--inv": inv } as CSSProperties };
+  return [ref, { "--inv": inv } as CSSProperties] as const;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ const CHAIR_H = 340;
 const CHAIR_SCALE = 96;
 
 export function ChairDrawing({ graph, model, conformer, showHydrogens, showDiaxial, hideLabels, showIndices }: ChairViewProps) {
-  const scaled = useInverseScale<SVGSVGElement>(CHAIR_W);
+  const [scaledRef, scaledStyle] = useInverseScale<SVGSVGElement>(CHAIR_W);
   const project = (p: { x: number; y: number; z: number }) => {
     const q = projectPoint(p, DEFAULT_CHAIR_VIEW);
     return { x: CHAIR_W / 2 + q.x * CHAIR_SCALE, y: CHAIR_H / 2 + 8 - q.y * CHAIR_SCALE, depth: q.depth };
@@ -89,7 +89,7 @@ export function ChairDrawing({ graph, model, conformer, showHydrogens, showDiaxi
   const diaxial = synDiaxialInteractions(conformer);
 
   return (
-    <svg ref={scaled.ref} style={scaled.style} className="conf-svg conf-chair" viewBox={`0 0 ${CHAIR_W} ${CHAIR_H}`} role="img" aria-label={`${conformer.label}: cyclohexane chair`}>
+    <svg ref={scaledRef} style={scaledStyle} className="conf-svg conf-chair" viewBox={`0 0 ${CHAIR_W} ${CHAIR_H}`} role="img" aria-label={`${conformer.label}: cyclohexane chair`}>
       {subs.filter((s) => s.item.orientation === "axial").map(({ item, origin, end }) => (
         <line key={`ax-${item.slot.position}-${item.slot.atom}`} x1={origin.x} y1={origin.y} x2={end.x} y2={end.y} className={`conf-sub ${hideLabels ? "" : "conf-axial"} ${item.slot.isHydrogen ? "conf-h" : ""}`} />
       ))}
@@ -154,12 +154,12 @@ type NewmanProps = {
 };
 
 export function NewmanDrawing({ diagram, setup, onRotate, onPickRef, compact = false }: NewmanProps) {
-  const scaled = useInverseScale<SVGSVGElement>(N_SIZE);
+  const [scaledRef, scaledStyle] = useInverseScale<SVGSVGElement>(N_SIZE);
   const dragging = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
 
   function rotateToPointer(event: ReactPointerEvent<SVGSVGElement>) {
-    const svg = scaled.ref.current;
+    const svg = scaledRef.current;
     if (!svg) return;
     const box = svg.getBoundingClientRect();
     const x = ((event.clientX - box.left) / box.width) * N_SIZE - N_C;
@@ -201,8 +201,8 @@ export function NewmanDrawing({ diagram, setup, onRotate, onPickRef, compact = f
 
   return (
     <svg
-      ref={scaled.ref}
-      style={scaled.style}
+      ref={scaledRef}
+      style={scaledStyle}
       className={`conf-svg conf-newman${compact ? " conf-compact" : ""}${isDragging ? " is-dragging" : ""}`}
       viewBox={`0 0 ${N_SIZE} ${N_SIZE}`}
       {...(interactive
@@ -283,7 +283,7 @@ const S_H = 300;
 const S_SCALE = 78;
 
 export function SawhorseDrawing({ diagram, setup, compact = false }: { diagram: SawhorseDiagram; setup: TorsionSetup; compact?: boolean }) {
-  const scaled = useInverseScale<SVGSVGElement>(S_W);
+  const [scaledRef, scaledStyle] = useInverseScale<SVGSVGElement>(S_W);
   const map = (p: { x: number; y: number }) => ({ x: S_W / 2 + p.x * S_SCALE, y: S_H / 2 + 10 - p.y * S_SCALE });
   const front = map(diagram.frontCarbon);
   const rear = map(diagram.rearCarbon);
@@ -294,7 +294,7 @@ export function SawhorseDrawing({ diagram, setup, compact = false }: { diagram: 
     return { x: end.x + (dx / n) * 13, y: end.y + (dy / n) * 13 + 4 };
   };
   return (
-    <svg ref={scaled.ref} style={scaled.style} className={`conf-svg conf-sawhorse ${compact ? "conf-compact" : ""}`} viewBox={`0 0 ${S_W} ${S_H}`} role="img"
+    <svg ref={scaledRef} style={scaledStyle} className={`conf-svg conf-sawhorse ${compact ? "conf-compact" : ""}`} viewBox={`0 0 ${S_W} ${S_H}`} role="img"
       aria-label={`Sawhorse projection about atoms ${diagram.frontAtom} (front) and ${diagram.rearAtom} (rear), dihedral ${diagram.rotation.toFixed(0)} degrees`}>
       {diagram.rear.map((item) => {
         const end = map(item.end);
@@ -470,7 +470,7 @@ const M_W = 420;
 const M_H = 260;
 
 export function StructureMap({ graph, mode, rotatable, selectedBond, frontAtom, rings, selectedRing, showIndices, onPickBond, onPickRing }: MapProps) {
-  const mapScaled = useInverseScale<SVGSVGElement>(M_W);
+  const [mapRef, mapStyle] = useInverseScale<SVGSVGElement>(M_W);
   const xs = graph.coords2D.map((p) => p.x);
   const ys = graph.coords2D.map((p) => p.y);
   const minX = Math.min(...xs);
@@ -487,7 +487,7 @@ export function StructureMap({ graph, mode, rotatable, selectedBond, frontAtom, 
   const sameBond = (bond: GraphBond) =>
     selectedBond !== null && ((bond.a === selectedBond[0] && bond.b === selectedBond[1]) || (bond.a === selectedBond[1] && bond.b === selectedBond[0]));
   return (
-    <svg ref={mapScaled.ref} style={mapScaled.style} className="conf-svg conf-map" viewBox={`0 0 ${M_W} ${M_H}`} role="group" aria-label="Structure: click a bond or ring to analyse">
+    <svg ref={mapRef} style={mapStyle} className="conf-svg conf-map" viewBox={`0 0 ${M_W} ${M_H}`} role="group" aria-label="Structure: click a bond or ring to analyse">
       {mode === "ring" && rings.map((item, i) => {
         const points = item.ring.map((a) => pt(a));
         const centre = { x: points.reduce((s, p) => s + p.x, 0) / points.length, y: points.reduce((s, p) => s + p.y, 0) / points.length };
