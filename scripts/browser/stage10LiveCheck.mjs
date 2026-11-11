@@ -8,6 +8,7 @@ import { q, screenshot, setViewport, sleep, startBrowser, waitFor } from "./lib/
 
 const results = [];
 const check = (name, ok, detail = "") => {
+  if (process.env.DBG) console.log("   [errors so far:", cdp?.errors?.length ?? 0, "]");
   results.push(ok);
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? `  - ${detail}` : ""}`);
 };
@@ -20,21 +21,22 @@ const load = async (smiles) => {
   await waitFor(() => ev(`[...document.querySelectorAll('button')].some((b) => b.innerText.trim() === 'Load' && !b.disabled)`), "engine", 120000);
   await setValue(".conf-smiles input", smiles);
   await click("Load");
-  await sleep(900);
+  await waitFor(() => ev(`!!document.querySelector('.mol-status.is-ok, .mol-status.is-error')`), "name/SMILES resolution (first use unpacks the offline name database)", 120000);
+  await sleep(600);
 };
 const fresh = async (width, scheme = "dark", extra = {}) => {
   await setViewport(cdp, width, width < 500 ? 812 : 900, { scheme, ...extra });
   await cdp.send("Page.navigate", { url });
   await waitFor(() => ev(`document.readyState === 'complete' && document.body.innerText.length > 50`), "app");
 };
-const openTool = async (name) => {
+const openTool = async (name, settle = 900) => {
   const direct = await ev(`(() => { const b = [...document.querySelectorAll('.tool-tabs [role=tab]')].find((x) => x.textContent.trim() === ${q(name)} && x.getClientRects().length); if (b) { b.click(); return true; } return false; })()`);
   if (!direct) {
     await ev(`document.querySelector('.shell-menu')?.click()`);
     await sleep(350);
     await ev(`[...document.querySelectorAll('.sheet-tool')].find((x) => x.querySelector('.sheet-tool-name')?.textContent.trim() === ${q(name)})?.click()`);
   }
-  await sleep(900);
+  await sleep(settle);
 };
 const rotation = () => ev(`document.querySelector('.conf-rotation output')?.innerText ?? ''`);
 const svgCentre = () => ev(`(() => { const r = document.querySelector('svg.conf-newman:not(.conf-compact)').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height, top: r.top }; })()`);
@@ -47,7 +49,7 @@ try {
   check("desktop: tab groups are labelled Analyze, Synthesize, Library", (await ev(`[...document.querySelectorAll('.tool-group-label')].map((x) => x.textContent).join(',')`)) === "Analyze,Synthesize,Library");
   let navOk = true;
   for (const tool of tools) {
-    await openTool(tool);
+    await openTool(tool, 1800);
     const selected = await ev(`document.querySelector('.tool-tabs [aria-selected=true]')?.textContent.trim()`);
     const panelOk = await ev(`!!document.querySelector('[id^=page-panel-]')`);
     if (selected !== tool || !panelOk) navOk = false;
@@ -160,11 +162,11 @@ try {
   const title = () => ev(`document.querySelector('.conf-view-title')?.innerText`);
   check("chair: starts at Chair A", (await title()) === "Chair A");
   await click("Flip chair");
-  await sleep(250);
-  const mid = await title();
+  let mid = "";
+  for (let i = 0; i < 20 && !/→/.test(mid); i += 1) { mid = await title(); if (!/→/.test(mid)) await sleep(20); }
   check("chair flip: animates (title shows the transition, flip button disabled)", /→/.test(mid), mid);
   await sleep(900);
-  check("chair flip: ends on Chair B with the real labels back", (await title()) === "Chair B" && (await ev(`document.querySelectorAll('svg.conf-chair .conf-sub.conf-axial:not(.conf-h)').length`)) === 2);
+  check("chair flip: ends on Chair B with the real labels back", (await title()) === "Chair B" && (await ev(`document.querySelectorAll('.conf-visual svg.conf-chair .conf-sub.conf-axial:not(.conf-h)').length`)) === 2);
   await fresh(1440, "dark", { reducedMotion: true });
   await openTool("Conformations");
   await load("C[C@H]1CC[C@H](C)CC1");
@@ -178,7 +180,7 @@ try {
       await fresh(width, scheme);
       const bad = [];
       for (const tool of tools) {
-        await openTool(tool);
+        await openTool(tool, 1800); // let each Ketcher editor finish starting before it is unmounted
         const o = await ev(`document.documentElement.scrollWidth - document.documentElement.clientWidth`);
         if (o > 0) bad.push(`${tool}:${o}`);
       }

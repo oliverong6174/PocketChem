@@ -16,7 +16,8 @@ const load = async (smiles) => {
   await waitFor(() => cdp.evaluate(`[...document.querySelectorAll('button')].some((b) => b.innerText.trim() === 'Load' && !b.disabled)`), "engine", 120000);
   await setValue(".conf-smiles input", smiles);
   await click("Load");
-  await sleep(900);
+  await waitFor(() => cdp.evaluate(`!!document.querySelector('.mol-status.is-ok, .mol-status.is-error')`), "name/SMILES resolution (first use unpacks the offline name database)", 120000);
+  await sleep(600);
 };
 const tab = (name) => cdp.evaluate(`(() => { const b = [...document.querySelectorAll('[role=tab]')].find((x) => x.textContent.trim() === ${q(name)} && x.getClientRects().length); b?.click(); })()`);
 const openTool = async (name) => {

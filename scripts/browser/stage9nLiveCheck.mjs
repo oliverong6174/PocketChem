@@ -86,7 +86,8 @@ const loadSmiles = async (smiles) => {
   await waitFor(() => cdp.evaluate(`[...document.querySelectorAll('button')].some((b) => b.innerText.trim() === 'Load' && !b.disabled)`), "RDKit ready on the Conformations page", 120000);
   await setValue(".conf-smiles input", smiles);
   await clickButton("Load");
-  await sleep(800);
+  await waitFor(() => cdp.evaluate(`!!document.querySelector('.mol-status.is-ok, .mol-status.is-error')`), "name/SMILES resolution (first use unpacks the offline name database)", 120000);
+  await sleep(600);
 };
 const rotationText = () => cdp.evaluate(`document.querySelector('.conf-rotation output')?.innerText ?? ''`);
 
@@ -116,23 +117,23 @@ async function main() {
     await loadSmiles("C[C@H]1CC[C@H](C)CC1");
     check("a chair is drawn for trans-1,4-dimethylcyclohexane", (await count("svg.conf-svg .conf-ring-bond")) === 6 || (await count("svg.conf-svg .conf-ring-bond")) > 0);
     check("Chair A is shown first", (await cdp.evaluate(`document.querySelector('.conf-view-title')?.innerText`)) === "Chair A");
-    const axialA = await count("svg.conf-svg .conf-sub.conf-axial:not(.conf-h)");
+    const axialA = await count(".conf-visual svg.conf-chair .conf-sub.conf-axial:not(.conf-h)");
     const stability = await cdp.evaluate(`document.querySelector('.conf-verdict')?.innerText ?? ''`);
     check("stability says Chair A (diequatorial) is favoured, as additive A-values", /Chair A/.test(stability) && /A-value/i.test(stability), stability.slice(0, 120));
     await shot("chair-A");
     check("Flip chair works", await clickButton("Flip chair"));
     await sleep(1200);
     check("Chair B is shown after the flip", (await cdp.evaluate(`document.querySelector('.conf-view-title')?.innerText`)) === "Chair B");
-    const axialB = await count("svg.conf-svg .conf-sub.conf-axial:not(.conf-h)");
+    const axialB = await count(".conf-visual svg.conf-chair .conf-sub.conf-axial:not(.conf-h)");
     check("trans-1,4: the two methyls swap from equatorial to axial on the flip", axialA === 0 && axialB === 2, `axial A=${axialA}, B=${axialB}`);
     await shot("chair-B");
     await clickButton("Flip chair");
     await sleep(1200);
-    check("flipping twice returns to Chair A", (await cdp.evaluate(`document.querySelector('.conf-view-title')?.innerText`)) === "Chair A" && (await count("svg.conf-svg .conf-sub.conf-axial:not(.conf-h)")) === 0);
+    check("flipping twice returns to Chair A", (await cdp.evaluate(`document.querySelector('.conf-view-title')?.innerText`)) === "Chair A" && (await count(".conf-visual svg.conf-chair .conf-sub.conf-axial:not(.conf-h)")) === 0);
 
     // cis-1,3: stereo-specified molecule, different pattern
     await loadSmiles("C[C@H]1CCC[C@@H](C)C1");
-    check("cis-1,3: diequatorial chair is shown", (await count("svg.conf-svg .conf-sub.conf-axial:not(.conf-h)")) === 0);
+    check("cis-1,3: diequatorial chair is shown", (await count(".conf-visual svg.conf-chair .conf-sub.conf-axial:not(.conf-h)")) === 0);
     // unspecified stereo is not guessed
     await loadSmiles("CC1CCCCC1C");
     check("1,2-dimethylcyclohexane without stereo asks the user instead of guessing", /does not say which substituents are on the same face/.test(await text()));
