@@ -16,6 +16,7 @@ import {
 } from "../utils/reactions/profiles/halogens";
 import { rendererForReactionDisplay } from "./reactionProductRenderer";
 import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
+import { ToolHeader } from "./ui/primitives";
 import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
 import { DebouncedTask } from "../utils/persistence/debouncedTask";
 import { restoreEditorContent } from "../utils/persistence/editorRestore";
@@ -1354,18 +1355,18 @@ export default function ReactionsPage({
 
   return (
     <section className="card reactions-page-card">
-      <div className="card-header">
-        <div>
-          <h2>Molecule Drawer</h2>
-          <p>
-            Draw reactant(s) to predict products, or draw a product to predict
-            reactants. Use R or * for generic groups.
-          </p>
-        </div>
-        <span className={`status ${ketcher ? "ready" : "loading"}`}>
-          {ketcher ? "Editor ready" : "Loading editor"}
-        </span>
-      </div>
+      <ToolHeader
+        group="Synthesize"
+        title="Reactions"
+        purpose="Draw reactant(s) to predict products, or draw a product to predict reactants. Use R or * for generic groups."
+        ready={Boolean(ketcher)}
+        evidence="rule"
+        steps={[
+          { label: "Draw or name", detail: "Add reactants with a drawing or a name; Add keeps what is drawn, Replace swaps it." },
+          { label: "Choose reagents", detail: "Pick a reagent or condition, or let PocketChem search." },
+          { label: "Read the products", detail: "Major and minor outcomes, with the rule behind each." },
+        ]}
+      />
 
       <WorkspaceNotice
         embedded

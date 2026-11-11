@@ -1336,3 +1336,27 @@ th {
   display: block;
   color: var(--text-muted);
 }
+
+/* ---------- tool header (Stage 10B) ---------- */
+.ui-tool-header { display: flex; flex-wrap: wrap; gap: var(--sp-4); align-items: flex-start; justify-content: space-between; margin-bottom: var(--sp-4); }
+.ui-tool-header-main { flex: 1 1 360px; min-width: 0; }
+.ui-tool-eyebrow { margin: 0 0 var(--sp-1); font-size: var(--fs-xs, 0.75rem); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.ui-tool-title { margin: 0; font-family: var(--font-display); font-size: var(--fs-xl, 1.5rem); line-height: 1.2; color: var(--text); }
+.ui-tool-purpose { margin: var(--sp-2) 0 0; max-width: 68ch; color: var(--text-muted, var(--text)); }
+.ui-tool-header-side { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; justify-content: flex-end; }
+.ui-tool-steps { list-style: none; counter-reset: tool-step; display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); margin: var(--sp-3) 0 0; padding: 0; }
+.ui-tool-steps li { counter-increment: tool-step; display: flex; flex-direction: column; font-size: var(--fs-sm, 0.875rem); color: var(--text-muted, var(--text)); max-width: 26ch; }
+.ui-tool-steps li strong { color: var(--text); }
+.ui-tool-steps li strong::before { content: counter(tool-step); display: inline-grid; place-items: center; width: 1.45em; height: 1.45em; margin-right: 0.5em; border-radius: 50%; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent, var(--border)); font-size: 0.8em; }
+@media (max-width: 640px) { .ui-tool-header-side { justify-content: flex-start; } .ui-tool-steps li { max-width: none; flex: 1 1 100%; } }
+
+/* tool header inside legacy containers that style bare h1/h2/p */
+.ranking-hero .ui-tool-header { flex: 1 1 auto; margin-bottom: 0; }
+.ranking-hero h1.ui-tool-title { font-size: var(--fs-xl); letter-spacing: normal; color: var(--text); }
+.ranking-hero .ui-tool-purpose, .synthesis-intro-card .ui-tool-purpose { margin: var(--sp-2) 0 0; color: var(--text-muted); }
+.synthesis-intro-card .ui-tool-header { flex: 1 1 auto; margin-bottom: 0; }
+.synthesis-intro-card h2.ui-tool-title { margin: 0; }
+.molecule-card .ui-tool-header, .spectroscopy-input-card .ui-tool-header, .reactions-page-card .ui-tool-header { margin-bottom: var(--sp-3); }
+.molecule-name-hint { margin: var(--sp-2) 0 0; font-size: var(--fs-sm); color: var(--text-muted); }
+.molecule-name-hint strong { color: var(--text); }
+@media (max-width: 520px) { .molecule-name-input-row { flex-wrap: wrap; } .molecule-name-input-row .molecule-name-input { flex: 1 1 100%; } .molecule-name-input-row .molecule-name-action { flex: 1 1 0; min-height: var(--touch); } }

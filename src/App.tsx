@@ -17,6 +17,7 @@
   } from "react";
 import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import MoleculeDrawer, { type KetcherApi } from "./components/MoleculeDrawer";
+import { ToolHeader } from "./components/ui/primitives";
   import {
     applyResolvedNameToIdentity,
     type MoleculeNameResolution,
@@ -1831,15 +1832,18 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
           role="tabpanel"
         >
           <div className="card molecule-card molecule-card-compact">
-            <div className="card-header">
-              <div>
-                <h2>Molecule Drawer</h2>
-                <p>Properties — draw a molecule to review its overview, acid/base sites, concepts, and molecular properties.</p>
-              </div>
-              <span className={`status ${isMainEditorReady ? "ready" : "loading"}`}>
-                {isMainEditorReady ? "Editor ready" : "Loading editor"}
-              </span>
-            </div>
+            <ToolHeader
+              group="Analyze"
+              title="Properties"
+              purpose="Draw a molecule to review its overview, acid/base sites, concepts, and molecular properties."
+              ready={isMainEditorReady}
+              evidence="estimate"
+              steps={[
+                { label: "Draw or name", detail: "Draw it, or type a name and press Enter." },
+                { label: "Analyze Molecule", detail: "Computes identity, groups and properties." },
+                { label: "Open a dashboard tab", detail: "Overview, acid/base, concepts, properties." },
+              ]}
+            />
 
             <div className="drawer-placeholder drawer-placeholder-compact">
               <MoleculeDrawer

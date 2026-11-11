@@ -29,6 +29,7 @@ import {
 import { describeRouteStructure } from "../utils/reactions/engine/routePresentation";
 import { routeQualityLabel } from "../utils/reactions/engine/routeQuality";
 import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
+import { ToolHeader } from "./ui/primitives";
 import { DebouncedTask } from "../utils/persistence/debouncedTask";
 import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
 import { ketHasStructureText, ketIdentityKey } from "../utils/persistence/ketIdentity";
@@ -1457,17 +1458,20 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
   return (
     <section className={`synthesis-page${isSearching ? " is-searching" : ""}`}>
       <div className="card synthesis-intro-card">
-        <div>
-          <h2>Multistep Synthesis</h2>
-          <p>
-            Draw all supplied starting materials together on the left and the
-            target on the right. Disconnected structures are treated as separate
-            starting materials.
-          </p>
-        </div>
-        <span className={`status ${editorsReady ? "ready" : "loading"}`}>
-          {editorsReady ? "Editors ready" : "Loading editors"}
-        </span>
+        <ToolHeader
+          group="Synthesize"
+          title="Multistep Synthesis"
+          purpose="Draw all supplied starting materials together on the left and the target on the right. Disconnected structures are treated as separate starting materials."
+          ready={editorsReady}
+          readyLabel="Editors ready"
+          loadingLabel="Loading editors"
+          evidence="rule"
+          steps={[
+            { label: "Draw both sides", detail: "Starting materials left, target right." },
+            { label: "Search", detail: "Forward, backward or both; you can cancel at any time." },
+            { label: "Compare routes", detail: "Each step shows its reaction rule and conditions." },
+          ]}
+        />
       </div>
 
       <WorkspaceNotice

@@ -15,6 +15,7 @@ import {
 } from "../utils/ranking/comparisonAnalysis";
 import { deriveRanking, displayedRankingSnapshot } from "../utils/ranking/rankingDisplay";
 import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
+import { ToolHeader } from "./ui/primitives";
 import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
 import { DebouncedTask } from "../utils/persistence/debouncedTask";
 import { restoreEditorContent } from "../utils/persistence/editorRestore";
@@ -612,14 +613,18 @@ export default function RankingPage({ openRequest = null, onOpenHandled }: Ranki
   return (
     <section className="ranking-page">
       <div className="ranking-hero">
-        <div>
-          <p className="ranking-eyebrow">Organic chemistry comparison workspace</p>
-          <h1>Ranking</h1>
-          <p>
-            Add up to five molecules once, then compare electronic effects,
-            stability, mechanisms, spectroscopy, physical properties, and more.
-          </p>
-        </div>
+        <ToolHeader
+          group="Analyze"
+          title="Ranking"
+          headingLevel={1}
+          purpose="Add up to five molecules once, then compare electronic effects, stability, mechanisms, spectroscopy, physical properties, and more."
+          evidence="estimate"
+          steps={[
+            { label: "Add molecules", detail: "Up to five, by drawing or by name." },
+            { label: "Pick a comparison", detail: "Choose a category, then a ranking." },
+            { label: "Read the order", detail: "Ties share a rank; reasons are listed." },
+          ]}
+        />
         <div className="ranking-count-card" aria-label={`${comparisonMolecules.length} comparison molecules`}>
           <strong>{comparisonMolecules.length}</strong>
           <span>/ 5 molecules</span>

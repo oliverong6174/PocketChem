@@ -54,6 +54,7 @@ import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersis
 import { useSavedAnalysisOpen } from "../utils/persistence/useSavedAnalysisOpen";
 import type { Capture, RecoveryOutcome } from "../utils/persistence/workspacePersistence";
 import type { WorkspaceResults } from "../utils/persistence/workspaceStore";
+import { Callout, ToolHeader } from "./ui/primitives";
 
 type SvgMap = Record<string, string | null>;
 type Selection = { ruleId: string | null; lotIds: string[] };
@@ -747,18 +748,25 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
 
   return (
     <>
-      <div className="card-header">
-        <div>
-          <h2>Multi-Catalytic Workspace</h2>
-          <p>
-            Keep several molecules in an inventory, pick exactly which ones each reaction consumes, and build separate branches
-            that you can later combine. Steps run one after another on isolated compounds: this is sequential and convergent
-            synthesis, not a one-pot tandem or cooperative catalytic process. A reaction that gives no product consumes
-            nothing, and a later step cannot use a molecule that was never made.
-          </p>
-        </div>
-        <span className={`status ${ketcher ? "ready" : "loading"}`}>{ketcher ? "Editor ready" : "Loading editor"}</span>
-      </div>
+      <ToolHeader
+        group="Synthesize"
+        title="Multi-Catalytic Workspace"
+        purpose="Keep several molecules in an inventory, pick exactly which ones each reaction consumes, and build separate branches that you can later combine."
+        ready={Boolean(ketcher)}
+        evidence="rule"
+        steps={[
+          { label: "Add molecules", detail: "Draw or name each one into the inventory." },
+          { label: "Choose what a step consumes", detail: "Pick the molecules and a reagent or catalyst." },
+          { label: "Combine branches", detail: "Later steps use only what was actually made." },
+        ]}
+      />
+      <Callout tone="info" title="How steps run">
+        <p>
+          Steps run one after another on isolated compounds: this is sequential and convergent synthesis, not a one-pot tandem
+          or cooperative catalytic process. A reaction that gives no product consumes nothing, and a later step cannot use a
+          molecule that was never made.
+        </p>
+      </Callout>
 
       <WorkspaceNotice
         embedded

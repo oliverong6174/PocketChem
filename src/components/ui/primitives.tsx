@@ -265,3 +265,51 @@ export function Explanation({ title, children }: { title?: ReactNode; children: 
     </div>
   );
 }
+
+/* ---------- tool page header ---------- */
+
+export interface ToolStep { label: string; detail?: string }
+
+/**
+ * The same opening block for every scientific tool: where it sits (group), what it is for, whether the editor is ready,
+ * how much to trust its output, and the three-step flow. It replaces each page's ad-hoc intro; it carries no chemistry.
+ */
+export function ToolHeader({ group, title, purpose, ready, readyLabel = "Editor ready", loadingLabel = "Loading editor", evidence, steps, aside, headingLevel = 2 }: {
+  group: "Analyze" | "Synthesize" | "Library";
+  title: ReactNode;
+  purpose: ReactNode;
+  /** undefined hides the status chip (tools with no editor). */
+  ready?: boolean;
+  readyLabel?: string;
+  loadingLabel?: string;
+  evidence?: EvidenceLevel;
+  steps?: ToolStep[];
+  aside?: ReactNode;
+  headingLevel?: 1 | 2;
+}) {
+  const Heading = headingLevel === 1 ? "h1" : "h2";
+  return (
+    <header className="ui-tool-header">
+      <div className="ui-tool-header-main">
+        <p className="ui-tool-eyebrow">{group}</p>
+        <Heading className="ui-tool-title">{title}</Heading>
+        <p className="ui-tool-purpose">{purpose}</p>
+        {steps && steps.length > 0 ? (
+          <ol className="ui-tool-steps" aria-label="How this tool works">
+            {steps.map((step) => (
+              <li key={step.label}>
+                <strong>{step.label}</strong>
+                {step.detail ? <span>{step.detail}</span> : null}
+              </li>
+            ))}
+          </ol>
+        ) : null}
+      </div>
+      <div className="ui-tool-header-side">
+        {ready !== undefined ? <span className={`status ${ready ? "ready" : "loading"}`} role="status">{ready ? readyLabel : loadingLabel}</span> : null}
+        {evidence ? <EvidenceBadge level={evidence} /> : null}
+        {aside}
+      </div>
+    </header>
+  );
+}

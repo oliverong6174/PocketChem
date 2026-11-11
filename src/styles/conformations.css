@@ -1164,3 +1164,7 @@ line.conf-grid {
     grid-template-columns: 1fr;
   }
 }
+
+/* the shared name field is a vertical stack (form / help / status), not a row */
+.conf-smiles.mol-input { display: grid; gap: var(--sp-2); align-items: stretch; }
+.conf-smiles .mol-input-label { flex: 1 1 200px; }

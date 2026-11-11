@@ -475,13 +475,14 @@ function MoleculeDrawer({
       >
         <div className="molecule-name-input-copy">
           <label htmlFor={`${globalKey}-molecule-name`}>Type a chemical name or SMILES</label>
-          <span>Common name, IUPAC name or SMILES (start with “smiles:” to force SMILES)</span>
+          <span id={`${globalKey}-molecule-name-help`}>Common name, IUPAC name or SMILES (start with “smiles:” to force SMILES)</span>
         </div>
 
         <div className="molecule-name-input-row">
           <input
             id={`${globalKey}-molecule-name`}
             className="molecule-name-input"
+            aria-describedby={`${globalKey}-molecule-name-help ${globalKey}-molecule-name-status`}
             type="text"
             value={nameQuery}
             onChange={(event) => {
@@ -515,11 +516,19 @@ function MoleculeDrawer({
           </button>
         </div>
 
-        {nameMessage && (
-          <p className={`molecule-name-message ${nameMessageKind}`} aria-live="polite">
-            {nameMessage}
+        {nameInputMode === "add-or-replace" && hasStructure && !nameMessage && (
+          <p className="molecule-name-hint">
+            <strong>Add</strong> keeps what is drawn and adds this molecule. <strong>Replace</strong> swaps the drawing for it.
           </p>
         )}
+
+        <div id={`${globalKey}-molecule-name-status`} aria-live="polite">
+          {nameMessage && (
+            <p className={`molecule-name-message ${nameMessageKind}`} role={nameMessageKind === "error" ? "alert" : undefined}>
+              {nameMessage}
+            </p>
+          )}
+        </div>
       </form>
     </div>
   );

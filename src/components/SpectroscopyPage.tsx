@@ -12,6 +12,7 @@ import {
 } from "../utils/moleculeNameResolver";
 import { getHighlightedMoleculeSvg } from "../utils/moleculeAnnotation";
 import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
+import { ToolHeader } from "./ui/primitives";
 import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
 import { DebouncedTask } from "../utils/persistence/debouncedTask";
 import { restoreEditorContent } from "../utils/persistence/editorRestore";
@@ -1792,13 +1793,18 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
   return (
     <div className="spectroscopy-page">
       <section className="card spectroscopy-input-card">
-        <div className="card-header">
-          <div>
-            <h2>Spectroscopy</h2>
-            <p>Draw one molecule to predict its ¹H NMR, ¹³C NMR, IR, and mass-spectrum features.</p>
-          </div>
-          <span className={`status ${ketcher ? "ready" : "loading"}`}>{ketcher ? "Editor ready" : "Loading editor"}</span>
-        </div>
+        <ToolHeader
+          group="Analyze"
+          title="Spectroscopy"
+          purpose="Draw one molecule to predict its ¹H NMR, ¹³C NMR, IR, and mass-spectrum features."
+          ready={Boolean(ketcher)}
+          evidence="estimate"
+          steps={[
+            { label: "Draw or name", detail: "One molecule; press Enter after a name to analyze." },
+            { label: "Analyze", detail: "Estimates all four spectra from the structure." },
+            { label: "Read the peaks", detail: "Each peak is tied to the atoms it comes from." },
+          ]}
+        />
 
         <div className="drawer-placeholder spectroscopy-drawer">
           <MoleculeDrawer

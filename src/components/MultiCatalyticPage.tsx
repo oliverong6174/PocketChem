@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
+import { ToolHeader } from "./ui/primitives";
 import ReactionWorkspacePanel from "./ReactionWorkspacePanel";
 import {
   analyzeFunctionalGroupHierarchy,
@@ -269,18 +270,18 @@ function OrderedSequencePanel() {
 
   return (
     <div className="multicatalytic-sequence-mode">
-      <div className="card-header">
-        <div>
-          <h2>Multi-Catalytic Synthesis</h2>
-          <p>
-            Start with one molecule and apply an ordered reagent/catalyst sequence.
-            A NO REACTION step leaves the molecule unchanged and continues to the next condition.
-          </p>
-        </div>
-        <span className={`status ${ketcher ? "ready" : "loading"}`}>
-          {ketcher ? "Editor ready" : "Loading editor"}
-        </span>
-      </div>
+      <ToolHeader
+        group="Synthesize"
+        title="Multi-Catalytic Synthesis"
+        purpose="Start with one molecule and apply an ordered reagent/catalyst sequence. A NO REACTION step leaves the molecule unchanged and continues to the next condition."
+        ready={Boolean(ketcher)}
+        evidence="rule"
+        steps={[
+          { label: "Draw one molecule", detail: "Draw it or type a name below the editor." },
+          { label: "Build the sequence", detail: "Add reagents or catalysts in the order they are used." },
+          { label: "Run and read each step", detail: "The product of each step feeds the next." },
+        ]}
+      />
 
       <div className="multicatalytic-editor">
         <MoleculeDrawer globalKey="multiCatalyticKetcher" onReady={setKetcher} />
