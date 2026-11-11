@@ -10,7 +10,10 @@ const PAGE_LABELS: Record<string, string> = {
   ranking: "Ranking",
   multicatalytic: "Multi-Catalytic Workspace",
   conformations: "Conformations",
+  genchem: "Acid–base & titration",
 };
+
+const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry" };
 
 const STATUS_LABELS: Record<string, string> = {
   found: "Routes found",
@@ -117,7 +120,7 @@ export default function SavedAnalysesPage({ onOpen }: Props) {
         </p>
       ) : items.length === 0 && problems.length === 0 ? (
         <p className="empty">
-          Nothing saved yet. Use “Save Analysis” on the Multi-Step page after a search to keep it here.
+          Nothing saved yet. Use “Save Analysis” on a tool page to keep a result here.
         </p>
       ) : (
         <ul className="saved-list">
@@ -151,7 +154,7 @@ export default function SavedAnalysesPage({ onOpen }: Props) {
                     ) : (
                       <strong>{item.name}</strong>
                     )}
-                    <span className="saved-badge">{PAGE_LABELS[item.page] ?? item.page}</span>
+                    <span className="saved-badge">{SUBJECT_LABELS[item.subject] ?? item.subject} · {PAGE_LABELS[item.page] ?? item.page}</span>
                     {item.status && <span className="saved-badge">{STATUS_LABELS[item.status] ?? item.status}</span>}
                     {item.stale && <span className="saved-badge saved-badge-warn">Earlier structures</span>}
                   </div>

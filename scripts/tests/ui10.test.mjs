@@ -8,19 +8,20 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const read = (...p) => fs.readFileSync(path.join(root, ...p), "utf8").replace(/\r\n/g, "\n");
 
-test("subject registry: five branches, two modes, only Organic available", async () => {
+test("subject registry: five branches, two modes; Organic and General Chemistry available, three planned", async () => {
   const src = read("src", "navigation", "subjects.ts");
   for (const id of ["organic", "general", "physics", "biology", "biochemistry"]) assert.match(src, new RegExp(`id: "${id}"`));
-  assert.equal((src.match(/status: "available",/g) ?? []).length, 1);
-  assert.equal((src.match(/status: "planned",/g) ?? []).length, 4);
-  assert.match(src, /id: "biology", label: "Biology", mode: "learning"/);
-  assert.match(src, /id: "physics", label: "Physics", mode: "workbench"/);
+  assert.equal((src.match(/status: "available",/g) ?? []).length, 2);
+  assert.equal((src.match(/status: "planned",/g) ?? []).length, 3);
+  assert.match(src, /id: "biology", slug: "biology", label: "Biology", mode: "learning"/);
+  assert.match(src, /id: "physics", slug: "physics", label: "Physics", mode: "workbench"/);
 });
 
 test("every organic tool id is an App page and keeps its tab/panel ids", () => {
   const nav = read("src", "navigation", "subjects.ts");
   const app = read("src", "App.tsx");
-  const ids = [...nav.matchAll(/\{ id: "(\w+)", label: "[^"]+", summary/g)].map((m) => m[1]);
+  const organic = nav.slice(nav.indexOf("export const ORGANIC_TOOLS"), nav.indexOf("export type GeneralToolId"));
+  const ids = [...organic.matchAll(/\{ id: "(\w+)", slug: "[a-z-]+", label: "[^"]+", summary/g)].map((m) => m[1]);
   assert.equal(ids.length, 8);
   for (const id of ids) assert.ok(app.includes(`"${id}"`), id);
   const shell = read("src", "components", "shell", "AppShell.tsx");

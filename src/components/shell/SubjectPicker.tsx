@@ -8,13 +8,15 @@ interface Props {
   /** When rendered inside the mobile sheet the list is always visible (no popover). */
   inline?: boolean;
   onPicked?: () => void;
+  /** Called when an available subject is chosen (the current one included, so the caller may ignore it). */
+  onSelectSubject?: (id: SubjectId) => void;
 }
 
 /**
  * Subject switcher. Available subjects switch; planned subjects open an informational preview (they never
  * replace the working tool). Grouped by product mode so Workbench and Learning subjects stay distinct.
  */
-export function SubjectPicker({ activeSubject, onPreview, inline = false, onPicked }: Props) {
+export function SubjectPicker({ activeSubject, onPreview, inline = false, onPicked, onSelectSubject }: Props) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const listId = useId();
@@ -56,6 +58,7 @@ export function SubjectPicker({ activeSubject, onPreview, inline = false, onPick
                     onClick={() => {
                       setOpen(false);
                       if (subject.status === "planned") onPreview(subject);
+                      else onSelectSubject?.(subject.id);
                       onPicked?.();
                     }}
                     type="button"

@@ -18,6 +18,7 @@
 import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import MoleculeDrawer, { type KetcherApi } from "./components/MoleculeDrawer";
 import { ToolHeader } from "./components/ui/primitives";
+import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectId } from "./navigation/subjects";
   import {
     applyResolvedNameToIdentity,
     type MoleculeNameResolution,
@@ -85,6 +86,8 @@ import { ToolHeader } from "./components/ui/primitives";
   const MultiCatalyticPage = lazy(() => import("./components/MultiCatalyticPage"));
   const SpectroscopyPage = lazy(() => import("./components/SpectroscopyPage"));
   const ConformationsPage = lazy(() => import("./components/ConformationsPage"));
+  const AcidBaseTitrationPage = lazy(() => import("./components/generalChem/AcidBaseTitrationPage"));
+  const GeneralChemistryOverview = lazy(() => import("./components/generalChem/GeneralChemistryOverview"));
 
 
   type AnnotationCarouselItem =
@@ -231,7 +234,11 @@ import { ToolHeader } from "./components/ui/primitives";
     const [moleculeIdentity, setMoleculeIdentity] =
     useState<MoleculeIdentityResult | null>(null);
 
-    const [activePage, setActivePage] = useState<AppPage>("analysis");
+    // Subject and tool: the URL hash (#/organic/reactions, #/general/acid-base-titration) selects them on load and follows them.
+    const initialRoute = useMemo(() => (typeof window === "undefined" ? null : parseRoute(window.location.hash)), []);
+    const [activeSubject, setActiveSubject] = useState<SubjectId>(initialRoute?.subject ?? "organic");
+    const [generalTool, setGeneralTool] = useState<GeneralToolId>(initialRoute?.subject === "general" ? (initialRoute.toolId as GeneralToolId) : "gcOverview");
+    const [activePage, setActivePage] = useState<AppPage>(initialRoute?.subject === "organic" ? (initialRoute.toolId as AppPage) : "analysis");
     const [analysisPanel, setAnalysisPanel] = useState<AnalysisPanel>("overview");
     const [reactionPathways, setReactionPathways] = useState<ReactionPathway[]>([]);
     const appShellRef = useRef<HTMLElement | null>(null);
@@ -530,7 +537,7 @@ import { ToolHeader } from "./components/ui/primitives";
 
     // A saved analysis chosen on the Saved page, waiting for its page to open it. Any other way of
     // changing page forgets it, so it can never be applied later by surprise.
-    const [pendingOpen, setPendingOpen] = useState<{ id: string; recordId: string; page: AppPage } | null>(null);
+    const [pendingOpen, setPendingOpen] = useState<{ id: string; recordId: string; page: AppPage | GeneralToolId } | null>(null);
 
     const switchPage = (page: AppPage, options?: { keepOpenRequest?: boolean }) => {
       if (!options?.keepOpenRequest) setPendingOpen(null);
@@ -545,13 +552,73 @@ import { ToolHeader } from "./components/ui/primitives";
       });
     };
 
+    // General Chemistry navigation. Leaving a tool lets it finish saving first, exactly like switchPage.
+    const switchGeneralTool = (tool: GeneralToolId, options?: { keepOpenRequest?: boolean }) => {
+      if (!options?.keepOpenRequest) setPendingOpen(null);
+      const request = (switchRequestRef.current += 1);
+      void runLeaveHooks().then(() => {
+        if (switchRequestRef.current === request) setGeneralTool(tool);
+      });
+    };
+
+    const switchSubject = (subject: SubjectId, options?: { keepOpenRequest?: boolean; tool?: GeneralToolId; page?: AppPage }) => {
+      if (subject === activeSubject && !options?.tool) return;
+      if (!options?.keepOpenRequest) setPendingOpen(null);
+      const request = (switchRequestRef.current += 1);
+      void runLeaveHooks().then(() => {
+        if (switchRequestRef.current !== request) return;
+        // Leaving Organic Chemistry unmounts the Properties editor; the next visit gets a new one.
+        if (subject !== "organic") setIsMainEditorReady(false);
+        if (subject === "general" && options?.tool) setGeneralTool(options.tool);
+        if (subject === "organic" && options?.page) setActivePage(options.page);
+        setActiveSubject(subject);
+      });
+    };
+
     const openSavedAnalysis = (analysis: { id: string; page: string }) => {
       const target = ANALYSIS_APP_PAGE[analysis.page as keyof typeof ANALYSIS_APP_PAGE];
       if (!target) return;
       openSequenceRef.current += 1;
       setPendingOpen({ id: `open-${openSequenceRef.current}`, recordId: analysis.id, page: target });
+      if (target === "gcAcidBase") {
+        if (activeSubject === "general") switchGeneralTool(target, { keepOpenRequest: true });
+        else switchSubject("general", { keepOpenRequest: true, tool: target });
+        return;
+      }
+      if (activeSubject !== "organic") {
+        switchSubject("organic", { keepOpenRequest: true, page: target });
+        return;
+      }
       switchPage(target, { keepOpenRequest: true });
     };
+
+    // Keep the address bar in step with the subject and tool, and follow back/forward.
+    const routeFirstRef = useRef(true);
+    const navRef = useRef<(route: { subject: SubjectId; toolId: string }) => void>(() => undefined);
+    useEffect(() => {
+      navRef.current = (route) => {
+        if (route.subject !== activeSubject) {
+          switchSubject(route.subject, route.subject === "general" ? { tool: route.toolId as GeneralToolId } : { page: route.toolId as AppPage });
+        } else if (route.subject === "organic") switchPage(route.toolId as AppPage);
+        else switchGeneralTool(route.toolId as GeneralToolId);
+      };
+    });
+    useEffect(() => {
+      const hash = routeHash({ subject: activeSubject, toolId: activeSubject === "organic" ? activePage : generalTool });
+      if (window.location.hash !== hash) {
+        if (routeFirstRef.current) window.history.replaceState(null, "", hash);
+        else window.history.pushState(null, "", hash);
+      }
+      routeFirstRef.current = false;
+    }, [activeSubject, activePage, generalTool]);
+    useEffect(() => {
+      const onPop = () => {
+        const route = parseRoute(window.location.hash);
+        if (route) navRef.current(route);
+      };
+      window.addEventListener("popstate", onPop);
+      return () => window.removeEventListener("popstate", onPop);
+    }, []);
 
 
     // ---- Saved Analyses for Properties (Stage 8B-3B-2) ---------------------------------------------
@@ -732,9 +799,24 @@ import { ToolHeader } from "./components/ui/primitives";
       });
     };
 
+    const handleGeneralTabKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, current: GeneralToolId) => {
+      const tools = SUBJECT_TOOLS.general;
+      const index = tools.findIndex((tool) => tool.id === current);
+      let next = index;
+      if (event.key === "ArrowRight") next = (index + 1) % tools.length;
+      if (event.key === "ArrowLeft") next = (index - 1 + tools.length) % tools.length;
+      if (event.key === "Home") next = 0;
+      if (event.key === "End") next = tools.length - 1;
+      if (next === index) return;
+      event.preventDefault();
+      const id = tools[next].id as GeneralToolId;
+      switchGeneralTool(id);
+      requestAnimationFrame(() => document.getElementById(`page-tab-${id}`)?.focus());
+    };
+
     useLayoutEffect(() => {
       scrollToAppTop();
-    }, [activePage]);
+    }, [activePage, activeSubject, generalTool]);
 
     const PROPERTY_INFO: Record<string, string> = {
     formula:
@@ -1817,14 +1899,46 @@ import { ToolHeader } from "./components/ui/primitives";
 
   return (
     <main className="app" ref={appShellRef}>
-      <AppShell
-        activeToolId={activePage}
-        onSelectTool={(id) => switchPage(id as AppPage)}
-        onToolKeyDown={(event, id) => handlePageTabKeyDown(event, id as AppPage)}
-      />
+      {activeSubject === "organic" ? (
+        <AppShell
+          activeToolId={activePage}
+          onSelectTool={(id) => switchPage(id as AppPage)}
+          onToolKeyDown={(event, id) => handlePageTabKeyDown(event, id as AppPage)}
+          onSelectSubject={(id) => switchSubject(id, id === "general" ? { tool: generalTool } : undefined)}
+        />
+      ) : (
+        <AppShell
+          activeSubject={activeSubject}
+          activeToolId={generalTool}
+          onSelectSubject={(id) => switchSubject(id, id === "general" ? { tool: generalTool } : undefined)}
+          onSelectTool={(id) => switchGeneralTool(id as GeneralToolId)}
+          onToolKeyDown={(event, id) => handleGeneralTabKeyDown(event, id as GeneralToolId)}
+          tools={SUBJECT_TOOLS[activeSubject]}
+        />
+      )}
 
       <div id="main-content" tabIndex={-1} className="main-content">
-      {activePage === "analysis" ? (
+      {activeSubject === "general" ? (
+        <section
+          aria-labelledby={`page-tab-${generalTool}`}
+          className="page-panel"
+          id={`page-panel-${generalTool}`}
+          role="tabpanel"
+        >
+          <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
+            {generalTool === "gcOverview" ? (
+              <GeneralChemistryOverview onOpenTool={(id) => switchGeneralTool(id)} />
+            ) : generalTool === "gcSaved" ? (
+              <SavedAnalysesPage onOpen={openSavedAnalysis} />
+            ) : (
+              <AcidBaseTitrationPage
+                openRequest={pendingOpen?.page === "gcAcidBase" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            )}
+          </Suspense>
+        </section>
+      ) : activePage === "analysis" ? (
         <section
           aria-labelledby="page-tab-analysis"
           className="workspace workspace-compact"

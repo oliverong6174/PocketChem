@@ -1,3 +1,4 @@
+import type { SubjectId } from "../../navigation/subjects";
 /**
  * The Saved Analyses library: named snapshots a user chooses to keep, stored in their own
  * IndexedDB object store ("analyses") and completely separate from each page's automatic workspace.
@@ -12,6 +13,7 @@
  * Saving always creates a new record. Overwriting is a separate, explicit `update(id, …)`.
  */
 import {
+  PAGE_SUBJECT,
   PERSISTENCE_APP_VERSION,
   PersistenceError,
   assertPlainJson,
@@ -31,6 +33,8 @@ export type SavedAnalysisRecord<I = unknown, R = unknown> = {
   kind: "saved-analysis";
   id: string;
   page: PersistedPage;
+  /** Explicit subject (Stage 11). Older records lack it and are read as PAGE_SUBJECT[page]. */
+  subject?: SubjectId;
   name: string;
   schemaVersion: number;
   /** Build that first saved the record (kept as written, also by duplicates). */
@@ -46,6 +50,7 @@ export type SavedAnalysisRecord<I = unknown, R = unknown> = {
 export type SavedAnalysisSummary = {
   id: string;
   page: PersistedPage;
+  subject: SubjectId;
   name: string;
   summary: string;
   createdAt: string;
@@ -111,7 +116,7 @@ export type AnalysisLibraryOptions = {
   newId?: () => string;
 };
 
-const PAGES: readonly string[] = ["synthesis", "properties", "reactions", "spectroscopy", "ranking", "multicatalytic", "conformations"];
+const PAGES: readonly string[] = ["synthesis", "properties", "reactions", "spectroscopy", "ranking", "multicatalytic", "conformations", "genchem"];
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 const isText = (value: unknown): value is string => typeof value === "string" && value.length > 0;
@@ -232,6 +237,7 @@ export class AnalysisLibrary {
   private envelopeProblem(key: string, raw: Record<string, unknown>): string | null {
     if (raw.id !== key) return "The saved analysis does not match its storage key.";
     if (!isText(raw.page) || !PAGES.includes(raw.page)) return "The saved analysis has an unknown page type.";
+    if (raw.subject !== undefined && raw.subject !== PAGE_SUBJECT[raw.page as PersistedPage]) return "The saved analysis names a subject that does not match its page type.";
     if (!isText(raw.name) || raw.name.length > MAX_ANALYSIS_NAME_CHARS) return "The saved analysis has no usable name.";
     if (!isText(raw.appVersion) || !isText(raw.createdAt) || !isText(raw.updatedAt)) return "The saved analysis is missing required fields.";
     if (typeof raw.summary !== "string") return "The saved analysis has no summary.";
@@ -252,6 +258,7 @@ export class AnalysisLibrary {
     return {
       id: record.id,
       page: record.page,
+      subject: record.subject ?? PAGE_SUBJECT[record.page],
       name: record.name,
       summary: record.summary,
       createdAt: record.createdAt,
@@ -308,6 +315,7 @@ export class AnalysisLibrary {
         kind: "saved-analysis",
         id,
         page,
+        subject: PAGE_SUBJECT[page],
         name,
         schemaVersion: this.schemaVersion,
         appVersion: PERSISTENCE_APP_VERSION,

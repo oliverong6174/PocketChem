@@ -14,6 +14,7 @@ interface Props {
   /** Tools of the active subject. Defaults to the Organic Chemistry tools (the only implemented subject). */
   tools?: ToolDef[];
   activeSubject?: SubjectId;
+  onSelectSubject?: (id: SubjectId) => void;
 }
 
 function BrandMark() {
@@ -32,7 +33,7 @@ function BrandMark() {
  *  - <  960px: one compact bar whose "current tool" button opens a full-height sheet with every tool,
  *    its description, the subject list and the theme control (large touch targets, focus-trapped).
  */
-export function AppShell({ activeToolId, onSelectTool, onToolKeyDown, tools = ORGANIC_TOOLS, activeSubject = "organic" }: Props) {
+export function AppShell({ activeToolId, onSelectTool, onToolKeyDown, tools = ORGANIC_TOOLS, activeSubject = "organic", onSelectSubject }: Props) {
   const { preference, setPreference } = useTheme();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [preview, setPreview] = useState<SubjectDef | null>(null);
@@ -54,7 +55,7 @@ export function AppShell({ activeToolId, onSelectTool, onToolKeyDown, tools = OR
           </a>
 
           <div className="shell-subject">
-            <SubjectPicker activeSubject={activeSubject} onPreview={setPreview} />
+            <SubjectPicker activeSubject={activeSubject} onPreview={setPreview} onSelectSubject={onSelectSubject} />
           </div>
 
           <button
@@ -155,7 +156,7 @@ export function AppShell({ activeToolId, onSelectTool, onToolKeyDown, tools = OR
             })}
 
             <h2 className="sheet-subject">Subjects</h2>
-            <SubjectPicker activeSubject={activeSubject} inline onPicked={() => setSheetOpen(false)} onPreview={setPreview} />
+            <SubjectPicker activeSubject={activeSubject} inline onPicked={() => setSheetOpen(false)} onPreview={setPreview} onSelectSubject={onSelectSubject} />
 
             <h2 className="sheet-subject">Appearance</h2>
             <ThemeToggle onChange={setPreference} preference={preference} />

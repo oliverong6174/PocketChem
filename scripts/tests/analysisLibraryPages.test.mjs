@@ -497,9 +497,9 @@ describe("navigation and page wiring", () => {
   const synthesis = read("src", "components", "SynthesisPage.tsx");
 
   test("[navigation] each saved type opens on its own page; the page ids exist in the navigation", () => {
-    assert.deepEqual({ ...libApp.ANALYSIS_APP_PAGE }, { synthesis: "multiStep", ranking: "acidBase", spectroscopy: "spectroscopy", properties: "analysis", reactions: "reactions", multicatalytic: "multiCatalytic", conformations: "conformations" });
-    assert.deepEqual([...libApp.OPENABLE_ANALYSIS_PAGES], ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations"]);
-    for (const id of Object.values(libApp.ANALYSIS_APP_PAGE)) assert.match(app, new RegExp(`\\{ id: "${id}", label:`));
+    assert.deepEqual({ ...libApp.ANALYSIS_APP_PAGE }, { synthesis: "multiStep", ranking: "acidBase", spectroscopy: "spectroscopy", properties: "analysis", reactions: "reactions", multicatalytic: "multiCatalytic", conformations: "conformations", genchem: "gcAcidBase" });
+    assert.deepEqual([...libApp.OPENABLE_ANALYSIS_PAGES], ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem"]);
+    for (const id of Object.values(libApp.ANALYSIS_APP_PAGE)) assert.match(id.startsWith("gc") ? read("src", "navigation", "subjects.ts") : app, new RegExp(`\\{ id: "${id}", (slug: "[a-z-]+", )?label:`));
     assert.match(app, /const target = ANALYSIS_APP_PAGE\[analysis\.page as keyof typeof ANALYSIS_APP_PAGE\];/);
     assert.match(app, /switchPage\(target, \{ keepOpenRequest: true \}\)/);
     assert.match(app, /openRequest=\{pendingOpen\?\.page === "acidBase" \? pendingOpen : null\}/);

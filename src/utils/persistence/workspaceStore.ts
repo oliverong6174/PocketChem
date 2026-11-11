@@ -1,3 +1,4 @@
+import type { SubjectId } from "../../navigation/subjects";
 /**
  * Versioned, bounded storage for PocketChem's automatic workspace recovery.
  *
@@ -18,7 +19,22 @@ export const PERSISTENCE_APP_VERSION = "pocketchem-stage8b1";
 /** Largest serialized record accepted, in characters of JSON. */
 export const DEFAULT_MAX_RECORD_CHARS = 6_000_000;
 
-export type PersistedPage = "synthesis" | "properties" | "reactions" | "spectroscopy" | "ranking" | "multicatalytic" | "conformations";
+export type PersistedPage = "synthesis" | "properties" | "reactions" | "spectroscopy" | "ranking" | "multicatalytic" | "conformations" | "genchem";
+
+/**
+ * The subject each persisted page belongs to. Saved-analysis records carry their subject explicitly; records written
+ * before Stage 11 have no subject field and are read as the subject of their page (all Organic Chemistry).
+ */
+export const PAGE_SUBJECT: Record<PersistedPage, SubjectId> = {
+  synthesis: "organic",
+  properties: "organic",
+  reactions: "organic",
+  spectroscopy: "organic",
+  ranking: "organic",
+  multicatalytic: "organic",
+  conformations: "organic",
+  genchem: "general",
+};
 
 export type PersistenceErrorCode =
   | "unavailable"

@@ -4,6 +4,7 @@
  * (Stage 8B-3B-2), and the Multi-Catalytic workspace (Stage 9B-2B).
  */
 import { CONFORMATIONS_ENGINE_VERSION, validateConformationsInputs, validateConformationsResults } from "./conformationsWorkspace";
+import { GENCHEM_ENGINE_VERSION, validateGenChemInputs, validateGenChemResults } from "./generalChemWorkspace";
 import { getAnalysisLibrary, registerAnalysisValidators, type AnalysisLibrary } from "./analysisLibrary";
 import {
   MULTICATALYTIC_ENGINE_VERSION,
@@ -21,7 +22,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -32,6 +33,7 @@ export const ANALYSIS_APP_PAGE = {
   reactions: "reactions",
   multicatalytic: "multiCatalytic",
   conformations: "conformations",
+  genchem: "gcAcidBase",
 } as const;
 
 let registered = false;
@@ -68,6 +70,11 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
         engineVersion: CONFORMATIONS_ENGINE_VERSION,
         validateInputs: validateConformationsInputs,
         validateResults: validateConformationsResults,
+      },
+      genchem: {
+        engineVersion: GENCHEM_ENGINE_VERSION,
+        validateInputs: validateGenChemInputs,
+        validateResults: validateGenChemResults,
       },
       multicatalytic: {
         engineVersion: MULTICATALYTIC_ENGINE_VERSION,
