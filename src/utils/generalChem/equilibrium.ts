@@ -170,6 +170,16 @@ export function solveEquilibrium(system: EquilibriumSystem): EquilibriumResult {
   return start(-d.xi, "reverse", d.products, d.reactants);
 }
 
+/** Plain-language value of Q for the starting mixture when it is not a finite positive number. */
+export function q0Description(system: EquilibriumSystem): string {
+  const reactantsAbsent = system.reactants.some((s) => s.c0 === 0);
+  const productsAbsent = system.products.some((s) => s.c0 === 0);
+  if (productsAbsent && reactantsAbsent) return "undefined (0/0)";
+  if (productsAbsent) return "0 (no product yet)";
+  if (reactantsAbsent) return "infinite (no reactant)";
+  return "undefined";
+}
+
 // ---- reaction quotient and bounds --------------------------------------------------------------------------------------
 
 /** Q for the given concentrations; null if it is zero/undefined/infinite (use lnQ for the extended value). */

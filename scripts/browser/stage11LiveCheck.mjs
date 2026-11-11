@@ -66,11 +66,11 @@ try {
   await sleep(300);
 
   await pickSubject("General Chemistry");
-  check("General Chemistry opens its own tool tabs (Overview, Acid–base & titration, Saved)", (await ev(`[...document.querySelectorAll('.tool-tabs [role=tab]')].map((b) => b.textContent.trim()).join('|')`)) === "Overview|Acid–base & titration|Saved");
+  check("General Chemistry opens its own tool tabs (Overview, the four tools, Saved)", (await ev(`[...document.querySelectorAll('.tool-tabs [role=tab]')].map((b) => b.textContent.trim()).join('|')`)) === "Overview|Acid–base & titration|Chemical equilibrium|Reaction kinetics|Thermodynamics|Saved");
   check("hash is #/general/overview", (await hash()) === "#/general/overview", await hash());
   const overview = await ev(`(() => { const planned = [...document.querySelectorAll('.gc-planned li')]; return { planned: planned.length, plannedButtons: document.querySelectorAll('.gc-planned button, .gc-planned a, .gc-planned input').length, openButtons: [...document.querySelectorAll('.gc-tool-card button')].map((b) => b.textContent.trim()), badges: planned.every((li) => /Planned/.test(li.textContent)) }; })()`);
   check("landing page lists planned areas as non-interactive 'Planned' items", overview.planned >= 4 && overview.plannedButtons === 0 && overview.badges, JSON.stringify(overview));
-  check("landing page offers exactly one working tool with an Open button", overview.openButtons.length === 1 && /Open Acid–base/.test(overview.openButtons[0]), overview.openButtons.join());
+  check("landing page offers the four working tools, each with an Open button", overview.openButtons.length === 4 && /Open Acid–base/.test(overview.openButtons[0]), overview.openButtons.join());
   await screenshot(cdp, path.join(outDir, "overview-dark.png"), { fullPage: false });
 
   await ev(`history.back()`);

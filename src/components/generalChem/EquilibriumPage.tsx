@@ -4,7 +4,7 @@ import { LineChart, type ChartMarker, type ChartSeries } from "../ui/LineChart";
 import { LearningModeSwitch, type LearningMode } from "../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, Explanation, KeyFigures, Legend, Panel, Segmented, ToolHeader } from "../ui/primitives";
 import {
-  EQ_LIMITS, VOLUME_FACTOR_RANGE, R_L_BAR, deltaNu, kExpressionText, kpFromKc, lnQ, predictDirection, progressCurve, reactionText,
+  EQ_LIMITS, VOLUME_FACTOR_RANGE, q0Description, R_L_BAR, deltaNu, kExpressionText, kpFromKc, lnQ, predictDirection, progressCurve, reactionText,
   solveEquilibrium, validateEquilibrium, applyDisturbance, withInitial,
   type Direction, type EquilibriumSystem, type Species,
 } from "../../utils/generalChem/equilibrium";
@@ -217,15 +217,15 @@ export default function EquilibriumPage({ openRequest = null, onOpenHandled }: P
               <KeyFigures
                 items={[
                   { label: "Reaction", value: <span className="gc-reaction">{reactionText(model.system)}</span>, note: kExpressionText(model.system) },
-                  { label: "Q₀ versus K", value: model.result.Q0 === null ? "Q₀ undefined" : `${fmt(model.result.Q0)} vs ${fmt(model.system.K)}`, note: `Net reaction: ${DIR_TEXT[model.result.direction]}` },
-                  { label: "Extent ξ", value: `${fmt(model.result.xi)} mol/L`, note: `Allowed range ${fmt(model.result.xiMin)} to ${fmt(model.result.xiMax)}` },
+                  { label: "Q₀ versus K", value: model.result.Q0 === null ? `${q0Description(model.system)} vs ${fmt(model.system.K)}` : `${fmt(model.result.Q0)} vs ${fmt(model.system.K)}`, note: `Net reaction: ${DIR_TEXT[model.result.direction]}` },
+                  { label: "Reaction extent", value: `${fmt(model.result.xi)} mol/L`, note: `Allowed range ${fmt(model.result.xiMin)} to ${fmt(model.result.xiMax)}` },
                   { label: "Check", value: `Q = ${Number.isFinite(model.result.Qeq) ? fmt(model.result.Qeq) : "—"}`, note: "recomputed from the answer; equals K" },
                 ]}
               />
 
               {view1 ? (
                 <DiagramFrame
-                  caption={`Progress ξ = ${fmt(probeXi)} mol/L. Drag on the graph, use the arrow keys, or move the slider; the equilibrium is where the amounts stop changing.`}
+                  caption={`Progress ξ = ${fmt(probeXi)} mol/L (negative means the reverse of the equation as written). Drag on the graph, use the arrow keys, or move the slider; the equilibrium is where the amounts stop changing.`}
                   label="Equilibrium composition"
                   legend={<Legend items={[...allSpecies(view1.system).map(({ s }, idx) => ({ label: s.name, color: COLORS[idx % COLORS.length], kind: (DASHES[idx % DASHES.length] ? "dashed" : "line") as "line" | "dashed" })), { label: "Selected progress", color: "#be123c", kind: "dashed" as const }, { label: "Equilibrium", color: "#b45309" }]} />}
                   title="Composition against reaction progress"
@@ -240,7 +240,7 @@ export default function EquilibriumPage({ openRequest = null, onOpenHandled }: P
                     title="Concentrations against reaction progress"
                     valueText={`Progress ${fmt(probeXi)} mol/L: ${allSpecies(view1.system).map(({ s, side, i }) => `${s.name} ${fmt((side === "reactants" ? probeConc!.reactants : probeConc!.products)[i])}`).join(", ")}; ${probeDir ? DIR_TEXT[probeDir.direction] : ""}`}
                     xDomain={[view1.result.xiMin, view1.result.xiMax]}
-                    xLabel="Reaction progress ξ (mol/L); negative = reverse of the equation"
+                    xLabel="Reaction progress ξ (mol/L)"
                     xStep={(view1.result.xiMax - view1.result.xiMin) / 400}
                     yDomain={[0, yMax * 1.05]}
                     yLabel="Concentration (mol/L)"

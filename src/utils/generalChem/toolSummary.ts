@@ -3,7 +3,7 @@
  * assumption lists each tool states. Pure functions of validated inputs; used by the pages and by the tests.
  */
 import {
-  applyDisturbance, deltaNu, solveEquilibrium, type Disturbance,
+  applyDisturbance, deltaNu, q0Description, solveEquilibrium, type Disturbance,
 } from "./equilibrium";
 import { formatSig } from "./format";
 import {
@@ -49,7 +49,7 @@ export function summarizeEquilibrium(inputs: EquilibriumInputs): ToolResults | n
   const dir = r.direction === "none" ? "no net change" : r.direction === "forward" ? "forward (toward products)" : "reverse (toward reactants)";
   const comp = [...sys.reactants.map((s, i) => `[${s.name}] = ${f(r.reactants[i])}`), ...sys.products.map((s, i) => `[${s.name}] = ${f(r.products[i])}`)].join(", ");
   const headline = [
-    `K = ${f(sys.K)}; Q₀ = ${r.Q0 === null ? "undefined (a species is absent)" : f(r.Q0)}: ${dir}`,
+    `K = ${f(sys.K)}; Q₀ = ${r.Q0 === null ? q0Description(sys) : f(r.Q0)}: ${dir}`,
     `Equilibrium (mol/L): ${comp}`,
     `Extent ξ = ${f(r.xi)} mol/L`,
   ];

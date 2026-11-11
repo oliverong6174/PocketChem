@@ -76,7 +76,7 @@
 .gc-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--sp-2); }
 .gc-field textarea { width: 100%; resize: vertical; font-size: var(--fs-sm); line-height: 1.45; }
 .gc-field .gc-mono, .gc-field input.gc-mono { font-family: var(--font-mono); }
-.gc-reaction { font-family: var(--font-mono); font-size: 1rem; overflow-wrap: anywhere; }
+.gc-reaction { font-family: var(--font-body, system-ui); font-size: 1rem; overflow-wrap: anywhere; }
 .gc-eq-line { margin: 0; font-family: var(--font-mono); font-size: var(--fs-sm); overflow-wrap: anywhere; }
 .gc-step { display: grid; gap: var(--sp-1); margin-bottom: var(--sp-3); }
 .gc-step h4 { margin: 0; font-size: var(--fs-md, 1rem); }
@@ -101,3 +101,6 @@
 .gc-band.kind-warn { fill: rgba(180, 83, 9, 0.16); }
 .gc-check { display: flex; gap: var(--sp-2); align-items: flex-start; font-size: var(--fs-sm); }
 .gc-check input { margin-top: 3px; }
+.gc-stage > *, .gc-inputs > * { min-width: 0; }
+.gc-stage .ui-figure { min-width: 0; }
+.gc-stage .ui-figure dd { overflow-wrap: anywhere; }
