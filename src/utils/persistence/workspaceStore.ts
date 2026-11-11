@@ -19,7 +19,7 @@ export const PERSISTENCE_APP_VERSION = "pocketchem-stage8b1";
 /** Largest serialized record accepted, in characters of JSON. */
 export const DEFAULT_MAX_RECORD_CHARS = 6_000_000;
 
-export type PersistedPage = "synthesis" | "properties" | "reactions" | "spectroscopy" | "ranking" | "multicatalytic" | "conformations" | "genchem";
+export type PersistedPage = "synthesis" | "properties" | "reactions" | "spectroscopy" | "ranking" | "multicatalytic" | "conformations" | "genchem" | "equilibrium" | "kinetics" | "thermo";
 
 /**
  * The subject each persisted page belongs to. Saved-analysis records carry their subject explicitly; records written
@@ -34,6 +34,9 @@ export const PAGE_SUBJECT: Record<PersistedPage, SubjectId> = {
   multicatalytic: "organic",
   conformations: "organic",
   genchem: "general",
+  equilibrium: "general",
+  kinetics: "general",
+  thermo: "general",
 };
 
 export type PersistenceErrorCode =

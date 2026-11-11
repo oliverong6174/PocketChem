@@ -88,6 +88,9 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
   const ConformationsPage = lazy(() => import("./components/ConformationsPage"));
   const AcidBaseTitrationPage = lazy(() => import("./components/generalChem/AcidBaseTitrationPage"));
   const GeneralChemistryOverview = lazy(() => import("./components/generalChem/GeneralChemistryOverview"));
+  const EquilibriumPage = lazy(() => import("./components/generalChem/EquilibriumPage"));
+  const KineticsPage = lazy(() => import("./components/generalChem/KineticsPage"));
+  const ThermodynamicsPage = lazy(() => import("./components/generalChem/ThermodynamicsPage"));
 
 
   type AnnotationCarouselItem =
@@ -580,7 +583,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
       if (!target) return;
       openSequenceRef.current += 1;
       setPendingOpen({ id: `open-${openSequenceRef.current}`, recordId: analysis.id, page: target });
-      if (target === "gcAcidBase") {
+      if (target === "gcAcidBase" || target === "gcEquilibrium" || target === "gcKinetics" || target === "gcThermo") {
         if (activeSubject === "general") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("general", { keepOpenRequest: true, tool: target });
         return;
@@ -1930,6 +1933,21 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
               <GeneralChemistryOverview onOpenTool={(id) => switchGeneralTool(id)} />
             ) : generalTool === "gcSaved" ? (
               <SavedAnalysesPage onOpen={openSavedAnalysis} />
+            ) : generalTool === "gcEquilibrium" ? (
+              <EquilibriumPage
+                openRequest={pendingOpen?.page === "gcEquilibrium" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcKinetics" ? (
+              <KineticsPage
+                openRequest={pendingOpen?.page === "gcKinetics" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcThermo" ? (
+              <ThermodynamicsPage
+                openRequest={pendingOpen?.page === "gcThermo" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
             ) : (
               <AcidBaseTitrationPage
                 openRequest={pendingOpen?.page === "gcAcidBase" ? pendingOpen : null}

@@ -39,8 +39,8 @@ export const SUBJECTS: SubjectDef[] = [
   { id: "organic", slug: "organic", label: "Organic Chemistry", mode: "workbench", icon: "molecule", status: "available", tagline: "Structures, reactions, synthesis, spectra and conformations." },
   {
     id: "general", slug: "general", label: "General Chemistry", mode: "workbench", icon: "general", status: "available",
-    tagline: "Acid–base equilibria and titrations today; more quantitative tools planned.",
-    planned: ["Stoichiometry and limiting reagents", "Gas laws", "Thermochemistry", "Solubility equilibria", "Periodic trends"],
+    tagline: "Acid–base, equilibrium, kinetics and thermodynamics today; more quantitative tools planned.",
+    planned: ["Stoichiometry and limiting reagents", "Gas laws", "Solubility equilibria", "Periodic trends"],
   },
   {
     id: "physics", slug: "physics", label: "Physics", mode: "workbench", icon: "physics", status: "planned",
@@ -90,11 +90,14 @@ export const ORGANIC_TOOLS: ToolDef[] = [
   { id: "saved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
-export type GeneralToolId = "gcOverview" | "gcAcidBase" | "gcSaved";
+export type GeneralToolId = "gcOverview" | "gcAcidBase" | "gcEquilibrium" | "gcKinetics" | "gcThermo" | "gcSaved";
 
 export const GENERAL_TOOLS: ToolDef[] = [
   { id: "gcOverview", slug: "overview", label: "Overview", summary: "What General Chemistry offers now, and what is still planned.", group: "analyze", icon: "general" },
   { id: "gcAcidBase", slug: "acid-base-titration", label: "Acid–base & titration", summary: "pH, buffers, dilution and titration curves for monoprotic acids and bases.", group: "analyze", icon: "flask" },
+  { id: "gcEquilibrium", slug: "equilibrium", label: "Chemical equilibrium", summary: "Q versus K, ICE tables, equilibrium compositions and Le Châtelier shifts for one reaction.", group: "analyze", icon: "equilibrium" },
+  { id: "gcKinetics", slug: "kinetics", label: "Reaction kinetics", summary: "Zero-, first- and second-order rate laws, half-lives, rate-law fitting and Arrhenius.", group: "analyze", icon: "kinetics" },
+  { id: "gcThermo", slug: "thermodynamics", label: "Thermodynamics", summary: "Gibbs energy versus temperature, Hess's law and calorimetry.", group: "analyze", icon: "thermo" },
   { id: "gcSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 

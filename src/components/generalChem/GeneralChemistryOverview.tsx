@@ -7,9 +7,36 @@ import "../../styles/generalChem.css";
  * Landing page of the General Chemistry subject. It lists only tools that exist (with a way to open them) and, separately
  * and clearly marked, the areas that are planned. Planned items have no buttons and no calculators.
  */
+const FEATURES: Record<string, string[]> = {
+  gcAcidBase: [
+    "Strong and weak monoprotic acids and bases; pH, pOH, percent ionization",
+    "Buffers, with a check on whether Henderson–Hasselbalch applies",
+    "Dilution and the effect of concentration on equilibrium",
+    "Interactive titration curves with equivalence and half-equivalence points",
+  ],
+  gcEquilibrium: [
+    "Q versus K, ICE tables and the equilibrium composition for one reaction (up to 2 reactants and 2 products)",
+    "Composition and Q-versus-K graphs you can drag along the reaction progress",
+    "Le Châtelier: add or remove a species, change the volume, and see the shift computed",
+    "Kc to Kp for gases; guided worked solution",
+  ],
+  gcKinetics: [
+    "Zero-, first- and second-order single-reactant rate laws with half-lives and integrated equations",
+    "Concentration–time and linearized plots that move together",
+    "Fit your concentration–time data and compare the three orders with a stated criterion",
+    "Arrhenius: activation energy from two points or a table, and k at any temperature",
+  ],
+  gcThermo: [
+    "ΔG° = ΔH° − TΔS° against temperature, crossover temperatures, K, and nonstandard ΔG",
+    "Hess's law with automatic reversal and scaling and a species-cancellation table",
+    "Calorimetry: reaction ΔH, mixing, and specific heat, with every energy-balance step",
+    "Explicit assumptions: constant ΔH and ΔS unless ΔCp is given",
+  ],
+};
+
 export default function GeneralChemistryOverview({ onOpenTool }: { onOpenTool: (id: GeneralToolId) => void }) {
   const subject = getSubject("general");
-  const implemented = GENERAL_TOOLS.filter((tool) => tool.id === "gcAcidBase");
+  const implemented = GENERAL_TOOLS.filter((tool) => tool.id in FEATURES);
   return (
     <div className="gc-page gc-overview">
       <ToolHeader
@@ -28,10 +55,7 @@ export default function GeneralChemistryOverview({ onOpenTool }: { onOpenTool: (
                 <h3>{tool.label}</h3>
                 <p>{tool.summary}</p>
                 <ul className="gc-feature-list">
-                  <li>Strong and weak monoprotic acids and bases; pH, pOH, percent ionization</li>
-                  <li>Buffers, with a check on whether Henderson–Hasselbalch applies</li>
-                  <li>Dilution and the effect of concentration on equilibrium</li>
-                  <li>Interactive titration curves with equivalence and half-equivalence points</li>
+                  {FEATURES[tool.id].map((line) => <li key={line}>{line}</li>)}
                 </ul>
                 <div className="gc-tool-card-foot">
                   <EvidenceBadge level="model" />
@@ -54,8 +78,9 @@ export default function GeneralChemistryOverview({ onOpenTool }: { onOpenTool: (
         </ul>
       </Panel>
 
-      <Callout tone="info" title="Scope of the acid–base tool">
-        <p>It models one monoprotic acid or base in water at 25 °C with ideal-solution assumptions. Polyprotic acids, mixtures, activity corrections, other temperatures and non-aqueous solvents are not supported, and the tool says so rather than approximating them.</p>
+      <Callout tone="info" title="Scope of the tools">
+        <p>The acid–base tool models one monoprotic acid or base in water at 25 °C with ideal-solution assumptions. Polyprotic acids, mixtures, activity corrections, other temperatures and non-aqueous solvents are not supported, and the tool says so rather than approximating them.</p>
+        <p>The equilibrium tool handles one reaction with ideal species at constant temperature. The kinetics tool handles one reactant with a zero-, first- or second-order rate law. The thermodynamics tool treats ΔH° and ΔS° as constant unless ΔCp is given. All of these are teaching models, not substitutes for measured data.</p>
       </Callout>
     </div>
   );

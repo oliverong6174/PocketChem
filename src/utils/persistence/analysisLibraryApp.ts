@@ -5,6 +5,10 @@
  */
 import { CONFORMATIONS_ENGINE_VERSION, validateConformationsInputs, validateConformationsResults } from "./conformationsWorkspace";
 import { GENCHEM_ENGINE_VERSION, validateGenChemInputs, validateGenChemResults } from "./generalChemWorkspace";
+import {
+  EQUILIBRIUM_ENGINE_VERSION, KINETICS_ENGINE_VERSION, THERMO_ENGINE_VERSION,
+  validateEquilibriumInputs, validateEquilibriumResults, validateKineticsInputs, validateKineticsResults, validateThermoInputs, validateThermoResults,
+} from "./generalChemTools";
 import { getAnalysisLibrary, registerAnalysisValidators, type AnalysisLibrary } from "./analysisLibrary";
 import {
   MULTICATALYTIC_ENGINE_VERSION,
@@ -22,7 +26,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -34,6 +38,9 @@ export const ANALYSIS_APP_PAGE = {
   multicatalytic: "multiCatalytic",
   conformations: "conformations",
   genchem: "gcAcidBase",
+  equilibrium: "gcEquilibrium",
+  kinetics: "gcKinetics",
+  thermo: "gcThermo",
 } as const;
 
 let registered = false;
@@ -76,6 +83,9 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
         validateInputs: validateGenChemInputs,
         validateResults: validateGenChemResults,
       },
+      equilibrium: { engineVersion: EQUILIBRIUM_ENGINE_VERSION, validateInputs: validateEquilibriumInputs, validateResults: validateEquilibriumResults },
+      kinetics: { engineVersion: KINETICS_ENGINE_VERSION, validateInputs: validateKineticsInputs, validateResults: validateKineticsResults },
+      thermo: { engineVersion: THERMO_ENGINE_VERSION, validateInputs: validateThermoInputs, validateResults: validateThermoResults },
       multicatalytic: {
         engineVersion: MULTICATALYTIC_ENGINE_VERSION,
         validateInputs: validateMulticatalyticInputs,

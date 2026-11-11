@@ -11,6 +11,9 @@ const PAGE_LABELS: Record<string, string> = {
   multicatalytic: "Multi-Catalytic Workspace",
   conformations: "Conformations",
   genchem: "Acid–base & titration",
+  equilibrium: "Chemical equilibrium",
+  kinetics: "Reaction kinetics",
+  thermo: "Thermodynamics",
 };
 
 const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry" };

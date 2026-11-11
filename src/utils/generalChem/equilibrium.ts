@@ -254,7 +254,7 @@ export function applyDisturbance(
   d: Disturbance,
 ): DisturbanceOutcome | { ok: false; reason: string } {
   const imm = { reactants: [...eq.reactants], products: [...eq.products] };
-  let note = "";
+  let note: string;
   if (d.kind === "add" || d.kind === "remove") {
     const list = imm[d.side];
     if (!Number.isInteger(d.index) || d.index < 0 || d.index >= list.length) return { ok: false, reason: "Choose a species that is in the reaction." };

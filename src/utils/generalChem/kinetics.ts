@@ -106,7 +106,7 @@ export function modelCurve(m: RateModel, points = 200, tMax = plotSpan(m)): Curv
   for (let i = 0; i <= points; i += 1) {
     const t = (tMax * i) / points;
     const c = concentrationAt(m, t);
-    out.push({ t, c, y: c > 0 ? linearized(m.order, c) : Number.NaN });
+    out.push({ t, c, y: m.order === 0 ? c : c > 0 ? linearized(m.order, c) : Number.NaN });
   }
   return out;
 }

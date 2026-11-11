@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { NumberField } from "./shared";
 import "../../styles/generalChem.css";
 import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "../SavedAnalysisControls";
 import WorkspaceNotice, { type WorkspaceNoticeItem } from "../WorkspaceNotice";
@@ -54,38 +55,6 @@ const REGION_LABEL: Record<string, string> = {
   equivalence: "Equivalence point",
   "excess-titrant": "Past equivalence",
 };
-
-/** A number field that keeps what the user typed (so "1e-" or "" can be edited) and reports numbers (NaN when unreadable). */
-function NumberField({ label, unit, value, onChange, error, hint, step }: {
-  label: string; unit?: string; value: number; onChange: (value: number) => void; error?: string | null; hint?: string; step?: number;
-}) {
-  const id = useId();
-  const show = (v: number) => (Number.isFinite(v) ? String(Number(v.toPrecision(10))) : "");
-  const [text, setText] = useState(show(value));
-  const [seen, setSeen] = useState(value);
-  if (!Object.is(value, seen)) {
-    // follow external changes (slider, presets, restored analysis) without fighting the user's typing
-    setSeen(value);
-    const typed = text.trim() === "" ? NaN : Number(text);
-    if (!Object.is(typed, value)) setText(show(value));
-  }
-  return (
-    <div className={`gc-field${error ? " has-error" : ""}`}>
-      <label htmlFor={id}>{label}{unit ? <span className="gc-unit"> ({unit})</span> : null}</label>
-      <input
-        aria-describedby={error ? `${id}-err` : hint ? `${id}-hint` : undefined}
-        aria-invalid={error ? true : undefined}
-        id={id}
-        inputMode="decimal"
-        onChange={(event) => { setText(event.target.value); onChange(event.target.value.trim() === "" ? NaN : Number(event.target.value)); }}
-        step={step}
-        type="text"
-        value={text}
-      />
-      {error ? <p className="gc-field-error" id={`${id}-err`} role="alert">{error}</p> : hint ? <p className="gc-field-hint" id={`${id}-hint`}>{hint}</p> : null}
-    </div>
-  );
-}
 
 const clampVt = (t: TitrationInput): TitrationInput => {
   const veq = equivalenceVolume(t);

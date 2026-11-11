@@ -12,9 +12,15 @@ import { niceTicks } from "../../utils/chartTicks";
  */
 
 export interface ChartPoint { x: number; y: number }
-export interface ChartSeries { id: string; label: string; points: ChartPoint[] }
+export interface ChartSeries {
+  id: string; label: string; points: ChartPoint[];
+  /** Stroke colour and dash pattern (e.g. "7 4"). Without them the default teal solid line is used. Dashes keep series distinguishable without colour. */
+  color?: string; dash?: string;
+  /** Draw a dot at each point (for measured data); with `noLine` the points are not joined. */
+  dots?: boolean; noLine?: boolean;
+}
 export interface ChartMarker { id: string; x: number; y: number; label: string; kind: "equivalence" | "half" | "info" }
-export interface ChartBand { id: string; x0: number; x1: number; label: string }
+export interface ChartBand { id: string; x0: number; x1: number; label: string; /** "warn" shades a less reliable region in amber. */ kind?: "warn" }
 
 interface Props {
   title: string;
@@ -87,8 +93,16 @@ export function LineChart({
     onXChange(Math.min(x1, Math.max(x0, next)));
   };
 
-  const path = (points: ChartPoint[]) =>
-    points.map((p, i) => `${i === 0 ? "M" : "L"}${sx(p.x).toFixed(2)},${sy(Math.min(y1, Math.max(y0, p.y))).toFixed(2)}`).join("");
+  /** Polyline path; points with a non-finite coordinate break the line instead of drawing to NaN. */
+  const path = (points: ChartPoint[]) => {
+    let pen = false;
+    return points.map((p) => {
+      if (!Number.isFinite(p.x) || !Number.isFinite(p.y)) { pen = false; return ""; }
+      const cmd = pen ? "L" : "M";
+      pen = true;
+      return `${cmd}${sx(p.x).toFixed(2)},${sy(Math.min(y1, Math.max(y0, p.y))).toFixed(2)}`;
+    }).join("");
+  };
 
   return (
     <div className="gc-chart" ref={wrapRef}>
@@ -113,7 +127,7 @@ export function LineChart({
         <defs><clipPath id={`${id}-clip`}><rect height={plotH} width={plotW} x={MARGIN.left} y={MARGIN.top} /></clipPath></defs>
 
         {bands.map((band) => (
-          <rect className="gc-band" height={plotH} key={band.id} width={Math.max(0, sx(band.x1) - sx(band.x0))} x={sx(band.x0)} y={MARGIN.top}>
+          <rect className={`gc-band${band.kind ? ` kind-${band.kind}` : ""}`} height={plotH} key={band.id} width={Math.max(0, sx(band.x1) - sx(band.x0))} x={sx(band.x0)} y={MARGIN.top}>
             <title>{band.label}</title>
           </rect>
         ))}
@@ -133,7 +147,12 @@ export function LineChart({
         <rect className="gc-frame" height={plotH} width={plotW} x={MARGIN.left} y={MARGIN.top} />
 
         <g clipPath={`url(#${id}-clip)`}>
-          {series.map((s) => <path className="gc-line" d={path(s.points)} fill="none" key={s.id} />)}
+          {series.map((s) => (
+            <g key={s.id}>
+              {s.noLine ? null : <path className="gc-line" d={path(s.points)} data-series={s.id} fill="none" style={s.color || s.dash ? { stroke: s.color, strokeDasharray: s.dash } : undefined} />}
+              {s.dots ? s.points.filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y)).map((p, i) => <circle className="gc-dot" cx={sx(p.x)} cy={sy(Math.min(y1, Math.max(y0, p.y)))} data-series={s.id} key={i} r={4.2} style={{ fill: s.color }} />) : null}
+            </g>
+          ))}
         </g>
 
         {markers.map((m) => {
