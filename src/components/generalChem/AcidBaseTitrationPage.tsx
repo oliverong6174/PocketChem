@@ -319,7 +319,7 @@ export default function AcidBaseTitrationPage({ openRequest = null, onOpenHandle
           <Panel className="gc-inputs" title="System" subtitle={`Titrant: ${titrantOf(raw.titration.analyte)} (chosen automatically)`}>
             <div className="gc-presets" role="group" aria-label="Example systems">
               {PRESETS.map((preset) => (
-                <button className="ghost-button" key={preset.label} onClick={() => setTitration({ ...preset.titration, vt: 0 })} type="button">{preset.label}</button>
+                <button className="secondary-button gc-chip" key={preset.label} onClick={() => setTitration({ ...preset.titration, vt: 0 })} type="button">{preset.label}</button>
               ))}
             </div>
             <Segmented
@@ -399,10 +399,10 @@ export default function AcidBaseTitrationPage({ openRequest = null, onOpenHandle
                     value={titration.point.vt}
                   />
                   <div className="gc-jumps" role="group" aria-label="Jump to a point">
-                    <button className="ghost-button" onClick={() => setTitration({ vt: 0 }, false)} type="button">Start</button>
-                    {titration.special.halfEquivalence && <button className="ghost-button" onClick={() => setTitration({ vt: titration.special.halfEquivalence!.vt }, false)} type="button">Half-equivalence</button>}
-                    <button className="ghost-button" onClick={() => setTitration({ vt: titration.special.veq }, false)} type="button">Equivalence</button>
-                    <button className="ghost-button" onClick={() => setTitration({ vt: titration.special.veq * 1.5 }, false)} type="button">Past equivalence</button>
+                    <button className="secondary-button gc-chip" onClick={() => setTitration({ vt: 0 }, false)} type="button">Start</button>
+                    {titration.special.halfEquivalence && <button className="secondary-button gc-chip" onClick={() => setTitration({ vt: titration.special.halfEquivalence!.vt }, false)} type="button">Half-equivalence</button>}
+                    <button className="secondary-button gc-chip" onClick={() => setTitration({ vt: titration.special.veq }, false)} type="button">Equivalence</button>
+                    <button className="secondary-button gc-chip" onClick={() => setTitration({ vt: titration.special.veq * 1.5 }, false)} type="button">Past equivalence</button>
                   </div>
                 </div>
 
