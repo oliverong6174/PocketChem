@@ -572,3 +572,25 @@ export function rearPoint(conformation: Conformation, atom: number): Vec3 | null
 export const FRONT_CARBON_3D: Vec3 = vec(0, 0, BOND / 2);
 export const REAR_CARBON_3D: Vec3 = vec(0, 0, -BOND / 2);
 
+
+/**
+ * The same strain split into its two parts (eclipsing/torsional and gauche CH3/CH3), for explanations. Uses the
+ * existing increments only; returns null when the model does not cover the substituents.
+ */
+export function strainBreakdownKJ(graph: ConformationGraph, setup: TorsionSetup, rotation: number): { eclipsing: number; gauche: number; total: number } | null {
+  if (!energySupport(graph, setup).supported) return null;
+  const conf = conformationAt(setup, rotation);
+  let eclipsing = 0;
+  let gauche = 0;
+  for (const f of conf.front) {
+    for (const r of conf.rear) {
+      const a = groupClass(graph, f.atom);
+      const b = groupClass(graph, r.atom);
+      const d = Math.abs(wrap180(dihedralBetween(conf, f.atom, r.atom)));
+      const key = a === "H" && b === "H" ? "HH" : a === "Me" && b === "Me" ? "MeMe" : "HMe";
+      if (d < 60) eclipsing += ENERGY_MODEL.eclipsingKJ[key] * cos2(1.5 * d);
+      if (key === "MeMe" && d > 0 && d < 120) gauche += ENERGY_MODEL.gaucheMeMeKJ * cos2(1.5 * (d - 60));
+    }
+  }
+  return { eclipsing, gauche, total: eclipsing + gauche };
+}

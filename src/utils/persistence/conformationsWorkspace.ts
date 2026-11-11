@@ -15,6 +15,9 @@
 /** Bump when the meaning of a saved assessment changes. */
 export const CONFORMATIONS_ENGINE_VERSION = 1;
 
+import type { ComparisonEntry } from "../conformations/ranking";
+import { MAX_COMPARISON_ENTRIES } from "../conformations/ranking";
+
 export type ConformationsMode = "chair" | "newman" | "sawhorse";
 
 export type ConformationsWorkspaceInputs = {
@@ -36,6 +39,8 @@ export type ConformationsWorkspaceInputs = {
     /** Dihedral between the reference groups, degrees. */
     rotation: number;
   };
+  /** Conformations the user added to the within-molecule comparison (Stage 10B). Energies are recomputed, never stored. */
+  comparison: ComparisonEntry[];
 };
 
 export type ChairSummary = {
@@ -84,9 +89,35 @@ const isIndex = (value: unknown): value is number => Number.isInteger(value) && 
 const isNullableIndex = (value: unknown): value is number | null => value === null || isIndex(value);
 const isNullableNumber = (value: unknown): value is number | null => value === null || isFiniteNumber(value);
 
+function validComparison(raw: unknown): ComparisonEntry[] | null {
+  if (raw === undefined) return [];
+  if (!Array.isArray(raw) || raw.length > MAX_COMPARISON_ENTRIES) return null;
+  const out: ComparisonEntry[] = [];
+  for (const item of raw) {
+    if (!isObject(item) || !isString(item.id) || item.id.length > 40 || !isString(item.label) || item.label.length > 120 || !isString(item.molecule) || item.molecule.length === 0 || item.molecule.length > 2000) return null;
+    if (item.kind === "chair") {
+      const c = item.chair;
+      if (!isObject(c) || typeof c.flipped !== "boolean" || !Array.isArray(c.ring) || c.ring.length !== 6 || !c.ring.every(isIndex) || !isObject(c.choices)) return null;
+      const choices: Record<string, "up" | "down"> = {};
+      for (const [k, v] of Object.entries(c.choices)) {
+        if (!/^\d{1,4}$/.test(k) || (v !== "up" && v !== "down")) return null;
+        choices[k] = v;
+      }
+      out.push({ id: item.id, kind: "chair", label: item.label, molecule: item.molecule, chair: { ring: c.ring as number[], flipped: c.flipped, choices } });
+    } else if (item.kind === "torsion") {
+      const t = item.torsion;
+      if (!isObject(t) || !isIndex(t.front) || !isIndex(t.rear) || !isNullableIndex(t.frontRef) || !isNullableIndex(t.rearRef) || !isFiniteNumber(t.rotation) || Math.abs(t.rotation) > 720) return null;
+      out.push({ id: item.id, kind: "torsion", label: item.label, molecule: item.molecule, torsion: { front: t.front as number, rear: t.rear as number, frontRef: t.frontRef as number | null, rearRef: t.rearRef as number | null, rotation: t.rotation } });
+    } else return null;
+  }
+  return out;
+}
+
 export function validateConformationsInputs(raw: unknown): ConformationsWorkspaceInputs | null {
   if (!isObject(raw)) return null;
   const { source, mode, chair, torsion } = raw;
+  const comparison = validComparison(raw.comparison);
+  if (comparison === null) return null;
   if (!isString(mode) || !MODES.includes(mode)) return null;
   let cleanSource: ConformationsWorkspaceInputs["source"] = null;
   if (source !== null) {
@@ -115,6 +146,7 @@ export function validateConformationsInputs(raw: unknown): ConformationsWorkspac
       rearRef: torsion.rearRef as number | null,
       rotation: torsion.rotation,
     },
+    comparison,
   };
 }
 

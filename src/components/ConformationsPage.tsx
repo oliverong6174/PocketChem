@@ -7,6 +7,20 @@ import { easeInOut, morphConformer, prefersReducedMotion } from "./conformations
 import { Badge, Callout, DiagramFrame, Disclosure, EmptyState, EvidenceBadge, Explanation, Legend, Panel } from "./ui/primitives";
 import { LearningModeSwitch } from "./ui/LearningModeSwitch";
 import { Icon } from "./ui/Icon";
+import { MoleculeInputField } from "./ui/MoleculeInputField";
+import { resolveWithFallback, type ResolvedInput } from "../utils/moleculeInputFallback";
+import { RankingList } from "./conformations/RankingList";
+import { parseSystematicName } from "../utils/conformations/systematicName";
+import {
+  MAX_COMPARISON_ENTRIES,
+  NOT_ABSOLUTE_NOTE,
+  compareEntries,
+  entrySignature,
+  torsionConformers,
+  type ComparisonEntry,
+  type ComparisonResult,
+  type RankedEntry,
+} from "../utils/conformations/ranking";
 import "../styles/conformations.css";
 import { getRDKit } from "../utils/rdkit";
 import { readKetcherStructureSnapshot } from "../utils/ketcherSnapshot";
@@ -67,13 +81,15 @@ type Props = {
   handoffMolfile?: string | null;
 };
 
-const EXAMPLES: Array<{ label: string; smiles: string; mode: ConformationsMode }> = [
-  { label: "Butane", smiles: "CCCC", mode: "newman" },
-  { label: "Methylcyclohexane", smiles: "CC1CCCCC1", mode: "chair" },
-  { label: "tert-Butylcyclohexane", smiles: "CC(C)(C)C1CCCCC1", mode: "chair" },
-  { label: "trans-1,4-Dimethyl", smiles: "C[C@H]1CC[C@H](C)CC1", mode: "chair" },
-  { label: "cis-1,3-Dimethyl", smiles: "C[C@H]1CCC[C@@H](C)C1", mode: "chair" },
-  { label: "(2R,3R)-2,3-Dibromobutane", smiles: "C[C@@H](Br)[C@H](Br)C", mode: "newman" },
+/** Examples are entered by NAME, so they exercise the same resolution path as typed input. */
+const EXAMPLES: Array<{ label: string; query: string; mode: ConformationsMode }> = [
+  { label: "Butane", query: "butane", mode: "newman" },
+  { label: "Pentane", query: "pentane", mode: "newman" },
+  { label: "Methylcyclohexane", query: "methylcyclohexane", mode: "chair" },
+  { label: "tert-Butylcyclohexane", query: "tert-butylcyclohexane", mode: "chair" },
+  { label: "cis-1,3-Dimethylcyclohexane", query: "cis-1,3-dimethylcyclohexane", mode: "chair" },
+  { label: "trans-1,4-Dimethylcyclohexane", query: "trans-1,4-dimethylcyclohexane", mode: "chair" },
+  { label: "(2R,3R)-2,3-Dibromobutane", query: "(2R,3R)-2,3-dibromobutane", mode: "newman" },
 ];
 
 const EMPTY_STATE: ConformationsWorkspaceInputs = {
@@ -81,6 +97,7 @@ const EMPTY_STATE: ConformationsWorkspaceInputs = {
   mode: "chair",
   chair: { ring: null, flipped: false, choices: {} },
   torsion: { front: null, rear: null, frontRef: null, rearRef: null, rotation: 180 },
+  comparison: [],
 };
 
 const rdkitOf = (module: unknown) => module as RdKitLike;
@@ -224,7 +241,7 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
     setError(null);
     setSaved(null);
     setAnswers({});
-    setState({ source: { kind, text }, mode, chair: defaults.chair, torsion: defaults.torsion });
+    setState({ source: { kind, text }, mode, chair: defaults.chair, torsion: defaults.torsion, comparison: [] });
     if (announce) setNotices([]);
     return true;
   }
@@ -251,14 +268,24 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
     }
   }
 
-  function applySmilesField() {
-    const text = smilesText.trim();
-    if (!text) {
-      setError("Enter a SMILES string, or draw a molecule and use it.");
-      return;
-    }
-    loadSource("smiles", text);
+  /** Called by the shared name/SMILES field once the shared resolver (or the documented fallback) produced a structure. */
+  function acceptResolved(result: ResolvedInput, preferredMode?: ConformationsMode): boolean {
+    // SMILES typed by the user is loaded exactly as written (atom order and stereo tags unchanged); names use the resolved structure
+    return loadSource("smiles", result.source === "smiles" ? result.resolution.query : result.smiles, preferredMode);
   }
+  const [exampleNote, setExampleNote] = useState<string | null>(null);
+  const [exampleRequest, setExampleRequest] = useState<{ query: string; mode: ConformationsMode; nonce: number } | null>(null);
+  useEffect(() => {
+    if (!exampleRequest || !rdkit) return;
+    let live = true;
+    void resolveWithFallback(exampleRequest.query, { maxComponents: 1, fallback: (text) => parseSystematicName(text, rdkit) }).then(
+      (result) => { if (live) { setExampleNote(`${result.label} · ${result.provenance}`); acceptResolved(result, exampleRequest.mode); } },
+      (error: unknown) => { if (live) setError(error instanceof Error ? error.message : "That example could not be loaded."); },
+    );
+    return () => { live = false; };
+    // acceptResolved is recreated every render; the request nonce is the trigger
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exampleRequest, rdkit]);
 
   // ---- state mutations ------------------------------------------------------------------------
   const setMode = (mode: ConformationsMode) => setState((current) => ({ ...current, mode }));
@@ -295,6 +322,76 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
   const chooseRing = (ring: number[]) => setState((current) => ({ ...current, chair: { ring, flipped: false, choices: {} } }));
   const setFaceChoice = (atom: number, face: "up" | "down") =>
     setState((current) => ({ ...current, chair: { ...current.chair, choices: { ...current.chair.choices, [String(atom)]: face } } }));
+
+  // ---- conformational ranking and comparison --------------------------------------------------
+  const molecule = graph?.smiles ?? "";
+  const chairFor = useCallback(
+    (entry: Extract<ComparisonEntry, { kind: "chair" }>) => {
+      if (!rdkit || !graph) return null;
+      const choices: FaceChoices = {};
+      for (const [key, value] of Object.entries(entry.chair.choices)) choices[Number(key)] = value;
+      const model = buildChairModel(rdkit, graph, entry.chair.ring, choices);
+      return model.status === "ready" ? { model, analysis: analyzeChairs(model) } : null;
+    },
+    [rdkit, graph],
+  );
+  const currentChairEntry = (flipped: boolean): Extract<ComparisonEntry, { kind: "chair" }> | null =>
+    activeRing && chairAnalysis ? { id: `chair-${flipped ? "B" : "A"}`, kind: "chair", label: flipped ? "Chair B" : "Chair A", molecule, chair: { ring: activeRing, flipped, choices: state.chair.choices } } : null;
+  const currentTorsionEntry = (rot: number, label?: string): Extract<ComparisonEntry, { kind: "torsion" }> | null =>
+    setup ? { id: `t-${Math.round(wrap360(rot))}`, kind: "torsion", label: label ?? `${Math.round(wrap360(rot))}°`, molecule, torsion: { front: setup.front.atom, rear: setup.rear.atom, frontRef: state.torsion.frontRef, rearRef: state.torsion.rearRef, rotation: rot } } : null;
+
+  const autoRanking: ComparisonResult | null = useMemo(() => {
+    if (!graph) return null;
+    const ctx = { graph, molecule: graph.smiles, chairFor };
+    if (state.mode === "chair") {
+      if (!activeRing || !chairAnalysis) return null;
+      const entries = [false, true].map((flipped) => ({ id: `chair-${flipped ? "B" : "A"}`, kind: "chair" as const, label: flipped ? "Chair B" : "Chair A", molecule: graph.smiles, chair: { ring: activeRing, flipped, choices: state.chair.choices } }));
+      return compareEntries(entries, ctx);
+    }
+    if (!setup) return null;
+    const principal = torsionConformers(graph, setup).conformers;
+    const entries = principal.map((c) => ({ id: `p${Math.round(wrap360(c.rotation))}`, kind: "torsion" as const, label: c.name, molecule: graph.smiles, torsion: { front: setup.front.atom, rear: setup.rear.atom, frontRef: state.torsion.frontRef, rearRef: state.torsion.rearRef, rotation: c.rotation } }));
+    return compareEntries(entries, ctx);
+  }, [graph, chairFor, state.mode, activeRing, chairAnalysis, setup, state.chair.choices, state.torsion.frontRef, state.torsion.rearRef]);
+
+  const comparisonResult: ComparisonResult | null = useMemo(
+    () => (graph && state.comparison.length > 0 ? compareEntries(state.comparison, { graph, molecule: graph.smiles, chairFor }) : null),
+    [graph, state.comparison, chairFor],
+  );
+
+  function addToComparison(entries: Array<ComparisonEntry | null>) {
+    const fresh = entries.filter((entry): entry is ComparisonEntry => entry !== null);
+    if (fresh.length === 0) return;
+    setState((current) => {
+      const have = new Set(current.comparison.map(entrySignature));
+      const next = [...current.comparison];
+      for (const entry of fresh) {
+        if (have.has(entrySignature(entry)) || next.length >= MAX_COMPARISON_ENTRIES) continue;
+        have.add(entrySignature(entry));
+        next.push({ ...entry, id: `c${Date.now().toString(36)}${next.length}` });
+      }
+      return { ...current, comparison: next };
+    });
+  }
+  const removeFromComparison = (id: string) => setState((current) => ({ ...current, comparison: current.comparison.filter((entry) => entry.id !== id) }));
+  const clearComparison = () => setState((current) => ({ ...current, comparison: [] }));
+  function showEntry(entry: ComparisonEntry) {
+    if (entry.kind === "chair") {
+      setState((current) => ({ ...current, mode: "chair", chair: { ring: entry.chair.ring, flipped: entry.chair.flipped, choices: entry.chair.choices } }));
+    } else {
+      setState((current) => ({ ...current, mode: current.mode === "sawhorse" ? "sawhorse" : "newman", torsion: { ...entry.torsion, rotation: wrap180(entry.torsion.rotation) } }));
+    }
+  }
+  const rankThumb = (row: RankedEntry) => {
+    if (!graph) return null;
+    if (row.entry.kind === "chair") {
+      const built = chairFor(row.entry);
+      return built ? <ChairDrawing graph={graph} model={built.model} conformer={buildConformer(built.model, row.entry.chair.flipped)} showHydrogens={false} showDiaxial={false} hideLabels={false} showIndices={false} /> : null;
+    }
+    const t = row.entry.torsion;
+    const rowSetup = setupTorsion(graph, t.front, t.rear, { frontRef: t.frontRef ?? undefined, rearRef: t.rearRef ?? undefined });
+    return <NewmanDrawing diagram={newmanDiagram(graph, rowSetup, t.rotation)} setup={rowSetup} onRotate={() => undefined} onPickRef={() => undefined} compact />;
+  };
 
   function viewFromOtherEnd() {
     if (!graph || !setup) return;
@@ -446,7 +543,12 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
         mode: inputs.mode,
         chair: ringOk ? inputs.chair : defaults.chair,
         torsion: bondOk ? inputs.torsion : defaults.torsion,
+        // comparison entries are kept only if they describe this very structure (atom indices must mean the same thing)
+        comparison: inputs.comparison.filter((entry) => entry.molecule === g.smiles),
       };
+      if (next.comparison.length !== inputs.comparison.length) {
+        setNotices((items) => [...items, { tone: "warn", text: "Some saved comparison entries described a different structure and were dropped." }]);
+      }
       if (!ringOk || !bondOk) {
         setNotices((items) => [...items, { tone: "warn", text: "Part of the saved selection (ring or bond) no longer matches the structure and was reset to a default; the molecule itself is unchanged." }]);
       }
@@ -583,20 +685,22 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
                 </button>
               )}
             </div>
-            <form className="conf-smiles" onSubmit={(event) => { event.preventDefault(); applySmilesField(); }}>
-              <label>
-                SMILES (stereochemistry is used exactly as written)
-                <input type="text" value={smilesText} placeholder="e.g. C[C@H]1CC[C@H](C)CC1" onChange={(event) => setSmilesText(event.target.value)} spellCheck={false} />
-              </label>
-              <button className="secondary-button" type="submit" disabled={!rdkit}>Load</button>
-            </form>
+            <MoleculeInputField
+              className="conf-smiles"
+              disabled={!rdkit}
+              fallback={rdkit ? (text) => parseSystematicName(text, rdkit) : undefined}
+              onChange={setSmilesText}
+              onResolved={(result) => acceptResolved(result)}
+              value={smilesText}
+            />
             <div className="conf-examples" role="group" aria-label="Example molecules">
               {EXAMPLES.map((example) => (
-                <button key={example.label} className="secondary-button conf-chip" type="button" disabled={!rdkit} onClick={() => { setSmilesText(example.smiles); loadSource("smiles", example.smiles, example.mode); }}>
+                <button key={example.label} className="secondary-button conf-chip" type="button" disabled={!rdkit} onClick={() => { setSmilesText(example.query); setExampleRequest({ query: example.query, mode: example.mode, nonce: Date.now() }); }}>
                   {example.label}
                 </button>
               ))}
             </div>
+            {exampleNote && !error && <p className="conf-hint" role="status">{exampleNote}</p>}
             {error && <p className="conf-error" role="alert">{error}</p>}
           </div>
         </div>
@@ -825,6 +929,47 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
                 </div>
               )}
             </div>
+          )}
+
+          {!practice && autoRanking && (
+            <Panel className="conf-rank" title={state.mode === "chair" ? "Chair ranking" : "Conformations of this bond, ranked"} subtitle={state.mode === "chair" ? "Chair A against Chair B, most stable first." : "The six principal conformations (every 60°), lowest model energy first."}>
+              <RankingList idPrefix="auto" result={autoRanking} thumbnail={rankThumb} onShow={(row) => showEntry(row.entry)} activeId={null} />
+            </Panel>
+          )}
+          {practice && autoRanking && (
+            <Callout tone="info" title="Rankings are hidden in practice mode.">
+              <p>Switch to Explore to see the ranked conformations and the reasons.</p>
+            </Callout>
+          )}
+          {!practice && graph && (state.mode === "chair" ? chairAnalysis : setup) && (
+            <Panel
+              className="conf-compare"
+              title="Compare conformations"
+              subtitle="Collect conformations of this molecule, rank them side by side, and save the comparison with the analysis."
+              actions={<button className="ghost-button" type="button" onClick={clearComparison} disabled={state.comparison.length === 0}>Clear comparison</button>}
+            >
+              <div className="conf-controls" role="group" aria-label="Add to comparison">
+                {state.mode === "chair" ? (
+                  <>
+                    <button className="secondary-button" type="button" onClick={() => addToComparison([currentChairEntry(state.chair.flipped)])}>Add the chair shown</button>
+                    <button className="secondary-button" type="button" onClick={() => addToComparison([currentChairEntry(false), currentChairEntry(true)])}>Add Chair A and Chair B</button>
+                  </>
+                ) : (
+                  <>
+                    <button className="secondary-button" type="button" onClick={() => addToComparison([currentTorsionEntry(rotation, cls?.name)])}>Add the conformation shown ({Math.round(wrap360(rotation))}°)</button>
+                    <button className="secondary-button" type="button" onClick={() => addToComparison(setup ? torsionConformers(graph, setup).conformers.slice(0, 4).map((c) => currentTorsionEntry(c.rotation, c.name)) : [])}>Add the four lowest</button>
+                  </>
+                )}
+              </div>
+              {state.comparison.length === 0 ? (
+                <p className="conf-hint">Nothing added yet. Entries are kept per molecule, and they are saved and restored with the analysis.</p>
+              ) : comparisonResult ? (
+                <RankingList idPrefix="cmp" result={comparisonResult} thumbnail={rankThumb} onShow={(row) => showEntry(row.entry)} onRemove={(row) => removeFromComparison(row.entry.id)} />
+              ) : null}
+              <Callout tone="estimate" title="Within one molecule only">
+                <p>{NOT_ABSOLUTE_NOTE} To compare different molecules by acidity, basicity and similar measures, use the Ranking tool.</p>
+              </Callout>
+            </Panel>
           )}
 
           {practice && questions.length > 0 && (

@@ -32,6 +32,7 @@ const inputs = (over = {}) => ({
   mode: "chair",
   chair: { ring: [1, 2, 3, 4, 5, 6], flipped: false, choices: {} },
   torsion: { front: null, rear: null, frontRef: null, rearRef: null, rotation: 0 },
+  comparison: [],
   ...over,
 });
 const chairSummary = (model, analysis, flipped) => ({

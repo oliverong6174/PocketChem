@@ -1256,3 +1256,83 @@ th {
 .multicatalytic-condition-option span {
   font-weight: 650;
 }
+
+/* ---- shared molecule name / SMILES field ---- */
+.mol-input {
+  display: grid;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+.mol-input-form {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.mol-input-label {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 220px;
+  min-width: 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.mol-input-label input {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: 400;
+}
+.mol-input-help {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--text-faint);
+}
+.mol-status {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.mol-status > .ui-icon {
+  flex: none;
+  margin-top: 2px;
+}
+.mol-status.is-ok {
+  color: var(--status-ok);
+  background: var(--status-ok-bg);
+  border-color: var(--status-ok);
+}
+.mol-status.is-ok span,
+.mol-status.is-error span {
+  color: var(--text);
+}
+.mol-status.source-fallback {
+  color: var(--status-estimate);
+  background: var(--status-estimate-bg);
+  border-color: var(--status-estimate);
+  border-style: dashed;
+}
+.mol-status.is-error {
+  color: var(--status-danger);
+  background: var(--status-danger-bg);
+  border-color: var(--status-danger);
+}
+.mol-status.is-error.code-ambiguous {
+  color: var(--status-warn);
+  background: var(--status-warn-bg);
+  border-color: var(--status-warn);
+}
+.mol-status-sub {
+  color: var(--text-muted);
+}
+.mol-status-note {
+  display: block;
+  color: var(--text-muted);
+}
