@@ -83,3 +83,26 @@
 @media (prefers-reduced-motion: reduce) {
   .ph-page * { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
+
+/* Stage 14: forces, energy, collisions */
+.ph-block { fill: #e6edf3; stroke: #0f172a; stroke-width: 2.2; }
+.ph-block.a { fill: #cfe8ea; stroke: #0b6a72; }
+.ph-block.b { fill: #f6e3c8; stroke: #b45309; }
+.ph-block.hang { fill: #e9e4f5; stroke: #6d28d9; }
+.ph-block-label { fill: #0f172a; font-size: 12px; font-weight: 700; font-family: var(--font-body, system-ui); }
+.ph-force-label { font-size: 12px; font-weight: 700; font-family: var(--font-body, system-ui); paint-order: stroke; stroke: #f6f9fc; stroke-width: 3px; }
+.ph-force { cursor: pointer; }
+.ph-force:focus { outline: none; }
+.ph-force:focus-visible line { stroke-width: 5; }
+.ph-force.is-selected line { stroke-width: 5; filter: drop-shadow(0 0 3px rgba(15, 23, 42, 0.45)); }
+.ph-dim-line { stroke: #64748b; stroke-width: 1.4; fill: none; }
+.ph-angle { stroke: #475569; stroke-width: 1.6; }
+.ph-pulley { fill: #f1f5f9; stroke: #0f172a; stroke-width: 2.4; }
+.ph-wall { fill: #94a3b8; stroke: #0f172a; stroke-width: 1.6; }
+.ph-cm { fill: #0f172a; stroke: #ffffff; stroke-width: 1.5; }
+.ph-bar { stroke: #0f172a; stroke-width: 1; }
+.ph-bar.ke { fill: #0b6a72; } .ph-bar.peg { fill: #b45309; } .ph-bar.pes { fill: #6d28d9; } .ph-bar.q { fill: #be123c; } .ph-bar.total { fill: #475569; }
+.ph-bars { max-width: 100%; }
+.ph-page .ph-charts .ui-diagram { min-width: 0; }
+.ph-clear { margin-top: var(--sp-2); }
+.ph-group-heading { margin: var(--sp-3) 0 var(--sp-2); font-family: var(--font-display); font-size: var(--fs-lg); }

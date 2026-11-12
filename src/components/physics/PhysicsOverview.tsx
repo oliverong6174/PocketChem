@@ -15,6 +15,24 @@ const FEATURES: Record<string, string[]> = {
     "Play, pause, reset and scrub: the diagram, the readouts and four graphs share one clock",
     "Time of flight, maximum height and range, including launches from a height and straight downward",
   ],
+  phForces: [
+    "A free-body diagram for a body on a flat or inclined surface, or a block pulled by a hanging mass over a pulley",
+    "Weight, normal force, static and kinetic friction, applied force and tension, with net force and acceleration",
+    "Static friction that adapts up to μₛN, kinetic friction that opposes sliding, and the normal force that is not always mg",
+    "Practice: tick the forces that act on the body and predict the acceleration before the answer is shown",
+  ],
+  phEnergy: [
+    "Block on an incline, rough horizontal surface, spring launch and an object changing height",
+    "Kinetic, gravitational and spring energy with an energy bar chart that always balances, heat from friction included",
+    "Work done by each force and the work–energy theorem checked at every moment",
+    "A “can it get there?” question that explains the physical limit when the energy runs out",
+  ],
+  phCollisions: [
+    "Two bodies in one dimension with independent masses and velocities, elastic to perfectly inelastic collisions",
+    "Momentum conservation, centre of mass, coefficient of restitution, impulse and kinetic-energy loss",
+    "Before and after table, four synchronized graphs and an animated collision you can scrub",
+    "No invented collision when the bodies are separating, and no force history that the model does not have",
+  ],
   phCircuits: [
     "Build series, parallel and nested resistor networks with one ideal DC source",
     "A circuit diagram drawn from the same network the calculations use, with current directions and voltage drops",
@@ -42,8 +60,28 @@ export default function PhysicsOverview({ onOpenTool }: { onOpenTool: (id: Physi
       />
 
       <Panel subtitle="Working laboratories you can open now." title="Available now">
+        <h3 className="ph-group-heading">Mechanics</h3>
         <ul className="gc-tool-cards">
-          {implemented.map((tool) => (
+          {implemented.filter((tool) => tool.group === "mechanics").map((tool) => (
+            <li className="gc-tool-card" key={tool.id}>
+              <Icon name={tool.icon} size={26} />
+              <div>
+                <h3>{tool.label}</h3>
+                <p>{tool.summary}</p>
+                <ul className="gc-feature-list">
+                  {FEATURES[tool.id].map((line) => <li key={line}>{line}</li>)}
+                </ul>
+                <div className="gc-tool-card-foot">
+                  <EvidenceBadge level="model" />
+                  <button className="primary-button" onClick={() => onOpenTool(tool.id as PhysicsToolId)} type="button">Open {tool.label}</button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <h3 className="ph-group-heading">Electricity</h3>
+        <ul className="gc-tool-cards">
+          {implemented.filter((tool) => tool.group === "electricity").map((tool) => (
             <li className="gc-tool-card" key={tool.id}>
               <Icon name={tool.icon} size={26} />
               <div>
@@ -74,7 +112,7 @@ export default function PhysicsOverview({ onOpenTool }: { onOpenTool: (id: Physi
       </Panel>
 
       <Callout tone="info" title="Scope of the laboratories">
-        <p>Mechanics models a point particle with constant acceleration over a flat ground at y = 0; for projectiles that is gravity alone, with no air resistance. The circuit tool handles one ideal DC source with ideal resistors in series and parallel groups only, and the RC tool handles exactly one resistor and one capacitor. Arbitrary circuits, AC, inductors, forces and rotation are not supported, and the tools say so rather than approximating them. They are teaching models, not substitutes for measurement or design software.</p>
+        <p>Mechanics models a point particle with constant acceleration over a flat ground at y = 0; for projectiles that is gravity alone, with no air resistance. The circuit tool handles one ideal DC source with ideal resistors in series and parallel groups only, and the RC tool handles exactly one resistor and one capacitor. Forces treats one body (or a block with a hanging mass) with Coulomb friction; Work & energy uses an ideal spring and constant friction; collisions are two bodies in one dimension with an instantaneous contact. Arbitrary circuits, AC, inductors, rotation and air resistance are not supported, and the tools say so rather than approximating them. They are teaching models, not substitutes for measurement or design software.</p>
       </Callout>
     </div>
   );

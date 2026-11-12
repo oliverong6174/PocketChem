@@ -95,6 +95,9 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type PhysicsToolId, type SubjectI
   const MechanicsPage = lazy(() => import("./components/physics/MechanicsPage"));
   const CircuitsPage = lazy(() => import("./components/physics/CircuitsPage"));
   const RcPage = lazy(() => import("./components/physics/RcPage"));
+  const ForcesPage = lazy(() => import("./components/physics/ForcesPage"));
+  const EnergyPage = lazy(() => import("./components/physics/EnergyPage"));
+  const CollisionsPage = lazy(() => import("./components/physics/CollisionsPage"));
 
 
   type AnnotationCarouselItem =
@@ -595,7 +598,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type PhysicsToolId, type SubjectI
         else switchSubject("general", { keepOpenRequest: true, tool: target });
         return;
       }
-      if (target === "phMechanics" || target === "phCircuits" || target === "phRc") {
+      if (target === "phMechanics" || target === "phCircuits" || target === "phRc" || target === "phForces" || target === "phEnergy" || target === "phCollisions") {
         if (activeSubject === "physics") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("physics", { keepOpenRequest: true, tool: target });
         return;
@@ -1949,6 +1952,21 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type PhysicsToolId, type SubjectI
             ) : generalTool === "phCircuits" ? (
               <CircuitsPage
                 openRequest={pendingOpen?.page === "phCircuits" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phForces" ? (
+              <ForcesPage
+                openRequest={pendingOpen?.page === "phForces" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phEnergy" ? (
+              <EnergyPage
+                openRequest={pendingOpen?.page === "phEnergy" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phCollisions" ? (
+              <CollisionsPage
+                openRequest={pendingOpen?.page === "phCollisions" ? pendingOpen : null}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />
             ) : generalTool === "phRc" ? (
