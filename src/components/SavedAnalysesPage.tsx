@@ -17,6 +17,9 @@ const PAGE_LABELS: Record<string, string> = {
   mechanics: "Mechanics & motion",
   circuits: "DC circuits",
   rc: "RC transient",
+  forces: "Forces & Newton's laws",
+  energy: "Work & energy",
+  collisions: "Momentum & collisions",
 };
 
 const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry", physics: "Physics" };

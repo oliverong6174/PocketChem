@@ -125,3 +125,90 @@ export function describeRcAnalysis(inputs: RcInputs): string {
   const { Vs, V0, R, C } = inputs.rc;
   return `RC transient: ${Vs} V source, ${V0} V initial, R = ${R} Ω, C = ${C} F`.slice(0, 300);
 }
+
+// ---- forces, energy and collisions (Stage 14) ---------------------------------------------------------------------------------
+
+import { analyzeEnergy, validateEnergyInput, type EnergyInput } from "../physics/energy";
+import { solveCollision, validateCollisionInput, type CollisionInput } from "../physics/collisions";
+import { DEFAULT_FORCE_INPUT, validateForceInput, type ForceId, type ForceInput } from "../physics/forces";
+import { DEFAULT_COLLISION_INPUT } from "../physics/collisions";
+import { DEFAULT_ENERGY_INPUT } from "../physics/energy";
+
+export const FORCES_ENGINE_VERSION = 1;
+export const ENERGY_ENGINE_VERSION = 1;
+export const COLLISIONS_ENGINE_VERSION = 1;
+
+const FORCE_IDS: readonly ForceId[] = ["weight", "normal", "friction", "applied", "tension", "hangingWeight"];
+
+export type ForcesInputs = {
+  subject: "physics";
+  tool: "forces";
+  input: ForceInput;
+  /** The simulation time shown (s) and the force being inspected. */
+  tNow: number;
+  speed: SpeedChoice;
+  selected: ForceId | null;
+};
+export const DEFAULT_FORCES_INPUTS: ForcesInputs = { subject: "physics", tool: "forces", input: DEFAULT_FORCE_INPUT, tNow: 0, speed: "real", selected: null };
+
+export function validateForcesInputs(raw: unknown): ForcesInputs | null {
+  if (!isObject(raw) || raw.subject !== "physics" || raw.tool !== "forces") return null;
+  const input = validateForceInput(raw.input);
+  if (!input.ok) return null;
+  if (typeof raw.speed !== "string" || !SPEED_CHOICES.includes(raw.speed as SpeedChoice)) return null;
+  if (raw.selected !== null && (typeof raw.selected !== "string" || !FORCE_IDS.includes(raw.selected as ForceId))) return null;
+  if (!finite(raw.tNow) || !withinEnd(raw.tNow, input.value.duration)) return null;
+  return { subject: "physics", tool: "forces", input: input.value, tNow: raw.tNow, speed: raw.speed as SpeedChoice, selected: raw.selected as ForceId | null };
+}
+export function describeForcesAnalysis(inputs: ForcesInputs): string {
+  const i = inputs.input;
+  return (i.mode === "pulley" ? `Forces: ${i.m} kg block with a ${i.m2} kg hanging mass, μk = ${i.muk}` : `Forces: ${i.m} kg on a ${i.theta}° surface, F = ${i.F} N, μs = ${i.mus}, μk = ${i.muk}`).slice(0, 300);
+}
+
+export type EnergyInputs = {
+  subject: "physics";
+  tool: "energy";
+  input: EnergyInput;
+  tNow: number;
+  speed: SpeedChoice;
+  /** Position (m, along the scenario's own coordinate) asked about in the "can it get there?" question. */
+  target: number;
+};
+export const DEFAULT_ENERGY_INPUTS: EnergyInputs = { subject: "physics", tool: "energy", input: DEFAULT_ENERGY_INPUT, tNow: 0, speed: "real", target: 2 };
+
+export function validateEnergyInputs(raw: unknown): EnergyInputs | null {
+  if (!isObject(raw) || raw.subject !== "physics" || raw.tool !== "energy") return null;
+  const input = validateEnergyInput(raw.input);
+  if (!input.ok) return null;
+  if (typeof raw.speed !== "string" || !SPEED_CHOICES.includes(raw.speed as SpeedChoice)) return null;
+  if (!finite(raw.target) || Math.abs(raw.target) > 1e4) return null;
+  if (!finite(raw.tNow) || !withinEnd(raw.tNow, analyzeEnergy(input.value).tEnd)) return null;
+  return { subject: "physics", tool: "energy", input: input.value, tNow: raw.tNow, speed: raw.speed as SpeedChoice, target: raw.target };
+}
+export function describeEnergyAnalysis(inputs: EnergyInputs): string {
+  const i = inputs.input;
+  const name = { incline: `incline ${i.theta}°, μk = ${i.muk}`, flat: `rough surface, F = ${i.F} N, μk = ${i.muk}`, spring: `spring ${i.k} N/m compressed ${i.x0} m`, height: `height ${i.h0} m, v₀ = ${i.v0} m/s` }[i.scenario];
+  return `Energy: ${i.m} kg, ${name}`.slice(0, 300);
+}
+
+export type CollisionsInputs = {
+  subject: "physics";
+  tool: "collisions";
+  input: CollisionInput;
+  tNow: number;
+  speed: SpeedChoice;
+};
+export const DEFAULT_COLLISIONS_INPUTS: CollisionsInputs = { subject: "physics", tool: "collisions", input: DEFAULT_COLLISION_INPUT, tNow: 0, speed: "real" };
+
+export function validateCollisionsInputs(raw: unknown): CollisionsInputs | null {
+  if (!isObject(raw) || raw.subject !== "physics" || raw.tool !== "collisions") return null;
+  const input = validateCollisionInput(raw.input);
+  if (!input.ok) return null;
+  if (typeof raw.speed !== "string" || !SPEED_CHOICES.includes(raw.speed as SpeedChoice)) return null;
+  if (!finite(raw.tNow) || !withinEnd(raw.tNow, solveCollision(input.value).tEnd)) return null;
+  return { subject: "physics", tool: "collisions", input: input.value, tNow: raw.tNow, speed: raw.speed as SpeedChoice };
+}
+export function describeCollisionsAnalysis(inputs: CollisionsInputs): string {
+  const i = inputs.input;
+  return `Collision: ${i.mA} kg at ${i.vA} m/s and ${i.mB} kg at ${i.vB} m/s, e = ${i.e}`.slice(0, 300);
+}

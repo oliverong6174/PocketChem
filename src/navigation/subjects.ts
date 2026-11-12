@@ -44,8 +44,8 @@ export const SUBJECTS: SubjectDef[] = [
   },
   {
     id: "physics", slug: "physics", label: "Physics", mode: "workbench", icon: "physics", status: "available",
-    tagline: "Projectile motion, resistor networks and RC transients with live diagrams and synchronized graphs.",
-    planned: ["Forces and Newton's laws", "Energy and momentum", "Waves and optics", "Inductors and AC circuits"],
+    tagline: "Motion, forces, energy, collisions, resistor networks and RC transients with live diagrams and synchronized graphs.",
+    planned: ["Rotational motion and torque", "Gravitation and orbits", "Waves and optics", "Inductors and AC circuits"],
   },
   {
     id: "biology", slug: "biology", label: "Biology", mode: "learning", icon: "biology", status: "planned",
@@ -59,10 +59,12 @@ export const SUBJECTS: SubjectDef[] = [
   },
 ];
 
-export type ToolGroupId = "analyze" | "synthesize" | "library";
+export type ToolGroupId = "analyze" | "mechanics" | "electricity" | "synthesize" | "library";
 
 export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "analyze", label: "Analyze" },
+  { id: "mechanics", label: "Mechanics" },
+  { id: "electricity", label: "Electricity" },
   { id: "synthesize", label: "Synthesize" },
   { id: "library", label: "Library" },
 ];
@@ -101,13 +103,16 @@ export const GENERAL_TOOLS: ToolDef[] = [
   { id: "gcSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
-export type PhysicsToolId = "phOverview" | "phMechanics" | "phCircuits" | "phRc" | "phSaved";
+export type PhysicsToolId = "phOverview" | "phMechanics" | "phForces" | "phEnergy" | "phCollisions" | "phCircuits" | "phRc" | "phSaved";
 
 export const PHYSICS_TOOLS: ToolDef[] = [
   { id: "phOverview", slug: "overview", label: "Overview", summary: "What Physics offers now, and what is still planned.", group: "analyze", icon: "physics" },
-  { id: "phMechanics", slug: "mechanics", label: "Mechanics & motion", summary: "Projectile and constant-acceleration motion: a live diagram, vectors and synchronized graphs.", group: "analyze", icon: "mechanics" },
-  { id: "phCircuits", slug: "circuits", label: "DC circuits", summary: "Series and parallel resistor networks: equivalent resistance, currents, voltages and power.", group: "analyze", icon: "circuits" },
-  { id: "phRc", slug: "rc-transient", label: "RC transient", summary: "Charging and discharging of one capacitor through one resistor.", group: "analyze", icon: "rc" },
+  { id: "phMechanics", slug: "mechanics", label: "Mechanics & motion", summary: "Projectile and constant-acceleration motion: a live diagram, vectors and synchronized graphs.", group: "mechanics", icon: "mechanics" },
+  { id: "phForces", slug: "forces", label: "Forces & Newton's laws", summary: "Free-body diagrams, friction, inclines and tension for one body or a block with a hanging mass.", group: "mechanics", icon: "forces" },
+  { id: "phEnergy", slug: "energy", label: "Work & energy", summary: "Kinetic, gravitational and spring energy, work, friction losses and energy bar charts.", group: "mechanics", icon: "energy" },
+  { id: "phCollisions", slug: "collisions", label: "Momentum & collisions", summary: "Two-body one-dimensional collisions: momentum, restitution, impulse and energy loss.", group: "mechanics", icon: "collisions" },
+  { id: "phCircuits", slug: "circuits", label: "DC circuits", summary: "Series and parallel resistor networks: equivalent resistance, currents, voltages and power.", group: "electricity", icon: "circuits" },
+  { id: "phRc", slug: "rc-transient", label: "RC transient", summary: "Charging and discharging of one capacitor through one resistor.", group: "electricity", icon: "rc" },
   { id: "phSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 

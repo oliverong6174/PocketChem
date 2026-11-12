@@ -72,3 +72,87 @@ export function summarizeRc(inputs: RcInputs): PhysicsResults | null {
     checkLabel: "time constant (s)",
   };
 }
+
+// ---- forces, energy and collisions (Stage 14) ---------------------------------------------------------------------------------
+
+import { analyzeEnergy } from "./energy";
+import { analyzeForces, describeState } from "./forces";
+import { solveCollision } from "./collisions";
+import {
+  COLLISIONS_ENGINE_VERSION, ENERGY_ENGINE_VERSION, FORCES_ENGINE_VERSION,
+  type CollisionsInputs, type EnergyInputs, type ForcesInputs,
+} from "../persistence/physicsTools";
+
+export const FORCES_ASSUMPTIONS = [
+  "One rigid body treated as a point (or a block with a hanging mass over an ideal pulley): no rotation, no tipping, no torques.",
+  "Coulomb friction: static friction adapts up to μₛN, kinetic friction is μₖN and opposes sliding; both coefficients are constant and μₖ ≤ μₛ.",
+  "A flat or inclined plane with constant gravity and no air resistance. The normal force is whatever the surface supplies, N = mg cosθ − F sinφ; if that is negative the body has left the surface.",
+  "Constant applied force; the string is light, inextensible and stays taut; the pulley is ideal and frictionless.",
+];
+export const ENERGY_ASSUMPTIONS = [
+  "A point mass with constant gravity near Earth's surface; potential energy mg(h − h_ref) depends on the chosen reference height (the bottom of the incline, or the height you set).",
+  "An ideal Hookean spring (massless, F = kx, no damping) and constant kinetic friction μₖN; no air resistance.",
+  "Friction turns mechanical energy into heat (Q): mechanical energy decreases, total energy KE + PE + Q is conserved; the external applied force adds W_applied.",
+  "The block never leaves its track: the incline has ends, the spring is released from rest, and the height scenario stops at the ground.",
+];
+export const COLLISION_ASSUMPTIONS = [
+  "Two rigid bodies on a frictionless straight line with A to the left of B; no external forces, so total momentum is conserved.",
+  "The collision is instantaneous and idealised: the velocities after it follow from momentum conservation and the coefficient of restitution e (0 ≤ e ≤ 1). No contact-force history is modelled.",
+  "Bodies collide only if A is closing on B (vA > vB); otherwise they never touch and nothing is invented.",
+  "An average collision force is shown only when you give a collision duration (F = impulse / duration).",
+];
+
+const fmtN = (v: number) => formatSI(v, "N");
+
+export function summarizeForces(inputs: ForcesInputs): PhysicsResults | null {
+  const a = analyzeForces(inputs.input);
+  const m = a.at(0);
+  return {
+    engineVersion: FORCES_ENGINE_VERSION,
+    headline: [
+      `${describeState(m.state)}${m.state === "sliding" ? `: a = ${fmt(m.a)} m/s²` : ""}`,
+      a.contact ? `Normal force ${fmtN(a.normal)}; ${m.friction.kind === "none" ? "no friction" : `${m.friction.kind} friction ${fmtN(Math.abs(m.friction.value))}`}` : "Contact lost: no normal force or surface friction",
+      `Net force ${fmtN(m.net.magnitude)}`,
+      a.contact ? `Static friction limit μₛN = ${fmtN(a.staticMax)}` : "No static-friction limit (not touching)",
+    ],
+    assumptions: FORCES_ASSUMPTIONS,
+    check: a.contact ? a.normal : m.net.magnitude,
+    checkLabel: a.contact ? "normal force (N)" : "net force (N)",
+  };
+}
+
+export function summarizeEnergy(inputs: EnergyInputs): PhysicsResults | null {
+  const a = analyzeEnergy(inputs.input);
+  const f = a.final;
+  return {
+    engineVersion: ENERGY_ENGINE_VERSION,
+    headline: [
+      `The body ${a.ending}`,
+      `Final speed ${fmt(Math.abs(f.v))} m/s, kinetic energy ${formatSI(f.KE, "J")}`,
+      `Heat from friction ${formatSI(f.Q, "J")}; work by the applied force ${formatSI(f.Wapplied, "J")}`,
+      `Energy ledger KE + PE + Q = ${formatSI(f.Etotal, "J")} (started at ${formatSI(a.initial.Etotal, "J")})`,
+    ],
+    assumptions: ENERGY_ASSUMPTIONS,
+    check: f.Etotal,
+    checkLabel: "total energy at the end (J)",
+  };
+}
+
+export function summarizeCollisions(inputs: CollisionsInputs): PhysicsResults | null {
+  const r = solveCollision(inputs.input);
+  const i = inputs.input;
+  return {
+    engineVersion: COLLISIONS_ENGINE_VERSION,
+    headline: r.collides
+      ? [
+        `${r.kind[0].toUpperCase()}${r.kind.slice(1)} collision at t = ${fmt(r.tc!)} s`,
+        `Velocities after: A ${fmt(r.vA2)} m/s, B ${fmt(r.vB2)} m/s (before: ${fmt(i.vA)} and ${fmt(i.vB)} m/s)`,
+        `Total momentum ${fmt(r.pTotal)} kg·m/s conserved; impulse on B ${fmt(r.J)} N·s`,
+        `Kinetic energy ${formatSI(r.KEbefore, "J")} → ${formatSI(r.KEafter, "J")} (${fmt(100 * r.lossFraction)} % lost)`,
+      ]
+      : [r.reason, `Total momentum ${fmt(r.pTotal)} kg·m/s`],
+    assumptions: COLLISION_ASSUMPTIONS,
+    check: r.collides ? r.vB2 : r.pTotal,
+    checkLabel: r.collides ? "final velocity of B (m/s)" : "total momentum (kg·m/s)",
+  };
+}

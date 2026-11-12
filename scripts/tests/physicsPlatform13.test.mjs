@@ -42,11 +42,11 @@ const validators = () => Object.fromEntries([
 const ids = () => { let n = 0; return () => `s13x${(n += 1).toString().padStart(4, "0")}`; };
 
 describe("registry, navigation and the overview", () => {
-  test("[subjects] Physics is available with five tabs; Biology and Biochemistry stay planned without tools", () => {
+  test("[subjects] Physics is available (Stage 14 adds three mechanics tabs); Biology and Biochemistry stay planned without tools", () => {
     assert.equal(S.isAvailable("physics"), true);
     assert.equal(S.getSubject("physics").status, "available");
-    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phCircuits", "phRc", "phSaved"]);
-    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.label), ["Overview", "Mechanics & motion", "DC circuits", "RC transient", "Saved"]);
+    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phCircuits", "phRc", "phSaved"]);
+    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.label), ["Overview", "Mechanics & motion", "Forces & Newton's laws", "Work & energy", "Momentum & collisions", "DC circuits", "RC transient", "Saved"]);
     assert.equal(new Set(S.PHYSICS_TOOLS.map((t) => t.slug)).size, S.PHYSICS_TOOLS.length);
     assert.equal(S.SUBJECT_TOOLS.physics, S.PHYSICS_TOOLS);
     for (const id of ["biology", "biochemistry"]) { assert.equal(S.isAvailable(id), false); assert.deepEqual(S.SUBJECT_TOOLS[id], []); }
@@ -70,9 +70,10 @@ describe("registry, navigation and the overview", () => {
     const overview = read("src", "components", "physics", "PhysicsOverview.tsx");
     for (const id of ["phMechanics", "phCircuits", "phRc"]) assert.match(overview, new RegExp(`${id}:`));
     const plannedBlock = overview.slice(overview.indexOf('title="Planned"'), overview.indexOf("<Callout"));
+    for (const id of ["phForces", "phEnergy", "phCollisions"]) assert.match(overview, new RegExp(`${id}:`));
     assert.doesNotMatch(plannedBlock, /<button/);
     assert.match(plannedBlock, /Planned/);
-    assert.deepEqual(S.getSubject("physics").planned, ["Forces and Newton's laws", "Energy and momentum", "Waves and optics", "Inductors and AC circuits"]);
+    assert.deepEqual(S.getSubject("physics").planned, ["Rotational motion and torque", "Gravitation and orbits", "Waves and optics", "Inductors and AC circuits"]);
   });
   test("[icons] every Physics tool icon exists in the icon set", () => {
     const icons = read("src", "components", "ui", "Icon.tsx");

@@ -384,8 +384,8 @@ describe("the library across all five pages", () => {
   });
 
   test("[routing] every saved type opens on its own page, and the app wires all six (the Multi-Catalytic workspace was added in Stage 9B-2B)", () => {
-    assert.deepEqual({ ...libApp.ANALYSIS_APP_PAGE }, { synthesis: "multiStep", ranking: "acidBase", spectroscopy: "spectroscopy", properties: "analysis", reactions: "reactions", multicatalytic: "multiCatalytic", conformations: "conformations", genchem: "gcAcidBase", equilibrium: "gcEquilibrium", kinetics: "gcKinetics", thermo: "gcThermo", mechanics: "phMechanics", circuits: "phCircuits", rc: "phRc" });
-    assert.deepEqual([...libApp.OPENABLE_ANALYSIS_PAGES].sort(), ["circuits", "conformations", "equilibrium", "genchem", "kinetics", "mechanics", "multicatalytic", "properties", "ranking", "rc", "reactions", "spectroscopy", "synthesis", "thermo"]);
+    assert.deepEqual({ ...libApp.ANALYSIS_APP_PAGE }, { synthesis: "multiStep", ranking: "acidBase", spectroscopy: "spectroscopy", properties: "analysis", reactions: "reactions", multicatalytic: "multiCatalytic", conformations: "conformations", genchem: "gcAcidBase", equilibrium: "gcEquilibrium", kinetics: "gcKinetics", thermo: "gcThermo", mechanics: "phMechanics", circuits: "phCircuits", rc: "phRc", forces: "phForces", energy: "phEnergy", collisions: "phCollisions" });
+    assert.deepEqual([...libApp.OPENABLE_ANALYSIS_PAGES].sort(), ["circuits", "collisions", "conformations", "energy", "equilibrium", "forces", "genchem", "kinetics", "mechanics", "multicatalytic", "properties", "ranking", "rc", "reactions", "spectroscopy", "synthesis", "thermo"]);
     const app = read("src", "App.tsx");
     for (const id of Object.values(libApp.ANALYSIS_APP_PAGE)) assert.match(/^(gc|ph)/.test(id) ? read("src", "navigation", "subjects.ts") : app, new RegExp(`\\{ id: "${id}", (slug: "[a-z-]+", )?label:`));
     for (const page of ["acidBase", "spectroscopy", "multiStep", "reactions", "multiCatalytic", "conformations"]) assert.match(app, new RegExp(`openRequest=\\{pendingOpen\\?\\.page === "${page}" \\? pendingOpen : null\\}`));

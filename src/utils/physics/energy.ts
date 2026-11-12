@@ -224,17 +224,20 @@ export function analyzeEnergy(input: EnergyInput): EnergyAnalysis {
   }
 
   const window = tEnd > 0 ? tEnd : 0.5;
+  // round-off dust (a 1e-15 J "potential energy" at the bottom) is shown as exactly zero
+  const scale = 0.5 * m * input.v0 * input.v0 + m * g * (input.L + input.h0 + Math.abs(input.href) + 1) + 0.5 * input.k * input.x0 * input.x0 + Math.abs(input.F) * (input.L + 1) + 1e-9;
+  const dust = (v: number) => (Math.abs(v) < 1e-12 * scale ? 0 : v);
   const build = (tIn: number): EnergyState => {
     const t = clamp(tIn, window);
     const r = raw(Math.min(t, tEnd));
     const N = input.scenario === "incline" ? m * g * Math.cos((input.theta * Math.PI) / 180) : m * g;
-    const Q = input.scenario === "height" ? 0 : muk * N * r.path;
-    const KE = 0.5 * m * r.v * r.v;
-    const pg = PEg(r);
+    const Q = input.scenario === "height" ? 0 : dust(muk * N * r.path);
+    const KE = dust(0.5 * m * r.v * r.v);
+    const pg = dust(PEg(r));
     const Wa = Wapplied(r);
-    const Emech = KE + pg + r.PEs;
+    const Emech = KE + pg + dust(r.PEs);
     return {
-      t, pos: r.pos, v: r.v, height: r.height, compression: r.compression, path: r.path, KE, PEg: pg, PEs: r.PEs, Q, Wapplied: Wa,
+      t, pos: dust(r.pos), v: dust(r.v), height: dust(r.height), compression: dust(r.compression), path: r.path, KE, PEg: pg, PEs: dust(r.PEs), Q, Wapplied: dust(Wa),
       Emech, Etotal: Emech + Q, Wgravity: 0, Wspring: 0, Wfriction: -Q, phase: r.phase,
     };
   };
