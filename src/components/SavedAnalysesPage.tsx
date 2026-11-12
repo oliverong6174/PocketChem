@@ -14,9 +14,12 @@ const PAGE_LABELS: Record<string, string> = {
   equilibrium: "Chemical equilibrium",
   kinetics: "Reaction kinetics",
   thermo: "Thermodynamics",
+  mechanics: "Mechanics & motion",
+  circuits: "DC circuits",
+  rc: "RC transient",
 };
 
-const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry" };
+const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry", physics: "Physics" };
 
 const STATUS_LABELS: Record<string, string> = {
   found: "Routes found",

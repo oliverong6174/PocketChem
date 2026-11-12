@@ -43,9 +43,9 @@ export const SUBJECTS: SubjectDef[] = [
     planned: ["Stoichiometry and limiting reagents", "Gas laws", "Solubility equilibria", "Periodic trends"],
   },
   {
-    id: "physics", slug: "physics", label: "Physics", mode: "workbench", icon: "physics", status: "planned",
-    tagline: "Mechanics, waves, circuits and simulations with explicit units.",
-    planned: ["Kinematics and forces", "Waves and optics", "Circuits", "Unit-aware calculators"],
+    id: "physics", slug: "physics", label: "Physics", mode: "workbench", icon: "physics", status: "available",
+    tagline: "Projectile motion, resistor networks and RC transients with live diagrams and synchronized graphs.",
+    planned: ["Forces and Newton's laws", "Energy and momentum", "Waves and optics", "Inductors and AC circuits"],
   },
   {
     id: "biology", slug: "biology", label: "Biology", mode: "learning", icon: "biology", status: "planned",
@@ -101,11 +101,24 @@ export const GENERAL_TOOLS: ToolDef[] = [
   { id: "gcSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
+export type PhysicsToolId = "phOverview" | "phMechanics" | "phCircuits" | "phRc" | "phSaved";
+
+export const PHYSICS_TOOLS: ToolDef[] = [
+  { id: "phOverview", slug: "overview", label: "Overview", summary: "What Physics offers now, and what is still planned.", group: "analyze", icon: "physics" },
+  { id: "phMechanics", slug: "mechanics", label: "Mechanics & motion", summary: "Projectile and constant-acceleration motion: a live diagram, vectors and synchronized graphs.", group: "analyze", icon: "mechanics" },
+  { id: "phCircuits", slug: "circuits", label: "DC circuits", summary: "Series and parallel resistor networks: equivalent resistance, currents, voltages and power.", group: "analyze", icon: "circuits" },
+  { id: "phRc", slug: "rc-transient", label: "RC transient", summary: "Charging and discharging of one capacitor through one resistor.", group: "analyze", icon: "rc" },
+  { id: "phSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
+];
+
+/** The tool ids of every non-Organic subject (Organic keeps its own page state in App.tsx). */
+export type SubjectToolId = GeneralToolId | PhysicsToolId;
+
 /** Tools of every subject. Planned subjects have none: they cannot render a tool until they are implemented. */
 export const SUBJECT_TOOLS: Record<SubjectId, ToolDef[]> = {
   organic: ORGANIC_TOOLS,
   general: GENERAL_TOOLS,
-  physics: [],
+  physics: PHYSICS_TOOLS,
   biology: [],
   biochemistry: [],
 };

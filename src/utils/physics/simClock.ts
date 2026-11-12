@@ -29,6 +29,12 @@ export function rateFor(speed: SpeedChoice, tEnd: number): number {
   return tEnd > 0 ? tEnd / FIT_SECONDS : 1;
 }
 
+/** For a transient whose natural time scale can be nanoseconds or hours: the whole plotted span plays in 12, 6 or 3 wall seconds. */
+export function rateForTransient(speed: SpeedChoice, tEnd: number): number {
+  const seconds = speed === "quarter" ? 12 : speed === "fast" ? 3 : FIT_SECONDS;
+  return tEnd > 0 ? tEnd / seconds : 1;
+}
+
 /** Wall-clock seconds the whole motion takes at a speed choice. */
 export function playbackSeconds(speed: SpeedChoice, tEnd: number): number {
   const r = rateFor(speed, tEnd);

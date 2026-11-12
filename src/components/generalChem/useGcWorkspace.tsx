@@ -12,7 +12,7 @@ import type { Capture, RecoveryOutcome } from "../../utils/persistence/workspace
 // Autosave + saved analyses shared by the three Stage 12 tools. --------------------------------------------------------
 
 type WorkspaceConfig<I> = {
-  page: Extract<PersistedPage, "equilibrium" | "kinetics" | "thermo">;
+  page: PersistedPage;
   engineVersion: number;
   defaults: I;
   validateInputs: (raw: unknown) => I | null;
@@ -23,6 +23,8 @@ type WorkspaceConfig<I> = {
   fallbackName: string;
   openRequest: { id: string; recordId: string } | null;
   onOpenHandled?: (requestId: string) => void;
+  /** Called when the user presses Reset (the Physics pages stop their clock and zero the shared time). */
+  onReset?: () => void;
 };
 
 /** Autosave, restore, Save Analysis and open-from-Saved for a tool whose whole state is one validated inputs object. */
@@ -41,7 +43,10 @@ export function useGcWorkspace<I>(cfg: WorkspaceConfig<I>) {
     setSaveMessage(null);
     setRaw(fn);
   }, []);
+  const onResetRef = useRef(cfg.onReset);
+  useEffect(() => { onResetRef.current = cfg.onReset; });
   const reset = useCallback(() => {
+    onResetRef.current?.();
     touchedRef.current = true;
     setSaveMessage(null);
     setOpenedName(null);

@@ -298,6 +298,14 @@ describe("simulation clock (independent of render rate)", () => {
     assert.equal(C.advanceClock(1, -50, 1, 5).t, 1);
     assert.deepEqual(C.advanceClock(0, 16, 1, 0), { t: 0, done: true });
   });
+  test("[transient speeds] slow, normal and fast play any span (nanoseconds to hours) in 12, 6 and 3 wall seconds", () => {
+    for (const span of [5e-9, 0.02, 5, 3600]) {
+      near(span / C.rateForTransient("quarter", span), 12, 1e-9 * 12);
+      near(span / C.rateForTransient("real", span), 6, 1e-9 * 6);
+      near(span / C.rateForTransient("fast", span), 3, 1e-9 * 3);
+    }
+    assert.equal(C.rateForTransient("real", 0), 1);
+  });
   test("[speeds] fit-to-6-seconds plays any flight in 6 wall seconds; real time is 1x", () => {
     assert.equal(C.rateFor("real", 30), 1);
     assert.equal(C.rateFor("quarter", 30), 0.25);

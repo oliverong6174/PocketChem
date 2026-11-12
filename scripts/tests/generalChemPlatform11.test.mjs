@@ -32,10 +32,10 @@ describe("subject registry", () => {
     assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.label), ["Properties", "Ranking", "Spectroscopy", "Conformations", "Reactions", "Multi-Step", "Multi-Catalytic", "Saved"]);
     assert.equal(S.SUBJECT_TOOLS.organic, S.ORGANIC_TOOLS);
   });
-  test("[subjects] five subjects; Organic and General are available, the other three are planned and have no tools", () => {
+  test("[subjects] five subjects; Organic, General and Physics are available, Biology and Biochemistry are planned and have no tools", () => {
     assert.deepEqual(S.SUBJECTS.map((s) => s.id), ["organic", "general", "physics", "biology", "biochemistry"]);
-    for (const id of ["organic", "general"]) assert.equal(S.isAvailable(id), true, id);
-    for (const id of ["physics", "biology", "biochemistry"]) {
+    for (const id of ["organic", "general", "physics"]) assert.equal(S.isAvailable(id), true, id);
+    for (const id of ["biology", "biochemistry"]) {
       assert.equal(S.isAvailable(id), false, id);
       assert.deepEqual(S.SUBJECT_TOOLS[id], [], `${id} must not offer tools before it is implemented`);
       assert.equal(S.getSubject(id).status, "planned");
@@ -63,7 +63,7 @@ describe("subject registry", () => {
 
 describe("routes", () => {
   test("[routes] every available tool round-trips through its hash", () => {
-    for (const subject of ["organic", "general"]) {
+    for (const subject of ["organic", "general", "physics"]) {
       for (const tool of S.SUBJECT_TOOLS[subject]) {
         const hash = S.routeHash({ subject, toolId: tool.id });
         assert.deepEqual(S.parseRoute(hash), { subject, toolId: tool.id }, hash);
@@ -75,7 +75,7 @@ describe("routes", () => {
   test("[routes] a bare subject goes to its first tool; planned, unknown and malformed routes are ignored", () => {
     assert.deepEqual(S.parseRoute("#/general"), { subject: "general", toolId: "gcOverview" });
     assert.deepEqual(S.parseRoute("#/organic/"), { subject: "organic", toolId: "analysis" });
-    for (const bad of ["", "#", "#/physics", "#/biology/cells", "#/general/nope", "#/../x", "#/General", "general", "#/organic/reactions/extra", "#/organic/<script>"]) {
+    for (const bad of ["", "#", "#/physics/nope", "#/biology/cells", "#/biochemistry", "#/general/nope", "#/../x", "#/General", "general", "#/organic/reactions/extra", "#/organic/<script>"]) {
       assert.equal(S.parseRoute(bad), null, bad);
     }
   });
@@ -97,9 +97,10 @@ describe("App wiring (source checks for behaviour that must not regress)", () =>
     assert.match(app, /target === "gcAcidBase"/);
     assert.match(app, /switchSubject\("general", \{ keepOpenRequest: true, tool: target \}\)/);
   });
-  test("[general] planned subjects cannot reach a tool panel: only 'general' has a branch", () => {
+  test("[general] planned subjects cannot reach a tool panel: only 'general' and 'physics' have branches", () => {
     assert.match(app, /activeSubject === "general" \? \(/);
-    assert.doesNotMatch(app, /activeSubject === "(physics|biology|biochemistry)"/);
+    assert.match(app, /activeSubject === "physics" \? \(/);
+    assert.doesNotMatch(app, /activeSubject === "(biology|biochemistry)"/);
   });
   test("[shell] the picker only selects available subjects", () => {
     const picker = read("src", "components", "shell", "SubjectPicker.tsx");
@@ -253,7 +254,7 @@ describe("General Chemistry in the Saved Analyses library", () => {
   test("[app] the app library registers the genchem validators and the page list used by the library", () => {
     const src = read("src", "utils", "persistence", "analysisLibraryApp.ts");
     assert.match(src, /genchem: \{\s*engineVersion: GENCHEM_ENGINE_VERSION,\s*validateInputs: validateGenChemInputs,\s*validateResults: validateGenChemResults,/);
-    assert.match(read("src", "utils", "persistence", "analysisLibrary.ts"), /"conformations", "genchem", "equilibrium", "kinetics", "thermo"]/);
+    assert.match(read("src", "utils", "persistence", "analysisLibrary.ts"), /"conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc"]/);
   });
   test("[workspace] autosave store keeps the General Chemistry workspace separate from every organic page", async () => {
     const backend = new store.MemoryBackend();

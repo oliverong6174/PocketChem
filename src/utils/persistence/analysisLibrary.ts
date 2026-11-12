@@ -116,7 +116,7 @@ export type AnalysisLibraryOptions = {
   newId?: () => string;
 };
 
-const PAGES: readonly string[] = ["synthesis", "properties", "reactions", "spectroscopy", "ranking", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo"];
+const PAGES: readonly string[] = ["synthesis", "properties", "reactions", "spectroscopy", "ranking", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc"];
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 const isText = (value: unknown): value is string => typeof value === "string" && value.length > 0;

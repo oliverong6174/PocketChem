@@ -9,6 +9,10 @@ import {
   EQUILIBRIUM_ENGINE_VERSION, KINETICS_ENGINE_VERSION, THERMO_ENGINE_VERSION,
   validateEquilibriumInputs, validateEquilibriumResults, validateKineticsInputs, validateKineticsResults, validateThermoInputs, validateThermoResults,
 } from "./generalChemTools";
+import {
+  CIRCUITS_ENGINE_VERSION, MECHANICS_ENGINE_VERSION, RC_ENGINE_VERSION,
+  validateCircuitsInputs, validateMechanicsInputs, validatePhysicsResults, validateRcInputs,
+} from "./physicsTools";
 import { getAnalysisLibrary, registerAnalysisValidators, type AnalysisLibrary } from "./analysisLibrary";
 import {
   MULTICATALYTIC_ENGINE_VERSION,
@@ -26,7 +30,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -41,6 +45,9 @@ export const ANALYSIS_APP_PAGE = {
   equilibrium: "gcEquilibrium",
   kinetics: "gcKinetics",
   thermo: "gcThermo",
+  mechanics: "phMechanics",
+  circuits: "phCircuits",
+  rc: "phRc",
 } as const;
 
 let registered = false;
@@ -86,6 +93,9 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
       equilibrium: { engineVersion: EQUILIBRIUM_ENGINE_VERSION, validateInputs: validateEquilibriumInputs, validateResults: validateEquilibriumResults },
       kinetics: { engineVersion: KINETICS_ENGINE_VERSION, validateInputs: validateKineticsInputs, validateResults: validateKineticsResults },
       thermo: { engineVersion: THERMO_ENGINE_VERSION, validateInputs: validateThermoInputs, validateResults: validateThermoResults },
+      mechanics: { engineVersion: MECHANICS_ENGINE_VERSION, validateInputs: validateMechanicsInputs, validateResults: validatePhysicsResults },
+      circuits: { engineVersion: CIRCUITS_ENGINE_VERSION, validateInputs: validateCircuitsInputs, validateResults: validatePhysicsResults },
+      rc: { engineVersion: RC_ENGINE_VERSION, validateInputs: validateRcInputs, validateResults: validatePhysicsResults },
       multicatalytic: {
         engineVersion: MULTICATALYTIC_ENGINE_VERSION,
         validateInputs: validateMulticatalyticInputs,

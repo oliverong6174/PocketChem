@@ -30,7 +30,7 @@ export type ToolResults = {
   checkLabel: string;
 };
 
-function validateToolResults(raw: unknown): ToolResults | null {
+export function validateToolResults(raw: unknown): ToolResults | null {
   if (!isObject(raw)) return null;
   if (typeof raw.engineVersion !== "number" || !Number.isInteger(raw.engineVersion)) return null;
   if (!finite(raw.check)) return null;
