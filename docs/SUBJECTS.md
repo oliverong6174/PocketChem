@@ -63,3 +63,15 @@ Physics is an implemented Scientific Workbench subject with tools `phOverview`, 
 - Persistence pages `mechanics`, `circuits`, `rc` (subject `physics`) are validated in `utils/persistence/physicsTools.ts`, which also rejects
   contradictory records (a time beyond the end of the motion, a selected component that is not in the circuit).
 - Not supported, stated in the tools: air resistance, forces, non-series/parallel circuit topologies, AC, inductors, multi-capacitor circuits.
+
+### Physics, Stage 14 additions
+
+Three more Physics tools share the Stage 13 simulation infrastructure (`useSimClock`, `useSimTime`, `SimControls`, arrows, `LineChart` via
+`TimeChart`, `useGcWorkspace`, `GcPredictPanel`): `phForces`, `phEnergy`, `phCollisions` (routes `#/physics/forces|energy|collisions`, pages
+`forces`, `energy`, `collisions`). Tool groups are now `analyze`, `mechanics`, `electricity`, `synthesize`, `library` (`TOOL_GROUPS`); the shell
+shows a group label only when a subject has tools in it, so Organic and General are unchanged.
+
+- `utils/physics/forces.ts`: static/kinetic friction engine (piecewise analytic motion), normal force N = mg cosθ − F sinφ with contact loss, inclines,
+  and a block + hanging mass on one friction engine. `energy.ts`: four time-based scenarios with one ledger KE + PE + Q = E(0) + W_applied.
+  `collisions.ts`: momentum + restitution, collision only when the bodies are closing, impulse always, average force only with a given duration.
+- Learning content (`mechanicsLearning.ts`) includes a free-body-diagram quiz whose correct answer is computed from the physics.

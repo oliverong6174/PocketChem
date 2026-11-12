@@ -84,9 +84,9 @@ async function netlistVsTable() {
 try {
   // ---------------- overview and navigation ----------------
   await fresh(1440, "dark", "#/physics/overview");
-  check("Physics tabs: Overview, Mechanics & motion, DC circuits, RC transient, Saved", (await tabs()) === "Overview|Mechanics & motion|DC circuits|RC transient|Saved", await tabs());
+  check("Physics tabs: Overview, Mechanics & motion, DC circuits, RC transient, Saved", (await tabs()) === "Overview|Mechanics & motion|Forces & Newton's laws|Work & energy|Momentum & collisions|DC circuits|RC transient|Saved", await tabs());
   const ov = await ev(`({ h1: document.querySelector('h1')?.textContent, buttons: [...document.querySelectorAll('.gc-tool-card button')].map((b) => b.textContent.trim()), planned: [...document.querySelectorAll('.gc-planned li')].map((l) => l.querySelector('span').textContent), plannedButtons: document.querySelectorAll('.gc-planned button, .gc-planned a').length })`);
-  check("overview: three working laboratories with Open buttons", ov.h1 === "Physics" && ov.buttons.length === 3 && ov.buttons.every((b) => /^Open /.test(b)), ov.buttons.join(" | "));
+  check("overview: six working laboratories with Open buttons", ov.h1 === "Physics" && ov.buttons.length === 6 && ov.buttons.every((b) => /^Open /.test(b)), ov.buttons.join(" | "));
   check("overview: planned areas are non-interactive and labelled Planned", ov.plannedButtons === 0 && ov.planned.length === 4 && (await ev(`[...document.querySelectorAll('.gc-planned li')].every((l) => /Planned/.test(l.textContent))`)), ov.planned.join(" | "));
   await screenshot(cdp, path.join(outDir, "overview-1440-dark.png"), { fullPage: false });
   await click("Open Mechanics & motion");
@@ -428,7 +428,7 @@ try {
   await sleep(250);
   await ev(`[...document.querySelectorAll('.subject-popover .subject-item')].find((b) => b.querySelector('.subject-item-name').textContent.trim() === 'Physics')?.click()`);
   await sleep(700);
-  check("switching General → Physics shows Physics tabs (not a General tool id)", (await tabs()) === "Overview|Mechanics & motion|DC circuits|RC transient|Saved" && /^#\/physics\//.test(await hash()), `${await hash()} ${await tabs()}`);
+  check("switching General → Physics shows Physics tabs (not a General tool id)", (await tabs()) === "Overview|Mechanics & motion|Forces & Newton's laws|Work & energy|Momentum & collisions|DC circuits|RC transient|Saved" && /^#\/physics\//.test(await hash()), `${await hash()} ${await tabs()}`);
   await ev(`history.back()`);
   await sleep(700);
   check("browser Back returns to the General Chemistry tool", (await hash()) === "#/general/equilibrium" && (await tabs()).startsWith("Overview|Acid"), `${await hash()} ${await tabs()}`);
