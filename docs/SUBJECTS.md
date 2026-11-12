@@ -47,3 +47,19 @@ never opened. The record schema version is unchanged (the field is additive and 
   their model so the plot and readouts cannot disagree. Put it in a `DiagramFrame` (paper surface).
 - `utils/chartTicks.ts`: tick generation.
 - `utils/generalChem/format.ts`: significant-figure and pH formatting.
+
+## Physics (Stage 13)
+
+Physics is an implemented Scientific Workbench subject with tools `phOverview`, `phMechanics`, `phCircuits`, `phRc` and `phSaved`
+(`PHYSICS_TOOLS`, routes `#/physics/overview|mechanics|circuits|rc-transient|saved`). `App.tsx` keeps one non-Organic tool state
+(`SubjectToolId`); `switchSubject` selects the open tool when it belongs to the target subject and otherwise that subject's Overview.
+
+- Pure models (no React) live in `src/utils/physics/`: `mechanics.ts` (analytic constant-acceleration kinematics, landing event, summaries),
+  `circuits.ts` (series/parallel resistor trees, KCL/KVL checks, editing helpers), `circuitLayout.ts` (the drawing derived from the same tree),
+  `rc.ts` (first-order RC transient), `simClock.ts` (frame-rate-independent clock arithmetic), `format.ts` (SI formatting).
+- Simulation UI helpers are in `src/components/physics/sim.tsx` (`useSimClock` with requestAnimationFrame only while playing, `SimControls`,
+  `ParamSlider`, arrows) and `useSimTime.ts` (shared time kept local and committed to saved inputs when the user stops).
+  Charts reuse `ui/LineChart`; autosave and Saved Analyses reuse `generalChem/useGcWorkspace`.
+- Persistence pages `mechanics`, `circuits`, `rc` (subject `physics`) are validated in `utils/persistence/physicsTools.ts`, which also rejects
+  contradictory records (a time beyond the end of the motion, a selected component that is not in the circuit).
+- Not supported, stated in the tools: air resistance, forces, non-series/parallel circuit topologies, AC, inductors, multi-capacitor circuits.
