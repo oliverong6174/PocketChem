@@ -18,7 +18,7 @@
 import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import MoleculeDrawer, { type KetcherApi } from "./components/MoleculeDrawer";
 import { ToolHeader } from "./components/ui/primitives";
-import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectId } from "./navigation/subjects";
+import { SUBJECT_TOOLS, parseRoute, routeHash, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
   import {
     applyResolvedNameToIdentity,
     type MoleculeNameResolution,
@@ -91,6 +91,10 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
   const EquilibriumPage = lazy(() => import("./components/generalChem/EquilibriumPage"));
   const KineticsPage = lazy(() => import("./components/generalChem/KineticsPage"));
   const ThermodynamicsPage = lazy(() => import("./components/generalChem/ThermodynamicsPage"));
+  const PhysicsOverview = lazy(() => import("./components/physics/PhysicsOverview"));
+  const MechanicsPage = lazy(() => import("./components/physics/MechanicsPage"));
+  const CircuitsPage = lazy(() => import("./components/physics/CircuitsPage"));
+  const RcPage = lazy(() => import("./components/physics/RcPage"));
 
 
   type AnnotationCarouselItem =
@@ -240,7 +244,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
     // Subject and tool: the URL hash (#/organic/reactions, #/general/acid-base-titration) selects them on load and follows them.
     const initialRoute = useMemo(() => (typeof window === "undefined" ? null : parseRoute(window.location.hash)), []);
     const [activeSubject, setActiveSubject] = useState<SubjectId>(initialRoute?.subject ?? "organic");
-    const [generalTool, setGeneralTool] = useState<GeneralToolId>(initialRoute?.subject === "general" ? (initialRoute.toolId as GeneralToolId) : "gcOverview");
+    const [generalTool, setGeneralTool] = useState<SubjectToolId>(initialRoute && (initialRoute.subject === "general" || initialRoute.subject === "physics") ? (initialRoute.toolId as SubjectToolId) : "gcOverview");
     const [activePage, setActivePage] = useState<AppPage>(initialRoute?.subject === "organic" ? (initialRoute.toolId as AppPage) : "analysis");
     const [analysisPanel, setAnalysisPanel] = useState<AnalysisPanel>("overview");
     const [reactionPathways, setReactionPathways] = useState<ReactionPathway[]>([]);
@@ -540,7 +544,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
 
     // A saved analysis chosen on the Saved page, waiting for its page to open it. Any other way of
     // changing page forgets it, so it can never be applied later by surprise.
-    const [pendingOpen, setPendingOpen] = useState<{ id: string; recordId: string; page: AppPage | GeneralToolId } | null>(null);
+    const [pendingOpen, setPendingOpen] = useState<{ id: string; recordId: string; page: AppPage | SubjectToolId } | null>(null);
 
     const switchPage = (page: AppPage, options?: { keepOpenRequest?: boolean }) => {
       if (!options?.keepOpenRequest) setPendingOpen(null);
@@ -556,7 +560,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
     };
 
     // General Chemistry navigation. Leaving a tool lets it finish saving first, exactly like switchPage.
-    const switchGeneralTool = (tool: GeneralToolId, options?: { keepOpenRequest?: boolean }) => {
+    const switchGeneralTool = (tool: SubjectToolId, options?: { keepOpenRequest?: boolean }) => {
       if (!options?.keepOpenRequest) setPendingOpen(null);
       const request = (switchRequestRef.current += 1);
       void runLeaveHooks().then(() => {
@@ -564,15 +568,18 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
       });
     };
 
-    const switchSubject = (subject: SubjectId, options?: { keepOpenRequest?: boolean; tool?: GeneralToolId; page?: AppPage }) => {
+    const switchSubject = (subject: SubjectId, options?: { keepOpenRequest?: boolean; tool?: SubjectToolId; page?: AppPage }) => {
       if (subject === activeSubject && !options?.tool) return;
+      // The tool shown in a non-Organic subject: the requested one, else the one already open if it belongs to that subject, else its Overview.
+      const subjectTools = SUBJECT_TOOLS[subject];
+      const toolFor: SubjectToolId | undefined = options?.tool ?? (subjectTools.some((entry) => entry.id === generalTool) ? generalTool : (subjectTools[0]?.id as SubjectToolId | undefined));
       if (!options?.keepOpenRequest) setPendingOpen(null);
       const request = (switchRequestRef.current += 1);
       void runLeaveHooks().then(() => {
         if (switchRequestRef.current !== request) return;
         // Leaving Organic Chemistry unmounts the Properties editor; the next visit gets a new one.
         if (subject !== "organic") setIsMainEditorReady(false);
-        if (subject === "general" && options?.tool) setGeneralTool(options.tool);
+        if (subject !== "organic" && toolFor) setGeneralTool(toolFor);
         if (subject === "organic" && options?.page) setActivePage(options.page);
         setActiveSubject(subject);
       });
@@ -588,6 +595,11 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
         else switchSubject("general", { keepOpenRequest: true, tool: target });
         return;
       }
+      if (target === "phMechanics" || target === "phCircuits" || target === "phRc") {
+        if (activeSubject === "physics") switchGeneralTool(target, { keepOpenRequest: true });
+        else switchSubject("physics", { keepOpenRequest: true, tool: target });
+        return;
+      }
       if (activeSubject !== "organic") {
         switchSubject("organic", { keepOpenRequest: true, page: target });
         return;
@@ -601,9 +613,9 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
     useEffect(() => {
       navRef.current = (route) => {
         if (route.subject !== activeSubject) {
-          switchSubject(route.subject, route.subject === "general" ? { tool: route.toolId as GeneralToolId } : { page: route.toolId as AppPage });
+          switchSubject(route.subject, route.subject === "organic" ? { page: route.toolId as AppPage } : { tool: route.toolId as SubjectToolId });
         } else if (route.subject === "organic") switchPage(route.toolId as AppPage);
-        else switchGeneralTool(route.toolId as GeneralToolId);
+        else switchGeneralTool(route.toolId as SubjectToolId);
       };
     });
     useEffect(() => {
@@ -802,8 +814,8 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
       });
     };
 
-    const handleGeneralTabKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, current: GeneralToolId) => {
-      const tools = SUBJECT_TOOLS.general;
+    const handleGeneralTabKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, current: SubjectToolId) => {
+      const tools = SUBJECT_TOOLS[activeSubject];
       const index = tools.findIndex((tool) => tool.id === current);
       let next = index;
       if (event.key === "ArrowRight") next = (index + 1) % tools.length;
@@ -812,7 +824,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
       if (event.key === "End") next = tools.length - 1;
       if (next === index) return;
       event.preventDefault();
-      const id = tools[next].id as GeneralToolId;
+      const id = tools[next].id as SubjectToolId;
       switchGeneralTool(id);
       requestAnimationFrame(() => document.getElementById(`page-tab-${id}`)?.focus());
     };
@@ -1907,21 +1919,51 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type GeneralToolId, type SubjectI
           activeToolId={activePage}
           onSelectTool={(id) => switchPage(id as AppPage)}
           onToolKeyDown={(event, id) => handlePageTabKeyDown(event, id as AppPage)}
-          onSelectSubject={(id) => switchSubject(id, id === "general" ? { tool: generalTool } : undefined)}
+          onSelectSubject={(id) => switchSubject(id)}
         />
       ) : (
         <AppShell
           activeSubject={activeSubject}
           activeToolId={generalTool}
-          onSelectSubject={(id) => switchSubject(id, id === "general" ? { tool: generalTool } : undefined)}
-          onSelectTool={(id) => switchGeneralTool(id as GeneralToolId)}
-          onToolKeyDown={(event, id) => handleGeneralTabKeyDown(event, id as GeneralToolId)}
+          onSelectSubject={(id) => switchSubject(id)}
+          onSelectTool={(id) => switchGeneralTool(id as SubjectToolId)}
+          onToolKeyDown={(event, id) => handleGeneralTabKeyDown(event, id as SubjectToolId)}
           tools={SUBJECT_TOOLS[activeSubject]}
         />
       )}
 
       <div id="main-content" tabIndex={-1} className="main-content">
-      {activeSubject === "general" ? (
+      {activeSubject === "physics" ? (
+        <section
+          aria-labelledby={`page-tab-${generalTool}`}
+          className="page-panel"
+          id={`page-panel-${generalTool}`}
+          role="tabpanel"
+        >
+          <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
+            {generalTool === "phMechanics" ? (
+              <MechanicsPage
+                openRequest={pendingOpen?.page === "phMechanics" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phCircuits" ? (
+              <CircuitsPage
+                openRequest={pendingOpen?.page === "phCircuits" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phRc" ? (
+              <RcPage
+                openRequest={pendingOpen?.page === "phRc" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phSaved" ? (
+              <SavedAnalysesPage onOpen={openSavedAnalysis} />
+            ) : (
+              <PhysicsOverview onOpenTool={(id: PhysicsToolId) => switchGeneralTool(id)} />
+            )}
+          </Suspense>
+        </section>
+      ) : activeSubject === "general" ? (
         <section
           aria-labelledby={`page-tab-${generalTool}`}
           className="page-panel"

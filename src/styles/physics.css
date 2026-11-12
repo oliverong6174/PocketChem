@@ -1,0 +1,85 @@
+/* Physics laboratories (Stage 13). Reuses the Stage 11/12 General Chemistry layout classes; diagrams sit on paper in both themes. */
+.ph-page .ph-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); min-width: 0; }
+@media (max-width: 1180px) { .ph-page .ph-charts { grid-template-columns: minmax(0, 1fr); } }
+
+/* transport */
+.ph-controls { display: grid; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface-raised); }
+.ph-transport { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+.ph-timeline { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--sp-3); align-items: center; }
+.ph-timeline label { font-size: var(--fs-sm); font-weight: 600; color: var(--text-muted); }
+.ph-timeline input[type="range"], .ph-slider input[type="range"], .ph-vslider input[type="range"] { width: 100%; min-height: var(--touch); accent-color: var(--accent); }
+.ph-time-readout { font-family: var(--font-mono); font-size: var(--fs-sm); white-space: nowrap; }
+@media (max-width: 520px) { .ph-timeline { grid-template-columns: minmax(0, 1fr); } .ph-time-readout { white-space: normal; } }
+.ph-note { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+.ph-toggles { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+
+/* diagrams: always on paper */
+.ph-diagram { width: 100%; min-width: 0; overflow-x: auto; justify-self: stretch; }
+.ph-svg { display: block; max-width: none; user-select: none; }
+.ph-sky { fill: #f6f9fc; }
+.ph-earth { fill: #e5dfd0; }
+.ph-paper { fill: #fbfaf7; }
+.ph-grid { stroke: #d6dde6; stroke-width: 1; }
+.ph-ground { stroke: #6b5b3e; stroke-width: 2.4; }
+.ph-tick { fill: #334155; font-size: 12px; font-family: var(--font-body, system-ui); }
+.ph-axis-label { fill: #0f172a; font-size: 13px; font-weight: 600; font-family: var(--font-body, system-ui); }
+.ph-note-text { fill: #475569; font-size: 12px; font-family: var(--font-body, system-ui); }
+.ph-path-future { stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 6 5; }
+.ph-path-past { stroke: #0b6a72; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.ph-step-dot { fill: #0f172a; opacity: 0.55; }
+.ph-particle { fill: #be123c; stroke: #ffffff; stroke-width: 2.5; }
+.ph-mark { fill: #0f172a; stroke: #ffffff; stroke-width: 2; }
+.ph-mark.apex { fill: #b45309; }
+.ph-mark.land { fill: #6b5b3e; }
+.ph-dim line { stroke: #0f172a; stroke-width: 1.4; }
+.ph-dim text { fill: #0f172a; font-size: 12px; font-weight: 600; font-family: var(--font-body, system-ui); }
+.ph-dim.soft line { stroke: #64748b; stroke-dasharray: 3 3; }
+.ph-dim.soft text { fill: #475569; font-weight: 500; }
+.ph-vec-label { font-size: 14px; font-weight: 700; font-style: italic; font-family: var(--font-body, system-ui); }
+.ph-vec-label.v { fill: #0b6a72; }
+.ph-vec-label.a { fill: #b45309; }
+.ph-diagram .ph-note { color: #475569; }
+.ph-legend-line { display: flex; flex-wrap: wrap; gap: 4px var(--sp-3); align-items: center; margin-top: var(--sp-2); }
+.ph-key { display: inline-block; width: 16px; height: 0; border-top: 3px solid; margin-right: 5px; vertical-align: middle; }
+.ph-key.v { border-color: #0b6a72; } .ph-key.a { border-color: #b45309; } .ph-key.c { border-color: #475569; border-top-style: dashed; }
+.ph-key.dot { width: 6px; height: 6px; border: 0; border-radius: 50%; background: #0f172a; opacity: 0.6; }
+
+/* circuits and RC */
+.ph-wire { stroke: #0f172a; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+.ph-zigzag { stroke: #0f172a; stroke-width: 2.6; stroke-linejoin: round; stroke-linecap: round; }
+.ph-plate { stroke: #0f172a; stroke-width: 3.4; stroke-linecap: round; }
+.ph-plate.long { stroke-width: 3.8; }
+.ph-sign { fill: #0f172a; font-size: 16px; font-weight: 700; font-family: var(--font-body, system-ui); }
+.ph-sign.small { font-size: 12px; fill: #475569; }
+.ph-comp-label { fill: #0f172a; font-size: 13px; font-weight: 700; font-family: var(--font-body, system-ui); }
+.ph-val { fill: #1e293b; font-size: 12px; font-family: var(--font-mono, ui-monospace, monospace); }
+.ph-val.strong { font-weight: 700; fill: #0b6a72; font-size: 13px; }
+.ph-i-label { fill: #be123c; font-size: 12px; font-weight: 700; font-family: var(--font-body, system-ui); }
+.ph-hit { fill: transparent; stroke: transparent; cursor: pointer; }
+.ph-resistor:hover .ph-hit { fill: rgba(11, 106, 114, 0.07); }
+.ph-resistor:focus { outline: none; }
+.ph-resistor:focus-visible .ph-hit { stroke: #0f172a; stroke-width: 2; stroke-dasharray: 4 3; }
+.ph-resistor.is-selected .ph-hit { fill: rgba(180, 83, 9, 0.14); stroke: #b45309; stroke-width: 2; }
+.ph-resistor.is-selected .ph-zigzag { stroke: #b45309; }
+.ph-group-hl { fill: rgba(180, 83, 9, 0.09); stroke: #b45309; stroke-width: 2; stroke-dasharray: 6 4; }
+.ph-cap-fill { fill: #0b6a72; }
+.ph-circuit-wrap { overflow-x: auto; }
+
+/* circuit editor */
+.ph-group { background: var(--surface-sunken, transparent); }
+.ph-group.is-parallel { border-style: dashed; }
+.ph-group .ph-group { margin-top: var(--sp-1); }
+.ph-res-row { display: grid; gap: var(--sp-2); padding: var(--sp-2); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-raised); }
+.ph-res-row.is-selected { border-color: var(--accent); background: var(--accent-soft); }
+.ph-row-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; }
+.ph-row-button { background: none; border: 0; padding: 4px 6px; font: inherit; color: inherit; text-align: left; cursor: pointer; min-height: 32px; text-decoration: underline dotted; text-underline-offset: 3px; }
+.ph-row-button[aria-pressed="true"] { font-weight: 700; text-decoration: none; }
+.ph-group-row th, .ph-group-row td { color: var(--text-muted); }
+.ph-table td, .ph-table th { white-space: nowrap; }
+.ph-page .gc-pair { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); }
+.ph-page .gc-inputs > *, .ph-page .gc-stage > * { min-width: 0; }
+.ph-page .gc-stage .ui-figure dd { overflow-wrap: anywhere; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ph-page * { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
