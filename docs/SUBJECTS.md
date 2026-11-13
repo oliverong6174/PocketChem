@@ -113,3 +113,29 @@ Three more working tools: `bioRegulation` (`#/biology/gene-regulation`, group `g
 - Diagrams are SVG with fixed paper colours, shapes and labels that do not rely on colour alone (maternal solid, paternal hatched), selectable
   components (keyboard operable), reduced-motion respected, and a focused one-cell view on phones.
 - Tests: `biologyRegulation16`, `biologyGenetics16`, `biologyDivision16`, `biologyPlatform16`; browser check `scripts/browser/stage16LiveCheck.mjs`.
+
+## Biochemistry (Stage 17): amino acids, protein structure and enzymes
+
+Biochemistry is the fifth available subject (Interactive Learning). Tools: `bcAminoAcids` (`#/biochemistry/amino-acids`), `bcProteins`
+(`#/biochemistry/protein-structure`), `bcEnzymes` (`#/biochemistry/enzymes`), all in the group `biomolecules`, plus Overview and Saved. Saved pages
+`aminoacids`, `proteins`, `enzymes` (subject `biochemistry`; versioned in `utils/persistence/biochemTools17.ts`, strict validators, derived results rebuilt on open).
+
+- `src/utils/biochem/aminoAcids.ts` is the single reference table for the 20 standard L-amino acids: SMILES with explicit stereochemistry (the one chemical
+  identity used for drawing, peptide assembly, formulas and masses), textbook pKa values (Lehninger), Kyte–Doolittle hydropathy, Zamyatnin volumes, class,
+  CIP descriptors. `scripts/tests/biochemData17.test.mjs` checks every row against RDKit (formula from InChI, CIP labels, exact mass) and against separately
+  typed reference values. `ionization.ts` (Henderson–Hasselbalch charge, pI, titration curve), `peptide.ts` (strict parsing, assembly SMILES with atom roles,
+  formula, masses, GRAVY, peptide-bond facts), `aaStructure.ts` (RDKit substructure roles and highlighted SVG; reuses the Organic Chemistry RDKit loader).
+- `protein.ts` holds ideal secondary-structure geometry (α-helix i→i+4 bonds, helical wheel, β-sheet bond patterns, turns), the Ramachandran region
+  classifier (separate glycine and proline regions), a qualitative folding-forces demonstration (pH, thermal energy, reducing agent, denaturant on a made-up
+  domain) and curated substitutions (sickle-cell Glu6Val, proline in a helix, an insulin disulfide, a buried leucine, a salt bridge). It makes no folding
+  prediction and gives no stability numbers; each substitution reports what the model *supports* and what is *uncertain*.
+- `enzyme.ts`: Michaelis–Menten kinetics with the general reversible-inhibition scheme (α = 1 + [I]/Ki, α′ = 1 + [I]/Ki′), apparent parameters, species
+  fractions, double-reciprocal lines, a schematic energy profile (RT ln 10 per decade), three binding models and one worked serine-protease mechanism.
+  The velocity curve, the Lineweaver–Burk lines, the species bars and the readouts all come from the same α and α′.
+- `learning.ts` derives every Practice question and Challenge from those engines (never typed in separately).
+- Diagrams are SVG with fixed paper colours, glyphs or text beside every color (class shapes ● ⬢ ◆ ▲ ▼, Ramachandran glyphs, ✔ ~ ✖), keyboard-operable
+  residues and Ramachandran marker, and the shared `LineChart` (a slider marker) for titration and kinetic curves; structures come from the local RDKit build
+  (no network).
+- Hand-off: the Translation tool's final peptide opens in the peptide builder (`handoff16.ts`, kind `peptide`; validated by the receiver; peptides longer
+  than 30 residues are cut to the explorer's limit and the page says so).
+- Tests: `biochemData17`, `biochemModels17`, `biochemPlatform17`; browser check `scripts/browser/stage17LiveCheck.mjs`.

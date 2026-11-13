@@ -4,6 +4,7 @@ import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Legend, Panel, Se
 import { useGcWorkspace } from "../generalChem/useGcWorkspace";
 import { OrganismNote, PredictPanel, QuizPanel, SeqField, StepControls } from "./bioShared";
 import { useStepPlayer } from "./bioHooks";
+import { PeptideHandoff } from "./PeptideHandoff";
 import { RibosomeDiagram } from "./RibosomeDiagram";
 import { ALL_CODONS, readCodon } from "../../utils/biology/geneticCode";
 import { findStarts } from "../../utils/biology/translate";
@@ -15,7 +16,7 @@ import {
   DEFAULT_TRANSLATION_INPUTS, describeTranslationAnalysis, TRANSLATION_ENGINE_VERSION, validateBiologyResults, validateTranslationInputs, type TranslationInputs,
 } from "../../utils/persistence/biologyTools";
 
-type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void };
+type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void; onOpenPeptide?: () => void };
 
 export function GeneticCodeTable({ highlight }: { highlight: string | null }) {
   return (
@@ -33,7 +34,7 @@ export function GeneticCodeTable({ highlight }: { highlight: string | null }) {
   );
 }
 
-export default function TranslationPage({ openRequest = null, onOpenHandled }: Props) {
+export default function TranslationPage({ openRequest = null, onOpenHandled, onOpenPeptide }: Props) {
   const ws = useGcWorkspace<TranslationInputs>({
     page: "translation",
     engineVersion: TRANSLATION_ENGINE_VERSION,
@@ -149,6 +150,7 @@ export default function TranslationPage({ openRequest = null, onOpenHandled }: P
                   {model.translation && model.translation.leftover ? <span className="bio-codon-chip">{model.translation.leftover}</span> : null}
                 </div>
                 <p className="ph-note">Peptide read so far: <strong data-testid="peptide-text">{cur.peptide || "(none)"}</strong>{model.translation && step >= max ? ` — final peptide ${model.translation.protein || "(none)"}` : ""}.</p>
+                {model.translation && step >= max ? <PeptideHandoff onOpen={onOpenPeptide} sequence={model.translation.protein} source="the Translation tool" /> : null}
               </Panel>
 
               {mode === "explore" ? (

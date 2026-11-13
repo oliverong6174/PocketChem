@@ -18,7 +18,7 @@
 import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import MoleculeDrawer, { type KetcherApi } from "./components/MoleculeDrawer";
 import { ToolHeader } from "./components/ui/primitives";
-import { SUBJECT_TOOLS, parseRoute, routeHash, type BiologyToolId, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
+import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type BiologyToolId, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
   import {
     applyResolvedNameToIdentity,
     type MoleculeNameResolution,
@@ -106,6 +106,10 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiologyToolId, type PhysicsT
   const RegulationPage = lazy(() => import("./components/biology/RegulationPage"));
   const GeneticsPage = lazy(() => import("./components/biology/GeneticsPage"));
   const CellDivisionPage = lazy(() => import("./components/biology/CellDivisionPage"));
+  const BiochemOverview = lazy(() => import("./components/biochem/BiochemOverview"));
+  const AminoAcidsPage = lazy(() => import("./components/biochem/AminoAcidsPage"));
+  const ProteinsPage = lazy(() => import("./components/biochem/ProteinsPage"));
+  const EnzymesPage = lazy(() => import("./components/biochem/EnzymesPage"));
 
 
   type AnnotationCarouselItem =
@@ -609,6 +613,11 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiologyToolId, type PhysicsT
       if (target === "phMechanics" || target === "phCircuits" || target === "phRc" || target === "phForces" || target === "phEnergy" || target === "phCollisions") {
         if (activeSubject === "physics") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("physics", { keepOpenRequest: true, tool: target });
+        return;
+      }
+      if (target === "bcAminoAcids" || target === "bcProteins" || target === "bcEnzymes") {
+        if (activeSubject === "biochemistry") switchGeneralTool(target, { keepOpenRequest: true });
+        else switchSubject("biochemistry", { keepOpenRequest: true, tool: target });
         return;
       }
       if (target === "bioReplication" || target === "bioTranscription" || target === "bioTranslation" || target === "bioDogma" || target === "bioRegulation" || target === "bioGenetics" || target === "bioDivision") {
@@ -1949,7 +1958,37 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiologyToolId, type PhysicsT
       )}
 
       <div id="main-content" tabIndex={-1} className="main-content">
-      {activeSubject === "biology" ? (
+      {activeSubject === "biochemistry" ? (
+        <section
+          aria-labelledby={`page-tab-${generalTool}`}
+          className="page-panel"
+          id={`page-panel-${generalTool}`}
+          role="tabpanel"
+        >
+          <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
+            {generalTool === "bcAminoAcids" ? (
+              <AminoAcidsPage
+                openRequest={pendingOpen?.page === "bcAminoAcids" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcProteins" ? (
+              <ProteinsPage
+                openRequest={pendingOpen?.page === "bcProteins" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcEnzymes" ? (
+              <EnzymesPage
+                openRequest={pendingOpen?.page === "bcEnzymes" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcSaved" ? (
+              <SavedAnalysesPage onOpen={openSavedAnalysis} />
+            ) : (
+              <BiochemOverview onOpenTool={(id: BiochemistryToolId) => switchGeneralTool(id)} />
+            )}
+          </Suspense>
+        </section>
+      ) : activeSubject === "biology" ? (
         <section
           aria-labelledby={`page-tab-${generalTool}`}
           className="page-panel"
@@ -1969,6 +2008,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiologyToolId, type PhysicsT
               />
             ) : generalTool === "bioTranslation" ? (
               <TranslationPage
+                onOpenPeptide={() => switchSubject("biochemistry", { tool: "bcAminoAcids" })}
                 openRequest={pendingOpen?.page === "bioTranslation" ? pendingOpen : null}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />

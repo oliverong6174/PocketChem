@@ -1,0 +1,43 @@
+/* Biochemistry (Stage 17). Class colors are always paired with a shape glyph and text, never color alone. */
+.bc-page .bc-views { margin: 0.5rem 0 0.75rem; }
+.bc-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+.bc-grid-row { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+.bc-grid-label { flex: 0 0 100%; font-size: 0.8rem; font-weight: 600; color: var(--text-muted, #475569); }
+.bc-aa { display: inline-flex; align-items: baseline; gap: 0.25rem; padding: 0.3rem 0.55rem; min-height: 36px; border: 1.5px solid var(--border, #cbd5e1); border-radius: 8px; background: var(--surface, #fff); color: inherit; font: inherit; cursor: pointer; }
+.bc-aa small { font-size: 0.72rem; opacity: 0.75; }
+.bc-aa em { font-style: normal; font-size: 0.7rem; margin-left: 0.2rem; }
+.bc-aa:hover { border-color: var(--accent, #0f766e); }
+.bc-aa:focus-visible { outline: 3px solid var(--accent, #0f766e); outline-offset: 2px; }
+.bc-aa.is-active { background: var(--accent-soft, #ccfbf1); border-color: var(--accent, #0f766e); font-weight: 700; }
+.bc-nonpolar-aliphatic { border-left: 5px solid #64748b; }
+.bc-aromatic { border-left: 5px solid #a16207; }
+.bc-polar-uncharged { border-left: 5px solid #0e7490; }
+.bc-positive { border-left: 5px solid #1d4ed8; }
+.bc-negative { border-left: 5px solid #be123c; }
+.bc-sub { margin: 0.75rem 0 0.25rem; font-size: 0.9rem; }
+.bc-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
+.bc-mol { margin: 0; }
+.bc-mol-art { display: flex; justify-content: center; background: #fff; border-radius: 8px; overflow: auto; }
+.bc-mol-art svg { max-width: 100%; height: auto; }
+.bc-mol-legend { display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.8rem; margin-top: 0.4rem; color: var(--text-muted, #475569); }
+.bc-mol-legend i { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 50%; margin-right: 0.3rem; vertical-align: -1px; border: 1px solid rgba(0,0,0,0.3); }
+.bc-props { display: grid; grid-template-columns: minmax(9rem, max-content) 1fr; gap: 0.3rem 1rem; margin: 0; }
+.bc-props dt { font-weight: 600; }
+.bc-props dd { margin: 0; }
+.bc-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.bc-table th, .bc-table td { text-align: left; padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--border, #e2e8f0); }
+.bc-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; }
+.bc-chain { list-style: none; display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0; margin: 0; align-items: center; }
+.bc-chain li { display: inline-flex; align-items: center; gap: 0.2rem; }
+.bc-bond { font-size: 0.7rem; color: var(--text-muted, #475569); }
+.bc-selected { margin-top: 0.75rem; padding: 0.6rem; border: 1px solid var(--border, #cbd5e1); border-radius: 8px; }
+@media (max-width: 600px) { .bc-props { grid-template-columns: 1fr; } }
+.bc-svg { width: 100%; height: auto; max-width: 720px; display: block; margin: 0 auto; background: #fff; border-radius: 8px; }
+.bc-wheel { max-width: 260px; }
+.bc-rama { max-width: 440px; }
+.bc-rama [role="slider"]:focus-visible circle:last-child { stroke: #0f766e; stroke-width: 3; }
+.bc-legend { display: flex; flex-wrap: wrap; gap: 0.6rem; list-style: none; margin: 0; padding: 0; font-size: 0.8rem; }
+.bc-legend i { display: inline-block; width: 0.9rem; height: 0.9rem; margin-right: 0.3rem; border: 1px solid #475569; vertical-align: -2px; }
+.bc-check { display: flex; align-items: center; gap: 0.5rem; margin: 0.4rem 0; min-height: 32px; }
+.bc-select { display: flex; flex-direction: column; gap: 0.25rem; margin: 0.5rem 0; font-weight: 600; }
+.bc-select select { font: inherit; padding: 0.4rem; min-height: 36px; }
