@@ -75,3 +75,19 @@ shows a group label only when a subject has tools in it, so Organic and General 
   and a block + hanging mass on one friction engine. `energy.ts`: four time-based scenarios with one ledger KE + PE + Q = E(0) + W_applied.
   `collisions.ts`: momentum + restitution, collision only when the bodies are closing, impulse always, average force only with a given duration.
 - Learning content (`mechanicsLearning.ts`) includes a free-body-diagram quiz whose correct answer is computed from the physics.
+
+## Biology (Stage 15)
+
+Biology is an implemented Interactive Learning subject with tools `bioOverview`, `bioReplication`, `bioTranscription`, `bioTranslation`,
+`bioDogma` and `bioSaved` (`BIOLOGY_TOOLS`, routes `#/biology/overview|dna-replication|transcription|translation|dna-rna-protein|saved`; new tool
+group `geneExpression`). Pages are lazy-loaded in `App.tsx` and share `useGcWorkspace` (autosave, Save Analysis, open-from-Saved).
+
+- Pure engines (no React) live in `src/utils/biology/`: `sequence.ts` (validated parsing, strands, 5'/3' helpers), `geneticCode.ts`,
+  `translate.ts` (frames, ORFs), `mutations.ts` (classification by translating the mutant), `dogma.ts`, `replication.ts` (one fork, leading/lagging,
+  Okazaki fragments, primer removal, ligation), `transcription.ts` (bubble, cap, splicing, polyadenylation), `translation.ts` (A/P/E-site timeline),
+  `bioLearning.ts` (questions derived from engine state), `bioSummary.ts` (summaries and assumptions), `examples.ts`.
+- Every timeline is a list of snapshots built from the sequence; diagrams (`ReplicationDiagram`, `TranscriptionDiagram`, `RibosomeDiagram`) only draw one snapshot.
+- Each tool has Explore / Practice (labels hidden, questions) / Challenge (predict, then reveal); the step player (`bioHooks.ts`) is the only timer.
+- Persistence pages `replication`, `transcription`, `translation`, `dogma` (subject `biology`) are validated in `utils/persistence/biologyTools.ts`; a
+  step beyond the timeline, an invalid sequence or a mutation that does not fit make a record damaged.
+- Bacterial and eukaryotic machinery are kept apart (replication enzymes, σ factor vs general factors, no splicing/cap/poly(A) in bacteria, RF1/RF2 vs eRF1).
