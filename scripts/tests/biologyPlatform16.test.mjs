@@ -58,7 +58,7 @@ describe("navigation and registration", () => {
     assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phCircuits", "phRc", "phSaved"]);
     assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcSaved"]);
     assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.id), ["analysis", "acidBase", "spectroscopy", "conformations", "reactions", "multiStep", "multiCatalytic", "saved"]);
-    assert.equal(S.getSubject("biochemistry").status, "planned");
+    assert.equal(S.getSubject("biochemistry").status, "available");
   });
   test("[planned vs working] planned Biology items are plans, and none of the working tools is listed as planned", () => {
     const planned = S.getSubject("biology").planned.join(" | ");

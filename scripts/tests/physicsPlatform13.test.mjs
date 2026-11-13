@@ -42,14 +42,14 @@ const validators = () => Object.fromEntries([
 const ids = () => { let n = 0; return () => `s13x${(n += 1).toString().padStart(4, "0")}`; };
 
 describe("registry, navigation and the overview", () => {
-  test("[subjects] Physics is available (Stage 14 adds three mechanics tabs); Biochemistry stays planned without tools (Biology became available in Stage 15)", () => {
+  test("[subjects] Physics is available (Stage 14 adds three mechanics tabs); Biochemistry became available in Stage 17 (Biology became available in Stage 15)", () => {
     assert.equal(S.isAvailable("physics"), true);
     assert.equal(S.getSubject("physics").status, "available");
     assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phCircuits", "phRc", "phSaved"]);
     assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.label), ["Overview", "Mechanics & motion", "Forces & Newton's laws", "Work & energy", "Momentum & collisions", "DC circuits", "RC transient", "Saved"]);
     assert.equal(new Set(S.PHYSICS_TOOLS.map((t) => t.slug)).size, S.PHYSICS_TOOLS.length);
     assert.equal(S.SUBJECT_TOOLS.physics, S.PHYSICS_TOOLS);
-    for (const id of ["biochemistry"]) { assert.equal(S.isAvailable(id), false); assert.deepEqual(S.SUBJECT_TOOLS[id], []); }
+    assert.equal(S.isAvailable("biochemistry"), true);
   });
   test("[routes] every Physics tool has a deep link that round-trips; bare #/physics opens the Overview; junk is ignored", () => {
     for (const t of TOOLS) {

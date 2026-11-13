@@ -47,12 +47,12 @@ describe("navigation", () => {
     assert.deepEqual(S.BIOLOGY_TOOLS.map((t) => t.group), ["analyze", "geneExpression", "geneExpression", "geneExpression", "geneExpression", "geneExpression", "inheritance", "inheritance", "library"]);
     assert.ok(S.TOOL_GROUPS.some((g) => g.id === "geneExpression"));
     assert.equal(new Set(S.BIOLOGY_TOOLS.map((t) => t.slug)).size, S.BIOLOGY_TOOLS.length);
-    assert.equal(S.getSubject("biochemistry").status, "planned"); assert.equal(S.isAvailable("biochemistry"), false);
+    assert.equal(S.getSubject("biochemistry").status, "available"); assert.equal(S.isAvailable("biochemistry"), true);
   });
   test("[routes] deep links round-trip; other subjects' tool lists are unchanged", () => {
     for (const t of TOOLS) { assert.equal(S.routeHash({ subject: "biology", toolId: t.id }), `#/biology/${t.slug}`); assert.deepEqual(S.parseRoute(`#/biology/${t.slug}`), { subject: "biology", toolId: t.id }); }
     assert.deepEqual(S.parseRoute("#/biology"), { subject: "biology", toolId: "bioOverview" });
-    assert.equal(S.parseRoute("#/biology/nonsense"), null); assert.equal(S.parseRoute("#/biochemistry"), null);
+    assert.equal(S.parseRoute("#/biology/nonsense"), null); assert.deepEqual(S.parseRoute("#/biochemistry"), { subject: "biochemistry", toolId: "bcOverview" });
     assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phCircuits", "phRc", "phSaved"]);
     assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcSaved"]);
     assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.id), ["analysis", "acidBase", "spectroscopy", "conformations", "reactions", "multiStep", "multiCatalytic", "saved"]);

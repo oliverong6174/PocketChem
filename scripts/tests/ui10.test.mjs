@@ -8,11 +8,11 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const read = (...p) => fs.readFileSync(path.join(root, ...p), "utf8").replace(/\r\n/g, "\n");
 
-test("subject registry: five branches, two modes; Organic, General Chemistry and Physics available, two planned", async () => {
+test("subject registry: five branches, two modes; all five available (Biology since Stage 15, Biochemistry since Stage 17)", async () => {
   const src = read("src", "navigation", "subjects.ts");
   for (const id of ["organic", "general", "physics", "biology", "biochemistry"]) assert.match(src, new RegExp(`id: "${id}"`));
-  assert.equal((src.match(/status: "available",/g) ?? []).length, 3);
-  assert.equal((src.match(/status: "planned",/g) ?? []).length, 2);
+  assert.equal((src.match(/status: "available",/g) ?? []).length, 5);
+  assert.equal((src.match(/status: "planned",/g) ?? []).length, 0);
   assert.match(src, /id: "biology", slug: "biology", label: "Biology", mode: "learning"/);
   assert.match(src, /id: "physics", slug: "physics", label: "Physics", mode: "workbench"/);
 });
