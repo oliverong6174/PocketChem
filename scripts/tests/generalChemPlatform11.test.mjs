@@ -32,10 +32,10 @@ describe("subject registry", () => {
     assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.label), ["Properties", "Ranking", "Spectroscopy", "Conformations", "Reactions", "Multi-Step", "Multi-Catalytic", "Saved"]);
     assert.equal(S.SUBJECT_TOOLS.organic, S.ORGANIC_TOOLS);
   });
-  test("[subjects] five subjects; Organic, General and Physics are available, Biology and Biochemistry are planned and have no tools", () => {
+  test("[subjects] five subjects; Organic, General, Physics and Biology are available, Biochemistry is planned and has no tools", () => {
     assert.deepEqual(S.SUBJECTS.map((s) => s.id), ["organic", "general", "physics", "biology", "biochemistry"]);
-    for (const id of ["organic", "general", "physics"]) assert.equal(S.isAvailable(id), true, id);
-    for (const id of ["biology", "biochemistry"]) {
+    for (const id of ["organic", "general", "physics", "biology"]) assert.equal(S.isAvailable(id), true, id);
+    for (const id of ["biochemistry"]) {
       assert.equal(S.isAvailable(id), false, id);
       assert.deepEqual(S.SUBJECT_TOOLS[id], [], `${id} must not offer tools before it is implemented`);
       assert.equal(S.getSubject(id).status, "planned");
@@ -43,7 +43,7 @@ describe("subject registry", () => {
   });
   test("[modes] Workbench: Organic, General, Physics; Interactive Learning: Biology, Biochemistry", () => {
     const by = (mode) => S.SUBJECTS.filter((s) => s.mode === mode).map((s) => s.id);
-    assert.deepEqual(by("workbench"), ["organic", "general", "physics"]);
+    assert.deepEqual(by("workbench"), ["organic", "general", "physics"]); // Biology is a learning subject
     assert.deepEqual(by("learning"), ["biology", "biochemistry"]);
   });
   test("[general] tool ids, slugs and groups are unique and General has an Overview, the analyzer and Saved", () => {
@@ -97,10 +97,11 @@ describe("App wiring (source checks for behaviour that must not regress)", () =>
     assert.match(app, /target === "gcAcidBase"/);
     assert.match(app, /switchSubject\("general", \{ keepOpenRequest: true, tool: target \}\)/);
   });
-  test("[general] planned subjects cannot reach a tool panel: only 'general' and 'physics' have branches", () => {
+  test("[general] planned subjects cannot reach a tool panel: only 'general', 'physics' and 'biology' have branches", () => {
     assert.match(app, /activeSubject === "general" \? \(/);
     assert.match(app, /activeSubject === "physics" \? \(/);
-    assert.doesNotMatch(app, /activeSubject === "(biology|biochemistry)"/);
+    assert.match(app, /activeSubject === "biology" \? \(/);
+    assert.doesNotMatch(app, /activeSubject === "biochemistry"/);
   });
   test("[shell] the picker only selects available subjects", () => {
     const picker = read("src", "components", "shell", "SubjectPicker.tsx");
@@ -254,7 +255,7 @@ describe("General Chemistry in the Saved Analyses library", () => {
   test("[app] the app library registers the genchem validators and the page list used by the library", () => {
     const src = read("src", "utils", "persistence", "analysisLibraryApp.ts");
     assert.match(src, /genchem: \{\s*engineVersion: GENCHEM_ENGINE_VERSION,\s*validateInputs: validateGenChemInputs,\s*validateResults: validateGenChemResults,/);
-    assert.match(read("src", "utils", "persistence", "analysisLibrary.ts"), /"conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions"]/);
+    assert.match(read("src", "utils", "persistence", "analysisLibrary.ts"), /"conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "replication", "transcription", "translation", "dogma"]/);
   });
   test("[workspace] autosave store keeps the General Chemistry workspace separate from every organic page", async () => {
     const backend = new store.MemoryBackend();

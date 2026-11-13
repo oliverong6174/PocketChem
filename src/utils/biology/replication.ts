@@ -56,10 +56,10 @@ export function validateReplicationInput(raw: unknown): Validation<ReplicationIn
   return { ok: true, value: { template, direction: r.direction as ForkDirection, okazakiLength: r.okazakiLength as number, primerLength: r.primerLength as number, organism: r.organism as Organism } };
 }
 
-export interface EnzymeNames { helicase: string; primase: string; leadingPol: string; laggingPol: string; clamp: string; ssb: string; topo: string; primerRemoval: string; ligase: string }
+export interface EnzymeNames { helicase: string; primase: string; leadingPol: string; laggingPol: string; clamp: string; ssb: string; topo: string; primerRemoval: string; gapFiller: string; ligase: string }
 export const ENZYMES: Record<Organism, EnzymeNames> = {
-  bacteria: { helicase: "DnaB helicase", primase: "DnaG primase", leadingPol: "DNA polymerase III", laggingPol: "DNA polymerase III", clamp: "β sliding clamp", ssb: "SSB", topo: "DNA gyrase (topoisomerase II)", primerRemoval: "DNA polymerase I (5′→3′ exonuclease)", ligase: "DNA ligase" },
-  eukaryote: { helicase: "CMG helicase (MCM2–7)", primase: "Pol α–primase", leadingPol: "DNA polymerase ε", laggingPol: "DNA polymerase δ", clamp: "PCNA clamp", ssb: "RPA", topo: "topoisomerase", primerRemoval: "RNase H2 / FEN1", ligase: "DNA ligase I" },
+  bacteria: { helicase: "DnaB helicase", primase: "DnaG primase", leadingPol: "DNA polymerase III", laggingPol: "DNA polymerase III", clamp: "β sliding clamp", ssb: "SSB", topo: "DNA gyrase (topoisomerase II)", primerRemoval: "DNA polymerase I (5′→3′ exonuclease)", gapFiller: "DNA polymerase I", ligase: "DNA ligase" },
+  eukaryote: { helicase: "CMG helicase (MCM2–7)", primase: "Pol α–primase", leadingPol: "DNA polymerase ε", laggingPol: "DNA polymerase δ", clamp: "PCNA clamp", ssb: "RPA", topo: "topoisomerase", primerRemoval: "RNase H2 / FEN1", gapFiller: "DNA polymerase δ", ligase: "DNA ligase I" },
 };
 
 /** What occupies a position of a new strand. */
@@ -206,7 +206,7 @@ export function buildReplication(input: ReplicationInput): ReplicationModel {
         lag[u] = 2;
         j.fillNext -= 1;
         if (j.fillNext < frags[repair].b - P + 1) j.stage = "filled";
-        actions.push({ kind: "fillGap", strand: "lagging", u, text: `${enz.laggingPol} fills the gap with DNA by extending fragment ${repair + 2}'s 3′ end` });
+        actions.push({ kind: "fillGap", strand: "lagging", u, text: `${enz.gapFiller} fills the gap with DNA by extending fragment ${repair + 2}'s 3′ end` });
       } else if (j.stage === "filled") {
         j.stage = "sealed";
         actions.push({ kind: "ligate", strand: "lagging", u: frags[repair].b - P, text: `${enz.ligase} seals the nick between fragments ${repair + 1} and ${repair + 2} (joins 3′-OH to 5′ phosphate, using ${input.organism === "bacteria" ? "NAD⁺" : "ATP"})` });

@@ -20,9 +20,13 @@ const PAGE_LABELS: Record<string, string> = {
   forces: "Forces & Newton's laws",
   energy: "Work & energy",
   collisions: "Momentum & collisions",
+  replication: "DNA replication",
+  transcription: "Transcription & RNA processing",
+  translation: "Translation",
+  dogma: "DNA → RNA → protein",
 };
 
-const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry", physics: "Physics" };
+const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry", physics: "Physics", biology: "Biology" };
 
 const STATUS_LABELS: Record<string, string> = {
   found: "Routes found",

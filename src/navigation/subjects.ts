@@ -48,9 +48,9 @@ export const SUBJECTS: SubjectDef[] = [
     planned: ["Rotational motion and torque", "Gravitation and orbits", "Waves and optics", "Inductors and AC circuits"],
   },
   {
-    id: "biology", slug: "biology", label: "Biology", mode: "learning", icon: "biology", status: "planned",
-    tagline: "Labelled, explorable diagrams of cells, systems and processes.",
-    planned: ["Cell structure explorer", "Inheritance and genetics", "Physiology pathways", "Label-hiding practice"],
+    id: "biology", slug: "biology", label: "Biology", mode: "learning", icon: "biology", status: "available",
+    tagline: "Interactive diagrams of DNA replication, transcription and RNA processing, and translation, with a connected DNA → RNA → protein workflow.",
+    planned: ["Cell structure explorer", "Inheritance and genetics", "Physiology pathways", "Gene regulation"],
   },
   {
     id: "biochemistry", slug: "biochemistry", label: "Biochemistry", mode: "learning", icon: "biochemistry", status: "planned",
@@ -59,12 +59,13 @@ export const SUBJECTS: SubjectDef[] = [
   },
 ];
 
-export type ToolGroupId = "analyze" | "mechanics" | "electricity" | "synthesize" | "library";
+export type ToolGroupId = "analyze" | "mechanics" | "electricity" | "geneExpression" | "synthesize" | "library";
 
 export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "analyze", label: "Analyze" },
   { id: "mechanics", label: "Mechanics" },
   { id: "electricity", label: "Electricity" },
+  { id: "geneExpression", label: "Gene expression" },
   { id: "synthesize", label: "Synthesize" },
   { id: "library", label: "Library" },
 ];
@@ -116,15 +117,26 @@ export const PHYSICS_TOOLS: ToolDef[] = [
   { id: "phSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
+export type BiologyToolId = "bioOverview" | "bioReplication" | "bioTranscription" | "bioTranslation" | "bioDogma" | "bioSaved";
+
+export const BIOLOGY_TOOLS: ToolDef[] = [
+  { id: "bioOverview", slug: "overview", label: "Overview", summary: "What Biology offers now, and what is still planned.", group: "analyze", icon: "biology" },
+  { id: "bioReplication", slug: "dna-replication", label: "DNA replication", summary: "A replication fork: helicase, primers, leading and lagging strands, Okazaki fragments and ligase.", group: "geneExpression", icon: "dna" },
+  { id: "bioTranscription", slug: "transcription", label: "Transcription & RNA processing", summary: "Template and coding strands, RNA synthesis, and eukaryotic capping, splicing and polyadenylation.", group: "geneExpression", icon: "rna" },
+  { id: "bioTranslation", slug: "translation", label: "Translation", summary: "A ribosome reading an mRNA: A, P and E sites, codons, tRNAs, peptide growth and termination.", group: "geneExpression", icon: "ribosome" },
+  { id: "bioDogma", slug: "dna-rna-protein", label: "DNA → RNA → protein", summary: "One gene from DNA to peptide, with reading frames and point mutations.", group: "geneExpression", icon: "biology" },
+  { id: "bioSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
+];
+
 /** The tool ids of every non-Organic subject (Organic keeps its own page state in App.tsx). */
-export type SubjectToolId = GeneralToolId | PhysicsToolId;
+export type SubjectToolId = GeneralToolId | PhysicsToolId | BiologyToolId;
 
 /** Tools of every subject. Planned subjects have none: they cannot render a tool until they are implemented. */
 export const SUBJECT_TOOLS: Record<SubjectId, ToolDef[]> = {
   organic: ORGANIC_TOOLS,
   general: GENERAL_TOOLS,
   physics: PHYSICS_TOOLS,
-  biology: [],
+  biology: BIOLOGY_TOOLS,
   biochemistry: [],
 };
 

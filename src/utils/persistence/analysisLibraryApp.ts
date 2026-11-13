@@ -13,6 +13,10 @@ import {
   CIRCUITS_ENGINE_VERSION, COLLISIONS_ENGINE_VERSION, ENERGY_ENGINE_VERSION, FORCES_ENGINE_VERSION, MECHANICS_ENGINE_VERSION, RC_ENGINE_VERSION,
   validateCircuitsInputs, validateCollisionsInputs, validateEnergyInputs, validateForcesInputs, validateMechanicsInputs, validatePhysicsResults, validateRcInputs,
 } from "./physicsTools";
+import {
+  DOGMA_ENGINE_VERSION, REPLICATION_ENGINE_VERSION, TRANSCRIPTION_ENGINE_VERSION, TRANSLATION_ENGINE_VERSION,
+  validateBiologyResults, validateDogmaInputs, validateReplicationInputs, validateTranscriptionInputs, validateTranslationInputs,
+} from "./biologyTools";
 import { getAnalysisLibrary, registerAnalysisValidators, type AnalysisLibrary } from "./analysisLibrary";
 import {
   MULTICATALYTIC_ENGINE_VERSION,
@@ -30,7 +34,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "replication", "transcription", "translation", "dogma"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -51,6 +55,10 @@ export const ANALYSIS_APP_PAGE = {
   forces: "phForces",
   energy: "phEnergy",
   collisions: "phCollisions",
+  replication: "bioReplication",
+  transcription: "bioTranscription",
+  translation: "bioTranslation",
+  dogma: "bioDogma",
 } as const;
 
 let registered = false;
@@ -102,6 +110,10 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
       forces: { engineVersion: FORCES_ENGINE_VERSION, validateInputs: validateForcesInputs, validateResults: validatePhysicsResults },
       energy: { engineVersion: ENERGY_ENGINE_VERSION, validateInputs: validateEnergyInputs, validateResults: validatePhysicsResults },
       collisions: { engineVersion: COLLISIONS_ENGINE_VERSION, validateInputs: validateCollisionsInputs, validateResults: validatePhysicsResults },
+      replication: { engineVersion: REPLICATION_ENGINE_VERSION, validateInputs: validateReplicationInputs, validateResults: validateBiologyResults },
+      transcription: { engineVersion: TRANSCRIPTION_ENGINE_VERSION, validateInputs: validateTranscriptionInputs, validateResults: validateBiologyResults },
+      translation: { engineVersion: TRANSLATION_ENGINE_VERSION, validateInputs: validateTranslationInputs, validateResults: validateBiologyResults },
+      dogma: { engineVersion: DOGMA_ENGINE_VERSION, validateInputs: validateDogmaInputs, validateResults: validateBiologyResults },
       multicatalytic: {
         engineVersion: MULTICATALYTIC_ENGINE_VERSION,
         validateInputs: validateMulticatalyticInputs,

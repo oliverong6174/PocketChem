@@ -18,7 +18,7 @@
 import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import MoleculeDrawer, { type KetcherApi } from "./components/MoleculeDrawer";
 import { ToolHeader } from "./components/ui/primitives";
-import { SUBJECT_TOOLS, parseRoute, routeHash, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
+import { SUBJECT_TOOLS, parseRoute, routeHash, type BiologyToolId, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
   import {
     applyResolvedNameToIdentity,
     type MoleculeNameResolution,
@@ -98,6 +98,11 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type PhysicsToolId, type SubjectI
   const ForcesPage = lazy(() => import("./components/physics/ForcesPage"));
   const EnergyPage = lazy(() => import("./components/physics/EnergyPage"));
   const CollisionsPage = lazy(() => import("./components/physics/CollisionsPage"));
+  const BiologyOverview = lazy(() => import("./components/biology/BiologyOverview"));
+  const ReplicationPage = lazy(() => import("./components/biology/ReplicationPage"));
+  const TranscriptionPage = lazy(() => import("./components/biology/TranscriptionPage"));
+  const TranslationPage = lazy(() => import("./components/biology/TranslationPage"));
+  const CentralDogmaPage = lazy(() => import("./components/biology/CentralDogmaPage"));
 
 
   type AnnotationCarouselItem =
@@ -247,7 +252,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type PhysicsToolId, type SubjectI
     // Subject and tool: the URL hash (#/organic/reactions, #/general/acid-base-titration) selects them on load and follows them.
     const initialRoute = useMemo(() => (typeof window === "undefined" ? null : parseRoute(window.location.hash)), []);
     const [activeSubject, setActiveSubject] = useState<SubjectId>(initialRoute?.subject ?? "organic");
-    const [generalTool, setGeneralTool] = useState<SubjectToolId>(initialRoute && (initialRoute.subject === "general" || initialRoute.subject === "physics") ? (initialRoute.toolId as SubjectToolId) : "gcOverview");
+    const [generalTool, setGeneralTool] = useState<SubjectToolId>(initialRoute && initialRoute.subject !== "organic" ? (initialRoute.toolId as SubjectToolId) : "gcOverview");
     const [activePage, setActivePage] = useState<AppPage>(initialRoute?.subject === "organic" ? (initialRoute.toolId as AppPage) : "analysis");
     const [analysisPanel, setAnalysisPanel] = useState<AnalysisPanel>("overview");
     const [reactionPathways, setReactionPathways] = useState<ReactionPathway[]>([]);
@@ -601,6 +606,11 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type PhysicsToolId, type SubjectI
       if (target === "phMechanics" || target === "phCircuits" || target === "phRc" || target === "phForces" || target === "phEnergy" || target === "phCollisions") {
         if (activeSubject === "physics") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("physics", { keepOpenRequest: true, tool: target });
+        return;
+      }
+      if (target === "bioReplication" || target === "bioTranscription" || target === "bioTranslation" || target === "bioDogma") {
+        if (activeSubject === "biology") switchGeneralTool(target, { keepOpenRequest: true });
+        else switchSubject("biology", { keepOpenRequest: true, tool: target });
         return;
       }
       if (activeSubject !== "organic") {
@@ -1936,7 +1946,42 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type PhysicsToolId, type SubjectI
       )}
 
       <div id="main-content" tabIndex={-1} className="main-content">
-      {activeSubject === "physics" ? (
+      {activeSubject === "biology" ? (
+        <section
+          aria-labelledby={`page-tab-${generalTool}`}
+          className="page-panel"
+          id={`page-panel-${generalTool}`}
+          role="tabpanel"
+        >
+          <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
+            {generalTool === "bioReplication" ? (
+              <ReplicationPage
+                openRequest={pendingOpen?.page === "bioReplication" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioTranscription" ? (
+              <TranscriptionPage
+                openRequest={pendingOpen?.page === "bioTranscription" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioTranslation" ? (
+              <TranslationPage
+                openRequest={pendingOpen?.page === "bioTranslation" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioDogma" ? (
+              <CentralDogmaPage
+                openRequest={pendingOpen?.page === "bioDogma" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioSaved" ? (
+              <SavedAnalysesPage onOpen={openSavedAnalysis} />
+            ) : (
+              <BiologyOverview onOpenTool={(id: BiologyToolId) => switchGeneralTool(id)} />
+            )}
+          </Suspense>
+        </section>
+      ) : activeSubject === "physics" ? (
         <section
           aria-labelledby={`page-tab-${generalTool}`}
           className="page-panel"
