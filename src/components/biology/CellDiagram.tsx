@@ -1,5 +1,6 @@
 import { ChromDefs, ChromGlyph } from "./ChromosomeArt";
 import { COLORS, chromatidText, glyphWidth } from "./chromosomeGeometry";
+import { useNarrow } from "./bioHooks";
 import type { CellView, ChromView, DivisionStage } from "../../utils/biology/cellDivision";
 
 /**
@@ -22,7 +23,7 @@ interface Pos { x: number; y: number; flip: boolean; order: number[]; cell: numb
 
 function placeCell(cell: CellView, geo: Geo, cellIndex: number, nCells: number): Map<string, Pos> {
   const out = new Map<string, Pos>();
-  const height = nCells >= 4 ? 70 : nCells === 2 ? 80 : 88;
+  const height = nCells >= 4 ? 78 : nCells === 2 ? 98 : 120;
   const groups = new Map<string, ChromView[]>();
   for (const c of cell.chromosomes) {
     const key = c.position === "moving" && c.pole !== null ? `pole${c.pole}` : "mid";
@@ -39,21 +40,21 @@ function placeCell(cell: CellView, geo: Geo, cellIndex: number, nCells: number):
       else { used.add(c.id); units.push([c]); }
     }
     units.sort((a, b) => a[0].pair - b[0].pair || a[0].homolog - b[0].homolog);
-    const unitW = (u: Unit) => u.reduce((a, c) => a + glyphWidth(c.chromatids.length) + 26, 0) + (u.length > 1 ? 8 : 0);
+    const unitW = (u: Unit) => u.reduce((a, c) => a + glyphWidth(c.chromatids.length) + 30, 0) + (u.length > 1 ? 26 : 0);
     const gap = nCells >= 4 ? 22 : 34;
     const total = units.reduce((a, u) => a + unitW(u), 0) + gap * (units.length - 1);
     let x = geo.cx - total / 2;
     const stagger = key === "mid" && list.some((c) => c.position === "moving");
     units.forEach((u, ui) => {
       const w = unitW(u);
-      const y0 = key === "pole0" ? geo.cy - geo.ry * 0.45 : key === "pole1" ? geo.cy + geo.ry * 0.45 : stagger ? geo.cy + (ui % 2 === 0 ? -32 : 30) : geo.cy;
+      const y0 = key === "pole0" ? geo.cy - geo.ry * 0.62 : key === "pole1" ? geo.cy + geo.ry * 0.62 : stagger ? geo.cy + (ui % 2 === 0 ? -32 : 30) : geo.cy;
       let cursor = x;
-      u.forEach((c) => {
-        const gw = glyphWidth(c.chromatids.length) + 26;
+      u.forEach((c, k) => {
+        const gw = glyphWidth(c.chromatids.length) + 30;
         const cross = c.chiasmata[0];
         const order = c.paired && c.chromatids.length === 2 && cross ? (c.homolog === 0 ? (cross.mine === 0 ? [1, 0] : [0, 1]) : (cross.mine === 0 ? [0, 1] : [1, 0])) : c.chromatids.map((_, i) => i);
-        out.set(c.id, { x: cursor + gw / 2, y: y0 + (stagger ? 0 : 0), flip: key === "pole1", order, cell: cellIndex, height, chiasmaGap: cross ? cross.gap : null });
-        cursor += gw;
+        out.set(c.id, { x: cursor + gw / 2, y: y0, flip: key === "pole1", order, cell: cellIndex, height, chiasmaGap: cross ? cross.gap : null });
+        cursor += gw + (u.length > 1 && k === 0 ? 26 : 0);
       });
       x += w + gap;
     });
@@ -68,12 +69,14 @@ export function CellDiagram({ stage, selectedId, onSelect, hideLabels, focus }: 
   const geos = stage.cells.map((_, i) => geometry(n, i));
   const placed = new Map<string, Pos & { c: ChromView }>();
   stage.cells.forEach((cell, i) => { for (const [id, p] of placeCell(cell, geos[i], i, n)) placed.set(id, { ...p, c: cell.chromosomes.find((c) => c.id === id)! }); });
+  const narrow = useNarrow();
   const g = focus !== null && geos[focus] ? geos[focus] : null;
-  const viewBox = g ? `${g.cx - g.rx - 12} 0 ${(g.rx + 12) * 2} ${H}` : `0 0 ${W} ${H}`;
+  const cropped = !g && narrow && n === 1; // phones: a single big cell is cropped to its middle so the chromosomes stay legible
+  const viewBox = g ? `${g.cx - g.rx - 12} 0 ${(g.rx + 12) * 2} ${H}` : cropped ? `${430 - 280} 0 560 ${H}` : `0 0 ${W} ${H}`;
   const summary = `${stage.title}. ${n} cell${n === 1 ? "" : "s"}. ${stage.counts.map((c, i) => `${stage.cells[i].label}: ${c.chromosomes} chromosomes, ${c.chromatids} chromatids, DNA ${c.dnaC}C, ${c.sets}`).join("; ")}.`;
   return (
     <div className="bio-diagram cd-diagram" data-testid="cell-diagram" data-stage={stage.id} data-cells={n} data-chromosomes={stage.counts.map((c) => c.chromosomes).join(",")} data-chromatids={stage.counts.map((c) => c.chromatids).join(",")}>
-      <svg aria-label={summary} className="ph-svg cd-svg" role="img" viewBox={viewBox}>
+      <svg aria-label={summary} className="ph-svg cd-svg" role="img" style={{ minWidth: g || cropped ? 340 : undefined }} viewBox={viewBox}>
         <ChromDefs />
         <rect fill="#f8fafc" height={H} width={W} x={g ? g.cx - g.rx - 12 : 0} y={0} />
         {stage.cells.map((cell, i) => {
@@ -90,7 +93,7 @@ export function CellDiagram({ stage, selectedId, onSelect, hideLabels, focus }: 
                 </g>
               ) : null}
               {plate ? <g><line stroke="#64748b" strokeDasharray="6 5" strokeWidth={1.2} x1={geo.cx - geo.rx * 0.82} x2={geo.cx + geo.rx * 0.82} y1={geo.cy} y2={geo.cy} />{!hideLabels && n <= 2 ? <text className="bio-small" x={geo.cx + geo.rx * 0.84} y={geo.cy - 4} textAnchor="end">plate</text> : null}</g> : null}
-              <text className="bio-small strong" textAnchor="middle" x={geo.cx} y={H - 8}>{hideLabels ? `Cell ${i + 1}` : `${cell.label} · ${stage.counts[i].chromosomes} chr · ${stage.counts[i].chromatids} chromatids · ${stage.counts[i].dnaC}C`}</text>
+              <text className="bio-small strong" textAnchor="middle" x={geo.cx} y={H - 8}>{hideLabels ? `Cell ${i + 1}` : `${cell.label} · ${stage.counts[i].chromosomes} chr · ${stage.counts[i].chromatids} chromatid${stage.counts[i].chromatids === 1 ? "" : "s"} · ${stage.counts[i].dnaC}C`}</text>
             </g>
           );
         })}
@@ -117,7 +120,7 @@ export function CellDiagram({ stage, selectedId, onSelect, hideLabels, focus }: 
             style={{ transform: `translate(${p.x}px, ${p.y}px)` }}
             tabIndex={0}
           >
-            <ChromGlyph chromatids={p.c.chromatids} chiasmaGap={p.chiasmaGap} condensed={p.c.condensed || p.c.chromatids.length === 2 || p.c.position !== "nucleus"} flip={p.flip} height={p.height} hideLabels={hideLabels} loci={p.c.loci} order={p.order} origin={p.c.origin} selected={selectedId === id} showIndex={stage.id === "metaphase2"} tag x={0} y={0} />
+            <ChromGlyph chromatids={p.c.chromatids} chiasmaGap={p.chiasmaGap} condensed={p.c.condensed || p.c.chromatids.length === 2 || p.c.position !== "nucleus"} flip={p.flip} height={p.height} hideLabels={hideLabels} loci={p.c.loci} order={p.order} origin={p.c.origin} outer={p.c.paired && p.c.homolog === 0 ? "left" : "right"} selected={selectedId === id} showIndex={stage.id === "metaphase2"} tag x={0} y={0} />
           </g>
         ))}
         {/* synapsis ladders and chiasmata between paired homologs */}

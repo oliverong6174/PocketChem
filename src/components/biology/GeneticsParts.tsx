@@ -49,19 +49,19 @@ export function ParentChromosomes({ individual, label, hideLabels = false }: { i
   const W = Math.max(190, individual.pairs.length * pairW + 40);
   const text = `${label}: ${individual.pairs.map((p, i) => `pair ${i + 1} ${layout.pairs[i].map((l) => LOCI[l].name).join(" and ")}: maternal homolog ${p.a.alleles.map(alleleText).join("")}, ${isY(p.b) ? "Y chromosome" : `paternal homolog ${p.b.alleles.map(alleleText).join("")}`}`).join("; ")}.`;
   return (
-    <svg aria-label={text} className="ph-svg bio-parent-svg" data-testid="parent-chromosomes" role="img" viewBox={`0 0 ${W} 150`}>
+    <svg aria-label={text} className="ph-svg bio-parent-svg" data-testid="parent-chromosomes" role="img" viewBox={`0 0 ${W} 170`}>
       <ChromDefs />
-      <rect fill="#f8fafc" height={150} width={W} />
+      <rect fill="#f8fafc" height={170} width={W} />
       <text className="bio-small strong" textAnchor="start" x={10} y={16}>{label}</text>
       {individual.pairs.map((p, i) => {
         const cx = 20 + i * pairW + pairW / 2;
         return (
           <g key={i}>
-            <ChromGlyph chromatids={[chromatidOf(p.a, "maternal")]} hideLabels={hideLabels} loci={layout.pairs[i]} origin="maternal" tag x={cx - 36} y={52} />
+            <ChromGlyph chromatids={[chromatidOf(p.a, "maternal")]} hideLabels={hideLabels} loci={layout.pairs[i]} origin="maternal" tag x={cx - 36} y={74} />
             {isY(p.b)
-              ? <ChromGlyph chromatids={[{ alleles: [], origins: ["paternal"] }]} height={56} hideLabels={hideLabels} loci={[]} origin="paternal" tag x={cx + 36} y={52} />
-              : <ChromGlyph chromatids={[chromatidOf(p.b, "paternal")]} hideLabels={hideLabels} loci={layout.pairs[i]} origin="paternal" tag x={cx + 36} y={52} />}
-            <text className="bio-small" textAnchor="middle" x={cx} y={146}>{lociNames(layout.pairs[i]).slice(0, 26)}</text>
+              ? <ChromGlyph chromatids={[{ alleles: [], origins: ["paternal"] }]} height={56} hideLabels={hideLabels} loci={[]} origin="paternal" tag x={cx + 36} y={74} />
+              : <ChromGlyph chromatids={[chromatidOf(p.b, "paternal")]} hideLabels={hideLabels} loci={layout.pairs[i]} origin="paternal" tag x={cx + 36} y={74} />}
+            <text className="bio-small" textAnchor="middle" x={cx} y={164}>{lociNames(layout.pairs[i]).slice(0, 26)}</text>
           </g>
         );
       })}
@@ -117,12 +117,11 @@ export function PunnettTable({ result, hide = false }: { result: CrossResult; hi
       <table className="bio-punnett" data-cells={result.gametes1.length * result.gametes2.length} data-testid="punnett">
         <caption>Punnett square: rows are the gametes of parent 1, columns the gametes of parent 2. Each box is one fertilisation; its probability is the product of the two gamete probabilities.</caption>
         <thead>
-          <tr><td aria-hidden /><th scope="col" className="bio-punnett-corner">♂ / ♀ gametes</th>{result.gametes2.map((g) => <th key={g.label} scope="col">{g.label}<small>{frText(g.p)}</small></th>)}</tr>
+          <tr><th scope="col" className="bio-punnett-corner">parent 1 ↓ · parent 2 →</th>{result.gametes2.map((g) => <th key={g.label} scope="col">{g.label}<small>{frText(g.p)}</small></th>)}</tr>
         </thead>
         <tbody>
           {result.grid.map((row, i) => (
             <tr key={result.gametes1[i].label}>
-              <td aria-hidden />
               <th scope="row">{result.gametes1[i].label}<small>{frText(result.gametes1[i].p)}</small></th>
               {row.map((cell) => (
                 <td data-genotype={cell.offspring.genotype} data-phenotype={cell.offspring.phenotype} key={cell.g2.label} title={hide ? "" : cell.offspring.phenotype}>

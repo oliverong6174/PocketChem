@@ -1,5 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 
+/** True while the viewport is at most `maxWidth` px wide (phones): used to offer a focused diagram view instead of a tiny full one. */
+export function useNarrow(maxWidth = 600): boolean {
+  const query = `(max-width: ${maxWidth}px)`;
+  const [narrow, setNarrow] = useState(() => (typeof window !== "undefined" && typeof window.matchMedia === "function" ? window.matchMedia(query).matches : false));
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return undefined;
+    const m = window.matchMedia(query);
+    const on = () => setNarrow(m.matches);
+    on();
+    m.addEventListener("change", on);
+    return () => m.removeEventListener("change", on);
+  }, [query]);
+  return narrow;
+}
+
 /** Upper-cases and removes spaces/line breaks as the user types; anything else is left for the validator to report. */
 export const cleanSeq = (text: string) => text.toUpperCase().replace(/\s+/g, "");
 

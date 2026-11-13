@@ -4,7 +4,7 @@ import { Badge, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHead
 import { NumberField } from "../generalChem/shared";
 import { useGcWorkspace } from "../generalChem/useGcWorkspace";
 import { PredictPanel, QuizPanel, StepControls } from "./bioShared";
-import { useStepPlayer } from "./bioHooks";
+import { useNarrow, useStepPlayer } from "./bioHooks";
 import { CellDiagram } from "./CellDiagram";
 import { ChromLegend } from "./ChromosomeArt";
 import { chromatidText } from "./chromosomeGeometry";
@@ -57,7 +57,8 @@ export default function CellDivisionPage({ openRequest = null, onOpenHandled, on
   });
   const player = useStepPlayer(stageIndex, max, setStage);
   const [revealedLabels, setRevealedLabels] = useState(false);
-  const [focus, setFocus] = useState<number | null>(null);
+  const narrow = useNarrow();
+  const [focus, setFocus] = useState<number | null>(narrow ? 0 : null);
   const locked = mode === "challenge" && !raw.revealed;
   const hide = mode === "practice" && !revealedLabels;
   const layoutId = ind.layout;

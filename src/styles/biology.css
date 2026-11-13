@@ -61,8 +61,8 @@
 .bio-ladder td.bio-aa-diff { background: var(--status-warn-bg); color: var(--status-warn); font-weight: 700; }
 
 /* ---- Stage 16: gene regulation, genetics, mitosis and meiosis -------------------------------------------------------------- */
-.bio-diagram { overflow-x: auto; }
-.rg-svg, .cd-svg { width: 100%; min-width: 700px; height: auto; }
+.bio-diagram { overflow-x: auto; width: 100%; }
+.rg-svg, .cd-svg { width: 100%; min-width: 760px; height: auto; }
 .bio-parent-svg { width: 100%; min-width: 210px; max-width: 460px; height: auto; border-radius: 8px; }
 .bio-gamete-svg { width: 100%; min-width: 210px; max-width: 760px; height: auto; border-radius: 8px; }
 .bio-cross-svg { width: 100%; min-width: 520px; max-width: 760px; height: auto; border-radius: 8px; }
@@ -120,3 +120,11 @@
 .bio-bar { display: block; height: 10px; width: 100%; min-width: 60px; background: var(--border); border-radius: 5px; overflow: hidden; }
 .bio-bar > span { display: block; height: 100%; background: var(--accent); }
 @media (max-width: 520px) { .bio-select-row { grid-template-columns: minmax(0, 1fr); } .bio-genotype-hom { min-width: 0; width: 100%; } }
+
+/* allele symbols are case-sensitive: never upper-case table headers or labels in the genetics tables */
+.bio-punnett th, .bio-punnett td, .bio-dist th, .bio-dist td, .bio-genotype select, .bio-genotype option { text-transform: none; letter-spacing: normal; }
+.bio-dist th[scope="row"] { font-weight: 600; }
+.gc-field select, .bio-select-row select, .bio-genotype select { max-width: 100%; }
+.gc-inputs .gc-field select { width: 100%; }
+.bio-genotype-row label { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-sm); }
+.bio-chip-row .gc-chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 700; }

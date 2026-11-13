@@ -53,6 +53,8 @@ export interface GlyphProps {
   tag?: boolean;
   /** Crossover to mark: the gap index (between locus gap and gap+1). */
   chiasmaGap?: number | null;
+  /** Side on which a gene label is written when the sister chromatids carry the same allele (default right). */
+  outer?: "left" | "right";
 }
 
 /** One chromosome (one or two chromatids) with its genes. */
@@ -84,10 +86,16 @@ export function ChromGlyph(p: GlyphProps) {
             {cut > 1 ? seg(0, 1, oTop, "a") : <>{seg(0, cut, oTop, "a")}{seg(cut, 1, oBot, "b")}</>}
             {cut <= 1 ? <line stroke="#ffffff" strokeWidth={2} x1={cx - rodW / 2} x2={cx + rodW / 2} y1={yCut} y2={yCut} /> : null}
             {p.loci.map((_, k) => <rect fill="#ffffff" fillOpacity={0.9} height={4} key={k} stroke={COLORS.ink} strokeWidth={0.8} width={rodW + 2} x={cx - rodW / 2 - 1} y={yAt(locusF(k)) - 2} />)}
-            {lab ? p.loci.map((_, k) => {
-              const left = n > 1 && slot === 0;
-              return <text className="bio-chrom-allele" key={`t${k}`} textAnchor={left ? "end" : "start"} x={left ? cx - rodW / 2 - 4 : cx + rodW / 2 + 4} y={yAt(locusF(k)) + 4}><AlleleTspans id={ch.alleles[k]} /></text>;
+            {lab && n > 1 ? p.loci.map((_, k) => {
+              // sisters with the same allele share one label on the outer side; sisters that differ are labelled one on each side
+              const alike = p.chromatids.every((c) => c.alleles[k] === p.chromatids[0].alleles[k]);
+              const left = alike ? (p.outer === "left") : slot === 0;
+              if (alike && slot !== (left ? 0 : n - 1)) return null;
+              return <text className="bio-chrom-allele" key={`t${k}`} textAnchor={left ? "end" : "start"} x={left ? p.x - w / 2 - 4 : p.x + w / 2 + 4} y={yAt(locusF(k)) + 4}><AlleleTspans id={ch.alleles[k]} /></text>;
             }) : null}
+            {lab && n === 1 ? p.loci.map((_, k) => (
+              <text className="bio-chrom-allele" key={`t${k}`} textAnchor={p.outer === "left" ? "end" : "start"} x={p.outer === "left" ? cx - rodW / 2 - 4 : cx + rodW / 2 + 4} y={yAt(locusF(k)) + 4}><AlleleTspans id={ch.alleles[k]} /></text>
+            )) : null}
             {p.showIndex && n > 1 && lab ? <text className="bio-small" textAnchor="middle" x={cx} y={yAt(0) + (p.flip ? 12 : -4)}>{ci + 1}</text> : null}
           </g>
         );

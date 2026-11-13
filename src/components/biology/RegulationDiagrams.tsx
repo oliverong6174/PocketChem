@@ -1,9 +1,8 @@
 import type { ReactNode } from "react";
 import {
-  TRP_CODON_INDEX, TRP_LEADER_PEPTIDE, TRP_REGIONS, evaluateEuk, evaluateLac, evaluateTrp, lacStepCaption, trpStep,
+  TRP_LEADER_PEPTIDE, TRP_REGIONS, evaluateEuk, evaluateLac, evaluateTrp, lacStepCaption, trpStep,
   type EukInput, type LacInput, type TrpInput,
 } from "../../utils/biology/geneRegulation";
-import { AMINO_ACIDS } from "../../utils/biology/geneticCode";
 
 /**
  * Regulatory-DNA diagrams for the lac operon, the trp operon (with the leader RNA) and the eukaryotic gene. Every mark comes from
@@ -42,8 +41,8 @@ export function LacDiagram({ input, selected, onSelect, hideLabels }: { input: L
   const ev = evaluateLac(input);
   const step = input.step;
   const rows = input.copies.length;
-  const rowH = 190;
-  const H = 70 + rows * rowH + 30;
+  const rowH = 215;
+  const H = 70 + rows * rowH + 10;
   const L = (t: string) => (hideLabels ? "?" : t);
   const summary = `lac operon diagram, step ${step} of 4. ${lacStepCaption(input, step).text}`;
   return (
@@ -53,9 +52,9 @@ export function LacDiagram({ input, selected, onSelect, hideLabels }: { input: L
         {/* signals */}
         <g>
           <Sel id="allolactose" label="Allolactose, the inducer" onSelect={onSelect} selected={selected}>
-            <Ring on={selected === "allolactose"} h={34} w={110} x={20} y={12} />
-            <path d="M75 14 l22 17 -22 17 -22 -17z" fill={input.lactose ? C.small : "#ffffff"} stroke={C.smallStroke} strokeDasharray={input.lactose ? "" : "4 3"} strokeWidth={2} />
-            <Txt x={75} y={36} size={10} bold>{input.lactose ? L("allolact.") : "no lactose"}</Txt>
+            <Ring on={selected === "allolactose"} h={46} w={74} x={38} y={8} />
+            <path d="M75 8 l32 23 -32 23 -32 -23z" fill={input.lactose ? C.small : "#ffffff"} stroke={C.smallStroke} strokeDasharray={input.lactose ? "" : "4 3"} strokeWidth={2} />
+            <Txt x={75} y={35} size={10} bold>{input.lactose ? L("inducer") : "no lactose"}</Txt>
           </Sel>
           <Sel id="crp" label="cAMP–CRP, the glucose signal" onSelect={onSelect} selected={selected}>
             <Ring on={selected === "crp"} h={34} w={150} x={160} y={12} />
@@ -66,13 +65,13 @@ export function LacDiagram({ input, selected, onSelect, hideLabels }: { input: L
         </g>
         {input.copies.map((copy, ci) => {
           const st = ev.copies[ci];
-          const y = 70 + ci * rowH + 80; // DNA line
+          const y = 70 + ci * rowH + 105; // DNA line
           const x0 = 30;
           const stepRep = step >= 1, stepCrp = step >= 2, stepPol = step >= 3, stepOut = step >= 4;
           const rank = st.level.rank;
           return (
             <g key={ci}>
-              <Txt x={x0} y={y - 66} size={12} bold anchor="start">{rows > 1 ? (ci === 0 ? "Chromosome" : "F′ plasmid (second copy)") : "Chromosome"}</Txt>
+              <Txt x={x0} y={y - 98} size={12} bold anchor="start">{rows > 1 ? (ci === 0 ? "Chromosome" : "F′ plasmid (second copy)") : "Chromosome"}</Txt>
               <line stroke={DNA} strokeWidth={3} x1={x0} x2={830} y1={y} y2={y} />
               {/* lacI gene */}
               <Sel id="lacI" label={`lacI gene${rows > 1 ? ` copy ${ci + 1}` : ""}`} onSelect={onSelect} selected={selected}>
@@ -94,14 +93,14 @@ export function LacDiagram({ input, selected, onSelect, hideLabels }: { input: L
               </Sel>
               {/* operator */}
               <Sel id="operator" label="lac operator" onSelect={onSelect} selected={selected}>
-                <Ring on={selected === "operator"} h={26} w={40} x={326} y={y - 13} />
-                <rect fill={copy.O === "+" ? C.element : "#fee2e2"} height={26} stroke={copy.O === "+" ? C.elementStroke : C.bad} strokeWidth={2} width={40} x={326} y={y - 13} />
-                <Txt x={346} y={y + 4} size={10.5} bold>{copy.O === "+" ? L("operator") : "Oᶜ"}</Txt>
+                <Ring on={selected === "operator"} h={26} w={52} x={326} y={y - 13} />
+                <rect fill={copy.O === "+" ? C.element : "#fee2e2"} height={26} stroke={copy.O === "+" ? C.elementStroke : C.bad} strokeWidth={2} width={52} x={326} y={y - 13} />
+                <Txt x={352} y={y + 4} size={10.5} bold>{copy.O === "+" ? L("operator") : "Oᶜ"}</Txt>
               </Sel>
               {/* structural genes */}
               <Sel id="lacZYA" label="lacZ, lacY, lacA genes" onSelect={onSelect} selected={selected}>
-                <Ring on={selected === "lacZYA"} h={32} w={400} x={380} y={y - 16} />
-                {[["lacZ", 380, 150], ["lacY", 534, 120], ["lacA", 658, 122]].map(([n, x, w]) => (
+                <Ring on={selected === "lacZYA"} h={32} w={394} x={386} y={y - 16} />
+                {[["lacZ", 386, 146], ["lacY", 536, 118], ["lacA", 658, 122]].map(([n, x, w]) => (
                   <g key={n as string}>
                     <rect fill={C.gene} height={32} stroke={C.geneStroke} strokeWidth={2} width={w as number} x={x as number} y={y - 16} />
                     <Txt x={(x as number) + (w as number) / 2} y={y + 4} size={12} bold>{n === "lacZ" && copy.Z === "-" ? "lacZ⁻ ✕" : (n as string)}</Txt>
@@ -113,9 +112,9 @@ export function LacDiagram({ input, selected, onSelect, hideLabels }: { input: L
                 <Sel id="repressor" label={`LacI repressor${st.repressorBound ? " bound to the operator" : " not on the operator"}`} onSelect={onSelect} selected={selected}>
                   {st.repressorBound ? (
                     <g>
-                      <Ring on={selected === "repressor"} h={40} w={56} x={318} y={y - 58} />
-                      {[0, 1, 2, 3].map((k) => <circle cx={332 + (k % 2) * 28} cy={y - 36 + Math.floor(k / 2) * 16} fill={C.protein} key={k} r={12} stroke={C.proteinStroke} strokeWidth={2} />)}
-                      <Txt x={346} y={y - 62} size={11} bold>{L("LacI on operator")}</Txt>
+                      <Ring on={selected === "repressor"} h={40} w={56} x={324} y={y - 58} />
+                      {[0, 1, 2, 3].map((k) => <circle cx={338 + (k % 2) * 28} cy={y - 36 + Math.floor(k / 2) * 16} fill={C.protein} key={k} r={12} stroke={C.proteinStroke} strokeWidth={2} />)}
+                      <Txt x={352} y={y - 62} size={11} bold>{L("LacI on operator")}</Txt>
                     </g>
                   ) : (
                     <g>
@@ -172,15 +171,15 @@ export function TrpDiagram({ input, selected, onSelect, hideLabels }: { input: T
   const drawn = st.drawn ?? null;
   const alt = ev.scenario === "mixed" && st.drawn ? ev.structures[1] : null;
   const codons = Array.from(TRP_LEADER_PEPTIDE);
-  const ribX = st.ribosome.codon === null ? null : st.ribosome.codon <= TRP_CODON_INDEX.firstTrp ? rX(0) + 20 + (st.ribosome.codon / 14) * 110 : rX(0) + rw * 0.55 + (st.ribosome.codon - TRP_CODON_INDEX.firstTrp) * 9;
+  const ribX = st.ribosome.codon === null ? null : rX(0) + st.ribosome.codon * 25 + 11; // under the leader-peptide residue it is reading
   const arc = (pair: string, dashed: boolean, k: number) => {
     const [a, b] = pair.split(":").map(Number);
     const xa = rX(a - 1) + rw / 2, xb = rX(b - 1) + rw / 2;
     const h = 30 + (b - a) * 26;
     return (
       <g key={`${pair}-${k}-${dashed ? "d" : "s"}`}>
-        <path d={`M${xa},${ry} C${xa},${ry - h * 1.6} ${xb},${ry - h * 1.6} ${xb},${ry}`} fill="none" stroke={pair === "3:4" ? C.bad : "#1d4ed8"} strokeDasharray={dashed ? "6 4" : ""} strokeWidth={3} />
-        <Txt x={(xa + xb) / 2} y={ry - h * 1.2 - 4 - (dashed ? 14 : 0)} size={11} bold fill={pair === "3:4" ? C.bad : "#1d4ed8"}>{pair === "3:4" ? "3:4 terminator hairpin" : pair === "2:3" ? "2:3 antiterminator" : "1:2 pause hairpin"}{dashed ? " (alternative)" : ""}</Txt>
+        <path d={`M${xa},${ry - 14} C${xa},${ry - 14 - h * 1.5} ${xb},${ry - 14 - h * 1.5} ${xb},${ry - 14}`} fill="none" stroke={pair === "3:4" ? C.bad : "#1d4ed8"} strokeDasharray={dashed ? "6 4" : ""} strokeWidth={3} />
+        <Txt x={(xa + xb) / 2} y={ry - 14 - h * 1.1 - 6 - (dashed ? 14 : 0)} size={11} bold fill={pair === "3:4" ? C.bad : "#1d4ed8"}>{pair === "3:4" ? "3:4 terminator hairpin" : pair === "2:3" ? "2:3 antiterminator" : "1:2 pause hairpin"}{dashed ? " (alternative)" : ""}</Txt>
       </g>
     );
   };
@@ -188,8 +187,8 @@ export function TrpDiagram({ input, selected, onSelect, hideLabels }: { input: T
   const repX = 330;
   return (
     <div className="bio-diagram" data-testid="trp-diagram" data-step={input.step} data-operator={ev.operator} data-pairs={drawn ? drawn.pairs.join(",") : ""} data-outcome={st.outcome} data-rank={ev.level.rank}>
-      <svg aria-label={summary} className="ph-svg rg-svg" role="img" viewBox="0 0 860 330">
-        <rect fill="#f8fafc" height={330} width={860} />
+      <svg aria-label={summary} className="ph-svg rg-svg" role="img" viewBox="0 0 860 390">
+        <rect fill="#f8fafc" height={390} width={860} />
         <line stroke={DNA} strokeWidth={3} x1={30} x2={830} y1={y} y2={y} />
         {[
           ["trpR", "trpR gene", 30, 90, C.gene],
@@ -240,9 +239,9 @@ export function TrpDiagram({ input, selected, onSelect, hideLabels }: { input: T
           </Sel>
         ) : null}
         <Sel id="trp" label="Tryptophan" onSelect={onSelect} selected={selected}>
-          <path d="M690 112 l24 18 -24 18 -24 -18z" fill={C.small} fillOpacity={input.trp === "low" ? 0.35 : input.trp === "moderate" ? 0.65 : 1} stroke={C.smallStroke} strokeWidth={2} />
-          <Txt x={690} y={134} size={10} bold>Trp</Txt>
-          <Txt x={690} y={162} size={11} bold>{`tryptophan: ${input.trp}`}</Txt>
+          <path d="M150 108 l26 19 -26 19 -26 -19z" fill={C.small} fillOpacity={input.trp === "low" ? 0.35 : input.trp === "moderate" ? 0.65 : 1} stroke={C.smallStroke} strokeWidth={2} />
+          <Txt x={150} y={131} size={10} bold>Trp</Txt>
+          <Txt x={150} y={162} size={11} bold>{`tryptophan: ${input.trp}`}</Txt>
         </Sel>
         {/* RNA polymerase over the DNA */}
         <g>
@@ -271,16 +270,17 @@ export function TrpDiagram({ input, selected, onSelect, hideLabels }: { input: T
           {codons.map((aa, i) => (
             <g key={i}>
               <rect fill={aa === "W" ? "#fde68a" : "#f1f5f9"} height={22} rx={4} stroke={aa === "W" ? C.proteinStroke : "#94a3b8"} strokeWidth={aa === "W" ? 2.2 : 1} width={22} x={rX(0) + i * 25} y={ry + 48} />
-              <Txt x={rX(0) + i * 25 + 11} y={ry + 63} size={11} bold>{hideLabels ? "?" : AMINO_ACIDS[aa]?.three.slice(0, 1) ?? aa}</Txt>
+              <Txt x={rX(0) + i * 25 + 11} y={ry + 63} size={11} bold>{hideLabels ? "?" : aa}</Txt>
             </g>
           ))}
         </g>
         {ribX !== null ? (
           <Sel id="ribosome" label={`Ribosome on the leader (${st.ribosome.mode})`} onSelect={onSelect} selected={selected}>
             <g data-testid="trp-ribosome" data-mode={st.ribosome.mode}>
-              <Ring on={selected === "ribosome"} h={34} w={76} x={ribX - 38} y={ry + 72} />
-              <path d={`M${ribX - 34},${ry + 98} a34,26 0 0 1 68,0 z`} fill="#dcfce7" stroke={C.ok} strokeWidth={2.2} />
-              <Txt x={ribX} y={ry + 92} size={10.5} bold>{st.ribosome.mode === "stalled" ? "ribosome stalled" : st.ribosome.mode === "stopping" ? "ribosome at stop" : "ribosome"}</Txt>
+              <Ring on={selected === "ribosome"} h={40} w={112} x={ribX - 56} y={ry + 70} />
+              <circle cx={ribX} cy={ry + 76} fill="#dcfce7" r={11} stroke={C.ok} strokeWidth={2.2} />
+              <rect fill="#dcfce7" height={32} rx={14} stroke={C.ok} strokeWidth={2.2} width={104} x={ribX - 52} y={ry + 76} />
+              <Txt x={ribX} y={ry + 97} size={10.5} bold>{st.ribosome.mode === "stalled" ? "ribosome stalled" : st.ribosome.mode === "stopping" ? "ribosome at stop" : "ribosome"}</Txt>
             </g>
           </Sel>
         ) : <Txt x={rX(0) + 330} y={ry + 70} size={11} anchor="start" fill={MUTED}>no ribosome on the leader</Txt>}
@@ -304,8 +304,8 @@ export function EukDiagram({ input, selected, onSelect, hideLabels }: { input: E
   const conflict = ev.chromatin === "conflicting";
   const nuc = (x: number, k: number) => (
     <g key={k}>
-      <circle cx={x} cy={y + 22} fill={openChrom ? "#f1f5f9" : "#cbd5e1"} r={openChrom ? 10 : 15} stroke="#64748b" strokeWidth={2} />
-      {input.acetylation ? <g><circle cx={x + 8} cy={y + 36} fill="#fef3c7" r={6} stroke={C.proteinStroke} strokeWidth={1.4} /><text fontSize={8} fontWeight={700} textAnchor="middle" x={x + 8} y={y + 39}>Ac</text></g> : null}
+      <circle cx={x} cy={y + 112} fill={openChrom ? "#f1f5f9" : "#cbd5e1"} r={openChrom ? 11 : 15} stroke="#64748b" strokeWidth={2} />
+      {input.acetylation ? <g><circle cx={x + 10} cy={y + 94} fill="#fef3c7" r={8} stroke={C.proteinStroke} strokeWidth={1.4} /><text fontSize={9} fontWeight={800} textAnchor="middle" x={x + 10} y={y + 97}>Ac</text></g> : null}
     </g>
   );
   const nucs: number[] = [];
@@ -319,14 +319,16 @@ export function EukDiagram({ input, selected, onSelect, hideLabels }: { input: E
         <rect fill="#f8fafc" height={380} width={860} />
         <Txt x={30} y={28} size={12} bold anchor="start">{`Chromatin: ${ev.chromatin}${conflict ? " (conflicting marks)" : ""}`}</Txt>
         <line stroke={DNA} strokeWidth={3} x1={30} x2={830} y1={y} y2={y} />
+        <line stroke="#94a3b8" strokeDasharray="3 3" strokeWidth={2} x1={30} x2={830} y1={y + 112} y2={y + 112} />
+        <Txt x={30} y={y + 72} size={10.5} anchor="start" fill={MUTED}>chromatin (nucleosomes on the same DNA)</Txt>
         {nucs.map((x, k) => nuc(x, k))}
         <Sel id="methyl" label="Promoter DNA methylation" onSelect={onSelect} selected={selected}>
           <Ring on={selected === "methyl"} h={26} w={90} x={proX - 4} y={y - 52} />
-          {input.methylation ? [0, 1, 2].map((k) => <g key={k}><line stroke="#7c3aed" strokeWidth={2} x1={proX + 8 + k * 24} x2={proX + 8 + k * 24} y1={y - 12} y2={y - 30} /><circle cx={proX + 8 + k * 24} cy={y - 34} fill="#7c3aed" r={5} /></g>) : <Txt x={proX + 40} y={y - 34} size={10.5} fill={MUTED}>unmethylated</Txt>}
+          {input.methylation ? [0, 1, 2].map((k) => <g key={k}><line stroke="#7c3aed" strokeWidth={2} x1={proX + 8 + k * 24} x2={proX + 8 + k * 24} y1={y - 12} y2={y - 30} /><circle cx={proX + 8 + k * 24} cy={y - 34} fill="#7c3aed" r={5} /></g>) : <Txt x={proX + 112} y={y - 30} size={10.5} anchor="start" fill={MUTED}>promoter unmethylated</Txt>}
         </Sel>
         <Sel id="histones" label="Histone acetylation" onSelect={onSelect} selected={selected}>
-          <Ring on={selected === "histones"} h={22} w={170} x={30} y={y + 60} />
-          <Txt x={115} y={y + 76} size={10.5} bold>{input.acetylation ? "histones acetylated (Ac)" : "histones not acetylated"}</Txt>
+          <Ring on={selected === "histones"} h={22} w={200} x={30} y={y + 136} />
+          <Txt x={130} y={y + 152} size={10.5} bold>{input.acetylation ? "histones acetylated (Ac)" : "histones not acetylated"}</Txt>
         </Sel>
         {/* cis elements */}
         <Sel id="silencer" label="Silencer" onSelect={onSelect} selected={selected}>
@@ -391,7 +393,6 @@ export function EukDiagram({ input, selected, onSelect, hideLabels }: { input: E
             <Txt x={geneX + 175} y={y + 52} size={11} bold anchor="start" fill={ev.level.rank === null ? "#92400e" : ev.level.rank > 0 ? C.ok : C.bad}>{ev.level.rank === null ? "Uncertain" : ev.level.rank === 0 ? "silent / repressed" : ev.level.rank === 1 ? "basal mRNA" : "high mRNA"}</Txt>
           </g>
         ) : null}
-        <Txt x={30} y={362} size={11} anchor="start" fill={MUTED}>Rectangles are DNA elements (cis); ellipses and rounded boxes are diffusible proteins and machines (trans).</Txt>
       </svg>
     </div>
   );

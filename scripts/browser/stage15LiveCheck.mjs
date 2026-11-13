@@ -31,9 +31,9 @@ const rc = (s) => [...s].reverse().map((b) => comp[b]).join("");
 try {
   // ---- navigation
   await fresh(1440, "light", "#/biology/overview");
-  check("Biology tabs", (await tabs()) === "Overview|DNA replication|Transcription & RNA processing|Translation|DNA → RNA → protein|Saved", await tabs());
+  check("Biology tabs", (await tabs()) === "Overview|DNA replication|Transcription & RNA processing|Translation|DNA → RNA → protein|Gene regulation|Genetics & inheritance|Mitosis & meiosis|Saved", await tabs());
   const ov = await ev(`({ cards: [...document.querySelectorAll('.gc-tool-card button')].map((b) => b.textContent.trim()), pb: document.querySelectorAll('.gc-planned button').length })`);
-  check("overview: 4 working tools, planned list has no buttons", ov.cards.length === 4 && ov.pb === 0, ov.cards.join(" | "));
+  check("overview: 7 working tools (Stage 16 added three), planned list has no buttons", ov.cards.length === 7 && ov.pb === 0, ov.cards.join(" | "));
   await click("Open DNA replication"); await sleep(800);
   check("Open button reaches replication; hash", (await ev("location.hash")) === "#/biology/dna-replication");
   await fresh(1440, "light", "#/organic/properties");

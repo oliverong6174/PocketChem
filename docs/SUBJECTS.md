@@ -91,3 +91,25 @@ group `geneExpression`). Pages are lazy-loaded in `App.tsx` and share `useGcWork
 - Persistence pages `replication`, `transcription`, `translation`, `dogma` (subject `biology`) are validated in `utils/persistence/biologyTools.ts`; a
   step beyond the timeline, an invalid sequence or a mutation that does not fit make a record damaged.
 - Bacterial and eukaryotic machinery are kept apart (replication enzymes, σ factor vs general factors, no splicing/cap/poly(A) in bacteria, RF1/RF2 vs eRF1).
+
+## Biology (Stage 16): regulation, genetics and cell division
+
+Three more working tools: `bioRegulation` (`#/biology/gene-regulation`, group `geneExpression`), `bioGenetics` (`#/biology/genetics`) and `bioDivision`
+(`#/biology/mitosis-meiosis`), both in the new group `inheritance` ("Genetics & cell division"). Saved pages: `regulation`, `genetics`, `celldivision`
+(engine versions in `utils/persistence/biologyTools16.ts`; strict validators; every derived result is rebuilt on open).
+
+- `src/utils/biology/chromosome.ts` is the shared chromosome/allele model: loci with a stated genotype → phenotype rule (complete, incomplete,
+  codominant, multiple alleles, X-linked), layouts (which loci lie on which chromosome pair), individuals (maternal/paternal homologs), chromatids
+  and the one crossover operation. `genetics.ts` (exact fractions: gametes, crosses, test cross, two-locus linkage with a stated recombination
+  fraction) and `cellDivision.ts` (mitosis and meiosis stage engines, crossing over, independent assortment, nondisjunction) both use it, so a genotype
+  set on one page is the object segregated on the other. `meiosisDistribution` averages the meiosis engine over every equally likely setting and is
+  tested to equal the Genetics model exactly; one illustrated meiosis is never presented as a distribution.
+- `geneRegulation.ts` holds the lac operon (repressor, allolactose, CAP–cAMP, operator/promoter mutations, a second copy for cis/trans), the trp operon
+  (repression separate from attenuation; a schematic leader whose 1:2/2:3/3:4 pairing is derived from complementarity and ribosome coverage) and a
+  small eukaryotic model (enhancer, silencer, Mediator, chromatin, histone acetylation, DNA methylation, Pol II; some combinations are *uncertain*).
+  Levels are ordinal and qualitative, never rates.
+- Hand-offs between tools (`handoff16.ts`) are one-shot and validated by the receiver: Genetics → Mitosis & meiosis → Genetics, and Genetics →
+  DNA → RNA → protein (an allele shown as a specified sequence variant; no phenotype is inferred from sequence).
+- Diagrams are SVG with fixed paper colours, shapes and labels that do not rely on colour alone (maternal solid, paternal hatched), selectable
+  components (keyboard operable), reduced-motion respected, and a focused one-cell view on phones.
+- Tests: `biologyRegulation16`, `biologyGenetics16`, `biologyDivision16`, `biologyPlatform16`; browser check `scripts/browser/stage16LiveCheck.mjs`.
