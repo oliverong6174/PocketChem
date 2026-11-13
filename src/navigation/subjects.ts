@@ -53,13 +53,13 @@ export const SUBJECTS: SubjectDef[] = [
     planned: ["Cell structure explorer", "Population genetics", "Physiology pathways", "Evolution and phylogenetics"],
   },
   {
-    id: "biochemistry", slug: "biochemistry", label: "Biochemistry", mode: "learning", icon: "biochemistry", status: "planned",
-    tagline: "Metabolic pathways, enzymes and macromolecule structure.",
-    planned: ["Metabolic pathway maps", "Enzyme kinetics and inhibition", "Amino acids and protein structure", "Predict-the-change challenges"],
+    id: "biochemistry", slug: "biochemistry", label: "Biochemistry", mode: "learning", icon: "biochemistry", status: "available",
+    tagline: "Amino acids and peptides, protein structure and folding, enzymes and catalysis.",
+    planned: ["Metabolic pathway maps", "Carbohydrates and lipids", "Nucleic-acid structure and thermodynamics", "Bioenergetics and ATP coupling"],
   },
 ];
 
-export type ToolGroupId = "analyze" | "mechanics" | "electricity" | "geneExpression" | "inheritance" | "synthesize" | "library";
+export type ToolGroupId = "analyze" | "mechanics" | "electricity" | "geneExpression" | "inheritance" | "biomolecules" | "synthesize" | "library";
 
 export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "analyze", label: "Analyze" },
@@ -67,6 +67,7 @@ export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "electricity", label: "Electricity" },
   { id: "geneExpression", label: "Gene expression" },
   { id: "inheritance", label: "Genetics & cell division" },
+  { id: "biomolecules", label: "Biomolecules" },
   { id: "synthesize", label: "Synthesize" },
   { id: "library", label: "Library" },
 ];
@@ -132,8 +133,19 @@ export const BIOLOGY_TOOLS: ToolDef[] = [
   { id: "bioSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
+
+export type BiochemistryToolId = "bcOverview" | "bcAminoAcids" | "bcProteins" | "bcEnzymes" | "bcSaved";
+
+export const BIOCHEMISTRY_TOOLS: ToolDef[] = [
+  { id: "bcOverview", slug: "overview", label: "Overview", summary: "What Biochemistry offers now, and what is still planned.", group: "analyze", icon: "biochemistry" },
+  { id: "bcAminoAcids", slug: "amino-acids", label: "Amino acids & peptides", summary: "The 20 amino acids: structures, side chains, ionization and pKa, and peptide bonds in sequences you build.", group: "biomolecules", icon: "molecule" },
+  { id: "bcProteins", slug: "protein-structure", label: "Protein structure & folding", summary: "Primary to quaternary structure, α-helices, β-sheets, Ramachandran angles, stabilizing interactions and mutations.", group: "biomolecules", icon: "chromosome" },
+  { id: "bcEnzymes", slug: "enzymes", label: "Enzymes & catalysis", summary: "Enzyme–substrate binding, a catalytic mechanism, Michaelis–Menten kinetics and the four kinds of reversible inhibition.", group: "biomolecules", icon: "kinetics" },
+  { id: "bcSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
+];
+
 /** The tool ids of every non-Organic subject (Organic keeps its own page state in App.tsx). */
-export type SubjectToolId = GeneralToolId | PhysicsToolId | BiologyToolId;
+export type SubjectToolId = GeneralToolId | PhysicsToolId | BiologyToolId | BiochemistryToolId;
 
 /** Tools of every subject. Planned subjects have none: they cannot render a tool until they are implemented. */
 export const SUBJECT_TOOLS: Record<SubjectId, ToolDef[]> = {
@@ -141,7 +153,7 @@ export const SUBJECT_TOOLS: Record<SubjectId, ToolDef[]> = {
   general: GENERAL_TOOLS,
   physics: PHYSICS_TOOLS,
   biology: BIOLOGY_TOOLS,
-  biochemistry: [],
+  biochemistry: BIOCHEMISTRY_TOOLS,
 };
 
 export const getSubject = (id: SubjectId): SubjectDef => SUBJECTS.find((subject) => subject.id === id) ?? SUBJECTS[0];

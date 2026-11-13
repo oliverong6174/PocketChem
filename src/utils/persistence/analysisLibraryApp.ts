@@ -21,6 +21,9 @@ import {
   CELLDIVISION_ENGINE_VERSION, GENETICS_ENGINE_VERSION, REGULATION_ENGINE_VERSION,
   validateCellDivisionInputs, validateGeneticsInputs, validateRegulationInputs,
 } from "./biologyTools16";
+import {
+  AMINOACIDS_ENGINE_VERSION, ENZYMES_ENGINE_VERSION, PROTEINS_ENGINE_VERSION, validateAminoAcidsInputs, validateEnzymesInputs, validateProteinsInputs,
+} from "./biochemTools17";
 import { getAnalysisLibrary, registerAnalysisValidators, type AnalysisLibrary } from "./analysisLibrary";
 import {
   MULTICATALYTIC_ENGINE_VERSION,
@@ -38,7 +41,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "aminoacids", "proteins", "enzymes"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -66,6 +69,9 @@ export const ANALYSIS_APP_PAGE = {
   regulation: "bioRegulation",
   genetics: "bioGenetics",
   celldivision: "bioDivision",
+  aminoacids: "bcAminoAcids",
+  proteins: "bcProteins",
+  enzymes: "bcEnzymes",
 } as const;
 
 let registered = false;
@@ -124,6 +130,9 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
       regulation: { engineVersion: REGULATION_ENGINE_VERSION, validateInputs: validateRegulationInputs, validateResults: validateBiologyResults },
       genetics: { engineVersion: GENETICS_ENGINE_VERSION, validateInputs: validateGeneticsInputs, validateResults: validateBiologyResults },
       celldivision: { engineVersion: CELLDIVISION_ENGINE_VERSION, validateInputs: validateCellDivisionInputs, validateResults: validateBiologyResults },
+      aminoacids: { engineVersion: AMINOACIDS_ENGINE_VERSION, validateInputs: validateAminoAcidsInputs, validateResults: validateBiologyResults },
+      proteins: { engineVersion: PROTEINS_ENGINE_VERSION, validateInputs: validateProteinsInputs, validateResults: validateBiologyResults },
+      enzymes: { engineVersion: ENZYMES_ENGINE_VERSION, validateInputs: validateEnzymesInputs, validateResults: validateBiologyResults },
       multicatalytic: {
         engineVersion: MULTICATALYTIC_ENGINE_VERSION,
         validateInputs: validateMulticatalyticInputs,

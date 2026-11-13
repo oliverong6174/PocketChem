@@ -27,9 +27,12 @@ const PAGE_LABELS: Record<string, string> = {
   regulation: "Gene regulation",
   genetics: "Genetics & inheritance",
   celldivision: "Mitosis & meiosis",
+  aminoacids: "Amino acids & peptides",
+  proteins: "Protein structure & folding",
+  enzymes: "Enzymes & catalysis",
 };
 
-const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry", physics: "Physics", biology: "Biology" };
+const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry", physics: "Physics", biology: "Biology", biochemistry: "Biochemistry" };
 
 const STATUS_LABELS: Record<string, string> = {
   found: "Routes found",

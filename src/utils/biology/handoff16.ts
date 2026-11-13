@@ -9,7 +9,9 @@ import type { Mutation } from "./mutations";
 export type Handoff =
   | { to: "genetics"; individual: Individual }
   | { to: "celldivision"; individual: Individual }
-  | { to: "dogma"; coding: string; mutation: Mutation | null };
+  | { to: "dogma"; coding: string; mutation: Mutation | null }
+  /** Stage 17: a translated peptide sent to the Biochemistry peptide explorer. */
+  | { to: "peptide"; sequence: string; source: string };
 
 let slot: Handoff | null = null;
 export const putHandoff = (h: Handoff): void => { slot = h; };
