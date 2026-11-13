@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, Callout, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../ui/primitives";
 import { NumberField } from "../generalChem/shared";
@@ -13,6 +13,7 @@ import { complementDna } from "../../utils/biology/sequence";
 import { describeMutation, MUTATION_LIMITS, type Mutation } from "../../utils/biology/mutations";
 import { translateFrame, type Translation } from "../../utils/biology/translate";
 import { DOGMA_ASSUMPTIONS, summarizeDogma } from "../../utils/biology/bioSummary";
+import { takeHandoff } from "../../utils/biology/handoff16";
 import {
   DEFAULT_DOGMA_INPUTS, describeDogmaAnalysis, DOGMA_ENGINE_VERSION, validateBiologyResults, validateDogmaInputs, type DogmaInputs,
 } from "../../utils/persistence/biologyTools";
@@ -69,6 +70,13 @@ export default function CentralDogmaPage({ openRequest = null, onOpenHandled }: 
     onOpenHandled,
   });
   const { raw, update } = ws;
+  // a gene sent from the Genetics tool (one-shot, validated before use)
+  useEffect(() => {
+    const h = takeHandoff("dogma");
+    if (!h) return;
+    const ok = validateDogmaInput({ coding: h.coding, mutation: h.mutation });
+    if (ok.ok) update((c) => ({ ...c, input: ok.value }));
+  }, [update]);
   const mode = raw.mode;
   const setCoding = (coding: string) => update((c) => ({ ...c, input: { coding, mutation: null } }));
   const setMutation = (mutation: Mutation | null) => update((c) => ({ ...c, input: { ...c.input, mutation } }));

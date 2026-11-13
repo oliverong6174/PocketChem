@@ -91,7 +91,7 @@ export function QuizPanel({ questions, title = "Practice questions", subtitle = 
 }
 
 /** Challenge: commit to a prediction about the NEXT step; the step is revealed only afterwards. */
-export function PredictPanel({ question, onReveal, finished }: { question: Question | null; onReveal: () => void; finished: boolean }) {
+export function PredictPanel({ question, onReveal, finished, revealLabel = "Reveal the next step", subtitle = "Commit to an answer first; the next step is shown only after you choose." }: { question: Question | null; onReveal: () => void; finished: boolean; revealLabel?: string; subtitle?: string }) {
   const [choice, setChoice] = useState<number | null>(null);
   const [tally, setTally] = useState({ asked: 0, right: 0 });
   const key = question?.id ?? "none";
@@ -106,7 +106,7 @@ export function PredictPanel({ question, onReveal, finished }: { question: Quest
     );
   }
   return (
-    <Panel className="bio-quiz" subtitle="Commit to an answer first; the next step is shown only after you choose." title="Predict, then reveal">
+    <Panel className="bio-quiz" subtitle={subtitle} title="Predict, then reveal">
       <p className="bio-score" data-testid="predict-score">{tally.right} of {tally.asked} predictions correct</p>
       <p className="gc-question" data-testid="predict-prompt">{question.prompt}</p>
       <Options choice={choice} onChoose={(c) => { setChoice(c); setTally((t) => ({ asked: t.asked + 1, right: t.right + (c === question.answer ? 1 : 0) })); }} q={question} />
@@ -114,7 +114,7 @@ export function PredictPanel({ question, onReveal, finished }: { question: Quest
         <div aria-live="polite" className="gc-reveal">
           <Callout tone={choice === question.answer ? "ok" : "warn"} title={choice === question.answer ? "Your prediction matches" : `Not quite: it is “${question.options[question.answer]}”`}>
             <p>{question.explanation}</p>
-            <button className="primary-button" data-testid="predict-reveal" onClick={onReveal} type="button">Reveal the next step</button>
+            <button className="primary-button" data-testid="predict-reveal" onClick={onReveal} type="button">{revealLabel}</button>
           </Callout>
         </div>
       ) : null}

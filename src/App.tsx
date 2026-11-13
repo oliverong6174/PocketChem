@@ -103,6 +103,9 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiologyToolId, type PhysicsT
   const TranscriptionPage = lazy(() => import("./components/biology/TranscriptionPage"));
   const TranslationPage = lazy(() => import("./components/biology/TranslationPage"));
   const CentralDogmaPage = lazy(() => import("./components/biology/CentralDogmaPage"));
+  const RegulationPage = lazy(() => import("./components/biology/RegulationPage"));
+  const GeneticsPage = lazy(() => import("./components/biology/GeneticsPage"));
+  const CellDivisionPage = lazy(() => import("./components/biology/CellDivisionPage"));
 
 
   type AnnotationCarouselItem =
@@ -608,7 +611,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiologyToolId, type PhysicsT
         else switchSubject("physics", { keepOpenRequest: true, tool: target });
         return;
       }
-      if (target === "bioReplication" || target === "bioTranscription" || target === "bioTranslation" || target === "bioDogma") {
+      if (target === "bioReplication" || target === "bioTranscription" || target === "bioTranslation" || target === "bioDogma" || target === "bioRegulation" || target === "bioGenetics" || target === "bioDivision") {
         if (activeSubject === "biology") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("biology", { keepOpenRequest: true, tool: target });
         return;
@@ -1972,6 +1975,23 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiologyToolId, type PhysicsT
             ) : generalTool === "bioDogma" ? (
               <CentralDogmaPage
                 openRequest={pendingOpen?.page === "bioDogma" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioRegulation" ? (
+              <RegulationPage
+                openRequest={pendingOpen?.page === "bioRegulation" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioGenetics" ? (
+              <GeneticsPage
+                onNavigate={(id: BiologyToolId) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioGenetics" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioDivision" ? (
+              <CellDivisionPage
+                onNavigate={(id: BiologyToolId) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioDivision" ? pendingOpen : null}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />
             ) : generalTool === "bioSaved" ? (

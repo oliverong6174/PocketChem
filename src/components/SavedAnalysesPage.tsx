@@ -24,6 +24,9 @@ const PAGE_LABELS: Record<string, string> = {
   transcription: "Transcription & RNA processing",
   translation: "Translation",
   dogma: "DNA → RNA → protein",
+  regulation: "Gene regulation",
+  genetics: "Genetics & inheritance",
+  celldivision: "Mitosis & meiosis",
 };
 
 const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry", physics: "Physics", biology: "Biology" };

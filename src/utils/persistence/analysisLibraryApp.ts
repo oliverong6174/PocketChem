@@ -17,6 +17,10 @@ import {
   DOGMA_ENGINE_VERSION, REPLICATION_ENGINE_VERSION, TRANSCRIPTION_ENGINE_VERSION, TRANSLATION_ENGINE_VERSION,
   validateBiologyResults, validateDogmaInputs, validateReplicationInputs, validateTranscriptionInputs, validateTranslationInputs,
 } from "./biologyTools";
+import {
+  CELLDIVISION_ENGINE_VERSION, GENETICS_ENGINE_VERSION, REGULATION_ENGINE_VERSION,
+  validateCellDivisionInputs, validateGeneticsInputs, validateRegulationInputs,
+} from "./biologyTools16";
 import { getAnalysisLibrary, registerAnalysisValidators, type AnalysisLibrary } from "./analysisLibrary";
 import {
   MULTICATALYTIC_ENGINE_VERSION,
@@ -34,7 +38,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "replication", "transcription", "translation", "dogma"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -59,6 +63,9 @@ export const ANALYSIS_APP_PAGE = {
   transcription: "bioTranscription",
   translation: "bioTranslation",
   dogma: "bioDogma",
+  regulation: "bioRegulation",
+  genetics: "bioGenetics",
+  celldivision: "bioDivision",
 } as const;
 
 let registered = false;
@@ -114,6 +121,9 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
       transcription: { engineVersion: TRANSCRIPTION_ENGINE_VERSION, validateInputs: validateTranscriptionInputs, validateResults: validateBiologyResults },
       translation: { engineVersion: TRANSLATION_ENGINE_VERSION, validateInputs: validateTranslationInputs, validateResults: validateBiologyResults },
       dogma: { engineVersion: DOGMA_ENGINE_VERSION, validateInputs: validateDogmaInputs, validateResults: validateBiologyResults },
+      regulation: { engineVersion: REGULATION_ENGINE_VERSION, validateInputs: validateRegulationInputs, validateResults: validateBiologyResults },
+      genetics: { engineVersion: GENETICS_ENGINE_VERSION, validateInputs: validateGeneticsInputs, validateResults: validateBiologyResults },
+      celldivision: { engineVersion: CELLDIVISION_ENGINE_VERSION, validateInputs: validateCellDivisionInputs, validateResults: validateBiologyResults },
       multicatalytic: {
         engineVersion: MULTICATALYTIC_ENGINE_VERSION,
         validateInputs: validateMulticatalyticInputs,

@@ -49,8 +49,8 @@ export const SUBJECTS: SubjectDef[] = [
   },
   {
     id: "biology", slug: "biology", label: "Biology", mode: "learning", icon: "biology", status: "available",
-    tagline: "Interactive diagrams of DNA replication, transcription and RNA processing, and translation, with a connected DNA → RNA → protein workflow.",
-    planned: ["Cell structure explorer", "Inheritance and genetics", "Physiology pathways", "Gene regulation"],
+    tagline: "Interactive diagrams of gene expression and its regulation, genetics and inheritance, and mitosis and meiosis.",
+    planned: ["Cell structure explorer", "Population genetics", "Physiology pathways", "Evolution and phylogenetics"],
   },
   {
     id: "biochemistry", slug: "biochemistry", label: "Biochemistry", mode: "learning", icon: "biochemistry", status: "planned",
@@ -59,13 +59,14 @@ export const SUBJECTS: SubjectDef[] = [
   },
 ];
 
-export type ToolGroupId = "analyze" | "mechanics" | "electricity" | "geneExpression" | "synthesize" | "library";
+export type ToolGroupId = "analyze" | "mechanics" | "electricity" | "geneExpression" | "inheritance" | "synthesize" | "library";
 
 export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "analyze", label: "Analyze" },
   { id: "mechanics", label: "Mechanics" },
   { id: "electricity", label: "Electricity" },
   { id: "geneExpression", label: "Gene expression" },
+  { id: "inheritance", label: "Genetics & cell division" },
   { id: "synthesize", label: "Synthesize" },
   { id: "library", label: "Library" },
 ];
@@ -117,7 +118,7 @@ export const PHYSICS_TOOLS: ToolDef[] = [
   { id: "phSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
-export type BiologyToolId = "bioOverview" | "bioReplication" | "bioTranscription" | "bioTranslation" | "bioDogma" | "bioSaved";
+export type BiologyToolId = "bioOverview" | "bioReplication" | "bioTranscription" | "bioTranslation" | "bioDogma" | "bioRegulation" | "bioGenetics" | "bioDivision" | "bioSaved";
 
 export const BIOLOGY_TOOLS: ToolDef[] = [
   { id: "bioOverview", slug: "overview", label: "Overview", summary: "What Biology offers now, and what is still planned.", group: "analyze", icon: "biology" },
@@ -125,6 +126,9 @@ export const BIOLOGY_TOOLS: ToolDef[] = [
   { id: "bioTranscription", slug: "transcription", label: "Transcription & RNA processing", summary: "Template and coding strands, RNA synthesis, and eukaryotic capping, splicing and polyadenylation.", group: "geneExpression", icon: "rna" },
   { id: "bioTranslation", slug: "translation", label: "Translation", summary: "A ribosome reading an mRNA: A, P and E sites, codons, tRNAs, peptide growth and termination.", group: "geneExpression", icon: "ribosome" },
   { id: "bioDogma", slug: "dna-rna-protein", label: "DNA → RNA → protein", summary: "One gene from DNA to peptide, with reading frames and point mutations.", group: "geneExpression", icon: "biology" },
+  { id: "bioRegulation", slug: "gene-regulation", label: "Gene regulation", summary: "The lac and trp operons and a eukaryotic promoter: repressors, activators, attenuation, enhancers and chromatin.", group: "geneExpression", icon: "operon" },
+  { id: "bioGenetics", slug: "genetics", label: "Genetics & inheritance", summary: "Chromosomes, alleles, gametes and offspring: Punnett squares, dominance patterns, X-linkage and linked genes.", group: "inheritance", icon: "chromosome" },
+  { id: "bioDivision", slug: "mitosis-meiosis", label: "Mitosis & meiosis", summary: "Chromosomes and chromatids through mitosis and meiosis: crossing over, independent assortment and nondisjunction.", group: "inheritance", icon: "cell" },
   { id: "bioSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 

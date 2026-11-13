@@ -34,6 +34,24 @@ const FEATURES: Record<string, string[]> = {
     "Substitutions, insertions and deletions, with the consequence derived by translating the mutant",
     "Challenge: predict whether a mutation is silent, missense, nonsense or a frameshift before it is applied",
   ],
+  bioRegulation: [
+    "The lac operon: repressor, allolactose, operator, promoter, cAMP–CRP and RNA polymerase, with leaky basal expression and a second copy to test cis versus trans",
+    "The trp operon: the corepressor, the leader peptide and the competing 2:3 and 3:4 RNA structures that decide attenuation",
+    "A eukaryotic gene: enhancer, silencer, Mediator, chromatin accessibility, histone acetylation, DNA methylation and Pol II, with uncertain outcomes where the model cannot decide",
+    "Challenge: predict whether a regulatory change increases, decreases or leaves expression about the same",
+  ],
+  bioGenetics: [
+    "Parents' chromosome pairs with their alleles, the gametes each makes, a Punnett square and exact genotype and phenotype ratios",
+    "Monohybrid and dihybrid crosses, test crosses, incomplete dominance, codominance, ABO multiple alleles and an X-linked gene",
+    "Two linked genes: coupling and repulsion, a recombination fraction you set, and parental and recombinant chromatids",
+    "Practice picking the gametes; Challenge predicting a fraction before the square is shown",
+  ],
+  bioDivision: [
+    "Mitosis and meiosis of a small cell, with chromosomes, sister chromatids, centromeres and the spindle drawn from the process engine",
+    "Chromosome number and DNA content counted at every stage; homologs separate in meiosis I and sister chromatids in meiosis II",
+    "Crossing over, independent assortment and meiosis I or II nondisjunction, with the resulting gametes compared with the Genetics tool's expectation",
+    "Select any chromosome to inspect its origin, chromatids, alleles and spindle attachment",
+  ],
 };
 
 export default function BiologyOverview({ onOpenTool }: { onOpenTool: (id: BiologyToolId) => void }) {
@@ -44,14 +62,16 @@ export default function BiologyOverview({ onOpenTool }: { onOpenTool: (id: Biolo
       <ToolHeader
         group="Analyze"
         headingLevel={1}
-        purpose="Interactive study guides for how genetic information is copied, transcribed and translated. Every diagram is drawn from the sequence and process state you are looking at, and every tool has Explore, Practice and Challenge modes."
+        purpose="Interactive study guides for how genetic information is copied, transcribed, translated and regulated, and how it is inherited through meiosis. Every diagram is drawn from the sequence and process state you are looking at, and every tool has Explore, Practice and Challenge modes."
         title="Biology"
       />
 
       <Panel subtitle="Working tools you can open now." title="Available now">
-        <h3 className="ph-group-heading">Gene expression</h3>
+        {(["geneExpression", "inheritance"] as const).map((group) => (
+        <div key={group}>
+        <h3 className="ph-group-heading">{group === "geneExpression" ? "Gene expression" : "Genetics & cell division"}</h3>
         <ul className="gc-tool-cards">
-          {implemented.map((tool) => (
+          {implemented.filter((tool) => tool.group === group).map((tool) => (
             <li className="gc-tool-card" key={tool.id}>
               <Icon name={tool.icon} size={26} />
               <div>
@@ -68,6 +88,8 @@ export default function BiologyOverview({ onOpenTool }: { onOpenTool: (id: Biolo
             </li>
           ))}
         </ul>
+        </div>
+        ))}
       </Panel>
 
       <Panel subtitle="How to use the learning modes." title="Explore, Practice, Challenge">
@@ -90,7 +112,7 @@ export default function BiologyOverview({ onOpenTool }: { onOpenTool: (id: Biolo
       </Panel>
 
       <Callout tone="info" title="Scope of the tools">
-        <p>These are simplified teaching models. Replication shows one fork with a few nucleotides per primer and Okazaki fragment. Transcription places the promoter and terminator outside the sequence shown and accepts only GU…AG introns. Translation uses the standard genetic code with one tRNA per codon (no wobble). Bacterial and eukaryotic machinery are shown separately and never combined. The models describe textbook mechanisms; they do not predict the behaviour of a real gene or organism.</p>
+        <p>These are simplified teaching models. Gene-regulation levels are ordinal and qualitative, not measured rates. Genetics shows expected proportions from the stated rules, and one illustrated meiosis is one random outcome, not a distribution. Replication shows one fork with a few nucleotides per primer and Okazaki fragment. Transcription places the promoter and terminator outside the sequence shown and accepts only GU…AG introns. Translation uses the standard genetic code with one tRNA per codon (no wobble). Bacterial and eukaryotic machinery are shown separately and never combined. The models describe textbook mechanisms; they do not predict the behaviour of a real gene or organism.</p>
       </Callout>
     </div>
   );
