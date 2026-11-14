@@ -45,8 +45,8 @@ export function MechanismDiagram({ state, hideLabels }: { state: MechState; hide
       {!hideLabels ? <text fill={MUTED} fontSize={11} x={52} y={290}>Enzyme ({closed ? "closed site" : "open site"})</text> : null}
       {/* catalytic triad */}
       <g>
-        <rect fill="#fef3c7" height={30} rx={6} stroke="#b45309" width={112} x={250} y={215} />
-        <text fill={INK} fontSize={11} textAnchor="middle" x={306} y={234}>{hideLabels ? "residue A" : SER(state)}</text>
+        <rect fill="#fef3c7" height={30} rx={6} stroke="#b45309" width={150} x={240} y={215} />
+        <text fill={INK} fontSize={11} textAnchor="middle" x={315} y={234}>{hideLabels ? "residue A" : SER(state)}</text>
         <rect fill={state.his === "protonated" ? "#dbeafe" : "#e0f2fe"} height={30} rx={6} stroke="#1d4ed8" strokeDasharray={state.his === "protonated" ? undefined : "4 3"} width={112} x={110} y={215} />
         <text fill={INK} fontSize={11} textAnchor="middle" x={166} y={234}>{hideLabels ? "residue B" : state.his === "protonated" ? "His57 (N–H⁺)" : "His57"}</text>
         <rect fill="#fee2e2" height={30} rx={6} stroke="#be123c" width={96} x={62} y={262} />
@@ -86,7 +86,7 @@ export function MechanismDiagram({ state, hideLabels }: { state: MechState; hide
       {state.water && sub !== "released" ? (
         <g><circle cx={cx + 110} cy={cy + 70} fill="#bae6fd" r={11} stroke="#0369a1" /><text fill={INK} fontSize={10} textAnchor="middle" x={cx + 110} y={cy + 74}>H₂O</text></g>
       ) : null}
-      {state.product1 === "free" ? <text fill={INK} fontSize={12} x={430} y={70}>P₁ (amine) released</text> : null}
+      {state.product1 === "free" && sub !== "released" ? <text fill={INK} fontSize={12} x={430} y={70}>P₁ (amine) released</text> : null}
       {sub === "released" ? <g><text fill={INK} fontSize={13} x={300} y={120}>Free enzyme regenerated</text><text fill={INK} fontSize={12} x={300} y={145}>P₂ (carboxylic acid, R–COOH) released</text></g> : null}
       <text fill={MUTED} fontSize={11} x={52} y={22}>{hideLabels ? "Names hidden: use the description below, then reveal." : state.species}</text>
     </svg>

@@ -19,6 +19,7 @@ const setLabelled = (startsWith, value) => ev(`(() => { const f = [...document.q
 const text = (sel) => ev(`document.querySelector(${q(sel)})?.textContent ?? null`);
 const attr = (sel, a) => ev(`document.querySelector(${q(sel)})?.getAttribute(${q(a)}) ?? null`);
 const count = (sel) => ev(`document.querySelectorAll(${q(sel)}).length`);
+const figs = () => ev(`(document.querySelector('.ui-figures')?.innerText ?? '').replace(/\\s+/g, ' ')`);
 const bodyText = () => ev(`document.body.innerText`);
 const clearStorage = () => ev(`(async () => { try { localStorage.clear(); sessionStorage.clear(); const dbs = (await indexedDB.databases?.()) ?? []; await Promise.all(dbs.map((d) => new Promise((res) => { const r = indexedDB.deleteDatabase(d.name); r.onsuccess = r.onerror = r.onblocked = () => res(); }))); } catch (e) { /* nothing to clear */ } return true; })()`);
 const fresh = async (w, scheme, target, { keep = false } = {}) => {
@@ -93,7 +94,7 @@ try {
   const rows7 = await tableCells("[data-testid=group-table]");
   await setPh(12); await sleep(400);
   const rows12 = await tableCells("[data-testid=group-table]");
-  check("4 lysine: side-chain amino is ~100% protonated at pH 7 and ~3% at pH 12", /side chain.*?=10\.53=100%/i.test(rows7) && /side chain.*?=10\.53=3%/i.test(rows12), `${rows7} || ${rows12}`);
+  check("4 lysine: side-chain amino is ~100% protonated at pH 7 and ~3% at pH 12", /side-chain.*?=10\.53=100%/i.test(rows7) && /side-chain.*?=10\.53=3%/i.test(rows12), `${rows7} || ${rows12}`);
   check("4 titration chart with a draggable pH marker (slider) and a pI marker", (await count("[data-testid=aa-props], .ui-diagram [role=slider]")) >= 1 && /pI 9\.74|pI 9\.7/.test(await bodyText()));
   await ev(`(() => { const s = document.querySelector('.ui-diagram [role=slider]'); s.focus(); s.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); })()`); await sleep(300);
   check("4 keyboard moves the chart's pH marker", /pH 12\.1/.test(await attr(".ui-diagram [role=slider]", "aria-valuetext") ?? ""), await attr(".ui-diagram [role=slider]", "aria-valuetext"));
@@ -102,7 +103,7 @@ try {
   // ---- 5. peptide builder
   await choose("Build a peptide"); await sleep(900);
   await setLabelled("Sequence (N → C)", "YGGFL"); await sleep(1200);
-  const keys = await text(".ui-keyfigures, .gc-keyfigures") ?? "";
+  const keys = await text(".ui-figures") ?? "";
   check("5 Leu-enkephalin YGGFL: formula C28H37N5O7 and mass 555.2693", /C28H37N5O7/.test(await bodyText()) && /555\.2693/.test(await bodyText()), keys.slice(0, 120));
   check("5 four peptide bonds listed and drawn in green", (await count("[data-testid=peptide-chain] .bc-bond")) === 4 && /Peptide-bond planar unit/.test(await text(".bc-mol-legend")));
   await ev(`document.querySelectorAll('[data-testid=peptide-chain] button')[3].click()`); await sleep(500);
@@ -137,10 +138,10 @@ try {
   check("7 levels: insulin primary structure shows real residues", (await count("svg[aria-label^='Level 1'] text")) > 10 && /insulin/i.test(await bodyText()));
   await choose("Tertiary"); await sleep(400);
   check("7 insulin tertiary level shows its three disulfide bonds", (await ev(`document.querySelector("svg[aria-label^='Level 3']").textContent.match(/S–S/g)?.length`)) === 3 && /three disulfide|disulfide/i.test((await text("[data-testid=level-text]")) ?? ""));
-  await choose("Quaternary"); await click("Hemoglobin"); await sleep(400);
+  await choose("Quaternary"); await choose("Hemoglobin A"); await sleep(400);
   check("7 hemoglobin quaternary: four subunits", /4 chains assemble/.test(await ev(`document.querySelector("svg[aria-label^='Level 4']").textContent`)));
   await choose("α-helix"); await sleep(500);
-  check("7 helix of 14: 10 backbone H-bonds, and 4 free N–H and 4 free C=O", /10/.test(await ev(`document.querySelector('.ui-keyfigures, .gc-keyfigures')?.textContent ?? ''`)) && /4 N–H, 4 C=O/.test(await bodyText()));
+  check("7 helix of 14: 10 backbone H-bonds, and 4 free N–H and 4 free C=O", /10/.test(await ev(`document.querySelector('.ui-figures')?.textContent ?? ''`)) && /4 N–H, 4 C=O/.test(await bodyText()));
   await ev(`document.querySelector('svg[aria-label^="Alpha helix"] [role=button]').dispatchEvent(new MouseEvent('click', { bubbles: true }))`); await sleep(300);
   check("7 helix: selecting residue 1 reports its partner (residue 5)", /residue 5/.test((await text("[data-testid=helix-selected]")) ?? ""), await text("[data-testid=helix-selected]"));
   await shot("helix.png", ".ui-diagram");
@@ -153,9 +154,9 @@ try {
   await choose("Ramachandran"); await sleep(400);
   check("7 rama: default φ −57, ψ −47 is the α-helix region", /α-helix|alpha/i.test((await text("[data-testid=rama-readout]")) ?? "") || /helix/i.test(await attr("[data-testid=rama-plot]", "aria-label") ?? ""), await attr("[data-testid=rama-plot]", "aria-label"));
   await click("Clash"); await sleep(400);
-  check("7 rama: φ 60, ψ −120 is disallowed with an explanation", /clash|disallowed|overlap/i.test(await bodyText()) && /disallowed/i.test(await attr("[data-testid=rama-plot]", "aria-label") ?? ""));
+  check("7 rama: φ 60, ψ −120 is disallowed with an explanation", /clash|disallowed|overlap/i.test(await bodyText()) && /disfavou?red/i.test(await attr("[data-testid=rama-plot]", "aria-label") ?? ""));
   await choose("Glycine"); await sleep(400);
-  check("7 rama: the same angles are allowed for glycine", !/disallowed/i.test(await attr("[data-testid=rama-plot]", "aria-label") ?? ""), await attr("[data-testid=rama-plot]", "aria-label"));
+  check("7 rama: the same angles are allowed for glycine", !/disfavou?red/i.test(await attr("[data-testid=rama-plot]", "aria-label") ?? ""), await attr("[data-testid=rama-plot]", "aria-label"));
   await choose("Most residues"); await click("α-helix"); await sleep(300);
   await ev(`(() => { const m = document.querySelector('[data-testid=rama-marker]'); m.focus(); m.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); })()`); await sleep(300);
   check("7 rama: the marker moves by 2° with the arrow key", /phi -55/.test(await attr("[data-testid=rama-plot]", "aria-label") ?? ""), await attr("[data-testid=rama-plot]", "aria-label"));
@@ -169,7 +170,7 @@ try {
   await shot("forces.png", ".ui-diagram");
   await choose("Mutations"); await sleep(900);
   const sub1 = await bodyText();
-  check("7 mutation (sickle-cell): Glu → Val, charge changes, supported/uncertain lists present, no folding prediction claimed", /Glutamate/.test(sub1) && /Valine/.test(sub1) && (await count("[data-testid=supported] li")) >= 1 && (await count("[data-testid=uncertain] li")) >= 1 && /not a prediction of folding|qualitative/.test(sub1));
+  check("7 mutation (sickle-cell): Glu → Val, charge changes, supported/uncertain lists present, no folding prediction claimed", /Glutamic acid/.test(sub1) && /Valine/.test(sub1) && (await count("[data-testid=supported] li")) >= 1 && (await count("[data-testid=uncertain] li")) >= 1 && /not a prediction of folding|qualitative/.test(sub1));
   check("7 mutation: two structures drawn", (await count("[data-testid=molecule-svg] svg")) === 2);
   await setSel("scenario-select", "pro-helix"); await sleep(900);
   check("7 mutation (proline in a helix): lost backbone bonds are marked", (await ev(`document.querySelector('svg[aria-label^="Alpha helix"]')?.textContent.match(/✖/g)?.length ?? 0`)) >= 1 && /lost|cannot donate/i.test(await bodyText()));
@@ -179,22 +180,22 @@ try {
   await fresh(1440, "light", "#/biochemistry/enzymes");
   check("8 kinetics default: two charts (Michaelis–Menten and Lineweaver–Burk) and enzyme species", (await count(".ui-diagram svg")) >= 3 && (await count("[data-testid=species-bars]")) === 1);
   const km0 = await ev(`[...document.querySelectorAll('.ui-keyfigure, .gc-figure, .ui-keyfigures > *')].map((x) => x.textContent.replace(/\\s+/g, ' ')).join('|')`);
-  check("8 kinetics default (competitive, [I]=4, Ki=2): Vmax,app 100, Km,app 6, v 25", /Vmax,app\s*100/.test(await ev(`document.body.innerText.replace(/\\s+/g,' ')`)) && /Km,app\s*6/.test(await ev(`document.body.innerText.replace(/\\s+/g,' ')`)) && /Velocity v\s*25/.test(await ev(`document.body.innerText.replace(/\\s+/g,' ')`)), km0.slice(0, 200));
+  check("8 kinetics default (competitive, [I]=5, Ki=2, Ki′=4): Vmax,app 100, Km,app 7, v 22.22", /vmax,app\s*100/i.test(await figs()) && /km,app\s*7\b/i.test(await figs()) && /velocity v\s*22\.22/i.test(await figs()), await figs());
   await choose("Uncompetitive"); await sleep(500);
-  const un = await ev(`document.body.innerText.replace(/\\s+/g,' ')`);
-  check("8 uncompetitive: Vmax,app 33.33 and Km,app 0.6667 (both fall by α′)", /Vmax,app\s*33\.33/.test(un) && /Km,app\s*0\.6667/.test(un), un.match(/Vmax,app[^A-Z]{0,30}/)?.[0]);
+  const un = await figs();
+  check("8 uncompetitive (α′ = 2.25): Vmax,app 44.44 and Km,app 0.8889 (both fall by α′)", /vmax,app\s*44\.44/i.test(un) && /km,app\s*0\.8889/i.test(un), un);
   await choose("Noncompetitive"); await sleep(500);
-  const nc = await ev(`document.body.innerText.replace(/\\s+/g,' ')`);
-  check("8 noncompetitive: Km,app unchanged (2), Vmax,app 33.33", /Km,app\s*2\b/.test(nc) && /Vmax,app\s*33\.33/.test(nc));
+  const nc = await figs();
+  check("8 noncompetitive (α = α′ = 3.5): Km,app unchanged (2), Vmax,app 28.57", /km,app\s*2\b/i.test(nc) && /vmax,app\s*28\.57/i.test(nc), nc);
   await choose("None"); await sleep(500);
-  check("8 no inhibitor: v at [S]=Km is Vmax/2 = 50", /Velocity v\s*50/.test(await ev(`document.body.innerText.replace(/\\s+/g,' ')`)));
+  check("8 no inhibitor: v at [S]=Km is Vmax/2 = 50", /velocity v\s*50\b/i.test(await figs()), await figs());
   await choose("Competitive"); await sleep(400);
   await ev(`(() => { const s = document.querySelector('.ui-diagram [role=slider]'); s.focus(); for (let i = 0; i < 10; i += 1) s.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); })()`); await sleep(400);
   check("8 the [S] marker moves with the keyboard and the readout follows", /\[S\] 2\.[0-9]+|\[S\] [3-9]/.test(await attr(".ui-diagram [role=slider]", "aria-valuetext") ?? "") || (await ev(`[...document.querySelectorAll('.gc-field input')].some((i) => Number(i.value) > 2 && Number(i.value) < 3.5)`)));
   await setLabelled("Km", "-5"); await sleep(400);
   check("8 invalid Km (−5) is reported inline and the graphs are withheld", /cannot be used|between/.test(await bodyText()) && (await count(".ui-diagram svg")) === 0);
   await setLabelled("Km", "2"); await sleep(400);
-  await shot("kinetics.png", ".ui-keyfigures, .gc-keyfigures");
+  await shot("kinetics.png", ".ui-figures");
   await choose("Catalytic mechanism"); await sleep(500);
   check("8 mechanism: step 0 of 6 with the free enzyme and substrate", (await readout()) === "0 of 6" && /Free enzyme and substrate/.test(await text("[data-testid=step-caption]")));
   await steps(3);
@@ -221,7 +222,7 @@ try {
   await ev(`document.querySelectorAll('.bio-quiz .bio-option')[2].click()`); await sleep(300);
   check("9 enzyme challenge: competitive Vmax stays the same (correct answer is explained)", /Apparent Vmax = 100/.test((await text(".gc-reveal")) ?? ""), (await text(".gc-reveal"))?.slice(0, 120));
   await tick("predict-reveal"); await sleep(500);
-  check("9 enzyme challenge: reveal applies the inhibitor to the graph", /Competitive inhibitor/.test(await bodyText()));
+  check("9 enzyme challenge: reveal moves to the kinetics graph and offers the next prediction", (await count(".ui-diagram svg")) >= 2 && (await text("[data-testid=predict-prompt]")) !== ep, String(await text("[data-testid=predict-prompt]")).slice(0, 80));
 
   // ---- 10. Translation hand-off
   await fresh(1440, "light", "#/biology/translation");
@@ -252,7 +253,7 @@ try {
   await fresh(1440, "light", "#/biochemistry/enzymes");
   await choose("Uncompetitive"); await sleep(2600);
   await cdp.send("Page.reload"); await waitFor(() => ev(`document.readyState === 'complete' && document.body.innerText.length > 50`), "reload"); await sleep(1500);
-  check("11 autosave: a reloaded enzymes page restores the uncompetitive inhibitor", /Vmax,app\s*33\.33/.test(await ev(`document.body.innerText.replace(/\\s+/g,' ')`)));
+  check("11 autosave: a reloaded enzymes page restores the uncompetitive inhibitor", /vmax,app\s*44\.44/i.test(await figs()), await figs());
   await fresh(1440, "light", "#/biochemistry/protein-structure");
   await choose("Ramachandran"); await click("Left-handed"); await sleep(2600);
   await cdp.send("Page.reload"); await waitFor(() => ev(`document.readyState === 'complete' && document.body.innerText.length > 50`), "reload"); await sleep(1500);

@@ -80,7 +80,7 @@ export default function ProteinsPage({ openRequest = null, onOpenHandled }: Prop
         <Panel className="gc-inputs" title="Controls" subtitle="Each view has its own controls.">
           {view === "levels" ? (
             <>
-              <Segmented<string> label="Protein" onChange={(id) => set({ example: id })} options={PROTEIN_EXAMPLES.map((e) => ({ id: e.id, label: e.name.replace("Human ", "").replace("Sperm-whale ", "") }))} value={raw.example} />
+              <Segmented<string> label="Protein" onChange={(id) => set({ example: id })} options={PROTEIN_EXAMPLES.map((e) => { const n = e.name.replace("Human ", "").replace("Sperm-whale ", ""); return { id: e.id, label: n.charAt(0).toUpperCase() + n.slice(1) }; })} value={raw.example} />
               <Segmented<"1" | "2" | "3" | "4"> label="Level" onChange={(v) => setLevel(Number(v) as 1 | 2 | 3 | 4)} options={[{ id: "1", label: "Primary" }, { id: "2", label: "Secondary" }, { id: "3", label: "Tertiary" }, { id: "4", label: "Quaternary" }]} value={String(level) as "1" | "2" | "3" | "4"} />
             </>
           ) : null}
