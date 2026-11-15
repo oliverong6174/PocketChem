@@ -110,6 +110,11 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
   const AminoAcidsPage = lazy(() => import("./components/biochem/AminoAcidsPage"));
   const ProteinsPage = lazy(() => import("./components/biochem/ProteinsPage"));
   const EnzymesPage = lazy(() => import("./components/biochem/EnzymesPage"));
+  const GlycolysisPage = lazy(() => import("./components/biochem/metabolism/GlycolysisPage"));
+  const GluconeogenesisPage = lazy(() => import("./components/biochem/metabolism/GluconeogenesisPage"));
+  const CitricAcidPage = lazy(() => import("./components/biochem/metabolism/CitricAcidPage"));
+  const ElectronTransportPage = lazy(() => import("./components/biochem/metabolism/ElectronTransportPage"));
+  const MetabolicMapPage = lazy(() => import("./components/biochem/metabolism/MetabolicMapPage"));
 
 
   type AnnotationCarouselItem =
@@ -615,7 +620,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
         else switchSubject("physics", { keepOpenRequest: true, tool: target });
         return;
       }
-      if (target === "bcAminoAcids" || target === "bcProteins" || target === "bcEnzymes") {
+      if (target === "bcAminoAcids" || target === "bcProteins" || target === "bcEnzymes" || target === "bcGlycolysis" || target === "bcGluconeogenesis" || target === "bcTca" || target === "bcEtc" || target === "bcMetabolism") {
         if (activeSubject === "biochemistry") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("biochemistry", { keepOpenRequest: true, tool: target });
         return;
@@ -1979,6 +1984,32 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
             ) : generalTool === "bcEnzymes" ? (
               <EnzymesPage
                 openRequest={pendingOpen?.page === "bcEnzymes" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcGlycolysis" ? (
+              <GlycolysisPage
+                openRequest={pendingOpen?.page === "bcGlycolysis" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcGluconeogenesis" ? (
+              <GluconeogenesisPage
+                openRequest={pendingOpen?.page === "bcGluconeogenesis" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcTca" ? (
+              <CitricAcidPage
+                openRequest={pendingOpen?.page === "bcTca" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcEtc" ? (
+              <ElectronTransportPage
+                openRequest={pendingOpen?.page === "bcEtc" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcMetabolism" ? (
+              <MetabolicMapPage
+                openRequest={pendingOpen?.page === "bcMetabolism" ? pendingOpen : null}
+                onOpenTool={(id: BiochemistryToolId) => switchGeneralTool(id)}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />
             ) : generalTool === "bcSaved" ? (

@@ -24,6 +24,10 @@ import {
 import {
   AMINOACIDS_ENGINE_VERSION, ENZYMES_ENGINE_VERSION, PROTEINS_ENGINE_VERSION, validateAminoAcidsInputs, validateEnzymesInputs, validateProteinsInputs,
 } from "./biochemTools17";
+import {
+  ETC_ENGINE_VERSION, GLUCONEOGENESIS_ENGINE_VERSION, GLYCOLYSIS_ENGINE_VERSION, METABOLISM_ENGINE_VERSION, TCA_ENGINE_VERSION,
+  validateEtcInputs, validateGluconeogenesisInputs, validateGlycolysisInputs, validateMetabolismInputs, validateTcaInputs,
+} from "./biochemTools18";
 import { getAnalysisLibrary, registerAnalysisValidators, type AnalysisLibrary } from "./analysisLibrary";
 import {
   MULTICATALYTIC_ENGINE_VERSION,
@@ -41,7 +45,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "aminoacids", "proteins", "enzymes"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -72,6 +76,11 @@ export const ANALYSIS_APP_PAGE = {
   aminoacids: "bcAminoAcids",
   proteins: "bcProteins",
   enzymes: "bcEnzymes",
+  glycolysis: "bcGlycolysis",
+  gluconeogenesis: "bcGluconeogenesis",
+  tca: "bcTca",
+  etc: "bcEtc",
+  metabolism: "bcMetabolism",
 } as const;
 
 let registered = false;
@@ -133,6 +142,11 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
       aminoacids: { engineVersion: AMINOACIDS_ENGINE_VERSION, validateInputs: validateAminoAcidsInputs, validateResults: validateBiologyResults },
       proteins: { engineVersion: PROTEINS_ENGINE_VERSION, validateInputs: validateProteinsInputs, validateResults: validateBiologyResults },
       enzymes: { engineVersion: ENZYMES_ENGINE_VERSION, validateInputs: validateEnzymesInputs, validateResults: validateBiologyResults },
+      glycolysis: { engineVersion: GLYCOLYSIS_ENGINE_VERSION, validateInputs: validateGlycolysisInputs, validateResults: validateBiologyResults },
+      gluconeogenesis: { engineVersion: GLUCONEOGENESIS_ENGINE_VERSION, validateInputs: validateGluconeogenesisInputs, validateResults: validateBiologyResults },
+      tca: { engineVersion: TCA_ENGINE_VERSION, validateInputs: validateTcaInputs, validateResults: validateBiologyResults },
+      etc: { engineVersion: ETC_ENGINE_VERSION, validateInputs: validateEtcInputs, validateResults: validateBiologyResults },
+      metabolism: { engineVersion: METABOLISM_ENGINE_VERSION, validateInputs: validateMetabolismInputs, validateResults: validateBiologyResults },
       multicatalytic: {
         engineVersion: MULTICATALYTIC_ENGINE_VERSION,
         validateInputs: validateMulticatalyticInputs,

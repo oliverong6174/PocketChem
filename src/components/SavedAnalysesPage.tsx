@@ -30,6 +30,11 @@ const PAGE_LABELS: Record<string, string> = {
   aminoacids: "Amino acids & peptides",
   proteins: "Protein structure & folding",
   enzymes: "Enzymes & catalysis",
+  glycolysis: "Glycolysis",
+  gluconeogenesis: "Gluconeogenesis",
+  tca: "Pyruvate oxidation & citric acid cycle",
+  etc: "Electron transport & oxidative phosphorylation",
+  metabolism: "Integrated metabolic map",
 };
 
 const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry", physics: "Physics", biology: "Biology", biochemistry: "Biochemistry" };

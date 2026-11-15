@@ -333,3 +333,13 @@ export function validateNetwork(): string[] {
   dup(REGULATION.map((g) => g.id), "regulation");
   return errors;
 }
+
+/** The five mechanistic stages of the pyruvate dehydrogenase complex (E1 with TPP, E2 with lipoamide, E3 with FAD and NAD⁺). */
+export const PDH_MECHANISM: Array<{ title: string; enzyme: string; text: string; carbons: number; released?: string }> = [
+  { title: "Pyruvate and CoA available", enzyme: "PDH complex", text: "Pyruvate (C3) has entered the matrix on the mitochondrial pyruvate carrier. The complex carries five coenzymes: thiamine pyrophosphate (TPP), lipoamide, CoA, FAD and NAD⁺.", carbons: 3 },
+  { title: "1. Decarboxylation (E1, TPP)", enzyme: "E1 (pyruvate dehydrogenase)", text: "Pyruvate adds to TPP and loses its carboxyl as CO₂, leaving a hydroxyethyl-TPP (C2).", carbons: 2, released: "CO₂" },
+  { title: "2. Oxidation and transfer (E1)", enzyme: "E1", text: "The hydroxyethyl group is oxidized to an acetyl group as it is transferred to the oxidized lipoamide arm of E2; lipoamide is reduced.", carbons: 2 },
+  { title: "3. Acetyl transfer to CoA (E2)", enzyme: "E2 (dihydrolipoyl transacetylase)", text: "The acetyl group is transferred from lipoamide to coenzyme A, forming acetyl-CoA, which leaves the complex.", carbons: 2 },
+  { title: "4. Re-oxidation of lipoamide (E3, FAD)", enzyme: "E3 (dihydrolipoyl dehydrogenase)", text: "Reduced lipoamide gives its electrons to E3's bound FAD, giving FADH₂ and regenerating oxidized lipoamide.", carbons: 2 },
+  { title: "5. NAD⁺ reduced (E3)", enzyme: "E3", text: "FADH₂ passes its electrons to NAD⁺, giving NADH and regenerating FAD. Net: pyruvate + CoA + NAD⁺ → acetyl-CoA + CO₂ + NADH + H⁺.", carbons: 2 },
+];

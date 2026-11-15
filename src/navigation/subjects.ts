@@ -54,12 +54,12 @@ export const SUBJECTS: SubjectDef[] = [
   },
   {
     id: "biochemistry", slug: "biochemistry", label: "Biochemistry", mode: "learning", icon: "biochemistry", status: "available",
-    tagline: "Amino acids and peptides, protein structure and folding, enzymes and catalysis.",
-    planned: ["Metabolic pathway maps", "Carbohydrates and lipids", "Nucleic-acid structure and thermodynamics", "Bioenergetics and ATP coupling"],
+    tagline: "Amino acids and peptides, protein structure and folding, enzymes and catalysis, and the central metabolic pathways from glucose to ATP.",
+    planned: ["Carbohydrates and lipids", "Nucleic-acid structure and thermodynamics", "Bioenergetics and ATP coupling"],
   },
 ];
 
-export type ToolGroupId = "analyze" | "mechanics" | "electricity" | "geneExpression" | "inheritance" | "biomolecules" | "synthesize" | "library";
+export type ToolGroupId = "analyze" | "mechanics" | "electricity" | "geneExpression" | "inheritance" | "biomolecules" | "metabolism" | "synthesize" | "library";
 
 export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "analyze", label: "Analyze" },
@@ -68,6 +68,7 @@ export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "geneExpression", label: "Gene expression" },
   { id: "inheritance", label: "Genetics & cell division" },
   { id: "biomolecules", label: "Biomolecules" },
+  { id: "metabolism", label: "Metabolism" },
   { id: "synthesize", label: "Synthesize" },
   { id: "library", label: "Library" },
 ];
@@ -134,13 +135,18 @@ export const BIOLOGY_TOOLS: ToolDef[] = [
 ];
 
 
-export type BiochemistryToolId = "bcOverview" | "bcAminoAcids" | "bcProteins" | "bcEnzymes" | "bcSaved";
+export type BiochemistryToolId = "bcOverview" | "bcAminoAcids" | "bcProteins" | "bcEnzymes" | "bcGlycolysis" | "bcGluconeogenesis" | "bcTca" | "bcEtc" | "bcMetabolism" | "bcSaved";
 
 export const BIOCHEMISTRY_TOOLS: ToolDef[] = [
   { id: "bcOverview", slug: "overview", label: "Overview", summary: "What Biochemistry offers now, and what is still planned.", group: "analyze", icon: "biochemistry" },
   { id: "bcAminoAcids", slug: "amino-acids", label: "Amino acids & peptides", summary: "The 20 amino acids: structures, side chains, ionization and pKa, and peptide bonds in sequences you build.", group: "biomolecules", icon: "molecule" },
   { id: "bcProteins", slug: "protein-structure", label: "Protein structure & folding", summary: "Primary to quaternary structure, α-helices, β-sheets, Ramachandran angles, stabilizing interactions and mutations.", group: "biomolecules", icon: "chromosome" },
   { id: "bcEnzymes", slug: "enzymes", label: "Enzymes & catalysis", summary: "Enzyme–substrate binding, a catalytic mechanism, Michaelis–Menten kinetics and the four kinds of reversible inhibition.", group: "biomolecules", icon: "kinetics" },
+  { id: "bcGlycolysis", slug: "glycolysis", label: "Glycolysis", summary: "The ten reactions from glucose to pyruvate: ATP investment and payoff, NADH, irreversible steps and regulation.", group: "metabolism", icon: "kinetics" },
+  { id: "bcGluconeogenesis", slug: "gluconeogenesis", label: "Gluconeogenesis", summary: "Pyruvate to glucose: the shared reversible steps, the three bypasses, energy cost and reciprocal regulation, side by side with glycolysis.", group: "metabolism", icon: "kinetics" },
+  { id: "bcTca", slug: "citric-acid-cycle", label: "Pyruvate oxidation & citric acid cycle", summary: "The pyruvate dehydrogenase complex and the eight cycle reactions: carbon counts, carriers, oxaloacetate regeneration and regulation.", group: "metabolism", icon: "kinetics" },
+  { id: "bcEtc", slug: "electron-transport", label: "Electron transport & oxidative phosphorylation", summary: "Complexes I to IV, coenzyme Q, cytochrome c, the proton gradient and ATP synthase; NADH versus FADH₂, inhibitors and uncouplers.", group: "metabolism", icon: "kinetics" },
+  { id: "bcMetabolism", slug: "metabolic-map", label: "Integrated metabolic map", summary: "One connected map from glucose to oxidative phosphorylation, with shared metabolites, an energy ledger and qualitative scenarios.", group: "metabolism", icon: "kinetics" },
   { id: "bcSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 

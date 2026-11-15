@@ -26,7 +26,33 @@ const FEATURES: Record<string, string[]> = {
     "Michaelis–Menten and Lineweaver–Burk graphs plus the enzyme-species fractions, for competitive, uncompetitive, noncompetitive and mixed inhibition",
     "An energy profile showing that catalysis lowers the barrier without changing ΔG° or the equilibrium constant",
   ],
+  bcGlycolysis: [
+    "The ten reactions from glucose to pyruvate with enzymes, structures, cofactors and compartment",
+    "ATP investment and payoff, four ATP made and two net, two NADH, and why steps after aldolase run twice per glucose",
+    "Qualitative regulation of hexokinase, PFK-1 and pyruvate kinase by ATP, AMP, fructose 2,6-bisphosphate and G6P",
+  ],
+  bcGluconeogenesis: [
+    "Pyruvate to glucose through the mitochondrial matrix, cytosol and ER, with the three bypasses highlighted",
+    "A side-by-side lane diagram with glycolysis, the cost of 4 ATP + 2 GTP + 2 NADH, and futile-cycle costs",
+    "Fed-like, fasting-like, low-energy and acetyl-CoA scenarios with reciprocal regulation, kept qualitative",
+  ],
+  bcTca: [
+    "The pyruvate dehydrogenase complex in five stages, then the eight cycle reactions around a ring for one or two turns",
+    "Carbon counts, NADH, FADH₂, GTP and CO₂ per turn and per glucose without double counting, with oxaloacetate regeneration",
+    "Regulation by energy and redox signals, stated as directions only",
+  ],
+  bcEtc: [
+    "Complexes I to IV, coenzyme Q, cytochrome c, oxygen and ATP synthase with electron and proton movement",
+    "NADH versus succinate entry, about 10 versus 6 protons per electron pair, and complex II pumping none",
+    "Inhibitors (rotenone, malonate, antimycin, cyanide, oligomycin), an uncoupler and low oxygen, with qualitative outcomes",
+  ],
+  bcMetabolism: [
+    "One connected map from glucose to oxidative phosphorylation with gluconeogenesis returning to glucose",
+    "Pathway and reaction levels share the same metabolites and reactions, with a single energy-carrier ledger",
+    "Scenarios labelled by what stoichiometry, curated regulation or the respiratory model supports, and what would need a kinetic model",
+  ],
 };
+const GROUPS: Array<{ id: string; label: string }> = [{ id: "biomolecules", label: "Biomolecules" }, { id: "metabolism", label: "Metabolism" }];
 
 export default function BiochemOverview({ onOpenTool }: { onOpenTool: (id: BiochemistryToolId) => void }) {
   const subject = getSubject("biochemistry");
@@ -36,13 +62,15 @@ export default function BiochemOverview({ onOpenTool }: { onOpenTool: (id: Bioch
       <ToolHeader
         group="Analyze"
         headingLevel={1}
-        purpose="Interactive study guides for the molecules of life: amino acids and peptides, how proteins are organized and held together, and how enzymes speed reactions. Every diagram is drawn from the structure or constants you are looking at."
+        purpose="Interactive study guides for the molecules of life and their metabolism: amino acids and peptides, protein structure, enzymes, and the pathways from glucose to ATP. Every diagram is drawn from the structure, constants or reactions you are looking at."
         title="Biochemistry"
       />
       <Panel subtitle="Working tools you can open now." title="Available now">
-        <h3 className="ph-group-heading">Biomolecules</h3>
+        {GROUPS.map((group) => (
+          <div key={group.id}>
+        <h3 className="ph-group-heading">{group.label}</h3>
         <ul className="gc-tool-cards">
-          {implemented.map((tool) => (
+          {implemented.filter((tool) => tool.group === group.id).map((tool) => (
             <li className="gc-tool-card" key={tool.id}>
               <Icon name={tool.icon} size={26} />
               <div>
@@ -57,6 +85,8 @@ export default function BiochemOverview({ onOpenTool }: { onOpenTool: (id: Bioch
             </li>
           ))}
         </ul>
+          </div>
+        ))}
       </Panel>
       <Panel subtitle="How to use the learning modes." title="Explore, Practice, Challenge">
         <ul className="gc-assumptions">
@@ -71,7 +101,7 @@ export default function BiochemOverview({ onOpenTool }: { onOpenTool: (id: Bioch
         </ul>
       </Panel>
       <Callout tone="info" title="Scope of the tools">
-        <p>These are teaching models. The pKa and hydropathy values are textbook references, the protein tool illustrates ideal structures and does not predict folding, and enzyme kinetics assumes a single substrate and ideal reversible inhibitors.</p>
+        <p>These are teaching models. The pKa and hydropathy values are textbook references, the protein tool illustrates ideal structures and does not predict folding, enzyme kinetics assumes a single substrate and ideal reversible inhibitors, and the metabolic pathways show stoichiometry and curated qualitative regulation: no rates, concentrations or cellular fluxes are computed, and ATP yields are estimates.</p>
       </Callout>
     </div>
   );
