@@ -50,9 +50,9 @@ const tableCells = (sel) => ev(`[...document.querySelectorAll(${q(sel)} + ' tbod
 try {
   // ---- 1. Biochemistry navigation; the other subjects
   await fresh(1440, "light", "#/biochemistry/overview");
-  check("1 Biochemistry tabs", (await tabs()) === "Overview|Amino acids & peptides|Protein structure & folding|Enzymes & catalysis|Saved", await tabs());
+  check("1 Biochemistry tabs", (await tabs()) === "Overview|Amino acids & peptides|Protein structure & folding|Enzymes & catalysis|Glycolysis|Gluconeogenesis|Pyruvate oxidation & citric acid cycle|Electron transport & oxidative phosphorylation|Integrated metabolic map|Saved", await tabs());
   const ov = await ev(`({ cards: [...document.querySelectorAll('.gc-tool-card button')].map((b) => b.textContent.trim()), pb: document.querySelectorAll('.gc-planned button').length, planned: [...document.querySelectorAll('.gc-planned li')].map((x) => x.textContent).join('|') })`);
-  check("1 overview: three working tools, planned list has no buttons", ov.cards.length === 3 && ov.pb === 0 && /Metabolic/.test(ov.planned) && !/Enzyme kinetics|Amino acids/.test(ov.planned), JSON.stringify(ov.cards));
+  check("1 overview: eight working tools (three Stage 17 + five metabolic), planned list has no buttons and no longer lists metabolic pathway maps", ov.cards.length === 8 && ov.pb === 0 && /Carbohydrates/.test(ov.planned) && !/Metabolic pathway|Enzyme kinetics|Amino acids/.test(ov.planned), JSON.stringify(ov.cards));
   await click("Open Enzymes & catalysis"); await sleep(800);
   check("1 Open button reaches Enzymes; hash", (await ev("location.hash")) === "#/biochemistry/enzymes", await ev("location.hash"));
   const picker = await ev(`[...document.querySelectorAll('button, [role=tab], [role=option], option')].map((b) => b.textContent.trim()).filter((t) => /Biochemistry/.test(t)).slice(0, 3).join('|')`);

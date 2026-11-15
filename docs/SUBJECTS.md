@@ -139,3 +139,27 @@ Biochemistry is the fifth available subject (Interactive Learning). Tools: `bcAm
 - Hand-off: the Translation tool's final peptide opens in the peptide builder (`handoff16.ts`, kind `peptide`; validated by the receiver; peptides longer
   than 30 residues are cut to the explorer's limit and the page says so).
 - Tests: `biochemData17`, `biochemModels17`, `biochemPlatform17`; browser check `scripts/browser/stage17LiveCheck.mjs`.
+
+## Biochemistry (Stage 18): metabolic pathways
+
+Five tools in the new `metabolism` group (`bcGlycolysis`, `bcGluconeogenesis`, `bcTca`, `bcEtc`, `bcMetabolism`; slugs `glycolysis`, `gluconeogenesis`,
+`citric-acid-cycle`, `electron-transport`, `metabolic-map`). Saved pages `glycolysis`, `gluconeogenesis`, `tca`, `etc`, `metabolism`
+(`utils/persistence/biochemTools18.ts`; strict validators, versioned, derived results rebuilt on open).
+
+- `utils/biochem/metabolism/network.ts` is the single curated network: metabolites (id, formula, charge, carbons, compartments, optional RDKit-verified
+  structure), enzymes, reactions (stoichiometry, direction, reversibility, compartment, pathway roles with per-glucose multiplicity), pathways and curated
+  regulatory effects. `validateNetwork()` rejects duplicate ids, unknown references, bad coefficients, unavailable compartments and any reaction that does not
+  balance for atoms and charge. One reaction is described once and may play several pathway roles (e.g. malate dehydrogenase: forward in the cycle, reverse in
+  gluconeogenesis; succinate dehydrogenase is complex II).
+- Bookkeeping convention: neutral acid forms with NAD⁺ as a cation and explicit H⁺, so atoms and charge balance exactly. The UI states this wherever it
+  matters. Metabolites without a verified structure (CoA derivatives, nucleotides) are drawn schematically, never invented.
+- `ledger.ts` sums stoichiometry × multiplicity (net equations, carrier ledgers, glucose totals, futile-cycle costs); ATP from oxidative phosphorylation is an
+  estimate (10 and 6 H⁺ per electron pair, about 4 H⁺ per ATP, two shuttle options). `regulation.ts` gives only directions (higher, lower, reference,
+  uncertain) relative to an all-normal reference; conflicting signals are reported as uncertain. `etc.ts` derives inhibitor/uncoupler outcomes from chain
+  topology and stated rules. Nothing computes a rate, flux, concentration or time course.
+- `learning.ts` generates Practice questions, predict-then-reveal challenges and integrated-map scenario statements (each labelled as following from
+  stoichiometry, curated regulation, the respiratory model, or as not modelled) from those same modules.
+- Diagrams are SVG on a paper surface (`LaneDiagram`, `CycleDiagram`, `MitoDiagram`, `MapDiagram`); on narrow screens they scroll sideways inside their frame and
+  bring the selected part into view. Every node and arrow is a real metabolite or reaction and is keyboard-operable.
+- Tests: `biochemMetabolism18` (network, glycolysis, gluconeogenesis, cycle, respiratory chain, RDKit structure checks), `biochemPlatform18` (navigation,
+  validators, saved round trips, learning consistency); browser check `scripts/browser/stage18LiveCheck.mjs`.
