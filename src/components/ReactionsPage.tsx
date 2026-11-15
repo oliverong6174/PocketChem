@@ -40,6 +40,7 @@ import { getAppAnalysisLibrary } from "../utils/persistence/analysisLibraryApp";
 import type { OpenedAnalysis } from "../utils/persistence/analysisLibrary";
 import { useSavedAnalysisOpen } from "../utils/persistence/useSavedAnalysisOpen";
 import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./SavedAnalysisControls";
+import { ReactionResultsExplorer } from "./reactions/ReactionResultsExplorer";
 
 import {
   predictReactionPathways,
@@ -116,6 +117,7 @@ type ReactionsResultMeta = {
   opened?: { name: string; savedAt: string } | null;
 };
 const RESULTS_PER_BATCH = 12;
+const EMPTY_ID_SET: ReadonlySet<string> = new Set();
 
 function courseLabel(course: ReactionPathway["course"]) {
   return course === "ochem-1"
@@ -987,10 +989,17 @@ export default function ReactionsPage({
     () => groupDisplayPathways(pathways),
     [pathways],
   );
-  const visiblePathways = useMemo(
-    () => displayPathways.slice(0, visibleResultCount),
-    [displayPathways, visibleResultCount],
-  );
+  // Which result rows are open. Diagrams are built only for open rows. The set belongs to one analysis: a new analysis starts closed.
+  const [expandedState, setExpandedState] = useState<{ source: unknown; ids: ReadonlySet<string> }>({ source: null, ids: new Set() });
+  const expandedIds: ReadonlySet<string> = expandedState.source === pathways ? expandedState.ids : EMPTY_ID_SET;
+  const setExpandedRows = (ids: readonly string[]) => setExpandedState({ source: pathways, ids: new Set(ids) });
+  const toggleExpandedRow = (id: string) => {
+    const next = new Set(expandedIds);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    setExpandedState({ source: pathways, ids: next });
+  };
+  const expandedPathways = useMemo(() => displayPathways.filter((pathway) => expandedIds.has(pathway.id)), [displayPathways, expandedIds]);
+  const svgCacheRef = useRef<{ context: string; source: unknown; reactants: SvgListMap; products: ProductVariantSvgMap }>({ context: "", source: null, reactants: {}, products: {} });
   const visibleRetroPathways = useMemo(
     () => retroPathways.slice(0, visibleResultCount),
     [retroPathways, visibleResultCount],
@@ -1000,10 +1009,16 @@ export default function ReactionsPage({
     let cancelled = false;
 
     async function buildSvgs() {
-      const nextReactants: SvgListMap = {};
-      const nextProducts: ProductVariantSvgMap = {};
+      const contextKey = JSON.stringify([reactionSvgSnapshot, reactionMolfile, reactionComponentMolfiles]);
+      const cache = svgCacheRef.current;
+      if (cache.context !== contextKey || cache.source !== pathways) {
+        cache.context = contextKey; cache.source = pathways; cache.reactants = {}; cache.products = {};
+      }
+      const nextReactants = cache.reactants;
+      const nextProducts = cache.products;
 
-      for (const pathway of visiblePathways) {
+      for (const pathway of expandedPathways) {
+        if (cache.reactants[pathway.id] !== undefined) continue;
         const reactantComponents = pathway.reactantComponents.length > 0
           ? pathway.reactantComponents
           : pathway.reactantSmiles.split(".").filter(Boolean);
@@ -1076,8 +1091,8 @@ export default function ReactionsPage({
       }
 
       if (!cancelled) {
-        setReactantSvgs(nextReactants);
-        setProductSvgs(nextProducts);
+        setReactantSvgs({ ...nextReactants });
+        setProductSvgs({ ...nextProducts });
       }
     }
 
@@ -1086,7 +1101,7 @@ export default function ReactionsPage({
     return () => {
       cancelled = true;
     };
-  }, [visiblePathways, reactionMolfile, reactionSvgSnapshot, reactionComponentMolfiles]);
+  }, [expandedPathways, pathways, reactionMolfile, reactionSvgSnapshot, reactionComponentMolfiles]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1497,25 +1512,15 @@ export default function ReactionsPage({
               structures from the same Ketcher canvas.
             </p>
 
-            {displayPathways.length > 1 ? (
-              <section aria-label="Outcomes at a glance" className="outcomes-overview" data-testid="outcomes-overview">
-                <h3>Outcomes at a glance</h3>
-                <p>
-                  {displayPathways.length} supported outcomes. These are <strong>alternatives</strong> for different reagents or conditions, not consecutive steps; choose a reagent to see its product.
-                  {" "}{displayPathways.filter((pathway) => pathway.productStatus === "computed").length} with a computed product,
-                  {" "}{displayPathways.filter((pathway) => pathway.productStatus !== "computed").length} representative, generic or conceptual (read each card's status label). Predictions are rule-based estimates, not experimental results.
-                </p>
-                <ol className="outcomes-index">
-                  {visiblePathways.map((pathway) => (
-                    <li key={pathway.id}><button className="related-link" onClick={() => document.getElementById(`pathway-${pathway.id}`)?.scrollIntoView({ block: "start", behavior: "auto" })} type="button">{displayPathwayTitle(pathway)}</button></li>
-                  ))}
-                </ol>
-              </section>
-            ) : null}
-
-            <div className="reaction-pathway-list">
-              {visiblePathways.map((pathway) => (
-                <div className="reaction-pathway-card" id={`pathway-${pathway.id}`} key={pathway.id}>
+            <ReactionResultsExplorer
+              candidateCount={pathways.length}
+              expanded={expandedIds}
+              noReactionCount={noReactionOutcomes.length}
+              onSetExpanded={setExpandedRows}
+              onToggleRow={toggleExpandedRow}
+              outcomes={displayPathways}
+              renderBody={(pathway) => (
+                <div className="reaction-pathway-card" id={`pathway-${pathway.id}`}>
                   <div className="reaction-card-heading">
                     <div>
                       <h3>{displayPathwayTitle(pathway)}</h3>
@@ -1701,8 +1706,9 @@ export default function ReactionsPage({
                     </p>
                   )}
                 </div>
-              ))}
-            </div>
+              )}
+              substrate={reactionInputName || ""}
+            />
             {noReactionOutcomes.length > 0 && (
               <div className="no-reaction-section">
                 <h3>Applicable NO REACTION conditions for this substrate</h3>
@@ -1732,22 +1738,6 @@ export default function ReactionsPage({
               </div>
             )}
 
-            {visiblePathways.length < displayPathways.length && (
-              <button
-                className="secondary-button load-more-button"
-                onClick={() =>
-                  setVisibleResultCount((count) => count + RESULTS_PER_BATCH)
-                }
-                type="button"
-              >
-                Show{" "}
-                {Math.min(
-                  RESULTS_PER_BATCH,
-                  displayPathways.length - visiblePathways.length,
-                )}{" "}
-                more reactions
-              </button>
-            )}
           </>
         )
       ) : retroPathways.length === 0 ? (

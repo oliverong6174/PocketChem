@@ -40,6 +40,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
   import "./App.css";
   import "./styles/ui.css";
   import "./styles/concepts.css";
+  import "./styles/organic.css";
   import { AppShell } from "./components/shell/AppShell";
   import {
     analyzeChirality,
