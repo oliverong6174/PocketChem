@@ -55,6 +55,8 @@ import { useSavedAnalysisOpen } from "../utils/persistence/useSavedAnalysisOpen"
 import type { Capture, RecoveryOutcome } from "../utils/persistence/workspacePersistence";
 import type { WorkspaceResults } from "../utils/persistence/workspaceStore";
 import { Callout, ToolHeader } from "./ui/primitives";
+import { WorkspaceRoutePanel } from "./multicatalytic/RouteViews";
+import { buildWorkspaceOverview } from "../utils/reactions/engine/workspaceRoute";
 
 type SvgMap = Record<string, string | null>;
 type Selection = { ruleId: string | null; lotIds: string[] };
@@ -596,6 +598,7 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
     [workspace, vesselSteps],
   );
   const pending = workspace ? pendingSelection(workspace) : null;
+  const overview = useMemo(() => (workspace ? buildWorkspaceOverview(workspace) : null), [workspace]);
   const assessed = workspace && assessment.workspace === workspace ? assessment.data : null;
   const expectedMolecules = requirement?.arity ?? 1;
   const selectionReady =
@@ -983,10 +986,22 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
         </article>
       )}
 
+      {overview && overview.supplied.length > 0 && workspace && workspace.history.length > 0 && (
+        <WorkspaceRoutePanel nameOf={label} overview={overview} svgOf={(smiles) => svgs[smiles]} />
+      )}
+
       {workspace && workspace.history.length > 0 && (
         <section aria-label="Reaction history" className="multicatalytic-results">
-          <h3>History</h3>
-          <div className="multicatalytic-route-steps">{workspace.history.map(renderStep)}</div>
+          <h3>Step-by-step details</h3>
+          <p className="mc-caveat">Each attempt, with its conditions, what it consumed and made, selectivity and cautions. The latest attempt and any without a product are open.</p>
+          <div className="multicatalytic-route-steps">
+            {workspace.history.map((step, index) => (
+              <details className="mc-step-details" data-testid="mc-step-details" key={step.attempt} open={index === workspace.history.length - 1 || isUnresolvedStep(step)}>
+                <summary>Attempt {step.attempt}{step.committedStep !== null ? ` · step ${step.committedStep}` : ""}: {step.title} — {STEP_STATUS_CHIP[step.status]}</summary>
+                {renderStep(step)}
+              </details>
+            ))}
+          </div>
         </section>
       )}
 

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import { ToolHeader } from "./ui/primitives";
+import { SequenceRoutePanel } from "./multicatalytic/RouteViews";
+import { buildSequenceOverview } from "../utils/reactions/engine/sequenceOverview";
 import ReactionWorkspacePanel from "./ReactionWorkspacePanel";
 import {
   analyzeFunctionalGroupHierarchy,
@@ -133,6 +135,16 @@ function OrderedSequencePanel() {
   const [startingSmiles, setStartingSmiles] = useState("");
   const [startingName, setStartingName] = useState("");
   const [svgs, setSvgs] = useState<SvgMap>({});
+  // Which sequence outcome's detail is open. The choice belongs to one run; a new run starts at the engine's first outcome.
+  const [selectedOutcome, setSelectedOutcome] = useState<{ source: unknown; index: number }>({ source: null, index: 0 });
+  const activeOutcome = selectedOutcome.source === branches ? Math.min(selectedOutcome.index, Math.max(0, branches.length - 1)) : 0;
+  const sequenceOverview = useMemo(() => buildSequenceOverview(startingSmiles, branches), [startingSmiles, branches]);
+  const nameLookup = useMemo(() => {
+    const known = new Map<string, string>();
+    if (startingSmiles && startingName) known.set(startingSmiles, startingName);
+    for (const branch of branches) for (const step of branch.steps) if (step.status === "reaction" && step.productLabel && !known.has(step.productSmiles)) known.set(step.productSmiles, step.productLabel);
+    return known;
+  }, [startingSmiles, startingName, branches]);
   const [isRunning, setIsRunning] = useState(false);
   // Legacy diagnostic mode: keep applying later conditions to the last established molecule after a
   // step that formed no product. Off by default; its results are provisional.
@@ -411,8 +423,20 @@ function OrderedSequencePanel() {
       )}
 
       {branches.length > 0 && (
+        <SequenceRoutePanel
+          nameOf={(smiles) => nameLookup.get(smiles) ?? smiles}
+          onSelect={(index) => setSelectedOutcome({ source: branches, index })}
+          overview={sequenceOverview}
+          selectedIndex={activeOutcome}
+          stepSvg={(branchId, stepNumber) => svgs[`${branchId}-${stepNumber}`]}
+          svgOf={(smiles) => (smiles === startingSmiles ? svgs.start : null)}
+        />
+      )}
+
+      {branches.length > 0 && (
         <div className="multicatalytic-results">
-          {branches.map((branch, branchIndex) => (
+          <h3>Step-by-step details of outcome #{activeOutcome + 1}</h3>
+          {branches.map((branch, branchIndex) => branchIndex !== activeOutcome ? null : (
             <article className="reaction-pathway-card" key={branch.id}>
               <div className="reaction-card-heading">
                 <div>
