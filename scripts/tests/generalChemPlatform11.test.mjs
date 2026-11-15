@@ -35,7 +35,7 @@ describe("subject registry", () => {
   test("[subjects] five subjects; Organic, General, Physics and Biology are available, Biochemistry became available in Stage 17", () => {
     assert.deepEqual(S.SUBJECTS.map((s) => s.id), ["organic", "general", "physics", "biology", "biochemistry"]);
     for (const id of ["organic", "general", "physics", "biology", "biochemistry"]) assert.equal(S.isAvailable(id), true, id);
-    assert.deepEqual(S.SUBJECT_TOOLS.biochemistry.map((t) => t.id), ["bcOverview", "bcAminoAcids", "bcProteins", "bcEnzymes", "bcSaved"]);
+    assert.deepEqual(S.SUBJECT_TOOLS.biochemistry.map((t) => t.id), ["bcOverview", "bcAminoAcids", "bcProteins", "bcEnzymes", "bcGlycolysis", "bcGluconeogenesis", "bcTca", "bcEtc", "bcMetabolism", "bcSaved"]);
   });
   test("[modes] Workbench: Organic, General, Physics; Interactive Learning: Biology, Biochemistry", () => {
     const by = (mode) => S.SUBJECTS.filter((s) => s.mode === mode).map((s) => s.id);
@@ -251,7 +251,7 @@ describe("General Chemistry in the Saved Analyses library", () => {
   test("[app] the app library registers the genchem validators and the page list used by the library", () => {
     const src = read("src", "utils", "persistence", "analysisLibraryApp.ts");
     assert.match(src, /genchem: \{\s*engineVersion: GENCHEM_ENGINE_VERSION,\s*validateInputs: validateGenChemInputs,\s*validateResults: validateGenChemResults,/);
-    assert.match(read("src", "utils", "persistence", "analysisLibrary.ts"), /"conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "aminoacids", "proteins", "enzymes"]/);
+    assert.match(read("src", "utils", "persistence", "analysisLibrary.ts"), /"conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"]/);
   });
   test("[workspace] autosave store keeps the General Chemistry workspace separate from every organic page", async () => {
     const backend = new store.MemoryBackend();
