@@ -1,4 +1,8 @@
 import { useMemo, useState } from "react";
+import { useNavigation } from "../../navigation/NavigationContext";
+import { putHandoff } from "../../utils/biology/handoff16";
+import { prepareMrnaContext } from "../../utils/concepts/context";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Legend, Panel, Segmented, ToolHeader } from "../ui/primitives";
 import { NumberField } from "../generalChem/shared";
@@ -41,6 +45,8 @@ export default function TranscriptionPage({ openRequest = null, onOpenHandled }:
   const player = useStepPlayer(step, max, setStep);
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [handoffError, setHandoffError] = useState<string | null>(null);
+  const { openDestination } = useNavigation();
   const mode = raw.mode;
   const cur = model ? model.steps[step] : null;
   const hide = mode === "practice" && !revealed;
@@ -163,6 +169,8 @@ export default function TranscriptionPage({ openRequest = null, onOpenHandled }:
                     <dt>First-AUG peptide</dt><dd data-testid="mature-peptide">{model.translation ? `${model.translation.protein || "(none)"} (${model.translation.status})` : "no AUG: no peptide"}</dd>
                   </dl>
                   <button className="secondary-button" onClick={() => { void navigator.clipboard?.writeText(mature).then(() => setCopied(true), () => setCopied(false)); }} type="button">{copied ? "Copied" : "Copy the mRNA for the Translation tool"}</button>
+                  <button className="secondary-button" data-testid="to-translation" onClick={() => { const c = prepareMrnaContext(mature, raw.input.organism); if (c.ok) { putHandoff({ to: "translation", mrna: c.value.mrna, organism: c.value.organism, source: "the Transcription tool" }); openDestination({ subject: "biology", toolId: "bioTranslation" }); } else setHandoffError(c.error); }} type="button">Open this mRNA in Translation</button>
+                  <p className="ph-note">Replaces the mRNA in the Translation tool with this finished mRNA (cap and tail omitted). {handoffError}</p>
                   {euk && !model.polyA ? <p className="ph-note">No AAUAAA signal was found, so no cleavage or poly(A) tail is shown.</p> : null}
                   {euk && model.polyA?.short ? <p className="ph-note">Fewer than 15 nt follow the AAUAAA signal, so cleavage is placed at the end of the RNA.</p> : null}
                 </Panel>
@@ -195,6 +203,7 @@ export default function TranscriptionPage({ openRequest = null, onOpenHandled }:
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{TRANSCRIPTION_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>
+      <RelatedConcepts subject="biology" toolId="bioTranscription" />
     </div>
   );
 }

@@ -49,6 +49,7 @@ const PATHS = {
   external: "M14 4h6v6m0-6L10 14M18 14v6H4V6h6",
   refresh: "M20 5v5h-5M4 19v-5h5m11-4a8 8 0 00-14-3M4 14a8 8 0 0014 3",
   flip: "M4 8h13l-3-3m3 3l-3 3M20 16H7l3-3m-3 3l3 3",
+  search: "M11 4a7 7 0 100 14 7 7 0 000-14zm5 12l4.5 4.5",
 } as const;
 
 export type IconName = keyof typeof PATHS;

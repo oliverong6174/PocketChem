@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import "../../styles/generalChem.css";
 import "../../styles/physics.css";
 import { type ChartSeries } from "../ui/LineChart";
@@ -279,6 +280,7 @@ export default function EnergyPage({ openRequest = null, onOpenHandled }: Props)
           <li>Not modelled: air resistance, springs with mass or damping, non-Hookean springs, rolling, curved tracks, a block that leaves the end of the track, and impact at the end of a fall.</li>
         </ul>
       </Panel>
+      <RelatedConcepts subject="physics" toolId="phEnergy" />
     </div>
   );
 }

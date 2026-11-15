@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import "../../styles/generalChem.css";
 import { LineChart, type ChartBand, type ChartMarker, type ChartSeries } from "../ui/LineChart";
 import { LearningModeSwitch, type LearningMode } from "../ui/LearningModeSwitch";
@@ -374,6 +375,7 @@ export default function ThermodynamicsPage({ openRequest = null, onOpenHandled }
           <li>Hess's law needs balanced equations measured at the same temperature with consistent states. Calorimetry assumes no heat loss and constant specific heats.</li>
         </ul>
       </Panel>
+      <RelatedConcepts subject="general" toolId="gcThermo" />
     </div>
   );
 }

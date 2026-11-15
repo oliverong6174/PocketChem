@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import "../../styles/generalChem.css";
 import { LineChart, type ChartMarker, type ChartSeries } from "../ui/LineChart";
 import { LearningModeSwitch, type LearningMode } from "../ui/LearningModeSwitch";
@@ -465,6 +466,7 @@ export default function KineticsPage({ openRequest = null, onOpenHandled }: Prop
           <li>Arrhenius assumes constant A and Ea over the temperature range; it is an empirical description, not a prediction for an unmeasured mechanism.</li>
         </ul>
       </Panel>
+      <RelatedConcepts subject="general" toolId="gcKinetics" />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../ui/primitives";
 import { LineChart } from "../ui/LineChart";
@@ -333,6 +334,7 @@ export default function AminoAcidsPage({ openRequest = null, onOpenHandled }: Pr
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{AMINOACIDS_ASSUMPTIONS.map((x) => <li key={x}>{x}</li>)}</ul>
       </Panel>
+      <RelatedConcepts subject="biochemistry" toolId="bcAminoAcids" />
     </div>
   );
 }

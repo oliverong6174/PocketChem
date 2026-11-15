@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import "../../styles/generalChem.css";
 import "../../styles/physics.css";
 import { LineChart, type ChartMarker, type ChartSeries } from "../ui/LineChart";
@@ -259,6 +260,7 @@ export default function RcPage({ openRequest = null, onOpenHandled }: Props) {
           <li>Not modelled: several capacitors or loops, inductors (RL and RLC circuits), a non-ideal source, a leaky or non-linear capacitor, a switch with its own resistance or bounce.</li>
         </ul>
       </Panel>
+      <RelatedConcepts subject="physics" toolId="phRc" />
     </div>
   );
 }

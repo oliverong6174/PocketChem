@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../ui/primitives";
 import { useGcWorkspace } from "../generalChem/useGcWorkspace";
@@ -247,6 +248,7 @@ export default function RegulationPage({ openRequest = null, onOpenHandled }: Pr
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{REGULATION_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>
+      <RelatedConcepts subject="biology" toolId="bioRegulation" />
     </div>
   );
 }

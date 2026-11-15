@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../ui/primitives";
 import { LineChart, type ChartMarker, type ChartSeries } from "../ui/LineChart";
@@ -284,6 +285,7 @@ export default function EnzymesPage({ openRequest = null, onOpenHandled }: Props
       </div>
 
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits"><ul className="gc-assumptions">{ENZYMES_ASSUMPTIONS.map((x) => <li key={x}>{x}</li>)}</ul></Panel>
+      <RelatedConcepts subject="biochemistry" toolId="bcEnzymes" />
     </div>
   );
 }

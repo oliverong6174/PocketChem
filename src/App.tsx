@@ -18,6 +18,10 @@
 import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import MoleculeDrawer, { type KetcherApi } from "./components/MoleculeDrawer";
 import { ToolHeader } from "./components/ui/primitives";
+import { ConceptSearch } from "./components/shell/ConceptSearch";
+import { NavigationContext } from "./navigation/NavigationContext";
+import type { ConceptDestination } from "./utils/concepts/conceptIndex";
+import "./styles/concepts.css";
 import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type BiologyToolId, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
   import {
     applyResolvedNameToIdentity,
@@ -665,6 +669,33 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
       return () => window.removeEventListener("popstate", onPop);
     }, []);
 
+
+    // ---- Stage 19: global concept search and cross-subject navigation --------------------------------
+    const [searchState, setSearchState] = useState<{ open: boolean; query: string }>({ open: false, query: "" });
+    const openSearch = useCallback((query = "") => setSearchState({ open: true, query }), []);
+    const closeSearch = useCallback(() => setSearchState((current) => ({ ...current, open: false })), []);
+    // Opens a tool of any subject through the same switch functions as the tab bar, so unsaved work is flushed first and
+    // Back/Forward follow the address bar. Opening a tool never changes another tool's inputs.
+    const openDestination = (destination: ConceptDestination) => {
+      if (destination.subject === "organic") {
+        if (activeSubject === "organic") switchPage(destination.toolId as AppPage);
+        else switchSubject("organic", { page: destination.toolId as AppPage });
+      } else if (destination.subject === activeSubject) switchGeneralTool(destination.toolId as SubjectToolId);
+      else switchSubject(destination.subject, { tool: destination.toolId as SubjectToolId });
+    };
+    const openDestinationRef = useRef(openDestination);
+    useEffect(() => { openDestinationRef.current = openDestination; });
+    const navigation = useMemo(() => ({ openDestination: (destination: ConceptDestination) => openDestinationRef.current(destination), openSearch }), [openSearch]);
+    useEffect(() => {
+      const onKey = (event: KeyboardEvent) => {
+        if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === "k") {
+          event.preventDefault();
+          setSearchState((current) => (current.open ? current : { open: true, query: "" }));
+        }
+      };
+      window.addEventListener("keydown", onKey);
+      return () => window.removeEventListener("keydown", onKey);
+    }, []);
 
     // ---- Saved Analyses for Properties (Stage 8B-3B-2) ---------------------------------------------
     // "Save Analysis" copies the finished analysis (structure, groups, acid/base, resonance,
@@ -1943,18 +1974,21 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
   {/*RETURN STATEMENT*/}
 
   return (
+    <NavigationContext.Provider value={navigation}>
     <main className="app" ref={appShellRef}>
       {activeSubject === "organic" ? (
         <AppShell
           activeToolId={activePage}
           onSelectTool={(id) => switchPage(id as AppPage)}
           onToolKeyDown={(event, id) => handlePageTabKeyDown(event, id as AppPage)}
+          onOpenSearch={() => openSearch()}
           onSelectSubject={(id) => switchSubject(id)}
         />
       ) : (
         <AppShell
           activeSubject={activeSubject}
           activeToolId={generalTool}
+          onOpenSearch={() => openSearch()}
           onSelectSubject={(id) => switchSubject(id)}
           onSelectTool={(id) => switchGeneralTool(id as SubjectToolId)}
           onToolKeyDown={(event, id) => handleGeneralTabKeyDown(event, id as SubjectToolId)}
@@ -2909,6 +2943,8 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
       )}
     </div>
     </main>
+    <ConceptSearch initialQuery={searchState.query} onClose={closeSearch} onOpenDestination={openDestination} onOpenSaved={(analysis) => openSavedAnalysis(analysis)} open={searchState.open} />
+    </NavigationContext.Provider>
   );
 }
 

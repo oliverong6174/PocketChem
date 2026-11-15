@@ -15,6 +15,8 @@ interface Props {
   tools?: ToolDef[];
   activeSubject?: SubjectId;
   onSelectSubject?: (id: SubjectId) => void;
+  /** Opens the global concept search (Ctrl/Cmd+K does the same). */
+  onOpenSearch?: () => void;
 }
 
 function BrandMark() {
@@ -33,7 +35,7 @@ function BrandMark() {
  *  - <  960px: one compact bar whose "current tool" button opens a full-height sheet with every tool,
  *    its description, the subject list and the theme control (large touch targets, focus-trapped).
  */
-export function AppShell({ activeToolId, onSelectTool, onToolKeyDown, tools = ORGANIC_TOOLS, activeSubject = "organic", onSelectSubject }: Props) {
+export function AppShell({ activeToolId, onSelectTool, onToolKeyDown, tools = ORGANIC_TOOLS, activeSubject = "organic", onSelectSubject, onOpenSearch }: Props) {
   const { preference, setPreference } = useTheme();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [preview, setPreview] = useState<SubjectDef | null>(null);
@@ -57,6 +59,14 @@ export function AppShell({ activeToolId, onSelectTool, onToolKeyDown, tools = OR
           <div className="shell-subject">
             <SubjectPicker activeSubject={activeSubject} onPreview={setPreview} onSelectSubject={onSelectSubject} />
           </div>
+
+          {onOpenSearch ? (
+            <button aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K" aria-label="Search concepts and tools" className="shell-search" data-testid="open-search" onClick={onOpenSearch} type="button">
+              <Icon name="search" size={16} />
+              <span className="shell-search-text">Search</span>
+              <kbd className="shell-search-key">Ctrl K</kbd>
+            </button>
+          ) : null}
 
           <button
             aria-expanded={sheetOpen}

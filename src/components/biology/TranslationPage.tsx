@@ -1,4 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { takeHandoff } from "../../utils/biology/handoff16";
+import { prepareMrnaContext } from "../../utils/concepts/context";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Legend, Panel, Segmented, ToolHeader } from "../ui/primitives";
 import { useGcWorkspace } from "../generalChem/useGcWorkspace";
@@ -48,6 +51,19 @@ export default function TranslationPage({ openRequest = null, onOpenHandled, onO
     onOpenHandled,
   });
   const { raw, update } = ws;
+  // An mRNA sent from the Transcription tool (the user clicked the button there): taken once, validated, then saved in this tool's own state.
+  const [arrivalNote, setArrivalNote] = useState<string | null>(null);
+  useEffect(() => {
+    const h = takeHandoff("translation");
+    if (!h) return;
+    const ok = prepareMrnaContext(h.mrna, h.organism);
+    if (ok.ok) {
+      update((c) => ({ ...c, input: { ...c.input, mrna: ok.value.mrna, organism: ok.value.organism, start: null, step: 0 } }));
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- takes the one-shot hand-off slot (an external value) once at mount
+      setArrivalNote(`Loaded the mRNA (${ok.value.mrna.length} bases, ${ok.value.organism === "bacteria" ? "bacterial" : "eukaryotic"}) from ${h.source}.`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const setIn = (patch: Partial<TranslationInput>) => update((c) => ({ ...c, input: { ...c.input, ...patch, step: 0 } }));
   const check = useMemo(() => validateTranslationInput(raw.input), [raw.input]);
   const errors = check.ok ? null : check.errors;
@@ -88,6 +104,7 @@ export default function TranslationPage({ openRequest = null, onOpenHandled, onO
         {ws.actions}
       </div>
       {ws.saveFormEl}
+      {arrivalNote ? <Callout tone="info" title="mRNA received"><p data-testid="arrival-note">{arrivalNote}</p></Callout> : null}
 
       <div className="gc-layout">
         <Panel className="gc-inputs" subtitle="Choose an mRNA and an organism." title="mRNA">
@@ -174,6 +191,7 @@ export default function TranslationPage({ openRequest = null, onOpenHandled, onO
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{TRANSLATION_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>
+      <RelatedConcepts subject="biology" toolId="bioTranslation" />
     </div>
   );
 }

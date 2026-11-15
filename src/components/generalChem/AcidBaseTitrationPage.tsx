@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { NumberField } from "./shared";
 import "../../styles/generalChem.css";
 import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "../SavedAnalysisControls";
@@ -571,6 +572,7 @@ export default function AcidBaseTitrationPage({ openRequest = null, onOpenHandle
           <li>Values outside these ranges are refused rather than approximated. pH is shown to two decimals because the ideal-solution assumption limits real accuracy.</li>
         </ul>
       </Disclosure>
+      <RelatedConcepts subject="general" toolId="gcAcidBase" />
     </div>
   );
 }

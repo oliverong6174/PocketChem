@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { RelatedConcepts } from "../../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../../ui/primitives";
 import { useGcWorkspace } from "../../generalChem/useGcWorkspace";
@@ -183,6 +184,7 @@ export default function MetabolicMapPage({ openRequest = null, onOpenHandled, on
           <AssumptionsPanel items={METABOLIC_ASSUMPTIONS} />
         </div>
       </div>
+      <RelatedConcepts subject="biochemistry" toolId="bcMetabolism" />
     </div>
   );
 }

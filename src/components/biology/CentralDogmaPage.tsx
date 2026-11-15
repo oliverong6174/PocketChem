@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, Callout, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../ui/primitives";
 import { NumberField } from "../generalChem/shared";
@@ -237,6 +238,7 @@ export default function CentralDogmaPage({ openRequest = null, onOpenHandled }: 
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{DOGMA_ASSUMPTIONS.map((x) => <li key={x}>{x}</li>)}</ul>
       </Panel>
+      <RelatedConcepts subject="biology" toolId="bioDogma" />
     </div>
   );
 }

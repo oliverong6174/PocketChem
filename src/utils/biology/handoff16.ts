@@ -11,7 +11,9 @@ export type Handoff =
   | { to: "celldivision"; individual: Individual }
   | { to: "dogma"; coding: string; mutation: Mutation | null }
   /** Stage 17: a translated peptide sent to the Biochemistry peptide explorer. */
-  | { to: "peptide"; sequence: string; source: string };
+  | { to: "peptide"; sequence: string; source: string }
+  /** Stage 19: a finished mRNA sent from Transcription to Translation (validated again by the Translation validator on arrival). */
+  | { to: "translation"; mrna: string; organism: "bacteria" | "eukaryote"; source: string };
 
 let slot: Handoff | null = null;
 export const putHandoff = (h: Handoff): void => { slot = h; };

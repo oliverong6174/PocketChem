@@ -1,0 +1,160 @@
+/* Stage 19: global concept search and related-learning panel. Tokens only; both themes come from tokens.css. */
+
+.shell-search {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 40px;
+  padding: 0 var(--sp-3);
+  color: var(--text-muted);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font: inherit;
+  cursor: pointer;
+}
+.shell-search:hover { color: var(--text-strong); border-color: var(--border-strong); }
+.shell-search-key {
+  padding: 1px 6px;
+  font: 600 0.72rem/1.4 var(--font-mono, ui-monospace, monospace);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+}
+@media (max-width: 720px) {
+  .shell-search-text, .shell-search-key { display: none; }
+  .shell-search { min-width: 44px; min-height: 44px; justify-content: center; padding: 0; }
+}
+
+.concept-scrim { align-items: start; padding-top: min(12vh, 96px); }
+.concept-search {
+  width: min(680px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  max-height: calc(100dvh - 24px);
+  padding: var(--sp-4);
+}
+@media (max-width: 720px) {
+  .concept-scrim { padding: var(--sp-2); padding-top: var(--sp-2); }
+  .concept-search { max-height: calc(100dvh - 16px); }
+}
+.concept-input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-2) 0 var(--sp-3);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+.concept-input-row:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
+.concept-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  color: var(--text-strong);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  font-size: 1rem;
+}
+.concept-input::placeholder { color: var(--text-faint); }
+.concept-filters { display: grid; gap: var(--sp-2); }
+.concept-chips { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+.concept-chip {
+  min-height: 32px;
+  padding: 2px 10px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.concept-chip:hover { color: var(--text-strong); border-color: var(--border-strong); }
+.concept-chip[aria-pressed="true"] { color: var(--accent-contrast); background: var(--accent-solid); border-color: var(--accent-solid); }
+.concept-status { margin: 0; color: var(--text-faint); font-size: 0.8rem; }
+.concept-results {
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.concept-result {
+  display: grid;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-3);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+.concept-result:last-child { border-bottom: 0; }
+.concept-result.is-active { background: var(--surface-raised); box-shadow: inset 3px 0 0 var(--accent); }
+.concept-result-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-2); }
+.concept-result-title { color: var(--text-strong); font-weight: 600; }
+.concept-kind {
+  padding: 0 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+.concept-kind.kind-tool { color: var(--accent); border-color: var(--accent); }
+.concept-kind.kind-saved { color: var(--text-strong); border-style: dashed; }
+.concept-subject { color: var(--text-faint); font-size: 0.78rem; }
+.concept-result-summary { color: var(--text-muted); font-size: 0.86rem; }
+.concept-result-reason { color: var(--text-faint); font-size: 0.78rem; font-style: italic; }
+.concept-empty { color: var(--text-muted); font-size: 0.9rem; }
+.concept-empty p { margin: 0 0 var(--sp-2); }
+.concept-try { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1); }
+.concept-foot { margin: 0; color: var(--text-faint); font-size: 0.76rem; }
+.concept-foot kbd, .concept-search kbd {
+  padding: 0 5px;
+  font: 600 0.72rem/1.5 var(--font-mono, ui-monospace, monospace);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+}
+@media (max-width: 720px) { .concept-foot { display: none; } }
+
+/* ---- Related learning panel ---------------------------------------------------------------------------------- */
+.related-learning {
+  margin-top: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+.related-learning > h3 { margin: 0 0 var(--sp-2); font-size: 0.95rem; color: var(--text-strong); }
+.related-learning-note { margin: 0 0 var(--sp-2); color: var(--text-muted); font-size: 0.82rem; }
+.related-list { display: grid; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+.related-item { display: grid; gap: 2px; }
+.related-item-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-2); }
+.related-link {
+  min-height: 32px;
+  padding: 0;
+  color: var(--accent);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.related-link:hover { color: var(--text-strong); }
+.related-type { color: var(--text-faint); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.related-explain { margin: 0; color: var(--text-muted); font-size: 0.84rem; }
+@media (max-width: 720px) { .related-link { min-height: 44px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .concept-scrim, .concept-search { animation: none; }
+}
