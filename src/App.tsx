@@ -41,6 +41,8 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
   import "./styles/ui.css";
   import "./styles/concepts.css";
   import "./styles/organic.css";
+  import { PropertiesDetail, PropertiesIdentity, PropertiesSummary } from "./components/properties/PropertiesResults";
+  import { countGroups } from "./utils/propertiesSections";
   import { AppShell } from "./components/shell/AppShell";
   import {
     analyzeChirality,
@@ -176,10 +178,10 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
   ];
 
   const ANALYSIS_PANELS: Array<{ id: AnalysisPanel; label: string }> = [
-    { id: "overview", label: "Overview" },
+    { id: "overview", label: "Summary" },
     { id: "acidBase", label: "Acid/Base" },
     { id: "concepts", label: "Concepts" },
-    { id: "properties", label: "Properties" },
+    { id: "properties", label: "All properties" },
   ];
 
   const CONCEPT_OPTIONS: Array<{ id: AnnotationConcept; label: string }> = [
@@ -192,33 +194,6 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
     { id: "resonance", label: "Resonance Sites" },
     { id: "chirality", label: "Chirality" },
   ];
-
-  type PropertyTileProps = {
-    label: string;
-    value: string | number;
-    info: string;
-  };
-
-  function PropertyTile({ label, value, info }: PropertyTileProps) {
-    return (
-      <div className="property-tile">
-        <div className="property-tile-header">
-          <span>{label}</span>
-
-          <button
-            type="button"
-            className="info-button"
-            aria-label={`What is ${label}?`}
-            title={info}
-          >
-            ?
-          </button>
-        </div>
-
-        <strong>{value}</strong>
-      </div>
-    );
-  }
 
   function formatPkaRange(range: readonly [number, number]) {
     return `${range[0]}–${range[1]}`;
@@ -1972,6 +1947,9 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
     propertiesNotices.push({ tone: "warn", text: "The results were too large to save; your structure was saved without them." });
   }
 
+  const propertyGroups = useMemo(() => countGroups(functionalGroupOccurrences), [functionalGroupOccurrences]);
+  const propertyStereocenters = useMemo(() => chiralityResults.map((result) => ({ label: result.label, configuration: result.configuration })), [chiralityResults]);
+
   {/*RETURN STATEMENT*/}
 
   return (
@@ -2302,31 +2280,14 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
               />
             )}
 
-            <div className="dashboard-mini-grid">
-              <div>
-                <p className="label">Status</p>
-                <strong aria-live="polite">{status}</strong>
-              </div>
+            <p aria-live="polite" className="pr-status" data-testid="pr-status">
+              <span className="label">Status</span> <strong>{status}</strong>
+              {moleculeIdentity ? <span className="pr-status-meta"> · {reactionPathways.length} predicted {reactionPathways.length === 1 ? "reaction" : "reactions"}</span> : null}
+            </p>
 
-              <div>
-                <p className="label">Formula</p>
-                <strong>
-                  {moleculeIdentity?.properties.molecularFormula ?? "—"}
-                </strong>
-              </div>
-
-              <div>
-                <p className="label">DBE</p>
-                <strong>
-                  {moleculeIdentity?.properties.degreesOfUnsaturation ?? "—"}
-                </strong>
-              </div>
-
-              <div>
-                <p className="label">Reactions</p>
-                <strong>{reactionPathways.length}</strong>
-              </div>
-            </div>
+            {moleculeIdentity ? (
+              <PropertiesIdentity groups={propertyGroups} identity={moleculeIdentity} smiles={smiles} stereocenters={propertyStereocenters} />
+            ) : null}
 
             <div className="dashboard-tab-row">
               {ANALYSIS_PANELS.map((panel) => (
@@ -2349,84 +2310,11 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
             <div className="dashboard-panel-scroll">
               {analysisPanel === "overview" && (
                 <div className="dashboard-panel">
-                  <div className="analysis-section compact-section">
-                    <p className="label">SMILES</p>
-                    <p className="smiles-output">{smiles}</p>
-                  </div>
-
-                  <div className="analysis-section compact-section">
-                    <p className="label">Identity</p>
-
-                    {!moleculeIdentity ? (
-                      <p className="empty">
-                        Analyze a molecule to estimate its name, formula, DBE,
-                        and molecular properties.
-                      </p>
-                    ) : (
-                      <div className="group-card">
-                        <div className="group-card-header">
-                          <h3>
-                            {moleculeIdentity.nomenclature.displayName ||
-                              moleculeIdentity.nomenclature.estimatedName}
-                          </h3>
-                          <span>
-                            {moleculeIdentity.nomenclature.namingConfidence} {" "}
-                            confidence
-                          </span>
-                        </div>
-
-                        {moleculeIdentity.nomenclature.commonName && (
-                          <p>
-                            <strong>Common name:</strong> {" "}
-                            {moleculeIdentity.nomenclature.commonName}
-                          </p>
-                        )}
-
-                        <p>
-                          <strong>Main suffix:</strong> {" "}
-                          {moleculeIdentity.nomenclature.mainSuffix ??
-                            "Hydrocarbon / no suffix group detected"}
-                        </p>
-
-                        <p>{moleculeIdentity.nomenclature.explanation}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="analysis-section compact-section">
-                    <p className="label">Quick Counts</p>
-
-                    <div className="property-grid compact-properties">
-                      <PropertyTile
-                        label="Functional groups"
-                        value={functionalGroupOccurrences.length}
-                        info="Number of detected functional-group occurrences."
-                      />
-
-                      <PropertyTile
-                        label="Chiral centers"
-                        value={chiralityResults.length}
-                        info="Possible stereocenters detected from the structure."
-                      />
-
-                      <PropertyTile
-                        label="H-bond donors"
-                        value={
-                          moleculeIdentity?.properties.hydrogenBondDonors ?? "N/A"
-                        }
-                        info={PROPERTY_INFO.hbd}
-                      />
-
-                      <PropertyTile
-                        label="H-bond acceptors"
-                        value={
-                          moleculeIdentity?.properties.hydrogenBondAcceptors ??
-                          "N/A"
-                        }
-                        info={PROPERTY_INFO.hba}
-                      />
-                    </div>
-                  </div>
+                  {moleculeIdentity ? (
+                    <PropertiesSummary groups={propertyGroups} identity={moleculeIdentity} info={PROPERTY_INFO} smiles={smiles} stereocenters={propertyStereocenters} />
+                  ) : (
+                    <p className="empty">Analyze a molecule to estimate its name, formula, DBE, and molecular properties.</p>
+                  )}
                 </div>
               )}
 
@@ -2707,185 +2595,11 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
 
               {analysisPanel === "properties" && (
                 <div className="dashboard-panel">
-                  <div className="analysis-section compact-section">
-                    <p className="label">Nomenclature & Core Properties</p>
-
-                    {!moleculeIdentity ? (
-                      <p className="empty">
-                        Analyze a molecule to estimate its name, formula, DBE,
-                        and molecular properties.
-                      </p>
-                    ) : (
-                      <div className="group-list">
-                        <div className="group-card">
-                          <div className="group-card-header">
-                            <h3>
-                              {moleculeIdentity.nomenclature.displayName ||
-                                moleculeIdentity.nomenclature.estimatedName}
-                            </h3>
-
-                            <span>
-                              {moleculeIdentity.nomenclature.namingConfidence} {" "}
-                              confidence
-                            </span>
-                          </div>
-
-                          {moleculeIdentity.nomenclature.commonName && (
-                            <p>
-                              <strong>Common name:</strong> {" "}
-                              {moleculeIdentity.nomenclature.commonName}
-                            </p>
-                          )}
-
-                          <p>
-                            <strong>Parent chain:</strong> {" "}
-                            {moleculeIdentity.nomenclature.parentChain ??
-                              "Not assigned"}
-                            {moleculeIdentity.nomenclature.parentChainLength > 0
-                              ? ` (${moleculeIdentity.nomenclature.parentChainLength} C)`
-                              : ""}
-                          </p>
-
-                          <p>
-                            <strong>Main suffix:</strong> {" "}
-                            {moleculeIdentity.nomenclature.mainSuffix ??
-                              "Hydrocarbon / no suffix group detected"}
-                          </p>
-
-                          {moleculeIdentity.nomenclature.prefixes.length > 0 && (
-                            <p>
-                              <strong>Detected prefixes:</strong> {" "}
-                              {moleculeIdentity.nomenclature.prefixes.join(", ")}
-                            </p>
-                          )}
-
-                          <p>{moleculeIdentity.nomenclature.explanation}</p>
-
-                          <div className="limitation-list">
-                            {moleculeIdentity.nomenclature.limitations.map(
-                              (limitation) => (
-                                <p className="empty" key={limitation}>
-                                  {limitation}
-                                </p>
-                              )
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="property-grid compact-properties">
-                          <PropertyTile
-                            label="Formula"
-                            value={moleculeIdentity.properties.molecularFormula}
-                            info={PROPERTY_INFO.formula}
-                          />
-
-                          <PropertyTile
-                            label="DBE / unsaturation"
-                            value={
-                              moleculeIdentity.properties
-                                .degreesOfUnsaturation ?? "N/A"
-                            }
-                            info={PROPERTY_INFO.dbe}
-                          />
-
-                          <PropertyTile
-                            label="Molecular weight"
-                            value={
-                              moleculeIdentity.properties.molecularWeight
-                                ? `${moleculeIdentity.properties.molecularWeight} g/mol`
-                                : "N/A"
-                            }
-                            info={PROPERTY_INFO.molecularWeight}
-                          />
-
-                          <PropertyTile
-                            label="Exact mass"
-                            value={moleculeIdentity.properties.exactMass ?? "N/A"}
-                            info={PROPERTY_INFO.exactMass}
-                          />
-
-                          <PropertyTile
-                            label="Formal charge"
-                            value={moleculeIdentity.properties.formalCharge}
-                            info={PROPERTY_INFO.formalCharge}
-                          />
-
-                          <PropertyTile
-                            label="Heavy atoms"
-                            value={moleculeIdentity.properties.heavyAtomCount}
-                            info={PROPERTY_INFO.heavyAtoms}
-                          />
-
-                          <PropertyTile
-                            label="Water solubility"
-                            value={
-                              moleculeIdentity.properties.waterSolubilityTendency
-                                .level
-                            }
-                            info={PROPERTY_INFO.waterSolubility}
-                          />
-
-                          <PropertyTile
-                            label="Membrane permeability"
-                            value={
-                              moleculeIdentity.properties
-                                .membranePermeabilityTendency.level
-                            }
-                            info={PROPERTY_INFO.membranePermeability}
-                          />
-
-                          <PropertyTile
-                            label="Boiling point tendency"
-                            value={
-                              moleculeIdentity.properties.boilingPointTendency
-                                .level
-                            }
-                            info={PROPERTY_INFO.boilingPoint}
-                          />
-
-                          <PropertyTile
-                            label="Volatility"
-                            value={
-                              moleculeIdentity.properties.volatilityTendency.level
-                            }
-                            info={PROPERTY_INFO.volatility}
-                          />
-
-                          <PropertyTile
-                            label="H-bond donors"
-                            value={
-                              moleculeIdentity.properties.hydrogenBondDonors ??
-                              "N/A"
-                            }
-                            info={PROPERTY_INFO.hbd}
-                          />
-
-                          <PropertyTile
-                            label="H-bond acceptors"
-                            value={
-                              moleculeIdentity.properties.hydrogenBondAcceptors ??
-                              "N/A"
-                            }
-                            info={PROPERTY_INFO.hba}
-                          />
-
-                          <PropertyTile
-                            label="Rotatable bonds"
-                            value={
-                              moleculeIdentity.properties.rotatableBonds ?? "N/A"
-                            }
-                            info={PROPERTY_INFO.rotatableBonds}
-                          />
-
-                          <PropertyTile
-                            label="Rings"
-                            value={moleculeIdentity.properties.ringCount ?? "N/A"}
-                            info={PROPERTY_INFO.rings}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  {moleculeIdentity ? (
+                    <PropertiesDetail groups={propertyGroups} identity={moleculeIdentity} info={PROPERTY_INFO} smiles={smiles} stereocenters={propertyStereocenters} />
+                  ) : (
+                    <p className="empty">Analyze a molecule to estimate its name, formula, DBE, and molecular properties.</p>
+                  )}
                 </div>
               )}
             </div>
