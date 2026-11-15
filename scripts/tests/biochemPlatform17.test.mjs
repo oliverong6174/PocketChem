@@ -253,7 +253,10 @@ describe("Biology to peptide hand-off", () => {
     }
     assert.ok(checked >= 1, "at least one example translated");
     const src = read("src", "components", "biology", "PeptideHandoff.tsx");
-    assert.match(src, /slice\(0, PEPTIDE_LIMITS\.max\)/, "long peptides are cut to the limit and the page says so");
+    // Stage 19 moved the cut into the shared validated context (behaviour is tested in conceptRelations19); the component must use it and report it.
+    assert.match(src, /preparePeptideContext\(sequence\)/);
+    assert.match(src, /truncatedFrom/, "the page says when a long peptide was cut");
+    assert.match(read("src", "utils", "concepts", "context.ts"), /slice\(0, PEPTIDE_LIMITS\.max\)/, "long peptides are cut to the limit");
     assert.match(read("src", "components", "biology", "TranslationPage.tsx"), /<PeptideHandoff/);
     assert.match(read("src", "components", "biochem", "AminoAcidsPage.tsx"), /takeHandoff\("peptide"\)/);
   });

@@ -1888,6 +1888,11 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
             <code>{smiles}</code>
           </div>
         </div>
+        {result ? (
+          <p className="spectroscopy-estimate-note" data-testid="spectroscopy-estimate-note" role="note">
+            <strong>Predicted, not measured.</strong> These spectra are generated algorithmically from the structure. They are estimates, not experimental data.
+          </p>
+        ) : null}
 
         {activeTab === "mass" && massPreviewSvgs.length > 1 ? (
           <div

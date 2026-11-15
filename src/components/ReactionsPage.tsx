@@ -1497,9 +1497,25 @@ export default function ReactionsPage({
               structures from the same Ketcher canvas.
             </p>
 
+            {displayPathways.length > 1 ? (
+              <section aria-label="Outcomes at a glance" className="outcomes-overview" data-testid="outcomes-overview">
+                <h3>Outcomes at a glance</h3>
+                <p>
+                  {displayPathways.length} supported outcomes. These are <strong>alternatives</strong> for different reagents or conditions, not consecutive steps; choose a reagent to see its product.
+                  {" "}{displayPathways.filter((pathway) => pathway.productStatus === "computed").length} with a computed product,
+                  {" "}{displayPathways.filter((pathway) => pathway.productStatus !== "computed").length} representative, generic or conceptual (read each card's status label). Predictions are rule-based estimates, not experimental results.
+                </p>
+                <ol className="outcomes-index">
+                  {visiblePathways.map((pathway) => (
+                    <li key={pathway.id}><button className="related-link" onClick={() => document.getElementById(`pathway-${pathway.id}`)?.scrollIntoView({ block: "start", behavior: "auto" })} type="button">{displayPathwayTitle(pathway)}</button></li>
+                  ))}
+                </ol>
+              </section>
+            ) : null}
+
             <div className="reaction-pathway-list">
               {visiblePathways.map((pathway) => (
-                <div className="reaction-pathway-card" key={pathway.id}>
+                <div className="reaction-pathway-card" id={`pathway-${pathway.id}`} key={pathway.id}>
                   <div className="reaction-card-heading">
                     <div>
                       <h3>{displayPathwayTitle(pathway)}</h3>

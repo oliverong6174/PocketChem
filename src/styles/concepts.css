@@ -158,3 +158,62 @@
 @media (prefers-reduced-motion: reduce) {
   .concept-scrim, .concept-search { animation: none; }
 }
+
+/* ---- Stage 19: Organic results organisation (shared) ----------------------------------------------------------- */
+.ranking-basis { padding: var(--sp-3) var(--sp-4); }
+.ranking-basis ul { margin: var(--sp-1) 0 0; padding-left: 1.1rem; color: var(--text-muted); font-size: 0.88rem; }
+.ranking-basis p:not(.label) { margin: var(--sp-1) 0 0; color: var(--text-muted); font-size: 0.88rem; }
+.ranking-unranked { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text-faint); text-align: center; }
+.spectroscopy-estimate-note { margin: 0; padding: var(--sp-2) var(--sp-3); font-size: 0.85rem; color: var(--text-muted); border-left: 3px solid var(--warn-400); background: var(--surface-sunken); border-radius: var(--radius-sm, 6px); }
+
+/* The sticky, self-scrolling Spectroscopy input card hid the name field under the pinned action row on viewports shorter than the card.
+   Let it flow normally unless the viewport is tall enough to show it whole. */
+@media (min-width: 981px) and (max-height: 1199px) {
+  .spectroscopy-input-card { position: static; max-height: none; overflow: visible; }
+  .spectroscopy-input-card > .button-row { position: static; background: none; padding-top: 0; }
+}
+
+/* Route at a glance (Synthesis) */
+.route-glance { display: grid; gap: 4px; margin: var(--sp-2) 0; padding: var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-4); list-style: none; background: var(--surface-sunken); border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.9rem; }
+.route-glance-n { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); margin-right: 4px; }
+.route-glance-title { color: var(--text-strong); font-weight: 600; }
+.route-glance-reagent { color: var(--text-muted); }
+
+/* Reactions: outcomes overview */
+.outcomes-overview { margin: var(--sp-3) 0; padding: var(--sp-3) var(--sp-4); background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius-md); }
+.outcomes-overview h3 { margin: 0 0 var(--sp-1); font-size: 1rem; color: var(--text-strong); }
+.outcomes-overview p { margin: 0 0 var(--sp-2); color: var(--text-muted); font-size: 0.88rem; }
+.outcomes-index { display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-4); margin: 0; padding-left: 1.4rem; font-size: 0.88rem; }
+.outcomes-index li { min-width: 200px; }
+.reaction-pathway-card { scroll-margin-top: 80px; }
+
+/* Multi-Catalytic reaction list: rows were squeezed by the bounded grid so each subtitle overlapped the next row's title, and the
+   subtitle used a fixed light grey that is unreadable on the light theme. */
+.multicatalytic-search-results { grid-auto-rows: max-content; align-content: start; }
+.multicatalytic-condition-option { min-height: max-content; }
+.multicatalytic-condition-option small,
+.multicatalytic-sequence-list small { color: var(--text-muted); }
+
+/* The row carries the focus ring; the inner input must not add a second box (global input styles are more specific than .concept-input). */
+.concept-input-row input.concept-input,
+.concept-input-row input.concept-input:focus,
+.concept-input-row input.concept-input:focus-visible {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+/* Provenance panel (metabolism tools) */
+.provenance-panel { margin-top: var(--sp-3); }
+.provenance-note { margin: 0 0 var(--sp-2); color: var(--text-muted); font-size: 0.86rem; }
+.provenance-list { display: grid; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+.provenance-item { display: grid; gap: 2px; padding-bottom: var(--sp-2); border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+.provenance-item:last-child { border-bottom: 0; }
+.provenance-statement { color: var(--text-strong); }
+.provenance-sources, .provenance-caveat { color: var(--text-muted); font-size: 0.8rem; }
+.provenance-caveat { font-style: italic; }
+.provenance-sources a { color: var(--accent); }
+.pc-visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ranking-unranked { font-size: 1.2rem; }

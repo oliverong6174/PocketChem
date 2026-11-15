@@ -94,6 +94,26 @@ type RankingPageProps = {
   onOpenHandled?: (requestId: string) => void;
 };
 
+/** Explains how the order below was decided, from the same rows the cards use (presentation only). */
+function OrderingBasis({ direction, total, ranked, distinctRanks }: { direction: string; total: number; ranked: number; distinctRanks: number }) {
+  const unranked = total - ranked;
+  const ties = ranked - distinctRanks;
+  return (
+    <section aria-label="How the order was decided" className="card ranking-basis" data-testid="ranking-basis">
+      <p className="label">How the order was decided</p>
+      {direction === "none" ? (
+        <p>This is a side-by-side comparison, not a ranking: molecules are labelled A, B, C in the order you added them and no order is implied.</p>
+      ) : (
+        <ul>
+          <li>Molecules are ordered by the criterion above, {direction === "asc" ? "lowest value first" : "highest value first"}. Values come from PocketChem's estimation models, not measurements.</li>
+          <li><strong>{ranked}</strong> of {total} {total === 1 ? "molecule is" : "molecules are"} ranked{ties > 0 ? `; ${ties} ${ties === 1 ? "shares" : "share"} a rank with another because the values are equal` : ""}.</li>
+          {unranked > 0 ? <li><strong>{unranked}</strong> {unranked === 1 ? "molecule is" : "molecules are"} not ranked: no tabulated or computed value exists for this criterion, so it is left out of the order rather than given an invented one.</li> : null}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 export default function RankingPage({ openRequest = null, onOpenHandled }: RankingPageProps) {
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -806,6 +826,8 @@ export default function RankingPage({ openRequest = null, onOpenHandled }: Ranki
               </p>
             </section>
           ) : (
+            <>
+            <OrderingBasis direction={activeMode.direction} total={rankedRows.length} ranked={rankedRows.filter(({ molecule, metric }) => (metric.score !== null || Boolean(metric.sortVector)) && rankById.get(molecule.id) !== undefined).length} distinctRanks={new Set(rankedRows.map(({ molecule }) => rankById.get(molecule.id)).filter((rank) => rank !== undefined)).size} />
             <section className="ranking-results-list" aria-label={`${activeMode.label} results`}>
               {rankedRows.map(({ molecule, metric }) => {
                 const displayRank = rankById.get(molecule.id);
@@ -821,7 +843,7 @@ export default function RankingPage({ openRequest = null, onOpenHandled }: Ranki
                           <strong>#{displayRank}</strong>
                         </>
                       ) : (
-                        <span>—</span>
+                        <span className="ranking-unranked" title="No ranking for this comparison: the molecule has no tabulated or computed value for it."><span aria-hidden="true">—</span><span className="pc-visually-hidden">Not ranked</span></span>
                       )}
                     </div>
 
@@ -874,6 +896,7 @@ export default function RankingPage({ openRequest = null, onOpenHandled }: Ranki
                 );
               })}
             </section>
+            </>
           )}
         </main>
       </div>

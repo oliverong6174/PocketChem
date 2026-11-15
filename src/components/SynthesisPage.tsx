@@ -1706,6 +1706,14 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
             </span>
           </div>
 
+          {route.steps.length > 0 ? (
+            <ol aria-label={`Route at a glance, ${route.steps.length} ${route.steps.length === 1 ? "step" : "steps"}`} className="route-glance" data-testid="route-glance">
+              {route.steps.map((step) => (
+                <li key={step.id}><span className="route-glance-n">Step {step.stepNumber}</span> <span className="route-glance-title">{step.title}</span>{step.reagentLabel ? <span className="route-glance-reagent"> · {step.reagentLabel}</span> : null}</li>
+              ))}
+            </ol>
+          ) : null}
+
           <div className={`reaction-detail synthesis-quality synthesis-quality-${route.quality?.tier ?? "unassessed"}`} data-testid="route-quality">
             <p>
               <strong>Chemical quality (advisory, separate from structure verification):</strong>{" "}

@@ -21,7 +21,6 @@ import { ToolHeader } from "./components/ui/primitives";
 import { ConceptSearch } from "./components/shell/ConceptSearch";
 import { NavigationContext } from "./navigation/NavigationContext";
 import type { ConceptDestination } from "./utils/concepts/conceptIndex";
-import "./styles/concepts.css";
 import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type BiologyToolId, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
   import {
     applyResolvedNameToIdentity,
@@ -40,6 +39,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
   } from "./utils/resonanceUtils";
   import "./App.css";
   import "./styles/ui.css";
+  import "./styles/concepts.css";
   import { AppShell } from "./components/shell/AppShell";
   import {
     analyzeChirality,
