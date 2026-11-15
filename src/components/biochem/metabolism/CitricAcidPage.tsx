@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { ProvenancePanel } from "./ProvenancePanel";
 import { LearningModeSwitch } from "../../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../../ui/primitives";
 import { useGcWorkspace } from "../../generalChem/useGcWorkspace";
@@ -221,6 +222,7 @@ export default function CitricAcidPage({ openRequest = null, onOpenHandled }: Pr
           ) : null}
           {mode === "challenge" && view !== "cycle" ? <Callout tone="info" title="Challenge"><p>Switch to the Citric acid cycle view to predict each next reaction before it is revealed.</p></Callout> : null}
           <AssumptionsPanel items={METABOLIC_ASSUMPTIONS} />
+          <ProvenancePanel topics={["pyruvate-oxidation","tca","regulation"]} />
         </div>
       </div>
     </div>

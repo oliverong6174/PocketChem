@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { ProvenancePanel } from "./ProvenancePanel";
 import { LearningModeSwitch } from "../../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../../ui/primitives";
 import { LineChart } from "../../ui/LineChart";
@@ -147,6 +148,7 @@ export default function GlycolysisPage({ openRequest = null, onOpenHandled }: Pr
             <ChallengePanel items={challenges} index={raw.challenge} onNext={() => set({ challenge: raw.challenge + 1 })} onReveal={(p) => set({ signals: { ...NORMAL_SIGNALS, ...p.signals }, view: p.view })} />
           ) : null}
           <AssumptionsPanel items={METABOLIC_ASSUMPTIONS} />
+          <ProvenancePanel topics={["glycolysis","regulation"]} />
         </div>
       </div>
     </div>

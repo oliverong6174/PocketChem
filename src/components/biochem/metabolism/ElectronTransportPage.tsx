@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { ProvenancePanel } from "./ProvenancePanel";
 import { LearningModeSwitch } from "../../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../../ui/primitives";
 import { useGcWorkspace } from "../../generalChem/useGcWorkspace";
@@ -181,6 +182,7 @@ export default function ElectronTransportPage({ openRequest = null, onOpenHandle
             <ChallengePanel items={challenges} index={raw.challenge} onNext={() => set({ challenge: raw.challenge + 1 })} onReveal={(p) => update((c) => ({ ...c, condition: p.condition, donor: p.donor, view: p.view, step: Math.max(...donorsOf(p.donor).map((x) => DONORS[x].path.length)) }))} />
           ) : null}
           <AssumptionsPanel items={[...ETC_ASSUMPTIONS, ...METABOLIC_ASSUMPTIONS.slice(0, 2)]} />
+          <ProvenancePanel topics={["etc"]} />
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { ProvenancePanel } from "./ProvenancePanel";
 import { RelatedConcepts } from "../../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../../ui/primitives";
@@ -182,6 +183,7 @@ export default function MetabolicMapPage({ openRequest = null, onOpenHandled, on
           {mode === "practice" ? <QuizPanel questions={questions} /> : null}
           {mode === "challenge" ? <ChallengePanel items={challenges} index={raw.challenge} onNext={() => set({ challenge: raw.challenge + 1 })} onReveal={(p) => set({ scenario: p.scenario })} label="Apply the scenario to the map" /> : null}
           <AssumptionsPanel items={METABOLIC_ASSUMPTIONS} />
+          <ProvenancePanel topics={["glycolysis","gluconeogenesis","pyruvate-oxidation","tca","etc","regulation"]} />
         </div>
       </div>
       <RelatedConcepts subject="biochemistry" toolId="bcMetabolism" />

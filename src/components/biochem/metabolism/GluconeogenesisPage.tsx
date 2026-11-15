@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { ProvenancePanel } from "./ProvenancePanel";
 import { LearningModeSwitch } from "../../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../../ui/primitives";
 import { useGcWorkspace } from "../../generalChem/useGcWorkspace";
@@ -192,6 +193,7 @@ export default function GluconeogenesisPage({ openRequest = null, onOpenHandled 
             <ChallengePanel items={challenges} index={raw.challenge} onNext={() => set({ challenge: raw.challenge + 1 })} onReveal={(p) => set({ scenario: p.scenario, signals: { ...NORMAL_SIGNALS, ...signalsFor(p.scenario) }, view: p.view })} />
           ) : null}
           <AssumptionsPanel items={METABOLIC_ASSUMPTIONS} />
+          <ProvenancePanel topics={["gluconeogenesis","regulation"]} />
         </div>
       </div>
     </div>
