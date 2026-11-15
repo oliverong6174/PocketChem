@@ -1454,6 +1454,9 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
     workspaceNotices.push({ tone: "warn", text: "The results were too large to save; your structures were saved without them." });
   }
   const canDiscardRecovered = Boolean(resultMeta?.restored || inputsOnlyRestored);
+  // Which alternative route's detail is open. The choice belongs to one result set; a new search starts at the first route.
+  const [routeChoice, setRouteChoice] = useState<{ source: unknown; index: number }>({ source: null, index: 0 });
+  const activeRoute = routeChoice.source === routes ? Math.min(routeChoice.index, Math.max(0, routes.length - 1)) : 0;
 
   return (
     <section className={`synthesis-page${isSearching ? " is-searching" : ""}`}>
@@ -1686,7 +1689,27 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
         )}
       </div>
 
-      {routes.map((route) => (
+      {routes.length > 1 && (
+        <section aria-labelledby="route-alts" className="card route-alternatives" data-testid="route-alternatives">
+          <h2 id="route-alts">Alternative routes ({routes.length})</h2>
+          <p className="reaction-note">Each is a different set of steps from the starting materials to the target, in the order the search returned them. Choose one to see its steps and evidence below; none is proven optimal.</p>
+          <ul className="route-alt-list">
+            {routes.map((route, index) => (
+              <li key={route.id}>
+                <button aria-pressed={index === activeRoute} className={`route-alt${index === activeRoute ? " is-selected" : ""}`} data-testid="route-alt" onClick={() => setRouteChoice({ source: routes, index })} type="button">
+                  <span className="route-alt-n">Route {index + 1}</span>
+                  <span className="route-alt-main">
+                    <span className="route-alt-steps">{route.steps.length === 0 ? "A starting material already matches the target" : route.steps.map((step) => step.title).join(" → ")}</span>
+                    <span className="route-alt-meta">{route.steps.length} {route.steps.length === 1 ? "step" : "steps"} · {route.verification?.status === "verified" ? "Structure verified" : route.verification?.status === "connectivity-only" ? "Connectivity verified" : "Not replay-verified"}{route.quality ? ` · ${routeQualityLabel(route.quality.tier)}` : ""}</span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {routes.map((route, routeIndex) => routeIndex !== activeRoute ? null : (
         <div className="card synthesis-route-card" key={route.id}>
           <div className="synthesis-route-header">
             <div>

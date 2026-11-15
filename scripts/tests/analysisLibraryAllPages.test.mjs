@@ -285,7 +285,7 @@ describe("reactions saved analyses", () => {
     const page = read("src", "components", "ReactionsPage.tsx");
     const open = page.slice(page.indexOf("async function applySavedAnalysis"), page.indexOf("const savedOpen = useSavedAnalysisOpen"));
     for (const call of ["setReactantSvgs({})", "setProductSvgs({})", "setRetroTargetSvgs({})", "setRetroPrecursorSvgs({})"]) assert.ok(open.includes(call), call);
-    assert.match(page, /\}, \[visiblePathways, reactionMolfile, reactionSvgSnapshot, reactionComponentMolfiles\]\);/, "the product images are built from the pathways and molfiles on screen");
+    assert.match(page, /\}, \[expandedPathways, pathways, reactionMolfile, reactionSvgSnapshot, reactionComponentMolfiles\]\);/, "the product images are built from the pathways and molfiles on screen");
     assert.match(page, /\}, \[visibleRetroPathways\]\);/);
   });
 

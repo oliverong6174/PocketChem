@@ -175,3 +175,15 @@ h4 .pr-note { display: block; margin: 2px 0 0; }
   .pr-table th, .pr-table td { border: 0; padding: 2px 0; }
   .pr-naming div { grid-template-columns: 1fr; }
 }
+
+/* ---- Multi-Step alternative routes ------------------------------------------------------------------------------- */
+.route-alternatives h2 { margin: 0 0 var(--sp-2); font-size: 1.05rem; }
+.route-alt-list { display: grid; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+.route-alt { display: flex; align-items: center; gap: var(--sp-3); width: 100%; min-height: 56px; padding: var(--sp-2) var(--sp-3); color: var(--text); background: var(--surface-sunken); border: 1px solid var(--border); border-radius: var(--radius-md); font: inherit; text-align: left; cursor: pointer; }
+.route-alt:hover { border-color: var(--border-strong); }
+.route-alt.is-selected { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.route-alt-n { font-weight: 700; color: var(--accent); white-space: nowrap; }
+.route-alt-main { display: grid; gap: 2px; min-width: 0; }
+.route-alt-steps { font-weight: 600; color: var(--text-strong); overflow-wrap: anywhere; }
+.route-alt-meta { font-size: 0.8rem; color: var(--text-muted); }
+@media (max-width: 720px) { .route-alt { flex-wrap: wrap; } }
