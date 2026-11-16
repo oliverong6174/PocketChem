@@ -45,10 +45,10 @@ try {
   // ---------------- navigation ----------------
   await fresh(1440, "dark", "#/general/overview");
   const tabs = await ev(`[...document.querySelectorAll('.tool-tabs [role=tab]')].map((b) => b.textContent.trim()).join('|')`);
-  check("General Chemistry tabs: Overview, Acid–base & titration, Chemical equilibrium, Reaction kinetics, Thermodynamics, Saved", tabs === "Overview|Acid–base & titration|Chemical equilibrium|Reaction kinetics|Thermodynamics|Saved", tabs);
+  check("General Chemistry tabs: Overview, Stoichiometry, Gas laws, Acid–base & titration, Chemical equilibrium, Reaction kinetics, Thermodynamics, Electrochemistry, Saved", tabs === "Overview|Stoichiometry|Gas laws|Acid–base & titration|Chemical equilibrium|Reaction kinetics|Thermodynamics|Electrochemistry|Saved", tabs);
   const ov = await ev(`({ buttons: [...document.querySelectorAll('.gc-tool-card button')].map((b) => b.textContent.trim()), planned: [...document.querySelectorAll('.gc-planned li')].map((l) => l.querySelector('span').textContent.trim()), plannedButtons: document.querySelectorAll('.gc-planned button, .gc-planned a').length })`);
-  check("overview: four working tools with Open buttons", ov.buttons.length === 4 && ov.buttons.every((b) => /^Open /.test(b)), ov.buttons.join(" | "));
-  check("overview: planned items are non-interactive and no longer include thermochemistry", ov.plannedButtons === 0 && ov.planned.length === 4 && !ov.planned.some((p) => /thermo/i.test(p)), ov.planned.join(" | "));
+  check("overview: seven working tools with Open buttons", ov.buttons.length === 7 && ov.buttons.every((b) => /^Open /.test(b)), ov.buttons.join(" | "));
+  check("overview: planned items are non-interactive and no longer include thermochemistry", ov.plannedButtons === 0 && ov.planned.length === 3 && !ov.planned.some((p) => /thermo/i.test(p)), ov.planned.join(" | "));
   await screenshot(cdp, path.join(outDir, "overview-1440-dark.png"), { fullPage: false });
   await click("Open Chemical equilibrium");
   await waitTool(".gc-ice");
