@@ -105,6 +105,9 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
   const ForcesPage = lazy(() => import("./components/physics/ForcesPage"));
   const EnergyPage = lazy(() => import("./components/physics/EnergyPage"));
   const CollisionsPage = lazy(() => import("./components/physics/CollisionsPage"));
+const WavesPage = lazy(() => import("./components/physics/WavesPage"));
+const OpticsPage = lazy(() => import("./components/physics/OpticsPage"));
+const InterferencePage = lazy(() => import("./components/physics/InterferencePage"));
   const BiologyOverview = lazy(() => import("./components/biology/BiologyOverview"));
   const ReplicationPage = lazy(() => import("./components/biology/ReplicationPage"));
   const TranscriptionPage = lazy(() => import("./components/biology/TranscriptionPage"));
@@ -595,7 +598,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
         else switchSubject("general", { keepOpenRequest: true, tool: target });
         return;
       }
-      if (target === "phMechanics" || target === "phCircuits" || target === "phRc" || target === "phForces" || target === "phEnergy" || target === "phCollisions") {
+      if (target === "phMechanics" || target === "phCircuits" || target === "phRc" || target === "phForces" || target === "phEnergy" || target === "phCollisions" || target === "phWaves" || target === "phOptics" || target === "phInterference") {
         if (activeSubject === "physics") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("physics", { keepOpenRequest: true, tool: target });
         return;
@@ -2116,6 +2119,21 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
             ) : generalTool === "phCollisions" ? (
               <CollisionsPage
                 openRequest={pendingOpen?.page === "phCollisions" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phWaves" ? (
+              <WavesPage
+                openRequest={pendingOpen?.page === "phWaves" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phOptics" ? (
+              <OpticsPage
+                openRequest={pendingOpen?.page === "phOptics" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phInterference" ? (
+              <InterferencePage
+                openRequest={pendingOpen?.page === "phInterference" ? pendingOpen : null}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />
             ) : generalTool === "phRc" ? (

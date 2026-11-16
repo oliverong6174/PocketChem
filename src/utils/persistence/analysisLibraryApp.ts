@@ -10,8 +10,8 @@ import {
   validateEquilibriumInputs, validateEquilibriumResults, validateKineticsInputs, validateKineticsResults, validateThermoInputs, validateThermoResults,
 } from "./generalChemTools";
 import {
-  CIRCUITS_ENGINE_VERSION, COLLISIONS_ENGINE_VERSION, ENERGY_ENGINE_VERSION, FORCES_ENGINE_VERSION, MECHANICS_ENGINE_VERSION, RC_ENGINE_VERSION,
-  validateCircuitsInputs, validateCollisionsInputs, validateEnergyInputs, validateForcesInputs, validateMechanicsInputs, validatePhysicsResults, validateRcInputs,
+  CIRCUITS_ENGINE_VERSION, COLLISIONS_ENGINE_VERSION, INTERFERENCE_ENGINE_VERSION, OPTICS_ENGINE_VERSION, WAVES_ENGINE_VERSION, ENERGY_ENGINE_VERSION, FORCES_ENGINE_VERSION, MECHANICS_ENGINE_VERSION, RC_ENGINE_VERSION,
+  validateCircuitsInputs, validateCollisionsInputs, validateInterferenceInputs, validateOpticsInputs, validateWavesInputs, validateEnergyInputs, validateForcesInputs, validateMechanicsInputs, validatePhysicsResults, validateRcInputs,
 } from "./physicsTools";
 import {
   DOGMA_ENGINE_VERSION, REPLICATION_ENGINE_VERSION, TRANSCRIPTION_ENGINE_VERSION, TRANSLATION_ENGINE_VERSION,
@@ -45,7 +45,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -66,6 +66,9 @@ export const ANALYSIS_APP_PAGE = {
   forces: "phForces",
   energy: "phEnergy",
   collisions: "phCollisions",
+  waves: "phWaves",
+  optics: "phOptics",
+  interference: "phInterference",
   replication: "bioReplication",
   transcription: "bioTranscription",
   translation: "bioTranslation",
@@ -132,6 +135,9 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
       forces: { engineVersion: FORCES_ENGINE_VERSION, validateInputs: validateForcesInputs, validateResults: validatePhysicsResults },
       energy: { engineVersion: ENERGY_ENGINE_VERSION, validateInputs: validateEnergyInputs, validateResults: validatePhysicsResults },
       collisions: { engineVersion: COLLISIONS_ENGINE_VERSION, validateInputs: validateCollisionsInputs, validateResults: validatePhysicsResults },
+      waves: { engineVersion: WAVES_ENGINE_VERSION, validateInputs: validateWavesInputs, validateResults: validatePhysicsResults },
+      optics: { engineVersion: OPTICS_ENGINE_VERSION, validateInputs: validateOpticsInputs, validateResults: validatePhysicsResults },
+      interference: { engineVersion: INTERFERENCE_ENGINE_VERSION, validateInputs: validateInterferenceInputs, validateResults: validatePhysicsResults },
       replication: { engineVersion: REPLICATION_ENGINE_VERSION, validateInputs: validateReplicationInputs, validateResults: validateBiologyResults },
       transcription: { engineVersion: TRANSCRIPTION_ENGINE_VERSION, validateInputs: validateTranscriptionInputs, validateResults: validateBiologyResults },
       translation: { engineVersion: TRANSLATION_ENGINE_VERSION, validateInputs: validateTranslationInputs, validateResults: validateBiologyResults },

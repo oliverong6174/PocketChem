@@ -179,7 +179,7 @@ export function allowedHarmonic(kind: ResonatorKind, n: number): boolean {
   if (!Number.isInteger(n) || n < 1 || n > RESONATOR_LIMITS.maxN) return false;
   return kind === "closed" ? n % 2 === 1 : true;
 }
-export function allowedHarmonics(kind: ResonatorKind, count = RESONATOR_LIMITS.maxN): number[] {
+export function allowedHarmonics(kind: ResonatorKind, count: number = RESONATOR_LIMITS.maxN): number[] {
   const out: number[] = [];
   for (let n = 1; n <= count; n++) if (allowedHarmonic(kind, n)) out.push(n);
   return out;

@@ -212,3 +212,113 @@ export function describeCollisionsAnalysis(inputs: CollisionsInputs): string {
   const i = inputs.input;
   return `Collision: ${i.mA} kg at ${i.vA} m/s and ${i.mB} kg at ${i.vB} m/s, e = ${i.e}`.slice(0, 300);
 }
+
+
+// ---- waves and sound, geometric optics, interference and diffraction (Stage 21) ---------------------------------------------------
+
+import {
+  DEFAULT_DOPPLER, DEFAULT_RESONATOR, DEFAULT_SUPERPOSITION, DEFAULT_WAVE, dopplerGeometry, fundamentalFrequency, harmonicFrequency, superpositionEnd,
+  validateDoppler, validateResonator, validateSuperposition, validateWave,
+  type DopplerInput, type ResonatorInput, type SuperpositionInput, type WaveInput,
+} from "../physics/waves";
+import {
+  DEFAULT_IMAGING, DEFAULT_REFRACTION, validateImaging, validateRefraction, type ImagingInput, type RefractionInput,
+} from "../physics/optics";
+import { DEFAULT_SLITS, validateSlits, type SlitInput } from "../physics/interference";
+
+export const WAVES_ENGINE_VERSION = 1;
+export const OPTICS_ENGINE_VERSION = 1;
+export const INTERFERENCE_ENGINE_VERSION = 1;
+
+export const WAVE_VIEWS = ["travel", "superposition", "standing", "doppler"] as const;
+export type WaveView = (typeof WAVE_VIEWS)[number];
+export const WAVE_VIEW_LABEL: Record<WaveView, string> = { travel: "Traveling wave", superposition: "Superposition and beats", standing: "Standing waves and resonance", doppler: "Doppler effect" };
+
+export type WavesInputs = {
+  subject: "physics";
+  tool: "waves";
+  view: WaveView;
+  wave: WaveInput;
+  /** Draw the wave as a longitudinal (compression) wave instead of a transverse one. */
+  longitudinal: boolean;
+  sup: SuperpositionInput;
+  res: ResonatorInput;
+  dop: DopplerInput;
+  tNow: number;
+  speed: SpeedChoice;
+};
+export const DEFAULT_WAVES_INPUTS: WavesInputs = {
+  subject: "physics", tool: "waves", view: "travel", wave: DEFAULT_WAVE, longitudinal: false, sup: DEFAULT_SUPERPOSITION, res: DEFAULT_RESONATOR, dop: DEFAULT_DOPPLER, tNow: 0, speed: "real",
+};
+
+/** End of the time axis for the page that is showing (s). */
+export function wavesEnd(i: Pick<WavesInputs, "view" | "wave" | "sup" | "res" | "dop">): number {
+  if (i.view === "travel") return 3 / i.wave.f;
+  if (i.view === "superposition") return superpositionEnd(i.sup);
+  if (i.view === "standing") return 3 / harmonicFrequency(i.res.kind, i.res.L, i.res.v, i.res.n);
+  // The Doppler picture is dimensionless: time in source periods.
+  return dopplerGeometry(i.dop).tEnd;
+}
+
+export function validateWavesInputs(raw: unknown): WavesInputs | null {
+  if (!isObject(raw) || raw.subject !== "physics" || raw.tool !== "waves") return null;
+  if (typeof raw.view !== "string" || !(WAVE_VIEWS as readonly string[]).includes(raw.view)) return null;
+  if (typeof raw.longitudinal !== "boolean") return null;
+  const wave = validateWave(raw.wave);
+  const sup = validateSuperposition(raw.sup);
+  const res = validateResonator(raw.res);
+  const dop = validateDoppler(raw.dop);
+  if (!wave.ok || !sup.ok || !res.ok || !dop.ok) return null;
+  if (typeof raw.speed !== "string" || !SPEED_CHOICES.includes(raw.speed as SpeedChoice)) return null;
+  if (!finite(raw.tNow)) return null;
+  const out: WavesInputs = { subject: "physics", tool: "waves", view: raw.view as WaveView, wave: wave.value, longitudinal: raw.longitudinal, sup: sup.value, res: res.value, dop: dop.value, tNow: raw.tNow, speed: raw.speed as SpeedChoice };
+  if (!withinEnd(out.tNow, wavesEnd(out))) return null;
+  return out;
+}
+export function describeWavesAnalysis(i: WavesInputs): string {
+  if (i.view === "travel") return `Wave: ${i.wave.f} Hz, ${i.wave.v} m/s, A = ${i.wave.A} m, ${i.longitudinal ? "longitudinal" : "transverse"}`.slice(0, 300);
+  if (i.view === "superposition") return `Superposition: ${i.sup.w1.f} Hz and ${i.sup.w2.f} Hz in a ${i.sup.v} m/s medium`.slice(0, 300);
+  if (i.view === "standing") return `${i.res.kind === "string" ? "String" : i.res.kind === "open" ? "Open pipe" : "Closed pipe"}: L = ${i.res.L} m, harmonic ${i.res.n}, f = ${Number(harmonicFrequency(i.res.kind, i.res.L, i.res.v, i.res.n).toPrecision(4))} Hz`.slice(0, 300);
+  return `Doppler: ${i.dop.fs} Hz, source ${i.dop.vs} m/s, observer ${i.dop.vo} m/s, c = ${i.dop.c} m/s`.slice(0, 300);
+}
+export { fundamentalFrequency };
+
+export const OPTICS_VIEWS = ["imaging", "refraction"] as const;
+export type OpticsView = (typeof OPTICS_VIEWS)[number];
+export type OpticsInputs = { subject: "physics"; tool: "optics"; view: OpticsView; imaging: ImagingInput; refraction: RefractionInput };
+export const DEFAULT_OPTICS_INPUTS: OpticsInputs = { subject: "physics", tool: "optics", view: "imaging", imaging: DEFAULT_IMAGING, refraction: DEFAULT_REFRACTION };
+
+export function validateOpticsInputs(raw: unknown): OpticsInputs | null {
+  if (!isObject(raw) || raw.subject !== "physics" || raw.tool !== "optics") return null;
+  if (typeof raw.view !== "string" || !(OPTICS_VIEWS as readonly string[]).includes(raw.view)) return null;
+  const imaging = validateImaging(raw.imaging);
+  const refraction = validateRefraction(raw.refraction);
+  if (!imaging.ok || !refraction.ok) return null;
+  return { subject: "physics", tool: "optics", view: raw.view as OpticsView, imaging: imaging.value, refraction: refraction.value };
+}
+export function describeOpticsAnalysis(i: OpticsInputs): string {
+  if (i.view === "refraction") return `Refraction: n = ${i.refraction.n1} to ${i.refraction.n2} at ${i.refraction.theta1}°`.slice(0, 300);
+  const g = i.imaging;
+  return `${g.element === "lens" ? (g.f > 0 ? "Converging lens" : "Diverging lens") : g.f > 0 ? "Concave mirror" : "Convex mirror"}: f = ${g.f} cm, object at ${g.s} cm`.slice(0, 300);
+}
+
+export type InterferenceInputs = {
+  subject: "physics";
+  tool: "interference";
+  slits: SlitInput;
+  /** Height of the probe point on the screen, from the centre (mm). */
+  probeMm: number;
+};
+export const DEFAULT_INTERFERENCE_INPUTS: InterferenceInputs = { subject: "physics", tool: "interference", slits: DEFAULT_SLITS, probeMm: 4 };
+
+export function validateInterferenceInputs(raw: unknown): InterferenceInputs | null {
+  if (!isObject(raw) || raw.subject !== "physics" || raw.tool !== "interference") return null;
+  const slits = validateSlits(raw.slits);
+  if (!slits.ok) return null;
+  if (!finite(raw.probeMm) || Math.abs(raw.probeMm) > 1000 * slits.value.L * 0.5) return null;
+  return { subject: "physics", tool: "interference", slits: slits.value, probeMm: raw.probeMm };
+}
+export function describeInterferenceAnalysis(i: InterferenceInputs): string {
+  const s = i.slits;
+  return (s.N === 1 ? `Single slit: a = ${s.aUm} µm, λ = ${s.lambdaNm} nm` : s.N === 2 ? `Double slit: d = ${s.dUm} µm, a = ${s.aUm} µm, λ = ${s.lambdaNm} nm` : `${s.N}-slit grating: d = ${s.dUm} µm, λ = ${s.lambdaNm} nm`).slice(0, 300);
+}

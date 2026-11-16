@@ -156,3 +156,109 @@ export function summarizeCollisions(inputs: CollisionsInputs): PhysicsResults | 
     checkLabel: r.collides ? "final velocity of B (m/s)" : "total momentum (kg·m/s)",
   };
 }
+
+
+// ---- waves, optics, interference (Stage 21) --------------------------------------------------------------------------------------
+
+import { solveImaging, solveRefraction } from "./optics";
+import { summarizeSlits } from "./interference";
+import { classifySuperposition, harmonicFrequency, solveDoppler, waveQuantities } from "./waves";
+import {
+  INTERFERENCE_ENGINE_VERSION, OPTICS_ENGINE_VERSION, WAVES_ENGINE_VERSION,
+  type InterferenceInputs, type OpticsInputs, type WavesInputs,
+} from "../persistence/physicsTools";
+
+export const WAVES_ASSUMPTIONS = [
+  "Small-amplitude (linear) waves in a uniform, lossless medium: the wave speed is set by the medium and does not depend on frequency or amplitude, and nothing is damped. The amplitude is limited to 0.15 of the wavelength.",
+  "Superposition is exact addition of displacements. Two waves share one medium and so one wave speed. A true standing wave needs equal frequency and amplitude in opposite directions; other opposite-direction pairs are labelled partly standing.",
+  "Standing waves use the elementary boundary conditions: a string fixed at both ends, a pipe open at both ends and a pipe closed at one end, with no end correction, damping or driving model. Displacement (not pressure) is drawn.",
+  "Doppler effect for sound in a medium at rest and motion along the line joining source and observer, with speeds below the speed of sound: f′ = f (c + v_o)/(c − v_s). Supersonic sources (shock waves), motion across the line, wind and the relativistic Doppler shift of light are not modelled.",
+];
+export const OPTICS_ASSUMPTIONS = [
+  "A single thin lens or spherical mirror in the paraxial approximation: rays stay close to the axis and make small angles, so there are no spherical or chromatic aberrations and no lens thickness. Two-element systems are not modelled.",
+  "Real objects only (object distance positive). Sign convention: real images have s′ > 0; f > 0 for a converging lens or concave mirror. The mirror focal length is R/2.",
+  "Refraction at a flat boundary between two uniform transparent media with Snell's law. The reflected ray is drawn with angle of reflection equal to the angle of incidence; how much light is reflected and transmitted (Fresnel) is not calculated, and dispersion is ignored.",
+  "Principal rays are constructed from the standard rules and drawn from the same numbers as the equations; an image at infinity is reported as such, never as a very large number.",
+];
+export const INTERFERENCE_ASSUMPTIONS = [
+  "Monochromatic, coherent, scalar light and identical rectangular slits, observed in the far field (Fraunhofer): I/I₀ = sinc²β · [sin Nγ / (N sin γ)]². Settings whose Fresnel number exceeds 0.5 are refused, because the pattern would not be correct there.",
+  "The pattern is calculated at the true angle (screen position y = L tanθ), with no small-angle approximation in the intensity; the simple fringe spacing λL/d is labelled as small-angle.",
+  "Not modelled: finite source size or coherence, polarization, slits of different widths, thin-film and Michelson interference, and the angle dependence of the amplitude beyond the slit envelope. The colour is a display aid for the wavelength.",
+];
+
+export function summarizeWaves(inputs: WavesInputs): PhysicsResults | null {
+  const v = inputs.view;
+  if (v === "travel") {
+    const q = waveQuantities(inputs.wave);
+    return {
+      engineVersion: WAVES_ENGINE_VERSION,
+      headline: [
+        `Wavelength ${fmt(q.lambda)} m, period ${fmt(q.T)} s (v = fλ = ${fmt(inputs.wave.v)} m/s)`,
+        `Greatest particle speed ωA = ${fmt(q.omega * inputs.wave.A)} m/s, not the wave speed`,
+        `${inputs.longitudinal ? "Longitudinal" : "Transverse"} display, traveling toward ${inputs.wave.dir === 1 ? "+x" : "−x"}`,
+      ],
+      assumptions: WAVES_ASSUMPTIONS, check: q.lambda, checkLabel: "wavelength (m)",
+    };
+  }
+  if (v === "superposition") {
+    const c = classifySuperposition(inputs.sup);
+    return {
+      engineVersion: WAVES_ENGINE_VERSION,
+      headline: [c.title, `Largest amplitude ${fmt(c.maxAmplitude)} m, smallest ${fmt(c.minAmplitude)} m`, `Beat frequency |f₁ − f₂| = ${fmt(c.beatFrequency)} Hz`],
+      assumptions: WAVES_ASSUMPTIONS, check: c.maxAmplitude, checkLabel: "largest amplitude (m)",
+    };
+  }
+  if (v === "standing") {
+    const r = inputs.res;
+    const f = harmonicFrequency(r.kind, r.L, r.v, r.n);
+    return {
+      engineVersion: WAVES_ENGINE_VERSION,
+      headline: [`Harmonic ${r.n} at ${fmt(f)} Hz (fundamental ${fmt(harmonicFrequency(r.kind, r.L, r.v, 1))} Hz)`, `Wavelength ${fmt((r.kind === "closed" ? 4 : 2) * r.L / r.n)} m in a length of ${fmt(r.L)} m`],
+      assumptions: WAVES_ASSUMPTIONS, check: f, checkLabel: "frequency of the harmonic (Hz)",
+    };
+  }
+  const d = solveDoppler(inputs.dop);
+  return {
+    engineVersion: WAVES_ENGINE_VERSION,
+    headline: [`Observed frequency ${fmt(d.fObserved)} Hz from ${fmt(inputs.dop.fs)} Hz emitted (${d.trend === "same" ? "no shift" : d.trend})`, `Wavelength in the medium ${fmt(d.lambdaMedium)} m (${fmt(d.lambdaAtRest)} m at rest)`],
+    assumptions: WAVES_ASSUMPTIONS, check: d.fObserved, checkLabel: "observed frequency (Hz)",
+  };
+}
+
+export function summarizeOptics(inputs: OpticsInputs): PhysicsResults | null {
+  if (inputs.view === "refraction") {
+    const s = solveRefraction(inputs.refraction);
+    return {
+      engineVersion: OPTICS_ENGINE_VERSION,
+      headline: [
+        s.tir ? "Total internal reflection: no refracted ray" : `Refracted ray at ${fmt(s.theta2 as number)}° (${s.bending})`,
+        s.critical === null ? "No critical angle: light enters a denser medium" : `Critical angle ${fmt(s.critical)}°`,
+      ],
+      assumptions: OPTICS_ASSUMPTIONS, check: s.theta2 ?? s.thetaReflected, checkLabel: s.tir ? "angle of reflection (°)" : "angle of refraction (°)",
+    };
+  }
+  const r = solveImaging(inputs.imaging);
+  return {
+    engineVersion: OPTICS_ENGINE_VERSION,
+    headline: r.sPrime === null
+      ? ["The object is at the focal point: the rays leave parallel and there is no image (it is at infinity)"]
+      : [`${r.nature[0].toUpperCase()}${r.nature.slice(1)}, ${r.orientation}, ${r.size} image`, `Image distance ${fmt(r.sPrime)} cm, magnification ${fmt(r.m as number)}`, `Image height ${fmt(r.hPrime as number)} cm; power ${fmt(r.power)} dioptres`],
+    assumptions: OPTICS_ASSUMPTIONS, check: r.sPrime ?? 0, checkLabel: r.sPrime === null ? "image distance (none: at infinity)" : "image distance (cm)",
+  };
+}
+
+export function summarizeInterference(inputs: InterferenceInputs): PhysicsResults | null {
+  const s = inputs.slits;
+  const r = summarizeSlits(s);
+  return {
+    engineVersion: INTERFERENCE_ENGINE_VERSION,
+    headline: s.N === 1
+      ? [`Central maximum ${fmt(2000 * (r.centralHalfWidth ?? 0))} mm wide (first minima at ±${fmt(1000 * (r.centralHalfWidth ?? 0))} mm)`, `Fresnel number ${fmt(r.fresnel)} (far-field model valid below 0.5)`]
+      : [
+        `Fringe spacing ≈ ${fmt(1000 * (r.fringeSpacing as number))} mm; highest order ${r.maxOrder}`,
+        r.missingOrders.length ? `Missing orders: ${r.missingOrders.slice(0, 4).join(", ")}${r.missingOrders.length > 4 ? "…" : ""}` : "No missing orders",
+        `${r.fringesInCentral} fringes inside the central diffraction peak`,
+      ],
+    assumptions: INTERFERENCE_ASSUMPTIONS, check: s.N === 1 ? 2000 * (r.centralHalfWidth ?? 0) : 1000 * (r.fringeSpacing as number), checkLabel: s.N === 1 ? "width of the central maximum (mm)" : "fringe spacing (mm)",
+  };
+}

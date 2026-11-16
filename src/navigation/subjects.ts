@@ -44,8 +44,8 @@ export const SUBJECTS: SubjectDef[] = [
   },
   {
     id: "physics", slug: "physics", label: "Physics", mode: "workbench", icon: "physics", status: "available",
-    tagline: "Motion, forces, energy, collisions, resistor networks and RC transients with live diagrams and synchronized graphs.",
-    planned: ["Rotational motion and torque", "Gravitation and orbits", "Waves and optics", "Inductors and AC circuits"],
+    tagline: "Motion, forces, energy, collisions, waves and sound, optics, interference, resistor networks and RC transients with live diagrams and synchronized graphs.",
+    planned: ["Rotational motion and torque", "Gravitation and orbits", "Thin-film interference and polarization", "Inductors and AC circuits"],
   },
   {
     id: "biology", slug: "biology", label: "Biology", mode: "learning", icon: "biology", status: "available",
@@ -59,11 +59,12 @@ export const SUBJECTS: SubjectDef[] = [
   },
 ];
 
-export type ToolGroupId = "analyze" | "mechanics" | "electricity" | "geneExpression" | "inheritance" | "biomolecules" | "metabolism" | "synthesize" | "library";
+export type ToolGroupId = "analyze" | "mechanics" | "waves" | "electricity" | "geneExpression" | "inheritance" | "biomolecules" | "metabolism" | "synthesize" | "library";
 
 export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "analyze", label: "Analyze" },
   { id: "mechanics", label: "Mechanics" },
+  { id: "waves", label: "Waves & optics" },
   { id: "electricity", label: "Electricity" },
   { id: "geneExpression", label: "Gene expression" },
   { id: "inheritance", label: "Genetics & cell division" },
@@ -107,7 +108,7 @@ export const GENERAL_TOOLS: ToolDef[] = [
   { id: "gcSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
-export type PhysicsToolId = "phOverview" | "phMechanics" | "phForces" | "phEnergy" | "phCollisions" | "phCircuits" | "phRc" | "phSaved";
+export type PhysicsToolId = "phOverview" | "phMechanics" | "phForces" | "phEnergy" | "phCollisions" | "phWaves" | "phOptics" | "phInterference" | "phCircuits" | "phRc" | "phSaved";
 
 export const PHYSICS_TOOLS: ToolDef[] = [
   { id: "phOverview", slug: "overview", label: "Overview", summary: "What Physics offers now, and what is still planned.", group: "analyze", icon: "physics" },
@@ -115,6 +116,9 @@ export const PHYSICS_TOOLS: ToolDef[] = [
   { id: "phForces", slug: "forces", label: "Forces & Newton's laws", summary: "Free-body diagrams, friction, inclines and tension for one body or a block with a hanging mass.", group: "mechanics", icon: "forces" },
   { id: "phEnergy", slug: "energy", label: "Work & energy", summary: "Kinetic, gravitational and spring energy, work, friction losses and energy bar charts.", group: "mechanics", icon: "energy" },
   { id: "phCollisions", slug: "collisions", label: "Momentum & collisions", summary: "Two-body one-dimensional collisions: momentum, restitution, impulse and energy loss.", group: "mechanics", icon: "collisions" },
+  { id: "phWaves", slug: "waves-sound", label: "Waves & sound", summary: "Traveling and longitudinal waves, superposition and beats, standing waves and resonance in strings and pipes, and the Doppler effect.", group: "waves", icon: "waves" },
+  { id: "phOptics", slug: "geometric-optics", label: "Geometric optics", summary: "Thin lenses, spherical mirrors, ray diagrams and image formation, plus refraction and total internal reflection.", group: "waves", icon: "optics" },
+  { id: "phInterference", slug: "interference-diffraction", label: "Interference & diffraction", summary: "Single-slit, double-slit and grating patterns: fringe spacing, missing orders and the intensity across the screen.", group: "waves", icon: "interference" },
   { id: "phCircuits", slug: "circuits", label: "DC circuits", summary: "Series and parallel resistor networks: equivalent resistance, currents, voltages and power.", group: "electricity", icon: "circuits" },
   { id: "phRc", slug: "rc-transient", label: "RC transient", summary: "Charging and discharging of one capacitor through one resistor.", group: "electricity", icon: "rc" },
   { id: "phSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },

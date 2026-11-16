@@ -16,16 +16,18 @@ const MODE_COPY: Record<LearningMode, { label: string; blurb: string }> = {
   challenge: { label: "Challenge", blurb: "Predict what changes before it is shown." },
 };
 
-export function LearningModeSwitch({ mode, modes = ["explore", "practice"], onChange }: {
+export function LearningModeSwitch({ mode, modes = ["explore", "practice"], onChange, blurbs }: {
   mode: LearningMode;
   modes?: LearningMode[];
   onChange: (mode: LearningMode) => void;
+  /** Replacement descriptions for a page whose modes work differently from the defaults. */
+  blurbs?: Partial<Record<LearningMode, string>>;
 }) {
-  const options: Array<SegmentedOption<LearningMode>> = modes.map((id) => ({ id, label: MODE_COPY[id].label, title: MODE_COPY[id].blurb }));
+  const options: Array<SegmentedOption<LearningMode>> = modes.map((id) => ({ id, label: MODE_COPY[id].label, title: blurbs?.[id] ?? MODE_COPY[id].blurb }));
   return (
     <div className="ui-learning-switch">
       <Segmented label="Learning mode" onChange={onChange} options={options} value={mode} />
-      <p className="ui-learning-note">{MODE_COPY[mode].blurb}</p>
+      <p className="ui-learning-note">{blurbs?.[mode] ?? MODE_COPY[mode].blurb}</p>
     </div>
   );
 }

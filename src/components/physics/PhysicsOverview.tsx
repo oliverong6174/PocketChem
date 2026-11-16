@@ -33,6 +33,24 @@ const FEATURES: Record<string, string[]> = {
     "Before and after table, four synchronized graphs and an animated collision you can scrub",
     "No invented collision when the bodies are separating, and no force history that the model does not have",
   ],
+  phWaves: [
+    "Traveling waves (transverse or longitudinal) with wavelength, period, phase and the difference between wave speed and particle speed",
+    "Superposition of two waves: interference, true versus partly standing waves, and beats",
+    "Standing waves on a string and in open or closed pipes, with nodes, antinodes, harmonics and resonance frequencies",
+    "The Doppler effect for a moving source and observer, drawn as wavefronts and checked by counting them; supersonic motion is refused",
+  ],
+  phOptics: [
+    "Thin lenses and spherical mirrors with principal-ray diagrams you can drag, real and virtual images, magnification and power",
+    "Refraction at a boundary with Snell's law, the critical angle and total internal reflection",
+    "An image at the focal point is reported as “at infinity”, never as a large number",
+    "Explore, Practice (predict, then observe) and Challenge (reach a target setup)",
+  ],
+  phInterference: [
+    "One slit, two slits and gratings of up to 20 slits at any visible wavelength, with an intensity graph and a coloured fringe strip",
+    "Fringe spacing, missing orders, the diffraction envelope and the sharpening of principal maxima with more slits",
+    "A probe you can move on the screen that reports the path difference and the intensity there",
+    "Settings outside the far-field model are refused with the reason, not approximated",
+  ],
   phCircuits: [
     "Build series, parallel and nested resistor networks with one ideal DC source",
     "A circuit diagram drawn from the same network the calculations use, with current directions and voltage drops",
@@ -63,6 +81,25 @@ export default function PhysicsOverview({ onOpenTool }: { onOpenTool: (id: Physi
         <h3 className="ph-group-heading">Mechanics</h3>
         <ul className="gc-tool-cards">
           {implemented.filter((tool) => tool.group === "mechanics").map((tool) => (
+            <li className="gc-tool-card" key={tool.id}>
+              <Icon name={tool.icon} size={26} />
+              <div>
+                <h3>{tool.label}</h3>
+                <p>{tool.summary}</p>
+                <ul className="gc-feature-list">
+                  {FEATURES[tool.id].map((line) => <li key={line}>{line}</li>)}
+                </ul>
+                <div className="gc-tool-card-foot">
+                  <EvidenceBadge level="model" />
+                  <button className="primary-button" onClick={() => onOpenTool(tool.id as PhysicsToolId)} type="button">Open {tool.label}</button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <h3 className="ph-group-heading">Waves &amp; optics</h3>
+        <ul className="gc-tool-cards">
+          {implemented.filter((tool) => tool.group === "waves").map((tool) => (
             <li className="gc-tool-card" key={tool.id}>
               <Icon name={tool.icon} size={26} />
               <div>
@@ -112,7 +149,7 @@ export default function PhysicsOverview({ onOpenTool }: { onOpenTool: (id: Physi
       </Panel>
 
       <Callout tone="info" title="Scope of the laboratories">
-        <p>Mechanics models a point particle with constant acceleration over a flat ground at y = 0; for projectiles that is gravity alone, with no air resistance. The circuit tool handles one ideal DC source with ideal resistors in series and parallel groups only, and the RC tool handles exactly one resistor and one capacitor. Forces treats one body (or a block with a hanging mass) with Coulomb friction; Work & energy uses an ideal spring and constant friction; collisions are two bodies in one dimension with an instantaneous contact. Arbitrary circuits, AC, inductors, rotation and air resistance are not supported, and the tools say so rather than approximating them. They are teaching models, not substitutes for measurement or design software.</p>
+        <p>Mechanics models a point particle with constant acceleration over a flat ground at y = 0; for projectiles that is gravity alone, with no air resistance. The circuit tool handles one ideal DC source with ideal resistors in series and parallel groups only, and the RC tool handles exactly one resistor and one capacitor. Forces treats one body (or a block with a hanging mass) with Coulomb friction; Work & energy uses an ideal spring and constant friction; collisions are two bodies in one dimension with an instantaneous contact. Waves are small-amplitude and linear in a lossless medium, standing waves use the elementary boundary conditions, and the Doppler model is for subsonic motion along one line. Optics uses single thin elements in the paraxial approximation, and interference is the far-field pattern of identical slits in monochromatic light. Arbitrary circuits, AC, inductors, rotation and air resistance are not supported, and the tools say so rather than approximating them. They are teaching models, not substitutes for measurement or design software.</p>
       </Callout>
     </div>
   );
