@@ -328,6 +328,7 @@ th {
 
 .tool-group-label {
   display: none;
+  white-space: nowrap;
   align-self: center;
   margin-right: var(--sp-1);
   font-size: 0.6875rem;

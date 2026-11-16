@@ -37,7 +37,7 @@ const INK = "#0f172a";
 type WavePatch = Partial<WavesInputs["wave"]>;
 const WAVE_PRESETS: Array<{ label: string; wave: WavePatch; longitudinal?: boolean }> = [
   { label: "Rope wave", wave: { A: 0.1, f: 2, v: 4, phiDeg: 0, dir: 1 } },
-  { label: "Longitudinal pulse (clear compressions)", wave: { A: 0.3, f: 2, v: 4, phiDeg: 0, dir: 1 }, longitudinal: true },
+  { label: "Longitudinal pulse (clear compressions)", wave: { A: 0.15, f: 2, v: 4, phiDeg: 0, dir: 1 }, longitudinal: true },
   { label: "Sound in air, 440 Hz", wave: { A: 0.005, f: 440, v: 343, phiDeg: 0, dir: 1 } },
   { label: "Wave toward −x", wave: { A: 0.1, f: 2, v: 4, phiDeg: 0, dir: -1 } },
 ];
@@ -280,12 +280,12 @@ export default function WavesPage({ openRequest = null, onOpenHandled }: Props) 
                     <TravelDiagram longitudinal={raw.longitudinal} t={t} wave={waveCheck.value} />
                   </DiagramFrame>
                   <KeyFigures items={[
-                    { label: "Wavelength λ = v/f", value: `${fmt(q.lambda)} m` },
-                    { label: "Period T = 1/f", value: `${fmt(q.T)} s` },
+                    { label: "Wavelength", value: `${fmt(q.lambda)} m`, note: "λ = v/f" },
+                    { label: "Period", value: `${fmt(q.T)} s`, note: "T = 1/f" },
                     { label: "Wave speed", value: `${fmt(waveCheck.value.v)} m/s`, note: "set by the medium" },
-                    { label: "Greatest particle speed ωA", value: `${fmt(q.omega * waveCheck.value.A)} m/s`, note: "not the wave speed" },
-                    { label: "k = 2π/λ", value: `${fmt(q.k)} rad/m` },
-                    { label: "ω = 2πf", value: `${fmt(q.omega)} rad/s` },
+                    { label: "Greatest particle speed", value: `${fmt(q.omega * waveCheck.value.A)} m/s`, note: "ωA: not the wave speed" },
+                    { label: "Wave number", value: `${fmt(q.k)} rad/m`, note: "k = 2π/λ" },
+                    { label: "Angular frequency", value: `${fmt(q.omega)} rad/s`, note: "ω = 2πf" },
                   ]} />
                   <p className="gc-eq-line">y(x, t) = A sin(kx {waveCheck.value.dir === 1 ? "−" : "+"} ωt + φ) = {fmt(waveCheck.value.A)} sin({fmt(q.k)}x {waveCheck.value.dir === 1 ? "−" : "+"} {fmt(q.omega)}t + {fmt(waveCheck.value.phiDeg)}°)</p>
                 </>
@@ -300,8 +300,8 @@ export default function WavesPage({ openRequest = null, onOpenHandled }: Props) 
                   <KeyFigures items={[
                     { label: "Largest amplitude", value: `${fmt(cls.maxAmplitude)} m` },
                     { label: "Smallest amplitude", value: `${fmt(cls.minAmplitude)} m`, note: cls.kind === "standing" ? "zero at the nodes" : undefined },
-                    { label: "Beat frequency |f₁ − f₂|", value: `${fmt(cls.beatFrequency)} Hz` },
-                    { label: "Phase difference", value: `${fmt(cls.phaseDifferenceDeg)}°`, note: "φ₂ − φ₁" },
+                    { label: "Beat frequency", value: `${fmt(cls.beatFrequency)} Hz`, note: "|f₁ − f₂|" },
+                    { label: "Phase difference", value: `${fmt(cls.phaseDifferenceDeg)}°`, note: "second wave minus first" },
                   ]} />
                 </>
               ) : null}
@@ -341,11 +341,11 @@ export default function WavesPage({ openRequest = null, onOpenHandled }: Props) 
                   </DiagramFrame>
                   <KeyFigures items={[
                     { label: "Observed frequency", value: `${fmt(dop.fObserved)} Hz` },
-                    { label: "f′ / f", value: fmt(dop.ratio) },
+                    { label: "Frequency ratio", value: fmt(dop.ratio), note: "f′/f" },
                     { label: "Wavelength in the medium", value: `${fmt(dop.lambdaMedium)} m`, note: `${fmt(dop.lambdaAtRest)} m at rest` },
                     { label: "Source moving alone", value: `${fmt(dop.fSourceOnly)} Hz` },
                     { label: "Observer moving alone", value: `${fmt(dop.fObserverOnly)} Hz` },
-                    { label: "Wavefronts received so far", value: String(wavefronts), note: `counted ratio ${fmt(ratioCounted)} = f′/f` },
+                    { label: "Wavefronts received so far", value: String(wavefronts), note: `counted ratio ${fmt(ratioCounted, 4)} = f′/f` },
                   ]} />
                 </>
               ) : null}

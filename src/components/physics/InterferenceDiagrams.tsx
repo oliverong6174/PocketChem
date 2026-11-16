@@ -12,7 +12,7 @@ const RED = "#be123c";
 export function FringeStrip({ slits, halfWidth, probeY }: { slits: SlitInput; halfWidth: number; probeY: number }) {
   const [wrapRef, avail] = useContainerWidth();
   const W = Math.max(300, Math.min(avail, 960));
-  const H = 96;
+  const H = 112;
   const left = 52;
   const right = W - 16;
   const cols = Math.min(400, Math.max(120, Math.floor(right - left)));
@@ -30,11 +30,11 @@ export function FringeStrip({ slits, halfWidth, probeY }: { slits: SlitInput; ha
         {[-1, -0.5, 0, 0.5, 1].map((f) => (
           <g key={f}>
             <line stroke={INK} x1={px(f * halfWidth)} x2={px(f * halfWidth)} y1={56} y2={61} />
-            <text className="ph-tick" textAnchor="middle" x={px(f * halfWidth)} y={78 + 8}>{fmt(f * halfWidth * 1000)}</text>
+            <text className="ph-tick" textAnchor="middle" x={px(f * halfWidth)} y={76}>{fmt(f * halfWidth * 1000)}</text>
           </g>
         ))}
         <text className="ph-note-text" x={4} y={32}>screen</text>
-        <text className="ph-note-text" textAnchor="end" x={W - 16} y={H - 0.5}>position on the screen (mm); brightness is √(I/I₀)</text>
+        <text className="ph-note-text" textAnchor="end" x={W - 16} y={H - 8}>position on the screen (mm); brightness is √(I/I₀)</text>
       </svg>
     </div>
   );

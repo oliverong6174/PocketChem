@@ -70,7 +70,8 @@ export function TravelDiagram({ wave, longitudinal, t }: { wave: WaveInput; long
   const eq = Array.from({ length: N + 1 }, (_, k) => (k / N) * X);
   const posOf = (xe: number) => longitudinalPosition(wave, xe, t);
   const dens = Array.from({ length: 241 }, (_, k) => { const x = (k / 240) * X; return [x, densityRatio(wave, x, t)] as [number, number]; });
-  const dMax = Math.max(1.05, ...dens.map((d) => d[1]));
+  const dMaxFull = Math.max(1.05, ...dens.map((d) => d[1]));
+  const dMax = Math.min(dMaxFull, 2.5);
   const dMin = Math.min(0.95, ...dens.map((d) => d[1]));
   const dTop = bandTop + bandH + 56;
   const dH = H - dTop - 36;
@@ -85,9 +86,11 @@ export function TravelDiagram({ wave, longitudinal, t }: { wave: WaveInput; long
         <line className="ph-grid" x1={left} x2={W - left} y1={bandTop + bandH + 6} y2={bandTop + bandH + 6} />
         <circle cx={px(x0)} cy={bandTop + bandH + 6} fill="none" r={3} stroke={GREY} />
         <circle cx={px(here)} cy={bandTop + bandH + 6} fill={RED} r={5}><title>marked particle (equilibrium position shown as a ring)</title></circle>
-        <text className="ph-note-text" textAnchor="middle" x={px(x0)} y={bandTop + bandH + 26}>marked particle oscillates about its ring</text>
+        <text className="ph-note-text" x={left} y={bandTop + bandH + 26}>the red dot is one particle; it oscillates about its ring</text>
         <line className="ph-grid" x1={left} x2={W - left} y1={dy(1)} y2={dy(1)} />
-        <path d={path(dens.map(([x, r]) => [px(posOf(x)), dy(r)] as [number, number]))} fill="none" stroke={AMBER} strokeWidth={2.8} />
+        <clipPath id={`${uid}-dens`}><rect height={dH + 4} width={W} x={0} y={dTop - 2} /></clipPath>
+        <path clipPath={`url(#${uid}-dens)`} d={path(dens.map(([x, r]) => [px(posOf(x)), dy(r)] as [number, number]))} fill="none" stroke={AMBER} strokeWidth={2.8} />
+        {dMaxFull > dMax ? <text className="ph-note-text" textAnchor="end" x={W - left} y={dTop + 12}>peaks above {fmt(dMax)} are cut off (maximum {fmt(dMaxFull)})</text> : null}
         <text className="ph-axis-label" x={8} y={dTop - 8}>density ρ/ρ₀ (above 1: compression, below 1: rarefaction)</text>
         <text className="ph-tick" x={left - 4} y={dy(1) - 4}>1</text>
         <text className="ph-note-text" x={8} y={H - 10}>x from 0 to {fmt(X)} m; wavelength {fmt(q.lambda)} m</text>
@@ -223,6 +226,7 @@ export function DopplerDiagram({ dop, t }: { dop: DopplerInput; t: number }) {
         <text className="ph-axis-label" textAnchor="middle" x={px(xo)} y={cy + 28}>observer</text>
         <Arrow kind="v" prefix={uid} title={`observer velocity ${fmt(dop.vo)} m/s`} width={3.4} x1={px(xo)} x2={px(xo) - (dop.vo / Math.max(dop.c, 1)) * 140} y1={cy - 18} y2={cy - 18} />
         <text className="ph-note-text" x={10} y={16}>Wavefronts emitted one per source period (c = 1; lengths in rest wavelengths). Wavefronts received by the observer: {got}</text>
+        {t < 0.05 ? <text className="ph-axis-label" textAnchor="middle" x={W / 2} y={cy - 60}>Press Play or drag the time slider: the source starts emitting wavefronts</text> : null}
         <text className="ph-note-text" x={10} y={H - 10}>Frequency heard {fmt(r.fObserved)} Hz vs {fmt(dop.fs)} Hz emitted ({r.trend === "same" ? "unchanged" : r.trend})</text>
       </svg>
     </div>

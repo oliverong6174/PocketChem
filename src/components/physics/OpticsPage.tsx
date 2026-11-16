@@ -143,12 +143,12 @@ export default function OpticsPage({ openRequest = null, onOpenHandled }: Props)
                 <ImagingDiagram input={imgCheck.value} onObjectDistance={(s) => setImg({ s })} />
               </DiagramFrame>
               <KeyFigures items={[
-                { label: "Image distance s′", value: img.sPrime === null ? "at infinity" : `${fmt(img.sPrime)} cm`, note: img.nature === "real" ? "real" : img.nature === "virtual" ? "virtual" : "no image" },
-                { label: "Magnification m", value: img.m === null ? "undefined" : fmt(img.m), note: img.orientation ? `${img.orientation}, ${img.size}` : undefined },
-                { label: "Image height", value: img.hPrime === null ? "—" : `${fmt(img.hPrime)} cm`, note: "negative: inverted" },
-                { label: "Power 1/f", value: `${fmt(img.power)} D`, note: "f in metres" },
+                { label: "Image distance", value: img.sPrime === null ? "at infinity" : `${fmt(img.sPrime)} cm`, note: img.nature === "real" ? "s′ > 0: real" : img.nature === "virtual" ? "s′ < 0: virtual" : "no image" },
+                { label: "Magnification", value: img.m === null ? "undefined" : fmt(img.m), note: img.orientation ? `m = −s′/s: ${img.orientation}, ${img.size}` : undefined },
+                { label: "Image height", value: img.hPrime === null ? "—" : `${fmt(img.hPrime)} cm`, note: img.hPrime === null ? undefined : img.hPrime < 0 ? "negative: inverted" : "positive: upright" },
+                { label: "Optical power", value: `${fmt(img.power)} D`, note: "1/f with f in metres" },
                 { label: "Object region", value: REGION_LABEL[img.region] },
-                ...(img.radius !== null ? [{ label: "Radius of curvature R = 2f", value: `${fmt(img.radius)} cm` }] : []),
+                ...(img.radius !== null ? [{ label: "Radius of curvature", value: `${fmt(img.radius)} cm`, note: "R = 2f" }] : []),
               ]} />
               <Panel subtitle="The standard cases for this element; the row for your object is highlighted." title="Where is the object, what is the image?">
                 <div className="gc-table-scroll">
@@ -170,7 +170,7 @@ export default function OpticsPage({ openRequest = null, onOpenHandled }: Props)
                 <RefractionDiagram input={refCheck.value} />
               </DiagramFrame>
               <KeyFigures items={[
-                { label: "Angle of refraction θ₂", value: ref.theta2 === null ? "none" : `${fmt(ref.theta2)}°`, note: ref.tir ? "total internal reflection" : ref.bending },
+                { label: "Angle of refraction", value: ref.theta2 === null ? "none" : `${fmt(ref.theta2)}°`, note: ref.tir ? "θ₂: total internal reflection" : `θ₂: ${ref.bending}` },
                 { label: "Critical angle", value: ref.critical === null ? "none" : `${fmt(ref.critical)}°`, note: ref.critical === null ? "light enters a denser medium" : "asin(n₂/n₁)" },
                 { label: "Speed in medium 1", value: `${fmt(100 * ref.speed1)} % of c` },
                 { label: "Speed in medium 2", value: `${fmt(100 * ref.speed2)} % of c` },

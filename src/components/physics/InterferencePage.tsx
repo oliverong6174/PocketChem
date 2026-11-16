@@ -148,10 +148,10 @@ export default function InterferencePage({ openRequest = null, onOpenHandled }: 
               </DiagramFrame>
               <KeyFigures items={[
                 { label: "Probe position", value: `${fmt(probeShown * 1000)} mm`, note: "drag the graph marker" },
-                { label: "Intensity at the probe", value: fmt(probeI), note: "relative to the centre" },
-                ...(delta !== null ? [{ label: "Path difference d sinθ", value: `${fmt(delta)} λ`, note: Math.abs(delta - Math.round(delta)) < 0.02 ? "whole number: in step" : Math.abs(Math.abs(delta % 1) - 0.5) < 0.02 ? "half-integer: out of step" : "partial" }] : []),
-                ...(s.N > 1 ? [{ label: "Fringe spacing λL/d", value: formatSI(summary.fringeSpacing as number, "m"), note: "small-angle" }] : []),
-                { label: "Central maximum, first minima", value: summary.centralHalfWidth === null ? "none" : `±${formatSI(summary.centralHalfWidth, "m")}`, note: "a sinθ = λ" },
+                { label: "Intensity at the probe", value: fmt(probeI), note: "relative to the centre (I/I₀)" },
+                ...(delta !== null ? [{ label: "Path difference", value: `${fmt(delta)} λ`, note: Math.abs(delta - Math.round(delta)) < 0.02 ? "d sinθ: whole number, in step" : Math.abs(Math.abs(delta % 1) - 0.5) < 0.02 ? "d sinθ: half-integer, out of step" : "d sinθ: in between" }] : []),
+                ...(s.N > 1 ? [{ label: "Fringe spacing", value: formatSI(summary.fringeSpacing as number, "m"), note: "λL/d, small-angle" }] : []),
+                { label: "Central maximum edge", value: summary.centralHalfWidth === null ? "none" : `±${formatSI(summary.centralHalfWidth, "m")}`, note: "first minimum, a sinθ = λ" },
                 ...(s.N > 1 ? [{ label: "Fringes in the central peak", value: String(summary.fringesInCentral) }, { label: "Highest order", value: String(summary.maxOrder) }, { label: "Secondary maxima", value: String(summary.secondaryMaxima), note: "between principal maxima" }] : []),
                 { label: "Fresnel number", value: fmt(summary.fresnel), note: `valid below ${SLIT_LIMITS.maxFresnel}` },
               ]} />
