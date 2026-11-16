@@ -10,6 +10,9 @@ import {
   validateEquilibriumInputs, validateEquilibriumResults, validateKineticsInputs, validateKineticsResults, validateThermoInputs, validateThermoResults,
 } from "./generalChemTools";
 import {
+  ELECTROCHEM_ENGINE_VERSION, GASLAWS_ENGINE_VERSION, STOICHIOMETRY_ENGINE_VERSION, validateElectroInputs, validateGasInputs, validateGcResults22, validateStoichInputs,
+} from "./gcTools22";
+import {
   CIRCUITS_ENGINE_VERSION, COLLISIONS_ENGINE_VERSION, INTERFERENCE_ENGINE_VERSION, OPTICS_ENGINE_VERSION, WAVES_ENGINE_VERSION, ENERGY_ENGINE_VERSION, FORCES_ENGINE_VERSION, MECHANICS_ENGINE_VERSION, RC_ENGINE_VERSION,
   validateCircuitsInputs, validateCollisionsInputs, validateInterferenceInputs, validateOpticsInputs, validateWavesInputs, validateEnergyInputs, validateForcesInputs, validateMechanicsInputs, validatePhysicsResults, validateRcInputs,
 } from "./physicsTools";
@@ -45,7 +48,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -60,6 +63,9 @@ export const ANALYSIS_APP_PAGE = {
   equilibrium: "gcEquilibrium",
   kinetics: "gcKinetics",
   thermo: "gcThermo",
+  stoichiometry: "gcStoichiometry",
+  gaslaws: "gcGas",
+  electrochem: "gcElectro",
   mechanics: "phMechanics",
   circuits: "phCircuits",
   rc: "phRc",
@@ -129,6 +135,9 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
       equilibrium: { engineVersion: EQUILIBRIUM_ENGINE_VERSION, validateInputs: validateEquilibriumInputs, validateResults: validateEquilibriumResults },
       kinetics: { engineVersion: KINETICS_ENGINE_VERSION, validateInputs: validateKineticsInputs, validateResults: validateKineticsResults },
       thermo: { engineVersion: THERMO_ENGINE_VERSION, validateInputs: validateThermoInputs, validateResults: validateThermoResults },
+      stoichiometry: { engineVersion: STOICHIOMETRY_ENGINE_VERSION, validateInputs: validateStoichInputs, validateResults: validateGcResults22 },
+      gaslaws: { engineVersion: GASLAWS_ENGINE_VERSION, validateInputs: validateGasInputs, validateResults: validateGcResults22 },
+      electrochem: { engineVersion: ELECTROCHEM_ENGINE_VERSION, validateInputs: validateElectroInputs, validateResults: validateGcResults22 },
       mechanics: { engineVersion: MECHANICS_ENGINE_VERSION, validateInputs: validateMechanicsInputs, validateResults: validatePhysicsResults },
       circuits: { engineVersion: CIRCUITS_ENGINE_VERSION, validateInputs: validateCircuitsInputs, validateResults: validatePhysicsResults },
       rc: { engineVersion: RC_ENGINE_VERSION, validateInputs: validateRcInputs, validateResults: validatePhysicsResults },

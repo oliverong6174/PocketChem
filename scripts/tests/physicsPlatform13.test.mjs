@@ -62,7 +62,7 @@ describe("registry, navigation and the overview", () => {
   });
   test("[other subjects] Organic and General Chemistry tool lists and routes are unchanged", () => {
     assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.id), ["analysis", "acidBase", "spectroscopy", "conformations", "reactions", "multiStep", "multiCatalytic", "saved"]);
-    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcSaved"]);
+    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcStoichiometry", "gcGas", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcElectro", "gcSaved"]);
     assert.equal(S.routeHash({ subject: "general", toolId: "gcKinetics" }), "#/general/kinetics");
     assert.equal(S.routeHash({ subject: "organic", toolId: "multiStep" }), "#/organic/multi-step");
   });

@@ -39,8 +39,8 @@ export const SUBJECTS: SubjectDef[] = [
   { id: "organic", slug: "organic", label: "Organic Chemistry", mode: "workbench", icon: "molecule", status: "available", tagline: "Structures, reactions, synthesis, spectra and conformations." },
   {
     id: "general", slug: "general", label: "General Chemistry", mode: "workbench", icon: "general", status: "available",
-    tagline: "Acid–base, equilibrium, kinetics and thermodynamics today; more quantitative tools planned.",
-    planned: ["Stoichiometry and limiting reagents", "Gas laws", "Solubility equilibria", "Periodic trends"],
+    tagline: "Stoichiometry, gas laws, acid–base, equilibrium, kinetics, thermodynamics and electrochemistry; more quantitative tools planned.",
+    planned: ["Solubility equilibria", "Periodic trends", "Phase diagrams and colligative properties"],
   },
   {
     id: "physics", slug: "physics", label: "Physics", mode: "workbench", icon: "physics", status: "available",
@@ -97,14 +97,17 @@ export const ORGANIC_TOOLS: ToolDef[] = [
   { id: "saved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
-export type GeneralToolId = "gcOverview" | "gcAcidBase" | "gcEquilibrium" | "gcKinetics" | "gcThermo" | "gcSaved";
+export type GeneralToolId = "gcOverview" | "gcStoichiometry" | "gcGas" | "gcAcidBase" | "gcEquilibrium" | "gcKinetics" | "gcThermo" | "gcElectro" | "gcSaved";
 
 export const GENERAL_TOOLS: ToolDef[] = [
   { id: "gcOverview", slug: "overview", label: "Overview", summary: "What General Chemistry offers now, and what is still planned.", group: "analyze", icon: "general" },
+  { id: "gcStoichiometry", slug: "stoichiometry", label: "Stoichiometry", summary: "Formula masses, equation balancing, limiting reagents, yields, dilution and solution reactions.", group: "analyze", icon: "stoichiometry" },
+  { id: "gcGas", slug: "gas-laws", label: "Gas laws", summary: "PV = nRT, controlled gas experiments, mixtures, kinetic theory and molecular speed distributions.", group: "analyze", icon: "gas" },
   { id: "gcAcidBase", slug: "acid-base-titration", label: "Acid–base & titration", summary: "pH, buffers, dilution and titration curves for monoprotic acids and bases.", group: "analyze", icon: "flask" },
   { id: "gcEquilibrium", slug: "equilibrium", label: "Chemical equilibrium", summary: "Q versus K, ICE tables, equilibrium compositions and Le Châtelier shifts for one reaction.", group: "analyze", icon: "equilibrium" },
   { id: "gcKinetics", slug: "kinetics", label: "Reaction kinetics", summary: "Zero-, first- and second-order rate laws, half-lives, rate-law fitting and Arrhenius.", group: "analyze", icon: "kinetics" },
   { id: "gcThermo", slug: "thermodynamics", label: "Thermodynamics", summary: "Gibbs energy versus temperature, Hess's law and calorimetry.", group: "analyze", icon: "thermo" },
+  { id: "gcElectro", slug: "electrochemistry", label: "Electrochemistry", summary: "Galvanic cells, standard and Nernst potentials, ΔG° and K, and electrolysis with Faraday's law.", group: "analyze", icon: "electro" },
   { id: "gcSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 

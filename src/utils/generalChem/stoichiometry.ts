@@ -182,3 +182,7 @@ export function concentrationsAfterMixing(result: StoichResult): Array<{ text: s
   if (result.totalMl === null || result.totalMl <= 0) return null;
   return result.ledger.map((r) => ({ text: r.text, role: r.role, M: (r.finalMol / result.totalMl!) * 1000 }));
 }
+
+const nice = (v: number) => { if (v <= 0) return 1; const e = 10 ** Math.floor(Math.log10(v)); const m = v / e; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * e; };
+/** Moles that one marker of the schematic particle picture stands for (about 24 markers for the largest amount). */
+export const particleUnit = (result: StoichResult) => nice(Math.max(1e-300, ...result.ledger.map((r) => Math.max(r.initialMol, r.finalMol))) / 24);

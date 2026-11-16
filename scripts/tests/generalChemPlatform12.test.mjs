@@ -37,9 +37,9 @@ const validators = () => Object.fromEntries([
 const ids = () => { let n = 0; return () => `s12x${(n += 1).toString().padStart(4, "0")}`; };
 
 describe("registry, navigation and the overview", () => {
-  test("[tools] General Chemistry lists Overview, Acid-base, Equilibrium, Kinetics, Thermodynamics, Saved in that order", () => {
-    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcSaved"]);
-    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.label), ["Overview", "Acid–base & titration", "Chemical equilibrium", "Reaction kinetics", "Thermodynamics", "Saved"]);
+  test("[tools] General Chemistry lists Overview, Stoichiometry, Gas laws, Acid-base, Equilibrium, Kinetics, Thermodynamics, Electrochemistry, Saved in that order", () => {
+    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcStoichiometry", "gcGas", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcElectro", "gcSaved"]);
+    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.label), ["Overview", "Stoichiometry", "Gas laws", "Acid–base & titration", "Chemical equilibrium", "Reaction kinetics", "Thermodynamics", "Electrochemistry", "Saved"]);
     assert.equal(new Set(S.GENERAL_TOOLS.map((t) => t.slug)).size, S.GENERAL_TOOLS.length);
   });
   test("[routes] each new tool has a deep link that round-trips; the old acid-base link is unchanged", () => {
@@ -56,7 +56,7 @@ describe("registry, navigation and the overview", () => {
   });
   test("[planned] implemented tools are not listed as planned; thermochemistry moved out, the rest stay planned and have no button", () => {
     const planned = S.getSubject("general").planned;
-    assert.deepEqual(planned, ["Stoichiometry and limiting reagents", "Gas laws", "Solubility equilibria", "Periodic trends"]);
+    assert.deepEqual(planned, ["Solubility equilibria", "Periodic trends", "Phase diagrams and colligative properties"]);
     const overview = read("src", "components", "generalChem", "GeneralChemistryOverview.tsx");
     assert.match(overview, /gc-planned/);
     const plannedBlock = overview.slice(overview.indexOf('title="Planned"'));
@@ -78,11 +78,11 @@ describe("App wiring", () => {
     }
   });
   test("[app] a saved record of any General tool switches subject and keeps its open request", () => {
-    assert.match(app, /target === "gcAcidBase" \|\| target === "gcEquilibrium" \|\| target === "gcKinetics" \|\| target === "gcThermo"/);
+    assert.match(app, /target === "gcAcidBase" \|\| target === "gcEquilibrium" \|\| target === "gcKinetics" \|\| target === "gcThermo" \|\| target === "gcStoichiometry" \|\| target === "gcGas" \|\| target === "gcElectro"/);
     assert.match(app, /switchSubject\("general", \{ keepOpenRequest: true, tool: target \}\)/);
   });
   test("[library] the app library registers every page and maps each saved page to its tool", () => {
-    assert.deepEqual({ ...libApp.ANALYSIS_APP_PAGE }, { synthesis: "multiStep", ranking: "acidBase", spectroscopy: "spectroscopy", properties: "analysis", reactions: "reactions", multicatalytic: "multiCatalytic", conformations: "conformations", genchem: "gcAcidBase", equilibrium: "gcEquilibrium", kinetics: "gcKinetics", thermo: "gcThermo", mechanics: "phMechanics", circuits: "phCircuits", rc: "phRc", forces: "phForces", energy: "phEnergy", collisions: "phCollisions", waves: "phWaves", optics: "phOptics", interference: "phInterference", replication: "bioReplication", transcription: "bioTranscription", translation: "bioTranslation", dogma: "bioDogma", regulation: "bioRegulation", genetics: "bioGenetics", celldivision: "bioDivision", aminoacids: "bcAminoAcids", proteins: "bcProteins", enzymes: "bcEnzymes", glycolysis: "bcGlycolysis", gluconeogenesis: "bcGluconeogenesis", tca: "bcTca", etc: "bcEtc", metabolism: "bcMetabolism" });
+    assert.deepEqual({ ...libApp.ANALYSIS_APP_PAGE }, { synthesis: "multiStep", ranking: "acidBase", spectroscopy: "spectroscopy", properties: "analysis", reactions: "reactions", multicatalytic: "multiCatalytic", conformations: "conformations", genchem: "gcAcidBase", equilibrium: "gcEquilibrium", kinetics: "gcKinetics", thermo: "gcThermo", stoichiometry: "gcStoichiometry", gaslaws: "gcGas", electrochem: "gcElectro", mechanics: "phMechanics", circuits: "phCircuits", rc: "phRc", forces: "phForces", energy: "phEnergy", collisions: "phCollisions", waves: "phWaves", optics: "phOptics", interference: "phInterference", replication: "bioReplication", transcription: "bioTranscription", translation: "bioTranslation", dogma: "bioDogma", regulation: "bioRegulation", genetics: "bioGenetics", celldivision: "bioDivision", aminoacids: "bcAminoAcids", proteins: "bcProteins", enzymes: "bcEnzymes", glycolysis: "bcGlycolysis", gluconeogenesis: "bcGluconeogenesis", tca: "bcTca", etc: "bcEtc", metabolism: "bcMetabolism" });
     for (const t of TOOLS) assert.ok(libApp.OPENABLE_ANALYSIS_PAGES.includes(t.page));
     const labels = read("src", "components", "SavedAnalysesPage.tsx");
     for (const label of ["Chemical equilibrium", "Reaction kinetics", "Thermodynamics"]) assert.match(labels, new RegExp(label));

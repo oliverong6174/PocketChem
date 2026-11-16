@@ -50,7 +50,7 @@ describe("navigation and groups", () => {
     }
     assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.id), ["analysis", "acidBase", "spectroscopy", "conformations", "reactions", "multiStep", "multiCatalytic", "saved"]);
     assert.ok(S.ORGANIC_TOOLS.every((t) => ["analyze", "synthesize", "library"].includes(t.group)));
-    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcSaved"]);
+    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcStoichiometry", "gcGas", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcElectro", "gcSaved"]);
   });
   test("[icons and overview] every tool icon exists; the overview groups the cards and keeps the planned list button-free", () => {
     const icons = read("src", "components", "ui", "Icon.tsx");

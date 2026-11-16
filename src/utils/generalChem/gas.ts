@@ -43,7 +43,7 @@ export function checkVariable(name: GasUnknown, v: number): string | null {
     if (v < GAS_LIMITS.minT || v > GAS_LIMITS.maxT) return `The ideal-gas model is limited to ${GAS_LIMITS.minT}–${GAS_LIMITS.maxT} K here.`;
     return null;
   }
-  const lim = { P: [GAS_LIMITS.minP, GAS_LIMITS.maxP, "pressure"], V: [GAS_LIMITS.minV, GAS_LIMITS.maxV, "volume"], n: [GAS_LIMITS.minN, GAS_LIMITS.maxN, "amount"] }[name];
+  const lim: [number, number, string] = { P: [GAS_LIMITS.minP, GAS_LIMITS.maxP, "pressure"], V: [GAS_LIMITS.minV, GAS_LIMITS.maxV, "volume"], n: [GAS_LIMITS.minN, GAS_LIMITS.maxN, "amount"] }[name] as [number, number, string];
   if (v <= 0) return `The ${lim[2]} must be above zero.`;
   if (v < lim[0] || v > lim[1]) return `The ${lim[2]} is outside the supported range.`;
   return null;

@@ -25,7 +25,7 @@ function parseSide(text: string, side: string): { ok: true; items: EqSpecies[] }
     if (piece === "") return { ok: false, error: `The ${side} side has an empty species (check for a doubled or trailing "+").` };
     let coeff: number | null = null;
     let formula = piece;
-    const lead = /^(\d+)\s*(?=[A-Za-z(\[])/.exec(piece);
+    const lead = /^(\d+)\s*(?=[A-Za-z([])/.exec(piece);
     if (lead) {
       coeff = Number(lead[1]);
       if (coeff < 1 || coeff > EQUATION_LIMITS.maxCoefficient) return { ok: false, error: `A coefficient must be a whole number from 1 to ${EQUATION_LIMITS.maxCoefficient} (${lead[1]} in "${piece}").` };
