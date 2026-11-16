@@ -98,6 +98,9 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
   const EquilibriumPage = lazy(() => import("./components/generalChem/EquilibriumPage"));
   const KineticsPage = lazy(() => import("./components/generalChem/KineticsPage"));
   const ThermodynamicsPage = lazy(() => import("./components/generalChem/ThermodynamicsPage"));
+  const StoichiometryPage = lazy(() => import("./components/generalChem/StoichiometryPage"));
+  const GasLawsPage = lazy(() => import("./components/generalChem/GasLawsPage"));
+  const ElectrochemistryPage = lazy(() => import("./components/generalChem/ElectrochemistryPage"));
   const PhysicsOverview = lazy(() => import("./components/physics/PhysicsOverview"));
   const MechanicsPage = lazy(() => import("./components/physics/MechanicsPage"));
   const CircuitsPage = lazy(() => import("./components/physics/CircuitsPage"));
@@ -593,7 +596,7 @@ const InterferencePage = lazy(() => import("./components/physics/InterferencePag
       if (!target) return;
       openSequenceRef.current += 1;
       setPendingOpen({ id: `open-${openSequenceRef.current}`, recordId: analysis.id, page: target });
-      if (target === "gcAcidBase" || target === "gcEquilibrium" || target === "gcKinetics" || target === "gcThermo") {
+      if (target === "gcAcidBase" || target === "gcEquilibrium" || target === "gcKinetics" || target === "gcThermo" || target === "gcStoichiometry" || target === "gcGas" || target === "gcElectro") {
         if (activeSubject === "general") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("general", { keepOpenRequest: true, tool: target });
         return;
@@ -2168,6 +2171,21 @@ const InterferencePage = lazy(() => import("./components/physics/InterferencePag
             ) : generalTool === "gcKinetics" ? (
               <KineticsPage
                 openRequest={pendingOpen?.page === "gcKinetics" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcStoichiometry" ? (
+              <StoichiometryPage
+                openRequest={pendingOpen?.page === "gcStoichiometry" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcGas" ? (
+              <GasLawsPage
+                openRequest={pendingOpen?.page === "gcGas" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcElectro" ? (
+              <ElectrochemistryPage
+                openRequest={pendingOpen?.page === "gcElectro" ? pendingOpen : null}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />
             ) : generalTool === "gcThermo" ? (

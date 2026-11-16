@@ -8,6 +8,24 @@ import "../../styles/generalChem.css";
  * and clearly marked, the areas that are planned. Planned items have no buttons and no calculators.
  */
 const FEATURES: Record<string, string[]> = {
+  gcStoichiometry: [
+    "Formula masses from a documented formula grammar (groups, hydrates, ionic charges); malformed formulas are refused",
+    "Exact balancing of a reaction you supply, including redox and ionic equations, with a conservation check for manual coefficients",
+    "Limiting reagent, excess, theoretical and percent yield from one reaction extent; grams, moles, purity or solutions",
+    "Molarity, dilution, and reactive mixing of solutions, with a schematic particle picture",
+  ],
+  gcGas: [
+    "PV = nRT with unit conversion and absolute temperature; Boyle, Charles, Gay-Lussac and Avogadro as controlled experiments",
+    "A gas container with schematic particles and synchronized P-V, V-T and P-T graphs",
+    "Ideal gas mixtures: mole fractions, Dalton's law, density",
+    "Kinetic theory: rms speed and the Maxwell-Boltzmann speed distribution for two gases at two temperatures",
+  ],
+  gcElectro: [
+    "Galvanic cells from 28 curated half-reactions: anode, cathode, electron flow, salt bridge, overall reaction",
+    "Standard cell potential, the Nernst equation with concentrations, gas pressures and pH, and the link to Gibbs energy and K",
+    "Electrolysis with Faraday's law for seven curated cases, with current efficiency and gas volumes",
+    "Galvanic versus electrolytic sign conventions, and E against log Q",
+  ],
   gcAcidBase: [
     "Strong and weak monoprotic acids and bases; pH, pOH, percent ionization",
     "Buffers, with a check on whether Henderson–Hasselbalch applies",
