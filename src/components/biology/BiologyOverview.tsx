@@ -52,6 +52,24 @@ const FEATURES: Record<string, string[]> = {
     "Crossing over, independent assortment and meiosis I or II nondisjunction, with the resulting gametes compared with the Genetics tool's expectation",
     "Select any chromosome to inspect its origin, chromatids, alleles and spindle attachment",
   ],
+  bioMembrane: [
+    "A phospholipid bilayer with selectable proteins, cholesterol and a schematic fluidity comparison for different lipids and temperatures",
+    "Passive transport (simple diffusion, channels, carriers) with concentrations and voltage you set; permeability is kept separate from the concentration difference",
+    "Ion gradients, Nernst potentials with the sign of the valence, and a GHK membrane voltage; the Na⁺/K⁺-ATPase cycle step by step and SGLT1 cotransport",
+    "Osmosis, osmolarity versus tonicity, and an idealized volume only where its assumptions hold",
+  ],
+  bioSignaling: [
+    "Receptor classes compared: G-protein-coupled receptors, receptor tyrosine kinases, ligand-gated channels and intracellular receptors",
+    "Gs, Gi and Gq pathways with GDP/GTP exchange, second messengers and termination; Gi lowers cAMP production rather than raising it",
+    "The EGFR → Ras → Raf → MEK → ERK cascade, stepped one event at a time",
+    "Inhibitors, constitutive mutations and blocked termination, with consequences derived from the mechanism graph",
+  ],
+  bioNeuron: [
+    "An interactive neuron and synapse, from dendrites to the postsynaptic membrane",
+    "Resting potential from the GHK equation, and a passive RC membrane with the time constant you set",
+    "A Hodgkin–Huxley action potential with channel gates, conductances, TTX- and TEA-like blocks and a measured refractory profile",
+    "Saltatory versus continuous conduction, chemical synapses (excitatory and inhibitory, ionotropic and metabotropic) and summation of postsynaptic potentials",
+  ],
 };
 
 export default function BiologyOverview({ onOpenTool }: { onOpenTool: (id: BiologyToolId) => void }) {
@@ -62,14 +80,14 @@ export default function BiologyOverview({ onOpenTool }: { onOpenTool: (id: Biolo
       <ToolHeader
         group="Analyze"
         headingLevel={1}
-        purpose="Interactive study guides for how genetic information is copied, transcribed, translated and regulated, and how it is inherited through meiosis. Every diagram is drawn from the sequence and process state you are looking at, and every tool has Explore, Practice and Challenge modes."
+        purpose="Interactive study guides for how genetic information is copied, transcribed, translated and regulated, how it is inherited through meiosis, and how cells control transport, signalling and electrical activity. Every diagram is drawn from the sequence and process state you are looking at, and every tool has Explore, Practice and Challenge modes."
         title="Biology"
       />
 
       <Panel subtitle="Working tools you can open now." title="Available now">
-        {(["geneExpression", "inheritance"] as const).map((group) => (
+        {(["geneExpression", "inheritance", "cellular"] as const).map((group) => (
         <div key={group}>
-        <h3 className="ph-group-heading">{group === "geneExpression" ? "Gene expression" : "Genetics & cell division"}</h3>
+        <h3 className="ph-group-heading">{group === "geneExpression" ? "Gene expression" : group === "inheritance" ? "Genetics & cell division" : "Cellular biology & physiology"}</h3>
         <ul className="gc-tool-cards">
           {implemented.filter((tool) => tool.group === group).map((tool) => (
             <li className="gc-tool-card" key={tool.id}>
@@ -112,7 +130,7 @@ export default function BiologyOverview({ onOpenTool }: { onOpenTool: (id: Biolo
       </Panel>
 
       <Callout tone="info" title="Scope of the tools">
-        <p>These are simplified teaching models. Gene-regulation levels are ordinal and qualitative, not measured rates. Genetics shows expected proportions from the stated rules, and one illustrated meiosis is one random outcome, not a distribution. Replication shows one fork with a few nucleotides per primer and Okazaki fragment. Transcription places the promoter and terminator outside the sequence shown and accepts only GU…AG introns. Translation uses the standard genetic code with one tRNA per codon (no wobble). Bacterial and eukaryotic machinery are shown separately and never combined. The models describe textbook mechanisms; they do not predict the behaviour of a real gene or organism.</p>
+        <p>These are simplified teaching models. Gene-regulation levels are ordinal and qualitative, not measured rates. Genetics shows expected proportions from the stated rules, and one illustrated meiosis is one random outcome, not a distribution. Replication shows one fork with a few nucleotides per primer and Okazaki fragment. Transcription places the promoter and terminator outside the sequence shown and accepts only GU…AG introns. Translation uses the standard genetic code with one tRNA per codon (no wobble). Bacterial and eukaryotic machinery are shown separately and never combined. The cellular tools use ideal-solution transport models, curated signalling pathways with on/off states (no rates), and a Hodgkin–Huxley squid-axon model that does not predict any particular neuron. The models describe textbook mechanisms; they do not predict the behaviour of a real gene or organism.</p>
       </Callout>
     </div>
   );

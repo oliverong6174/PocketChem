@@ -43,8 +43,8 @@ describe("navigation", () => {
   test("[tools] Biology is available and lists Overview, the Stage 15 tools, the Stage 16 tools and Saved, in groups with unique slugs", () => {
     const biology = S.getSubject("biology");
     assert.equal(biology.status, "available"); assert.equal(biology.mode, "learning"); assert.equal(S.isAvailable("biology"), true);
-    assert.deepEqual(S.BIOLOGY_TOOLS.map((t) => t.id), ["bioOverview", "bioReplication", "bioTranscription", "bioTranslation", "bioDogma", "bioRegulation", "bioGenetics", "bioDivision", "bioSaved"]);
-    assert.deepEqual(S.BIOLOGY_TOOLS.map((t) => t.group), ["analyze", "geneExpression", "geneExpression", "geneExpression", "geneExpression", "geneExpression", "inheritance", "inheritance", "library"]);
+    assert.deepEqual(S.BIOLOGY_TOOLS.map((t) => t.id), ["bioOverview", "bioReplication", "bioTranscription", "bioTranslation", "bioDogma", "bioRegulation", "bioGenetics", "bioDivision", "bioMembrane", "bioSignaling", "bioNeuron", "bioSaved"]);
+    assert.deepEqual(S.BIOLOGY_TOOLS.map((t) => t.group), ["analyze", "geneExpression", "geneExpression", "geneExpression", "geneExpression", "geneExpression", "inheritance", "inheritance", "cellular", "cellular", "cellular", "library"]);
     assert.ok(S.TOOL_GROUPS.some((g) => g.id === "geneExpression"));
     assert.equal(new Set(S.BIOLOGY_TOOLS.map((t) => t.slug)).size, S.BIOLOGY_TOOLS.length);
     assert.equal(S.getSubject("biochemistry").status, "available"); assert.equal(S.isAvailable("biochemistry"), true);

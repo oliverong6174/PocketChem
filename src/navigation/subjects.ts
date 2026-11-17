@@ -49,8 +49,8 @@ export const SUBJECTS: SubjectDef[] = [
   },
   {
     id: "biology", slug: "biology", label: "Biology", mode: "learning", icon: "biology", status: "available",
-    tagline: "Interactive diagrams of gene expression and its regulation, genetics and inheritance, and mitosis and meiosis.",
-    planned: ["Cell structure explorer", "Population genetics", "Physiology pathways", "Evolution and phylogenetics"],
+    tagline: "Interactive diagrams of gene expression and its regulation, genetics, mitosis and meiosis, membrane transport, cell signaling and neuronal physiology.",
+    planned: ["Cell structure explorer", "Population genetics", "Organ-system physiology", "Evolution and phylogenetics"],
   },
   {
     id: "biochemistry", slug: "biochemistry", label: "Biochemistry", mode: "learning", icon: "biochemistry", status: "available",
@@ -59,7 +59,7 @@ export const SUBJECTS: SubjectDef[] = [
   },
 ];
 
-export type ToolGroupId = "analyze" | "mechanics" | "waves" | "electricity" | "geneExpression" | "inheritance" | "biomolecules" | "metabolism" | "synthesize" | "library";
+export type ToolGroupId = "analyze" | "mechanics" | "waves" | "electricity" | "geneExpression" | "inheritance" | "cellular" | "biomolecules" | "metabolism" | "synthesize" | "library";
 
 export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "analyze", label: "Analyze" },
@@ -68,6 +68,7 @@ export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "electricity", label: "Electricity" },
   { id: "geneExpression", label: "Gene expression" },
   { id: "inheritance", label: "Genetics & cell division" },
+  { id: "cellular", label: "Cellular biology & physiology" },
   { id: "biomolecules", label: "Biomolecules" },
   { id: "metabolism", label: "Metabolism" },
   { id: "synthesize", label: "Synthesize" },
@@ -127,7 +128,7 @@ export const PHYSICS_TOOLS: ToolDef[] = [
   { id: "phSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
-export type BiologyToolId = "bioOverview" | "bioReplication" | "bioTranscription" | "bioTranslation" | "bioDogma" | "bioRegulation" | "bioGenetics" | "bioDivision" | "bioSaved";
+export type BiologyToolId = "bioOverview" | "bioReplication" | "bioTranscription" | "bioTranslation" | "bioDogma" | "bioRegulation" | "bioGenetics" | "bioDivision" | "bioMembrane" | "bioSignaling" | "bioNeuron" | "bioSaved";
 
 export const BIOLOGY_TOOLS: ToolDef[] = [
   { id: "bioOverview", slug: "overview", label: "Overview", summary: "What Biology offers now, and what is still planned.", group: "analyze", icon: "biology" },
@@ -138,6 +139,9 @@ export const BIOLOGY_TOOLS: ToolDef[] = [
   { id: "bioRegulation", slug: "gene-regulation", label: "Gene regulation", summary: "The lac and trp operons and a eukaryotic promoter: repressors, activators, attenuation, enhancers and chromatin.", group: "geneExpression", icon: "operon" },
   { id: "bioGenetics", slug: "genetics", label: "Genetics & inheritance", summary: "Chromosomes, alleles, gametes and offspring: Punnett squares, dominance patterns, X-linkage and linked genes.", group: "inheritance", icon: "chromosome" },
   { id: "bioDivision", slug: "mitosis-meiosis", label: "Mitosis & meiosis", summary: "Chromosomes and chromatids through mitosis and meiosis: crossing over, independent assortment and nondisjunction.", group: "inheritance", icon: "cell" },
+  { id: "bioMembrane", slug: "membranes-transport", label: "Membranes & transport", summary: "The phospholipid bilayer, passive and active transport, ion gradients and the Nernst potential, the Na⁺/K⁺ pump, and osmosis and tonicity.", group: "cellular", icon: "membrane" },
+  { id: "bioSignaling", slug: "cell-signaling", label: "Cell signaling", summary: "Receptor classes and signal transduction: GPCR (Gs, Gi, Gq), the EGFR–Ras–ERK cascade, ligand-gated channels and intracellular receptors, with inhibitors, mutations and termination.", group: "cellular", icon: "signaling" },
+  { id: "bioNeuron", slug: "neuronal-physiology", label: "Neuronal physiology", summary: "Neuron anatomy, resting potential, passive RC membrane, a Hodgkin–Huxley action potential, propagation and myelination, chemical synapses and synaptic summation.", group: "cellular", icon: "neuron" },
   { id: "bioSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 

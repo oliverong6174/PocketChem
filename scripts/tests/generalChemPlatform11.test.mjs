@@ -251,7 +251,7 @@ describe("General Chemistry in the Saved Analyses library", () => {
   test("[app] the app library registers the genchem validators and the page list used by the library", () => {
     const src = read("src", "utils", "persistence", "analysisLibraryApp.ts");
     assert.match(src, /genchem: \{\s*engineVersion: GENCHEM_ENGINE_VERSION,\s*validateInputs: validateGenChemInputs,\s*validateResults: validateGenChemResults,/);
-    assert.match(read("src", "utils", "persistence", "analysisLibrary.ts"), /"conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"]/);
+    assert.match(read("src", "utils", "persistence", "analysisLibrary.ts"), /"conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "membrane", "signaling", "neuron", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"]/);
   });
   test("[workspace] autosave store keeps the General Chemistry workspace separate from every organic page", async () => {
     const backend = new store.MemoryBackend();

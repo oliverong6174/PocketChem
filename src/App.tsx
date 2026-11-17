@@ -119,6 +119,9 @@ const InterferencePage = lazy(() => import("./components/physics/InterferencePag
   const RegulationPage = lazy(() => import("./components/biology/RegulationPage"));
   const GeneticsPage = lazy(() => import("./components/biology/GeneticsPage"));
   const CellDivisionPage = lazy(() => import("./components/biology/CellDivisionPage"));
+  const MembranePage = lazy(() => import("./components/biology/MembranePage"));
+  const SignalingPage = lazy(() => import("./components/biology/SignalingPage"));
+  const NeuronPage = lazy(() => import("./components/biology/NeuronPage"));
   const BiochemOverview = lazy(() => import("./components/biochem/BiochemOverview"));
   const AminoAcidsPage = lazy(() => import("./components/biochem/AminoAcidsPage"));
   const ProteinsPage = lazy(() => import("./components/biochem/ProteinsPage"));
@@ -611,7 +614,7 @@ const InterferencePage = lazy(() => import("./components/physics/InterferencePag
         else switchSubject("biochemistry", { keepOpenRequest: true, tool: target });
         return;
       }
-      if (target === "bioReplication" || target === "bioTranscription" || target === "bioTranslation" || target === "bioDogma" || target === "bioRegulation" || target === "bioGenetics" || target === "bioDivision") {
+      if (target === "bioReplication" || target === "bioTranscription" || target === "bioTranslation" || target === "bioDogma" || target === "bioRegulation" || target === "bioGenetics" || target === "bioDivision" || target === "bioMembrane" || target === "bioSignaling" || target === "bioNeuron") {
         if (activeSubject === "biology") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("biology", { keepOpenRequest: true, tool: target });
         return;
@@ -2082,6 +2085,24 @@ const InterferencePage = lazy(() => import("./components/physics/InterferencePag
               <CellDivisionPage
                 onNavigate={(id: BiologyToolId) => switchGeneralTool(id)}
                 openRequest={pendingOpen?.page === "bioDivision" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioMembrane" ? (
+              <MembranePage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioMembrane" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioSignaling" ? (
+              <SignalingPage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioSignaling" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioNeuron" ? (
+              <NeuronPage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioNeuron" ? pendingOpen : null}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />
             ) : generalTool === "bioSaved" ? (
