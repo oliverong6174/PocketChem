@@ -25,6 +25,9 @@ import {
   validateCellDivisionInputs, validateGeneticsInputs, validateRegulationInputs,
 } from "./biologyTools16";
 import {
+  MEMBRANE_ENGINE_VERSION, NEURON_ENGINE_VERSION, SIGNALING_ENGINE_VERSION, validateMembraneInputs, validateNeuronInputs, validateSignalingInputs,
+} from "./biologyTools23";
+import {
   AMINOACIDS_ENGINE_VERSION, ENZYMES_ENGINE_VERSION, PROTEINS_ENGINE_VERSION, validateAminoAcidsInputs, validateEnzymesInputs, validateProteinsInputs,
 } from "./biochemTools17";
 import {
@@ -48,7 +51,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "membrane", "signaling", "neuron", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -82,6 +85,9 @@ export const ANALYSIS_APP_PAGE = {
   regulation: "bioRegulation",
   genetics: "bioGenetics",
   celldivision: "bioDivision",
+  membrane: "bioMembrane",
+  signaling: "bioSignaling",
+  neuron: "bioNeuron",
   aminoacids: "bcAminoAcids",
   proteins: "bcProteins",
   enzymes: "bcEnzymes",
@@ -154,6 +160,9 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
       regulation: { engineVersion: REGULATION_ENGINE_VERSION, validateInputs: validateRegulationInputs, validateResults: validateBiologyResults },
       genetics: { engineVersion: GENETICS_ENGINE_VERSION, validateInputs: validateGeneticsInputs, validateResults: validateBiologyResults },
       celldivision: { engineVersion: CELLDIVISION_ENGINE_VERSION, validateInputs: validateCellDivisionInputs, validateResults: validateBiologyResults },
+      membrane: { engineVersion: MEMBRANE_ENGINE_VERSION, validateInputs: validateMembraneInputs, validateResults: validateBiologyResults },
+      signaling: { engineVersion: SIGNALING_ENGINE_VERSION, validateInputs: validateSignalingInputs, validateResults: validateBiologyResults },
+      neuron: { engineVersion: NEURON_ENGINE_VERSION, validateInputs: validateNeuronInputs, validateResults: validateBiologyResults },
       aminoacids: { engineVersion: AMINOACIDS_ENGINE_VERSION, validateInputs: validateAminoAcidsInputs, validateResults: validateBiologyResults },
       proteins: { engineVersion: PROTEINS_ENGINE_VERSION, validateInputs: validateProteinsInputs, validateResults: validateBiologyResults },
       enzymes: { engineVersion: ENZYMES_ENGINE_VERSION, validateInputs: validateEnzymesInputs, validateResults: validateBiologyResults },
