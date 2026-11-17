@@ -62,7 +62,7 @@ export function summarizeMembrane(i: MembraneInputs): BiologyResults | null {
     case "active": {
       if (i.active.transporter === "nak") {
         const s = pumpState(i.active.pumpStep, i.active.pumpPerturbation);
-        return ok(MEMBRANE_ENGINE_VERSION, [`Na⁺/K⁺-ATPase step ${i.active.pumpStep + 1}: ${s.title}`, `Na⁺ out ${s.naMovedOut}, K⁺ in ${s.kMovedIn}, ATP hydrolysed ${s.atpHydrolyzed}`], MEMBRANE_ASSUMPTIONS, s.atpHydrolyzed, "ATP hydrolysed so far");
+        return ok(MEMBRANE_ENGINE_VERSION, [`Na⁺/K⁺-ATPase step ${i.active.pumpStep} of 7: ${s.title}`, `Na⁺ out ${s.naMovedOut}, K⁺ in ${s.kMovedIn}, ATP hydrolysed ${s.atpHydrolyzed}`], MEMBRANE_ASSUMPTIONS, s.atpHydrolyzed, "ATP hydrolysed so far");
       }
       const r = evaluateSglt(i.active.sglt);
       return ok(MEMBRANE_ENGINE_VERSION, [`SGLT1 (2 Na⁺ : 1 glucose): ΔG per cycle ${r.deltaGCycleKJ.toFixed(1)} kJ/mol, net glucose ${r.glucoseDirection}`, `Thermodynamic accumulation limit ${r.maxAccumulationRatio.toPrecision(3)}×`], MEMBRANE_ASSUMPTIONS, Number(r.deltaGCycleKJ.toFixed(4)), "ΔG per cycle (kJ/mol)");
