@@ -40,3 +40,5 @@
 @media (prefers-reduced-motion: reduce) { .c23-sel, .c23-card { transition: none; } }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.c23-tablewrap { overflow-x: auto; max-width: 100%; }
+.c23-card-static { list-style: none; display: grid; gap: var(--sp-2); padding: var(--sp-3); border: 1px solid var(--border-strong); border-radius: var(--radius-md, 8px); }

@@ -82,13 +82,25 @@ export default function SignalingPage({ openRequest = null, onOpenHandled, onNav
       {ws.saveFormEl}
 
       <Panel subtitle="Receptors do not all work the same way. Choose a class to open its model." title="Receptor classes">
-        <table className="c23-table" data-testid="receptor-table">
+        {narrow ? (
+          <ul className="c23-mech-list" data-testid="receptor-table">
+            {RECEPTOR_CLASSES.map((c) => (
+              <li className="c23-card-static" key={c.id}>
+                <strong>{c.name}</strong>
+                <dl className="bio-seqline"><dt>Location</dt><dd>{c.location}</dd><dt>Activation</dt><dd>{c.activation}</dd><dt>Signal</dt><dd>{c.transmission}</dd><dt>Speed</dt><dd>{c.speed}</dd></dl>
+                <button className="secondary-button" data-testid={`open-${c.id}`} onClick={() => setSystem(c.system)} type="button">Open {c.name}</button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="c23-tablewrap">        <table className="c23-table" data-testid="receptor-table">
           <thead><tr><th scope="col">Class</th><th scope="col">Location</th><th scope="col">Activation</th><th scope="col">Signal transmission</th><th scope="col">Speed</th><th scope="col"><span className="sr-only">Open</span></th></tr></thead>
           <tbody>{RECEPTOR_CLASSES.map((c) => (
             <tr key={c.id}><th scope="row">{c.name}</th><td>{c.location}</td><td>{c.activation}</td><td>{c.transmission}</td><td>{c.speed}</td>
               <td><button className="secondary-button" data-testid={`open-${c.id}`} onClick={() => setSystem(c.system)} type="button">Open</button></td></tr>
           ))}</tbody>
-        </table>
+        </table></div>
+        )}
       </Panel>
 
       <div className="c23-sections"><Segmented<SystemId> label="Signaling pathway" onChange={setSystem} options={SYSTEM_IDS.map((id) => ({ id, label: SYSTEM_LABEL[id] }))} value={sig.system} /></div>

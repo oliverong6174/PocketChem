@@ -104,8 +104,8 @@ export default function MembranePage({ openRequest = null, onOpenHandled, onNavi
           <p className="c23-note">{FLUIDITY_CAVEAT}</p>
         </Panel>
         <Panel subtitle="Selective permeability: what the lipid core lets through by itself." title="Permeability of the bilayer">
-          <table className="c23-table" data-testid="permeability-table"><thead><tr><th scope="col">Solute class</th><th scope="col">Examples</th><th scope="col">Through the lipid</th><th scope="col">Usual route</th></tr></thead>
-            <tbody>{PERMEABILITY_CLASSES.map((p) => <tr key={p.id}><th scope="row">{p.label}</th><td>{p.examples}</td><td>{p.bilayer}</td><td>{p.route}</td></tr>)}</tbody></table>
+          <div className="c23-tablewrap"><table className="c23-table" data-testid="permeability-table"><thead><tr><th scope="col">Solute class</th><th scope="col">Examples</th><th scope="col">Through the lipid</th><th scope="col">Usual route</th></tr></thead>
+            <tbody>{PERMEABILITY_CLASSES.map((p) => <tr key={p.id}><th scope="row">{p.label}</th><td>{p.examples}</td><td>{p.bilayer}</td><td>{p.route}</td></tr>)}</tbody></table></div>
         </Panel>
       </>
     );
@@ -180,8 +180,8 @@ export default function MembranePage({ openRequest = null, onOpenHandled, onNavi
     figures = [{ label: `E(${IONS[sel.ion].symbol})`, value: mv(sel.eMv), note: "Nernst, z = " + (sel.z > 0 ? "+" : "−") + Math.abs(sel.z) }, { label: "Membrane voltage Vm", value: mv(e.vmMv), note: raw.ions.vmSource === "ghk" ? "GHK" : "set by hand" }, { label: "Vm − E", value: mv(sel.drivingMv) }, { label: "Open channel", value: sel.direction === "none" ? "no net flow" : `net ${sel.direction}` }];
     explore = (
       <Panel subtitle="For the selected ion." title="Chemical and electrical driving forces">
-        <table className="c23-table" data-testid="ion-table"><thead><tr><th scope="col">Ion</th><th scope="col">E (mV)</th><th scope="col">Vm − E (mV)</th><th scope="col">Open channel</th></tr></thead>
-          <tbody>{e.ions.map((d) => <tr key={d.ion}><th scope="row">{IONS[d.ion].symbol}</th><td>{d.eMv.toFixed(1)}</td><td>{d.drivingMv.toFixed(1)}</td><td>{d.direction === "none" ? "no net flow" : d.direction}</td></tr>)}</tbody></table>
+        <div className="c23-tablewrap"><table className="c23-table" data-testid="ion-table"><thead><tr><th scope="col">Ion</th><th scope="col">E (mV)</th><th scope="col">Vm − E (mV)</th><th scope="col">Open channel</th></tr></thead>
+          <tbody>{e.ions.map((d) => <tr key={d.ion}><th scope="row">{IONS[d.ion].symbol}</th><td>{d.eMv.toFixed(1)}</td><td>{d.drivingMv.toFixed(1)}</td><td>{d.direction === "none" ? "no net flow" : d.direction}</td></tr>)}</tbody></table></div>
         <ul className="gc-assumptions" data-testid="reasons">
           <li>Chemical term: {IONS[sel.ion].symbol} is {raw.ions.ions[sel.ion].out > raw.ions.ions[sel.ion].in ? "more concentrated outside, so diffusion alone would push it in" : "more concentrated inside, so diffusion alone would push it out"}.</li>
           <li>Electrical term: with Vm = {mv(e.vmMv)} the electrical force {sel.z * e.vmMv < 0 ? "favours inward movement" : "favours outward movement"} of {IONS[sel.ion].symbol} (valence {sel.z > 0 ? "+" : "−"}{Math.abs(sel.z)}).</li>
@@ -220,7 +220,7 @@ export default function MembranePage({ openRequest = null, onOpenHandled, onNavi
       caption = "The pump's conformation, bound ions, phosphorylation and the ions moved so far all come from the cycle state at this step.";
       figures = [{ label: "Conformation", value: s.conformation, note: s.facing === "occluded" ? "occluded" : `open to ${s.facing}` }, { label: "Na⁺ moved out", value: `${s.naMovedOut} of 3` }, { label: "K⁺ moved in", value: `${s.kMovedIn} of 2` }, { label: "ATP hydrolysed", value: `${s.atpHydrolyzed}`, note: "per completed cycle: 1" }];
       explore = (
-        <Panel subtitle="One simplified Post–Albers cycle." title={`Step ${pumpStep + 1}: ${s.title}`}>
+        <Panel subtitle="One simplified Post–Albers cycle." title={`Step ${pumpStep} of ${pumpMax}: ${s.title}`}>
           <p data-testid="pump-text">{s.text}</p>
           {a.pumpPerturbation !== "none" ? <Callout tone="warn" title={PUMP_PERTURBATIONS.find((p) => p.id === a.pumpPerturbation)!.label}><p>{PUMP_PERTURBATIONS.find((p) => p.id === a.pumpPerturbation)!.effect}</p></Callout> : null}
           <p><strong>Net charge moved out so far:</strong> {s.netChargeOut > 0 ? `+${s.netChargeOut}` : s.netChargeOut} elementary charge{Math.abs(s.netChargeOut) === 1 ? "" : "s"}</p>
@@ -235,7 +235,7 @@ export default function MembranePage({ openRequest = null, onOpenHandled, onNavi
       caption = "The drawn cycle is the inward direction. If the energy balance reverses, the diagram says so and the arrows are reversed.";
       figures = [{ label: "ΔG per cycle (2 Na⁺ + 1 glucose in)", value: `${r.deltaGCycleKJ.toFixed(1)} kJ/mol` }, { label: "Net glucose", value: r.glucoseDirection === "none" ? "none (equilibrium)" : r.glucoseDirection }, { label: "Accumulation limit", value: `${r.maxAccumulationRatio.toPrecision(3)}×`, note: "thermodynamic limit, not a prediction" }, { label: "ATP used by SGLT1", value: "none" }];
       explore = (
-        <Panel subtitle="Energy bookkeeping." title={`Step ${a.sgltStep + 1}: ${SGLT_STEPS[a.sgltStep].title}`}>
+        <Panel subtitle="Energy bookkeeping." title={`Step ${a.sgltStep} of ${SGLT_STEPS.length - 1}: ${SGLT_STEPS[a.sgltStep].title}`}>
           <p>{SGLT_STEPS[a.sgltStep].text}</p>
           <ul className="gc-assumptions" data-testid="reasons">
             <li>Na⁺ term for two Na⁺ moving in: {r.naTermKJ.toFixed(1)} kJ/mol (strongly negative: a steep gradient and a negative membrane voltage).</li>

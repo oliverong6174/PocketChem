@@ -159,7 +159,7 @@ export default function NeuronPage({ openRequest = null, onOpenHandled, onNaviga
     const h = raw.hh;
     const phase = analysis.phases[hhIndex];
     const cs = channelState(trace.m[hhIndex], trace.h[hhIndex], trace.n[hhIndex]);
-    const bands = analysis.transitions.filter((t, i, a) => t.phase !== "rest" && i < a.length).map((t, i, a) => { const end = a.find((x) => x.index > t.index); return { id: `b${i}${t.index}`, x0: trace.t[t.index], x1: end ? trace.t[end.index] : trace.t[trace.t.length - 1], label: PHASE_BAND_LABEL[t.phase] }; });
+    const bands = analysis.transitions.map((t, i, a) => ({ t, end: a[i + 1] })).filter(({ t }) => t.phase === "rising" || t.phase === "repol" || t.phase === "ahp").map(({ t, end }, i) => ({ id: `b${i}${t.index}`, x0: trace.t[t.index], x1: end ? trace.t[end.index] : trace.t[trace.t.length - 1], label: PHASE_BAND_LABEL[t.phase] }));
     inputs = (
       <>
         <Param label="Stimulus amplitude" max={100} min={0} onChange={(v) => setHh({ amp: v })} step={0.5} testId="hh-amp" unit="µA/cm²" value={h.amp} />
@@ -199,8 +199,8 @@ export default function NeuronPage({ openRequest = null, onOpenHandled, onNaviga
         <Panel subtitle="Hodgkin–Huxley model; relative and absolute refractory periods." title="Refractory behaviour">
           <p>{REFRACTORY_NOTE}</p>
           {refr ? (
-            <table className="c23-table" data-testid="refractory-table"><thead><tr><th scope="col">Second pulse starts after</th><th scope="col">Smallest amplitude that fires a second spike</th><th scope="col">Period</th></tr></thead>
-              <tbody>{refr.map((r) => { const base = thrAmp ?? thresholdAmplitude({ ...h, amp2: 0 }) ?? 0; return <tr key={r.delayMs}><th scope="row">{r.delayMs} ms</th><td>{r.minAmp === null ? "none up to 400 µA/cm²" : `${r.minAmp} µA/cm²`}</td><td>{r.minAmp === null ? "absolute refractory" : r.minAmp > base * 1.25 ? "relative refractory" : "recovered"}</td></tr>; })}</tbody></table>
+            <div className="c23-tablewrap"><table className="c23-table" data-testid="refractory-table"><thead><tr><th scope="col">Second pulse starts after</th><th scope="col">Smallest amplitude that fires a second spike</th><th scope="col">Period</th></tr></thead>
+              <tbody>{refr.map((r) => { const base = thrAmp ?? thresholdAmplitude({ ...h, amp2: 0 }) ?? 0; return <tr key={r.delayMs}><th scope="row">{r.delayMs} ms</th><td>{r.minAmp === null ? "none up to 400 µA/cm²" : `${r.minAmp} µA/cm²`}</td><td>{r.minAmp === null ? "absolute refractory" : r.minAmp > base * 1.25 ? "relative refractory" : "recovered"}</td></tr>; })}</tbody></table></div>
           ) : <p className="bio-note">Press “Measure refractory profile” to run the model for several delays.</p>}
         </Panel>
         <Panel subtitle="Read before using the numbers." title="What this model is, and is not">

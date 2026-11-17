@@ -78,7 +78,7 @@ export function SignalingDiagram({ system, ev, selected, onSelect }: { system: S
       <rect fill="#fde68a" height={NH + 10} opacity={0.55} width={640} x={0} y={rowY(mRow) - 5} />
       <Txt anchor="start" bold fill="#92400e" size={11} x={6} y={rowY(mRow) + 6}>PLASMA MEMBRANE</Txt>
       <Txt anchor="start" bold fill={MUTED} size={11} x={6} y={14}>{system.id === "nuclear" ? "" : "EXTRACELLULAR"}</Txt>
-      <Txt anchor="start" bold fill={MUTED} size={11} x={6} y={rowY(mRow) + NH + 26}>{system.id === "nuclear" ? "CYTOSOL" : "CYTOSOL"}</Txt>
+      <Txt anchor="start" bold fill={MUTED} size={11} x={6} y={H - 6}>CYTOSOL</Txt>
       {edges}
       {system.nodes.map((n) => {
         const b = box(n), s = ev.current[n.id], reached = ev.reached[n.id];

@@ -114,6 +114,25 @@ Three more working tools: `bioRegulation` (`#/biology/gene-regulation`, group `g
   components (keyboard operable), reduced-motion respected, and a focused one-cell view on phones.
 - Tests: `biologyRegulation16`, `biologyGenetics16`, `biologyDivision16`, `biologyPlatform16`; browser check `scripts/browser/stage16LiveCheck.mjs`.
 
+## Biology (Stage 23): membranes, cell signaling and neuronal physiology
+
+Three more working tools in the new group `cellular` ("Cellular biology & physiology"): `bioMembrane` (`#/biology/membranes-transport`), `bioSignaling`
+(`#/biology/cell-signaling`) and `bioNeuron` (`#/biology/neuronal-physiology`). Saved pages `membrane`, `signaling`, `neuron` (engine version 1 each,
+`utils/persistence/biologyTools23.ts`; strict validators that reject contradictory records; every derived result is rebuilt on open).
+
+- `utils/biology/membrane23.ts`: Nernst (signed valence), electrochemical driving force and direction (Δμ_in = zF(Vm − E)), GHK for K⁺/Na⁺/Cl⁻,
+  neutral-solute flux (simple, channel, symmetrical saturable carrier), the Na⁺/K⁺-ATPase cycle (3 Na⁺ out, 2 K⁺ in, 1 ATP), SGLT1 symport energetics
+  (a thermodynamic limit, not a prediction), osmosis/tonicity (impermeant versus permeant solutes; volume only within 0.5–2 × and only idealized) and
+  an ordinal bilayer-fluidity comparison. Passive transport never uses ATP and is never drawn uphill.
+- `utils/biology/signaling23.ts`: curated mechanism graphs (Gs, Gi, Gq, EGFR→Ras→Raf→MEK→ERK, a ligand-gated channel, a nuclear receptor). Node states
+  (on, off, blocked, attenuated, persisting) are derived from requires/suppressed-by edges, perturbations (block or constitutive) and the phase (ligand
+  present, prolonged, removed). No rates, no amplification factors, no phenotype predictions.
+- `utils/biology/neuron23.ts`: passive RC membrane (closed form), Hodgkin–Huxley squid axon at 6.3 °C with RK4 (dt 0.01 ms) and TTX-/TEA-like blocks,
+  schematic propagation (site counting, no velocities), chemical-synapse stages with reversal-potential polarity, and linear synaptic summation.
+- `bioLearning23.ts` builds Practice questions and Challenge predictions from the same engine calls that draw the diagrams. Phones get a focused list
+  of events for the signalling diagram instead of a shrunken graph.
+- Tests: `biologyMembrane23`, `biologySignaling23`, `biologyNeuron23`, `biologyPlatform23`; browser check `scripts/browser/stage23LiveCheck.mjs`.
+
 ## Biochemistry (Stage 17): amino acids, protein structure and enzymes
 
 Biochemistry is the fifth available subject (Interactive Learning). Tools: `bcAminoAcids` (`#/biochemistry/amino-acids`), `bcProteins`

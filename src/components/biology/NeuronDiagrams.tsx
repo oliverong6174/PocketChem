@@ -31,8 +31,8 @@ export function NeuronAnatomy({ selected, onSelect }: { selected: PartId | null;
       <SelG id="hillock" label="Axon hillock and initial segment" onSelect={pick} selected={S}>
         <path d="M184 112 L226 126 L226 134 L184 148 Z" fill="#fde68a" stroke="#b45309" strokeWidth={2.4} />
         {ring(176, 100, 60, 60, S === "hillock")}
-        <Txt bold fill="#92400e" size={12} x={210} y={92}>Axon hillock</Txt>
-        <Txt fill="#92400e" size={11} x={210} y={106}>(initial segment)</Txt>
+        <Txt bold fill="#92400e" size={12} x={236} y={80}>Axon hillock</Txt>
+        <Txt fill="#92400e" size={11} x={236} y={94}>(initial segment)</Txt>
       </SelG>
       <SelG id="axon" label="Axon" onSelect={pick} selected={S}>
         <line stroke="#334155" strokeWidth={5} x1={226} x2={566} y1={130} y2={130} />
@@ -61,7 +61,7 @@ export function NeuronAnatomy({ selected, onSelect }: { selected: PartId | null;
         <rect fill="#e0f2fe" height={80} stroke="#0369a1" strokeDasharray="3 3" strokeWidth={1.6} width={16} x={606} y={90} />
         {[[614, 112], [613, 128], [615, 144]].map(([x, y]) => <circle cx={x} cy={y} fill="#be185d" key={`${x}${y}`} r={2.8} />)}
         {ring(602, 86, 24, 88, S === "cleft")}
-        <Txt bold fill="#0369a1" size={11} x={614} y={190}>Cleft</Txt>
+        <Txt bold fill="#0369a1" size={11} x={606} y={226}>Cleft</Txt>
       </SelG>
       <SelG id="postsynaptic" label="Postsynaptic membrane" onSelect={pick} selected={S}>
         <path d="M626 96 L690 96 L690 164 L626 164 Z" fill="#ddd6fe" stroke="#6d28d9" strokeWidth={2.6} />
@@ -145,8 +145,8 @@ export function ChannelDiagram({ tr, index, phase }: { tr: HhTrace; index: numbe
       <Txt anchor="start" bold fill={MUTED} size={11} x={8} y={262}>INSIDE</Txt>
       <Txt anchor="end" bold size={12.5} x={472} y={16}>V = {v.toFixed(1)} mV · {tr.t[index].toFixed(2)} ms</Txt>
       {na(130)}{k(350)}
-      {iNa < -0.5 ? <line markerEnd="url(#ch-blue)" stroke={COL.na} strokeWidth={Math.min(8, 2 + Math.abs(iNa) / 40)} x1={130} x2={130} y1={34} y2={MB + 40} /> : null}
-      {iK > 0.5 ? <line markerEnd="url(#ch-bad)" stroke={COL.k} strokeWidth={Math.min(8, 2 + Math.abs(iK) / 40)} x1={350} x2={350} y1={MB + 60} y2={32} /> : iK < -0.5 ? <line markerEnd="url(#ch-ink)" stroke={COL.k} strokeWidth={3} x1={350} x2={350} y1={34} y2={MB + 40} /> : null}
+      {iNa < -0.5 ? <line markerEnd="url(#ch-blue)" stroke={COL.na} strokeWidth={Math.min(8, 2 + Math.abs(iNa) / 40)} x1={130} x2={130} y1={34} y2={MB + 12} /> : null}
+      {iK > 0.5 ? <line markerEnd="url(#ch-bad)" stroke={COL.k} strokeWidth={Math.min(8, 2 + Math.abs(iK) / 40)} x1={350} x2={350} y1={MB + 12} y2={32} /> : iK < -0.5 ? <line markerEnd="url(#ch-ink)" stroke={COL.k} strokeWidth={3} x1={350} x2={350} y1={34} y2={MB + 12} /> : null}
       <Txt bold fill={COL.na} size={12.5} x={130} y={176}>Na⁺ channel</Txt>
       <Txt size={11} x={130} y={192}>activation gate m = {m.toFixed(2)}</Txt>
       <Txt size={11} x={130} y={206}>({cs.naActivation})</Txt>
@@ -157,8 +157,8 @@ export function ChannelDiagram({ tr, index, phase }: { tr: HhTrace; index: numbe
       <Txt size={11} x={350} y={208}>{cs.kChannel.replace("K⁺ channels: ", "")}</Txt>
       <Txt fill={COL.na} size={11} x={130} y={252}>{iNa < -0.5 ? "net Na⁺ current INWARD" : "no net Na⁺ current"}</Txt>
       <Txt fill={COL.k} size={11} x={350} y={252}>{iK > 0.5 ? "K⁺ current OUTWARD" : iK < -0.5 ? "K⁺ current inward" : "no net K⁺ current"}</Txt>
-      <Txt bold fill="#be123c" size={10.5} x={190} y={MB + 38}>inactivation ball</Txt>
-      <Txt bold fill="#2563eb" size={10.5} x={96} y={MT - 18}>activation gate</Txt>
+      <Txt anchor="start" bold fill="#be123c" size={10.5} x={176} y={MB + 30}>inactivation ball</Txt>
+      <Txt anchor="end" bold fill="#2563eb" size={10.5} x={92} y={MT - 18}>activation gate</Txt>
       <Txt anchor="end" bold fill={INK} size={11.5} x={472} y={30}>{phase}</Txt>
     </svg>
   );
@@ -229,8 +229,7 @@ export function SynapseDiagram({ input, state }: { input: SynapseInput; state: S
           <Txt bold fill={COL.proteinStroke} size={11.5} x={Xr - 60} y={288}>{ex.receptor}</Txt>
         </g>
       )}
-      {state.receptorActive ? <Txt anchor="end" bold fill={r.effect === "excitatory" ? COL.ok : COL.bad} size={12} x={472} y={326}>{r.polarity}: {r.effect}</Txt> : null}
-      <Txt anchor="start" fill={MUTED} size={11} x={8} y={342}>{state.stage.title}</Txt>
+      {state.receptorActive ? <Txt anchor="end" bold fill={r.effect === "excitatory" ? COL.ok : COL.bad} size={12} x={472} y={316}>{r.polarity}: {r.effect}</Txt> : null}
     </svg>
   );
 }

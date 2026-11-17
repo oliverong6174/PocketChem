@@ -74,7 +74,7 @@ function Channel({ x, open = true, label, sel, onSelect, id = "channel", ion, wi
       <rect fill={COL.protein} height={104} rx={6} stroke={COL.proteinStroke} strokeWidth={2} width={18} x={x - 18 - g} y={MT - 18} />
       <rect fill={COL.protein} height={104} rx={6} stroke={COL.proteinStroke} strokeWidth={2} width={18} x={x + g} y={MT - 18} />
       {open ? <rect fill="#dbeafe" height={96} width={g * 2} x={x - g} y={MT - 14} /> : <rect fill="#94a3b8" height={14} rx={3} width={g * 2 + 6} x={x - g - 3} y={MID - 7} />}
-      {ion ? <Txt bold fill={COL.proteinStroke} size={11} x={x} y={MB + 34}>{ion}</Txt> : null}
+      {ion ? <Txt bold fill={COL.proteinStroke} size={11} x={x} y={MB + 46}>{ion}</Txt> : null}
       {sel === id ? <rect fill="none" height={116} rx={9} stroke="#1d4ed8" strokeDasharray="5 3" strokeWidth={2.2} width={g * 2 + 48} x={x - g - 24} y={MT - 24} /> : null}
     </SelG>
   );
@@ -165,8 +165,8 @@ export function BilayerScene({ state, onSelect }: { state: BilayerState; onSelec
       <Txt fill={INK} size={11} x={297} y={110}>carrier</Txt>
       <Txt fill={INK} size={11} x={375} y={110}>pump</Txt>
       <Txt fill={INK} size={10.5} x={437} y={110}>head</Txt>
-      <Txt fill={INK} size={10.5} x={437} y={218}>tails</Txt>
-      <Txt fill={INK} size={10.5} x={461} y={218}>cholesterol{state.cholesterol ? "" : " (absent)"}</Txt>
+      <Txt fill={INK} size={10.5} x={425} y={216}>tails</Txt>
+      <Txt anchor="end" fill={INK} size={10.5} x={W - 4} y={230}>cholesterol{state.cholesterol ? "" : " (absent)"}</Txt>
       <Txt anchor="end" fill={MUTED} italic size={11} x={W - 8} y={H_MAX - 8}>Heads face water; tails form the hydrophobic core</Txt>
     </svg>
   );
@@ -188,14 +188,6 @@ export function PassiveScene({ input, result, selected, onSelect }: { input: Pas
   const summary = `${def.label} ${input.mechanism === "simple" ? "simple diffusion" : input.mechanism === "carrier" ? "carrier-mediated facilitated diffusion" : "channel-mediated transport"}. Outside ${input.cOut} mM, inside ${input.cIn} mM. Net movement: ${dirWord(result.direction)}. No ATP is used.${result.ion ? ` Equilibrium potential ${result.ion.eMv.toFixed(1)} mV, membrane voltage ${input.vmMv} mV.` : ""}`;
   const chem = input.cOut > input.cIn ? "in" : input.cOut < input.cIn ? "out" : "none";
   const elec = result.ion ? (def.z * input.vmMv < 0 ? "in" : def.z * input.vmMv > 0 ? "out" : "none") : "none";
-  const small = (kind: string, side: string, y: number) => (
-    <g>
-      <Txt anchor="start" bold fill={INK} size={11} x={332} y={y}>{kind}</Txt>
-      {side === "none" ? <Txt anchor="start" fill={MUTED} size={11} x={332} y={y + 15}>— none —</Txt> : (
-        <g><line markerEnd="url(#pa-ink)" stroke={INK} strokeWidth={2.4} x1={338} x2={338} y1={side === "in" ? y + 6 : y + 26} y2={side === "in" ? y + 26 : y + 6} /><Txt anchor="start" fill={INK} size={11} x={348} y={y + 20}>favours {side === "in" ? "inward" : "outward"}</Txt></g>
-      )}
-    </g>
-  );
   return (
     <svg aria-label={summary} className="c23-svg" role="img" viewBox={`0 0 ${W} ${H_MAX}`}>
       <ArrowMarkers prefix="pa" />
@@ -205,31 +197,33 @@ export function PassiveScene({ input, result, selected, onSelect }: { input: Pas
       {input.mechanism === "channel" ? <Channel id="channel" ion={def.ion ? `${def.label} channel` : "channel"} onSelect={onSelect} sel={selected} x={X} /> : null}
       {input.mechanism === "carrier" ? <Carrier id="carrier" onSelect={onSelect} sel={selected} tag="GLUT carrier" x={X} /> : null}
       {dots(nOut, 20, 160, 28, 120, color, "circle", 1)}
-      {dots(nIn, 20, 160, MB + 16, 300, color, "circle", 2)}
+      {dots(nIn, 20, 160, MB + 40, 300, color, "circle", 2)}
       <Txt anchor="start" bold fill={color} size={12} x={24} y={126}>{def.label}: {input.cOut} mM</Txt>
-      <Txt anchor="start" bold fill={color} size={12} x={24} y={226}>{def.label}: {input.cIn} mM</Txt>
+      <Txt anchor="start" bold fill={color} size={12} x={24} y={MB + 30}>{def.label}: {input.cIn} mM</Txt>
       {result.direction === "none" ? (
         <g>
-          <line markerEnd="url(#pa-ink)" stroke={MUTED} strokeDasharray="4 3" strokeWidth={2.2} x1={X - 14} x2={X - 14} y1={86} y2={168 + 60} />
-          <line markerEnd="url(#pa-ink)" stroke={MUTED} strokeDasharray="4 3" strokeWidth={2.2} x1={X + 14} x2={X + 14} y1={250} y2={90} />
-          <Txt bold fill={MUTED} size={12} x={X + 52} y={152}>equal rates</Txt>
+          <line markerEnd="url(#pa-ink)" stroke={MUTED} strokeDasharray="4 3" strokeWidth={2.2} x1={X - 14} x2={X - 14} y1={74} y2={228} />
+          <line markerEnd="url(#pa-ink)" stroke={MUTED} strokeDasharray="4 3" strokeWidth={2.2} x1={X + 14} x2={X + 14} y1={228} y2={76} />
+          <Txt anchor="start" bold fill={MUTED} size={12} x={X + 34} y={118}>equal rates</Txt>
         </g>
       ) : (
         <g>
-          <line markerEnd="url(#pa-ok)" stroke={arrowColor} strokeWidth={4} x1={X} x2={X} y1={down ? 80 : 262} y2={down ? 262 : 80} />
-          <Txt anchor="start" bold fill={COL.ok} size={12} x={X + 34} y={down ? 100 : 250}>net: {down ? "in" : "out"}</Txt>
+          <line markerEnd="url(#pa-ok)" stroke={arrowColor} strokeWidth={4} x1={X} x2={X} y1={down ? 74 : 228} y2={down ? 228 : 74} />
+          <Txt anchor="start" bold fill={COL.ok} size={12} x={X + 34} y={118}>net: {down ? "in" : "out"}</Txt>
         </g>
       )}
       <Txt anchor="end" bold fill={COL.bad} size={11.5} x={W - 8} y={H_MAX - 26}>No ATP: passive ({input.mechanism === "simple" ? "simple diffusion" : "facilitated"})</Txt>
       {result.ion ? (
         <g>
-          <rect fill="#ffffff" height={152} rx={8} stroke="#cbd5e1" width={140} x={326} y={28} />
-          <Txt anchor="start" bold fill={INK} size={11} x={332} y={46}>Driving forces on {def.label}</Txt>
-          {small("Concentration:", chem, 56)}
-          {small("Electrical (Vm):", elec, 92)}
-          <Txt anchor="start" bold fill={COL.ok} size={11} x={332} y={146}>Net: {result.direction === "none" ? "equilibrium" : result.direction}</Txt>
-          <Txt anchor="start" fill={MUTED} size={10.5} x={332} y={162}>E = {result.ion.eMv.toFixed(0)} mV, Vm = {input.vmMv} mV</Txt>
-          <Txt anchor="end" bold fill={INK} size={11} x={W - 8} y={MT + 4}>{input.vmMv < 0 ? "inside −" : input.vmMv > 0 ? "inside +" : "Vm = 0"}</Txt>
+          <rect fill="#ffffff" height={106} rx={8} stroke="#cbd5e1" width={150} x={322} y={22} />
+          <Txt anchor="start" bold fill={INK} size={11} x={330} y={38}>Forces on {def.label}</Txt>
+          <Txt anchor="start" fill={INK} size={11} x={330} y={56}>Concentration:</Txt>
+          {chem === "none" ? <Txt anchor="start" fill={MUTED} size={11} x={420} y={56}>none</Txt> : <g><line markerEnd="url(#pa-ink)" stroke={INK} strokeWidth={2.4} x1={416} x2={416} y1={chem === "in" ? 46 : 62} y2={chem === "in" ? 62 : 46} /><Txt anchor="start" fill={INK} size={11} x={424} y={56}>{chem}</Txt></g>}
+          <Txt anchor="start" fill={INK} size={11} x={330} y={78}>Electrical (Vm):</Txt>
+          {elec === "none" ? <Txt anchor="start" fill={MUTED} size={11} x={430} y={78}>none</Txt> : <g><line markerEnd="url(#pa-ink)" stroke={INK} strokeWidth={2.4} x1={426} x2={426} y1={elec === "in" ? 68 : 84} y2={elec === "in" ? 84 : 68} /><Txt anchor="start" fill={INK} size={11} x={434} y={78}>{elec}</Txt></g>}
+          <Txt anchor="start" bold fill={COL.ok} size={11} x={330} y={100}>Net: {result.direction === "none" ? "equilibrium" : result.direction}</Txt>
+          <Txt anchor="start" fill={MUTED} size={10.5} x={330} y={118}>E {result.ion.eMv.toFixed(0)} mV · Vm {input.vmMv} mV</Txt>
+          <Txt anchor="end" bold fill={INK} size={11} x={W - 6} y={MB + 20}>{input.vmMv < 0 ? "inside −" : input.vmMv > 0 ? "inside +" : "Vm = 0"}</Txt>
         </g>
       ) : null}
     </svg>
@@ -305,7 +299,7 @@ export function VoltageLadder({ input }: { input: IonExplorerInput }) {
 export function PumpScene({ state }: { state: PumpState }) {
   const X = 240;
   const openTop = state.facing === "extracellular", openBottom = state.facing === "cytosol";
-  const summary = `Na⁺/K⁺-ATPase step ${state.step + 1} of 8: ${state.title}. Conformation ${state.conformation}, ${state.facing === "occluded" ? "occluded (open to neither side)" : `open to the ${state.facing}`}. ${state.phosphorylated ? "Phosphorylated." : "Not phosphorylated."} ${state.naBound} Na⁺ and ${state.kBound} K⁺ bound. Moved so far: ${state.naMovedOut} Na⁺ out, ${state.kMovedIn} K⁺ in; ATP hydrolysed ${state.atpHydrolyzed}.`;
+  const summary = `Na⁺/K⁺-ATPase step ${state.step} of 7: ${state.title}. Conformation ${state.conformation}, ${state.facing === "occluded" ? "occluded (open to neither side)" : `open to the ${state.facing}`}. ${state.phosphorylated ? "Phosphorylated." : "Not phosphorylated."} ${state.naBound} Na⁺ and ${state.kBound} K⁺ bound. Moved so far: ${state.naMovedOut} Na⁺ out, ${state.kMovedIn} K⁺ in; ATP hydrolysed ${state.atpHydrolyzed}.`;
   const cav = (y: number, open: boolean) => <rect fill={open ? "#ffffff" : COL.protein} height={34} rx={10} stroke={COL.proteinStroke} strokeWidth={open ? 1.6 : 0} width={44} x={X - 22} y={y} />;
   const ions: ReactNode[] = [];
   const cy = MID;
@@ -326,11 +320,11 @@ export function PumpScene({ state }: { state: PumpState }) {
       {state.atpBound ? <g><rect fill="#cffafe" height={20} rx={10} stroke={COL.atp} strokeWidth={1.8} width={44} x={X - 22} y={MB + 12} /><Txt bold fill={COL.atp} size={12} x={X} y={MB + 26}>ATP</Txt></g> : null}
       {state.adpReleased > 0 && state.step <= 4 ? <Txt bold fill={COL.atp} size={11.5} x={X - 70} y={MB + 40}>ADP released</Txt> : null}
       {state.piReleased > 0 ? <Txt bold fill={COL.atp} size={11.5} x={X + 70} y={MB + 40}>Pi released</Txt> : null}
-      {dots(state.naMovedOut, X - 80, X + 80, 30, 98, COL.na, "circle", 3)}
+      {dots(state.naMovedOut, X - 80, X + 40, 30, 92, COL.na, "circle", 3)}
       {dots(state.kMovedIn, X - 80, X + 80, MB + 50, 300, COL.k, "circle", 5)}
       <Txt anchor="start" fill={COL.na} size={11.5} x={14} y={60}>Na⁺ high outside</Txt>
       <Txt anchor="start" fill={COL.k} size={11.5} x={14} y={H_MAX - 40}>K⁺ high inside</Txt>
-      {state.naMovedOut ? <Txt bold fill={COL.na} size={12.5} x={X} y={118}>{state.naMovedOut} Na⁺ moved out</Txt> : null}
+      {state.naMovedOut ? <Txt bold fill={COL.na} size={12.5} x={X - 60} y={108}>{state.naMovedOut} Na⁺ moved out</Txt> : null}
       {state.kMovedIn ? <Txt bold fill={COL.k} size={12.5} x={X} y={H_MAX - 8}>{state.kMovedIn} K⁺ moved in</Txt> : null}
       {state.naMovedOut === 3 && state.step === 4 ? <line markerEnd="url(#pu-blue)" stroke={COL.na} strokeWidth={3} x1={X + 60} x2={X + 60} y1={MT + 10} y2={64} /> : null}
       {state.kMovedIn === 2 && state.step === 7 ? <line markerEnd="url(#pu-ink)" stroke={COL.k} strokeWidth={3} x1={X + 60} x2={X + 60} y1={MB - 10} y2={MB + 68} /> : null}
@@ -345,7 +339,7 @@ export function SgltScene({ input, result, step, step_titles }: { input: SgltInp
   // forward cycle faces: 0 outward empty, 1 outward loaded, 2 occluded loaded, 3 inward releasing, 4 inward empty/return
   const facing = step <= 1 ? "out" : step === 2 ? "closed" : "in";
   const loaded = step >= 1 && step <= 2;
-  const summary = `SGLT1, a Na⁺-glucose symporter (secondary active transport). Step ${step + 1} of 5: ${step_titles[step]}. At these concentrations and voltage the net glucose movement is ${none ? "none (equilibrium)" : rev ? "outward (the cycle would run in reverse)" : "inward"}; the transporter hydrolyses no ATP.`;
+  const summary = `SGLT1, a Na⁺-glucose symporter (secondary active transport). Step ${step} of 4: ${step_titles[step]}. At these concentrations and voltage the net glucose movement is ${none ? "none (equilibrium)" : rev ? "outward (the cycle would run in reverse)" : "inward"}; the transporter hydrolyses no ATP.`;
   const nMaxOut = 18;
   return (
     <svg aria-label={summary} className="c23-svg" role="img" viewBox={`0 0 ${W} ${H_MAX}`}>
