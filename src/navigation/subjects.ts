@@ -150,7 +150,7 @@ export const BIOLOGY_TOOLS: ToolDef[] = [
 ];
 
 
-export type BiochemistryToolId = "bcOverview" | "bcAminoAcids" | "bcProteins" | "bcEnzymes" | "bcGlycolysis" | "bcGluconeogenesis" | "bcTca" | "bcEtc" | "bcMetabolism" | "bcSaved";
+export type BiochemistryToolId = "bcOverview" | "bcAminoAcids" | "bcProteins" | "bcEnzymes" | "bcGlycolysis" | "bcGluconeogenesis" | "bcTca" | "bcEtc" | "bcMetabolism" | "bcFattyAcids" | "bcAminoMetabolism" | "bcFuel" | "bcSaved";
 
 export const BIOCHEMISTRY_TOOLS: ToolDef[] = [
   { id: "bcOverview", slug: "overview", label: "Overview", summary: "What Biochemistry offers now, and what is still planned.", group: "analyze", icon: "biochemistry" },
@@ -162,6 +162,9 @@ export const BIOCHEMISTRY_TOOLS: ToolDef[] = [
   { id: "bcTca", slug: "citric-acid-cycle", label: "Pyruvate oxidation & citric acid cycle", summary: "The pyruvate dehydrogenase complex and the eight cycle reactions: carbon counts, carriers, oxaloacetate regeneration and regulation.", group: "metabolism", icon: "kinetics" },
   { id: "bcEtc", slug: "electron-transport", label: "Electron transport & oxidative phosphorylation", summary: "Complexes I to IV, coenzyme Q, cytochrome c, the proton gradient and ATP synthase; NADH versus FADH₂, inhibitors and uncouplers.", group: "metabolism", icon: "kinetics" },
   { id: "bcMetabolism", slug: "metabolic-map", label: "Integrated metabolic map", summary: "One connected map from glucose to oxidative phosphorylation, with shared metabolites, an energy ledger and qualitative scenarios.", group: "metabolism", icon: "kinetics" },
+  { id: "bcFattyAcids", slug: "fatty-acids-ketone-bodies", label: "Fatty-acid & ketone-body metabolism", summary: "Fatty-acid structure, activation, the carnitine shuttle, β-oxidation and its ledger, fatty-acid synthesis, ketogenesis, ketolysis and the reciprocal regulation of synthesis and oxidation.", group: "metabolism", icon: "kinetics" },
+  { id: "bcAminoMetabolism", slug: "amino-acid-metabolism", label: "Amino-acid metabolism & urea cycle", summary: "Transamination with pyridoxal phosphate, oxidative deamination, carbon-skeleton destinations (glucogenic, ketogenic), nitrogen carriers and the five-step urea cycle with its nitrogen and ATP ledgers.", group: "metabolism", icon: "kinetics" },
+  { id: "bcFuel", slug: "fuel-metabolism", label: "Integrated fuel metabolism", summary: "Carbohydrate, fatty-acid, ketone-body and amino-acid metabolism on one map: shared metabolites, separate carbon, nitrogen and energy ledgers, tissue context and qualitative scenarios.", group: "metabolism", icon: "kinetics" },
   { id: "bcSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 

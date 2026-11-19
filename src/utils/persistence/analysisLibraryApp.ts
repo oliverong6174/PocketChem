@@ -28,6 +28,9 @@ import {
   validateCellDivisionInputs, validateGeneticsInputs, validateRegulationInputs,
 } from "./biologyTools16";
 import {
+  AMINOMETABOLISM_ENGINE_VERSION, FATTYACIDS_ENGINE_VERSION, FUELMETABOLISM_ENGINE_VERSION, validateAminoInputs, validateFattyAcidInputs, validateFuelInputs,
+} from "./biochemTools25";
+import {
   MEMBRANE_ENGINE_VERSION, NEURON_ENGINE_VERSION, SIGNALING_ENGINE_VERSION, validateMembraneInputs, validateNeuronInputs, validateSignalingInputs,
 } from "./biologyTools23";
 import {
@@ -54,7 +57,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "efield", "magnetic", "induction", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "membrane", "signaling", "neuron", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "efield", "magnetic", "induction", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "membrane", "signaling", "neuron", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism", "fattyacids", "aminometabolism", "fuelmetabolism"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -102,6 +105,9 @@ export const ANALYSIS_APP_PAGE = {
   tca: "bcTca",
   etc: "bcEtc",
   metabolism: "bcMetabolism",
+  fattyacids: "bcFattyAcids",
+  aminometabolism: "bcAminoMetabolism",
+  fuelmetabolism: "bcFuel",
 } as const;
 
 let registered = false;
@@ -180,6 +186,9 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
       tca: { engineVersion: TCA_ENGINE_VERSION, validateInputs: validateTcaInputs, validateResults: validateBiologyResults },
       etc: { engineVersion: ETC_ENGINE_VERSION, validateInputs: validateEtcInputs, validateResults: validateBiologyResults },
       metabolism: { engineVersion: METABOLISM_ENGINE_VERSION, validateInputs: validateMetabolismInputs, validateResults: validateBiologyResults },
+      fattyacids: { engineVersion: FATTYACIDS_ENGINE_VERSION, validateInputs: validateFattyAcidInputs, validateResults: validateBiologyResults },
+      aminometabolism: { engineVersion: AMINOMETABOLISM_ENGINE_VERSION, validateInputs: validateAminoInputs, validateResults: validateBiologyResults },
+      fuelmetabolism: { engineVersion: FUELMETABOLISM_ENGINE_VERSION, validateInputs: validateFuelInputs, validateResults: validateBiologyResults },
       multicatalytic: {
         engineVersion: MULTICATALYTIC_ENGINE_VERSION,
         validateInputs: validateMulticatalyticInputs,

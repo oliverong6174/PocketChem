@@ -51,6 +51,23 @@ const FEATURES: Record<string, string[]> = {
     "Pathway and reaction levels share the same metabolites and reactions, with a single energy-carrier ledger",
     "Scenarios labelled by what stoichiometry, curated regulation or the respiratory model supports, and what would need a kinetic model",
   ],
+  bcFattyAcids: [
+    "Saturated fatty acids C4–C18 drawn with carbon numbering, activation (ATP → AMP + PPi, two ATP equivalents) and the carnitine shuttle with CPT I, the translocase and CPT II",
+    "β-Oxidation stepped reaction by reaction while the chain shortens; palmitate gives 7 cycles, 8 acetyl-CoA, 7 NADH and 7 FADH₂ and a conventional 106 ATP equivalents, with odd-chain and oleate special cases",
+    "De novo palmitate synthesis with NADPH and ATP kept in separate rows, why it is not β-oxidation backward, and reciprocal regulation through malonyl-CoA",
+    "Ketogenesis in liver, ketolysis in other tissues (SCOT), and a comparison of carbohydrate- and ketone-derived acetyl-CoA",
+  ],
+  bcAminoMetabolism: [
+    "All 20 amino acids with structures, amino group, carbon skeleton and curated destination; glucogenic, ketogenic or both (leucine and lysine ketogenic only)",
+    "Transamination with pyridoxal phosphate stage by stage (no free ammonia) versus oxidative deamination by glutamate dehydrogenase",
+    "Nitrogen carriers and tissue examples; a stepwise urea cycle across matrix and cytosol with an atom-level nitrogen ledger and the 3 ATP / 4 bond accounting",
+    "N-acetylglutamate activation of CPS I as a qualitative demonstration",
+  ],
+  bcFuel: [
+    "One map joining glycolysis, gluconeogenesis, the citric acid cycle, fatty-acid oxidation and synthesis, ketone bodies, amino-acid catabolism and the urea cycle through shared metabolites",
+    "Separate carbon, nitrogen, ATP/GTP, NADH/FADH₂ and NADPH ledgers for any pathway; metabolite explorer listing every pathway that uses it",
+    "Fed, fasting, ketogenic, peripheral ketone use, amino-acid and nitrogen-disposal scenarios by tissue, each statement labelled by what supports it, and a fuel comparison",
+  ],
 };
 const GROUPS: Array<{ id: string; label: string }> = [{ id: "biomolecules", label: "Biomolecules" }, { id: "metabolism", label: "Metabolism" }];
 

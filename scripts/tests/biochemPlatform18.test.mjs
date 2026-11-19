@@ -45,7 +45,7 @@ const ids = () => { let n = 0; return () => `s18x${(n += 1).toString().padStart(
 describe("navigation and registration", () => {
   test("[subject] Biochemistry lists the five metabolic tools in a Metabolism group, with unique ids and slugs, and keeps its three Stage 17 tools", () => {
     const tools = S.BIOCHEMISTRY_TOOLS;
-    assert.deepEqual(tools.filter((t) => t.group === "metabolism").map((t) => t.id), ["bcGlycolysis", "bcGluconeogenesis", "bcTca", "bcEtc", "bcMetabolism"]);
+    assert.deepEqual(tools.filter((t) => t.group === "metabolism").map((t) => t.id), ["bcGlycolysis", "bcGluconeogenesis", "bcTca", "bcEtc", "bcMetabolism", "bcFattyAcids", "bcAminoMetabolism", "bcFuel"]);
     assert.deepEqual(tools.filter((t) => t.group === "biomolecules").map((t) => t.id), ["bcAminoAcids", "bcProteins", "bcEnzymes"]);
     assert.equal(new Set(tools.map((t) => t.id)).size, tools.length); assert.equal(new Set(tools.map((t) => t.slug)).size, tools.length);
     assert.ok(S.TOOL_GROUPS.some((g) => g.id === "metabolism"));

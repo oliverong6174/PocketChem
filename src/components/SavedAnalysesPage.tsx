@@ -38,6 +38,9 @@ const PAGE_LABELS: Record<string, string> = {
   tca: "Pyruvate oxidation & citric acid cycle",
   etc: "Electron transport & oxidative phosphorylation",
   metabolism: "Integrated metabolic map",
+  fattyacids: "Fatty-acid and ketone-body metabolism",
+  aminometabolism: "Amino-acid metabolism and urea cycle",
+  fuelmetabolism: "Integrated fuel metabolism",
 };
 
 const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry", physics: "Physics", biology: "Biology", biochemistry: "Biochemistry" };

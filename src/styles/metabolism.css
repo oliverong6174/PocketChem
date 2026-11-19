@@ -46,3 +46,14 @@
 .mt-map { max-width: 1000px; margin: 0 auto; }
 .mt-hint { display: none; margin: 0.35rem 0 0; font-size: 0.8rem; color: var(--text-muted, #475569); }
 @media (max-width: 760px) { .mt-hint { display: block; } }
+
+/* Stage 25: fatty-acid chain bar, shuttle step list, carbon circles (text inside every circle; colour is secondary) */
+.fa-chain { display: flex; flex-wrap: wrap; gap: 4px; margin: 0.5rem 0; }
+.fa-carbon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #334155; background: #f8fafc; color: #0f172a; font-size: 0.78rem; font-weight: 700; }
+.fa-carbon.fa-c1 { border-width: 4px; background: #fef3c7; }
+.fa-carbon.fa-ab { border-color: #15803d; background: #f0fdf4; }
+.fa-carbon.fa-released { border-style: dashed; color: #64748b; background: #e2e8f0; border-color: #94a3b8; }
+.mt-shuttle { padding-left: 1.2rem; }
+.mt-shuttle li { margin: 0.35rem 0; }
+.mt-shuttle li[aria-current="true"] { font-weight: 700; border-left: 4px solid var(--accent, #0f766e); padding-left: 0.4rem; }
+@media (max-width: 600px) { .fa-carbon { width: 26px; height: 26px; font-size: 0.72rem; } }

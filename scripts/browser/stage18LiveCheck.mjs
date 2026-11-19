@@ -43,10 +43,10 @@ const textOf = (sel) => ev(`(document.querySelector(${q(sel)})?.textContent ?? '
 try {
   // ---- 1. Biochemistry navigation and the other subjects
   await fresh(1440, "light", "#/biochemistry/overview");
-  const want = "Overview|Amino acids & peptides|Protein structure & folding|Enzymes & catalysis|Glycolysis|Gluconeogenesis|Pyruvate oxidation & citric acid cycle|Electron transport & oxidative phosphorylation|Integrated metabolic map|Saved";
+  const want = "Overview|Amino acids & peptides|Protein structure & folding|Enzymes & catalysis|Glycolysis|Gluconeogenesis|Pyruvate oxidation & citric acid cycle|Electron transport & oxidative phosphorylation|Integrated metabolic map|Fatty-acid & ketone-body metabolism|Amino-acid metabolism & urea cycle|Integrated fuel metabolism|Saved";
   check("1 Biochemistry tabs list all five metabolic tools after the Stage 17 tools", (await tabs()) === want, await tabs());
   const ov = await ev(`({ cards: [...document.querySelectorAll('.gc-tool-card button')].map((b) => b.textContent.trim()), pb: document.querySelectorAll('.gc-planned button').length, groups: [...document.querySelectorAll('.ph-group-heading')].map((h) => h.textContent).join('|') })`);
-  check("1 overview: eight working tools in two groups, planned list has no buttons", ov.cards.length === 8 && ov.pb === 0 && ov.groups === "Biomolecules|Metabolism", JSON.stringify(ov));
+  check("1 overview: eight working tools in two groups, planned list has no buttons", ov.cards.length === 11 && ov.pb === 0 && ov.groups === "Biomolecules|Metabolism", JSON.stringify(ov));
   await click("Open Glycolysis"); await sleep(900);
   check("1 Open button reaches Glycolysis; hash", (await ev("location.hash")) === "#/biochemistry/glycolysis", await ev("location.hash"));
   await shot("overview.png", ".gc-tool-cards");

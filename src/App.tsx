@@ -134,6 +134,9 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
   const CitricAcidPage = lazy(() => import("./components/biochem/metabolism/CitricAcidPage"));
   const ElectronTransportPage = lazy(() => import("./components/biochem/metabolism/ElectronTransportPage"));
   const MetabolicMapPage = lazy(() => import("./components/biochem/metabolism/MetabolicMapPage"));
+  const FattyAcidPage = lazy(() => import("./components/biochem/metabolism/FattyAcidPage"));
+  const AminoMetabolismPage = lazy(() => import("./components/biochem/metabolism/AminoMetabolismPage"));
+  const FuelMetabolismPage = lazy(() => import("./components/biochem/metabolism/FuelMetabolismPage"));
 
 
   type AnnotationCarouselItem =
@@ -612,7 +615,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
         else switchSubject("physics", { keepOpenRequest: true, tool: target });
         return;
       }
-      if (target === "bcAminoAcids" || target === "bcProteins" || target === "bcEnzymes" || target === "bcGlycolysis" || target === "bcGluconeogenesis" || target === "bcTca" || target === "bcEtc" || target === "bcMetabolism") {
+      if (target === "bcAminoAcids" || target === "bcProteins" || target === "bcEnzymes" || target === "bcGlycolysis" || target === "bcGluconeogenesis" || target === "bcTca" || target === "bcEtc" || target === "bcMetabolism" || target === "bcFattyAcids" || target === "bcAminoMetabolism" || target === "bcFuel") {
         if (activeSubject === "biochemistry") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("biochemistry", { keepOpenRequest: true, tool: target });
         return;
@@ -2034,6 +2037,22 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
             ) : generalTool === "bcMetabolism" ? (
               <MetabolicMapPage
                 openRequest={pendingOpen?.page === "bcMetabolism" ? pendingOpen : null}
+                onOpenTool={(id: BiochemistryToolId) => switchGeneralTool(id)}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcFattyAcids" ? (
+              <FattyAcidPage
+                openRequest={pendingOpen?.page === "bcFattyAcids" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcAminoMetabolism" ? (
+              <AminoMetabolismPage
+                openRequest={pendingOpen?.page === "bcAminoMetabolism" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcFuel" ? (
+              <FuelMetabolismPage
+                openRequest={pendingOpen?.page === "bcFuel" ? pendingOpen : null}
                 onOpenTool={(id: BiochemistryToolId) => switchGeneralTool(id)}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />

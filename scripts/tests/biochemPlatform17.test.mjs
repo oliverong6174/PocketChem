@@ -41,9 +41,9 @@ const ids = () => { let n = 0; return () => `s17x${(n += 1).toString().padStart(
 describe("navigation and registration", () => {
   test("[subject] Biochemistry is available with Overview, three tools and Saved, unique slugs, in the Biomolecules group", () => {
     assert.equal(S.getSubject("biochemistry").status, "available"); assert.equal(S.getSubject("biochemistry").mode, "learning"); assert.equal(S.isAvailable("biochemistry"), true);
-    assert.deepEqual(S.BIOCHEMISTRY_TOOLS.map((t) => t.id), ["bcOverview", "bcAminoAcids", "bcProteins", "bcEnzymes", "bcGlycolysis", "bcGluconeogenesis", "bcTca", "bcEtc", "bcMetabolism", "bcSaved"]);
-    assert.deepEqual(S.BIOCHEMISTRY_TOOLS.map((t) => t.group), ["analyze", "biomolecules", "biomolecules", "biomolecules", "metabolism", "metabolism", "metabolism", "metabolism", "metabolism", "library"]);
-    assert.equal(new Set(S.BIOCHEMISTRY_TOOLS.map((t) => t.slug)).size, 10);
+    assert.deepEqual(S.BIOCHEMISTRY_TOOLS.map((t) => t.id), ["bcOverview", "bcAminoAcids", "bcProteins", "bcEnzymes", "bcGlycolysis", "bcGluconeogenesis", "bcTca", "bcEtc", "bcMetabolism", "bcFattyAcids", "bcAminoMetabolism", "bcFuel", "bcSaved"]);
+    assert.deepEqual(S.BIOCHEMISTRY_TOOLS.map((t) => t.group), ["analyze", "biomolecules", "biomolecules", "biomolecules", "metabolism", "metabolism", "metabolism", "metabolism", "metabolism", "metabolism", "metabolism", "metabolism", "library"]);
+    assert.equal(new Set(S.BIOCHEMISTRY_TOOLS.map((t) => t.slug)).size, 13);
     assert.ok(S.TOOL_GROUPS.some((g) => g.id === "biomolecules") && S.TOOL_GROUPS.some((g) => g.id === "metabolism"));
     assert.equal(S.SUBJECT_TOOLS.biochemistry, S.BIOCHEMISTRY_TOOLS);
   });
