@@ -51,6 +51,24 @@ const FEATURES: Record<string, string[]> = {
     "A probe you can move on the screen that reports the path difference and the intensity there",
     "Settings outside the far-field model are refused with the reason, not approximated",
   ],
+  phEfield: [
+    "Up to six point charges you can drag, resize and flip, with a probe P and a test charge of your choice",
+    "Field arrows, field lines, equipotential contours, the force on the test charge, potential and potential energy, all from one Coulomb's-law model",
+    "A table that adds the field and potential charge by charge, so superposition can be checked by hand",
+    "A charged particle in a uniform field with velocity and kinetic-energy graphs on one clock; Explore, Practice and Challenge",
+  ],
+  phMagnetic: [
+    "Straight wires seen end-on, a circular current loop and an ideal solenoid, with the right-hand rule and ⊙ / ⊗ symbols for out of and into the screen",
+    "The Lorentz force F = q(E + v × B) for positive and negative charges, drawn with its x, y and z parts",
+    "Circular and helical motion of a charged particle, the cyclotron period and radius, and the E × B drift",
+    "The force on a current-carrying conductor, with Explore, Practice and Challenge",
+  ],
+  phInduction: [
+    "Magnetic flux through a loop at any angle, with the field lines that cross it highlighted",
+    "Faraday's and Lenz's laws with a signed convention: the induced current direction is drawn, never just stated",
+    "Motional EMF of a rod on rails, a rotating-coil AC generator, and the RL circuit with inductor voltage and stored energy",
+    "Synchronized flux, EMF, current and energy graphs on one clock; Explore, Practice and Challenge",
+  ],
   phCircuits: [
     "Build series, parallel and nested resistor networks with one ideal DC source",
     "A circuit diagram drawn from the same network the calculations use, with current directions and voltage drops",
@@ -116,6 +134,25 @@ export default function PhysicsOverview({ onOpenTool }: { onOpenTool: (id: Physi
             </li>
           ))}
         </ul>
+        <h3 className="ph-group-heading">Electromagnetism</h3>
+        <ul className="gc-tool-cards">
+          {implemented.filter((tool) => tool.group === "electromagnetism").map((tool) => (
+            <li className="gc-tool-card" key={tool.id}>
+              <Icon name={tool.icon} size={26} />
+              <div>
+                <h3>{tool.label}</h3>
+                <p>{tool.summary}</p>
+                <ul className="gc-feature-list">
+                  {FEATURES[tool.id].map((line) => <li key={line}>{line}</li>)}
+                </ul>
+                <div className="gc-tool-card-foot">
+                  <EvidenceBadge level="model" />
+                  <button className="primary-button" onClick={() => onOpenTool(tool.id as PhysicsToolId)} type="button">Open {tool.label}</button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
         <h3 className="ph-group-heading">Electricity</h3>
         <ul className="gc-tool-cards">
           {implemented.filter((tool) => tool.group === "electricity").map((tool) => (
@@ -149,7 +186,7 @@ export default function PhysicsOverview({ onOpenTool }: { onOpenTool: (id: Physi
       </Panel>
 
       <Callout tone="info" title="Scope of the laboratories">
-        <p>Mechanics models a point particle with constant acceleration over a flat ground at y = 0; for projectiles that is gravity alone, with no air resistance. The circuit tool handles one ideal DC source with ideal resistors in series and parallel groups only, and the RC tool handles exactly one resistor and one capacitor. Forces treats one body (or a block with a hanging mass) with Coulomb friction; Work & energy uses an ideal spring and constant friction; collisions are two bodies in one dimension with an instantaneous contact. Waves are small-amplitude and linear in a lossless medium, standing waves use the elementary boundary conditions, and the Doppler model is for subsonic motion along one line. Optics uses single thin elements in the paraxial approximation, and interference is the far-field pattern of identical slits in monochromatic light. Arbitrary circuits, AC, inductors, rotation and air resistance are not supported, and the tools say so rather than approximating them. They are teaching models, not substitutes for measurement or design software.</p>
+        <p>Mechanics models a point particle with constant acceleration over a flat ground at y = 0; for projectiles that is gravity alone, with no air resistance. The circuit tool handles one ideal DC source with ideal resistors in series and parallel groups only, and the RC tool handles exactly one resistor and one capacitor. Forces treats one body (or a block with a hanging mass) with Coulomb friction; Work & energy uses an ideal spring and constant friction; collisions are two bodies in one dimension with an instantaneous contact. Waves are small-amplitude and linear in a lossless medium, standing waves use the elementary boundary conditions, and the Doppler model is for subsonic motion along one line. Optics uses single thin elements in the paraxial approximation, and interference is the far-field pattern of identical slits in monochromatic light. The electromagnetism tools model static point charges, steady currents, ideal uniform fields and an ideal inductor in vacuum; they do not model conductors, materials, radiation or relativistic speeds. Arbitrary circuits, AC circuits with loads, rotation and air resistance are not supported, and the tools say so rather than approximating them. They are teaching models, not substitutes for measurement or design software.</p>
       </Callout>
     </div>
   );

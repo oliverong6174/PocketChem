@@ -7,8 +7,14 @@ import type { Challenge } from "../../utils/physics/waveOpticsLearning";
  * settings by a pure check; the hint and one worked solution stay hidden until asked for. Nothing is stored: the challenge in
  * progress is only the learner's own choice on this page.
  */
-export function ChallengePanel<I>({ challenges, inputs, onPick }: { challenges: Challenge<I>[]; inputs: I; onPick?: (c: Challenge<I>) => void }) {
-  const [index, setIndex] = useState(0);
+export function ChallengePanel<I>({ challenges, inputs, onPick, index: controlled, onIndex }: {
+  challenges: Challenge<I>[]; inputs: I; onPick?: (c: Challenge<I>) => void;
+  /** Optional controlled selection (the Stage 24 tools keep the chosen challenge in their saved state). */
+  index?: number; onIndex?: (index: number) => void;
+}) {
+  const [local, setLocal] = useState(0);
+  const index = controlled ?? local;
+  const setIndex = (i: number) => { setLocal(i); onIndex?.(i); };
   const c = challenges[Math.min(index, challenges.length - 1)];
   if (!c) return null;
   const { met, status } = c.check(inputs);

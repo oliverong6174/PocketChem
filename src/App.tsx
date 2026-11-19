@@ -111,6 +111,9 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
 const WavesPage = lazy(() => import("./components/physics/WavesPage"));
 const OpticsPage = lazy(() => import("./components/physics/OpticsPage"));
 const InterferencePage = lazy(() => import("./components/physics/InterferencePage"));
+const EfieldPage = lazy(() => import("./components/physics/EfieldPage"));
+const MagneticPage = lazy(() => import("./components/physics/MagneticPage"));
+const InductionPage = lazy(() => import("./components/physics/InductionPage"));
   const BiologyOverview = lazy(() => import("./components/biology/BiologyOverview"));
   const ReplicationPage = lazy(() => import("./components/biology/ReplicationPage"));
   const TranscriptionPage = lazy(() => import("./components/biology/TranscriptionPage"));
@@ -604,7 +607,7 @@ const InterferencePage = lazy(() => import("./components/physics/InterferencePag
         else switchSubject("general", { keepOpenRequest: true, tool: target });
         return;
       }
-      if (target === "phMechanics" || target === "phCircuits" || target === "phRc" || target === "phForces" || target === "phEnergy" || target === "phCollisions" || target === "phWaves" || target === "phOptics" || target === "phInterference") {
+      if (target === "phMechanics" || target === "phCircuits" || target === "phRc" || target === "phForces" || target === "phEnergy" || target === "phCollisions" || target === "phWaves" || target === "phOptics" || target === "phInterference" || target === "phEfield" || target === "phMagnetic" || target === "phInduction") {
         if (activeSubject === "physics") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("physics", { keepOpenRequest: true, tool: target });
         return;
@@ -2158,6 +2161,21 @@ const InterferencePage = lazy(() => import("./components/physics/InterferencePag
             ) : generalTool === "phInterference" ? (
               <InterferencePage
                 openRequest={pendingOpen?.page === "phInterference" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phEfield" ? (
+              <EfieldPage
+                openRequest={pendingOpen?.page === "phEfield" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phMagnetic" ? (
+              <MagneticPage
+                openRequest={pendingOpen?.page === "phMagnetic" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phInduction" ? (
+              <InductionPage
+                openRequest={pendingOpen?.page === "phInduction" ? pendingOpen : null}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />
             ) : generalTool === "phRc" ? (

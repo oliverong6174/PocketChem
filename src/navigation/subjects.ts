@@ -44,8 +44,8 @@ export const SUBJECTS: SubjectDef[] = [
   },
   {
     id: "physics", slug: "physics", label: "Physics", mode: "workbench", icon: "physics", status: "available",
-    tagline: "Motion, forces, energy, collisions, waves and sound, optics, interference, resistor networks and RC transients with live diagrams and synchronized graphs.",
-    planned: ["Rotational motion and torque", "Gravitation and orbits", "Thin-film interference and polarization", "Inductors and AC circuits"],
+    tagline: "Motion, forces, energy, collisions, waves and sound, optics, interference, electric fields and potential, magnetic fields and forces, electromagnetic induction, resistor networks and RC transients with live diagrams and synchronized graphs.",
+    planned: ["Rotational motion and torque", "Gravitation and orbits", "Thin-film interference and polarization", "AC circuits: RLC, impedance and resonance"],
   },
   {
     id: "biology", slug: "biology", label: "Biology", mode: "learning", icon: "biology", status: "available",
@@ -59,12 +59,13 @@ export const SUBJECTS: SubjectDef[] = [
   },
 ];
 
-export type ToolGroupId = "analyze" | "mechanics" | "waves" | "electricity" | "geneExpression" | "inheritance" | "cellular" | "biomolecules" | "metabolism" | "synthesize" | "library";
+export type ToolGroupId = "analyze" | "mechanics" | "waves" | "electromagnetism" | "electricity" | "geneExpression" | "inheritance" | "cellular" | "biomolecules" | "metabolism" | "synthesize" | "library";
 
 export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "analyze", label: "Analyze" },
   { id: "mechanics", label: "Mechanics" },
   { id: "waves", label: "Waves & optics" },
+  { id: "electromagnetism", label: "Electromagnetism" },
   { id: "electricity", label: "Electricity" },
   { id: "geneExpression", label: "Gene expression" },
   { id: "inheritance", label: "Genetics & cell division" },
@@ -112,7 +113,7 @@ export const GENERAL_TOOLS: ToolDef[] = [
   { id: "gcSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
-export type PhysicsToolId = "phOverview" | "phMechanics" | "phForces" | "phEnergy" | "phCollisions" | "phWaves" | "phOptics" | "phInterference" | "phCircuits" | "phRc" | "phSaved";
+export type PhysicsToolId = "phOverview" | "phMechanics" | "phForces" | "phEnergy" | "phCollisions" | "phWaves" | "phOptics" | "phInterference" | "phEfield" | "phMagnetic" | "phInduction" | "phCircuits" | "phRc" | "phSaved";
 
 export const PHYSICS_TOOLS: ToolDef[] = [
   { id: "phOverview", slug: "overview", label: "Overview", summary: "What Physics offers now, and what is still planned.", group: "analyze", icon: "physics" },
@@ -123,6 +124,9 @@ export const PHYSICS_TOOLS: ToolDef[] = [
   { id: "phWaves", slug: "waves-sound", label: "Waves & sound", summary: "Traveling and longitudinal waves, superposition and beats, standing waves and resonance in strings and pipes, and the Doppler effect.", group: "waves", icon: "waves" },
   { id: "phOptics", slug: "geometric-optics", label: "Geometric optics", summary: "Thin lenses, spherical mirrors, ray diagrams and image formation, plus refraction and total internal reflection.", group: "waves", icon: "optics" },
   { id: "phInterference", slug: "interference-diffraction", label: "Interference & diffraction", summary: "Single-slit, double-slit and grating patterns: fringe spacing, missing orders and the intensity across the screen.", group: "waves", icon: "interference" },
+  { id: "phEfield", slug: "electric-fields", label: "Electric fields & potential", summary: "Point charges, field vectors and lines, equipotentials, forces on a test charge, and charged-particle motion in a uniform field.", group: "electromagnetism", icon: "efield" },
+  { id: "phMagnetic", slug: "magnetic-fields", label: "Magnetic fields & forces", summary: "Fields of wires, loops and solenoids, the right-hand rule, the Lorentz force, circular and helical motion, and the force on a conductor.", group: "electromagnetism", icon: "magnetic" },
+  { id: "phInduction", slug: "induction", label: "Electromagnetic induction", summary: "Magnetic flux, Faraday's and Lenz's laws, motional EMF, a rotating-coil generator and RL circuit transients.", group: "electromagnetism", icon: "induction" },
   { id: "phCircuits", slug: "circuits", label: "DC circuits", summary: "Series and parallel resistor networks: equivalent resistance, currents, voltages and power.", group: "electricity", icon: "circuits" },
   { id: "phRc", slug: "rc-transient", label: "RC transient", summary: "Charging and discharging of one capacitor through one resistor.", group: "electricity", icon: "rc" },
   { id: "phSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
