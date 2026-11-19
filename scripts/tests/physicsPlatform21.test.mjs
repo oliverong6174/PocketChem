@@ -40,7 +40,7 @@ describe("navigation and wiring", () => {
   });
   test("[planned list] 'Waves and optics' is no longer listed as planned; remaining plans stay", () => {
     const planned = S.getSubject("physics").planned;
-    assert.ok(!planned.includes("Waves and optics")); assert.ok(planned.includes("Rotational motion and torque")); assert.ok(planned.includes("Inductors and AC circuits"));
+    assert.ok(!planned.includes("Waves and optics")); assert.ok(planned.includes("Rotational motion and torque")); assert.ok(planned.includes("AC circuits: RLC, impedance and resonance"));
   });
   test("[icons] every new tool icon exists", () => {
     const icons = read("src", "components", "ui", "Icon.tsx");

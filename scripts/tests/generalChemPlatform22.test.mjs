@@ -40,7 +40,7 @@ describe("navigation and wiring", () => {
     for (const id of NEW_TOOLS) assert.deepEqual(S.parseRoute(S.routeHash({ subject: "general", toolId: id })), { subject: "general", toolId: id });
   });
   test("[other subjects] Physics, Organic, Biology and Biochemistry tool lists are untouched", () => {
-    assert.equal(S.PHYSICS_TOOLS.length, 11); assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.id), ["analysis", "acidBase", "spectroscopy", "conformations", "reactions", "multiStep", "multiCatalytic", "saved"]);
+    assert.equal(S.PHYSICS_TOOLS.length, 14); assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.id), ["analysis", "acidBase", "spectroscopy", "conformations", "reactions", "multiStep", "multiCatalytic", "saved"]);
   });
   test("[planned list] stoichiometry and gas laws are no longer 'planned'; the remaining plans stay and are clearly plans", () => {
     const planned = S.getSubject("general").planned;

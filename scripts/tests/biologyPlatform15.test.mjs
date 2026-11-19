@@ -53,7 +53,7 @@ describe("navigation", () => {
     for (const t of TOOLS) { assert.equal(S.routeHash({ subject: "biology", toolId: t.id }), `#/biology/${t.slug}`); assert.deepEqual(S.parseRoute(`#/biology/${t.slug}`), { subject: "biology", toolId: t.id }); }
     assert.deepEqual(S.parseRoute("#/biology"), { subject: "biology", toolId: "bioOverview" });
     assert.equal(S.parseRoute("#/biology/nonsense"), null); assert.deepEqual(S.parseRoute("#/biochemistry"), { subject: "biochemistry", toolId: "bcOverview" });
-    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phWaves", "phOptics", "phInterference", "phCircuits", "phRc", "phSaved"]);
+    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phWaves", "phOptics", "phInterference", "phEfield", "phMagnetic", "phInduction", "phCircuits", "phRc", "phSaved"]);
     assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcStoichiometry", "gcGas", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcElectro", "gcSaved"]);
     assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.id), ["analysis", "acidBase", "spectroscopy", "conformations", "reactions", "multiStep", "multiCatalytic", "saved"]);
   });

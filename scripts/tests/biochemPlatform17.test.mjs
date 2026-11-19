@@ -54,7 +54,7 @@ describe("navigation and registration", () => {
   });
   test("[existing subjects] Organic, General, Physics and Biology tool lists are unchanged", () => {
     assert.deepEqual(S.BIOLOGY_TOOLS.map((t) => t.id), ["bioOverview", "bioReplication", "bioTranscription", "bioTranslation", "bioDogma", "bioRegulation", "bioGenetics", "bioDivision", "bioMembrane", "bioSignaling", "bioNeuron", "bioSaved"]);
-    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phWaves", "phOptics", "phInterference", "phCircuits", "phRc", "phSaved"]);
+    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phWaves", "phOptics", "phInterference", "phEfield", "phMagnetic", "phInduction", "phCircuits", "phRc", "phSaved"]);
     assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcStoichiometry", "gcGas", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcElectro", "gcSaved"]);
   });
   test("[icons] every Biochemistry tool icon exists", () => {

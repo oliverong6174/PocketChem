@@ -45,8 +45,8 @@ describe("registry, navigation and the overview", () => {
   test("[subjects] Physics is available (Stage 14 adds three mechanics tabs); Biochemistry became available in Stage 17 (Biology became available in Stage 15)", () => {
     assert.equal(S.isAvailable("physics"), true);
     assert.equal(S.getSubject("physics").status, "available");
-    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phWaves", "phOptics", "phInterference", "phCircuits", "phRc", "phSaved"]);
-    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.label), ["Overview", "Mechanics & motion", "Forces & Newton's laws", "Work & energy", "Momentum & collisions", "Waves & sound", "Geometric optics", "Interference & diffraction", "DC circuits", "RC transient", "Saved"]);
+    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phWaves", "phOptics", "phInterference", "phEfield", "phMagnetic", "phInduction", "phCircuits", "phRc", "phSaved"]);
+    assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.label), ["Overview", "Mechanics & motion", "Forces & Newton's laws", "Work & energy", "Momentum & collisions", "Waves & sound", "Geometric optics", "Interference & diffraction", "Electric fields & potential", "Magnetic fields & forces", "Electromagnetic induction", "DC circuits", "RC transient", "Saved"]);
     assert.equal(new Set(S.PHYSICS_TOOLS.map((t) => t.slug)).size, S.PHYSICS_TOOLS.length);
     assert.equal(S.SUBJECT_TOOLS.physics, S.PHYSICS_TOOLS);
     assert.equal(S.isAvailable("biochemistry"), true);
@@ -73,7 +73,7 @@ describe("registry, navigation and the overview", () => {
     for (const id of ["phForces", "phEnergy", "phCollisions"]) assert.match(overview, new RegExp(`${id}:`));
     assert.doesNotMatch(plannedBlock, /<button/);
     assert.match(plannedBlock, /Planned/);
-    assert.deepEqual(S.getSubject("physics").planned, ["Rotational motion and torque", "Gravitation and orbits", "Thin-film interference and polarization", "Inductors and AC circuits"]);
+    assert.deepEqual(S.getSubject("physics").planned, ["Rotational motion and torque", "Gravitation and orbits", "Thin-film interference and polarization", "AC circuits: RLC, impedance and resonance"]);
   });
   test("[icons] every Physics tool icon exists in the icon set", () => {
     const icons = read("src", "components", "ui", "Icon.tsx");
