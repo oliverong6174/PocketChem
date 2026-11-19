@@ -17,6 +17,9 @@ import {
   validateCircuitsInputs, validateCollisionsInputs, validateInterferenceInputs, validateOpticsInputs, validateWavesInputs, validateEnergyInputs, validateForcesInputs, validateMechanicsInputs, validatePhysicsResults, validateRcInputs,
 } from "./physicsTools";
 import {
+  EFIELD_ENGINE_VERSION, INDUCTION_ENGINE_VERSION, MAGNETIC_ENGINE_VERSION, validateEfieldInputs, validateInductionInputs, validateMagneticInputs,
+} from "./physicsTools24";
+import {
   DOGMA_ENGINE_VERSION, REPLICATION_ENGINE_VERSION, TRANSCRIPTION_ENGINE_VERSION, TRANSLATION_ENGINE_VERSION,
   validateBiologyResults, validateDogmaInputs, validateReplicationInputs, validateTranscriptionInputs, validateTranslationInputs,
 } from "./biologyTools";
@@ -51,7 +54,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "membrane", "signaling", "neuron", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "efield", "magnetic", "induction", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "membrane", "signaling", "neuron", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -78,6 +81,9 @@ export const ANALYSIS_APP_PAGE = {
   waves: "phWaves",
   optics: "phOptics",
   interference: "phInterference",
+  efield: "phEfield",
+  magnetic: "phMagnetic",
+  induction: "phInduction",
   replication: "bioReplication",
   transcription: "bioTranscription",
   translation: "bioTranslation",
@@ -153,6 +159,9 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
       waves: { engineVersion: WAVES_ENGINE_VERSION, validateInputs: validateWavesInputs, validateResults: validatePhysicsResults },
       optics: { engineVersion: OPTICS_ENGINE_VERSION, validateInputs: validateOpticsInputs, validateResults: validatePhysicsResults },
       interference: { engineVersion: INTERFERENCE_ENGINE_VERSION, validateInputs: validateInterferenceInputs, validateResults: validatePhysicsResults },
+      efield: { engineVersion: EFIELD_ENGINE_VERSION, validateInputs: validateEfieldInputs, validateResults: validatePhysicsResults },
+      magnetic: { engineVersion: MAGNETIC_ENGINE_VERSION, validateInputs: validateMagneticInputs, validateResults: validatePhysicsResults },
+      induction: { engineVersion: INDUCTION_ENGINE_VERSION, validateInputs: validateInductionInputs, validateResults: validatePhysicsResults },
       replication: { engineVersion: REPLICATION_ENGINE_VERSION, validateInputs: validateReplicationInputs, validateResults: validateBiologyResults },
       transcription: { engineVersion: TRANSCRIPTION_ENGINE_VERSION, validateInputs: validateTranscriptionInputs, validateResults: validateBiologyResults },
       translation: { engineVersion: TRANSLATION_ENGINE_VERSION, validateInputs: validateTranslationInputs, validateResults: validateBiologyResults },
