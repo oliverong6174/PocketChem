@@ -68,11 +68,11 @@ try {
   // ---------------- navigation ----------------
   await fresh(1440, "dark", "#/physics/overview");
   const tb = await tabs();
-  check("Physics tabs include the three new laboratories in order", tb === "Overview|Mechanics & motion|Forces & Newton's laws|Work & energy|Momentum & collisions|Waves & sound|Geometric optics|Interference & diffraction|DC circuits|RC transient|Saved", tb);
+  check("Physics tabs include the three new laboratories in order", tb === "Overview|Mechanics & motion|Forces & Newton's laws|Work & energy|Momentum & collisions|Waves & sound|Geometric optics|Interference & diffraction|Electric fields & potential|Magnetic fields & forces|Electromagnetic induction|DC circuits|RC transient|Saved", tb);
   const groups = await ev(`[...document.querySelectorAll('.tool-group-label')].map((x) => x.textContent.trim()).join('|')`);
-  check("the tab bar has a 'Waves & optics' group between Mechanics and Electricity", groups === "Analyze|Mechanics|Waves & optics|Electricity|Library", groups);
+  check("the tab bar has a 'Waves & optics' group between Mechanics and Electricity", groups === "Analyze|Mechanics|Waves & optics|Electromagnetism|Electricity|Library", groups);
   const ov = await ev(`({ headings: [...document.querySelectorAll('.ph-group-heading')].map((h) => h.textContent), buttons: [...document.querySelectorAll('.gc-tool-card button')].map((b) => b.textContent.trim()), planned: [...document.querySelectorAll('.gc-planned li')].map((x) => x.textContent), plannedButtons: document.querySelectorAll('.gc-planned button').length })`);
-  check("overview: nine laboratories under three headings, planned areas without buttons and without 'Waves and optics'", ov.buttons.length === 9 && ov.headings.join() === "Mechanics,Waves & optics,Electricity" && ov.plannedButtons === 0 && !ov.planned.some((p) => /Waves and optics/.test(p)), JSON.stringify(ov));
+  check("overview: twelve laboratories under four headings (Stage 24 added Electromagnetism), planned areas without buttons and without 'Waves and optics'", ov.buttons.length === 12 && ov.headings.join() === "Mechanics,Waves & optics,Electromagnetism,Electricity" && ov.plannedButtons === 0 && !ov.planned.some((p) => /Waves and optics/.test(p)), JSON.stringify(ov));
   await screenshot(cdp, path.join(outDir, "overview-1440-dark.png"), { fullPage: false });
   for (const [label, slug] of [["Waves & sound", "waves-sound"], ["Geometric optics", "geometric-optics"], ["Interference & diffraction", "interference-diffraction"]]) {
     await click(`Open ${label}`);
