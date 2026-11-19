@@ -3,7 +3,7 @@ import { Badge, Callout, Disclosure, Panel, Segmented } from "../../ui/primitive
 import { PredictPanel } from "../../biology/bioShared";
 import { MoleculeSvg } from "../MoleculeSvg";
 import {
-  COMPARTMENTS, ENZYMES_BY_ID, METABOLITES_BY_ID, PATHWAYS, REACTIONS_BY_ID, SIGNALS, TENDENCY_DEFINITIONS, type PathwayId, type Reaction, type SignalId, type SignalLevel, type Tendency,
+  COMPARTMENTS, ENZYMES_BY_ID, PATHWAYS, REACTIONS_BY_ID, metaboliteOf, SIGNALS, TENDENCY_DEFINITIONS, type PathwayId, type Reaction, type SignalId, type SignalLevel, type Tendency,
 } from "../../../utils/biochem/metabolism/network";
 import { carriersOf, type Net } from "../../../utils/biochem/metabolism/ledger";
 import { equationText } from "./format";
@@ -23,14 +23,15 @@ export function TendencyBadge({ tendency }: { tendency: Tendency }) {
 }
 
 /** Everything about one reaction: equation, enzyme, compartment, cofactors, structures and the reason for the step. */
-export function ReactionCard({ reactionId, pathway, hideNames = false, onSelectMetabolite }: { reactionId: string; pathway?: PathwayId; hideNames?: boolean; onSelectMetabolite?: (id: string) => void }) {
-  const r = REACTIONS_BY_ID[reactionId];
+export function ReactionCard({ reactionId, reaction, direction: forcedDirection, pathway, hideNames = false, onSelectMetabolite, perUnit }: { reactionId: string; reaction?: Reaction; direction?: "forward" | "reverse"; pathway?: PathwayId; hideNames?: boolean; onSelectMetabolite?: (id: string) => void; perUnit?: string }) {
+  const r = reaction ?? REACTIONS_BY_ID[reactionId];
   const enzyme = ENZYMES_BY_ID[r.enzyme];
   const role = r.roles.find((x) => x.pathway === pathway) ?? r.roles[0];
-  const direction = role.direction;
+  const direction = forcedDirection ?? role.direction;
   const times = role.perGlucose;
-  const structured = [...r.substrates, ...r.products].map((p) => METABOLITES_BY_ID[p.met]).filter((m, i, a) => m.structure && m.kind !== "inorganic" && a.indexOf(m) === i);
-  const schematic = [...r.substrates, ...r.products].map((p) => METABOLITES_BY_ID[p.met]).filter((m, i, a) => !m.structure && m.kind !== "cofactor" && a.indexOf(m) === i);
+  const resolve = (xs: Array<{ met: string }>) => xs.map((p) => metaboliteOf(p.met)!).filter(Boolean);
+  const structured = resolve([...r.substrates, ...r.products]).filter((m, i, a) => m.structure && m.kind !== "inorganic" && a.indexOf(m) === i);
+  const schematic = resolve([...r.substrates, ...r.products]).filter((m, i, a) => !m.structure && m.kind !== "cofactor" && m.kind !== "carrier" && a.indexOf(m) === i);
   return (
     <div className="mt-card" data-testid="reaction-card">
       <h3>{hideNames ? `Reaction ${role.step}` : r.name}</h3>
@@ -40,7 +41,9 @@ export function ReactionCard({ reactionId, pathway, hideNames = false, onSelectM
         {r.tags?.includes("regulatory") ? <Badge tone="estimate">Regulated step</Badge> : null}
         {r.tags?.includes("substrate-level-phosphorylation") ? <Badge tone="ok">Substrate-level phosphorylation</Badge> : null}
         {r.tags?.includes("bypass") ? <Badge tone="info">Gluconeogenic bypass</Badge> : null}
-        {times > 1 ? <Badge tone="neutral">×{times} per glucose</Badge> : null}
+        {times > 1 ? <Badge tone="neutral">×{times} {perUnit ?? "per glucose"}</Badge> : null}
+        {r.transport ? <Badge tone="info">Transport: {r.transport.map((t) => `${metaboliteOf(t.met)?.abbreviation ?? t.met} ${COMPARTMENTS[t.from].label.toLowerCase()} → ${COMPARTMENTS[t.to].label.toLowerCase()}`).join("; ")}</Badge> : null}
+        {r.tissues ? <Badge tone="neutral">{r.tissues.length === 1 ? (r.tissues[0] === "liver" ? "Liver" : "Extrahepatic tissues") : "Liver and extrahepatic"}</Badge> : null}
         {direction === "reverse" && pathway ? <Badge tone="neutral">Run in reverse here</Badge> : null}
       </div>
       <p className="mt-eq" data-testid="reaction-equation">{equationText(r, direction)}</p>
@@ -69,7 +72,7 @@ export function ReactionCard({ reactionId, pathway, hideNames = false, onSelectM
 }
 
 export function MetaboliteCard({ id, onSelectReaction }: { id: string; onSelectReaction?: (reactionId: string) => void }) {
-  const m = METABOLITES_BY_ID[id];
+  const m = metaboliteOf(id)!;
   const involved = Object.values(REACTIONS_BY_ID).filter((r) => [...r.substrates, ...r.products].some((p) => p.met === id));
   const pathways = [...new Set(involved.flatMap((r) => r.roles.map((x) => x.pathway)))];
   return (

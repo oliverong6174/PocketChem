@@ -1,8 +1,8 @@
-import { METABOLITES_BY_ID, type Reaction, type Tendency } from "../../../utils/biochem/metabolism/network";
+import { metaboliteOf, type Reaction, type Tendency } from "../../../utils/biochem/metabolism/network";
 import { reactionNet } from "../../../utils/biochem/metabolism/ledger";
 
 export const SIGN = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : "0");
-export const KEY_CARRIERS: Array<[string, string]> = [["atp", "ATP"], ["gtp", "GTP"], ["nadh", "NADH"], ["fadh2", "FADH₂"], ["co2", "CO₂"]];
+export const KEY_CARRIERS: Array<[string, string]> = [["atp", "ATP"], ["gtp", "GTP"], ["nadh", "NADH"], ["fadh2", "FADH₂"], ["nadph", "NADPH"], ["co2", "CO₂"]];
 
 /** Cofactor changes of a reaction run once in the given direction, as signed text chips (never colour alone). */
 export function carrierChanges(reaction: Reaction, direction: "forward" | "reverse" = "forward"): Array<{ key: string; text: string; sign: 1 | -1 }> {
@@ -17,7 +17,7 @@ export function carrierChanges(reaction: Reaction, direction: "forward" | "rever
 }
 
 const coef = (n: number) => (n === 1 ? "" : n === 0.5 ? "½ " : `${n} `);
-const side = (xs: Array<{ met: string; n: number }>) => xs.map((x) => `${coef(x.n)}${METABOLITES_BY_ID[x.met].abbreviation}`).join(" + ");
+const side = (xs: Array<{ met: string; n: number }>) => xs.map((x) => `${coef(x.n)}${metaboliteOf(x.met)?.abbreviation ?? x.met}`).join(" + ");
 export function equationText(reaction: Reaction, direction: "forward" | "reverse" = "forward"): string {
   return direction === "forward" ? `${side(reaction.substrates)} → ${side(reaction.products)}` : `${side(reaction.products)} → ${side(reaction.substrates)}`;
 }

@@ -22,7 +22,7 @@ import "../../../styles/biochemistry.css";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void; onOpenTool?: (tool: BiochemistryToolId) => void };
 const LEVEL_LABEL: Record<MapLevel, string> = { pathway: "Pathway level", reaction: "Reaction level" };
-const TOOL_OF: Record<PathwayId, { id: BiochemistryToolId; label: string }> = {
+const TOOL_OF: Partial<Record<PathwayId, { id: BiochemistryToolId; label: string }>> = {
   glycolysis: { id: "bcGlycolysis", label: "Glycolysis" }, gluconeogenesis: { id: "bcGluconeogenesis", label: "Gluconeogenesis" },
   "pyruvate-oxidation": { id: "bcTca", label: "Pyruvate oxidation & citric acid cycle" }, tca: { id: "bcTca", label: "Pyruvate oxidation & citric acid cycle" }, oxphos: { id: "bcEtc", label: "Electron transport & oxidative phosphorylation" },
 };
@@ -122,7 +122,7 @@ export default function MetabolicMapPage({ openRequest = null, onOpenHandled, on
                   {pathwayCard !== "oxphos" ? <p className="mt-eq">{formatEquation(pathwayNet(pathwayCard))}</p> : <p className="mt-eq">NADH + H⁺ + ½ O₂ → NAD⁺ + H₂O (≈ 10 H⁺ pumped); FADH₂ + ½ O₂ → FAD + H₂O (≈ 6 H⁺ pumped)</p>}
                   <p className="ph-note">Per glucose where the pathway has a defined glucose accounting; the cycle is shown for two turns.</p>
                   <ul className="mt-links">{pathwayReactions(pathwayCard).map(({ reaction }) => <li key={reaction.id}><button className="ghost-button" onClick={() => set({ reaction: reaction.id, level: "reaction" })} type="button">{reaction.name}</button></li>)}</ul>
-                  {onOpenTool ? <button className="primary-button" data-testid="open-pathway-tool" onClick={() => onOpenTool(TOOL_OF[pathwayCard].id)} type="button">Open {TOOL_OF[pathwayCard].label}</button> : null}
+                  {onOpenTool && TOOL_OF[pathwayCard] ? <button className="primary-button" data-testid="open-pathway-tool" onClick={() => onOpenTool(TOOL_OF[pathwayCard]!.id)} type="button">Open {TOOL_OF[pathwayCard]!.label}</button> : null}
                 </div>
               ) : <Callout tone="info" title="Select a pathway"><p>Choose a box on the map to see its reactions, net equation and compartments, and to open its full tool.</p></Callout>}
             </>

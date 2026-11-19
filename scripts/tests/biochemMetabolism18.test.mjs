@@ -294,7 +294,8 @@ describe("respiratory chain and oxidative phosphorylation", () => {
 describe("integrated network", () => {
   test("the same metabolite id is used across pathways (pyruvate links glycolysis, gluconeogenesis and pyruvate oxidation; OAA links the cycle and gluconeogenesis)", () => {
     const where = (m) => new Set(N.REACTIONS.filter((r) => [...r.substrates, ...r.products].some((p) => p.met === m)).flatMap((r) => r.roles.map((x) => x.pathway)));
-    assert.deepEqual([...where("pyruvate")].sort(), ["glycolysis", "gluconeogenesis", "pyruvate-oxidation"].sort());
+    // Stage 25 added malic enzyme (fatty-acid synthesis) and alanine aminotransferase (transamination) as further users of pyruvate
+    assert.deepEqual([...where("pyruvate")].sort(), ["glycolysis", "gluconeogenesis", "pyruvate-oxidation", "fa-synthesis", "transamination"].sort());
     assert.ok(where("oaa").has("tca") && where("oaa").has("gluconeogenesis"));
     assert.ok(where("acetylcoa").has("pyruvate-oxidation") && where("acetylcoa").has("tca"));
     assert.ok(where("nadh").has("oxphos") && where("nadh").has("glycolysis") && where("nadh").has("tca"));
@@ -320,7 +321,8 @@ describe("structures (RDKit)", () => {
   const CIP = { glucose: ["(R)", "(R)", "(R)", "(S)"], g6p: ["(R)", "(R)", "(R)", "(S)"], f6p: ["(R)", "(R)", "(S)"], f16bp: ["(R)", "(R)", "(S)"], g3p: ["(R)"], bpg13: ["(R)"], pg3: ["(R)"], pg2: ["(R)"], malate: ["(S)"] };
   test("each drawn structure parses, matches the recorded formula (InChI Hill formula) and has the expected CIP labels; achiral ones have none", async () => {
     const rd = await RD.getRDKit();
-    for (const m of N.METABOLITES) {
+    // Stage 18 metabolites only; Stage 25 structures are verified, with independently typed CIP labels, in biochemMetabolism25.test.mjs
+    for (const m of N.METABOLITES.slice(0, 34)) {
       if (!m.structure) continue;
       const mol = rd.get_mol(m.structure.smiles);
       assert.ok(mol && mol.is_valid(), m.id);

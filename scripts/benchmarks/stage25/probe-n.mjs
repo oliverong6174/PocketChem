@@ -1,0 +1,11 @@
+import { closeEngine, loadModule } from "../../tests/engine.mjs";
+const U = await loadModule("/src/utils/biochem/metabolism/nitrogen.ts");
+const j = (x) => JSON.stringify(x);
+console.log("urea net", j(U.ureaNet())); console.log("energy", j(U.ureaEnergy()));
+console.log("conn", j(U.fumarateConnection()));
+console.log("trace ok", [0,1,2,3,4,5,6,7,8].map((s) => U.ureaTraceConsistent(s)));
+console.log("class", j(U.carbonSkeletonSummary()));
+for (const o of U.TRANSAMINATION_ONES) console.log(o, U.transamination(o).balanced);
+console.log(j(U.transdeamination("A")));
+console.log(j(U.glutamateDehydrogenase("nadp", "amination")));
+await closeEngine();

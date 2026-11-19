@@ -24,7 +24,7 @@ export function reactionNet(r: Reaction, direction: "forward" | "reverse" = "for
 export function pathwayNet(pathway: PathwayId, basis: Basis = "glucose", upTo = Infinity): Net {
   const total: Net = {};
   for (const { reaction, role } of pathwayReactions(pathway)) {
-    if (role.step > upTo) continue;
+    if (role.step > upTo || reaction.branchOf) continue;
     const times = basis === "glucose" ? role.perGlucose : 1;
     for (const [k, v] of Object.entries(reactionNet(reaction, role.direction))) total[k] = (total[k] ?? 0) + v * times;
   }
