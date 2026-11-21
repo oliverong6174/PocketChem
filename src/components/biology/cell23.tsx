@@ -37,8 +37,8 @@ export function SelectRow<T extends string>({ label, value, options, onChange, i
     </label>
   );
 }
-export function CheckRow({ label, checked, onChange, id }: { label: string; checked: boolean; onChange: (v: boolean) => void; id?: string }) {
-  return <label className="bio-check"><input checked={checked} data-testid={id} onChange={(e) => onChange(e.target.checked)} type="checkbox" /> {label}</label>;
+export function CheckRow({ label, checked, onChange, id, disabled = false, hint }: { label: string; checked: boolean; onChange: (v: boolean) => void; id?: string; disabled?: boolean; hint?: string }) {
+  return <label className="bio-check" title={hint}><input checked={checked} data-testid={id} disabled={disabled} onChange={(e) => onChange(e.target.checked)} type="checkbox" /> {label}{disabled && hint ? <small className="c23-note"> — {hint}</small> : null}</label>;
 }
 
 /** A slider with its typed number field. */

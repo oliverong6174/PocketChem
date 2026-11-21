@@ -9,7 +9,7 @@ import { useId, type KeyboardEvent } from "react";
 export type NodeKind = "carbon" | "shared" | "nitrogen" | "lipid" | "ketone" | "product" | "enzyme" | "carrier" | "pathway" | "plain";
 export type Visual = "done" | "active" | "future" | "dim" | "normal";
 export interface GNode { id: string; x: number; y: number; w: number; h: number; lines: string[]; kind?: NodeKind; state?: Visual; selected?: boolean; aria?: string; badge?: string; badgeKind?: "nitrogen-nh4" | "nitrogen-asp" | "nitrogen-orn" }
-export interface GEdge { id: string; from: string; to: string; via?: Array<[number, number]>; label?: string; labelPos?: [number, number]; kind?: "main" | "transport" | "cofactor" | "link" | "regulation"; state?: Visual; selected?: boolean; aria?: string; both?: boolean; noArrow?: boolean }
+export interface GEdge { id: string; from: string; to: string; via?: Array<[number, number]>; label?: string; labelPos?: [number, number]; kind?: "main" | "transport" | "cofactor" | "link" | "regulation"; state?: Visual; selected?: boolean; aria?: string; both?: boolean; noArrow?: boolean; end?: "bar" }
 export interface GBand { id: string; x: number; y: number; w: number; h: number; label: string; tone?: "a" | "b" | "c" | "d" | "e" }
 export interface GText { x: number; y: number; text: string; anchor?: "start" | "middle" | "end"; weight?: number; size?: number; fill?: string }
 
@@ -45,7 +45,7 @@ export function GraphDiagram({ width, height, nodes, edges, bands = [], texts = 
   return (
     <svg aria-label={label} className={`mt-svg ${className}`} role="group" style={{ minWidth: minWidth ?? width }} viewBox={`0 0 ${width} ${height}`}>
       <title>{label}</title>
-      <defs>{(Object.keys(EDGE) as Array<keyof typeof EDGE>).map((k) => marker(EDGE[k], k))}{marker(INK, "sel")}</defs>
+      <defs>{(Object.keys(EDGE) as Array<keyof typeof EDGE>).map((k) => marker(EDGE[k], k))}{marker(INK, "sel")}<marker id={`${uid}-bar`} markerHeight="12" markerWidth="8" orient="auto" refX="6" refY="6" viewBox="0 0 8 12"><path d="M6 0 L6 12" stroke={EDGE.regulation} strokeWidth="3" /></marker></defs>
       <rect fill={PAPER} height={height} width={width} />
       {bands.map((b) => (
         <g key={b.id}>
@@ -71,7 +71,7 @@ export function GraphDiagram({ width, height, nodes, edges, bands = [], texts = 
         const inner = (
           <>
             {onEdge ? <path d={d} fill="none" stroke="transparent" strokeWidth={16} /> : null}
-            <path d={d} fill="none" markerEnd={e.noArrow || kind === "link" ? undefined : `url(#${uid}-${mk})`} markerStart={e.both ? `url(#${uid}-${mk})` : undefined} opacity={opacity(e.state)} stroke={color} strokeDasharray={dashed ? "6 4" : undefined} strokeWidth={e.selected || e.state === "active" ? 3.5 : 2} />
+            <path d={d} fill="none" markerEnd={e.noArrow || kind === "link" ? undefined : e.end === "bar" ? `url(#${uid}-bar)` : `url(#${uid}-${mk})`} markerStart={e.both ? `url(#${uid}-${mk})` : undefined} opacity={opacity(e.state)} stroke={color} strokeDasharray={dashed ? "6 4" : undefined} strokeWidth={e.selected || e.state === "active" ? 3.5 : 2} />
             {e.label ? <text fill={INK} fontSize={12} fontWeight={e.selected ? 700 : 500} opacity={opacity(e.state)} paintOrder="stroke" stroke={PAPER} strokeLinejoin="round" strokeWidth={9} textAnchor="middle" x={lp[0]} y={lp[1]}>{e.label}</text> : null}
           </>
         );

@@ -179,6 +179,15 @@ export function rootCauses(g: RegGraph, ev: Evaluation, id: string): RootCause[]
   return out;
 }
 
+/** A readable form of a rule, for example "Cyclin E expressed and not p21 and Cdc25 active". */
+export function exprText(e: Expr, label: (id: string) => string, top = true): string {
+  if (typeof e === "string") return label(e);
+  if ("not" in e) return `not ${exprText(e.not, label, false)}`;
+  const parts = ("all" in e ? e.all : e.any).map((x) => exprText(x, label, false));
+  const joined = parts.join("all" in e ? " AND " : " OR ");
+  return top || parts.length === 1 ? joined : `(${joined})`;
+}
+
 /** What a model says it can and cannot conclude. */
 export interface Outcome { definite: string[]; uncertain: string[] }
 
