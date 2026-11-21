@@ -124,6 +124,9 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
   const CellDivisionPage = lazy(() => import("./components/biology/CellDivisionPage"));
   const MembranePage = lazy(() => import("./components/biology/MembranePage"));
   const SignalingPage = lazy(() => import("./components/biology/SignalingPage"));
+  const OrganellesPage = lazy(() => import("./components/biology/OrganellesPage"));
+  const CellCyclePage = lazy(() => import("./components/biology/CellCyclePage"));
+  const CellDeathPage = lazy(() => import("./components/biology/CellDeathPage"));
   const NeuronPage = lazy(() => import("./components/biology/NeuronPage"));
   const BiochemOverview = lazy(() => import("./components/biochem/BiochemOverview"));
   const AminoAcidsPage = lazy(() => import("./components/biochem/AminoAcidsPage"));
@@ -620,7 +623,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
         else switchSubject("biochemistry", { keepOpenRequest: true, tool: target });
         return;
       }
-      if (target === "bioReplication" || target === "bioTranscription" || target === "bioTranslation" || target === "bioDogma" || target === "bioRegulation" || target === "bioGenetics" || target === "bioDivision" || target === "bioMembrane" || target === "bioSignaling" || target === "bioNeuron") {
+      if (target === "bioReplication" || target === "bioTranscription" || target === "bioTranslation" || target === "bioDogma" || target === "bioRegulation" || target === "bioGenetics" || target === "bioDivision" || target === "bioMembrane" || target === "bioSignaling" || target === "bioNeuron" || target === "bioOrganelles" || target === "bioCellCycle" || target === "bioCellDeath") {
         if (activeSubject === "biology") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("biology", { keepOpenRequest: true, tool: target });
         return;
@@ -2125,6 +2128,24 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
               <NeuronPage
                 onNavigate={(id) => switchGeneralTool(id)}
                 openRequest={pendingOpen?.page === "bioNeuron" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioOrganelles" ? (
+              <OrganellesPage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioOrganelles" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioCellCycle" ? (
+              <CellCyclePage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioCellCycle" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioCellDeath" ? (
+              <CellDeathPage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioCellDeath" ? pendingOpen : null}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />
             ) : generalTool === "bioSaved" ? (

@@ -116,7 +116,7 @@ export type AnalysisLibraryOptions = {
   newId?: () => string;
 };
 
-const PAGES: readonly string[] = ["synthesis", "properties", "reactions", "spectroscopy", "ranking", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "efield", "magnetic", "induction", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "membrane", "signaling", "neuron", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism", "fattyacids", "aminometabolism", "fuelmetabolism"];
+const PAGES: readonly string[] = ["synthesis", "properties", "reactions", "spectroscopy", "ranking", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "efield", "magnetic", "induction", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "membrane", "signaling", "neuron", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism", "fattyacids", "aminometabolism", "fuelmetabolism", "organelles", "cellcycle", "celldeath"];
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 const isText = (value: unknown): value is string => typeof value === "string" && value.length > 0;

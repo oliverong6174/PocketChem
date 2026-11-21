@@ -53,7 +53,7 @@ describe("navigation and registration", () => {
     for (const bad of ["#/biochemistry/nope", "#/biochemistry/amino-acids/x", "#/biochemistry/<script>", "#/biology/amino-acids"]) assert.equal(S.parseRoute(bad), null, bad);
   });
   test("[existing subjects] Organic, General, Physics and Biology tool lists are unchanged", () => {
-    assert.deepEqual(S.BIOLOGY_TOOLS.map((t) => t.id), ["bioOverview", "bioReplication", "bioTranscription", "bioTranslation", "bioDogma", "bioRegulation", "bioGenetics", "bioDivision", "bioMembrane", "bioSignaling", "bioNeuron", "bioSaved"]);
+    assert.deepEqual(S.BIOLOGY_TOOLS.map((t) => t.id), ["bioOverview", "bioReplication", "bioTranscription", "bioTranslation", "bioDogma", "bioRegulation", "bioGenetics", "bioDivision", "bioMembrane", "bioSignaling", "bioNeuron", "bioOrganelles", "bioCellCycle", "bioCellDeath", "bioSaved"]);
     assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phWaves", "phOptics", "phInterference", "phEfield", "phMagnetic", "phInduction", "phCircuits", "phRc", "phSaved"]);
     assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcStoichiometry", "gcGas", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcElectro", "gcSaved"]);
   });

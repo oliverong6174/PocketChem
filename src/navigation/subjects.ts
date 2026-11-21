@@ -49,8 +49,8 @@ export const SUBJECTS: SubjectDef[] = [
   },
   {
     id: "biology", slug: "biology", label: "Biology", mode: "learning", icon: "biology", status: "available",
-    tagline: "Interactive diagrams of gene expression and its regulation, genetics, mitosis and meiosis, membrane transport, cell signaling and neuronal physiology.",
-    planned: ["Cell structure explorer", "Population genetics", "Organ-system physiology", "Evolution and phylogenetics"],
+    tagline: "Interactive diagrams of gene expression and its regulation, genetics, mitosis and meiosis, membrane transport, cell signaling, neuronal physiology, organelles and protein trafficking, the cell cycle and checkpoints, and apoptosis and autophagy.",
+    planned: ["Population genetics", "Organ-system physiology", "Evolution and phylogenetics"],
   },
   {
     id: "biochemistry", slug: "biochemistry", label: "Biochemistry", mode: "learning", icon: "biochemistry", status: "available",
@@ -59,7 +59,7 @@ export const SUBJECTS: SubjectDef[] = [
   },
 ];
 
-export type ToolGroupId = "analyze" | "mechanics" | "waves" | "electromagnetism" | "electricity" | "geneExpression" | "inheritance" | "cellular" | "biomolecules" | "metabolism" | "synthesize" | "library";
+export type ToolGroupId = "analyze" | "mechanics" | "waves" | "electromagnetism" | "electricity" | "geneExpression" | "inheritance" | "cellular" | "cellOrg" | "biomolecules" | "metabolism" | "synthesize" | "library";
 
 export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "analyze", label: "Analyze" },
@@ -70,6 +70,7 @@ export const TOOL_GROUPS: Array<{ id: ToolGroupId; label: string }> = [
   { id: "geneExpression", label: "Gene expression" },
   { id: "inheritance", label: "Genetics & cell division" },
   { id: "cellular", label: "Cellular biology & physiology" },
+  { id: "cellOrg", label: "Cell organization & regulation" },
   { id: "biomolecules", label: "Biomolecules" },
   { id: "metabolism", label: "Metabolism" },
   { id: "synthesize", label: "Synthesize" },
@@ -132,7 +133,7 @@ export const PHYSICS_TOOLS: ToolDef[] = [
   { id: "phSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
-export type BiologyToolId = "bioOverview" | "bioReplication" | "bioTranscription" | "bioTranslation" | "bioDogma" | "bioRegulation" | "bioGenetics" | "bioDivision" | "bioMembrane" | "bioSignaling" | "bioNeuron" | "bioSaved";
+export type BiologyToolId = "bioOverview" | "bioReplication" | "bioTranscription" | "bioTranslation" | "bioDogma" | "bioRegulation" | "bioGenetics" | "bioDivision" | "bioMembrane" | "bioSignaling" | "bioNeuron" | "bioOrganelles" | "bioCellCycle" | "bioCellDeath" | "bioSaved";
 
 export const BIOLOGY_TOOLS: ToolDef[] = [
   { id: "bioOverview", slug: "overview", label: "Overview", summary: "What Biology offers now, and what is still planned.", group: "analyze", icon: "biology" },
@@ -146,6 +147,9 @@ export const BIOLOGY_TOOLS: ToolDef[] = [
   { id: "bioMembrane", slug: "membranes-transport", label: "Membranes & transport", summary: "The phospholipid bilayer, passive and active transport, ion gradients and the Nernst potential, the Na⁺/K⁺ pump, and osmosis and tonicity.", group: "cellular", icon: "membrane" },
   { id: "bioSignaling", slug: "cell-signaling", label: "Cell signaling", summary: "Receptor classes and signal transduction: GPCR (Gs, Gi, Gq), the EGFR–Ras–ERK cascade, ligand-gated channels and intracellular receptors, with inhibitors, mutations and termination.", group: "cellular", icon: "signaling" },
   { id: "bioNeuron", slug: "neuronal-physiology", label: "Neuronal physiology", summary: "Neuron anatomy, resting potential, passive RC membrane, a Hodgkin–Huxley action potential, propagation and myelination, chemical synapses and synaptic summation.", group: "cellular", icon: "neuron" },
+  { id: "bioOrganelles", slug: "organelles-trafficking", label: "Organelles & protein trafficking", summary: "A selectable eukaryotic cell and a cargo tracker: follow a secreted, membrane, lysosomal, nuclear, mitochondrial or cytosolic protein through its route, with vesicle coats, endosomes, protein quality control and perturbations.", group: "cellOrg", icon: "cell" },
+  { id: "bioCellCycle", slug: "cell-cycle-checkpoints", label: "Cell cycle & checkpoints", summary: "Cyclin–CDK regulation, G1/S control by RB and E2F, replication licensing, the DNA-damage checkpoint, G2/M control and the spindle assembly checkpoint with anaphase gating.", group: "cellOrg", icon: "chromosome" },
+  { id: "bioCellDeath", slug: "apoptosis-autophagy", label: "Apoptosis & autophagy", summary: "Intrinsic and extrinsic apoptosis, the caspase cascade, macroautophagy and a fate map linking stressors to the modelled mechanisms, with perturbations and explicit uncertainty.", group: "cellOrg", icon: "biology" },
   { id: "bioSaved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 

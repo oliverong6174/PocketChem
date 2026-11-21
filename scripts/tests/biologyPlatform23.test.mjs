@@ -47,7 +47,7 @@ describe("navigation and registration", () => {
   test("[tools] the Cellular Biology and Physiology group holds three tools after the Stage 16 tools and before Saved", () => {
     const list = S.BIOLOGY_TOOLS.map((t) => t.id);
     assert.deepEqual(list.slice(0, 8), ["bioOverview", "bioReplication", "bioTranscription", "bioTranslation", "bioDogma", "bioRegulation", "bioGenetics", "bioDivision"], "existing order is unchanged");
-    assert.deepEqual(list.slice(8), ["bioMembrane", "bioSignaling", "bioNeuron", "bioSaved"]);
+    assert.deepEqual(list.slice(8), ["bioMembrane", "bioSignaling", "bioNeuron", "bioOrganelles", "bioCellCycle", "bioCellDeath", "bioSaved"]);
     for (const t of TOOLS()) { const def = S.BIOLOGY_TOOLS.find((x) => x.id === t.id); assert.equal(def.slug, t.slug); assert.equal(def.group, "cellular"); }
     assert.ok(S.TOOL_GROUPS.some((g) => g.id === "cellular" && /Cellular biology/.test(g.label)));
     assert.equal(new Set(S.BIOLOGY_TOOLS.map((t) => t.slug)).size, S.BIOLOGY_TOOLS.length);
@@ -59,7 +59,7 @@ describe("navigation and registration", () => {
     assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phWaves", "phOptics", "phInterference", "phEfield", "phMagnetic", "phInduction", "phCircuits", "phRc", "phSaved"]);
     assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcStoichiometry", "gcGas", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcElectro", "gcSaved"]);
     assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.id), ["analysis", "acidBase", "spectroscopy", "conformations", "reactions", "multiStep", "multiCatalytic", "saved"]);
-    assert.equal(S.BIOCHEMISTRY_TOOLS.length, 10);
+    assert.equal(S.BIOCHEMISTRY_TOOLS.length, 13);
   });
   test("[pages] each tool is a persisted page of subject biology and maps back to its tool", () => {
     for (const t of TOOLS()) assert.equal(store.PAGE_SUBJECT[t.page], "biology");

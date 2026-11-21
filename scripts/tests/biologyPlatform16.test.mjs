@@ -46,7 +46,7 @@ describe("navigation and registration", () => {
   test("[tools] three new tools are registered with unique slugs, in the right groups, after the Stage 15 tools and before Saved", () => {
     const list = S.BIOLOGY_TOOLS.map((t) => t.id);
     assert.deepEqual(list.slice(0, 5), ["bioOverview", "bioReplication", "bioTranscription", "bioTranslation", "bioDogma"], "Stage 15 order is unchanged");
-    assert.deepEqual(list.slice(5), ["bioRegulation", "bioGenetics", "bioDivision", "bioMembrane", "bioSignaling", "bioNeuron", "bioSaved"]);
+    assert.deepEqual(list.slice(5), ["bioRegulation", "bioGenetics", "bioDivision", "bioMembrane", "bioSignaling", "bioNeuron", "bioOrganelles", "bioCellCycle", "bioCellDeath", "bioSaved"]);
     for (const t of TOOLS) { const def = S.BIOLOGY_TOOLS.find((x) => x.id === t.id); assert.equal(def.slug, t.slug); assert.equal(def.group, t.group); }
     assert.equal(new Set(S.BIOLOGY_TOOLS.map((t) => t.slug)).size, S.BIOLOGY_TOOLS.length);
     assert.ok(S.TOOL_GROUPS.some((g) => g.id === "inheritance"));

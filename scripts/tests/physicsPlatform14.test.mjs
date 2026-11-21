@@ -40,7 +40,7 @@ describe("navigation and groups", () => {
   test("[tools] Physics lists Overview, the four mechanics tools, the two electricity tools and Saved, in groups", () => {
     assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phWaves", "phOptics", "phInterference", "phEfield", "phMagnetic", "phInduction", "phCircuits", "phRc", "phSaved"]);
     assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.group), ["analyze", "mechanics", "mechanics", "mechanics", "mechanics", "waves", "waves", "waves", "electromagnetism", "electromagnetism", "electromagnetism", "electricity", "electricity", "library"]);
-    assert.deepEqual(S.TOOL_GROUPS.map((g) => g.id), ["analyze", "mechanics", "waves", "electromagnetism", "electricity", "geneExpression", "inheritance", "cellular", "biomolecules", "metabolism", "synthesize", "library"]);
+    assert.deepEqual(S.TOOL_GROUPS.map((g) => g.id), ["analyze", "mechanics", "waves", "electromagnetism", "electricity", "geneExpression", "inheritance", "cellular", "cellOrg", "biomolecules", "metabolism", "synthesize", "library"]);
     assert.equal(new Set(S.PHYSICS_TOOLS.map((t) => t.slug)).size, S.PHYSICS_TOOLS.length);
   });
   test("[routes] the new tools have deep links that round-trip; Organic and General tool lists are unchanged", () => {

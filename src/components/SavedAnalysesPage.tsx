@@ -41,6 +41,9 @@ const PAGE_LABELS: Record<string, string> = {
   fattyacids: "Fatty-acid and ketone-body metabolism",
   aminometabolism: "Amino-acid metabolism and urea cycle",
   fuelmetabolism: "Integrated fuel metabolism",
+  organelles: "Organelles & protein trafficking",
+  cellcycle: "Cell cycle & checkpoints",
+  celldeath: "Apoptosis & autophagy",
 };
 
 const SUBJECT_LABELS: Record<string, string> = { organic: "Organic Chemistry", general: "General Chemistry", physics: "Physics", biology: "Biology", biochemistry: "Biochemistry" };

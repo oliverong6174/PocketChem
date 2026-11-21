@@ -64,6 +64,24 @@ const FEATURES: Record<string, string[]> = {
     "The EGFR → Ras → Raf → MEK → ERK cascade, stepped one event at a time",
     "Inhibitors, constitutive mutations and blocked termination, with consequences derived from the mechanism graph",
   ],
+  bioOrganelles: [
+    "A selectable eukaryotic animal cell: nucleus, nuclear pores, rough and smooth ER, Golgi, mitochondria, lysosomes, endosomes, peroxisomes, ribosomes and cytoskeleton, with the processes that pass through each",
+    "A cargo tracker for six curated protein classes (cytosolic, secreted, membrane, lysosomal hydrolase, nuclear, mitochondrial matrix): position, compartment, machinery, processing state and direction at every step",
+    "COPII, COPI and clathrin transport with Rab and SNARE roles, endosome and lysosome sorting with mannose 6-phosphate, and protein quality control (ERAD, proteasome, lysosome)",
+    "Perturbations such as disabled SRP, impaired ER export, defective nuclear targeting or blocked M6P tagging, with outcomes derived from the transport graph",
+  ],
+  bioCellCycle: [
+    "A circular cell-cycle diagram with the G1/S, G2/M and anaphase checkpoints, and a regulatory network for each",
+    "Cyclin–CDK regulation (cyclin, activating and inhibitory phosphorylation, CDK inhibitors), the RB–E2F switch and replication licensing versus firing",
+    "The DNA-damage checkpoint (ATM–CHK2, ATR–CHK1, p53, p21, Cdc25) and the spindle assembly checkpoint (MAD/BUB, APC/C–Cdc20, securin, separase, cohesin)",
+    "Set conditions and mutations, then read whether each transition proceeds, pauses or is left unresolved, with the components that decide it",
+  ],
+  bioCellDeath: [
+    "Intrinsic apoptosis step by step on a mitochondrial diagram: BH3-only proteins, BCL-2 family, BAX/BAK, MOMP, cytochrome c, the apoptosome, caspase-9 and caspase-3/7",
+    "Extrinsic apoptosis through Fas, FADD, the DISC and caspase-8, with the BID link to mitochondria in type II cells",
+    "Macroautophagy as a separate recycling pathway (ULK1, Beclin 1–VPS34, LC3, lysosomal fusion and degradation)",
+    "A fate map of six stressors with established and context-dependent links, and explicit statements of what is not determined",
+  ],
   bioNeuron: [
     "An interactive neuron and synapse, from dendrites to the postsynaptic membrane",
     "Resting potential from the GHK equation, and a passive RC membrane with the time constant you set",
@@ -80,14 +98,14 @@ export default function BiologyOverview({ onOpenTool }: { onOpenTool: (id: Biolo
       <ToolHeader
         group="Analyze"
         headingLevel={1}
-        purpose="Interactive study guides for how genetic information is copied, transcribed, translated and regulated, how it is inherited through meiosis, and how cells control transport, signalling and electrical activity. Every diagram is drawn from the sequence and process state you are looking at, and every tool has Explore, Practice and Challenge modes."
+        purpose="Interactive study guides for how genetic information is copied, transcribed, translated and regulated, how it is inherited through meiosis, and how cells control transport, signalling and electrical activity, how organelles and protein trafficking organise the cell, and how the cell cycle, apoptosis and autophagy are regulated. Every diagram is drawn from the sequence and process state you are looking at, and every tool has Explore, Practice and Challenge modes."
         title="Biology"
       />
 
       <Panel subtitle="Working tools you can open now." title="Available now">
-        {(["geneExpression", "inheritance", "cellular"] as const).map((group) => (
+        {(["geneExpression", "inheritance", "cellular", "cellOrg"] as const).map((group) => (
         <div key={group}>
-        <h3 className="ph-group-heading">{group === "geneExpression" ? "Gene expression" : group === "inheritance" ? "Genetics & cell division" : "Cellular biology & physiology"}</h3>
+        <h3 className="ph-group-heading">{group === "geneExpression" ? "Gene expression" : group === "inheritance" ? "Genetics & cell division" : group === "cellular" ? "Cellular biology & physiology" : "Cell organization & regulation"}</h3>
         <ul className="gc-tool-cards">
           {implemented.filter((tool) => tool.group === group).map((tool) => (
             <li className="gc-tool-card" key={tool.id}>
