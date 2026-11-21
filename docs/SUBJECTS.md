@@ -133,6 +133,24 @@ Three more working tools in the new group `cellular` ("Cellular biology & physio
   of events for the signalling diagram instead of a shrunken graph.
 - Tests: `biologyMembrane23`, `biologySignaling23`, `biologyNeuron23`, `biologyPlatform23`; browser check `scripts/browser/stage23LiveCheck.mjs`.
 
+## Biology (Stage 26): organelles and protein trafficking, cell cycle and checkpoints, apoptosis and autophagy
+
+Three more working tools in the new group `cellOrg` ("Cell organization & regulation"): `bioOrganelles` (`#/biology/organelles-trafficking`), `bioCellCycle`
+(`#/biology/cell-cycle-checkpoints`) and `bioCellDeath` (`#/biology/apoptosis-autophagy`). Saved pages `organelles`, `cellcycle`, `celldeath` (engine version 1 each,
+`utils/persistence/biologyTools26.ts`; strict validators; every derived outcome is rebuilt on open, including steps that must lie inside a blocked route).
+
+- `utils/biology/mechanism26.ts`: the one shared building block, a validated boolean regulatory graph (all / any / not rules, cycle and unknown-reference checks)
+  with perturbations that force a node on or off, plus `rootCauses` (what actually decides a node). Diagram arrows are read from the rules, so they cannot disagree with the model.
+- `trafficking26.ts`: a transport graph (compartments, allowed transitions with machinery), six curated cargo routes (cytosolic, secreted, integral membrane,
+  lysosomal hydrolase, nuclear, mitochondrial matrix) validated against it, perturbations derived by stopping or detouring at a gated step, membrane topology,
+  COPII/COPI/clathrin stages (selection, budding, transport, tethering, docking, fusion), endocytic routes and protein quality control. Not a localisation predictor.
+- `cellcycle26.ts`: G1/S (mitogen, cyclin D–CDK4/6, RB, E2F, cyclin E–CDK2), DNA-damage checkpoint, G2/M (Wee1/Cdc25/CDK1), spindle checkpoint to separase, a four-condition
+  CDK activity graph and once-per-cycle licensing. Each transition is "proceeds", "pauses" or "unresolved"; fates beyond the gate are never decided.
+- `celldeath26.ts`: intrinsic and extrinsic apoptosis with the BID link, caspases, macroautophagy as a separate pathway, and a fate map whose every link is labelled established or context-dependent.
+- `provenance26.ts`: seven claims verified against OpenStax Biology 2e pages that were opened in Stage 26; every other mechanism is listed "not independently checked". Stage 25's biochemistry gaps are unchanged.
+- Diagrams: `CellMap26` (schematic cell on the transport-graph coordinates), `CycleRing`, `RegDiagram` (layered layout, long arrows routed along the gutter) and the shared `GraphDiagram`. Wide diagrams scroll inside their frame on phones.
+- Tests: `biologyTrafficking26`, `biologyCycle26`, `biologyDeath26`, `biologyPlatform26`; browser check `scripts/browser/stage26LiveCheck.mjs`.
+
 ## Biochemistry (Stage 17): amino acids, protein structure and enzymes
 
 Biochemistry is the fifth available subject (Interactive Learning). Tools: `bcAminoAcids` (`#/biochemistry/amino-acids`), `bcProteins`

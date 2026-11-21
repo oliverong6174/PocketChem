@@ -50,12 +50,15 @@ try {
   await click("Open Glycolysis"); await sleep(900);
   check("1 Open button reaches Glycolysis; hash", (await ev("location.hash")) === "#/biochemistry/glycolysis", await ev("location.hash"));
   await shot("overview.png", ".gc-tool-cards");
+  const inOrder = (original) => (t) => { const have = t.split("|"); let at = -1; return have[0] === original[0] && have[have.length - 1] === "Saved" && original.every((x) => { const i = have.indexOf(x, at + 1); if (i < 0) return false; at = i; return true; }); };
   for (const [target, expect, label] of [
     ["#/organic/properties", (t) => t.startsWith("Properties|Ranking|Spectroscopy|Conformations|Reactions"), "Organic"],
-    ["#/physics/overview", (t) => t === "Overview|Mechanics & motion|Forces & Newton's laws|Work & energy|Momentum & collisions|DC circuits|RC transient|Saved", "Physics"],
-    ["#/general/overview", (t) => t === "Overview|Acid–base & titration|Chemical equilibrium|Reaction kinetics|Thermodynamics|Saved", "General Chemistry"],
-    ["#/biology/overview", (t) => t === "Overview|DNA replication|Transcription & RNA processing|Translation|DNA → RNA → protein|Gene regulation|Genetics & inheritance|Mitosis & meiosis|Saved", "Biology"],
-  ]) { await fresh(1440, "light", target); check(`22 ${label} navigation unchanged`, expect(await tabs()), await tabs()); }
+    // Physics, General Chemistry and Biology gained tools after Stage 18, so an exact list went stale. The behavioural claim that matters here is that the
+    // tools those subjects had at Stage 18 are all still present, in the same relative order, with Overview first and Saved last.
+    ["#/physics/overview", inOrder(["Overview", "Mechanics & motion", "Forces & Newton's laws", "Work & energy", "Momentum & collisions", "DC circuits", "RC transient", "Saved"]), "Physics"],
+    ["#/general/overview", inOrder(["Overview", "Acid–base & titration", "Chemical equilibrium", "Reaction kinetics", "Thermodynamics", "Saved"]), "General Chemistry"],
+    ["#/biology/overview", inOrder(["Overview", "DNA replication", "Transcription & RNA processing", "Translation", "DNA → RNA → protein", "Gene regulation", "Genetics & inheritance", "Mitosis & meiosis", "Saved"]), "Biology"],
+  ]) { await fresh(1440, "light", target); check(`22 ${label} existing tools still present in order`, expect(await tabs()), await tabs()); }
 
   // ---- 2. glycolysis progression and ledger
   await fresh(1440, "light", "#/biochemistry/glycolysis");

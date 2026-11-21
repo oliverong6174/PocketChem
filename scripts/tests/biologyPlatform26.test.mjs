@@ -12,8 +12,9 @@ const read = (...parts) => fs.readFileSync(path.join(root, ...parts), "utf8").re
 const clone = (v) => JSON.parse(JSON.stringify(v));
 const ok = (r) => { assert.equal(r.ok, true, r.ok ? "" : JSON.stringify(r.error)); return r.value; };
 
-let S, store, lib, libApp, BT, BT26, SUM, L, T, C, D, I, Q, R, Lay;
+let PV, S, store, lib, libApp, BT, BT26, SUM, L, T, C, D, I, Q, R, Lay;
 before(async () => {
+  PV = await loadModule("/src/utils/biology/provenance26.ts");
   S = await loadModule("/src/navigation/subjects.ts");
   store = await loadModule("/src/utils/persistence/workspaceStore.ts");
   lib = await loadModule("/src/utils/persistence/analysisLibrary.ts");
@@ -283,6 +284,22 @@ describe("concept search and cross-subject links", () => {
       ["bioSignaling", "bioCellDeath"], ["bcEtc", "bioCellDeath"], ["bioOrganelles", "bioCellDeath"]];
     for (const [a, b] of pairs) { const r = has(a, b); assert.ok(r, `${a} → ${b}`); assert.match(r.caution ?? "", /conceptual|context-dependent/, `${a} → ${b} is conceptual`); }
     for (const id of ["bioOrganelles", "bioCellCycle", "bioCellDeath"]) assert.ok(R.relationsFrom("biology", id).length >= 2, id);
+  });
+  test("[links are reachable] every source tool of a Stage 26 relation renders the related-learning panel so the link is visible", () => {
+    const files = (dir) => fs.readdirSync(path.join(root, ...dir)).flatMap((n) => { const p = path.join(root, ...dir, n); return fs.statSync(p).isDirectory() ? files([...dir, n]) : n.endsWith(".tsx") ? [p] : []; });
+    const src = files(["src", "components"]).map((p) => fs.readFileSync(p, "utf8"));
+    for (const r of R.RELATIONS.filter((x) => /celldeath|organelles|cellcycle|-to-division|replication-to-cellcycle|etc-to-celldeath|proteins-to-organelles|division-to-cellcycle|metabolism-to-celldeath/.test(x.id))) {
+      assert.ok(src.some((t) => t.includes(`toolId="${r.from.toolId}"`) && t.includes("RelatedConcepts")), `${r.id}: no page renders related learning for ${r.from.toolId}`);
+    }
+  });
+  test("[provenance] verified claims cite an opened source page; unchecked claims cite nothing and are labelled so", () => {
+    assert.ok(PV.CLAIMS.filter((c) => c.status === "verified").length >= 6);
+    for (const c of PV.CLAIMS) {
+      if (c.status === "verified") assert.match(c.source?.url ?? "", /^openstax\.org\/books\/biology-2e\/pages\//, c.id);
+      else assert.equal(c.source, undefined, c.id);
+    }
+    assert.ok(PV.CLAIMS.filter((c) => c.status === "not-checked").length >= 10, "most mechanisms were not independently checked and say so");
+    for (const t of ["organelles", "cellcycle", "celldeath"]) assert.ok(PV.claimsFor(t).length >= 3, t);
   });
   test("[no silent handoff] the Stage 26 pages never write to another tool's saved or in-progress state", () => {
     for (const f of ["OrganellesPage", "CellCyclePage", "CellDeathPage"]) {
