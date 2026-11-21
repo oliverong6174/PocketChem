@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../ui/primitives";
 import { NumberField } from "../generalChem/shared";
@@ -161,6 +162,7 @@ export default function ReplicationPage({ openRequest = null, onOpenHandled }: P
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{REPLICATION_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>
+      <RelatedConcepts limit={5} subject="biology" toolId="bioReplication" />
     </div>
   );
 }

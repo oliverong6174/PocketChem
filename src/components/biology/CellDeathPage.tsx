@@ -2,14 +2,14 @@ import { useMemo } from "react";
 import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Panel, Segmented, ToolHeader } from "../ui/primitives";
-import { GraphDiagram, type GBand, type GEdge, type GNode, type GText, type Visual } from "../biochem/metabolism/GraphDiagram";
+import { GraphDiagram, GraphLegend, type GBand, type GEdge, type GNode, type GText, type Visual } from "../biochem/metabolism/GraphDiagram";
 import { useGcWorkspace } from "../generalChem/useGcWorkspace";
 import { PredictPanel, QuizPanel, StepControls } from "./bioShared";
 import { useStepPlayer } from "./bioHooks";
 import { CheckRow } from "./cell23";
 import { layoutSizeForFate } from "./fateLayout26";
 import { wrapLabel } from "./layout26";
-import { NodeDetail, OutcomePanel, PerturbationList, RegDiagram } from "./reg26";
+import { NodeDetail, OutcomePanel, PerturbationList, RegDiagram, ProvenancePanel } from "./reg26";
 import { REG_LEGEND } from "./layout26";
 import { rootCauses, type Evaluation } from "../../utils/biology/mechanism26";
 import {
@@ -38,28 +38,28 @@ function stepStates(steps: PathStep[], values: Record<string, boolean>, step: nu
 /** The stepwise mitochondrial diagram: each molecular event is a selectable box placed in the cell compartment where it happens. */
 function mitoSpec(ev: { values: Record<string, boolean>; forced: Record<string, boolean> }, step: number, selected: string | null) {
   const steps = PATH_STEPS.intrinsic;
-  const pos: Record<string, [number, number]> = { bh3Signal: [190, 20], bh3Effective: [190, 120], baxBak: [190, 220], momp: [440, 232], cytC: [440, 130], apoptosome: [720, 40], casp9: [720, 150], casp37: [720, 260] };
+  const pos: Record<string, [number, number]> = { bh3Signal: [190, 10], bh3Effective: [190, 105], baxBak: [190, 200], momp: [440, 236], cytC: [440, 120], apoptosome: [720, 20], casp9: [720, 120], casp37: [720, 220] };
   const nodes: GNode[] = steps.map((s, i) => {
     const n = APOPTOSIS_GRAPH.nodes.find((x) => x.id === s.node)!;
     const on = ev.values[s.node], shown = i < step, isForced = s.node in ev.forced;
     const state: Visual = shown ? (on ? "done" : "dim") : "future";
     const word = !shown ? "· later" : on ? "✓ occurs" : "✕ does not occur";
     const [x, y] = pos[s.node];
-    return { id: s.node, x, y, w: 200, h: 78, lines: [...wrapLabel(n.label, 27).slice(0, 3), word], kind: isForced ? "ketone" : "carbon", state: shown && on ? "active" : state, selected: selected === s.node, badge: shown && !on ? "✕" : isForced ? "▲" : undefined, aria: `${n.label}: ${word}` };
+    return { id: s.node, x, y, w: 200, h: 78, lines: [...wrapLabel(n.label, 24).slice(0, 3), word], kind: isForced ? "ketone" : "carbon", state: shown && on ? "active" : state, selected: selected === s.node, badge: shown && !on ? "✕" : isForced ? "▲" : undefined, aria: `${n.label}: ${word}` };
   });
-  nodes.push({ id: "bcl2", x: 10, y: 120, w: 150, h: 78, lines: ["Pro-survival BCL-2", "proteins (BCL-2, BCL-xL, MCL-1)", ev.values.prosurvivalExcess ? "in excess" : "normal level"], kind: "shared" });
+  nodes.push({ id: "bcl2", x: 10, y: 120, w: 150, h: 78, lines: ["Pro-survival BCL-2", "family proteins", ev.values.prosurvivalExcess ? "in excess" : "normal level"], kind: "shared" });
   const edges: GEdge[] = [];
   const chain = steps.map((s) => s.node);
   chain.slice(1).forEach((to, i) => { const from = chain[i]; edges.push({ id: `${from}>${to}`, from, to, kind: "main", state: i + 1 < step && ev.values[to] ? "active" : i + 1 <= step ? "dim" : "future" }); });
   edges.push({ id: "bcl2>bh3Effective", from: "bcl2", to: "bh3Effective", kind: "regulation", end: "bar", state: ev.values.prosurvivalExcess ? "active" : "dim" });
   const bands: GBand[] = [
-    { id: "cyto", x: 0, y: 0, w: 960, h: 340, label: "Cytosol", tone: "b" },
-    { id: "mito", x: 410, y: 340, w: 280, h: 150, label: "Mitochondrion", tone: "e" },
+    { id: "cyto", x: 0, y: 0, w: 960, h: 300, label: "Cytosol", tone: "b" },
+    { id: "mito", x: 290, y: 300, w: 390, h: 180, label: "Mitochondrion", tone: "e" },
   ];
   const texts: GText[] = [
-    { x: 424, y: 372, text: "Outer membrane (top edge)", size: 12 }, { x: 424, y: 420, text: "Intermembrane space: cytochrome c", size: 12 },
-    { x: 424, y: 440, text: ev.values.momp && step >= 4 ? "BAX/BAK pores: cytochrome c escapes ↑" : "cytochrome c stays inside until MOMP", size: 12, weight: 700 },
-    { x: 720, y: 360, text: "Executioner caspases cleave lamins, ICAD,", size: 12 }, { x: 720, y: 376, text: "ROCK1/gelsolin and activate scrambling:", size: 12 }, { x: 720, y: 392, text: "nuclear, DNA, cytoskeletal and membrane", size: 12 }, { x: 720, y: 408, text: "changes of apoptosis.", size: 12 },
+    { x: 304, y: 336, text: "Outer membrane = the top edge of this box", size: 12 }, { x: 304, y: 400, text: "Intermembrane space holds cytochrome c", size: 12 },
+    { x: 304, y: 420, text: ev.values.momp && step >= 4 ? "BAX/BAK pores open: cytochrome c escapes ↑" : "cytochrome c stays inside until MOMP", size: 12, weight: 700 },
+    { x: 720, y: 330, text: "Executioner caspases cleave lamins, ICAD,", size: 12 }, { x: 720, y: 346, text: "ROCK1/gelsolin and activate scrambling:", size: 12 }, { x: 720, y: 362, text: "nuclear, DNA, cytoskeletal and membrane", size: 12 }, { x: 720, y: 378, text: "changes of apoptosis.", size: 12 },
   ];
   return { nodes, edges, bands, texts, width: 960, height: 500 };
 }
@@ -74,9 +74,10 @@ function fateSpec(i: CellDeathInputs, f: ReturnType<typeof evaluateFate>) {
     const state: Visual = isStressor ? (chosen ? "active" : "normal") : row?.status === "engaged" ? "active" : row?.status === "blocked" || row?.status === "possible" ? "future" : "normal";
     return { id: n.id, x: pos[n.id][0], y: pos[n.id][1], w: size.w, h: size.h, lines: [...wrapLabel(n.label, 24), word], kind: isStressor ? "lipid" : n.kind === "outcome" ? "product" : n.id === "bcl2" ? "shared" : "carbon", state, selected: i.fate.selected === n.id, badge: row?.status === "blocked" ? "✕" : undefined, aria: `${n.label}: ${word}` };
   });
+  const VIA: Record<string, Array<[number, number]>> = { "bcl-auto": [[552, 248], [552, 500]], "ext-int": [[268, 350], [268, 162]] };
   const edges: GEdge[] = FATE_LINKS.map((l) => {
     const fromRow = rowOf(l.from), fromOn = l.from === sc.stressor || fromRow?.status === "engaged" || (l.from === "bcl2" && l.kind === "inhibits" && false);
-    return { id: l.id, from: l.from, to: l.to, kind: l.kind === "activates" ? "main" : "regulation", end: l.kind === "inhibits" ? "bar" : undefined, state: l.evidence === "context-dependent" ? "future" : fromOn ? "active" : "dim", aria: `${l.kind} (${l.evidence}): ${l.text}` };
+    return { id: l.id, from: l.from, to: l.to, via: VIA[l.id], kind: l.kind === "activates" ? "main" : "regulation", end: l.kind === "inhibits" ? "bar" : undefined, state: l.evidence === "context-dependent" ? "future" : fromOn ? "active" : "dim", aria: `${l.kind} (${l.evidence}): ${l.text}` };
   });
   const texts: GText[] = [{ x: 10, y: 14, text: "Stressors", weight: 700 }, { x: pos.checkpoint[0], y: 14, text: "Mechanisms", weight: 700 }, { x: pos.arrest[0], y: 14, text: "Outcomes (modelled)", weight: 700 }];
   return { nodes, edges, texts, width: 800, height: 560 };
@@ -205,7 +206,7 @@ export default function CellDeathPage({ openRequest = null, onOpenHandled, onNav
           <div className="gc-stage">
             <StepControls locked={mode === "challenge"} max={PATH_STEPS.extrinsic.length} onStep={setStep} player={player} step={apop.step} unit="Event" extra={<button className="secondary-button" data-testid="replay" onClick={() => setStep(0)} type="button">Reset to start</button>} />
             {caption ? <div aria-live="polite" className="bio-caption" data-testid="step-caption"><h3>{caption.title}</h3><p>{caption.text}</p></div> : null}
-            <DiagramFrame caption="Fas is shown as the example death receptor; other death receptors use different adaptors. Dashed boxes are not yet reached." label="Extrinsic apoptosis diagram" legend={REG_LEGEND.map((l) => <span key={l.text}>{l.text}</span>)} title="Extrinsic (death-receptor) pathway">
+            <DiagramFrame caption="Fas is shown as the example death receptor; other death receptors use different adaptors. Dashed boxes are not yet reached." label="Extrinsic apoptosis diagram" legend={<GraphLegend items={REG_LEGEND} />} title="Extrinsic (death-receptor) pathway">
               <RegDiagram forced={apEv.forced} graph={APOPTOSIS_GRAPH} label="Extrinsic apoptosis graph" module="extrinsic" onSelect={select} selected={raw.selected} stepStates={stepStates(PATH_STEPS.extrinsic, apEv.values, apop.step)} values={apEv.values} />
             </DiagramFrame>
             <p className="bio-score" data-testid="path-progress">Pathway reaches step {pathProgress("extrinsic", apEv.values)} of {PATH_STEPS.extrinsic.length}</p>
@@ -228,7 +229,7 @@ export default function CellDeathPage({ openRequest = null, onOpenHandled, onNav
                 <tbody>{CASPASES.map((c) => <tr key={c.id}><th scope="row">{c.name}</th><td>{c.kind}</td><td>{c.platform}</td><td>{c.activation}</td><td data-testid={`caspase-state-${c.id}`}>{apEv.values[c.id === "casp3" || c.id === "casp7" ? "casp37" : c.id] ? "active" : "inactive"}</td></tr>)}</tbody>
               </table></div>
             </Panel>
-            <DiagramFrame caption="Executioner caspase-3/7 activation leads to the dismantling steps shown below it. Dashed boxes come from the apoptosis pathways above." label="Caspase cascade diagram" legend={REG_LEGEND.map((l) => <span key={l.text}>{l.text}</span>)} title="From initiator to dismantling">
+            <DiagramFrame caption="Executioner caspase-3/7 activation leads to the dismantling steps shown below it. Dashed boxes come from the apoptosis pathways above." label="Caspase cascade diagram" legend={<GraphLegend items={REG_LEGEND} />} title="From initiator to dismantling">
               <RegDiagram forced={apEv.forced} graph={APOPTOSIS_GRAPH} label="Caspase cascade graph" module="caspase" onSelect={select} selected={raw.selected} values={apEv.values} />
             </DiagramFrame>
             {raw.selected ? <NodeDetail ev={apEv} graph={APOPTOSIS_GRAPH} id={raw.selected} onClear={() => select(null)} /> : <p className="bio-note">Select a box to see the consequence or caspase.</p>}
@@ -243,7 +244,7 @@ export default function CellDeathPage({ openRequest = null, onOpenHandled, onNav
           <div className="gc-stage">
             <StepControls locked={mode === "challenge"} max={AUTOPHAGY_STEPS.length} onStep={setStep} player={player} step={auto.step} unit="Stage" extra={<button className="secondary-button" data-testid="replay" onClick={() => setStep(0)} type="button">Reset to start</button>} />
             {caption ? <div aria-live="polite" className="bio-caption" data-testid="step-caption"><h3>{caption.title}</h3><p>{caption.text}</p></div> : null}
-            <DiagramFrame caption="Macroautophagy: initiation (ULK1), nucleation (Beclin 1–VPS34), expansion (LC3), cargo sequestration, autophagosome–lysosome fusion, degradation and recycling. A separate pathway from apoptosis." label="Autophagy pathway diagram" legend={REG_LEGEND.map((l) => <span key={l.text}>{l.text}</span>)} title="Macroautophagy">
+            <DiagramFrame caption="Macroautophagy: initiation (ULK1), nucleation (Beclin 1–VPS34), expansion (LC3), cargo sequestration, autophagosome–lysosome fusion, degradation and recycling. A separate pathway from apoptosis." label="Autophagy pathway diagram" legend={<GraphLegend items={REG_LEGEND} />} title="Macroautophagy">
               <RegDiagram forced={auEv.forced} graph={AUTOPHAGY_GRAPH} label="Autophagy graph" module="autophagy" onSelect={select} selected={raw.selected} stepStates={stepStates(AUTOPHAGY_STEPS, auEv.values, auto.step)} values={auEv.values} />
             </DiagramFrame>
             <p className="bio-score" data-testid="path-progress">Autophagy reaches stage {auEv.progress} of {AUTOPHAGY_STEPS.length}</p>
@@ -297,6 +298,7 @@ export default function CellDeathPage({ openRequest = null, onOpenHandled, onNav
         <ul className="gc-assumptions">{DEATH_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>
       {onNavigate ? <p className="c23-note">Related: <button className="ghost-button" onClick={() => onNavigate("bioCellCycle")} type="button">Cell cycle &amp; checkpoints</button> <button className="ghost-button" onClick={() => onNavigate("bioSignaling")} type="button">Cell signaling</button></p> : null}
+      <ProvenancePanel tool="celldeath" />
       <RelatedConcepts subject="biology" toolId="bioCellDeath" />
     </div>
   );

@@ -17,10 +17,10 @@ export type CompartmentId =
 export interface Compartment { id: CompartmentId; name: string; kind: "organelle" | "vesicle" | "cytosolic" | "extracellular" | "pore" | "membrane"; organelle: string; x: number; y: number }
 /** Layout coordinates in the 900 × 580 cell diagram. Schematic only. */
 export const COMPARTMENTS: readonly Compartment[] = [
-  { id: "cytosol", name: "Cytosol", kind: "cytosolic", organelle: "cytosol", x: 400, y: 420 },
+  { id: "cytosol", name: "Cytosol", kind: "cytosolic", organelle: "cytosol", x: 335, y: 395 },
   { id: "nucleus", name: "Nucleus (nucleoplasm)", kind: "organelle", organelle: "nucleus", x: 170, y: 220 },
   { id: "npc", name: "Nuclear pore complex", kind: "pore", organelle: "nuclear-pore", x: 275, y: 250 },
-  { id: "er", name: "Endoplasmic reticulum (lumen and membrane)", kind: "organelle", organelle: "rough-er", x: 400, y: 245 },
+  { id: "er", name: "Endoplasmic reticulum (lumen and membrane)", kind: "organelle", organelle: "rough-er", x: 395, y: 315 },
   { id: "v-copii", name: "COPII-coated carrier (ER exit)", kind: "vesicle", organelle: "golgi", x: 470, y: 215 },
   { id: "v-copi", name: "COPI-coated carrier (retrograde)", kind: "vesicle", organelle: "golgi", x: 470, y: 290 },
   { id: "golgi-cis", name: "cis-Golgi", kind: "organelle", organelle: "golgi", x: 525, y: 205 },

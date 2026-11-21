@@ -2,6 +2,7 @@ import { useMemo, type ReactNode } from "react";
 import { GraphDiagram, type GEdge, type GNode, type Visual } from "../biochem/metabolism/GraphDiagram";
 import { Badge, Callout, Panel } from "../ui/primitives";
 import { layeredLayout, wrapLabel } from "./layout26";
+import { claimsFor, type Claim } from "../../utils/biology/provenance26";
 import { exprText, graphEdges, rootCauses, type Evaluation, type Outcome, type Perturbation, type RegGraph, type RegNode } from "../../utils/biology/mechanism26";
 import "../../styles/metabolism.css";
 import "../../styles/bio26.css";
@@ -27,7 +28,7 @@ export function RegDiagram({ graph, module, values, forced, selected, onSelect, 
     const nodes: RegNode[] = [...own, ...ghostIds.map((id) => graph.nodes.find((n) => n.id === id)!)];
     const heightOf = (n: RegNode) => (wrapLabel(n.label, 25).length + 1) * LINE + 14;
     const edges = all.filter((e) => ownIds.has(e.to) && nodes.some((n) => n.id === e.from));
-    const lay = layeredLayout(nodes.map((n) => ({ id: n.id, w: W, h: heightOf(n) })), edges.map((e) => ({ from: e.from, to: e.to })));
+    const lay = layeredLayout(nodes.map((n) => ({ id: n.id, w: W, h: heightOf(n) })), edges.map((e) => ({ from: e.from, to: e.to })), 34, 54, 44);
     return { nodes, ownIds, edges, lay, heightOf };
   }, [graph, module]);
   const gnodes: GNode[] = spec.nodes.map((n) => {
@@ -45,8 +46,17 @@ export function RegDiagram({ graph, module, values, forced, selected, onSelect, 
       aria: `${n.label}: ${isForced ? (forced[n.id] ? "forced on by a perturbation" : "forced off by a perturbation") : on ? "on" : "off"}${ghost ? " (from another module)" : ""}`,
     };
   });
+  // arrows that skip a row run along the left or right gutter instead of behind unrelated boxes
+  const used = { left: 0, right: 0 };
+  const route = (from: string, to: string): Array<[number, number]> | undefined => {
+    if (spec.lay.depth[to] - spec.lay.depth[from] < 2) return undefined;
+    const a = gnodes.find((n) => n.id === from)!, b = gnodes.find((n) => n.id === to)!;
+    const left = a.x + a.w / 2 < spec.lay.width / 2;
+    const gx = left ? 10 + 6 * used.left++ : spec.lay.width - 10 - 6 * used.right++;
+    return [[gx, a.y + a.h / 2], [gx, b.y + b.h / 2]];
+  };
   const gedges: GEdge[] = spec.edges.map((e) => ({
-    id: `${e.from}>${e.to}`, from: e.from, to: e.to, kind: e.sign === 1 ? "main" : "regulation", end: e.sign === -1 ? "bar" : undefined,
+    id: `${e.from}>${e.to}`, from: e.from, to: e.to, via: route(e.from, e.to), kind: e.sign === 1 ? "main" : "regulation", end: e.sign === -1 ? "bar" : undefined,
     state: values[e.from] ? "active" : "dim", aria: `${e.sign === 1 ? "activates or is required by" : "inhibits"}: ${graph.nodes.find((n) => n.id === e.from)!.label} to ${graph.nodes.find((n) => n.id === e.to)!.label}`,
   }));
   return <GraphDiagram edges={gedges} height={spec.lay.height} label={label} minWidth={minWidth ?? Math.min(spec.lay.width, 760)} nodes={gnodes} onNode={onSelect} width={spec.lay.width} />;
@@ -122,4 +132,21 @@ export function OutcomePanel({ outcome, title = "What the model concludes" }: { 
 
 export function ChipList({ items }: { items: readonly string[] }) {
   return <ul className="b26-chips">{items.map((i) => <li key={i}>{i}</li>)}</ul>;
+}
+
+/** Which claims were checked against an opened source and which are standard textbook mechanisms not independently checked. */
+export function ProvenancePanel({ tool }: { tool: Claim["tool"] }) {
+  const claims = claimsFor(tool);
+  return (
+    <Panel subtitle="Only claims whose source page was opened and read during Stage 26 are marked verified." title="Sources and verification">
+      <ul className="gc-assumptions" data-testid="provenance">
+        {claims.map((c) => (
+          <li key={c.id}>
+            <Badge tone={c.status === "verified" ? "ok" : "estimate"}>{c.status === "verified" ? "Verified" : "Not independently checked"}</Badge>{" "}
+            {c.statement}{c.source ? <> <a href={`https://${c.source.url}`} rel="noreferrer" target="_blank">{c.source.title}</a></> : null}
+          </li>
+        ))}
+      </ul>
+    </Panel>
+  );
 }

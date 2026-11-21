@@ -69,15 +69,15 @@ export function CellMap26({ selected, onSelect, route, label = "Schematic animal
       <Sel onSelect={onSelect} selected={selected} id="plasma-membrane" name="Plasma membrane">
         <rect fill="none" height="540" rx="70" stroke={selected === "plasma-membrane" ? INK : "#92400e"} strokeWidth={selected === "plasma-membrane" ? 8 : 5} width="780" x="20" y="20" />
       </Sel>
-      <Txt anchor="start" bold fill="#92400e" size={12} x={34} y={50}>Plasma membrane</Txt>
-      <Txt anchor="start" fill={MUTE} italic size={12} x={34} y={66}>Cytosol (between the organelles)</Txt>
+      <Txt anchor="start" bold fill="#92400e" size={12} x={84} y={46}>Plasma membrane</Txt>
+      <Txt anchor="start" fill={MUTE} italic size={12} x={84} y={64}>Cytosol (between the organelles)</Txt>
 
       {/* cytoskeleton */}
       <Sel onSelect={onSelect} selected={selected} id="cytoskeleton" name="Cytoskeletal elements (microtubules)">
         <g fill="none" stroke={selected === "cytoskeleton" ? INK : "#94a3b8"} strokeDasharray="2 5" strokeLinecap="round" strokeWidth={selected === "cytoskeleton" ? 5 : 3}>
           <path d="M 300 330 C 400 330 520 320 640 270" /><path d="M 280 300 C 400 380 560 420 660 400" /><path d="M 300 200 C 420 160 560 120 690 120" />
         </g>
-        <Txt anchor="start" fill={MUTE} size={11} x={440} y={345}>microtubules</Txt>
+        <Txt anchor="start" fill={MUTE} size={11} x={560} y={395}>microtubules</Txt>
       </Sel>
 
       {/* nucleus */}
@@ -107,8 +107,8 @@ export function CellMap26({ selected, onSelect, route, label = "Schematic animal
         <Txt anchor="start" bold fill="#5b21b6" size={12} x={335} y={152}>Rough ER</Txt>
       </Sel>
       <Sel onSelect={onSelect} selected={selected} id="smooth-er" name="Smooth endoplasmic reticulum">
-        <path d="M 335 345 C 365 330 380 365 410 350 S 450 365 470 350 M 355 372 C 385 362 400 392 430 378" fill="none" stroke={selected === "smooth-er" ? INK : "#7c3aed"} strokeLinecap="round" strokeWidth={selected === "smooth-er" ? 8 : 6} />
-        <Txt anchor="start" fill="#5b21b6" size={11} x={400} y={398}>Smooth ER</Txt>
+        <path d="M 400 458 C 430 443 445 478 475 463 S 515 478 535 463 M 420 485 C 450 475 465 505 495 491" fill="none" stroke={selected === "smooth-er" ? INK : "#7c3aed"} strokeLinecap="round" strokeWidth={selected === "smooth-er" ? 8 : 6} />
+        <Txt anchor="start" fill="#5b21b6" size={11} x={440} y={522}>Smooth ER</Txt>
       </Sel>
 
       {/* Golgi */}
@@ -155,7 +155,7 @@ export function CellMap26({ selected, onSelect, route, label = "Schematic animal
       ))}
       <rect fill="#e2e8f0" height="18" rx="9" stroke="#475569" strokeWidth="2" width="40" x={460} y={401} />
       <Txt anchor="start" size={11} x={508} y={414}>proteasome</Txt>
-      <Txt anchor="end" fill={MUTE} size={11} x={452} y={236}>COPII</Txt>
+      <Txt anchor="middle" fill={MUTE} size={11} x={470} y={196}>COPII</Txt>
       <Txt anchor="start" fill={MUTE} size={11} x={482} y={306}>COPI (retrograde)</Txt>
       <Txt anchor="start" fill={MUTE} size={11} x={682} y={100}>secretory carrier</Txt>
 

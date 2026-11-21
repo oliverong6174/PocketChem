@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../ui/primitives";
 import { NumberField } from "../generalChem/shared";
@@ -304,6 +305,7 @@ export default function CellDivisionPage({ openRequest = null, onOpenHandled, on
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{DIVISION_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>
+      <RelatedConcepts limit={5} subject="biology" toolId="bioDivision" />
     </div>
   );
 }

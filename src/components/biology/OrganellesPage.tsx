@@ -2,13 +2,14 @@ import { useMemo } from "react";
 import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Panel, Segmented, ToolHeader } from "../ui/primitives";
-import { GraphDiagram, type GEdge, type GNode, type Visual } from "../biochem/metabolism/GraphDiagram";
+import { GraphDiagram, GraphLegend, type GEdge, type GNode, type Visual } from "../biochem/metabolism/GraphDiagram";
 import { useGcWorkspace } from "../generalChem/useGcWorkspace";
 import { PredictPanel, QuizPanel, StepControls } from "./bioShared";
 import { useStepPlayer } from "./bioHooks";
+import { wrapLabel } from "./layout26";
 import { CheckRow } from "./cell23";
 import { CellMap26 } from "./CellMap26";
-import { ChipList, NodeDetail, OutcomePanel, PerturbationList, RegDiagram } from "./reg26";
+import { ChipList, NodeDetail, OutcomePanel, PerturbationList, RegDiagram, ProvenancePanel } from "./reg26";
 import { REG_LEGEND } from "./layout26";
 import {
   CARGOS, ENDO_CARGOS, ENDO_PERTURBATIONS, ENDO_STAGES, MAX_TRAFF_PERTURBATIONS, ORGANELLES, QC_GRAPH, QC_PERTURBATIONS, TRAFF_PERTURBATIONS, VESICLE_ROUTES, VESICLE_STAGES, VESICLE_STAGE_DISTINCTION, VESICLE_STAGE_TITLE,
@@ -74,23 +75,23 @@ export default function OrganellesPage({ openRequest = null, onOpenHandled, onNa
   const vr = vesicleRoute(raw.vesicle.route);
   const vStage = raw.vesicle.stage;
   const setVesicle = (patch: Partial<OrganelleInputs["vesicle"]>) => update((c) => ({ ...c, vesicle: { ...c.vesicle, ...patch } }));
-  const vpos: Record<string, [number, number]> = { donor: [20, 10], selection: [20, 100], budding: [280, 100], transport: [540, 100], tethering: [540, 210], docking: [280, 210], fusion: [20, 210], acceptor: [20, 310] };
+  const vpos: Record<string, [number, number]> = { donor: [20, 10], selection: [20, 100], budding: [280, 100], transport: [540, 100], tethering: [540, 230], docking: [280, 230], fusion: [20, 230], acceptor: [20, 360] };
   const vnodes: GNode[] = [
-    { id: "donor", x: vpos.donor[0], y: vpos.donor[1], w: 200, h: 50, lines: ["Donor membrane", compartmentOf(vr.donor).name.slice(0, 28)], kind: "pathway", state: "normal" },
-    ...VESICLE_STAGES.map((s): GNode => ({ id: s, x: vpos[s][0], y: vpos[s][1], w: 200, h: 66, lines: [VESICLE_STAGE_TITLE[s], ...(vr.stage[s].machinery[0].length > 30 ? [vr.stage[s].machinery[0].slice(0, 30) + "…"] : [vr.stage[s].machinery[0]])], kind: "carbon", state: vStage === s ? "active" : "normal", selected: vStage === s })),
-    { id: "acceptor", x: vpos.acceptor[0], y: vpos.acceptor[1], w: 200, h: 50, lines: ["Acceptor membrane", compartmentOf(vr.acceptor).name.slice(0, 28)], kind: "pathway", state: "normal" },
+    { id: "donor", x: vpos.donor[0], y: vpos.donor[1], w: 200, h: 56, lines: ["Donor membrane", ...wrapLabel(compartmentOf(vr.donor).name.split(" (")[0], 26)], kind: "pathway", state: "normal" },
+    ...VESICLE_STAGES.map((s): GNode => ({ id: s, x: vpos[s][0], y: vpos[s][1], w: 200, h: 80, lines: [VESICLE_STAGE_TITLE[s], ...wrapLabel(vr.stage[s].machinery[0], 25).slice(0, 3)], kind: "carbon", state: vStage === s ? "active" : "normal", selected: vStage === s })),
+    { id: "acceptor", x: vpos.acceptor[0], y: vpos.acceptor[1], w: 200, h: 56, lines: ["Acceptor membrane", ...wrapLabel(compartmentOf(vr.acceptor).name.split(" (")[0], 26)], kind: "pathway", state: "normal" },
   ];
   const chain = ["donor", ...VESICLE_STAGES, "acceptor"];
   const vedges: GEdge[] = chain.slice(1).map((to, i) => ({ id: `${chain[i]}>${to}`, from: chain[i], to, kind: "main" as const }));
 
   // endosome diagram
   const ec = endoCargo(raw.endo.cargo), et = traceEndocytosis(ec.id, raw.endo.perturbations);
-  const epos: Record<string, [number, number]> = { uptake: [20, 110], early: [250, 110], recycle: [480, 20], transcytosed: [710, 20], late: [480, 200], lysosome: [710, 200], degraded: [710, 290] };
+  const epos: Record<string, [number, number]> = { uptake: [20, 120], early: [250, 120], recycle: [480, 20], transcytosed: [710, 20], late: [480, 210], lysosome: [710, 210], degraded: [710, 320] };
   const enodes: GNode[] = ENDO_STAGES.map((s) => {
     const on = et.path.includes(s.id);
     const blockedDeg = s.id === "degraded" && on && !et.degrades;
     const state: Visual = blockedDeg ? "future" : on ? (raw.endo.stage === s.id ? "active" : "done") : "dim";
-    return { id: s.id, x: epos[s.id][0], y: epos[s.id][1], w: 200, h: 62, lines: [s.title.length > 26 ? s.title.slice(0, 25) + "…" : s.title, `pH ${s.ph.split(" ")[0] === "≈" ? s.ph.replace("≈ ", "≈") : s.ph}`.slice(0, 30)], kind: s.id === "degraded" ? "product" : "carbon", state, selected: raw.endo.stage === s.id, badge: blockedDeg ? "✕" : undefined, aria: `${s.title}${on ? "" : " (not on this cargo's route)"}${blockedDeg ? " (does not occur: no acidification)" : ""}` };
+    return { id: s.id, x: epos[s.id][0], y: epos[s.id][1], w: 200, h: 78, lines: [...wrapLabel(s.title, 24), `pH ${s.ph}`.slice(0, 32)], kind: s.id === "degraded" ? "product" : "carbon", state, selected: raw.endo.stage === s.id, badge: blockedDeg ? "✕" : undefined, aria: `${s.title}${on ? "" : " (not on this cargo's route)"}${blockedDeg ? " (does not occur: no acidification)" : ""}` };
   });
   const eedges: GEdge[] = [["uptake", "early"], ["early", "recycle"], ["recycle", "transcytosed"], ["early", "late"], ["late", "lysosome"], ["lysosome", "degraded"]].map(([a, b]) => {
     const ia = et.path.indexOf(a as never), ib = et.path.indexOf(b as never);
@@ -210,7 +211,7 @@ export default function OrganellesPage({ openRequest = null, onOpenHandled, onNa
             <Segmented<VesicleRoute["id"]> label="Transport route" onChange={(r) => setVesicle({ route: r })} options={VESICLE_ROUTES.map((r) => ({ id: r.id, label: r.id === "copii" ? "COPII" : r.id === "copi" ? "COPI" : r.id === "clathrin-ap2" ? "Clathrin / AP-2" : "Clathrin / AP-1" }))} value={raw.vesicle.route} />
             <p className="bio-note" data-testid="vesicle-route">{vr.name}</p>
             <DiagramFrame caption="Select a stage. Each stage names the machinery that acts in it; budding, transport, tethering, docking and fusion are different events." label="Stages of vesicle transport" title="From donor to acceptor membrane">
-              <GraphDiagram edges={vedges} height={380} label="Vesicle transport stages" minWidth={640} nodes={vnodes} onNode={(id) => { if (id !== "donor" && id !== "acceptor") setVesicle({ stage: raw.vesicle.stage === id ? null : (id as VesicleStageId) }); }} width={760} />
+              <GraphDiagram edges={vedges} height={430} label="Vesicle transport stages" minWidth={640} nodes={vnodes} onNode={(id) => { if (id !== "donor" && id !== "acceptor") setVesicle({ stage: raw.vesicle.stage === id ? null : (id as VesicleStageId) }); }} width={760} />
             </DiagramFrame>
           </Panel>
           {vStage ? (
@@ -238,7 +239,7 @@ export default function OrganellesPage({ openRequest = null, onOpenHandled, onNa
               {ENDO_PERTURBATIONS.map((p) => <CheckRow checked={raw.endo.perturbations.includes(p.id)} id={`endo-pert-${p.id}`} key={p.id} label={p.label} onChange={(v) => toggleEndoPert(p.id, v)} />)}
             </fieldset>
             <DiagramFrame caption="Teal boxes are stages on this cargo's route; faded boxes are not on it. A ✕ on lysosomal degradation means it does not occur under the current perturbation." label="Endocytic pathway" title="Endosomal and lysosomal sorting">
-              <GraphDiagram edges={eedges} height={380} label="Endocytic pathway stages" minWidth={640} nodes={enodes} onNode={(id) => setEndo({ stage: raw.endo.stage === id ? null : (id as never) })} width={930} />
+              <GraphDiagram edges={eedges} height={420} label="Endocytic pathway stages" minWidth={640} nodes={enodes} onNode={(id) => setEndo({ stage: raw.endo.stage === id ? null : (id as never) })} width={930} />
             </DiagramFrame>
           </Panel>
           {selEndo ? (
@@ -263,7 +264,7 @@ export default function OrganellesPage({ openRequest = null, onOpenHandled, onNa
             <CheckRow checked={raw.qc.defect} id="qc-defect" label="Folding-prone (defective) protein" onChange={(v) => setQc({ defect: v })} />
             <CheckRow checked={raw.qc.aggregates} id="qc-aggregates" label="Forms large aggregates" onChange={(v) => { if (raw.qc.defect) setQc({ aggregates: v }); }} />
             <PerturbationList canAddFn={(cur, id) => canAdd(QC_PERTURBATIONS, cur, id, 3)} catalogue={QC_PERTURBATIONS} max={3} onToggle={(id, on) => update((c) => ({ ...c, qc: { ...c.qc, perturbations: on ? [...c.qc.perturbations, id] : c.qc.perturbations.filter((p) => p !== id) } }))} selected={raw.qc.perturbations} />
-            <DiagramFrame caption="Boxes are states; arrows run from what a state depends on to the state it gates. Red bar arrows inhibit." label="Protein quality-control states" legend={REG_LEGEND.map((l) => <span key={l.text}>{l.text}</span>)} title="ER quality control and degradation routes">
+            <DiagramFrame caption="Boxes are states; arrows run from what a state depends on to the state it gates. Red bar arrows inhibit." label="Protein quality-control states" legend={<GraphLegend items={REG_LEGEND} />} title="ER quality control and degradation routes">
               <RegDiagram forced={qcEv.forced} graph={QC_GRAPH} label="Protein quality-control graph" module="qc" onSelect={(id) => update((c) => ({ ...c, qcSelected: c.qcSelected === id ? null : id }))} selected={raw.qcSelected} values={qcEv.values} />
             </DiagramFrame>
           </Panel>
@@ -281,6 +282,7 @@ export default function OrganellesPage({ openRequest = null, onOpenHandled, onNa
       {onNavigate ? (
         <p className="c23-note">Related: <button className="ghost-button" onClick={() => onNavigate("bioTranslation")} type="button">Translation</button> <button className="ghost-button" onClick={() => onNavigate("bioMembrane")} type="button">Membranes &amp; transport</button> <button className="ghost-button" onClick={() => onNavigate("bioCellDeath")} type="button">Apoptosis &amp; autophagy</button></p>
       ) : null}
+      <ProvenancePanel tool="organelles" />
       <RelatedConcepts subject="biology" toolId="bioOrganelles" />
     </div>
   );

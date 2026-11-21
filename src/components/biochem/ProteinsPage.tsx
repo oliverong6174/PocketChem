@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { RelatedConcepts } from "../ui/RelatedConcepts";
 import { LearningModeSwitch } from "../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../ui/primitives";
 import { ParamSlider } from "../physics/sim";
@@ -275,6 +276,7 @@ export default function ProteinsPage({ openRequest = null, onOpenHandled }: Prop
       </div>
 
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits"><ul className="gc-assumptions">{PROTEINS_ASSUMPTIONS.map((x) => <li key={x}>{x}</li>)}</ul></Panel>
+      <RelatedConcepts limit={5} subject="biochemistry" toolId="bcProteins" />
     </div>
   );
 }

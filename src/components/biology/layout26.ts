@@ -25,6 +25,10 @@ export function layeredLayout(nodes: LNode[], edges: LEdge[], gapX = 34, gapY = 
     return depth[id];
   };
   nodes.forEach((n) => d(n.id));
+  // pure inputs sit one row above their earliest consumer, so a long arrow never runs through unrelated boxes
+  for (const n of nodes) { const out = succs.get(n.id)!; if (!preds.get(n.id)!.length && out.length) depth[n.id] = Math.min(...out.map((x) => depth[x])) - 1; }
+  const lowest = Math.min(...Object.values(depth), 0);
+  for (const k of Object.keys(depth)) depth[k] -= lowest;
   const layers: string[][] = [];
   for (const n of nodes) (layers[depth[n.id]] ??= []).push(n.id);
   for (let i = 0; i < layers.length; i++) layers[i] ??= [];

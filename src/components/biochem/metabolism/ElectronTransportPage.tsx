@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { RelatedConcepts } from "../../ui/RelatedConcepts";
 import { ProvenancePanel } from "./ProvenancePanel";
 import { LearningModeSwitch } from "../../ui/LearningModeSwitch";
 import { Badge, Callout, DiagramFrame, Disclosure, KeyFigures, Panel, Segmented, ToolHeader } from "../../ui/primitives";
@@ -185,6 +186,7 @@ export default function ElectronTransportPage({ openRequest = null, onOpenHandle
           <ProvenancePanel topics={["etc"]} />
         </div>
       </div>
+      <RelatedConcepts limit={5} subject="biochemistry" toolId="bcEtc" />
     </div>
   );
 }

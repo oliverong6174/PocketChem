@@ -6,8 +6,9 @@ import { useGcWorkspace } from "../generalChem/useGcWorkspace";
 import { PredictPanel, QuizPanel } from "./bioShared";
 import { CheckRow } from "./cell23";
 import { CycleRing } from "./CycleRing";
-import { ChipList, NodeDetail, OutcomePanel, PerturbationList, RegDiagram } from "./reg26";
+import { ChipList, NodeDetail, OutcomePanel, PerturbationList, RegDiagram, ProvenancePanel } from "./reg26";
 import { REG_LEGEND } from "./layout26";
+import { GraphLegend } from "../biochem/metabolism/GraphDiagram";
 import {
   CDK_COMPLEXES, CDK_GRAPH, CYCLE_GRAPH, CYCLE_PERTURBATIONS, LICENSE_GRAPH, LICENSE_PERTURBATIONS, LICENSE_PHASES, LICENSE_PHASE_LABEL, MAX_CYCLE_PERTURBATIONS, MODULE_TITLE, PHASES, PHASE_IDS,
   canAddCyclePerturbation, cycleConsistency, evaluateCdk, evaluateCycle, evaluateLicense, phaseInfo, withPhase, type CdkComplex, type CycleModule, type LicensePhase, type PhaseId,
@@ -141,7 +142,7 @@ export default function CellCyclePage({ openRequest = null, onOpenHandled, onNav
             <CheckRow checked={raw.cdk.inhibPhos} id="cdk-inhib" label="Inhibitory phosphates on Thr14/Tyr15 (Wee1/Myt1)" onChange={(v) => update((x) => ({ ...x, cdk: { ...x.cdk, inhibPhos: v } }))} />
             <CheckRow checked={raw.cdk.cki} id="cdk-cki" label="CDK inhibitor bound (INK4 or CIP/KIP)" onChange={(v) => update((x) => ({ ...x, cdk: { ...x.cdk, cki: v } }))} />
             <p className="bio-score" data-testid="cdk-result">{CDK_SHORT[raw.cdk.complex]}: {cdkEv.values.active ? "ACTIVE" : "inactive"}</p>
-            <DiagramFrame label="Cyclin–CDK regulation" legend={REG_LEGEND.map((l) => <span key={l.text}>{l.text}</span>)} title="What decides CDK activity">
+            <DiagramFrame label="Cyclin–CDK regulation" legend={<GraphLegend items={REG_LEGEND} />} title="What decides CDK activity">
               <RegDiagram forced={cdkEv.forced} graph={CDK_GRAPH} label="Cyclin–CDK regulation graph" module="cdk" onSelect={select} selected={raw.selected} values={cdkEv.values} />
             </DiagramFrame>
             <dl className="b26-facts" data-testid="cdk-facts">
@@ -157,7 +158,7 @@ export default function CellCyclePage({ openRequest = null, onOpenHandled, onNav
           <div className="gc-inputs">{conditions}</div>
           <div className="gc-stage">
             <Panel subtitle={mod === "g1s" ? "Mitogen → cyclin D–CDK4/6 → RB phosphorylation → E2F → cyclin E–CDK2 → S phase. Connects to the RTK–Ras–ERK pathway in Cell signaling." : mod === "ddr" ? "Damage sensors → ATM–CHK2 / ATR–CHK1 → p53 → p21, and Cdc25 inhibition, hold CDKs inactive." : mod === "g2m" ? "Cyclin B accumulates; Wee1 holds CDK1 inactive until Cdc25 acts; replication must be complete." : "An unattached kinetochore assembles the MCC, which blocks APC/C–Cdc20, securin and separase hold cohesin in place."} title={MODULE_TITLE[mod]}>
-              <DiagramFrame caption="Arrows run from a component to the component whose rule depends on it. Red bar arrows inhibit. Dashed boxes belong to another module." label={`${MODULE_TITLE[mod]} regulatory diagram`} legend={REG_LEGEND.map((l) => <span key={l.text}>{l.text}</span>)} title="Regulatory network">
+              <DiagramFrame caption="Arrows run from a component to the component whose rule depends on it. Red bar arrows inhibit. Dashed boxes belong to another module." label={`${MODULE_TITLE[mod]} regulatory diagram`} legend={<GraphLegend items={REG_LEGEND} />} title="Regulatory network">
                 <RegDiagram forced={ev.forced} graph={CYCLE_GRAPH} label={`${MODULE_TITLE[mod]} regulatory network`} module={mod} onSelect={select} selected={raw.selected} values={ev.values} />
               </DiagramFrame>
               {mod === "g1s" && onNavigate ? <p className="c23-note">The mitogenic signal arises from receptor pathways such as the RTK–Ras–ERK cascade: <button className="ghost-button" onClick={() => onNavigate("bioSignaling")} type="button">open Cell signaling</button>. Cell types differ in how much they depend on growth factors.</p> : null}
@@ -179,7 +180,7 @@ export default function CellCyclePage({ openRequest = null, onOpenHandled, onNav
               {[0, 1, 2].map((i) => <div className="b26-origin" key={i}><strong>Origin {i + 1}</strong><span data-testid={`origin-state-${i}`}>{licEv.origin}</span></div>)}
             </div>
             <p className="bio-score" data-testid="license-result">Licensing {licEv.values.licensingPermitted ? "PERMITTED" : "blocked"} · firing {licEv.values.firing ? "possible" : "not possible"}{licEv.values.relicensing ? " · RE-LICENSING HAZARD" : ""}</p>
-            <DiagramFrame caption="Three brakes stop licensing outside G1: geminin binds Cdt1, Cdt1 is degraded in S, and CDK inactivates Cdc6/ORC." label="Replication licensing regulatory diagram" legend={REG_LEGEND.map((l) => <span key={l.text}>{l.text}</span>)} title="Licensing, firing and the brakes on re-licensing">
+            <DiagramFrame caption="Three brakes stop licensing outside G1: geminin binds Cdt1, Cdt1 is degraded in S, and CDK inactivates Cdc6/ORC." label="Replication licensing regulatory diagram" legend={<GraphLegend items={REG_LEGEND} />} title="Licensing, firing and the brakes on re-licensing">
               <RegDiagram forced={licEv.forced} graph={LICENSE_GRAPH} label="Replication licensing graph" module="licensing" onSelect={select} selected={raw.selected} values={licEv.values} />
             </DiagramFrame>
             <Callout tone="info" title="Why replicate once per cycle?">
@@ -198,6 +199,7 @@ export default function CellCyclePage({ openRequest = null, onOpenHandled, onNav
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{CYCLE_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>
+      <ProvenancePanel tool="cellcycle" />
       <RelatedConcepts subject="biology" toolId="bioCellCycle" />
     </div>
   );
