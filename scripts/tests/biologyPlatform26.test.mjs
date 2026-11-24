@@ -292,13 +292,17 @@ describe("concept search and cross-subject links", () => {
       assert.ok(src.some((t) => t.includes(`toolId="${r.from.toolId}"`) && t.includes("RelatedConcepts")), `${r.id}: no page renders related learning for ${r.from.toolId}`);
     }
   });
-  test("[provenance] verified claims cite an opened source page; unchecked claims cite nothing and are labelled so", () => {
+  test("[provenance] verified and partly-verified claims cite a retrievable source with a date or a known OpenStax page; unchecked claims cite nothing and are labelled so", () => {
     assert.ok(PV.CLAIMS.filter((c) => c.status === "verified").length >= 6);
     for (const c of PV.CLAIMS) {
-      if (c.status === "verified") assert.match(c.source?.url ?? "", /^openstax\.org\/books\/biology-2e\/pages\//, c.id);
-      else assert.equal(c.source, undefined, c.id);
+      if (c.status === "not-checked") { assert.equal(c.source, undefined, c.id); assert.equal(c.retrieved, undefined, c.id); continue; }
+      assert.ok(c.source, c.id);
+      if (/^openstax\.org\//.test(c.source.url)) assert.match(c.source.url, /^openstax\.org\/books\/biology-2e\/pages\//, c.id);
+      else { assert.match(c.source.url, /^doi\.org\/10\.\d{4,}\/\S+$/, c.id); assert.match(c.retrieved ?? "", /^2026-\d\d-\d\d$/, `${c.id} needs a retrieval date`); }
+      if (c.status === "partly-verified") assert.ok((c.caveat ?? "").length > 40, `${c.id} must say what is not covered`);
     }
     assert.ok(PV.CLAIMS.filter((c) => c.status === "not-checked").length >= 10, "most mechanisms were not independently checked and say so");
+    assert.equal(new Set(PV.CLAIMS.map((c) => c.id)).size, PV.CLAIMS.length);
     for (const t of ["organelles", "cellcycle", "celldeath"]) assert.ok(PV.claimsFor(t).length >= 3, t);
   });
   test("[no silent handoff] the Stage 26 pages never write to another tool's saved or in-progress state", () => {

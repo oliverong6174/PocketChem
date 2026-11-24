@@ -379,7 +379,10 @@ describe("structures (RDKit) and provenance", () => {
   test("provenance table stays valid and the Stage 25 claims are honestly marked as not independently checked", () => {
     assert.deepEqual(PV.validateProvenance(), []);
     const c = PV.CLAIMS.filter((x) => ["lipid", "ketone", "amino", "urea"].includes(x.topic));
-    assert.ok(c.length >= 10); assert.ok(c.every((x) => x.status === "unverified" && x.sourceIds.length === 0 && x.caveat));
+    assert.ok(c.length >= 10);
+    // Stage 27 opened OpenStax 7.6 and upgraded exactly two claims to "partly checked"; every other claim is still not independently checked.
+    assert.ok(c.every((x) => x.caveat)); assert.deepEqual(c.filter((x) => x.status !== "unverified").map((x) => x.id).sort(), ["fa-beta-ox", "urea-stoich"]);
+    assert.ok(c.filter((x) => x.status === "unverified").every((x) => x.sourceIds.length === 0)); assert.ok(c.filter((x) => x.status === "partly-checked").every((x) => x.sourceIds.length > 0));
   });
 });
 

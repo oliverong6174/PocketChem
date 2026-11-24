@@ -134,16 +134,19 @@ export function ChipList({ items }: { items: readonly string[] }) {
   return <ul className="b26-chips">{items.map((i) => <li key={i}>{i}</li>)}</ul>;
 }
 
-/** Which claims were checked against an opened source and which are standard textbook mechanisms not independently checked. */
+/** Which claims were checked against a retrieved source, which only in part, and which are standard textbook mechanisms not independently checked. */
+const PROV_LABEL = { verified: "Verified", "partly-verified": "Partly verified", "not-checked": "Not independently checked" } as const;
+const PROV_TONE = { verified: "ok", "partly-verified": "info", "not-checked": "estimate" } as const;
 export function ProvenancePanel({ tool }: { tool: Claim["tool"] }) {
   const claims = claimsFor(tool);
   return (
-    <Panel subtitle="Only claims whose source page was opened and read during Stage 26 are marked verified." title="Sources and verification">
+    <Panel subtitle="A claim is verified only if its cited text was retrieved and read, and states it. Reviews and simplified models are not exact." title="Sources and verification">
       <ul className="gc-assumptions" data-testid="provenance">
         {claims.map((c) => (
-          <li key={c.id}>
-            <Badge tone={c.status === "verified" ? "ok" : "estimate"}>{c.status === "verified" ? "Verified" : "Not independently checked"}</Badge>{" "}
-            {c.statement}{c.source ? <> <a href={`https://${c.source.url}`} rel="noreferrer" target="_blank">{c.source.title}</a></> : null}
+          <li data-status={c.status} key={c.id}>
+            <Badge tone={PROV_TONE[c.status]}>{PROV_LABEL[c.status]}</Badge>{" "}
+            {c.statement}{c.source ? <> <a href={`https://${c.source.url}`} rel="noreferrer" target="_blank">{c.source.title}</a>{c.retrieved ? ` (retrieved ${c.retrieved})` : ""}</> : null}
+            {c.caveat ? <span className="provenance-caveat"> {c.caveat}</span> : null}
           </li>
         ))}
       </ul>
