@@ -18,6 +18,7 @@ import { amountToMoles, concentrationsAfterMixing, percentYield, resolveReaction
 import {
   DEFAULT_STOICH_INPUTS, STOICHIOMETRY_ENGINE_VERSION, STOICH_VIEW_LABEL, STOICH_VIEWS, describeStoichAnalysis, validateGcResults22, validateStoichInputs, type StoichInputs, type StoichView,
 } from "../../utils/persistence/gcTools22";
+import { EvidencePanel } from "../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void };
 const g = (v: number, sig = 4) => formatSig(v, sig);
@@ -320,6 +321,8 @@ export default function StoichiometryPage({ openRequest = null, onOpenHandled }:
         </div>
       </div>
 
+      <EvidencePanel id="gc-stoichiometry" />
+      <EvidencePanel id="gc-atomic-masses" />
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{STOICH_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
         <p className="gc-field-hint">Atomic masses are abridged IUPAC conventional values (4–5 significant figures); see the source note in the code and handoff.</p>

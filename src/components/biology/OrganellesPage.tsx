@@ -22,6 +22,7 @@ import { ORGANELLE_ASSUMPTIONS, describeOrganelles, summarizeOrganelles } from "
 import { ORGANELLES_ENGINE_VERSION, validateOrganelleInputs, DEFAULT_ORGANELLE_INPUTS, type OrganelleInputs, type OrganelleSection } from "../../utils/persistence/biologyTools26";
 import { validateBiologyResults } from "../../utils/persistence/biologyTools";
 import type { BiologyToolId } from "../../navigation/subjects";
+import { EvidencePanel } from "../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void; onNavigate?: (id: BiologyToolId) => void };
 
@@ -282,6 +283,7 @@ export default function OrganellesPage({ openRequest = null, onOpenHandled, onNa
       {onNavigate ? (
         <p className="c23-note">Related: <button className="ghost-button" onClick={() => onNavigate("bioTranslation")} type="button">Translation</button> <button className="ghost-button" onClick={() => onNavigate("bioMembrane")} type="button">Membranes &amp; transport</button> <button className="ghost-button" onClick={() => onNavigate("bioCellDeath")} type="button">Apoptosis &amp; autophagy</button></p>
       ) : null}
+      <EvidencePanel id="bio-organelles-trafficking" />
       <ProvenancePanel tool="organelles" />
       <RelatedConcepts subject="biology" toolId="bioOrganelles" />
     </div>

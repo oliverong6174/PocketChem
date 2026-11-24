@@ -24,6 +24,7 @@ import {
 import { validateBiologyResults } from "../../../utils/persistence/biologyTools";
 import { RelatedConcepts } from "../../ui/RelatedConcepts";
 import "../../../styles/biochemistry.css";
+import { EvidencePanel } from "../../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void };
 const VIEW_LABEL: Record<FaView, string> = { structure: "Structure", activation: "Activation & transport", oxidation: "β-Oxidation", energy: "Energy ledger", synthesis: "Synthesis", ketone: "Ketone bodies", regulation: "Regulation" };
@@ -367,6 +368,7 @@ export default function FattyAcidPage({ openRequest = null, onOpenHandled }: Pro
             <ChallengePanel index={raw.challenge} items={challenges} onNext={() => set({ challenge: raw.challenge + 1 })} onReveal={(p) => { set({ view: p.view, ...(p.chain ? { chain: p.chain, substrate: "saturated" as const, step: 0 } : {}), ...(p.conditions ? { conditions: p.conditions } : {}) }); }} />
           ) : null}
           <AssumptionsPanel items={LIPID_ASSUMPTIONS} />
+          <EvidencePanel id="biochem-fatty-acid-atp" />
           <ProvenancePanel topics={["lipid", "ketone"]} />
         </div>
       </div>

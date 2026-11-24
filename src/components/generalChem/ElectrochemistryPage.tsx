@@ -20,6 +20,7 @@ import { ELECTROLYSIS_SCENARIOS, ELECTRO_ASSUMPTIONS, ELECTRO_PRACTICE, ELECTRO_
 import {
   DEFAULT_ELECTRO_INPUTS, ELECTROCHEM_ENGINE_VERSION, ELECTRO_VIEWS, ELECTRO_VIEW_LABEL, describeElectroAnalysis, validateElectroInputs, validateGcResults22, type ElectroInputs, type ElectroView,
 } from "../../utils/persistence/gcTools22";
+import { EvidencePanel } from "../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void };
 const g = (v: number, sig = 4) => formatSig(v, sig);
@@ -341,6 +342,8 @@ export default function ElectrochemistryPage({ openRequest = null, onOpenHandled
         </div>
       </div>
 
+      <EvidencePanel id="gc-electrode-potentials" />
+      <EvidencePanel id="gc-nernst-cell" />
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{ELECTRO_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>

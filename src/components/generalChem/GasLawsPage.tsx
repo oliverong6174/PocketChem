@@ -21,6 +21,7 @@ import { GAS_ASSUMPTIONS, GAS_PRACTICE, GAS_SCENARIOS, gasLessons, summarizeGas 
 import {
   DEFAULT_GAS_INPUTS, GASLAWS_ENGINE_VERSION, GAS_VIEWS, GAS_VIEW_LABEL, describeGasAnalysis, validateGasInputs, validateGcResults22, type GasInputs, type GasView,
 } from "../../utils/persistence/gcTools22";
+import { EvidencePanel } from "../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void };
 const g = (v: number, sig = 4) => formatSig(v, sig);
@@ -399,6 +400,7 @@ export default function GasLawsPage({ openRequest = null, onOpenHandled }: Props
         </div>
       </div>
 
+      <EvidencePanel id="gc-ideal-gas" />
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{GAS_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>

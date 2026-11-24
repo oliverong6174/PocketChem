@@ -26,6 +26,7 @@ const NIT = await loadModule("/src/utils/biochem/metabolism/nitrogen.ts");
 const WAV = await loadModule("/src/utils/physics/waves.ts");
 const OPT = await loadModule("/src/utils/physics/optics.ts");
 const INT = await loadModule("/src/utils/physics/interference.ts");
+const EV = await loadModule("/src/utils/evidence/evidence27.ts");
 const ELS = await loadModule("/src/utils/physics/electrostatics.ts");
 const MAG = await loadModule("/src/utils/physics/magnetism.ts");
 const IND = await loadModule("/src/utils/physics/induction.ts");
@@ -212,6 +213,30 @@ describe("BIO-NERNST: Nernst, GHK and the membrane conventions", () => {
     const ions = MEM.TYPICAL_IONS; const top = 1 * 4 + 0.04 * 145 + 0.45 * 10, bot = 1 * 140 + 0.04 * 12 + 0.45 * 110; const v = MEM.ghkVoltageMv(ions, { k: 1, na: 0.04, cl: 0.45 }, 37);
     near(v, rtf(37) * Math.log(top / bot), 1e-9); assert.ok(v > MEM.nernstMv(1, 4, 140, 37) && v < MEM.nernstMv(1, 145, 12, 37)); near(MEM.ghkVoltageMv(ions, { k: 1, na: 0, cl: 0 }, 37), MEM.nernstMv(1, 4, 140, 37), 1e-9);
     near(MEM.ghkVoltageMv(ions, { k: 0, na: 1, cl: 0 }, 37), MEM.nernstMv(1, 145, 12, 37), 1e-9);
+  });
+
+  test("[BIO-ION] sodium matches OpenStax Biology 2e Table 35.1 (145 out / 12 in); the default K+ and Cl- gradients differ from that table, which changes E_Cl by about 27 mV, so E_Cl is a choice, not a constant", () => {
+    const os = { na: { out: 145, in: 12 }, k: { out: 4, in: 155 }, cl: { out: 120, in: 4 } }; const mine = MEM.TYPICAL_IONS;
+    assert.deepEqual(mine.na, os.na); assert.notDeepEqual(mine.k, os.k); assert.notDeepEqual(mine.cl, os.cl);
+    near(MEM.nernstMv(1, os.k.out, os.k.in, 37), rtf(37) * Math.log(4 / 155), 1e-9); near(MEM.nernstMv(-1, os.cl.out, os.cl.in, 37) - MEM.nernstMv(-1, mine.cl.out, mine.cl.in, 37), -rtf(37) * (Math.log(30) - Math.log(11)), 1e-9);
+    near(MEM.nernstMv(-1, os.cl.out, os.cl.in, 37) - MEM.nernstMv(-1, mine.cl.out, mine.cl.in, 37), -26.8, 0.2);
+    // both sets give a resting potential in the −60 to −80 mV range under the default permeabilities
+    for (const set of [mine, { ...mine, ...os }]) { const v = MEM.ghkVoltageMv(set, { k: 1, na: 0.04, cl: 0.45 }, 37); assert.ok(v < -60 && v > -80, `${v}`); }
+  });
+});
+
+describe("EVIDENCE: the evidence records do not claim more than the checks show", () => {
+  const suite = fs.readFileSync(new URL("./scientificReference27.test.mjs", import.meta.url), "utf8");
+  test("[EVIDENCE-1] records are internally consistent", () => assert.deepEqual(EV.validateEvidence(), []));
+  test("[EVIDENCE-2] every reference-case id named by a record exists in this suite", () => { for (const r of EV.EVIDENCE) for (const id of r.checks) assert.ok(suite.includes(`[${id}]`) || /^BIOCHEM-FA-(4|8|12|16|18)$/.test(id) && suite.includes("`[BIOCHEM-FA-${n}]"), `${r.id} -> ${id}`); });
+  test("[EVIDENCE-3] a curated mechanism is never quantitative and the Hodgkin-Huxley record admits the original paper was not retrieved", () => {
+    for (const r of EV.EVIDENCE.filter((x) => x.kind === "curated-mechanism")) assert.equal(r.quantitative, false, r.id);
+    const hh = EV.evidenceById("bio-hodgkin-huxley"); assert.equal(hh.source, "not-verified"); assert.equal(hh.sources.length, 0); assert.match(hh.sourceCovers, /could not be retrieved/);
+  });
+  test("[EVIDENCE-4] a tampered record is rejected: source-verified with no source, curated mechanism marked quantitative", () => {
+    const base = EV.evidenceById("gc-atomic-masses");
+    assert.ok(EV.validateEvidence([{ ...base, sources: [] }]).length > 0); assert.ok(EV.validateEvidence([{ ...EV.evidenceById("bio-apoptosis"), quantitative: true }]).length > 0);
+    assert.ok(EV.validateEvidence([{ ...base, sources: [{ ...base.sources[0], retrieved: "yesterday" }] }]).length > 0);
   });
 });
 

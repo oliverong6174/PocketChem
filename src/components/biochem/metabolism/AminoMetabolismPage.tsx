@@ -24,6 +24,7 @@ import {
 import { validateBiologyResults } from "../../../utils/persistence/biologyTools";
 import { RelatedConcepts } from "../../ui/RelatedConcepts";
 import "../../../styles/biochemistry.css";
+import { EvidencePanel } from "../../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void };
 const VIEW_LABEL: Record<AaView, string> = { structure: "Amino acid", transamination: "Transamination", deamination: "Deamination", skeleton: "Carbon skeletons", nitrogen: "Nitrogen handling", urea: "Urea cycle" };
@@ -246,6 +247,7 @@ export default function AminoMetabolismPage({ openRequest = null, onOpenHandled 
             <ChallengePanel index={raw.challenge} items={challenges} onNext={() => set({ challenge: raw.challenge + 1 })} onReveal={(p) => set({ view: p.view, ...(p.aa ? { aa: p.aa } : {}), ...(p.nag !== undefined ? { nag: p.nag } : {}), ...(p.arginine ? { arginine: p.arginine } : {}) })} />
           ) : null}
           <AssumptionsPanel items={AMINO_ASSUMPTIONS} />
+          <EvidencePanel id="biochem-urea-cycle" />
           <ProvenancePanel topics={["amino", "urea"]} />
         </div>
       </div>

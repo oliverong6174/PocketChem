@@ -21,6 +21,7 @@ import { DEATH_ASSUMPTIONS, describeCellDeath, summarizeCellDeath } from "../../
 import { CELLDEATH_ENGINE_VERSION, DEATH_SECTIONS, DEFAULT_CELLDEATH_INPUTS, validateCellDeathInputs, type CellDeathInputs, type DeathSection } from "../../utils/persistence/biologyTools26";
 import { validateBiologyResults } from "../../utils/persistence/biologyTools";
 import type { BiologyToolId } from "../../navigation/subjects";
+import { EvidencePanel } from "../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void; onNavigate?: (id: BiologyToolId) => void };
 
@@ -298,6 +299,7 @@ export default function CellDeathPage({ openRequest = null, onOpenHandled, onNav
         <ul className="gc-assumptions">{DEATH_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>
       {onNavigate ? <p className="c23-note">Related: <button className="ghost-button" onClick={() => onNavigate("bioCellCycle")} type="button">Cell cycle &amp; checkpoints</button> <button className="ghost-button" onClick={() => onNavigate("bioSignaling")} type="button">Cell signaling</button></p> : null}
+      <EvidencePanel id="bio-apoptosis" />
       <ProvenancePanel tool="celldeath" />
       <RelatedConcepts subject="biology" toolId="bioCellDeath" />
     </div>

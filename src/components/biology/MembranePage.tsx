@@ -19,6 +19,7 @@ import {
   DEFAULT_MEMBRANE_INPUTS, MEMBRANE_ENGINE_VERSION, MEMBRANE_SECTIONS, validateMembraneInputs, type MembraneInputs, type MembraneProtein, type MembraneSection,
 } from "../../utils/persistence/biologyTools23";
 import { validateBiologyResults } from "../../utils/persistence/biologyTools";
+import { EvidencePanel } from "../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void; onNavigate?: (id: "bioNeuron") => void };
 
@@ -322,6 +323,7 @@ export default function MembranePage({ openRequest = null, onOpenHandled, onNavi
           {section === "ions" && onNavigate ? <p className="c23-note">The neuronal tool uses the same equations to explain the resting potential: <button className="ghost-button" onClick={() => onNavigate("bioNeuron")} type="button">open Neuronal physiology</button></p> : null}
         </div>
       </div>
+      <EvidencePanel id="bio-membrane" />
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{MEMBRANE_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
         <p className="c23-note">Transporter classes in this tool: {TRANSPORTERS.map((t) => `${t.name} (${t.category}${t.usesATPDirectly ? ", uses ATP directly" : ""})`).join("; ")}. Steps in the pump cycle: {NAK_STEPS}.</p>

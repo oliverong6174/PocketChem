@@ -16,6 +16,7 @@ import {
 import { ChallengePanel } from "./ChallengePanel";
 import { ParamSlider } from "./sim";
 import { ImagingDiagram, RefractionDiagram } from "./OpticsDiagrams";
+import { EvidencePanel } from "../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void };
 
@@ -195,6 +196,7 @@ export default function OpticsPage({ openRequest = null, onOpenHandled }: Props)
         </div>
       </div>
 
+      <EvidencePanel id="physics-closed-forms" />
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">
           {OPTICS_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}

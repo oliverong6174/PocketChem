@@ -25,6 +25,7 @@ import { useSimClock } from "./simHooks";
 import { TimeChart } from "./TimeChart";
 import { useSimTime } from "./useSimTime";
 import { DopplerDiagram, ResonatorDiagram, SuperpositionDiagram, TravelDiagram } from "./WaveDiagrams";
+import { EvidencePanel } from "../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void };
 
@@ -368,6 +369,7 @@ export default function WavesPage({ openRequest = null, onOpenHandled }: Props) 
         </div>
       </div>
 
+      <EvidencePanel id="physics-closed-forms" />
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">
           {WAVES_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}

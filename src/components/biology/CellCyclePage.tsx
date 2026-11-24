@@ -19,6 +19,7 @@ import { CYCLE_ASSUMPTIONS, describeCellCycle, summarizeCellCycle } from "../../
 import { CELLCYCLE_ENGINE_VERSION, CYCLE_SECTIONS, DEFAULT_CELLCYCLE_INPUTS, validateCellCycleInputs, type CellCycleInputs, type CycleSection } from "../../utils/persistence/biologyTools26";
 import { validateBiologyResults } from "../../utils/persistence/biologyTools";
 import type { BiologyToolId } from "../../navigation/subjects";
+import { EvidencePanel } from "../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void; onNavigate?: (id: BiologyToolId) => void };
 
@@ -199,6 +200,7 @@ export default function CellCyclePage({ openRequest = null, onOpenHandled, onNav
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{CYCLE_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>
+      <EvidencePanel id="bio-cell-cycle" />
       <ProvenancePanel tool="cellcycle" />
       <RelatedConcepts subject="biology" toolId="bioCellCycle" />
     </div>

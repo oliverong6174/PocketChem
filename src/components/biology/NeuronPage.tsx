@@ -23,6 +23,7 @@ import { neuronChallenge, neuronQuestions } from "../../utils/biology/bioLearnin
 import { NEURON_ASSUMPTIONS, describeNeuron, summarizeNeuron } from "../../utils/biology/bioSummary23";
 import { DEFAULT_NEURON_INPUTS, NEURON_ENGINE_VERSION, NEURON_SECTIONS, validateNeuronInputs, type NeuronInputs, type NeuronSection } from "../../utils/persistence/biologyTools23";
 import { validateBiologyResults } from "../../utils/persistence/biologyTools";
+import { EvidencePanel } from "../ui/EvidencePanel";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void; onNavigate?: (id: "bioMembrane" | "bioSignaling") => void };
 const SECTION_LABELS: Record<NeuronSection, string> = { anatomy: "Anatomy", resting: "Resting potential", passive: "Passive membrane", ap: "Action potential", propagation: "Propagation", synapse: "Synapse", summation: "Summation" };
@@ -335,6 +336,8 @@ export default function NeuronPage({ openRequest = null, onOpenHandled, onNaviga
           {section === "ap" ? <Disclosure summary="Parameters of the model"><p>C = {HH.cm} µF/cm², g<sub>Na</sub> = {HH.gNa}, g<sub>K</sub> = {HH.gK}, g<sub>L</sub> = {HH.gL} mS/cm², E<sub>Na</sub> = {HH.eNa}, E<sub>K</sub> = {HH.eK}, E<sub>L</sub> = {HH.eL} mV, rest {HH.vRest} mV, {HH.tempC} °C.</p></Disclosure> : null}
         </div>
       </div>
+      <EvidencePanel id="bio-hodgkin-huxley" />
+      <EvidencePanel id="bio-membrane" />
       <Panel subtitle="What this tool does and does not model." title="Assumptions and limits">
         <ul className="gc-assumptions">{NEURON_ASSUMPTIONS.map((a) => <li key={a}>{a}</li>)}</ul>
       </Panel>
