@@ -289,6 +289,8 @@ function MoleculeDrawer({
   const handleEditorChange = useCallback(() => {
     void refreshHasStructure();
     if (!suppressEditorChangeRef.current) {
+      // A loader status describes a past import, not the identity of an edited drawing.
+      setNameMessage(null);
       onChange?.();
     }
   }, [onChange, refreshHasStructure]);

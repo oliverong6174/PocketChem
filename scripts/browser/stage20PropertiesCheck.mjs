@@ -43,7 +43,7 @@ try {
   check("SMILES is shown in the identity card", /CC\(=O\)O|OC\(C\)=O/.test(await text(".pr-smiles")), await text(".pr-smiles"));
 
   // ---- summary
-  check("tabs renamed to Summary / Acid/Base / Concepts / All properties", (await ev(`[...document.querySelectorAll('.dashboard-tab')].map((b) => b.textContent.trim()).join('|')`)) === "Summary|Acid/Base|Concepts|All properties");
+  check("tabs renamed to Summary / Acid/Base / Concepts / All Properties", (await ev(`[...document.querySelectorAll('.dashboard-tab')].map((b) => b.textContent.trim()).join('|')`)) === "Summary|Acid/Base|Aromaticity|Concepts|All Properties");
   check("summary: key results, groups, descriptors and tendencies sections", (await count("[data-testid=pr-summary] section")) >= 4 && /Key results/.test(await text("[data-testid=pr-summary]")) && /Functional groups and stereochemistry/.test(await text("[data-testid=pr-summary]")));
   check("summary: calculated values and estimates carry different visible labels", (await count("[data-testid=pr-summary] .pr-evidence.is-calculated")) >= 4 && (await count("[data-testid=pr-summary] .pr-evidence.is-estimate")) === 4);
   check("summary: the estimate section says these are not measured values", /not measured/i.test(await text("[data-testid=pr-summary]")));
@@ -59,7 +59,7 @@ try {
   check("Concepts tab still works with the identity card above", (await count("[data-testid=pr-identity]")) === 1 && (await count(".concept-button")) >= 3);
 
   // ---- all properties
-  await tab("All properties");
+  await tab("All Properties");
   check("all properties: three tables with caption, column headers and row headers", (await count("[data-testid=pr-detail] table")) === 3 && (await count("[data-testid=pr-detail] thead th[scope=col]")) === 12 && (await count("[data-testid=pr-detail] tbody th[scope=row]")) === 14);
   check("all properties: each estimate has a 'Why this level?' disclosure with reasoning", (await count("[data-testid=pr-detail] details.pr-why")) >= 5);
   const disclosure = await ev(`(() => { const d = document.querySelector('[data-testid=pr-detail] .pr-table details.pr-why'); const s = d.querySelector('summary'); s.click(); return d.open; })()`);
@@ -95,7 +95,7 @@ try {
     await screenshot(cdp, path.join(outDir, `pr-${w}-${scheme}.png`), { fullPage: false });
   }
   await setViewport(cdp, 375, 812, { scheme: "light" }); await sleep(500);
-  await tab("All properties");
+  await tab("All Properties");
   const tableOverflow = await ev(`(() => { const t = document.querySelector('.pr-table'); return t ? t.scrollWidth - t.clientWidth : -1; })()`);
   check("375px: the all-properties tables stack instead of overflowing", tableOverflow <= 0 && (await overflow()) <= 0, tableOverflow);
   await ev(`document.querySelector('[data-testid=pr-detail]')?.scrollIntoView()`); await sleep(300);

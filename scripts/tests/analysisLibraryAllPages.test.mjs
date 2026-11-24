@@ -165,8 +165,8 @@ describe("properties saved analyses", () => {
     assert.deepEqual(data.acidityResults, clone(propsResults.acidityResults));
     assert.deepEqual(data.basicityResults, clone(propsResults.basicityResults));
     assert.deepEqual(opened.inputs, clone(propsInputs()));
-    assert.equal(opened.engineMismatch, false);
-    assert.equal(opened.results.engineVersion, 1);
+    assert.equal(opened.engineMismatch, true, "the version-1 fixture predates generic-property guards");
+    assert.equal(opened.results.engineVersion, 1, "an older snapshot is preserved, never silently upgraded");
   });
 
   test("[structure] disconnected components, charges, isotopes and wedge stereo in the drawing keep their identity", async () => {

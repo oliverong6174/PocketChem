@@ -38,11 +38,11 @@ export function PropertiesIdentity({ identity, smiles, groups, stereocenters, on
   const source = identity.sourceIdentity;
   const derived = identity.structureDerivedNomenclature ?? nomenclature;
   const generic = identity.properties.fullySpecified === false;
-  const [variants, setVariants] = useState<MoleculeNameResolution[]>([]);
+  const [variantResult, setVariantResult] = useState<{ source: typeof source; entries: MoleculeNameResolution[] } | null>(null);
+  const variants = variantResult?.source === source ? variantResult?.entries ?? [] : [];
   useEffect(() => {
     let cancelled = false;
-    setVariants([]);
-    if (generic && source) void findConcreteNameVariants(source.resolution).then((list) => { if (!cancelled) setVariants(list); }).catch(() => {});
+    if (generic && source) void findConcreteNameVariants(source.resolution).then((entries) => { if (!cancelled) setVariantResult({ source, entries }); }).catch(() => {});
     return () => { cancelled = true; };
   }, [generic, source]);
   const name = source?.resolvedName || nomenclature.displayName || nomenclature.estimatedName;
@@ -58,7 +58,7 @@ export function PropertiesIdentity({ identity, smiles, groups, stereocenters, on
       <div className="pr-identity-main">
         <p className="pr-eyebrow">Current molecule</p>
         <h3 className="pr-name">{name}</h3>
-        {source ? <div className="pr-confidence"><strong>Loaded as: {source.resolvedName}</strong> · {source.sourceId} · {source.confidence}<br />Structure-derived name: {derived.namingStatus === "unsupported" ? "Unavailable" : derived.displayName}<details><summary>Identity provenance</summary><p>Entered: {source.originalQuery}<br />Recognized names: {source.aliases.join("; ")}<br />Source: bundled ChEBI · {source.sourceId}<br />Structure: {source.fullySpecified ? "Specified composition; stereochemistry only as drawn" : "Generic / variable composition"}</p></details></div> : <p className="pr-confidence"><strong>{nomenclature.namingConfidence} confidence</strong> in structure-derived name{nomenclature.commonName && nomenclature.commonName.toLowerCase() !== name.toLowerCase() ? <> · also known as <em>{nomenclature.commonName}</em></> : null}</p>}
+        {source ? <div className="pr-confidence"><strong>Loaded as: {source.resolvedName}</strong> · {source.sourceId} · Identity confidence: {source.confidence}<br />Structure-derived name: {derived.namingStatus === "unsupported" ? "Unavailable" : derived.displayName}<details><summary>Identity provenance</summary><p>Entered: {source.originalQuery}<br />Recognized names: {source.aliases.join("; ")}<br />Source: bundled ChEBI · {source.sourceId}<br />Structure: {source.fullySpecified ? "Specified composition; stereochemistry only as drawn" : "Generic / variable composition"}</p></details></div> : <p className="pr-confidence"><strong>{nomenclature.namingConfidence} confidence</strong> in structure-derived name{nomenclature.commonName && nomenclature.commonName.toLowerCase() !== name.toLowerCase() ? <> · also known as <em>{nomenclature.commonName}</em></> : null}</p>}
         <dl className="pr-keyfacts">
           {composition?.rows.filter((row) => ["formula", "mw", "exactMass", "charge"].includes(row.id)).map((row) => (
             <div key={row.id}><dt>{row.label}</dt><dd>{row.value}</dd></div>

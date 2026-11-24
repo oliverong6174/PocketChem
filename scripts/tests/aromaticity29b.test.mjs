@@ -37,6 +37,12 @@ test('fused systems keep individual rings; separate rings and mixed fused system
   const separate=await A.analyzeAromaticity('c1ccccc1C2CCCCC2');assert.equal(separate.systems.length,2);assert.deepEqual(separate.systems.map(s=>s.classification).sort(),['aromatic','nonaromatic']);
   const mixed=(await A.analyzeAromaticity('c1ccc2c(c1)CCCC2')).systems[0];assert.equal(mixed.classification,'mixed');assert.equal(mixed.piElectrons,null);
 });
+test('saturated fused, bridged and heterocyclic systems have interrupted cyclic conjugation',async()=>{
+  for(const smiles of ['C1CCC2CCCCC2C1','C1CC2CCC1C2','C1COCCO1']) {
+    const result=await A.analyzeAromaticity(smiles);
+    assert.ok(result.systems.every(s=>s.classification==='nonaromatic'),smiles);
+  }
+});
 test('wildcards, radicals, unsupported conjugated rings and invalid structures never invent antiaromaticity',async()=>{
   const wildcard=await A.analyzeAromaticity('*1=CC=CC=C1');assert.ok(wildcard.systems.every(s=>s.classification==='uncertain'));
   const large=await A.analyzeAromaticity('C1=CC=CC=CC=CC=CC=C1');assert.ok(large.systems.every(s=>s.classification!=='antiaromatic (planar model)'));

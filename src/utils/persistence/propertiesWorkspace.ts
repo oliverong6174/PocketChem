@@ -16,7 +16,7 @@ import type { BasicityResult } from "../ranking/acidBase/analyzeBasicity";
 import type { ReactionPathway } from "../reactionUtils";
 
 /** Bump when the shape or meaning of saved Properties results changes. */
-export const PROPERTIES_ENGINE_VERSION = 1;
+export const PROPERTIES_ENGINE_VERSION = 2;
 
 export type PropertiesAnalysisPanel = "overview" | "acidBase" | "aromaticity" | "concepts" | "properties";
 
@@ -114,7 +114,16 @@ export function validatePropertiesResults(raw: unknown): PropertiesWorkspaceResu
   if (identity !== null && !(isObject(identity) && isObject(identity.nomenclature) && isObject(identity.properties))) {
     return null;
   }
-  return raw as unknown as PropertiesWorkspaceResults;
+  const result = raw as unknown as PropertiesWorkspaceResults;
+  // Older saved snapshots may predate the generic-structure fix. Keep the snapshot but
+  // withhold invalid whole-molecule numbers without pretending it has been recomputed.
+  if (result.moleculeIdentity && (result.smiles.includes("*") || /R(?![a-z])|\([^)]*\)[nm]/.test(result.moleculeIdentity.properties.molecularFormula ?? ""))) {
+    const id = result.moleculeIdentity, p = id.properties;
+    if (p.fullySpecified === false && p.molecularWeight === null && p.exactMass === null && p.degreesOfUnsaturation === null) return result;
+    const unknown = p.unspecifiedAtomCount ?? p.atomCounts?.filter((a) => ["R", "*", "A", "Q", "X"].includes(a.element)).reduce((n,a) => n+a.count,0) ?? 0;
+    return { ...result, moleculeIdentity: { ...id, properties: { ...p, fullySpecified: false, unspecifiedAtomCount: unknown, heavyAtomCount: p.fullySpecified === false ? p.heavyAtomCount : Math.max(0,p.heavyAtomCount-unknown), molecularWeight: null, exactMass: null, degreesOfUnsaturation: null, notes: [...(p.notes ?? []), "Generic saved scaffold: whole-molecule mass, DBE and tendencies withheld; this snapshot was not recomputed."] } } };
+  }
+  return result;
 }
 
 /** The one-line description a saved Properties analysis gets in the library list. */

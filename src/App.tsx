@@ -20,6 +20,9 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
 import { AcidBasePanel } from "./components/properties/AcidBasePanel";
 import { AromaticityPanel } from "./components/properties/AromaticityPanel";
 import { useAromaticity } from "./components/properties/useAromaticity";
+import { CounterpartExplorer, type CounterpartOriginal } from "./components/properties/CounterpartExplorer";
+import type { CounterpartCandidate } from "./utils/aromaticCounterparts";
+import { molecularStructureKey } from "./utils/moleculeNameResolver";
 import { ConceptSearch } from "./components/shell/ConceptSearch";
 import { NavigationContext } from "./navigation/NavigationContext";
 import type { ConceptDestination } from "./utils/concepts/conceptIndex";
@@ -1985,6 +1988,16 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
     await analyzeMolecule();
   }
 
+  async function changePropertiesCounterpart(structure: string, expectedKey: string, resolution: MoleculeNameResolution | null) {
+    const editor = window.ketcher;
+    if (!editor || isAnalyzing) throw new Error("Wait for the editor and analysis to finish.");
+    const snapshot = await readKetcherStructureSnapshot(editor);
+    if (await molecularStructureKey(snapshot?.smiles ?? "") !== expectedKey) throw new Error("The editor changed after the preview. Analyze it and generate a fresh comparison before replacing the drawing.");
+    await editor.setMolecule(structure);
+    importedNameResolutionRef.current = resolution;
+    await analyzeMolecule();
+  }
+
   {/*RETURN STATEMENT*/}
 
   return (
@@ -2459,9 +2472,9 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
                 </div>
               )}
 
-              {analysisPanel === "aromaticity" && (
-                <div className="dashboard-panel"><AromaticityPanel smiles={smiles} /></div>
-              )}
+              <div hidden={analysisPanel !== "aromaticity"}>
+                <div className="dashboard-panel">{moleculeIdentity ? <AromaticityPanel smiles={smiles}><CounterpartExplorer smiles={smiles} resolution={moleculeIdentity.sourceIdentity?.resolution ?? null} onApply={(candidate: CounterpartCandidate, key) => changePropertiesCounterpart(candidate.molfile,key,null)} onRestore={(original: CounterpartOriginal, key) => changePropertiesCounterpart(original.ket,key,original.resolution)} /></AromaticityPanel> : <p>Analyze a molecule to inspect aromaticity.</p>}</div>
+              </div>
 
               {analysisPanel === "concepts" && (
                 <div className="dashboard-panel">

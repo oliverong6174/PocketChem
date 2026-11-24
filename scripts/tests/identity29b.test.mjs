@@ -81,3 +81,16 @@ test('ambiguous input stays rejected and explicit SMILES has no invented databas
   const id=await resolver.resolveStructureIdentity(manual.smiles,await analyze(manual.smiles),null);
   assert.equal(id.sourceIdentity,undefined);
 });
+
+test('older generic saved snapshots cannot reintroduce invalid mass or count R as a heavy atom',async()=>{
+  const P=await loadModule('/src/utils/persistence/propertiesWorkspace.ts');
+  const id=await analyze('*C');delete id.properties.fullySpecified;delete id.properties.unspecifiedAtomCount;
+  id.properties.heavyAtomCount=2;id.properties.molecularWeight='15.04';id.properties.exactMass='15.023';id.properties.degreesOfUnsaturation=0;
+  const raw={inputKey:'x',smiles:'*C',molfile:null,functionalGroups:[],acidityResults:[],basicityResults:[],resonanceResults:[],chiralityResults:[],reactionPathways:[],moleculeAnnotation:null,moleculeIdentity:id};
+  const restored=P.validatePropertiesResults(JSON.parse(JSON.stringify(raw)));
+  assert.equal(restored.moleculeIdentity.properties.molecularWeight,null);
+  assert.equal(restored.moleculeIdentity.properties.heavyAtomCount,1);
+  assert.equal(restored.moleculeIdentity.properties.fullySpecified,false);
+  const inputs={ket:null,key:null,analysisPanel:'aromaticity',selectedConcept:'functionalGroups',selectedHybridization:'all',selectedBondType:'all'};
+  assert.equal(P.validatePropertiesInputs(inputs).analysisPanel,'aromaticity');
+});

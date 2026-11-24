@@ -87,6 +87,10 @@ function systemDetails(graph: AromaticGraph, cycles: number[][], index: number):
   } else if (someAromatic) {
     classification = "mixed"; piElectrons = null;
     explanation = "This fused system contains aromatic and other ring regions. One electron total would obscure their different environments.";
+  } else if (cycles.every((cycle) => cycle.some((i) => graph.atoms[i].z === 6 && graph.atoms[i].charge === 0 && graph.bonds.filter((b) => b.a === i || b.b === i).every((b) => b.order === 1)))) {
+    classification = "nonaromatic";
+    conjugation = "Cyclic conjugation interrupted by saturated carbon";
+    explanation = "Every perceived ring contains a saturated carbon that breaks cyclic p overlap. This applies to saturated fused and bridged rings as well as simple carbocycles and heterocycles.";
   } else if (carbocycle && !hasExocyclicDouble && piElectrons !== null) {
     const neutral4 = atoms.length === 4 && piElectrons === 4 && atoms.every((i) => graph.atoms[i].charge === 0);
     const cation5 = atoms.length === 5 && piElectrons === 4 && atoms.filter((i) => graph.atoms[i].charge === 1).length === 1 && atoms.every((i) => [0,1].includes(graph.atoms[i].charge));
