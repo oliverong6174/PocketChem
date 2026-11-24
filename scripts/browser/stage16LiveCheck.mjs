@@ -40,6 +40,14 @@ const steps = async (n) => { for (let i = 0; i < n; i += 1) await click("Next �
 const readout = async () => (await ev(`document.querySelector('.ph-time-readout')?.textContent ?? ''`)).trim();
 const overflow = () => ev(`document.documentElement.scrollWidth - document.documentElement.clientWidth`);
 const tabs = () => ev(`[...document.querySelectorAll('.tool-tabs [role=tab]')].map((b) => b.textContent.trim()).join('|')`);
+// Stage 27: tab and card lists grew after this check was written (Physics, General Chemistry and Biology gained tools in Stages 21-26).
+// The intent was "the tools this stage depends on still exist, in the same relative order, Overview first and Saved last", so that is asserted.
+const tabsInOrder = (original) => (t) => { const have = t.split("|"); let at = -1; return have[0] === "Overview" && have[have.length - 1] === "Saved" && original.every((x) => { const i = have.indexOf(x, at + 1); if (i < 0) return false; at = i; return true; }); };
+const inOrderOf = (original, have) => { let at = -1; return original.every((x) => { const i = have.indexOf(x, at + 1); if (i < 0) return false; at = i; return true; }); };
+const BIO7_TABS = ["Overview", "DNA replication", "Transcription & RNA processing", "Translation", "DNA → RNA → protein", "Gene regulation", "Genetics & inheritance", "Mitosis & meiosis", "Saved"];
+const BIO7_CARDS = ["Open DNA replication", "Open Transcription & RNA processing", "Open Translation", "Open DNA → RNA → protein", "Open Gene regulation", "Open Genetics & inheritance", "Open Mitosis & meiosis"];
+const PHYS_TABS = ["Overview", "Mechanics & motion", "Forces & Newton's laws", "Work & energy", "Momentum & collisions", "DC circuits", "RC transient", "Saved"];
+const GC_TABS = ["Overview", "Acid–base & titration", "Chemical equilibrium", "Reaction kinetics", "Thermodynamics", "Saved"];
 const shot = async (name, sel = ".ui-diagram") => { await ev(`(document.querySelector(${q(sel)}) || document.body).scrollIntoView({ block: 'start' })`); await sleep(250); await screenshot(cdp, path.join(outDir, name), { fullPage: false }); };
 const lac = async () => ({ rank: await attr("[data-testid=lac-diagram]", "data-rank"), rep: await attr("[data-testid=lac-diagram]", "data-repressor-bound"), crp: await attr("[data-testid=lac-diagram]", "data-crp") });
 const cell = async () => ({ stage: await attr("[data-testid=cell-diagram]", "data-stage"), cells: await attr("[data-testid=cell-diagram]", "data-cells"), chr: await attr("[data-testid=cell-diagram]", "data-chromosomes"), cht: await attr("[data-testid=cell-diagram]", "data-chromatids") });
@@ -49,17 +57,17 @@ const tableCells = (sel) => ev(`[...document.querySelectorAll(${q(sel)} + ' tbod
 try {
   // ---- 1. Biology overview and navigation; existing subjects
   await fresh(1440, "light", "#/biology/overview");
-  check("1 Biology tabs include the three new tools in order", (await tabs()) === "Overview|DNA replication|Transcription & RNA processing|Translation|DNA → RNA → protein|Gene regulation|Genetics & inheritance|Mitosis & meiosis|Saved", await tabs());
+  check("1 Biology: the seven Stage 16 tools are present in order, Overview first, Saved last", tabsInOrder(BIO7_TABS)(await tabs()), await tabs());
   const ov = await ev(`({ cards: [...document.querySelectorAll('.gc-tool-card button')].map((b) => b.textContent.trim()), pb: document.querySelectorAll('.gc-planned button').length, planned: [...document.querySelectorAll('.gc-planned li')].map((l) => l.textContent).join('|'), headings: [...document.querySelectorAll('.ph-group-heading')].map((h) => h.textContent).join('|') })`);
-  check("1 overview: 7 working tools in two groups; planned list has no buttons and no longer lists built tools", ov.cards.length === 7 && ov.pb === 0 && !/Gene regulation|Inheritance/.test(ov.planned) && ov.headings === "Gene expression|Genetics & cell division", `${ov.cards.length} ${ov.headings} / ${ov.planned}`);
+  check("1 overview: the seven Stage 16 tools keep their cards in order and groups; planned list has no buttons and no longer lists built tools", inOrderOf(BIO7_CARDS, ov.cards) && ov.pb === 0 && !/Gene regulation|Inheritance/.test(ov.planned) && inOrderOf(["Gene expression", "Genetics & cell division"], ov.headings.split("|")), `${ov.cards.length} ${ov.headings} / ${ov.planned}`);
   await click("Open Gene regulation"); await sleep(800);
   check("1 Open button reaches Gene regulation; hash", (await ev("location.hash")) === "#/biology/gene-regulation");
   await fresh(1440, "light", "#/organic/properties");
   check("18 Organic tabs unchanged", (await tabs()).startsWith("Properties|Ranking|Spectroscopy|Conformations|Reactions"), await tabs());
   await fresh(1440, "light", "#/physics/overview");
-  check("18 Physics tabs unchanged", (await tabs()) === "Overview|Mechanics & motion|Forces & Newton's laws|Work & energy|Momentum & collisions|DC circuits|RC transient|Saved", await tabs());
+  check("18 Physics: the earlier tools are present in order, Overview first, Saved last", tabsInOrder(PHYS_TABS)(await tabs()), await tabs());
   await fresh(1440, "light", "#/general/overview");
-  check("18 General Chemistry tabs unchanged", (await tabs()) === "Overview|Acid–base & titration|Chemical equilibrium|Reaction kinetics|Thermodynamics|Saved", await tabs());
+  check("18 General Chemistry: the earlier tools are present in order, Overview first, Saved last", tabsInOrder(GC_TABS)(await tabs()), await tabs());
   await fresh(1440, "light", "#/biology/dna-rna-protein");
   check("18 Stage 15 DNA → RNA → protein still works", /M-?A-?K|MAKLGY|Met/i.test(await bodyText()) && (await count(".bio-ladder, .gc-page")) > 0);
 
