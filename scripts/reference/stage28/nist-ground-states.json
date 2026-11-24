@@ -1,0 +1,678 @@
+{
+ "retrieved": "2026-11-24",
+ "source": "NIST Physical Measurement Laboratory, Basic Atomic Spectroscopic Data (Handbook), per-element Atomic Data tables",
+ "rows": [
+  {
+   "Z": 1,
+   "name": "hydrogen",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/hydrogentable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s",
+     "term": "2S1/2",
+     "ieEV": 13.598433
+    }
+   ]
+  },
+  {
+   "Z": 2,
+   "name": "helium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/heliumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s2",
+     "term": "1S0",
+     "ieEV": 24.587387
+    },
+    {
+     "stage": "II",
+     "conf": "1s",
+     "term": "2S1/2",
+     "ieEV": 54.41776
+    }
+   ]
+  },
+  {
+   "Z": 3,
+   "name": "lithium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/lithiumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s",
+     "term": "2S1/2",
+     "ieEV": 5.391719
+    },
+    {
+     "stage": "II",
+     "conf": "1s2",
+     "term": "1S0",
+     "ieEV": 75.64
+    }
+   ]
+  },
+  {
+   "Z": 4,
+   "name": "beryllium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/berylliumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s2",
+     "term": "1S0",
+     "ieEV": 9.3227
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s",
+     "term": "2S1/2",
+     "ieEV": 18.21114
+    }
+   ]
+  },
+  {
+   "Z": 5,
+   "name": "boron",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/borontable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p",
+     "term": "2P&#176;1/2",
+     "ieEV": 8.29802
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s2",
+     "term": "1S0",
+     "ieEV": 25.1548
+    }
+   ]
+  },
+  {
+   "Z": 6,
+   "name": "carbon",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/carbontable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p2",
+     "term": "3P0",
+     "ieEV": 11.2603
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p",
+     "term": "2P&#176;1/2",
+     "ieEV": 24.3833
+    }
+   ]
+  },
+  {
+   "Z": 7,
+   "name": "nitrogen",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/nitrogentable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p3",
+     "term": "4S&#176;3/2",
+     "ieEV": 14.5341
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p2",
+     "term": "3P0",
+     "ieEV": 29.6013
+    }
+   ]
+  },
+  {
+   "Z": 8,
+   "name": "oxygen",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/oxygentable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p4",
+     "term": "3P2",
+     "ieEV": 13.61805
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p3",
+     "term": "4S&#176;3/2",
+     "ieEV": 35.1211
+    }
+   ]
+  },
+  {
+   "Z": 9,
+   "name": "fluorine",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/fluorinetable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p5",
+     "term": "2P&#176;3/2",
+     "ieEV": 17.4228
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p4",
+     "term": "3P2",
+     "ieEV": 34.9708
+    }
+   ]
+  },
+  {
+   "Z": 10,
+   "name": "neon",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/neontable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p6",
+     "term": "1S0",
+     "ieEV": 21.56454
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p5",
+     "term": "2P&#176;3/2",
+     "ieEV": 40.96296
+    }
+   ]
+  },
+  {
+   "Z": 11,
+   "name": "sodium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/sodiumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s",
+     "term": "2S1/2",
+     "ieEV": 5.139076
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p6",
+     "term": "1S0",
+     "ieEV": 47.2864
+    }
+   ]
+  },
+  {
+   "Z": 12,
+   "name": "magnesium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/magnesiumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s2",
+     "term": "1S0",
+     "ieEV": 7.646235
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s",
+     "term": "2S1/2",
+     "ieEV": 15.03527
+    }
+   ]
+  },
+  {
+   "Z": 13,
+   "name": "aluminum",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/aluminumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p",
+     "term": "2P1/2",
+     "ieEV": 5.985768
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s2",
+     "term": "1S0",
+     "ieEV": 18.82855
+    }
+   ]
+  },
+  {
+   "Z": 14,
+   "name": "silicon",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/silicontable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p2",
+     "term": "3P0",
+     "ieEV": 8.15168
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p",
+     "term": "2P&#176;1/2",
+     "ieEV": 16.34584
+    }
+   ]
+  },
+  {
+   "Z": 15,
+   "name": "phosphorus",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/phosphorustable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p3",
+     "term": "4S&#176;3/2",
+     "ieEV": 10.48669
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p2",
+     "term": "3P0",
+     "ieEV": 19.7695
+    }
+   ]
+  },
+  {
+   "Z": 16,
+   "name": "sulfur",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/sulfurtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p4",
+     "term": "3P2",
+     "ieEV": 10.36001
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p3",
+     "term": "4S&#176;3/2",
+     "ieEV": 23.33788
+    }
+   ]
+  },
+  {
+   "Z": 17,
+   "name": "chlorine",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/chlorinetable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p5",
+     "term": "2P&#176;3/2",
+     "ieEV": 12.96763
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p4",
+     "term": "3P2",
+     "ieEV": 23.8136
+    }
+   ]
+  },
+  {
+   "Z": 18,
+   "name": "argon",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/argontable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p6",
+     "term": "1S0",
+     "ieEV": 15.75961
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p5",
+     "term": "2P&#176;3/2",
+     "ieEV": 27.62966
+    }
+   ]
+  },
+  {
+   "Z": 19,
+   "name": "potassium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/potassiumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p64s",
+     "term": "2S1/2",
+     "ieEV": 4.3406633
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p6",
+     "term": "1S0",
+     "ieEV": 31.63
+    }
+   ]
+  },
+  {
+   "Z": 20,
+   "name": "calcium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/calciumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p64s2",
+     "term": "1S0",
+     "ieEV": 6.11316
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p64s",
+     "term": "2S1/2",
+     "ieEV": 11.87172
+    }
+   ]
+  },
+  {
+   "Z": 21,
+   "name": "scandium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/scandiumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d4s2",
+     "term": "2D3/2",
+     "ieEV": 6.56149
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d4s",
+     "term": "3D1",
+     "ieEV": 12.79977
+    }
+   ]
+  },
+  {
+   "Z": 22,
+   "name": "titanium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/titaniumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d24s2",
+     "term": "3F2",
+     "ieEV": 6.82812
+    }
+   ]
+  },
+  {
+   "Z": 23,
+   "name": "vanadium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/vanadiumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d34s2",
+     "term": "4F3/2",
+     "ieEV": 6.74619
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d4",
+     "term": "5D0",
+     "ieEV": 14.618
+    }
+   ]
+  },
+  {
+   "Z": 24,
+   "name": "chromium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/chromiumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d54s",
+     "term": "7S3",
+     "ieEV": 6.76651
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d5",
+     "term": "6S5/2",
+     "ieEV": 16.4857
+    }
+   ]
+  },
+  {
+   "Z": 25,
+   "name": "manganese",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/manganesetable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d54s2",
+     "term": "6S5/2",
+     "ieEV": 7.43402
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d54s",
+     "term": "7S3",
+     "ieEV": 15.64
+    }
+   ]
+  },
+  {
+   "Z": 26,
+   "name": "iron",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/irontable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d64s2",
+     "term": "5D4",
+     "ieEV": 7.9024
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d64s",
+     "term": "6D9/2",
+     "ieEV": 16.1877
+    }
+   ]
+  },
+  {
+   "Z": 27,
+   "name": "cobalt",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/cobalttable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d74s2",
+     "term": "4F9/2",
+     "ieEV": 7.88101
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d8",
+     "term": "3F4",
+     "ieEV": 17.084
+    }
+   ]
+  },
+  {
+   "Z": 28,
+   "name": "nickel",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/nickeltable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d84s2",
+     "term": "3F4",
+     "ieEV": 7.6398
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d9",
+     "term": "2D5/2",
+     "ieEV": 18.16884
+    }
+   ]
+  },
+  {
+   "Z": 29,
+   "name": "copper",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/coppertable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d104s",
+     "term": "2S1/2",
+     "ieEV": 7.72638
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d10",
+     "term": "1S0",
+     "ieEV": 20.2924
+    }
+   ]
+  },
+  {
+   "Z": 30,
+   "name": "zinc",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/zinctable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d104s2",
+     "term": "1S0",
+     "ieEV": 9.394199
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d104s",
+     "term": "2S1/2",
+     "ieEV": 17.96439
+    }
+   ]
+  },
+  {
+   "Z": 31,
+   "name": "gallium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/galliumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d104s24p",
+     "term": "2P&#176;1/2",
+     "ieEV": 5.999301
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d104s2",
+     "term": "1S0",
+     "ieEV": 20.51514
+    }
+   ]
+  },
+  {
+   "Z": 32,
+   "name": "germanium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/germaniumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d104s24p2",
+     "term": "3P0",
+     "ieEV": 7.89943
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d104s24p",
+     "term": "2P&#176;1/2",
+     "ieEV": 15.93461
+    }
+   ]
+  },
+  {
+   "Z": 33,
+   "name": "arsenic",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/arsenictable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d104s24p3",
+     "term": "4S&#176;3/2",
+     "ieEV": 9.7886
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d104s24p2",
+     "term": "3P0",
+     "ieEV": 18.5892
+    }
+   ]
+  },
+  {
+   "Z": 34,
+   "name": "selenium",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/seleniumtable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d104s24p4",
+     "term": "3P2",
+     "ieEV": 9.75239
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d104s24p3",
+     "term": "4S&#176;3/2",
+     "ieEV": 21.19
+    }
+   ]
+  },
+  {
+   "Z": 35,
+   "name": "bromine",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/brominetable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d104s24p5",
+     "term": "2P&#176;3/2",
+     "ieEV": 11.8138
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d104s24p4",
+     "term": "3P2",
+     "ieEV": 21.591
+    }
+   ]
+  },
+  {
+   "Z": 36,
+   "name": "krypton",
+   "url": "https://physics.nist.gov/PhysRefData/Handbook/Tables/kryptontable1.htm",
+   "raw": [
+    {
+     "stage": "I",
+     "conf": "1s22s22p63s23p63d104s24p6",
+     "term": "1S0",
+     "ieEV": 13.99961
+    },
+    {
+     "stage": "II",
+     "conf": "1s22s22p63s23p63d104s24p5",
+     "term": "2P&#176;3/2",
+     "ieEV": 24.35984
+    }
+   ]
+  }
+ ]
+}
