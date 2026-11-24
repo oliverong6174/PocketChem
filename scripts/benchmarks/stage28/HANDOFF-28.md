@@ -76,8 +76,8 @@ Heavy work sequential. A foreground `tsc` run exceeded 110 s on this machine (ab
 - `1d9fb2b` bonding and geometry models and tests
 - `1bdc7a2` molecular-orbital models and tests
 - `5d4d216` the three interactive laboratories, learning content, saved state, evidence registry
-- `a8aae5f` navigation, concept search, relations, registration, platform tests, stale-assertion updates
-- the final commit (browser checks, documentation, this handoff): see `git log -1`
+- `a6377a2` navigation, concept search, relations, registration, platform tests, stale-assertion updates
+- `009d9f3` browser checks, documentation and this handoff (a later small commit corrects hashes in this file)
 
 ## 26. Final git status
 Only the five long-standing untracked files remain; `stash@{0}` preserved.
