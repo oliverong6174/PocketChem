@@ -54,7 +54,7 @@ describe("navigation", () => {
     assert.deepEqual(S.parseRoute("#/biology"), { subject: "biology", toolId: "bioOverview" });
     assert.equal(S.parseRoute("#/biology/nonsense"), null); assert.deepEqual(S.parseRoute("#/biochemistry"), { subject: "biochemistry", toolId: "bcOverview" });
     assert.deepEqual(S.PHYSICS_TOOLS.map((t) => t.id), ["phOverview", "phMechanics", "phForces", "phEnergy", "phCollisions", "phWaves", "phOptics", "phInterference", "phEfield", "phMagnetic", "phInduction", "phCircuits", "phRc", "phSaved"]);
-    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcStoichiometry", "gcGas", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcElectro", "gcSaved"]);
+    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id).filter((id) => !["gcAtomic", "gcBonding", "gcMO"].includes(id)), ["gcOverview", "gcStoichiometry", "gcGas", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcElectro", "gcSaved"]);
     assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.id), ["analysis", "acidBase", "spectroscopy", "conformations", "reactions", "multiStep", "multiCatalytic", "saved"]);
   });
   test("[icons] every Biology tool icon exists", () => {

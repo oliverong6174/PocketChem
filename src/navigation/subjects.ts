@@ -39,7 +39,7 @@ export const SUBJECTS: SubjectDef[] = [
   { id: "organic", slug: "organic", label: "Organic Chemistry", mode: "workbench", icon: "molecule", status: "available", tagline: "Structures, reactions, synthesis, spectra and conformations." },
   {
     id: "general", slug: "general", label: "General Chemistry", mode: "workbench", icon: "general", status: "available",
-    tagline: "Stoichiometry, gas laws, acid–base, equilibrium, kinetics, thermodynamics and electrochemistry; more quantitative tools planned.",
+    tagline: "Atomic structure, bonding and molecular orbitals, stoichiometry, gas laws, acid–base, equilibrium, kinetics, thermodynamics and electrochemistry; more quantitative tools planned.",
     planned: ["Solubility equilibria", "Periodic trends", "Phase diagrams and colligative properties"],
   },
   {
@@ -100,10 +100,13 @@ export const ORGANIC_TOOLS: ToolDef[] = [
   { id: "saved", slug: "saved", label: "Saved", summary: "Reopen analyses saved on this device.", group: "library", icon: "saved" },
 ];
 
-export type GeneralToolId = "gcOverview" | "gcStoichiometry" | "gcGas" | "gcAcidBase" | "gcEquilibrium" | "gcKinetics" | "gcThermo" | "gcElectro" | "gcSaved";
+export type GeneralToolId = "gcOverview" | "gcAtomic" | "gcBonding" | "gcMO" | "gcStoichiometry" | "gcGas" | "gcAcidBase" | "gcEquilibrium" | "gcKinetics" | "gcThermo" | "gcElectro" | "gcSaved";
 
 export const GENERAL_TOOLS: ToolDef[] = [
   { id: "gcOverview", slug: "overview", label: "Overview", summary: "What General Chemistry offers now, and what is still planned.", group: "analyze", icon: "general" },
+  { id: "gcAtomic", slug: "atomic-structure", label: "Atomic structure", summary: "Quantum numbers, hydrogenic orbitals and nodes, electron configurations and hydrogen-like spectra.", group: "analyze", icon: "orbital" },
+  { id: "gcBonding", slug: "bonding-geometry", label: "Bonding & geometry", summary: "Lewis structures, formal charge, resonance, VSEPR shapes, bond polarity and hybridisation.", group: "analyze", icon: "bonding" },
+  { id: "gcMO", slug: "molecular-orbitals", label: "Molecular orbitals", summary: "MO diagrams of homonuclear diatomics: occupancy, bond order, magnetism and orbital overlap.", group: "analyze", icon: "mo" },
   { id: "gcStoichiometry", slug: "stoichiometry", label: "Stoichiometry", summary: "Formula masses, equation balancing, limiting reagents, yields, dilution and solution reactions.", group: "analyze", icon: "stoichiometry" },
   { id: "gcGas", slug: "gas-laws", label: "Gas laws", summary: "PV = nRT, controlled gas experiments, mixtures, kinetic theory and molecular speed distributions.", group: "analyze", icon: "gas" },
   { id: "gcAcidBase", slug: "acid-base-titration", label: "Acid–base & titration", summary: "pH, buffers, dilution and titration curves for monoprotic acids and bases.", group: "analyze", icon: "flask" },

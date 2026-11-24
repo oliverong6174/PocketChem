@@ -98,6 +98,9 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
   const EquilibriumPage = lazy(() => import("./components/generalChem/EquilibriumPage"));
   const KineticsPage = lazy(() => import("./components/generalChem/KineticsPage"));
   const ThermodynamicsPage = lazy(() => import("./components/generalChem/ThermodynamicsPage"));
+  const AtomicStructurePage = lazy(() => import("./components/generalChem/AtomicStructurePage"));
+  const BondingGeometryPage = lazy(() => import("./components/generalChem/BondingGeometryPage"));
+  const MolecularOrbitalsPage = lazy(() => import("./components/generalChem/MolecularOrbitalsPage"));
   const StoichiometryPage = lazy(() => import("./components/generalChem/StoichiometryPage"));
   const GasLawsPage = lazy(() => import("./components/generalChem/GasLawsPage"));
   const ElectrochemistryPage = lazy(() => import("./components/generalChem/ElectrochemistryPage"));
@@ -608,7 +611,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
       if (!target) return;
       openSequenceRef.current += 1;
       setPendingOpen({ id: `open-${openSequenceRef.current}`, recordId: analysis.id, page: target });
-      if (target === "gcAcidBase" || target === "gcEquilibrium" || target === "gcKinetics" || target === "gcThermo" || target === "gcStoichiometry" || target === "gcGas" || target === "gcElectro") {
+      if (target === "gcAcidBase" || target === "gcEquilibrium" || target === "gcKinetics" || target === "gcThermo" || target === "gcStoichiometry" || target === "gcGas" || target === "gcElectro" || target === "gcAtomic" || target === "gcBonding" || target === "gcMO") {
         if (activeSubject === "general") switchGeneralTool(target, { keepOpenRequest: true });
         else switchSubject("general", { keepOpenRequest: true, tool: target });
         return;
@@ -2250,6 +2253,21 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
             ) : generalTool === "gcKinetics" ? (
               <KineticsPage
                 openRequest={pendingOpen?.page === "gcKinetics" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcAtomic" ? (
+              <AtomicStructurePage
+                openRequest={pendingOpen?.page === "gcAtomic" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcBonding" ? (
+              <BondingGeometryPage
+                openRequest={pendingOpen?.page === "gcBonding" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcMO" ? (
+              <MolecularOrbitalsPage
+                openRequest={pendingOpen?.page === "gcMO" ? pendingOpen : null}
                 onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />
             ) : generalTool === "gcStoichiometry" ? (

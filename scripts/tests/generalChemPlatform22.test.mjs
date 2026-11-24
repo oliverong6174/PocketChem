@@ -61,7 +61,8 @@ describe("navigation and wiring", () => {
   });
   test("[no network] none of the new code can reach the network", () => {
     for (const f of ["src/utils/generalChem/elements.ts", "src/utils/generalChem/formula.ts", "src/utils/generalChem/balance.ts", "src/utils/generalChem/stoichiometry.ts", "src/utils/generalChem/gas.ts", "src/utils/generalChem/electrochem.ts", "src/utils/generalChem/chem22Learning.ts", "src/utils/persistence/gcTools22.ts", "src/components/generalChem/StoichiometryPage.tsx", "src/components/generalChem/GasLawsPage.tsx", "src/components/generalChem/ElectrochemistryPage.tsx"]) {
-      assert.doesNotMatch(read(...f.split("/")), /\bfetch\(|XMLHttpRequest|WebSocket|https?:\/\//, f);
+      // comments (source citations such as the CIAAW link in elements.ts) cannot reach the network
+      assert.doesNotMatch(read(...f.split("/")).replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, ""), /\bfetch\(|XMLHttpRequest|WebSocket|https?:\/\//, f);
     }
   });
 });

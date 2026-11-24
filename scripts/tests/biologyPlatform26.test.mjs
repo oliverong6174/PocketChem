@@ -54,7 +54,7 @@ describe("navigation and registration", () => {
     for (const t of TOOLS()) { assert.equal(S.routeHash({ subject: "biology", toolId: t.id }), `#/biology/${t.slug}`); assert.deepEqual(S.parseRoute(`#/biology/${t.slug}`), { subject: "biology", toolId: t.id }); }
   });
   test("[existing subjects] other tool lists are unchanged", () => {
-    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id), ["gcOverview", "gcStoichiometry", "gcGas", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcElectro", "gcSaved"]);
+    assert.deepEqual(S.GENERAL_TOOLS.map((t) => t.id).filter((id) => !["gcAtomic", "gcBonding", "gcMO"].includes(id)), ["gcOverview", "gcStoichiometry", "gcGas", "gcAcidBase", "gcEquilibrium", "gcKinetics", "gcThermo", "gcElectro", "gcSaved"]);
     assert.deepEqual(S.ORGANIC_TOOLS.map((t) => t.id), ["analysis", "acidBase", "spectroscopy", "conformations", "reactions", "multiStep", "multiCatalytic", "saved"]);
     assert.equal(S.BIOCHEMISTRY_TOOLS.length, 13);
   });

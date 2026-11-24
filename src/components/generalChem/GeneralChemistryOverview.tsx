@@ -8,6 +8,24 @@ import "../../styles/generalChem.css";
  * and clearly marked, the areas that are planned. Planned items have no buttons and no calculators.
  */
 const FEATURES: Record<string, string[]> = {
+  gcAtomic: [
+    "Quantum-number explorer: which (n, l, m_l, m_s) are allowed, with subshell and shell capacities and the reason when they are not",
+    "Hydrogenic orbitals 1s to 3d from their closed-form wavefunctions: density slices, probability enclosure, radial probability graphs and node counts",
+    "Ground-state configurations for Z = 1–36 (NIST), Aufbau exceptions such as Cr and Cu, ions, orbital boxes and noble-gas notation",
+    "Hydrogen-like energy levels and transitions: photon energy, frequency, wavelength and spectral series",
+  ],
+  gcBonding: [
+    "Lewis structures for 30 curated molecules and ions: place bonds and lone pairs, check electron conservation and formal charges",
+    "Resonance for ozone, nitrate, carbonate, nitrite and sulfur dioxide, with the hybrid averages and the usual cautions",
+    "Interactive VSEPR geometry you can rotate, electron-domain versus molecular shape, and ideal bond angles",
+    "Schematic bond dipoles and molecular polarity, and sp, sp², sp³ hybridisation with σ and π bond counts",
+  ],
+  gcMO: [
+    "Qualitative MO diagrams of 17 homonuclear diatomic molecules and ions, with the right 2p ordering for each",
+    "Fill the orbitals yourself under Pauli, Hund and Aufbau checks; bond order, unpaired electrons and magnetism follow from your occupancy",
+    "O₂ versus N₂: why oxygen is paramagnetic and a simple Lewis structure cannot show it",
+    "In-phase and out-of-phase orbital combinations from an explicit LCAO illustration",
+  ],
   gcStoichiometry: [
     "Formula masses from a documented formula grammar (groups, hydrates, ionic charges); malformed formulas are refused",
     "Exact balancing of a reaction you supply, including redox and ionic equations, with a conservation check for manual coefficients",

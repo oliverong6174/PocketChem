@@ -13,6 +13,9 @@ import {
   ELECTROCHEM_ENGINE_VERSION, GASLAWS_ENGINE_VERSION, STOICHIOMETRY_ENGINE_VERSION, validateElectroInputs, validateGasInputs, validateGcResults22, validateStoichInputs,
 } from "./gcTools22";
 import {
+  ATOMIC_ENGINE_VERSION, BONDING_ENGINE_VERSION, MOLORBITALS_ENGINE_VERSION, validateAtomicInputs, validateBondingInputs, validateGcResults28, validateMOInputs,
+} from "./gcTools28";
+import {
   CIRCUITS_ENGINE_VERSION, COLLISIONS_ENGINE_VERSION, INTERFERENCE_ENGINE_VERSION, OPTICS_ENGINE_VERSION, WAVES_ENGINE_VERSION, ENERGY_ENGINE_VERSION, FORCES_ENGINE_VERSION, MECHANICS_ENGINE_VERSION, RC_ENGINE_VERSION,
   validateCircuitsInputs, validateCollisionsInputs, validateInterferenceInputs, validateOpticsInputs, validateWavesInputs, validateEnergyInputs, validateForcesInputs, validateMechanicsInputs, validatePhysicsResults, validateRcInputs,
 } from "./physicsTools";
@@ -60,7 +63,7 @@ import {
 } from "./synthesisWorkspace";
 
 /** Pages whose saved analyses can be opened again by this version. */
-export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "efield", "magnetic", "induction", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "membrane", "signaling", "neuron", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism", "fattyacids", "aminometabolism", "fuelmetabolism", "organelles", "cellcycle", "celldeath"] as const;
+export const OPENABLE_ANALYSIS_PAGES = ["synthesis", "ranking", "spectroscopy", "properties", "reactions", "multicatalytic", "conformations", "genchem", "equilibrium", "kinetics", "thermo", "stoichiometry", "gaslaws", "electrochem", "atomic", "bonding", "molorbitals", "mechanics", "circuits", "rc", "forces", "energy", "collisions", "waves", "optics", "interference", "efield", "magnetic", "induction", "replication", "transcription", "translation", "dogma", "regulation", "genetics", "celldivision", "membrane", "signaling", "neuron", "aminoacids", "proteins", "enzymes", "glycolysis", "gluconeogenesis", "tca", "etc", "metabolism", "fattyacids", "aminometabolism", "fuelmetabolism", "organelles", "cellcycle", "celldeath"] as const;
 
 /** The app page each saved analysis type opens on. */
 export const ANALYSIS_APP_PAGE = {
@@ -78,6 +81,9 @@ export const ANALYSIS_APP_PAGE = {
   stoichiometry: "gcStoichiometry",
   gaslaws: "gcGas",
   electrochem: "gcElectro",
+  atomic: "gcAtomic",
+  bonding: "gcBonding",
+  molorbitals: "gcMO",
   mechanics: "phMechanics",
   circuits: "phCircuits",
   rc: "phRc",
@@ -162,6 +168,9 @@ export function getAppAnalysisLibrary(): AnalysisLibrary {
       stoichiometry: { engineVersion: STOICHIOMETRY_ENGINE_VERSION, validateInputs: validateStoichInputs, validateResults: validateGcResults22 },
       gaslaws: { engineVersion: GASLAWS_ENGINE_VERSION, validateInputs: validateGasInputs, validateResults: validateGcResults22 },
       electrochem: { engineVersion: ELECTROCHEM_ENGINE_VERSION, validateInputs: validateElectroInputs, validateResults: validateGcResults22 },
+      atomic: { engineVersion: ATOMIC_ENGINE_VERSION, validateInputs: validateAtomicInputs, validateResults: validateGcResults28 },
+      bonding: { engineVersion: BONDING_ENGINE_VERSION, validateInputs: validateBondingInputs, validateResults: validateGcResults28 },
+      molorbitals: { engineVersion: MOLORBITALS_ENGINE_VERSION, validateInputs: validateMOInputs, validateResults: validateGcResults28 },
       mechanics: { engineVersion: MECHANICS_ENGINE_VERSION, validateInputs: validateMechanicsInputs, validateResults: validatePhysicsResults },
       circuits: { engineVersion: CIRCUITS_ENGINE_VERSION, validateInputs: validateCircuitsInputs, validateResults: validatePhysicsResults },
       rc: { engineVersion: RC_ENGINE_VERSION, validateInputs: validateRcInputs, validateResults: validatePhysicsResults },
