@@ -1,0 +1,19 @@
+/* Stage 28: Atomic structure, Bonding and geometry, Molecular orbitals. Builds on generalChem.css, physics.css and chem22.css. */
+.chem-build { display: grid; gap: var(--sp-2); }
+.chem-build-row { display: grid; grid-template-columns: minmax(0, 1fr) auto 2.2rem auto; gap: var(--sp-2); align-items: center; }
+.chem-build-row button { min-width: var(--touch, 44px); min-height: var(--touch, 44px); }
+.chem-build-row output { text-align: center; font-family: var(--font-mono); font-size: 1.05rem; }
+.chem-mo-row { display: grid; grid-template-columns: minmax(0, 1fr) 3rem auto auto auto; gap: var(--sp-2); align-items: center; }
+.chem-mo-row button { min-width: var(--touch, 44px); min-height: var(--touch, 44px); }
+.chem-mo-name { font-family: var(--font-mono); overflow-wrap: anywhere; }
+.chem-mo-row output { font-size: 1.1rem; text-align: center; }
+.chem-swatch { display: inline-block; width: 1.1em; height: 1.1em; border-radius: 3px; border: 1px solid var(--border); vertical-align: -0.15em; }
+.gc-table tr.is-selected th, .gc-table tr.is-selected td { background: var(--surface-2, rgba(11, 106, 114, 0.12)); font-weight: 600; }
+.gc-table td { overflow-wrap: anywhere; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 480px) {
+  .chem-mo-row { grid-template-columns: minmax(0, 1fr) 2.2rem auto auto auto; gap: 4px; }
+  .chem-build-row { gap: 4px; }
+}
+.gc-table tbody th, .gc-table tbody td { text-transform: none; }
+.gc-table tbody th { letter-spacing: normal; }

@@ -3,6 +3,7 @@ import {
   CALC_LABEL, KIND_LABEL, SOURCE_LABEL, evidenceById,
   type CalcStatus, type SourceStatus,
 } from "../../utils/evidence/evidence27";
+import { evidence28ById } from "../../utils/evidence/evidence28";
 
 const SOURCE_TONE: Record<SourceStatus, Tone> = { "source-verified": "ok", "partly-verified": "info", "not-verified": "estimate" };
 const CALC_TONE: Record<CalcStatus, Tone> = { "independently-checked": "ok", "not-checked": "estimate" };
@@ -13,7 +14,7 @@ const CALC_TONE: Record<CalcStatus, Tone> = { "independently-checked": "ok", "no
  * certification: it lists what was compared with which retrieved text, and what the tool does not support.
  */
 export function EvidencePanel({ id }: { id: string }) {
-  const record = evidenceById(id);
+  const record = evidenceById(id) ?? evidence28ById(id);
   if (!record) return null;
   return (
     <section aria-label={`Scientific evidence: ${record.model}`} className="provenance-panel evidence-panel" data-evidence-id={record.id} data-testid="evidence-panel">

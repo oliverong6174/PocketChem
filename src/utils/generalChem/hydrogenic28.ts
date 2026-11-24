@@ -153,7 +153,7 @@ export function angularNodes(l: number, ml: number, basis: OrbitalBasis): { thet
   return {
     thetaNodes: theta, planesThroughAxis: 0, total: theta,
     note: planes > 0
-      ? `The complex function has ${theta} θ-node${theta === 1 ? "" : "s"} and vanishes along the z axis; its density does not depend on φ, so the ${planes} azimuthal node plane${planes === 1 ? "" : "s"} of the real combinations do not appear.`
+      ? `The complex function has ${theta} θ-node${theta === 1 ? "" : "s"} and vanishes along the z axis; its density does not depend on φ, so the ${planes} azimuthal node plane${planes === 1 ? "" : "s"} of the real combinations ${planes === 1 ? "does" : "do"} not appear.`
       : `${theta} angular node${theta === 1 ? "" : "s"}.`,
   };
 }
@@ -175,7 +175,7 @@ export function sliceGrid(spec: SliceSpec): SliceGrid {
   const key = `${spec.n}|${spec.l}|${spec.ml}|${spec.basis}|${spec.plane}|${spec.Z}`;
   const hit = sliceCache.get(key);
   if (hit) return hit;
-  const extent = displayRadius(spec.n, spec.Z) * 0.78;
+  const extent = displayRadius(spec.n, spec.Z) * 0.5;
   const N = SLICE_N;
   const dens = new Float64Array(N * N); const amp = new Float64Array(N * N);
   let md = 0; let ma = 0;
