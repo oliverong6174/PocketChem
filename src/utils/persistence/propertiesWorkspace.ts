@@ -18,7 +18,7 @@ import type { ReactionPathway } from "../reactionUtils";
 /** Bump when the shape or meaning of saved Properties results changes. */
 export const PROPERTIES_ENGINE_VERSION = 1;
 
-export type PropertiesAnalysisPanel = "overview" | "acidBase" | "concepts" | "properties";
+export type PropertiesAnalysisPanel = "overview" | "acidBase" | "aromaticity" | "concepts" | "properties";
 
 export type PropertiesWorkspaceInputs = {
   ket: string | null;
@@ -45,7 +45,7 @@ export type PropertiesWorkspaceResults = {
   reactionPathways: ReactionPathway[];
 };
 
-const PANELS: readonly string[] = ["overview", "acidBase", "concepts", "properties"];
+const PANELS: readonly string[] = ["overview", "acidBase", "aromaticity", "concepts", "properties"];
 const CONCEPTS: readonly string[] = [
   "hybridization",
   "bondOrbitals",

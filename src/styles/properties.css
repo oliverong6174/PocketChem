@@ -51,6 +51,16 @@
 .pr-site-table .is-selected { background: var(--accent-soft); }
 .pr-site-detail { display: grid; grid-template-columns: minmax(150px, .8fr) minmax(0, 1.3fr); gap: 16px; align-items: start; margin-top: 16px; }
 .pr-site-detail h4 { margin: 0 0 6px; }
+.pr-overview-science { border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.pr-overview-science h4 { margin: 0 0 6px; font-size: .9rem; }
+.pr-overview-science p { font-size: .82rem; margin: 5px 0; }
+.pr-overview-science button { background: transparent; border: 0; color: var(--accent); font: inherit; text-decoration: underline; cursor: pointer; padding: 4px; }
+.pr-aromatic-summary { font-weight: 600; font-size: .9rem; }
+.pr-ring-list { display: grid; gap: 1px; margin: 12px 0; }
+.pr-ring-list button { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; border: 0; border-left: 3px solid transparent; padding: 10px; background: var(--surface-sunken); color: var(--text); text-align: left; cursor: pointer; font: inherit; font-size: .82rem; }
+.pr-ring-list button[aria-pressed=true] { border-left-color: var(--accent); background: var(--accent-soft); }
+.pr-aromaticity > .pr-depiction { max-width: 560px; margin: 0 auto; }
+.pr-science-explanation { font-size: .86rem; }
 .pr-depiction { margin: 0; min-width: 0; }
 .pr-depiction > div { background: white; border: 1px solid var(--border); border-radius: 6px; }
 .pr-depiction svg { display: block; width: 100%; height: auto; }

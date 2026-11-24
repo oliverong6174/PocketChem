@@ -15,7 +15,7 @@ export function acidBaseSiteRows(acids: readonly AcidityResult[], bases: readonl
     ...acids.map((site, i): SiteRow => ({ id: `acid-${site.siteAtomIndex}-${i}`, kind: "Acid", rank: i + 1, atomIndex: site.siteAtomIndex, label: site.acidicSite, group: site.relatedGroup, range: site.estimatedPkaRange, confidence: site.confidence, reasons: [], detail: site })),
     ...bases.map((site, i): SiteRow => ({ id: `base-${site.siteAtomIndex}-${i}`, kind: "Base", rank: i + 1, atomIndex: site.siteAtomIndex, label: site.basicSite, group: site.relatedGroup, range: site.conjugateAcidPkaRange, confidence: site.confidence, reasons: [], detail: site })),
   ].map((row) => {
-    const effects = row.detail.factors?.filter((f) => f.pkaDelta !== 0).map((f) => ({ label: f.category, text: sentence(f.explanation) })) ?? [];
+    const effects: SiteRow["reasons"] = row.detail.factors?.filter((f) => f.pkaDelta !== 0).map((f) => ({ label: f.category, text: sentence(f.explanation) })) ?? [];
     if (row.kind === "Acid") {
       const site = row.detail as AcidityResult;
       for (const key of ["atom", "resonance", "induction", "orbital"] as const) {

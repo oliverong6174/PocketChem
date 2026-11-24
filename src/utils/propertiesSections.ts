@@ -60,11 +60,11 @@ export function buildPropertySections(identity: MoleculeIdentityResult, groups: 
   const keep = (rows: Array<PropertyRow | null>): PropertyRow[] => rows.filter((row): row is PropertyRow => row !== null);
 
   const composition = keep([
-    calc("formula", "Formula", p.molecularFormula, "formula"),
+    calc("formula", p.fullySpecified === false ? "Scaffold formula" : "Formula", p.molecularFormula, "formula"),
     calc("mw", "Molecular weight", p.molecularWeight, "molecularWeight", (v) => `${v} g/mol`),
     calc("exactMass", "Exact mass", p.exactMass, "exactMass"),
     calc("charge", "Formal charge", p.formalCharge, "formalCharge"),
-    calc("heavy", "Heavy atoms", p.heavyAtomCount, "heavyAtoms"),
+    calc("heavy", p.fullySpecified === false ? "Known heavy atoms" : "Heavy atoms", p.heavyAtomCount, "heavyAtoms"),
   ]);
   const descriptors = keep([
     calc("dbe", "DBE / unsaturation", p.degreesOfUnsaturation, "dbe"),

@@ -18,6 +18,8 @@
 import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import MoleculeDrawer, { type KetcherApi } from "./components/MoleculeDrawer";
 import { AcidBasePanel } from "./components/properties/AcidBasePanel";
+import { AromaticityPanel } from "./components/properties/AromaticityPanel";
+import { useAromaticity } from "./components/properties/useAromaticity";
 import { ConceptSearch } from "./components/shell/ConceptSearch";
 import { NavigationContext } from "./navigation/NavigationContext";
 import type { ConceptDestination } from "./utils/concepts/conceptIndex";
@@ -169,7 +171,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
       };
     
 
-  type AnalysisPanel = "overview" | "acidBase" | "concepts" | "properties";
+  type AnalysisPanel = "overview" | "acidBase" | "aromaticity" | "concepts" | "properties";
   type AppPage = "analysis" | "acidBase" | "reactions" | "spectroscopy" | "multiStep" | "multiCatalytic" | "conformations" | "saved";
 
   /** What the page knows about the dashboard results on screen. */
@@ -202,8 +204,9 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
   const ANALYSIS_PANELS: Array<{ id: AnalysisPanel; label: string }> = [
     { id: "overview", label: "Summary" },
     { id: "acidBase", label: "Acid/Base" },
+    { id: "aromaticity", label: "Aromaticity" },
     { id: "concepts", label: "Concepts" },
-    { id: "properties", label: "All properties" },
+    { id: "properties", label: "All Properties" },
   ];
 
   const CONCEPT_OPTIONS: Array<{ id: AnnotationConcept; label: string }> = [
@@ -1973,6 +1976,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
 
   const propertyGroups = useMemo(() => countGroups(functionalGroupOccurrences), [functionalGroupOccurrences]);
   const propertyStereocenters = useMemo(() => chiralityResults.map((result) => ({ label: result.label, configuration: result.configuration })), [chiralityResults]);
+  const aromaticityOverview = useAromaticity(moleculeIdentity ? smiles : "");
 
   async function loadPropertiesVariant(resolution: MoleculeNameResolution) {
     if (!window.ketcher || isAnalyzing) return;
@@ -2440,6 +2444,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
             <div className="dashboard-panel-scroll" role="tabpanel" id={`properties-panel-${analysisPanel}`} aria-labelledby={`properties-tab-${analysisPanel}`} tabIndex={0}>
               {analysisPanel === "overview" && (
                 <div className="dashboard-panel">
+                  {moleculeIdentity ? <section className="pr-overview-science"><h4>Reactivity at a glance</h4><p><strong>Aromaticity:</strong> {aromaticityOverview?.result?.summary ?? "Reading ring systems…"} <button type="button" onClick={() => setAnalysisPanel("aromaticity")}>Inspect rings</button></p><p><strong>Acid/Base:</strong> {acidityResults.length} acidic · {basicityResults.length} basic sites. {acidityResults[0] ? <>Strongest acid: {acidityResults[0].acidicSite}, est. pKa {acidityResults[0].estimatedPkaRange.join("–")}.</> : null} <button type="button" onClick={() => setAnalysisPanel("acidBase")}>Inspect sites</button></p></section> : null}
                   {moleculeIdentity ? (
                     <PropertiesSummary groups={propertyGroups} identity={moleculeIdentity} info={PROPERTY_INFO} smiles={smiles} stereocenters={propertyStereocenters} />
                   ) : (
@@ -2452,6 +2457,10 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
                 <div className="dashboard-panel">
                   <AcidBasePanel smiles={smiles} acids={acidityResults} bases={basicityResults} generic={moleculeIdentity?.properties.fullySpecified === false} />
                 </div>
+              )}
+
+              {analysisPanel === "aromaticity" && (
+                <div className="dashboard-panel"><AromaticityPanel smiles={smiles} /></div>
               )}
 
               {analysisPanel === "concepts" && (

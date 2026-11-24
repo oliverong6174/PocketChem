@@ -192,6 +192,7 @@ export function PropertiesDetail({ identity, smiles, groups, stereocenters, info
           <p className="pr-note">The engine returned no value for: {sections.unavailable.join(", ")}. Nothing was substituted.</p>
         </section>
       ) : null}
+      <details className="pr-why"><summary>Calculation notes and limitations</summary><ul>{identity.properties.notes.map((note) => <li key={note}>{note}</li>)}</ul></details>
     </div>
   );
 }
