@@ -68,7 +68,7 @@ Stage 11 scored 47/54 and Stage 19 scored 55/56 against the unchanged Stage 28 b
 - `b5ff1db` feat: expand Properties dashboard and condense acid base results
 - `b060a25` feat: analyze and highlight aromatic ring systems with model limits
 - `70af4f3` feat: preview aromatic and antiaromatic ring counterparts with apply and restore
-- Final commit: docs and verification scripts (this file and the browser scripts)
+- `b816c74` docs(stage29b): handoff and browser verification scripts
 
 ## Final Git status
 The only untracked files left are the five longstanding ones: `CLAUDE.md`, `scripts/benchmarks/stage9m/rd-probe.mjs`, `scripts/tests/.probe-names.mjs`, `stage5-changes.patch`, `stage5-status.txt`. The `phase1-synthesis-reliability` stash is intact (1 entry).
