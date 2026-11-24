@@ -17,7 +17,7 @@
   } from "react";
 import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   import MoleculeDrawer, { type KetcherApi } from "./components/MoleculeDrawer";
-import { ToolHeader } from "./components/ui/primitives";
+import { AcidBasePanel } from "./components/properties/AcidBasePanel";
 import { ConceptSearch } from "./components/shell/ConceptSearch";
 import { NavigationContext } from "./navigation/NavigationContext";
 import type { ConceptDestination } from "./utils/concepts/conceptIndex";
@@ -41,6 +41,7 @@ import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type Bio
   import "./styles/ui.css";
   import "./styles/concepts.css";
   import "./styles/organic.css";
+  import "./styles/properties.css";
   import { PropertiesDetail, PropertiesIdentity, PropertiesSummary } from "./components/properties/PropertiesResults";
   import { countGroups } from "./utils/propertiesSections";
   import { AppShell } from "./components/shell/AppShell";
@@ -216,9 +217,6 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
     { id: "chirality", label: "Chirality" },
   ];
 
-  function formatPkaRange(range: readonly [number, number]) {
-    return `${range[0]}–${range[1]}`;
-  }
 
   function App() {
     //useState calls
@@ -2313,23 +2311,13 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
       ) : activePage === "analysis" ? (
         <section
           aria-labelledby="page-tab-analysis"
-          className="workspace workspace-compact"
+          className="workspace workspace-compact properties-workspace"
           id="page-panel-analysis"
           role="tabpanel"
         >
           <div className="card molecule-card molecule-card-compact">
-            <ToolHeader
-              group="Analyze"
-              title="Properties"
-              purpose="Draw a molecule to review its overview, acid/base sites, concepts, and molecular properties."
-              ready={isMainEditorReady}
-              evidence="estimate"
-              steps={[
-                { label: "Draw or name", detail: "Draw it, or type a name and press Enter." },
-                { label: "Analyze Molecule", detail: "Computes identity, groups and properties." },
-                { label: "Open a dashboard tab", detail: "Overview, acid/base, concepts, properties." },
-              ]}
-            />
+            <header className="pr-editor-header"><h2>Properties</h2><span>{isMainEditorReady ? "Editor ready" : "Loading editor…"}</span></header>
+            <p className="pr-instructions">Draw or name a molecule → Analyze → Explore results</p>
 
             <div className="drawer-placeholder drawer-placeholder-compact">
               <MoleculeDrawer
@@ -2391,22 +2379,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
           </div>
 
           <div className="card analysis-card analysis-dashboard-card">
-            <div className="dashboard-header">
-              <div>
-                <h2>Properties Dashboard</h2>
-                <p>
-                  {moleculeIdentity
-                    ? moleculeIdentity.nomenclature.displayName ||
-                      moleculeIdentity.nomenclature.estimatedName
-                    : "Analyze a molecule to fill this dashboard."}
-                </p>
-              </div>
-
-              <span className="status">
-                {functionalGroupOccurrences.length} group
-                {functionalGroupOccurrences.length === 1 ? "" : "s"}
-              </span>
-            </div>
+            <div className="dashboard-header"><h2>Analysis</h2></div>
 
             <WorkspaceNotice
               embedded
@@ -2434,10 +2407,22 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
               <PropertiesIdentity groups={propertyGroups} identity={moleculeIdentity} smiles={smiles} stereocenters={propertyStereocenters} onLoadVariant={(resolution) => void loadPropertiesVariant(resolution)} />
             ) : null}
 
-            <div className="dashboard-tab-row">
+            <div className="dashboard-tab-row" role="tablist" aria-label="Properties results">
               {ANALYSIS_PANELS.map((panel) => (
                 <button
-                  aria-pressed={analysisPanel === panel.id}
+                  role="tab"
+                  id={`properties-tab-${panel.id}`}
+                  aria-controls={`properties-panel-${panel.id}`}
+                  aria-selected={analysisPanel === panel.id}
+                  tabIndex={analysisPanel === panel.id ? 0 : -1}
+                  onKeyDown={(event) => {
+                    const index = ANALYSIS_PANELS.findIndex((p) => p.id === panel.id);
+                    const next = event.key === "ArrowRight" ? (index + 1) % ANALYSIS_PANELS.length : event.key === "ArrowLeft" ? (index + ANALYSIS_PANELS.length - 1) % ANALYSIS_PANELS.length : event.key === "Home" ? 0 : event.key === "End" ? ANALYSIS_PANELS.length - 1 : null;
+                    if (next === null) return;
+                    event.preventDefault();
+                    setAnalysisPanel(ANALYSIS_PANELS[next].id);
+                    document.getElementById(`properties-tab-${ANALYSIS_PANELS[next].id}`)?.focus();
+                  }}
                   key={panel.id}
                   className={
                     analysisPanel === panel.id
@@ -2452,7 +2437,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
               ))}
             </div>
 
-            <div className="dashboard-panel-scroll">
+            <div className="dashboard-panel-scroll" role="tabpanel" id={`properties-panel-${analysisPanel}`} aria-labelledby={`properties-tab-${analysisPanel}`} tabIndex={0}>
               {analysisPanel === "overview" && (
                 <div className="dashboard-panel">
                   {moleculeIdentity ? (
@@ -2465,103 +2450,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
 
               {analysisPanel === "acidBase" && (
                 <div className="dashboard-panel">
-                  <div className="analysis-section compact-section">
-                    <p className="label">Acid/Base Sites & Estimates</p>
-
-                    <div className="acid-base-summary-grid">
-                      <div className="acid-base-summary-card">
-                        <span>Strongest acidic site</span>
-                        <strong>
-                          {acidityResults[0]
-                            ? `${acidityResults[0].acidicSite} (atom ${acidityResults[0].siteAtomIndex + 1})`
-                            : "None detected"}
-                        </strong>
-                        <p>
-                          {acidityResults[0]
-                            ? `Estimated pKa ${acidityResults[0].estimatedPka} · typical range ${formatPkaRange(acidityResults[0].estimatedPkaRange)} · ${acidityResults[0].confidence.toLowerCase()} confidence`
-                            : "Analyze a molecule first."}
-                        </p>
-                      </div>
-
-                      <div className="acid-base-summary-card">
-                        <span>Strongest basic site</span>
-                        <strong>
-                          {basicityResults[0]
-                            ? `${basicityResults[0].basicSite} (atom ${basicityResults[0].siteAtomIndex + 1})`
-                            : "None detected"}
-                        </strong>
-                        <p>
-                          {basicityResults[0]
-                            ? `Conjugate acid pKa ${basicityResults[0].conjugateAcidPka} · ${basicityResults[0].confidence.toLowerCase()} confidence`
-                            : "Analyze a molecule first."}
-                        </p>
-                      </div>
-
-                      <div className="acid-base-summary-card">
-                        <span>Detected groups</span>
-                        <strong>{functionalGroups.length}</strong>
-                        <p>
-                          {functionalGroups.length > 0
-                            ? functionalGroups.map((group) => group.name).join(", ")
-                            : "No groups loaded yet."}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="analysis-section compact-section">
-                    <p className="label">Acidity Estimate</p>
-                    {acidityResults.length === 0 ? (
-                      <p className="empty">No acidic sites estimated yet.</p>
-                    ) : (
-                      <div className="group-list compact-group-list">
-                        {acidityResults.map((result, index) => (
-                          <div className="group-card" key={`${result.relatedGroup}-${result.acidicSite}-${index}`}>
-                            <div className="group-card-header">
-                              <h3>{index === 0 ? "Strongest acidic site" : "Weaker acidic site"}: {result.acidicSite}</h3>
-                              <span>pKa {result.estimatedPka}</span>
-                            </div>
-                            <p><strong>Related group:</strong> {result.relatedGroup}</p>
-                            <p><strong>Detected atom:</strong> Atom {result.siteAtomIndex + 1} · {result.confidence.toLowerCase()} confidence</p>
-                            <p><strong>Typical pKa range:</strong> {formatPkaRange(result.estimatedPkaRange)}</p>
-                            <p><strong>A — Atom:</strong> {result.atom}</p>
-                            <p><strong>R — Resonance:</strong> {result.resonance}</p>
-                            <p><strong>I — Induction:</strong> {result.induction}</p>
-                            <p><strong>O — Orbital:</strong> {result.orbital}</p>
-                            <p>{result.explanation}</p>
-                            {result.modifiers.length > 0 && (
-                              <p><strong>pKa modifier:</strong> {result.modifiers.join(" ")}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="analysis-section compact-section">
-                    <p className="label">Basicity Estimate</p>
-                    {basicityResults.length === 0 ? (
-                      <p className="empty">No basic sites estimated yet.</p>
-                    ) : (
-                      <div className="group-list compact-group-list">
-                        {basicityResults.map((result, index) => (
-                          <div className="group-card" key={`${result.relatedGroup}-${result.basicSite}-${index}`}>
-                            <div className="group-card-header">
-                              <h3>{index === 0 ? "Strongest basic site" : "Weaker basic site"}: {result.basicSite}</h3>
-                              <span>conj. acid pKa {result.conjugateAcidPka}</span>
-                            </div>
-                            <p><strong>Related group:</strong> {result.relatedGroup}</p>
-                            <p><strong>Detected atom:</strong> Atom {result.siteAtomIndex + 1} · {result.confidence.toLowerCase()} confidence</p>
-                            <p><strong>Typical conjugate-acid pKa range:</strong> {formatPkaRange(result.conjugateAcidPkaRange)}</p>
-                            <p>{result.explanation}</p>
-                            {result.modifiers.length > 0 && (
-                              <p><strong>Basicity modifier:</strong> {result.modifiers.join(" ")}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <AcidBasePanel smiles={smiles} acids={acidityResults} bases={basicityResults} generic={moleculeIdentity?.properties.fullySpecified === false} />
                 </div>
               )}
 
