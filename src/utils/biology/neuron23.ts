@@ -103,10 +103,15 @@ export const GHK_ASSUMPTIONS = [
 // ---- Hodgkin–Huxley ------------------------------------------------------------------------------------------------------------
 
 export const HH = { cm: 1, gNa: 120, gK: 36, gL: 0.3, eNa: 50, eK: -77, eL: -54.387, vRest: -65, tempC: 6.3 } as const;
-const safe = (x: number, f: (x: number) => number, limit: number) => (Math.abs(x) < 1e-7 ? limit : f(x));
-export const alphaN = (v: number) => safe(v + 55, (x) => (0.01 * x) / (1 - Math.exp(-x / 10)), 0.1);
+/**
+ * alpha_n and alpha_m have the form c*x/(1 - exp(-x/10)), a removable singularity at x = 0 with limit 10c. Evaluated as
+ * c*x/(-expm1(-x/10)) the relative error stays near machine precision for every x (1 - exp(-x/10) loses digits for small x), and
+ * x = 0 returns the exact limit, so there is no cut-off and no discontinuity.
+ */
+const xOverOneMinusExp = (x: number, c: number) => (x === 0 ? 10 * c : (c * x) / -Math.expm1(-x / 10));
+export const alphaN = (v: number) => xOverOneMinusExp(v + 55, 0.01);
 export const betaN = (v: number) => 0.125 * Math.exp(-(v + 65) / 80);
-export const alphaM = (v: number) => safe(v + 40, (x) => (0.1 * x) / (1 - Math.exp(-x / 10)), 1);
+export const alphaM = (v: number) => xOverOneMinusExp(v + 40, 0.1);
 export const betaM = (v: number) => 4 * Math.exp(-(v + 65) / 18);
 export const alphaH = (v: number) => 0.07 * Math.exp(-(v + 65) / 20);
 export const betaH = (v: number) => 1 / (1 + Math.exp(-(v + 35) / 10));

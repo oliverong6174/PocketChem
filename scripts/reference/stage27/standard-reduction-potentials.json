@@ -1,0 +1,50 @@
+{
+  "id": "standard-reduction-potentials-crosscheck",
+  "title": "Standard electrode potentials, cross-check table",
+  "source": {
+    "name": "Wikipedia, 'Standard electrode potential (data page)' (secondary compilation; its rows cite the CRC Handbook of Chemistry and Physics 87th ed. and other sources per row)",
+    "url": "https://en.wikipedia.org/wiki/Standard_electrode_potential_(data_page)",
+    "retrieved": "2026-11-23",
+    "retrievedVia": "raw wikitext (action=raw), values transcribed programmatically then read by hand",
+    "conditions": "V vs SHE; 298.15 K; unit activity for aqueous species, solvent and pure solids/liquids; gases at 101.325 kPa (the table notes this is the common literature convention, not the current 100 kPa standard state)",
+    "status": "secondary-compilation"
+  },
+  "toleranceV": 0.025,
+  "toleranceNote": "Different compilations of the same couple differ by several mV (rounding to 2 decimals in the table, older vs newer evaluations). 0.025 V is wide enough to accept those differences and narrow enough to catch a wrong sign, a wrong couple or a misplaced digit. It is not a claim that every PocketChem value is accurate to 0.025 V.",
+  "couples": {
+    "Li":   { "table": -3.0401, "n": 1 },
+    "K":    { "table": -2.931,  "n": 1 },
+    "Ca":   { "table": -2.868,  "n": 2 },
+    "Na":   { "table": -2.71,   "n": 1 },
+    "Mg":   { "table": -2.372,  "n": 2 },
+    "Al":   { "table": -1.662,  "n": 3 },
+    "Mn":   { "table": -1.185,  "n": 2 },
+    "Zn":   { "table": -0.7618, "n": 2 },
+    "Cr":   { "table": -0.74,   "n": 3 },
+    "Fe":   { "table": -0.44,   "n": 2 },
+    "Cd":   { "table": -0.40,   "n": 2 },
+    "Co":   { "table": -0.28,   "n": 2 },
+    "Ni":   { "table": -0.257,  "n": 2 },
+    "Sn":   { "table": -0.13,   "n": 2 },
+    "Pb":   { "table": -0.126,  "n": 2 },
+    "H2":   { "table": 0.0,     "n": 2 },
+    "Sn4":  { "table": 0.151,   "n": 2 },
+    "Cu":   { "table": 0.337,   "n": 2 },
+    "I2":   { "table": 0.54,    "n": 2 },
+    "Fe3":  { "table": 0.771,   "n": 1 },
+    "Ag":   { "table": 0.7996,  "n": 1 },
+    "Br2":  { "table": 1.066,   "n": 2 },
+    "O2":   { "table": 1.229,   "n": 4 },
+    "Cr2O7":{ "table": 1.33,    "n": 6 },
+    "Cl2":  { "table": 1.36,    "n": 2 },
+    "Au":   { "table": 1.52,    "n": 3 },
+    "MnO4": { "table": 1.51,    "n": 5 },
+    "F2":   { "table": 2.87,    "n": 2 }
+  },
+  "knownSpread": {
+    "Au": "The table lists 1.52 V; PocketChem uses 1.498 V (a value of the CRC kind). The 0.022 V spread is real source variation, not a transcription error, and is inside the tolerance.",
+    "Cu": "The table lists 0.337 V; PocketChem uses 0.342 V (the value of the later CRC evaluation). 5 mV spread.",
+    "Fe": "The table lists -0.44 V (rounded); PocketChem uses -0.447 V. 7 mV spread.",
+    "Sn": "The table lists -0.13 V (rounded); PocketChem uses -0.138 V. 8 mV spread."
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "nist-codata-2022",
+  "title": "NIST Fundamental Physical Constants, complete listing (2022 CODATA adjustment)",
+  "url": "https://physics.nist.gov/cuu/Constants/Table/allascii.txt",
+  "retrieved": "2026-11-23",
+  "note": "Values transcribed from the retrieved listing. PocketChem's physics modules label some values CODATA 2018; those differ from the 2022 values only in the 9th-10th significant figure (see tolerances). Offline copy for tests only.",
+  "constants": {
+    "R":        { "name": "molar gas constant",           "value": 8.314462618,      "unit": "J mol^-1 K^-1", "exact": true,  "relTol": 1e-12 },
+    "F":        { "name": "Faraday constant",             "value": 96485.33212,      "unit": "C mol^-1",      "exact": true,  "relTol": 1e-12 },
+    "kB":       { "name": "Boltzmann constant",           "value": 1.380649e-23,     "unit": "J K^-1",        "exact": true,  "relTol": 1e-12 },
+    "NA":       { "name": "Avogadro constant",            "value": 6.02214076e23,    "unit": "mol^-1",        "exact": true,  "relTol": 1e-12 },
+    "e":        { "name": "elementary charge",            "value": 1.602176634e-19,  "unit": "C",             "exact": true,  "relTol": 1e-12 },
+    "c":        { "name": "speed of light in vacuum",     "value": 299792458,        "unit": "m s^-1",        "exact": true,  "relTol": 1e-12 },
+    "eps0":     { "name": "vacuum electric permittivity", "value": 8.8541878188e-12, "unit": "F m^-1",        "exact": false, "relTol": 2e-9 },
+    "mu0":      { "name": "vacuum mag. permeability",     "value": 1.25663706127e-6, "unit": "N A^-2",        "exact": false, "relTol": 2e-9 },
+    "me":       { "name": "electron mass",                "value": 9.1093837139e-31, "unit": "kg",            "exact": false, "relTol": 2e-9 },
+    "mp":       { "name": "proton mass",                  "value": 1.67262192595e-27,"unit": "kg",            "exact": false, "relTol": 2e-9 },
+    "malpha":   { "name": "alpha particle mass",          "value": 6.6446573450e-27, "unit": "kg",            "exact": false, "relTol": 2e-9 },
+    "g0":       { "name": "standard acceleration of gravity", "value": 9.80665,      "unit": "m s^-2",        "exact": true,  "relTol": 1e-12 }
+  }
+}

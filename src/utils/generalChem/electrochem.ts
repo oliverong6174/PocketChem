@@ -13,11 +13,13 @@
  *  - Nernst: E = E° − (RT/nF) ln Q with Q the reaction quotient of the overall cell reaction written with the lowest whole electron count n.
  *    Concentrations stand in for activities (ideal solutions), gases enter as pressure in bar, pure solids and liquids have activity 1.
  *
- * Reference data: standard potentials are values of the kind tabulated in the CRC Handbook of Chemistry and Physics ("Electrochemical Series")
- * and in Bard, Parsons & Jordan, Standard Potentials in Aqueous Solution (IUPAC, 1985), to the 3 decimals those sources give for
- * teaching use (uncertainty about ±0.005 V). They were entered here without network access and are NOT re-verified against the source
- * volumes in this repository; the tests check internal consistency (atoms and charge of every half-reaction, ordering of the series) and a
- * few widely quoted cell values (Daniell cell about 1.10 V), not each number against the original table.
+ * Reference data: standard potentials are values of the kind tabulated in the CRC Handbook of Chemistry and Physics ("Electrochemical
+ * Series") and in Bard, Parsons & Jordan, Standard Potentials in Aqueous Solution (IUPAC, 1985), to the 3 decimals those sources give for
+ * teaching use. Stage 27 cross-checked all 28 couples (identity, electron count, sign, value) against the Wikipedia "Standard electrode
+ * potential (data page)" compilation, a SECONDARY source (scripts/reference/stage27/standard-reduction-potentials.json): every value
+ * lies within 0.025 V of it and Au3+/Au differs by 0.022 V (1.498 here, 1.52 there), which is genuine source variation. The CRC Handbook
+ * and Bard et al. themselves were not opened, so the values are "cross-checked", not "primary-source verified". Standard-state note: the
+ * tables use 101.325 kPa for gases while this module says 1 bar; the 0.17 mV-scale difference is below the precision of the data.
  * Not modelled: temperature dependence of E°, activity coefficients, overpotentials, junction potentials, internal resistance, kinetics,
  * and complexation or precipitation.
  */

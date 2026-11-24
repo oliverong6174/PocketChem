@@ -105,8 +105,8 @@ describe("gas mixtures: Dalton's law", () => {
     // each gas alone in the same container would exert nRT/V: its partial pressure
     near(m.rows[1].partialPa, (0.21 * R * 298.15) / 0.0244, 1e-6);
   });
-  test("[average molar mass and density] M = 0.78(28.014) + 0.21(31.998) + 0.01(39.948) = 28.970 g/mol; density = m/V = 28.970/24.4 = 1.1873 g/L", () => {
-    const m = G.solveMixture(air); near(m.avgMolarMass, 0.78 * 28.014 + 0.21 * 31.998 + 0.01 * 39.948, 1e-9); near(m.densityGperL, 28.9704 / 24.4, 1e-4);
+  test("[average molar mass and density] M = 0.78(28.014) + 0.21(31.998) + 0.01(39.95) = 28.970 g/mol; density = m/V = 28.970/24.4 = 1.1873 g/L", () => {
+    const m = G.solveMixture(air); near(m.avgMolarMass, 0.78 * 28.014 + 0.21 * 31.998 + 0.01 * 39.95, 1e-9); near(m.densityGperL, 28.9705 / 24.4, 1e-4);
     near(m.densityGperL, G.gasDensityGperL(m.totalPa, m.T, m.avgMolarMass), 1e-9);
   });
   test("[single gas density] CO2 at 298.15 K, 1 atm: rho = PM/RT = 101325 x 44.009 / (8.314462618 x 298.15) = 1.799 g/L", () => { near(G.gasDensityGperL(101325, 298.15, 44.009), 1.799, 1e-3); });
@@ -131,7 +131,7 @@ describe("kinetic theory and the Maxwell-Boltzmann distribution", () => {
     near(G.rmsSpeed(300, 2.016) / G.rmsSpeed(300, 28.014), Math.sqrt(28.014 / 2.016), 1e-12); near(G.rmsSpeed(600, 28.014) / G.rmsSpeed(300, 28.014), Math.SQRT2, 1e-12);
   });
   test("[speed ratios of the distribution] v_mp : v_mean : v_rms = sqrt(2) : sqrt(8/pi) : sqrt(3)", () => {
-    const T = 350; const M = 39.948; const mp = G.mostProbableSpeed(T, M);
+    const T = 350; const M = 39.95; const mp = G.mostProbableSpeed(T, M);
     near(G.meanSpeed(T, M) / mp, Math.sqrt(4 / Math.PI), 1e-12); near(G.rmsSpeed(T, M) / mp, Math.sqrt(1.5), 1e-12);
   });
   test("[same T, same mean kinetic energy] (3/2) k T per molecule, 3.72 kJ/mol at 298.15 K, whatever the mass", () => {
