@@ -72,7 +72,7 @@ try {
   await fresh(1440, "dark", "#/general/overview");
   const tb = await tabs();
   check("1 General Chemistry lists Stoichiometry, Gas laws and Electrochemistry beside the existing tools", ["Overview", "Stoichiometry", "Gas laws", "Acid–base & titration", "Chemical equilibrium", "Reaction kinetics", "Thermodynamics", "Electrochemistry", "Saved"].every((t) => tb.includes(t)), tb);
-  check("1 the overview offers the three tools and no planned item is a button", (await ev(`document.querySelectorAll('.gc-tool-card').length`)) === 7 && (await ev(`[...document.querySelectorAll('.gc-planned button')].length`)) === 0);
+  check("1 the overview offers the seven earlier tools plus three Stage 28 laboratories, and no planned item is a button", (await ev(`document.querySelectorAll('.gc-tool-card').length`)) === 10 && (await ev(`[...document.querySelectorAll('.gc-planned button')].length`)) === 0);
   await shot("overview-dark.png");
   await ev(`[...document.querySelectorAll('.gc-tool-card button')].find((b) => b.textContent.includes('Open Stoichiometry')).click()`);
   await sleep(900);

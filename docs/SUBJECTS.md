@@ -241,3 +241,21 @@ Presentation only; the reaction, synthesis, spectroscopy, ranking and nomenclatu
 - **Properties** (`components/properties/PropertiesResults.tsx`, `utils/propertiesSections.ts`): identity card with structure above every tab; Summary (key results, functional groups, stereocenters, descriptors, tendencies) and All properties (definitions, evidence kind, "Why this level?", naming detail, what is unavailable). Calculated values and qualitative estimates carry different labels; unavailable values are listed, not shown as "N/A".
 - **Multi-Step**: route at a glance and, when several routes exist, a selectable list of alternatives. **Ranking**: ordering basis and a "Not ranked" state. **Spectroscopy**: "Predicted, not measured" note; inputs never covered by the action row.
 - Tests: `reactionsExplorer20`, `multicatalyticRoute20`, `propertiesSections20` (real engine output); browser checks `stage20ReactionsCheck`, `stage20McCheck`, `stage20PropertiesCheck`, `stage20ConsistencyCheck`, `stage20Measure`.
+
+## General Chemistry (Stage 28): atomic structure, bonding and geometry, molecular orbitals
+
+Three laboratories join General Chemistry (`gcAtomic` "Atomic structure", `gcBonding` "Bonding & geometry", `gcMO` "Molecular orbitals"; persisted pages `atomic`, `bonding`, `molorbitals`). Each has Explore, Practice and Challenge, strictly validated Saved Analyses (`src/utils/persistence/gcTools28.ts`) and evidence panels (`src/utils/evidence/evidence28.ts`, a separate registry so the Stage 27 manifest stays pinned to its own records).
+
+| Model (pure TypeScript, no React) | Module | What it is |
+|---|---|---|
+| Quantum numbers, shells, subshells | `quantum28.ts` | The rules n ≥ 1, 0 ≤ l ≤ n−1, −l ≤ m_l ≤ l, m_s = ±1/2; capacities 2(2l+1), 2n²; node counts n−l−1 and l. |
+| Hydrogenic orbitals and spectra | `hydrogenic28.ts` | Closed-form R_nl and Y_lm for 1s–3d (real and complex bases), bounded slice and enclosure grids, E_n = −Ry·Z²/n², photon energy, frequency, wavelength, series. Exact for one electron only. |
+| Electron configurations | `config28.ts` | NIST-compared ground states for Z = 1–36, Madelung order, removal/filling rules for ions, orbital boxes with Hund's rule, a student build checker. |
+| Lewis, resonance, hybridisation | `lewis28.ts` | 30 curated species stored with explicit bond orders and lone pairs; electron conservation, formal charge, octet status, resonance averages, hybrid labels. |
+| VSEPR, polarity | `vsepr28.ts` | 13 (bonded atoms, lone pairs) cases with ideal coordinates and angles; schematic |ΔEN| bond-dipole cancellation. |
+| Molecular orbitals | `mo28.ts` | 17 homonuclear diatomics, two 2p orderings, Pauli/Hund/Aufbau checks, bond order, unpaired electrons, a normalised two-1s LCAO illustration. |
+| Learning content | `learning28.ts` | Lessons, Practice and Challenge questions and saved-result summaries, all answered by the models above. |
+
+Rules kept by the code and tests (`scripts/tests/atomic28`, `bonding28`, `mo28`, `generalChemPlatform28`): expected values are closed forms, hand tables or the NIST fixture in `scripts/reference/stage28` (test data only, never imported by the app); every model states its approximation; colours in orbital pictures show wavefunction sign, never charge; resonance contributors are never presented as real interconverting species; hybridisation labels for five and six domains are bookkeeping; schematic dipoles are never given in debye; MO heights show order only; nothing needs the network.
+
+Related learning (conceptual links with cautions, no state transfer): Atomic structure → Bonding and geometry, Molecular orbitals, Physics Waves, Optics and Interference; Bonding and geometry → Organic Molecular structure, Conformations, Reactions, Molecular orbitals; Molecular orbitals → Physics Magnetism and Organic Spectroscopy. "Periodic trends" remains a planned item and is not linked.
