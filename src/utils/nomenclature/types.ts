@@ -18,6 +18,9 @@ export type PropertyTendencyResult = {
 };
 
 export type MoleculePropertyResult = {
+  /** False for wildcard/query atoms or a source entry with a variable formula. */
+  fullySpecified?: boolean;
+  unspecifiedAtomCount?: number;
   molecularFormula: string;
   exactMass: string | null;
   molecularWeight: string | null;
@@ -78,6 +81,17 @@ export type NomenclatureResult = {
 export type MoleculeIdentityResult = {
   nomenclature: NomenclatureResult;
   properties: MoleculePropertyResult;
+  structureKey?: string;
+  structureDerivedNomenclature?: NomenclatureResult;
+  sourceIdentity?: {
+    originalQuery: string;
+    resolvedName: string;
+    aliases: string[];
+    sourceId: string | null;
+    confidence: "Database match";
+    fullySpecified: boolean;
+    resolution: import("../moleculeNameResolver").MoleculeNameResolution;
+  };
 };
 
 export type ParsedAtom = {

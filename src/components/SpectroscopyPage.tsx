@@ -7,7 +7,7 @@ import {
 } from "../utils/functionalGroups";
 import { analyzeNomenclatureAndProperties } from "../utils/nomenclatureUtils";
 import {
-  applyResolvedNameToIdentity,
+  resolveStructureIdentity,
   type MoleculeNameResolution,
 } from "../utils/moleculeNameResolver";
 import { getHighlightedMoleculeSvg } from "../utils/moleculeAnnotation";
@@ -1249,7 +1249,7 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
   }, [snapshotTask]);
 
   function handleEditorChange() {
-    importedNameResolutionRef.current = null;
+    // Recheck the imported identity against canonical isomeric structure at analysis.
     // Programmatic restores are not user edits.
     if (restoringRef.current) return;
     snapshotTask.schedule();
@@ -1714,7 +1714,8 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
         hierarchy.primaryGroups,
         hierarchy.mainGroup,
       );
-      const identity = applyResolvedNameToIdentity(
+      const identity = await resolveStructureIdentity(
+        currentSmiles,
         localIdentity,
         importedNameResolutionRef.current,
       );

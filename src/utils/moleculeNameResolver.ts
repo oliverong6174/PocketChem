@@ -1,11 +1,15 @@
 import type { MoleculeIdentityResult } from "./nomenclatureUtils";
 import {
   lookupLocalChemicalName,
+  findRelatedChemicalNames,
   normalizeChemicalName,
 } from "./chemicalNameDatabase";
 import { toPlainChemicalName } from "./chemicalNameText";
+import { getRDKit } from "./rdkit";
 
 export type MoleculeNameResolution = {
+  sourceId?: string;
+  aliases?: string[];
   query: string;
   smiles: string;
   connectivitySmiles: string | null;
@@ -72,7 +76,7 @@ export async function resolveMoleculeName(
 
   const key = cacheKey(query);
   const cached = resolverCache.get(key);
-  if (cached) return cached;
+  if (cached) return { ...cached, query };
 
   let local;
   try {
@@ -88,6 +92,8 @@ export async function resolveMoleculeName(
   }
 
   const resolution: MoleculeNameResolution = {
+    sourceId: local.chebiId,
+    aliases: [...new Set([query, toPlainChemicalName(local.preferredName), toPlainChemicalName(local.iupacName)].filter((s): s is string => Boolean(s)))],
     query,
     smiles: local.smiles,
     // ChEBI's local structure is already the authoritative imported structure;
@@ -122,12 +128,15 @@ export function applyResolvedNameToIdentity(
   identity: MoleculeIdentityResult,
   resolution: MoleculeNameResolution | null | undefined,
 ): MoleculeIdentityResult {
-  const resolvedIupac = resolution?.iupacName?.trim();
-  if (!resolvedIupac) return identity;
+  if (!resolution) return identity;
+  const resolvedIupac = resolution.iupacName?.trim();
 
   const resolvedTitle = resolution?.title?.trim();
   const resolvedQuery = resolution?.query?.trim();
   const iupacKey = comparableName(resolvedIupac);
+  const name = resolvedIupac || resolvedTitle || resolvedQuery;
+  if (!name) return identity;
+  const fullySpecified = identity.properties.fullySpecified !== false && !isGenericResolution(resolution);
   const matchedCommonName = [resolvedTitle, resolvedQuery]
     .find((candidate) => candidate && comparableName(candidate) !== iupacKey)
     ?? identity.nomenclature.commonName;
@@ -138,14 +147,24 @@ export function applyResolvedNameToIdentity(
 
   return {
     ...identity,
+    structureDerivedNomenclature: identity.structureDerivedNomenclature ?? identity.nomenclature,
+    sourceIdentity: {
+      originalQuery: resolution.query, resolvedName: resolvedTitle || name,
+      aliases: [...new Set([...(resolution.aliases ?? []), resolution.query, name])],
+      sourceId: resolution.sourceId ?? null, confidence: "Database match", fullySpecified, resolution,
+    },
+    properties: fullySpecified ? identity.properties : {
+      ...identity.properties, fullySpecified: false, molecularWeight: null, exactMass: null, degreesOfUnsaturation: null,
+      notes: [...identity.properties.notes, "The source entry is a generic chemical family or variable-composition structure. Only scaffold properties are available."],
+    },
     nomenclature: {
       ...identity.nomenclature,
-      estimatedName: resolvedIupac,
-      displayName: resolvedIupac,
+      estimatedName: name,
+      displayName: name,
       commonName: matchedCommonName ?? null,
       namingConfidence: "High",
-      namingStatus: "systematic",
-      explanation: lookupExplanation,
+      namingStatus: resolvedIupac ? "systematic" : "common",
+      explanation: resolvedIupac ? lookupExplanation : `Loaded as ${name} from the bundled ChEBI database. A database identity does not require a structure-derived systematic name.`,
       limitations: [
         ...identity.nomenclature.limitations.filter(
           (item) => !item.toLocaleLowerCase().includes("estimated name"),
@@ -154,4 +173,53 @@ export function applyResolvedNameToIdentity(
       ],
     },
   };
+}
+
+export function isGenericResolution(resolution: MoleculeNameResolution): boolean {
+  return resolution.smiles.includes("*") || /(?:R(?![a-z])\d*|\([^)]*\)\s*[nm]|\bn\b)/.test(resolution.molecularFormula ?? "");
+}
+
+/** Canonical isomeric matching: never inherit an alias across charge, isotope or stereo changes. */
+export async function resolveStructureIdentity(structure: string, identity: MoleculeIdentityResult, resolution: MoleculeNameResolution | null | undefined): Promise<MoleculeIdentityResult> {
+  if (!resolution) return identity;
+  const [current, original] = await Promise.all([molecularStructureKey(structure), molecularStructureKey(resolution.smiles)]);
+  if (!current || current !== original) return identity;
+  return applyResolvedNameToIdentity(identity, resolution);
+}
+
+export async function molecularStructureKey(structure: string): Promise<string | null> {
+  const rdkit = await getRDKit();
+  let mol;
+  try {
+    mol = rdkit.get_mol(structure);
+    return mol?.get_smiles().split(".").sort().join(".") ?? null;
+  } catch { return null; } finally { mol?.delete(); }
+}
+
+/** Bounded suggestions from the same offline database, with concrete formula and scaffold match. */
+export async function findConcreteNameVariants(resolution: MoleculeNameResolution): Promise<MoleculeNameResolution[]> {
+  if (!isGenericResolution(resolution)) return [];
+  const records = await findRelatedChemicalNames([resolution.query, resolution.title ?? ""]);
+  const rdkit = await getRDKit();
+  const template = rdkit.get_mol(resolution.smiles);
+  if (!template) return [];
+  // A molecule dummy atom is element 0; a SMARTS wildcard is a query for any atom.
+  const scaffold = rdkit.get_qmol(template.get_smarts().replace(/\[#0\]/g, "[*]"));
+  template.delete();
+  if (!scaffold) return [];
+  const variants: MoleculeNameResolution[] = [];
+  try {
+    for (const record of records) {
+      const candidate: MoleculeNameResolution = { query: record.preferredName ?? record.chebiId, smiles: record.smiles, title: toPlainChemicalName(record.preferredName), iupacName: toPlainChemicalName(record.iupacName), molecularFormula: record.molecularFormula, sourceId: record.chebiId, inchiKey: record.inchiKey, connectivitySmiles: null, source: "chebi" };
+      if (isGenericResolution(candidate)) continue;
+      const mol = rdkit.get_mol(candidate.smiles);
+      if (!mol) continue;
+      try {
+        const match = JSON.parse(mol.get_substruct_match(scaffold));
+        if (match.atoms?.length) variants.push(candidate);
+      } finally { mol.delete(); }
+      if (variants.length >= 6) break;
+    }
+  } finally { scaffold.delete(); }
+  return variants;
 }

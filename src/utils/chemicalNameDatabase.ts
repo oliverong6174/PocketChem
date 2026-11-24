@@ -324,3 +324,16 @@ export async function lookupLocalChemicalByInchiKey(
 export function clearChemicalNameDatabaseCache() {
   indexPromise = null;
 }
+
+/** Related names from the existing alias index; candidates are not asserted to be variants until structure validation. */
+export async function findRelatedChemicalNames(names: string[], limit = 100): Promise<LocalChemicalNameRecord[]> {
+  const index = await getIndex();
+  const prefixes = names.map(normalizeChemicalName).filter((name) => name.length >= 4);
+  const targets = new Set<number>();
+  for (const [alias, target] of index.aliases) {
+    if (!prefixes.some((prefix) => alias.startsWith(prefix))) continue;
+    for (const i of typeof target === "number" ? [target] : target) targets.add(i);
+    if (targets.size >= limit) break;
+  }
+  return [...targets].map((i) => materializeRecord(index.records[i])).filter((r): r is LocalChemicalNameRecord => r !== null);
+}

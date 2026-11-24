@@ -498,8 +498,10 @@ export function buildProperties(
     (sum, atom) => sum + atom.charge,
     0
   );
-  const dbe = calculateDBE(counts, formalCharge);
-  const heavyAtomCount = parsedMol.atoms.filter((atom) => atom.element !== "H")
+  const unspecifiedAtomCount = parsedMol.atoms.filter((atom) => !/^[A-Z][a-z]?$/.test(atom.element) || ["R", "A", "Q", "X"].includes(atom.element)).length;
+  const fullySpecified = unspecifiedAtomCount === 0;
+  const dbe = fullySpecified ? calculateDBE(counts, formalCharge) : null;
+  const heavyAtomCount = parsedMol.atoms.filter((atom) => atom.element !== "H" && /^[A-Z][a-z]?$/.test(atom.element) && !["R", "A", "Q", "X"].includes(atom.element))
     .length;
 
   const exactMass = getNumberDescriptor(descriptors, [
@@ -592,9 +594,11 @@ export function buildProperties(
   }
 
   return {
+    fullySpecified,
+    unspecifiedAtomCount,
     molecularFormula: formula || "Not available",
-    exactMass: formatDescriptor(exactMass, 4),
-    molecularWeight: formatDescriptor(molecularWeight, 2),
+    exactMass: fullySpecified ? formatDescriptor(exactMass, 4) : null,
+    molecularWeight: fullySpecified ? formatDescriptor(molecularWeight, 2) : null,
     degreesOfUnsaturation: dbe,
     formalCharge,
     atomCounts,
@@ -609,6 +613,6 @@ export function buildProperties(
     waterSolubilityTendency,
     membranePermeabilityTendency,
     volatilityTendency,
-    notes,
+    notes: fullySpecified ? notes : [...notes, "Generic structure: R / wildcard atoms are unspecified substituents, not elements. Mass, DBE and whole-molecule physicochemical tendencies are unavailable. Atom counts, formal charge, rings and detected groups describe the drawn scaffold only."],
   };
 }

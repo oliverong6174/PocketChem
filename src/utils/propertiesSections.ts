@@ -74,10 +74,10 @@ export function buildPropertySections(identity: MoleculeIdentityResult, groups: 
     calc("hba", "H-bond acceptors", p.hydrogenBondAcceptors, "hba"),
   ]);
   const tendencies = keep([
-    tendency("solubility", "Water solubility", p.waterSolubilityTendency, "waterSolubility"),
-    tendency("permeability", "Membrane permeability", p.membranePermeabilityTendency, "membranePermeability"),
-    tendency("boiling", "Boiling point tendency", p.boilingPointTendency, "boilingPoint"),
-    tendency("volatility", "Volatility", p.volatilityTendency, "volatility"),
+    tendency("solubility", "Water solubility", p.fullySpecified === false ? undefined : p.waterSolubilityTendency, "waterSolubility"),
+    tendency("permeability", "Membrane permeability", p.fullySpecified === false ? undefined : p.membranePermeabilityTendency, "membranePermeability"),
+    tendency("boiling", "Boiling point tendency", p.fullySpecified === false ? undefined : p.boilingPointTendency, "boilingPoint"),
+    tendency("volatility", "Volatility", p.fullySpecified === false ? undefined : p.volatilityTendency, "volatility"),
   ]);
 
   const sections: PropertySection[] = [

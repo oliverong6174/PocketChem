@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getCondensedSulfonateSvg } from "../../utils/functionalGroups";
 import type { MoleculeIdentityResult } from "../../utils/nomenclatureUtils";
 import { buildPropertySections, type GroupCount, type PropertyRow, type StereoCenter } from "../../utils/propertiesSections";
+import { findConcreteNameVariants, type MoleculeNameResolution } from "../../utils/moleculeNameResolver";
 
 interface Shared {
   identity: MoleculeIdentityResult;
@@ -31,10 +32,20 @@ function EvidenceTag({ evidence }: { evidence: PropertyRow["evidence"] }) {
 }
 
 /** Who this molecule is: structure, name and its confidence, formula, mass and SMILES. Stays above every results tab. */
-export function PropertiesIdentity({ identity, smiles, groups, stereocenters }: Shared) {
+export function PropertiesIdentity({ identity, smiles, groups, stereocenters, onLoadVariant }: Shared & { onLoadVariant?: (resolution: MoleculeNameResolution) => void }) {
   const svg = useStructureSvg(smiles);
   const nomenclature = identity.nomenclature;
-  const name = nomenclature.displayName || nomenclature.estimatedName;
+  const source = identity.sourceIdentity;
+  const derived = identity.structureDerivedNomenclature ?? nomenclature;
+  const generic = identity.properties.fullySpecified === false;
+  const [variants, setVariants] = useState<MoleculeNameResolution[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    setVariants([]);
+    if (generic && source) void findConcreteNameVariants(source.resolution).then((list) => { if (!cancelled) setVariants(list); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [generic, source]);
+  const name = source?.resolvedName || nomenclature.displayName || nomenclature.estimatedName;
   const sections = useMemo(() => buildPropertySections(identity, groups, stereocenters), [identity, groups, stereocenters]);
   const composition = sections.sections.find((section) => section.id === "composition");
   const text = `${name}. ${composition?.rows.map((row) => `${row.label} ${row.value}`).join(", ") ?? ""}. SMILES ${smiles}.`;
@@ -47,12 +58,13 @@ export function PropertiesIdentity({ identity, smiles, groups, stereocenters }: 
       <div className="pr-identity-main">
         <p className="pr-eyebrow">Current molecule</p>
         <h3 className="pr-name">{name}</h3>
-        <p className="pr-confidence"><strong>{nomenclature.namingConfidence} confidence</strong> in this name{nomenclature.commonName && nomenclature.commonName.toLowerCase() !== name.toLowerCase() ? <> · also known as <em>{nomenclature.commonName}</em></> : null}</p>
+        {source ? <div className="pr-confidence"><strong>Loaded as: {source.resolvedName}</strong> · {source.sourceId} · {source.confidence}<br />Structure-derived name: {derived.namingStatus === "unsupported" ? "Unavailable" : derived.displayName}<details><summary>Identity provenance</summary><p>Entered: {source.originalQuery}<br />Recognized names: {source.aliases.join("; ")}<br />Source: bundled ChEBI · {source.sourceId}<br />Structure: {source.fullySpecified ? "Specified composition; stereochemistry only as drawn" : "Generic / variable composition"}</p></details></div> : <p className="pr-confidence"><strong>{nomenclature.namingConfidence} confidence</strong> in structure-derived name{nomenclature.commonName && nomenclature.commonName.toLowerCase() !== name.toLowerCase() ? <> · also known as <em>{nomenclature.commonName}</em></> : null}</p>}
         <dl className="pr-keyfacts">
           {composition?.rows.filter((row) => ["formula", "mw", "exactMass", "charge"].includes(row.id)).map((row) => (
             <div key={row.id}><dt>{row.label}</dt><dd>{row.value}</dd></div>
           ))}
         </dl>
+        {generic ? <div className="pr-generic" role="note"><strong>Generic structure / chemical family</strong><p>Unspecified substituents or variable composition prevent a unique molecular weight, exact mass, DBE or whole-molecule tendency. Formula, charge, known heavy atoms, ring analysis and detected groups describe the drawn scaffold. R is not an element.</p>{variants.length > 0 ? <details><summary>Choose a concrete database entry</summary><p>These entries match the scaffold. Each is a separate choice.</p>{variants.map((variant) => <button className="secondary-button" type="button" key={variant.sourceId} onClick={() => onLoadVariant?.(variant)} disabled={!onLoadVariant}>{variant.title} · {variant.sourceId}</button>)}</details> : null}</div> : null}
         <p className="pr-smiles"><span className="pr-eyebrow">SMILES</span> <code>{smiles}</code></p>
       </div>
     </section>

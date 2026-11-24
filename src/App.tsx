@@ -23,7 +23,7 @@ import { NavigationContext } from "./navigation/NavigationContext";
 import type { ConceptDestination } from "./utils/concepts/conceptIndex";
 import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type BiologyToolId, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
   import {
-    applyResolvedNameToIdentity,
+    resolveStructureIdentity,
     type MoleculeNameResolution,
   } from "./utils/moleculeNameResolver";
   import {
@@ -364,6 +364,12 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
         const key = await ketIdentityKey(ket);
         if (!persistence.isCurrent(token) || analyzeInFlightRef.current || propsRestoringRef.current) return;
         propsSnapshotRef.current = { ket: ketHasStructureText(ket) ? ket : null, key };
+        const analyzedIdentity = latestRef.current.moleculeIdentity;
+        if (analyzedIdentity && analyzedIdentity.structureKey !== key && latestRef.current.resultMeta?.structureKey !== key) {
+          importedNameResolutionRef.current = null;
+          setMoleculeIdentity(null);
+          setStatus("Structure changed - analyze to refresh identity and results");
+        }
         setResultMeta((meta) => (meta && !meta.stale && meta.structureKey !== key ? { ...meta, stale: true } : meta));
         requestPersist();
       } catch (snapshotError) {
@@ -453,6 +459,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
         setChiralityResults(data.chiralityResults);
         setMoleculeAnnotation(data.moleculeAnnotation);
         setMoleculeIdentity(data.moleculeIdentity);
+        importedNameResolutionRef.current = data.moleculeIdentity?.sourceIdentity?.resolution ?? null;
         setReactionPathways(data.reactionPathways);
         setStatus("Restored from your previous session");
         setResultMeta({
@@ -532,9 +539,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
     }, []);
 
     const handleMainEditorChange = useCallback(() => {
-      // Any manual edit means the previously resolved name is no longer
-      // guaranteed to describe the current graph.
-      importedNameResolutionRef.current = null;
+      // The settled snapshot compares chemical identity, including stereo and charge.
       scheduleSnapshotRef.current();
     }, []);
 
@@ -797,6 +802,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
         setChiralityResults(data.chiralityResults);
         setMoleculeAnnotation(data.moleculeAnnotation);
         setMoleculeIdentity(data.moleculeIdentity);
+        importedNameResolutionRef.current = data.moleculeIdentity?.sourceIdentity?.resolution ?? null;
         setReactionPathways(data.reactionPathways);
         setStatus(`Opened saved analysis “${opened.record.name}”`);
         setResultMeta({
@@ -1064,12 +1070,11 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
 
         if (latestAnalyzeRunRef.current !== runId) return;
 
+        const resolvedIdentity = identity ? await resolveStructureIdentity(safeSmiles, identity, importedNameResolutionRef.current) : null;
+        if (latestAnalyzeRunRef.current !== runId) return;
+        if (!resolvedIdentity?.sourceIdentity) importedNameResolutionRef.current = null;
         setReactionPathways(pathways);
-        setMoleculeIdentity(
-          identity
-            ? applyResolvedNameToIdentity(identity, importedNameResolutionRef.current)
-            : null,
-        );
+        setMoleculeIdentity(resolvedIdentity);
         setAcidityResults(acidity);
         setBasicityResults(basicity);
         if (analyzedKey) {
@@ -1971,6 +1976,13 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
   const propertyGroups = useMemo(() => countGroups(functionalGroupOccurrences), [functionalGroupOccurrences]);
   const propertyStereocenters = useMemo(() => chiralityResults.map((result) => ({ label: result.label, configuration: result.configuration })), [chiralityResults]);
 
+  async function loadPropertiesVariant(resolution: MoleculeNameResolution) {
+    if (!window.ketcher || isAnalyzing) return;
+    await window.ketcher.setMolecule(resolution.smiles);
+    importedNameResolutionRef.current = resolution;
+    await analyzeMolecule();
+  }
+
   {/*RETURN STATEMENT*/}
 
   return (
@@ -2419,7 +2431,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
             </p>
 
             {moleculeIdentity ? (
-              <PropertiesIdentity groups={propertyGroups} identity={moleculeIdentity} smiles={smiles} stereocenters={propertyStereocenters} />
+              <PropertiesIdentity groups={propertyGroups} identity={moleculeIdentity} smiles={smiles} stereocenters={propertyStereocenters} onLoadVariant={(resolution) => void loadPropertiesVariant(resolution)} />
             ) : null}
 
             <div className="dashboard-tab-row">

@@ -112,6 +112,7 @@ export async function analyzeNomenclatureAndProperties(
     );
 
     return {
+      structureKey: canonicalSmiles?.split(".").sort().join("."),
       nomenclature: estimateNomenclature(
         RDKit,
         mol as unknown as { get_substruct_matches: (query: { delete?: () => void }) => string },
