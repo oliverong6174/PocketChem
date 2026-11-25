@@ -100,3 +100,20 @@
   .properties-workspace .molecule-name-input-copy span { display: none; }
   .properties-workspace .drawer-placeholder-compact { height: 470px; }
 }
+/* Concepts: the molecule and the selected concept's information stay side by side. */
+.pr-concept-split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+.pr-concept-split:has(.pr-concept-visual) { grid-template-columns: minmax(260px, 1.1fr) minmax(0, 1fr); }
+.pr-concept-visual { position: sticky; top: 16px; margin: 0; }
+.pr-concept-visual .highlight-preview { margin: 0; }
+.pr-concept-info { min-width: 0; }
+.pr-concept-info .annotation-summary { margin-top: 0; }
+/* Stacked widths: the molecule stays pinned (compact) above the selected-concept information. */
+@media (max-width: 1280px) {
+  .pr-concept-split:has(.pr-concept-visual) { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .pr-concept-visual { top: 0; z-index: 2; background: var(--surface, var(--bg, #fff)); padding-bottom: 4px; }
+  .pr-concept-visual .highlighted-molecule-svg svg { max-height: 240px; }
+}
+@media (max-width: 600px) { .pr-concept-visual .highlighted-molecule-svg svg { max-height: 200px; } }
+.molecule-name-choices { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.molecule-name-choices button { font-size: .8rem; padding: 6px 10px; text-align: left; }
+.molecule-name-choices button span { color: var(--text-muted); font-weight: 400; }
