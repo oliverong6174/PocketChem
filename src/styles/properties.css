@@ -114,6 +114,15 @@
   .pr-concept-visual .highlighted-molecule-svg svg { max-height: 240px; }
 }
 @media (max-width: 600px) { .pr-concept-visual .highlighted-molecule-svg svg { max-height: 200px; } }
-.molecule-name-choices { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.molecule-name-choices button { font-size: .8rem; padding: 6px 10px; text-align: left; }
-.molecule-name-choices button span { color: var(--text-muted); font-weight: 400; }
+.molecule-name-choices { list-style: none; margin: 6px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.molecule-name-choices button { width: 100%; font-size: .78rem; padding: 6px 8px; text-align: left; min-height: 0; }
+.molecule-name-choices button strong { display: block; }
+.molecule-name-choices button span { display: block; }
+/* Concepts: compact selector grid and a wider information column. */
+.properties-workspace .compact-concept-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 8px 0 12px; }
+.properties-workspace .compact-concept-grid .concept-button { padding: 6px 4px; font-size: .78rem; min-height: 36px; border-radius: 6px; }
+.properties-workspace .pr-concept-split .annotation-carousel { grid-template-columns: 26px minmax(0, 1fr) 26px; gap: 6px; }
+.properties-workspace .pr-concept-split .carousel-arrow { font-size: 22px; border-radius: 6px; }
+.properties-workspace .pr-concept-split:has(.pr-concept-visual) { grid-template-columns: minmax(240px, .9fr) minmax(0, 1.1fr); }
+@media (max-width: 1280px) { .properties-workspace .pr-concept-split:has(.pr-concept-visual) { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) { .properties-workspace .compact-concept-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

@@ -1949,7 +1949,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
   }
 
   const propertyGroups = useMemo(() => countGroups(functionalGroupOccurrences), [functionalGroupOccurrences]);
-  const propertyStereocenters = useMemo(() => chiralityResults.map((result) => ({ label: result.label, configuration: result.configuration })), [chiralityResults]);
+  const propertyStereocenters = useMemo(() => chiralityResults.map((result) => ({ label: result.label, configuration: result.configuration, atom: result.atomIndex + 1 })), [chiralityResults]);
   const aromaticityOverview = useAromaticity(moleculeIdentity ? smiles : "");
 
   async function loadPropertiesVariant(resolution: MoleculeNameResolution) {

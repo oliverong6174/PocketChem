@@ -550,7 +550,7 @@ function MoleculeDrawer({
                     type="button"
                   >
                     <strong>{variant.variantLabel ?? variant.title ?? variant.query}</strong>
-                    {variant.variantDetail ? <span> · {variant.variantDetail}</span> : null}
+                    {variant.variantDetail ? <span>{variant.variantDetail}</span> : null}
                   </button>
                 </li>
               ))}

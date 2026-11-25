@@ -105,8 +105,8 @@ function describeSugar(form: SugarForm): { label: string; detail: string } {
   const anomer = form.anomer === "alpha" ? "α-" : form.anomer === "beta" ? "β-" : "";
   const ending = form.ring ? `o${form.ring}` : "ose";
   const label = `${form.open ? `${form.open}-` : ""}${anomer}${series}-${form.stem}${ending}`;
-  const shape = form.open ? "open chain" : form.ring === "pyranose" ? "six-membered ring (pyranose)" : form.ring === "furanose" ? "five-membered ring (furanose)" : "cyclic form";
-  const configuration = form.anomer ? `${form.anomer} anomer` : form.open ? "" : "anomer unspecified";
+  const shape = form.open ? "open chain" : form.ring ?? "cyclic";
+  const configuration = form.anomer ? `${form.anomer === "alpha" ? "α" : "β"} anomer` : form.open ? "" : "anomer unspecified";
   return { label, detail: [shape, configuration].filter(Boolean).join(", ") };
 }
 

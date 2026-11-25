@@ -30,7 +30,7 @@ export interface PropertySection {
 }
 
 export interface GroupCount { name: string; count: number }
-export interface StereoCenter { label: string; configuration: string }
+export interface StereoCenter { label: string; configuration: string; /** 1-based atom number in the drawing, when known. */ atom?: number }
 
 export interface PropertySections {
   sections: PropertySection[];

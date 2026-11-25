@@ -56,7 +56,7 @@ export function PropertiesIdentity({ identity, smiles, groups, stereocenters, on
       <div className="pr-identity-main">
         <p className="pr-eyebrow">Current molecule</p>
         <h3 className="pr-name">{name}</h3>
-        {source ? <p className="pr-confidence">{derived.namingStatus === "unsupported" ? <>Structure-derived name unavailable · </> : derived.displayName.toLowerCase() !== name.toLowerCase() ? <>Structure-derived name: {derived.displayName} · </> : null}ChEBI {source.sourceId}</p> : <p className="pr-confidence"><strong>{nomenclature.namingConfidence} confidence</strong> in structure-derived name{nomenclature.commonName && nomenclature.commonName.toLowerCase() !== name.toLowerCase() ? <> · also known as <em>{nomenclature.commonName}</em></> : null}</p>}
+        {source ? <p className="pr-confidence">{derived.namingStatus === "unsupported" ? <>Structure-derived name unavailable · </> : derived.displayName.toLowerCase() !== name.toLowerCase() ? <>Structure-derived name: {derived.displayName} · </> : null}{source.sourceId}</p> : <p className="pr-confidence"><strong>{nomenclature.namingConfidence} confidence</strong> in structure-derived name{nomenclature.commonName && nomenclature.commonName.toLowerCase() !== name.toLowerCase() ? <> · also known as <em>{nomenclature.commonName}</em></> : null}</p>}
         <dl className="pr-keyfacts">
           {composition?.rows.filter((row) => ["formula", "mw", "exactMass", "charge"].includes(row.id)).map((row) => (
             <div key={row.id}><dt>{row.label}</dt><dd>{row.value}</dd></div>
@@ -110,7 +110,7 @@ export function PropertiesSummary({ identity, smiles, groups, stereocenters, inf
         )}
         {sections.stereocenters.length === 0 ? <p className="pr-none">No stereocenter found.</p> : (
           <p className="pr-line">
-            {assigned.length > 0 ? <>Stereocenters: {assigned.map((center) => `${center.label} (${center.configuration})`).join(", ")}. </> : null}
+            {assigned.length > 0 ? <>Stereocenters: {assigned.map((center) => center.atom ? `atom ${center.atom}: ${center.configuration}` : center.configuration).join(", ")}. </> : null}
             {unspecified.length > 0 ? <>{unspecified.length === 1 ? "1 potential stereocenter" : `${unspecified.length} potential stereocenters`} with unspecified configuration.</> : null}
           </p>
         )}
