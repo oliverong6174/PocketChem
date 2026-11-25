@@ -1,4 +1,5 @@
 import { reagentBubbleLabels } from "../utils/reactions/reactionPresentation";
+import { useIncomingMolecule } from "./ui/useIncomingMolecule";
 import { useEffect, useRef, useState } from "react";
 import { MolecularFigure } from "./ui/MolecularFigure";
 import { componentSource } from "../utils/moleculeTransfer";
@@ -1460,8 +1461,10 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
   const [routeChoice, setRouteChoice] = useState<{ source: unknown; index: number }>({ source: null, index: 0 });
   const activeRoute = routeChoice.source === routes ? Math.min(routeChoice.index, Math.max(0, routes.length - 1)) : 0;
 
+  const incoming = useIncomingMolecule({ destination: "multiStep", api: reactantKetcher, ready: recovery !== null && Boolean(reactantKetcher), expectRestore: recovery?.kind === "restored" });
   return (
     <section className={`synthesis-page${isSearching ? " is-searching" : ""}`}>
+{incoming}
       <div className="card synthesis-intro-card">
         <ToolHeader
           group="Synthesize"

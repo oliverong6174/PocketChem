@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useIncomingMolecule } from "./ui/useIncomingMolecule";
 import { MolecularFigure } from "./ui/MolecularFigure";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import { ToolHeader } from "./ui/primitives";
@@ -281,8 +282,10 @@ function OrderedSequencePanel() {
     setStatus("Draw one starting molecule, then build a reagent sequence.");
   }
 
+  const incoming = useIncomingMolecule({ destination: "multiCatalytic", api: ketcher, ready: ketcher !== null, hasWork: branches.length > 0 });
   return (
     <div className="multicatalytic-sequence-mode">
+{incoming}
       <ToolHeader
         group="Synthesize"
         title="Multi-Catalytic Synthesis"

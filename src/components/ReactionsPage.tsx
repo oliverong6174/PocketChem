@@ -1,4 +1,5 @@
 import { reagentBubbleLabels } from "../utils/reactions/reactionPresentation";
+import { useIncomingMolecule } from "./ui/useIncomingMolecule";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MolecularFigure } from "./ui/MolecularFigure";
 import { componentSource } from "../utils/moleculeTransfer";
@@ -1370,8 +1371,10 @@ export default function ReactionsPage({
     setReactionStatus("Structure changed. Predict again when the new input is ready.");
   }, [snapshotTask]);
 
+  const incoming = useIncomingMolecule({ destination: "reactions", api: ketcher, ready: recovery !== null && ketcher !== null && !isAdopting, hasWork: pathways.length > 0, expectRestore: recovery?.kind === "restored" });
   return (
     <section className="card reactions-page-card">
+{incoming}
       <ToolHeader
         group="Synthesize"
         title="Reactions"

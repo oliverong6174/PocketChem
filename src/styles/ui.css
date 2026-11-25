@@ -1425,3 +1425,8 @@ th {
   .mv-title { flex-basis: 100%; order: 3; }
   .mv-tools { flex: 1 1 auto; justify-content: flex-start; }
 }
+
+.mf-incoming { margin: 0 0 12px; padding: 10px 14px; background: var(--surface-raised); color: var(--text); border: 1px solid var(--border-strong); border-left: 4px solid var(--accent); border-radius: var(--radius-md); }
+.mf-incoming.is-warn { border-left-color: var(--status-warn); }
+.mf-incoming p { margin: 0 0 8px; }
+.mf-incoming .button-row { display: flex; gap: 8px; flex-wrap: wrap; }

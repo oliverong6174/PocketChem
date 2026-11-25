@@ -25,6 +25,7 @@ import type { CounterpartCandidate } from "./utils/aromaticCounterparts";
 import { molecularStructureKey } from "./utils/moleculeNameResolver";
 import { ConceptSearch } from "./components/shell/ConceptSearch";
 import { NavigationContext } from "./navigation/NavigationContext";
+import { useIncomingMolecule } from "./components/ui/useIncomingMolecule";
 import { MolecularFigure, MoleculeOriginContext } from "./components/ui/MolecularFigure";
 import type { ConceptDestination } from "./utils/concepts/conceptIndex";
 import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type BiologyToolId, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
@@ -1970,6 +1971,8 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
     await analyzeMolecule();
   }
 
+  const incomingMolecule = useIncomingMolecule({ destination: "analysis", api: window.ketcher ?? null, ready: recovery !== null && activePage === "analysis" && isMainEditorReady && Boolean(window.ketcher), hasWork: Boolean(resultMeta), expectRestore: recovery?.kind === "restored" });
+
   {/*RETURN STATEMENT*/}
 
   return (
@@ -2306,8 +2309,8 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
           role="tabpanel"
         >
           <div className="card molecule-card molecule-card-compact">
-            <header className="pr-editor-header"><h2>Properties</h2><span>{isMainEditorReady ? "Editor ready" : "Loading editor…"}</span></header>
-            <p className="pr-instructions">Draw or name a molecule → Analyze → Explore results</p>
+            <header className="pr-editor-header"><h2>Properties</h2>{isMainEditorReady ? null : <span>Loading editor…</span>}</header>
+            {incomingMolecule}
 
             <div className="drawer-placeholder drawer-placeholder-compact">
               <MoleculeDrawer

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useIncomingMolecule } from "./ui/useIncomingMolecule";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
 import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./SavedAnalysisControls";
@@ -661,8 +662,10 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
   const hideAnswers = practice;
   const correctCount = questions.filter((question) => { const entry = answers[`${question.id}|${signature}`]; return entry?.revealed && entry.choice === question.correct; }).length;
 
+  const incoming = useIncomingMolecule({ destination: "conformations", api: ketcher, ready: recovery !== null && rdkit !== null, expectRestore: recovery?.kind === "restored", load: (t) => loadSource("molfile", t.molfile) });
   return (
     <div className="conf-page">
+{incoming}
       <section className="card conf-input-card">
         <div className="card-header">
           <div>

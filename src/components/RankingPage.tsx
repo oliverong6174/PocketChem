@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useIncomingMolecule } from "./ui/useIncomingMolecule";
 import { MolecularFigure } from "./ui/MolecularFigure";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import {
@@ -631,8 +632,10 @@ export default function RankingPage({ openRequest = null, onOpenHandled }: Ranki
     if (firstMode) setRankingMode(firstMode.id);
   }
 
+  const incoming = useIncomingMolecule({ destination: "acidBase", api: ketcher, ready: recovery !== null && ketcher !== null, expectRestore: recovery?.kind === "restored" });
   return (
     <section className="ranking-page">
+{incoming}
       <div className="ranking-hero">
         <ToolHeader
           group="Analyze"

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useIncomingMolecule } from "./ui/useIncomingMolecule";
 import { MolecularFigure } from "./ui/MolecularFigure";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import { readKetcherStructureSnapshot } from "../utils/ketcherSnapshot";
@@ -1792,8 +1793,10 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
     setActiveTab("proton");
   };
 
+  const incoming = useIncomingMolecule({ destination: "spectroscopy", api: ketcher, ready: recovery !== null && ketcher !== null, expectRestore: recovery?.kind === "restored" });
   return (
     <div className="spectroscopy-page">
+{incoming}
       <section className="card spectroscopy-input-card">
         <ToolHeader
           group="Analyze"
