@@ -31,4 +31,4 @@ dist/
 data/chebi-flat/
 
 # Large uncompressed generated database
-public/data/chemical-names.index.json
+public/data/chemical-names.index.jsonpublic/data/pka-reference.index.json

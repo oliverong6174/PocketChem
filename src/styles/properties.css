@@ -2,7 +2,9 @@
 .main-content:has(.properties-workspace) { max-width: none; }
 .properties-workspace { grid-template-columns: minmax(420px, 0.9fr) minmax(0, 1.2fr); gap: 20px; max-width: none; }
 .properties-workspace > .card { min-width: 0; padding: 18px; border-radius: 10px; box-shadow: none; }
-.properties-workspace .molecule-card-compact { position: sticky; top: 16px; }
+.properties-workspace .molecule-card-compact { position: sticky; top: var(--sticky-top); }
+/* The editor card is taller than a short viewport allows under the header: let it flow so its lower controls stay reachable. */
+@media (max-height: 820px) { .properties-workspace .molecule-card-compact { position: static; } }
 .properties-workspace .analysis-dashboard-card { position: static; max-height: none; overflow: visible; display: block; }
 .properties-workspace .dashboard-panel-scroll { overflow: visible; min-height: auto; padding: 0; }
 .properties-workspace .drawer-placeholder-compact { height: clamp(440px, calc(100dvh - 310px), 760px); max-height: none; }
@@ -49,8 +51,46 @@
 .pr-site-table button { border: 0; background: transparent; color: var(--accent); font: inherit; font-weight: 600; text-align: left; cursor: pointer; padding: 6px 0; }
 .pr-site-table button span { display: block; font-weight: 400; color: var(--text-muted); font-size: .75rem; }
 .pr-site-table .is-selected { background: var(--accent-soft); }
-.pr-site-detail { display: grid; grid-template-columns: minmax(150px, .8fr) minmax(0, 1.3fr); gap: 16px; align-items: start; margin-top: 16px; }
-.pr-site-detail h4 { margin: 0 0 6px; }
+/* Selected-site workspace: the structure and its values stay beside the site table (wide containers) or pinned above it (narrow). */
+.pr-acid-base { container-type: inline-size; }
+.pr-site-workspace { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 12px; align-items: start; }
+.pr-site-workspace > .pr-site-table { margin: 0; order: 2; }
+.pr-site-aside { display: contents; }
+.pr-site-aside > .pr-site-head { order: 1; display: grid; grid-template-columns: minmax(120px, .8fr) minmax(0, 1.2fr); gap: 12px; align-items: start; background: var(--surface, var(--bg, #fff)); padding: 6px 0 8px; border-bottom: 1px solid var(--border); }
+.pr-site-aside > .pr-factors { order: 3; margin: 0; }
+.pr-site-head .pr-depiction svg { max-height: 150px; }
+.pr-site-info { min-width: 0; }
+.pr-site-info h4 { margin: 0 0 4px; }
+.pr-site-info .pr-note { margin: 0 0 6px; }
+@media (min-height: 640px) { .pr-site-aside > .pr-site-head { position: sticky; top: var(--sticky-top); z-index: 2; } }
+@container (min-width: 780px) {
+  .pr-site-workspace { grid-template-columns: minmax(0, 1.25fr) minmax(280px, 1fr); gap: 18px; }
+  .pr-site-workspace > .pr-site-table { grid-column: 1; grid-row: 1; }
+  .pr-site-aside { display: block; grid-column: 2; grid-row: 1; position: sticky; top: var(--sticky-top); max-height: calc(100dvh - var(--sticky-top) - 16px); overflow: auto; padding-right: 2px; }
+  .pr-site-aside > .pr-site-head { position: static; grid-template-columns: minmax(0, 1fr); border-bottom: 0; padding: 0 0 6px; }
+  .pr-site-head .pr-depiction svg { max-height: 220px; }
+  .pr-site-aside > .pr-factors { margin-top: 4px; }
+}
+@media (max-height: 639px) { .pr-site-aside > .pr-site-head { position: static; } }
+@media (max-height: 539px) { @container (min-width: 780px) { .pr-site-aside { position: static; max-height: none; overflow: visible; } } }
+.pr-pka-summary { margin: 6px 0 0; display: grid; gap: 6px; }
+.pr-pka-summary > div { display: grid; gap: 1px; }
+.pr-pka-summary dt { font-size: .74rem; color: var(--text-muted); }
+.pr-pka-summary dd { margin: 0; font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pr-pka-summary dd small { display: block; font-size: .74rem; font-weight: 400; color: var(--text-muted); }
+.pr-pka-experimental dd { color: var(--accent); }
+.pr-pka-value { display: grid; gap: 1px; font-variant-numeric: tabular-nums; }
+.pr-pka-value .pr-pka-range { font-size: .75rem; color: var(--text-muted); }
+.pr-molecular-reference { margin: 10px 0 0; padding: 8px 10px; border-left: 3px solid var(--accent); background: var(--surface-sunken); }
+.pr-molecular-reference h4 { margin: 0 0 4px; font-size: .86rem; }
+.pr-molecular-reference dl { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 22px; }
+.pr-molecular-reference dl > div { display: grid; }
+.pr-molecular-reference dt { font-size: .74rem; color: var(--text-muted); }
+.pr-molecular-reference dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pr-molecular-reference .pr-note { margin: 4px 0 0; }
+.pr-source { margin-top: 10px; }
+.pr-confidence { display: flex; flex-wrap: wrap; gap: 2px 14px; }
+.pr-status-meta { margin-left: 12px; }
 .pr-overview-science { border-bottom: 1px solid var(--border); padding-bottom: 10px; }
 .pr-overview-science h4 { margin: 0 0 6px; font-size: .9rem; }
 .pr-overview-science p { font-size: .82rem; margin: 5px 0; }
@@ -90,9 +130,10 @@
   .properties-workspace .pr-identity { grid-template-columns: 1fr; }
   .properties-workspace .pr-structure-svg { max-width: 240px; }
   .properties-workspace .pr-tiles { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
-  .pr-site-detail { grid-template-columns: 1fr; }
+  .pr-site-aside > .pr-site-head { grid-template-columns: minmax(96px, .7fr) minmax(0, 1.3fr); }
+  .pr-site-head .pr-depiction svg { max-height: 110px; }
   .pr-site-table td:nth-child(2)::before { content: "Behavior: "; }
-  .pr-site-table td:nth-child(3)::before { content: "Est. pKa: "; }
+  .pr-site-table td:nth-child(3)::before { content: "Estimated pKa: "; }
   .pr-site-table td:nth-child(4)::before { content: "Confidence: "; }
   .pr-site-table td:nth-child(5)::before { content: "Rank: "; }
   .pr-site-table button { min-height: 44px; }
@@ -103,15 +144,23 @@
 /* Concepts: the molecule and the selected concept's information stay side by side. */
 .pr-concept-split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
 .pr-concept-split:has(.pr-concept-visual) { grid-template-columns: minmax(260px, 1.1fr) minmax(0, 1fr); }
-.pr-concept-visual { position: sticky; top: 16px; margin: 0; }
+.pr-concept-visual { margin: 0; position: static; }
+/* Desktop: pinned below the measured header and bounded by the split container; short viewports let it flow. */
+@media (min-width: 1281px) and (min-height: 700px) {
+  .pr-concept-visual { position: sticky; top: var(--sticky-top); }
+  .pr-concept-visual .highlighted-molecule-svg svg { max-height: calc(100dvh - var(--sticky-top) - 32px); }
+}
 .pr-concept-visual .highlight-preview { margin: 0; }
 .pr-concept-info { min-width: 0; }
 .pr-concept-info .annotation-summary { margin-top: 0; }
-/* Stacked widths: the molecule stays pinned (compact) above the selected-concept information. */
+/* Stacked widths: the molecule is pinned (compact) below the header only when the viewport is tall enough
+   to also show the concept card; otherwise it flows in the document. */
 @media (max-width: 1280px) {
   .pr-concept-split:has(.pr-concept-visual) { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .pr-concept-visual { top: 0; z-index: 2; background: var(--surface, var(--bg, #fff)); padding-bottom: 4px; }
   .pr-concept-visual .highlighted-molecule-svg svg { max-height: 240px; }
+}
+@media (max-width: 1280px) and (min-height: 760px) {
+  .pr-concept-visual { position: sticky; top: var(--sticky-top); z-index: 2; background: var(--surface, var(--bg, #fff)); padding-bottom: 6px; border-bottom: 1px solid var(--border); }
 }
 @media (max-width: 600px) { .pr-concept-visual .highlighted-molecule-svg svg { max-height: 200px; } }
 .molecule-name-choices { list-style: none; margin: 6px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
