@@ -291,5 +291,5 @@ export function describeMulticatalyticAnalysis(
   ];
   if (failed > 0) parts.push(`${failed} step${failed === 1 ? "" : "s"} not completed`);
   parts.push(`${live} molecule${live === 1 ? "" : "s"} in inventory`);
-  return parts.join(" · ");
+  return parts.join(", ");
 }

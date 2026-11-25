@@ -136,5 +136,5 @@ export function describePropertiesAnalysis(
   const groups = data.functionalGroups.length;
   const centers = data.chiralityResults.length;
   const reactions = data.reactionPathways.length;
-  return `${name}${formula ? ` (${formula})` : ""} · ${groups} functional group${groups === 1 ? "" : "s"}, ${centers} stereo result${centers === 1 ? "" : "s"}, ${reactions} predicted reaction${reactions === 1 ? "" : "s"}`;
+  return `${name}${formula ? ` (${formula})` : ""}, ${groups} functional group${groups === 1 ? "" : "s"}, ${centers} stereo result${centers === 1 ? "" : "s"}, ${reactions} predicted reaction${reactions === 1 ? "" : "s"}`;
 }

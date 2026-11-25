@@ -115,7 +115,7 @@ export function torsionConformers(graph: ConformationGraph, setup: TorsionSetup)
 
 function torsionDescriptor(graph: ConformationGraph, setup: TorsionSetup, rotation: number): string {
   const cls = classify(graph, setup, rotation);
-  return `${Math.round(wrap360(rotation))}° · ${cls.name}`;
+  return `${Math.round(wrap360(rotation))}°, ${cls.name}`;
 }
 
 function torsionReason(graph: ConformationGraph, setup: TorsionSetup, rotation: number): string {

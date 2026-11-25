@@ -156,5 +156,5 @@ export function describeSpectroscopyAnalysis(
   const who = data.name || data.smiles;
   const formula = data.formula ? ` (${data.formula})` : "";
   const { ir, protonNMR, carbonNMR, massSpec } = data.result;
-  return `${who}${formula} · predicted IR ${ir.length} bands, ¹H ${protonNMR.length} signals, ¹³C ${carbonNMR.length} signals, MS ${massSpec?.peaks.length ?? 0} peaks`;
+  return `${who}${formula}, predicted IR ${ir.length} bands, ¹H ${protonNMR.length} signals, ¹³C ${carbonNMR.length} signals, MS ${massSpec?.peaks.length ?? 0} peaks`;
 }

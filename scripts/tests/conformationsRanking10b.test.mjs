@@ -175,7 +175,7 @@ describe("torsion ranking", () => {
     const graph = graphOf("CCCC");
     const result = R.compareEntries(entries(graph, 1, 2, [0, 60, 180, 300]), { graph, molecule: graph.smiles, chairFor: () => null });
     assert.ok(result.ok, result.reason);
-    assert.deepEqual(result.ranked.map((r) => r.descriptor.split(" · ")[1]), ["anti", "gauche", "gauche", "fully eclipsed"]);
+    assert.deepEqual(result.ranked.map((r) => r.descriptor.split(", ")[1]), ["anti", "gauche", "gauche", "fully eclipsed"]);
     assert.deepEqual(result.ranked.map((r) => r.rank), [1, 2, 2, 4]);
     assert.equal(result.ranked[1].tied, true);
     assert.match(result.ranked[1].reason, /gauche CH₃\/CH₃/);

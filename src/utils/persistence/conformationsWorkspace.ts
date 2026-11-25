@@ -192,11 +192,11 @@ export function describeConformationsAnalysis(data: Pick<ConformationsWorkspaceR
       ? `${data.chair.preferred} favoured by ${data.chair.deltaKcal?.toFixed(2)} kcal/mol (additive A-values)`
       : data.chair.preferenceKind === "unassessed" ? "stability not assessed"
       : data.chair.preferenceKind === "equivalent-by-symmetry" ? "chairs equivalent by symmetry" : "no substituents";
-    return `${data.smiles} · cyclohexane chair, ${data.chair.showing} · ${pref}`;
+    return `${data.smiles}, cyclohexane chair, ${data.chair.showing}, ${pref}`;
   }
   if (data.torsion) {
     const energy = data.torsion.quantified && data.torsion.relativeKJ !== null ? `${data.torsion.relativeKJ.toFixed(1)} kJ/mol above the lowest` : "no numeric energy";
-    return `${data.smiles} · ${data.mode === "sawhorse" ? "sawhorse" : "Newman"} about atoms ${data.torsion.front}–${data.torsion.rear}, ${data.torsion.name} at ${data.torsion.rotation.toFixed(0)}° · ${energy}`;
+    return `${data.smiles}, ${data.mode === "sawhorse" ? "sawhorse" : "Newman"} about atoms ${data.torsion.front}–${data.torsion.rear}, ${data.torsion.name} at ${data.torsion.rotation.toFixed(0)}°, ${energy}`;
   }
   return data.smiles;
 }

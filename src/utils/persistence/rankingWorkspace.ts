@@ -130,5 +130,5 @@ export function describeRankingAnalysis(results: Pick<RankingWorkspaceResults, "
   const smiles = results.molecules.map((molecule) => molecule.smiles).join(", ");
   const shown = smiles.length > 90 ? `${smiles.slice(0, 87)}…` : smiles;
   const action = mode?.direction === "none" ? "compared" : "ranked";
-  return `${count} molecule${count === 1 ? "" : "s"} (${shown}) · ${action} by ${mode?.label ?? modeId}`;
+  return `${count} molecule${count === 1 ? "" : "s"} (${shown}), ${action} by ${mode?.label ?? modeId}`;
 }

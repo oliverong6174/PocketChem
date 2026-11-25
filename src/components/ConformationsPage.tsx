@@ -50,7 +50,6 @@ import {
   reverseView,
   setupTorsion,
   strainEnergyKJ,
-  TORSION_ENGINE_VERSION,
   type TorsionSetup,
 } from "../utils/conformations/torsion";
 import { chairNotes, chairQuestions, torsionNotes, torsionQuestions, type Question } from "../utils/conformations/guide";
@@ -228,7 +227,7 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
   // ---- loading a molecule ---------------------------------------------------------------------
   function loadSource(kind: "smiles" | "molfile", text: string, preferredMode?: ConformationsMode, announce = true): boolean {
     if (!rdkit) {
-      setError("The chemistry engine is still loading. Try again in a moment.");
+      setError("The structure tools are still loading. Try again in a moment.");
       return false;
     }
     const built = buildConformationGraph(rdkit, text);
@@ -761,7 +760,7 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
                   </Callout>
                 ) : chairModel?.status === "needs-choice" ? (
                   <Callout tone="warn" title="The input does not say which substituents are on the same face of the ring.">
-                    <p>PocketChem will not guess. Choose the arrangement below (or enter stereochemistry in the SMILES / draw wedge bonds) to see the chairs.</p>
+                    <p>Stereochemistry is not specified. Choose an arrangement below, or draw wedge bonds, to see the chairs.</p>
                     {chairModel.unresolved.map((atom) => {
                       const slot = chairModel.slots.find((s) => s.ringAtom === atom && !s.isHydrogen);
                       const current = state.chair.choices[String(atom)];
@@ -1034,7 +1033,7 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
             ) : (
               <ul>{ENERGY_MODEL.references.map((reference) => <li key={reference}>{reference}</li>)}</ul>
             )}
-            <p>Engine versions: chair {CONFORMATIONS_ENGINE_VERSION}, torsion {TORSION_ENGINE_VERSION}. Tetrahedral configuration is taken from the input only; substituents without stereo information are never assigned one.</p>
+            <p>Tetrahedral configuration is taken from the input only; substituents without stereo information are never assigned one.</p>
           </details>
         </section>
       )}

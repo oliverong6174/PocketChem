@@ -235,7 +235,7 @@ describe("reactions saved analyses", () => {
     const library = makeLibrary(backend);
     const saved = ok(await library.save("reactions", reactionsSave("forward")));
     assert.equal(saved.status, "forward-found");
-    assert.match(saved.summary, /^\(2S\)-2-bromobutane · \d+ predicted reactions?, \d+ no-reaction outcomes?$/);
+    assert.match(saved.summary, /^\(2S\)-2-bromobutane, \d+ predicted reactions?, \d+ no-reaction outcomes?$/);
     const opened = ok(await makeLibrary(backend).open(saved.id));
     const data = opened.results.data;
     assert.deepEqual(data, clone(reactionsData("forward")));

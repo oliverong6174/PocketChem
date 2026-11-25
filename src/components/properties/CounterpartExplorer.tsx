@@ -28,7 +28,7 @@ export function CounterpartExplorer({ smiles, resolution, onApply, onRestore }: 
       if (token !== request.current) return;
       setSelection(0);
       setPreview({ search: found, original: { ket, smiles, key, resolution } });
-      setMessage(found.candidates.length ? `${found.candidates.length} validated comparison${found.candidates.length===1?"":"s"}. Review changes before applying.` : found.reason);
+      setMessage(found.candidates.length ? `${found.candidates.length} comparison${found.candidates.length===1?"":"s"} found.` : found.reason);
     } catch (error) { setMessage(error instanceof Error ? error.message : "Comparison could not be generated."); }
     finally { setBusy(false); }
   }
@@ -53,15 +53,14 @@ export function CounterpartExplorer({ smiles, resolution, onApply, onRestore }: 
   return <section className="pr-counterparts" aria-label="Aromaticity counterpart explorer" data-testid="pr-counterparts">
     <h4>Explore a related ring structure</h4>
     <div className="button-row"><button type="button" className="secondary-button" disabled={busy} onClick={() => void search("aromatic")}>Find aromatic counterpart</button><button type="button" className="secondary-button" disabled={busy} onClick={() => void search("antiaromatic")}>Find antiaromatic counterpart</button>{restore ? <button type="button" className="secondary-button" disabled={busy} onClick={() => void restoreOriginal()}>Restore original</button> : null}</div>
-    <p className="pr-note">Bounded structural comparisons of isolated carbon rings. Preview first; edit cost does not predict stability or a chemical reaction.</p>
     {busy ? <p role="status">Validating structure…</p> : <p role="status" className="pr-note" data-testid="pr-counterpart-status">{message}</p>}
     {currentPreview && preview && candidate ? <section className="pr-counterpart-preview" aria-label="Counterpart preview" data-testid="pr-counterpart-preview">
-      <h4>Compare before applying</h4>
-      {preview.search.candidates.length > 1 ? <fieldset><legend>Validated candidates, ordered by edit cost</legend>{preview.search.candidates.map((c,i) => <label key={c.id}><input type="radio" name="counterpart-candidate" checked={selection===i} onChange={() => setSelection(i)} />Candidate {i+1}, cost {c.cost}, atom {c.atomIndex+1}</label>)}</fieldset> : null}
+      <h4>Compare before applying</h4><p className="pr-note">A structural comparison, not a predicted reaction product.</p>
+      {preview.search.candidates.length > 1 ? <fieldset><legend>Candidates, fewest changes first</legend>{preview.search.candidates.map((c,i) => <label key={c.id}><input type="radio" name="counterpart-candidate" checked={selection===i} onChange={() => setSelection(i)} />Candidate {i+1}, atom {c.atomIndex+1}</label>)}</fieldset> : null}
       <div className="pr-comparison-structures"><MolecularDepiction structure={preview.original.smiles} label="Original structure" indices={false} /><MolecularDepiction structure={candidate.molfile} atoms={[candidate.atomIndex]} label="Proposed structure with the edited carbon highlighted" indices={false} /></div>
       <table className="pr-table"><caption>Local changes at atom {candidate.atomIndex+1}; other atoms and connectivity preserved</caption><thead><tr><th scope="col">Property</th><th scope="col">Original</th><th scope="col">Proposed</th></tr></thead><tbody><tr><th scope="row">Formal charge at edited carbon</th><td>{candidate.originalCharge}</td><td>{candidate.proposedCharge}</td></tr><tr><th scope="row">Hydrogens at edited carbon</th><td>{candidate.originalHydrogens}</td><td>{candidate.proposedHydrogens}</td></tr><tr><th scope="row">System π electrons</th><td>{candidate.piBefore ?? "Unassigned"}</td><td>{candidate.piAfter}</td></tr><tr><th scope="row">Conjugation</th><td>{candidate.conjugationBefore}</td><td>{candidate.conjugationAfter}</td></tr><tr><th scope="row">Bond-order changes</th><td colSpan={2}>{candidate.bondOrderChanges}; heavy-atom connectivity preserved</td></tr></tbody></table>
       <p className="pr-comparison-assumption">{candidate.assumptions}</p>
-      <details className="pr-why"><summary>What “closest” means (edit cost {candidate.cost})</summary><p>{preview.search.criterion}</p><code>{candidate.smiles}</code></details>
+      <details className="pr-why"><summary>How the candidate was chosen</summary><p>{preview.search.criterion}</p><code>{candidate.smiles}</code></details>
       <div className="button-row"><button className="primary-button" type="button" disabled={busy} onClick={() => void apply()}>Apply to editor</button><button className="secondary-button" type="button" disabled={busy} onClick={() => { request.current++; setPreview(null); setMessage("Preview cancelled. Drawing unchanged."); }}>Cancel</button></div>
     </section> : null}
   </section>;

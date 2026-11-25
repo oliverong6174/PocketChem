@@ -208,7 +208,7 @@ describe("spectroscopy saved analyses", () => {
     const backend = new store.MemoryBackend();
     const library = makeLibrary(backend);
     const saved = ok(await library.save("spectroscopy", spectroSave()));
-    assert.match(saved.summary, /^ethanol \(C2H6O\) · predicted IR \d+ bands, ¹H \d+ signals, ¹³C \d+ signals, MS \d+ peaks$/);
+    assert.match(saved.summary, /^ethanol \(C2H6O\), predicted IR \d+ bands, ¹H \d+ signals, ¹³C \d+ signals, MS \d+ peaks$/);
 
     const opened = ok(await makeLibrary(backend).open(saved.id));
     const data = opened.results.data;

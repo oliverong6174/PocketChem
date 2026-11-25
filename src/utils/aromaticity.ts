@@ -74,16 +74,16 @@ function systemDetails(graph: AromaticGraph, cycles: number[][], index: number):
   const conjugated = contributions.every((c) => c.electrons !== null && !(c.electrons === 0 && graph.atoms[c.atom].charge === 0));
   let classification: AromaticClassification = "uncertain";
   let geometry = "Planarity is not established by a 2D structure.";
-  let explanation = "RDKit does not mark this ring system aromatic. Geometry or electron contributions need additional evidence; no antiaromaticity is inferred.";
+  let explanation = "This ring system is not aromatic as drawn. Geometry or electron contributions would need additional evidence; no antiaromaticity is inferred.";
   let conjugation = conjugated ? "Cyclic p-orbital connectivity supported" : "Cyclic conjugation interrupted or unsupported";
   if (invalid) {
     piElectrons = null;
     explanation = "A wildcard or radical in this ring prevents a supported electron and spin assignment.";
   } else if (allAromatic) {
     classification = "aromatic";
-    conjugation = "Aromatic conjugation perceived by RDKit";
-    geometry = "Planar conjugated model implicit in RDKit aromaticity; no 3D geometry measurement.";
-    explanation = cycles.length > 1 ? "RDKit perceives aromaticity in this fused system. Count shared atoms once; individual ring flags are shown separately. A global 4n+2 test is not applied to arbitrary fused topologies." : "RDKit perceives an aromatic cyclic system. The supported electron count is interpreted with heteroatom and charge contributions.";
+    conjugation = "Aromatic conjugation";
+    geometry = "Planar conjugated system assumed; geometry is not measured from the 2D drawing.";
+    explanation = cycles.length > 1 ? "This fused system is aromatic. Count shared atoms once; individual ring flags are shown separately. A global 4n+2 test is not applied to arbitrary fused topologies." : "This is an aromatic cyclic system. The supported electron count is interpreted with heteroatom and charge contributions.";
   } else if (someAromatic) {
     classification = "mixed"; piElectrons = null;
     explanation = "This fused system contains aromatic and other ring regions. One electron total would obscure their different environments.";
@@ -127,5 +127,5 @@ export async function analyzeAromaticity(structure: string): Promise<Aromaticity
   }
   const systems = pending.map((cycles,i) => systemDetails(graph,cycles,i));
   const counts = systems.reduce<Record<string,number>>((acc,s) => { acc[s.classification] = (acc[s.classification] ?? 0)+1; return acc; },{});
-  return { systems, summary: systems.length ? `${systems.length} ring system${systems.length===1?"":"s"} · ${Object.entries(counts).map(([k,v]) => `${v} ${k}`).join(" · ")}` : "No rings detected. Aromaticity requires a cyclic system.", model: "RDKit aromaticity + bounded planar teaching models", limitations: ["Aromaticity is model dependent. RDKit supplies aromatic flags and a smallest-ring basis, not an experimental measurement or all possible cycles.", "A 2D drawing does not determine 3D planarity, spin, stability or reaction feasibility. Antiaromatic labels are explicitly conditional.", "Electron totals are withheld for unsupported heteroatoms, radicals, wildcard ring atoms, mixed systems and exocyclic π interactions. Fused-system totals are not sums of individual rings."] };
+  return { systems, summary: systems.length ? `${systems.length} ring system${systems.length===1?"":"s"}: ${Object.entries(counts).map(([k,v]) => `${v} ${k}`).join(", ")}` : "No rings detected. Aromaticity requires a cyclic system.", model: "RDKit aromaticity + bounded planar teaching models", limitations: ["Aromaticity is model dependent. RDKit supplies aromatic flags and a smallest-ring basis, not an experimental measurement or all possible cycles.", "A 2D drawing does not determine 3D planarity, spin, stability or reaction feasibility. Antiaromatic labels are explicitly conditional.", "Electron totals are withheld for unsupported heteroatoms, radicals, wildcard ring atoms, mixed systems and exocyclic π interactions. Fused-system totals are not sums of individual rings."] };
 }

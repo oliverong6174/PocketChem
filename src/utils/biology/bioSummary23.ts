@@ -75,7 +75,7 @@ export function summarizeMembrane(i: MembraneInputs): BiologyResults | null {
 }
 export function describeMembrane(i: MembraneInputs): string {
   const s = summarizeMembrane(i);
-  return `Membranes · ${i.section}: ${s?.headline[0] ?? ""}`.slice(0, 300);
+  return `Membranes, ${i.section}: ${s?.headline[0] ?? ""}`.slice(0, 300);
 }
 
 export function summarizeSignaling(i: SignalingInputs): BiologyResults | null {
@@ -122,5 +122,5 @@ export function summarizeNeuron(i: NeuronInputs): BiologyResults | null {
 }
 export function describeNeuron(i: NeuronInputs): string {
   const s = summarizeNeuron(i);
-  return `Neuron · ${i.section}: ${s?.headline[0] ?? ""}`.slice(0, 300);
+  return `Neuron, ${i.section}: ${s?.headline[0] ?? ""}`.slice(0, 300);
 }

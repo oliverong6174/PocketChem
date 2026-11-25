@@ -205,9 +205,9 @@ export function describeReactionsAnalysis(
   const who = data.inputName || data.smiles;
   if (data.mode === "retrosynthesis") {
     const routes = data.retroPathways.length;
-    return `${who} · ${routes} precursor route${routes === 1 ? "" : "s"}`;
+    return `${who}, ${routes} precursor route${routes === 1 ? "" : "s"}`;
   }
   const reactions = data.pathways.length;
   const none = data.noReactionOutcomes.length;
-  return `${who} · ${reactions} predicted reaction${reactions === 1 ? "" : "s"}, ${none} no-reaction outcome${none === 1 ? "" : "s"}`;
+  return `${who}, ${reactions} predicted reaction${reactions === 1 ? "" : "s"}, ${none} no-reaction outcome${none === 1 ? "" : "s"}`;
 }

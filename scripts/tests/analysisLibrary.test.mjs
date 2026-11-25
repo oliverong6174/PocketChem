@@ -234,7 +234,7 @@ describe("library operations", () => {
     const saved = ok(await library.save("synthesis", parts()));
     assert.equal(saved.page, "synthesis");
     assert.equal(saved.status, "found");
-    assert.match(saved.summary, /p-cresol \+ bromomethane → 4-methylanisole · 1 verified route/);
+    assert.match(saved.summary, /p-cresol \+ bromomethane → 4-methylanisole, 1 verified route/);
 
     const restarted = makeLibrary(store.createIndexedDbBackends(factory).analyses);
     const listed = ok(await restarted.list());
@@ -713,8 +713,8 @@ describe("Synthesis and navigation integration", () => {
 
   test("[summary] the list line says what was found, how, and whether it is a snapshot", () => {
     const data = realResults.data;
-    assert.match(synthesis.describeSynthesisAnalysis(data, "found", false), /^p-cresol \+ bromomethane → 4-methylanisole · 1 verified route, shortest \d+ steps?$/);
-    assert.match(synthesis.describeSynthesisAnalysis(data, "found-interrupted", true), /search stopped early · snapshot of earlier structures$/);
+    assert.match(synthesis.describeSynthesisAnalysis(data, "found", false), /^p-cresol \+ bromomethane → 4-methylanisole, 1 verified route, shortest \d+ steps?$/);
+    assert.match(synthesis.describeSynthesisAnalysis(data, "found-interrupted", true), /search stopped early, snapshot of earlier structures$/);
     assert.match(synthesis.describeSynthesisAnalysis({ ...data, routes: [] }, "no-route-within-budget", false), /no route found$/);
   });
 });

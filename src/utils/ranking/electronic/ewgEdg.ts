@@ -86,12 +86,12 @@ export function applyEwgEdgMetrics(
 
   metrics.ewgStrength = metric(
     withdrawing ? withdrawing.sigmaP : null,
-    withdrawing ? `${withdrawing.name} · σp +${withdrawing.sigmaP.toFixed(2)}` : "No tabulated electron-withdrawing substituent",
+    withdrawing ? `${withdrawing.name}, σp +${withdrawing.sigmaP.toFixed(2)}` : "No tabulated electron-withdrawing substituent",
     `Strongest withdrawing substituent by ${basis}`,
   );
   metrics.edgStrength = metric(
     donating ? -donating.sigmaP : null,
-    donating ? `${donating.name} · σp ${donating.sigmaP.toFixed(2)}` : "No tabulated electron-donating substituent",
+    donating ? `${donating.name}, σp ${donating.sigmaP.toFixed(2)}` : "No tabulated electron-donating substituent",
     `Strongest donating substituent by ${basis}`,
   );
 

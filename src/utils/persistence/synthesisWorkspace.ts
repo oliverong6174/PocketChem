@@ -172,8 +172,8 @@ export function describeSynthesisAnalysis(
   const best = routes > 0 ? Math.min(...data.routes.map((route) => route.steps.length)) : 0;
   const outcome =
     status === "found" ? `${routes} verified route${routes === 1 ? "" : "s"}, shortest ${best} step${best === 1 ? "" : "s"}`
-    : status === "found-interrupted" ? `${routes} verified route${routes === 1 ? "" : "s"} · search stopped early`
-    : status === "cancelled" ? `${routes} verified route${routes === 1 ? "" : "s"} · search cancelled`
+    : status === "found-interrupted" ? `${routes} verified route${routes === 1 ? "" : "s"}, search stopped early`
+    : status === "cancelled" ? `${routes} verified route${routes === 1 ? "" : "s"}, search cancelled`
     : "no route found";
-  return `${materials} → ${target} · ${outcome}${stale ? " · snapshot of earlier structures" : ""}`;
+  return `${materials} → ${target}, ${outcome}${stale ? ", snapshot of earlier structures" : ""}`;
 }

@@ -277,7 +277,7 @@ describe("Saved Analyses library", () => {
   test("the description counts molecules, completed steps and steps that did not complete", () => {
     assert.equal(
       mc.describeMulticatalyticAnalysis(resultsFor(withFailures)),
-      "3 starting molecules · 1 completed step · 3 steps not completed · 3 molecules in inventory",
+      "3 starting molecules, 1 completed step, 3 steps not completed, 3 molecules in inventory",
     );
   });
 

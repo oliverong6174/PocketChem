@@ -144,7 +144,7 @@ export function SequenceRoutePanel({ overview, selectedIndex, onSelect, nameOf, 
             {" "}{overview.fullyReacted} {overview.fullyReacted === 1 ? "reacts" : "react"} at every step{overview.withUnresolved > 0 ? `, ${overview.withUnresolved} stop${overview.withUnresolved === 1 ? "s" : ""} at a step that gave no product` : ""}.
           </Fact>
         </dl>
-        <p className="mc-caveat">Outcomes are rule-based model predictions ordered by the engine ({branch.rankingBasis === "heuristic-selectivity-estimate" ? "heuristic selectivity estimates" : "original engine order, no selectivity estimate"}); no yields or feasibility are computed.</p>
+        <p className="mc-caveat">Rule-based predictions, ordered by {branch.rankingBasis === "heuristic-selectivity-estimate" ? "estimated selectivity" : "rule order, with no selectivity estimate"}. Yields and feasibility are not computed.</p>
       </section>
 
       <section aria-labelledby="mc-alt" className="mc-alternatives" data-testid="mc-alternatives">

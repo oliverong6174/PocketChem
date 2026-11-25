@@ -157,7 +157,7 @@ export default function AminoAcidsPage({ openRequest = null, onOpenHandled }: Pr
           { label: "Change the pH or build a chain", detail: "Charges and the peptide bond update with the structure." },
           { label: "Practise or predict", detail: "Hide labels, answer questions, or predict a charge change." },
         ]}
-        aside={<Badge tone="neutral" title="Textbook pKa and hydropathy values, structures drawn with RDKit.">Reference values</Badge>}
+        aside={<Badge tone="neutral" title="Textbook pKa and hydropathy values.">Reference values</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

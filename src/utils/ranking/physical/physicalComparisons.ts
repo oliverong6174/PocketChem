@@ -76,7 +76,7 @@ export function applyPhysicalMetrics(
   metrics.solubility = solubility
     ? metric(
         solubility.waterSolubilityScore,
-        `${solubility.tendency} · score ${solubility.waterSolubilityScore.toFixed(1)}`,
+        `${solubility.tendency}, score ${solubility.waterSolubilityScore.toFixed(1)}`,
         solubility.explanation,
         solubility.factors,
         // The coarse score decides first; equal scores fall back to hydrophobicity (lower Crippen logP = more water-soluble, the
@@ -102,7 +102,7 @@ export function applyPhysicalMetrics(
   metrics.polarity = metric(
     polarityScore,
     descriptors.tpsa !== null
-      ? `TPSA ${descriptors.tpsa.toFixed(1)} Å²${descriptors.logP !== null ? ` · logP ${descriptors.logP.toFixed(2)}` : ""}`
+      ? `TPSA ${descriptors.tpsa.toFixed(1)} Å²${descriptors.logP !== null ? `, logP ${descriptors.logP.toFixed(2)}` : ""}`
       : `polarity proxy ${polarityScore.toFixed(1)}`,
     "Higher TPSA/charge and lower hydrophobicity increase this qualitative polarity score.",
   );
@@ -118,7 +118,7 @@ export function applyPhysicalMetrics(
   const hbScore = (descriptors.hbd ?? 0) * 2 + (descriptors.hba ?? 0);
   metrics.hydrogenBonding = metric(
     hbScore,
-    `${descriptors.hbd ?? 0} donor(s) · ${descriptors.hba ?? 0} acceptor(s)`,
+    `${descriptors.hbd ?? 0} donor(s), ${descriptors.hba ?? 0} acceptor(s)`,
     "Donors receive extra weight because they contribute directly to intermolecular hydrogen-bond donation.",
   );
   const dipoleScore = polarityScore + strongestEwg.score * 4 + carbonyl.score * 3;

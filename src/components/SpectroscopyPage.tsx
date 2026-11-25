@@ -2097,7 +2097,7 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
                 )}
                 <div className="spectroscopy-notes">
                   <p><strong>Two-way linking:</strong> tap an assigned IR band to highlight its molecular vibration, or tap an atom/bond in the molecule to select the corresponding band and card. Repeated taps cycle through multiple bands associated with the same molecular site.</p>
-                  <p><strong>Functional-group region:</strong> 4000–1500 cm⁻¹. The engine applies characteristic stretches plus modifiers such as hydrogen bonding, conjugation, ring strain, resonance donation, overlap suppression, and symmetry suppression.</p>
+                  <p><strong>Functional-group region:</strong> 4000–1500 cm⁻¹. Characteristic stretches are adjusted for effects such as hydrogen bonding, conjugation, ring strain, resonance donation, overlapping bands and symmetry.</p>
                   <p><strong>Fingerprint region:</strong> below 1500 cm⁻¹. Named bands are combined with deterministic, complexity-weighted skeletal/bending modes; the 650–1350 cm⁻¹ region is intentionally more crowded while major diagnostic bands remain visible.</p>
                 </div>
                 <IrTable peaks={result.ir} selectedPeak={selectedIrPeak} onSelectPeak={handleIrPeakSelect} />

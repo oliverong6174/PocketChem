@@ -109,7 +109,7 @@ export default function CellDivisionPage({ openRequest = null, onOpenHandled, on
       <ToolHeader
         group="Genetics & cell division"
         title="Mitosis & meiosis"
-        purpose="Follow the chromosomes of a small cell through mitosis and meiosis. Every cell, chromosome and chromatid on the diagram comes from the process engine, so the counts, the allele combinations and the effect of a crossover or a nondisjunction are the real consequences of the choices you make."
+        purpose="Follow the chromosomes of a small cell through mitosis and meiosis. Counts, allele combinations and the effect of a crossover or nondisjunction follow from the choices you make."
         evidence="model"
         steps={[
           { label: "Choose a genotype and a process", detail: "Mitosis, or meiosis with your own settings." },

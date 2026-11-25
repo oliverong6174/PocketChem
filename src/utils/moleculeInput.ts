@@ -322,7 +322,7 @@ async function fromName(
     smiles: normalized?.smiles ?? resolution.smiles,
     components,
     nameResolution: resolution,
-    label: resolution.molecularFormula ? `${label} · ${resolution.molecularFormula}` : label,
+    label: resolution.molecularFormula ? `${label}, ${resolution.molecularFormula}` : label,
     notes,
   };
 }
