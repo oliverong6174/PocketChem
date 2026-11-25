@@ -926,7 +926,7 @@ button:disabled {
 
 .acid-base-drawer-card {
   position: sticky;
-  top: 18px;
+  top: var(--sticky-top);
 }
 
 .acid-base-ketcher-box {
@@ -1069,7 +1069,7 @@ body,
 .molecule-card-compact,
 .analysis-dashboard-card {
   position: sticky;
-  top: 18px;
+  top: var(--sticky-top);
 }
 
 .drawer-placeholder-compact {
@@ -1999,15 +1999,15 @@ body,
 
 .spectroscopy-input-card {
   position: sticky;
-  top: 18px;
+  top: var(--sticky-top);
   display: flex;
   flex-direction: column;
   /* Keep Ketcher at its normal geometry. On shorter desktop viewports, scroll
      only the spectroscopy input card instead of squeezing Ketcher's canvas and
      toolbars. This keeps the results column stationary while the ring palette
      remains reachable from the left panel. */
-  max-height: calc(100vh - 36px);
-  max-height: calc(100dvh - 36px);
+  max-height: calc(100vh - var(--sticky-top) - 18px);
+  max-height: calc(100dvh - var(--sticky-top) - 18px);
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior-y: contain;
@@ -2563,7 +2563,7 @@ body,
 
 .ranking-editor-card {
   position: sticky;
-  top: 18px;
+  top: var(--sticky-top);
   padding: 18px;
 }
 
@@ -3161,4 +3161,13 @@ body,
   .saved-item-actions {
     justify-content: flex-start;
   }
+}
+
+/* Sticky editor cards are only useful when they fit under the header; on short viewports they flow normally
+   so their lower controls are always reachable by scrolling. */
+@media (max-height: 760px) {
+  .acid-base-drawer-card,
+  .molecule-card-compact,
+  .analysis-dashboard-card,
+  .ranking-editor-card { position: static; }
 }

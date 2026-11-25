@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { ORGANIC_TOOLS, SUBJECTS, TOOL_GROUPS, type SubjectDef, type SubjectId, type ToolDef } from "../../navigation/subjects";
 import { useTheme } from "../../theme/useTheme";
 import { Icon } from "../ui/Icon";
@@ -42,6 +42,21 @@ export function AppShell({ activeToolId, onSelectTool, onToolKeyDown, tools = OR
   const sheetRef = useDialog<HTMLDivElement>(sheetOpen, () => setSheetOpen(false));
   const subject = SUBJECTS.find((entry) => entry.id === activeSubject) ?? SUBJECTS[0];
   const activeTool = tools.find((tool) => tool.id === activeToolId) ?? tools[0];
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Publish the real height of the sticky header so that sticky content below it
+  // (molecule previews, inspectors) offsets itself from the measured value rather than a guessed one.
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const root = document.documentElement;
+    const publish = () => root.style.setProperty("--shell-h", `${Math.ceil(header.getBoundingClientRect().height)}px`);
+    publish();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(publish);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
@@ -49,7 +64,7 @@ export function AppShell({ activeToolId, onSelectTool, onToolKeyDown, tools = OR
         Skip to tool workspace
       </a>
 
-      <header className="shell">
+      <header className="shell" ref={headerRef}>
         <div className="shell-bar">
           <a aria-label="PocketChem home" className="brand" href="/" onClick={(event) => { event.preventDefault(); onSelectTool(tools[0].id); }}>
             <BrandMark />

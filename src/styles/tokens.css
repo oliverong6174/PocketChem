@@ -251,6 +251,10 @@
 
   /* stacking */
   --z-sticky: 40;
+  /* Measured at runtime from the sticky header (AppShell); this is only the pre-measurement fallback. */
+  --shell-h: 61px;
+  --sticky-gap: 12px;
+  --sticky-top: calc(var(--shell-h) + var(--sticky-gap));
   --z-menu: 60;
   --z-dialog: 80;
   --z-skip: 100;
@@ -292,7 +296,7 @@
 
 html {
   background: var(--bg);
-  scroll-padding-top: 88px;
+  scroll-padding-top: calc(var(--shell-h, 61px) + 16px);
 }
 
 body {

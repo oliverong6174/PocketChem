@@ -793,7 +793,7 @@ th {
   .ui-workspace.has-inspector > .ui-inspector {
     grid-column: auto;
     position: sticky;
-    top: 76px;
+    top: var(--sticky-top);
   }
 }
 
