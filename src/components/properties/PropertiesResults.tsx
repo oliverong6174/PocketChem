@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getCondensedSulfonateSvg } from "../../utils/functionalGroups";
 import type { MoleculeIdentityResult } from "../../utils/nomenclatureUtils";
 import { buildPropertySections, type GroupCount, type PropertyRow, type StereoCenter } from "../../utils/propertiesSections";
-import { findConcreteNameVariants, type MoleculeNameResolution } from "../../utils/moleculeNameResolver";
+import { findConcreteNameVariants, findStereoVariants, type MoleculeNameResolution } from "../../utils/moleculeNameResolver";
 
 interface Shared {
   identity: MoleculeIdentityResult;
@@ -10,12 +10,6 @@ interface Shared {
   groups: readonly GroupCount[];
   stereocenters: readonly StereoCenter[];
 }
-
-const EVIDENCE_LABEL = { calculated: "Calculated", estimate: "Estimate" } as const;
-const EVIDENCE_TITLE = {
-  calculated: "Calculated from the structure; exact for this structure, not a measurement.",
-  estimate: "Qualitative estimate from structural features; heuristic, not a measured value.",
-} as const;
 
 function useStructureSvg(smiles: string): string | null {
   const [state, setState] = useState<{ smiles: string; svg: string | null }>({ smiles: "", svg: null });
@@ -25,10 +19,6 @@ function useStructureSvg(smiles: string): string | null {
     return () => { cancelled = true; };
   }, [smiles]);
   return state.smiles === smiles ? state.svg : null;
-}
-
-function EvidenceTag({ evidence }: { evidence: PropertyRow["evidence"] }) {
-  return <span className={`pr-evidence is-${evidence}`} title={EVIDENCE_TITLE[evidence]}>{EVIDENCE_LABEL[evidence]}</span>;
 }
 
 /** Who this molecule is: structure, name and its confidence, formula, mass and SMILES. Stays above every results tab. */
@@ -45,6 +35,14 @@ export function PropertiesIdentity({ identity, smiles, groups, stereocenters, on
     if (generic && source) void findConcreteNameVariants(source.resolution).then((entries) => { if (!cancelled) setVariantResult({ source, entries }); }).catch(() => {});
     return () => { cancelled = true; };
   }, [generic, source]);
+  const unspecifiedStereo = !generic && stereocenters.some((center) => center.configuration === "unknown");
+  const [stereoResult, setStereoResult] = useState<{ source: typeof source; entries: MoleculeNameResolution[] } | null>(null);
+  const stereoVariants = stereoResult?.source === source ? stereoResult?.entries ?? [] : [];
+  useEffect(() => {
+    let cancelled = false;
+    if (unspecifiedStereo && source) void findStereoVariants(source.resolution).then((entries) => { if (!cancelled) setStereoResult({ source, entries }); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [unspecifiedStereo, source]);
   const name = source?.resolvedName || nomenclature.displayName || nomenclature.estimatedName;
   const sections = useMemo(() => buildPropertySections(identity, groups, stereocenters), [identity, groups, stereocenters]);
   const composition = sections.sections.find((section) => section.id === "composition");
@@ -58,13 +56,14 @@ export function PropertiesIdentity({ identity, smiles, groups, stereocenters, on
       <div className="pr-identity-main">
         <p className="pr-eyebrow">Current molecule</p>
         <h3 className="pr-name">{name}</h3>
-        {source ? <div className="pr-confidence"><strong>Loaded as: {source.resolvedName}</strong> · {source.sourceId} · Identity confidence: {source.confidence}<br />Structure-derived name: {derived.namingStatus === "unsupported" ? "Unavailable" : derived.displayName}<details><summary>Identity provenance</summary><p>Entered: {source.originalQuery}<br />Recognized names: {source.aliases.join("; ")}<br />Source: bundled ChEBI · {source.sourceId}<br />Structure: {source.fullySpecified ? "Specified composition; stereochemistry only as drawn" : "Generic / variable composition"}</p></details></div> : <p className="pr-confidence"><strong>{nomenclature.namingConfidence} confidence</strong> in structure-derived name{nomenclature.commonName && nomenclature.commonName.toLowerCase() !== name.toLowerCase() ? <> · also known as <em>{nomenclature.commonName}</em></> : null}</p>}
+        {source ? <p className="pr-confidence">{derived.namingStatus === "unsupported" ? <>Structure-derived name unavailable · </> : derived.displayName.toLowerCase() !== name.toLowerCase() ? <>Structure-derived name: {derived.displayName} · </> : null}ChEBI {source.sourceId}</p> : <p className="pr-confidence"><strong>{nomenclature.namingConfidence} confidence</strong> in structure-derived name{nomenclature.commonName && nomenclature.commonName.toLowerCase() !== name.toLowerCase() ? <> · also known as <em>{nomenclature.commonName}</em></> : null}</p>}
         <dl className="pr-keyfacts">
           {composition?.rows.filter((row) => ["formula", "mw", "exactMass", "charge"].includes(row.id)).map((row) => (
             <div key={row.id}><dt>{row.label}</dt><dd>{row.value}</dd></div>
           ))}
         </dl>
-        {generic ? <div className="pr-generic" role="note"><strong>Generic structure / chemical family</strong><p>Unspecified substituents or variable composition prevent a unique molecular weight, exact mass, DBE or whole-molecule tendency. Formula, charge, known heavy atoms, ring analysis and detected groups describe the drawn scaffold. R is not an element.</p>{variants.length > 0 ? <details><summary>Choose a concrete database entry</summary><p>These entries match the scaffold. Each is a separate choice.</p>{variants.map((variant) => <button className="secondary-button" type="button" key={variant.sourceId} onClick={() => onLoadVariant?.(variant)} disabled={!onLoadVariant}>{variant.title} · {variant.sourceId}</button>)}</details> : null}</div> : null}
+        {generic ? <div className="pr-generic" role="note"><strong>Generic structure</strong><p>Molecular weight, exact mass and DBE are unavailable: substituents are unspecified (R is not an element).</p>{variants.length > 0 ? <details><summary>Choose a concrete database entry</summary><p>These entries match the scaffold. Each is a separate choice.</p>{variants.map((variant) => <button className="secondary-button" type="button" key={variant.sourceId} onClick={() => onLoadVariant?.(variant)} disabled={!onLoadVariant}>{variant.title} · {variant.sourceId}</button>)}</details> : null}</div> : null}
+        {unspecifiedStereo ? <p className="pr-generic" role="note"><strong>Stereochemistry unspecified.</strong>{stereoVariants.length > 0 ? <> Load a specific isomer: {stereoVariants.map((variant) => <button className="secondary-button" type="button" key={variant.sourceId} onClick={() => onLoadVariant?.(variant)} disabled={!onLoadVariant}>{variant.variantLabel ?? variant.title}</button>)}</> : null}</p> : null}
         <p className="pr-smiles"><span className="pr-eyebrow">SMILES</span> <code>{smiles}</code></p>
       </div>
     </section>
@@ -76,7 +75,6 @@ function Tile({ row, info }: { row: PropertyRow; info: Record<string, string> })
     <div className="pr-tile" data-testid="pr-tile">
       <span className="pr-tile-label">{row.label}</span>
       <strong className="pr-tile-value">{row.value}</strong>
-      <EvidenceTag evidence={row.evidence} />
       {info[row.infoKey] ? <span className="pc-visually-hidden">{info[row.infoKey]}</span> : null}
     </div>
   );
@@ -89,6 +87,8 @@ export function PropertiesSummary({ identity, smiles, groups, stereocenters, inf
   const keyRows = byId("composition")?.rows.filter((row) => ["mw", "heavy"].includes(row.id)) ?? [];
   const descriptors = byId("descriptors");
   const tendencies = byId("tendencies");
+  const assigned = sections.stereocenters.filter((center) => center.configuration !== "unknown");
+  const unspecified = sections.stereocenters.filter((center) => center.configuration === "unknown");
   return (
     <div className="pr-summary" data-testid="pr-summary">
       <section aria-labelledby="pr-key" className="pr-block">
@@ -96,8 +96,8 @@ export function PropertiesSummary({ identity, smiles, groups, stereocenters, inf
         <div className="pr-tiles">
           {descriptors?.rows.filter((row) => ["dbe", "rings"].includes(row.id)).map((row) => <Tile info={info} key={row.id} row={row} />)}
           {keyRows.map((row) => <Tile info={info} key={row.id} row={row} />)}
-          <div className="pr-tile" data-testid="pr-tile"><span className="pr-tile-label">Functional groups</span><strong className="pr-tile-value">{sections.groups.reduce((n, g) => n + g.count, 0)}</strong><span className="pr-evidence is-calculated" title={EVIDENCE_TITLE.calculated}>Detected</span></div>
-          <div className="pr-tile" data-testid="pr-tile"><span className="pr-tile-label">Stereocenters</span><strong className="pr-tile-value">{sections.stereocenters.length}</strong><span className="pr-evidence is-calculated" title={EVIDENCE_TITLE.calculated}>Detected</span></div>
+          <div className="pr-tile" data-testid="pr-tile"><span className="pr-tile-label">Functional groups</span><strong className="pr-tile-value">{sections.groups.reduce((n, g) => n + g.count, 0)}</strong></div>
+          <div className="pr-tile" data-testid="pr-tile"><span className="pr-tile-label">Stereocenters</span><strong className="pr-tile-value">{assigned.length}{unspecified.length > 0 ? ` + ${unspecified.length} unspecified` : ""}</strong></div>
         </div>
       </section>
 
@@ -108,26 +108,27 @@ export function PropertiesSummary({ identity, smiles, groups, stereocenters, inf
             {sections.groups.map((group) => <li className="pr-chip" key={group.name}>{group.name}{group.count > 1 ? <strong> × {group.count}</strong> : null}</li>)}
           </ul>
         )}
-        {sections.stereocenters.length === 0 ? <p className="pr-none">No stereocenter detected.</p> : (
-          <p className="pr-line">Stereocenters: {sections.stereocenters.map((center) => `${center.label} (${center.configuration})`).join(", ")}.</p>
+        {sections.stereocenters.length === 0 ? <p className="pr-none">No stereocenter found.</p> : (
+          <p className="pr-line">
+            {assigned.length > 0 ? <>Stereocenters: {assigned.map((center) => `${center.label} (${center.configuration})`).join(", ")}. </> : null}
+            {unspecified.length > 0 ? <>{unspecified.length === 1 ? "1 potential stereocenter" : `${unspecified.length} potential stereocenters`} with unspecified configuration.</> : null}
+          </p>
         )}
       </section>
 
       {descriptors && descriptors.rows.length > 0 ? (
         <section aria-labelledby="pr-desc" className="pr-block">
-          <h4 id="pr-desc">{descriptors.title} <span className="pr-note">{descriptors.evidenceNote}</span></h4>
+          <h4 id="pr-desc">{descriptors.title}</h4>
           <div className="pr-tiles">{descriptors.rows.filter((row) => !["dbe", "rings"].includes(row.id)).map((row) => <Tile info={info} key={row.id} row={row} />)}</div>
         </section>
       ) : null}
 
       {tendencies && tendencies.rows.length > 0 ? (
         <section aria-labelledby="pr-tend" className="pr-block">
-          <h4 id="pr-tend">{tendencies.title}</h4>
-          <p className="pr-note">{tendencies.evidenceNote}</p>
+          <h4 id="pr-tend">{tendencies.title} <span className="pr-note">· estimated, not measured</span></h4>
           <div className="pr-tiles">{tendencies.rows.map((row) => <Tile info={info} key={row.id} row={row} />)}</div>
         </section>
       ) : null}
-      <p className="pr-note">Reactions predicted for this molecule are listed on the Reactions page; acid/base sites are on the Acid/Base tab.</p>
       <span className="pc-visually-hidden">{smiles}</span>
     </div>
   );
@@ -142,16 +143,15 @@ export function PropertiesDetail({ identity, smiles, groups, stereocenters, info
       {sections.sections.map((section) => (
         <section aria-labelledby={`pr-d-${section.id}`} className="pr-block" key={section.id}>
           <h4 id={`pr-d-${section.id}`}>{section.title}</h4>
-          <p className="pr-note">{section.evidenceNote}</p>
+          {section.id === "tendencies" ? <p className="pr-note">Estimated from structural features; not measured values.</p> : null}
           <table className="pr-table">
             <caption className="pc-visually-hidden">{section.title}</caption>
-            <thead><tr><th scope="col">Property</th><th scope="col">Value</th><th scope="col">Kind</th><th scope="col">What it means</th></tr></thead>
+            <thead><tr><th scope="col">Property</th><th scope="col">Value</th><th scope="col">What it means</th></tr></thead>
             <tbody>
               {section.rows.map((row) => (
                 <tr key={row.id}>
                   <th scope="row">{row.label}</th>
                   <td><strong>{row.value}</strong></td>
-                  <td><EvidenceTag evidence={row.evidence} /></td>
                   <td>
                     {info[row.infoKey] ?? ""}
                     {row.detail ? (
@@ -179,20 +179,14 @@ export function PropertiesDetail({ identity, smiles, groups, stereocenters, info
           {nomenclature.prefixes.length > 0 ? <div><dt>Detected prefixes</dt><dd>{nomenclature.prefixes.join(", ")}</dd></div> : null}
           <div><dt>SMILES</dt><dd><code>{smiles}</code></dd></div>
         </dl>
-        <details className="pr-why">
-          <summary>How this name was decided, and its limits</summary>
-          <p>{nomenclature.explanation}</p>
-          {nomenclature.limitations.length > 0 ? <ul>{nomenclature.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul> : null}
-        </details>
       </section>
 
       {sections.unavailable.length > 0 ? (
         <section aria-labelledby="pr-d-na" className="pr-block" data-testid="pr-unavailable">
           <h4 id="pr-d-na">Not available for this structure</h4>
-          <p className="pr-note">The engine returned no value for: {sections.unavailable.join(", ")}. Nothing was substituted.</p>
+          <p className="pr-note">No value for: {sections.unavailable.join(", ")}.</p>
         </section>
       ) : null}
-      <details className="pr-why"><summary>Calculation notes and limitations</summary><ul>{identity.properties.notes.map((note) => <li key={note}>{note}</li>)}</ul></details>
     </div>
   );
 }

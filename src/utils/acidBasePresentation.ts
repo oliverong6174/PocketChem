@@ -6,7 +6,7 @@ export type SiteRow = {
   range: readonly [number, number]; confidence: string; reasons: Array<{ label: string; text: string }>;
   detail: AcidityResult | BasicityResult;
 };
-/** Preserve complete sentences; full original reasoning is always available separately. */
+/** Keep the first complete sentence of each effect; the engine's full text remains on the result objects. */
 const sentence = (text: string) => text.match(/^.*?[.!?](?:\s|$)/)?.[0].trim() || text;
 const neutral = /^(?:no |little |limited |not |there is no |does not )/i;
 
@@ -23,6 +23,6 @@ export function acidBaseSiteRows(acids: readonly AcidityResult[], bases: readonl
         effects.push({ label: key === "atom" ? "Atom" : key[0].toUpperCase() + key.slice(1), text: sentence(site[key]) });
       }
     }
-    return { ...row, reasons: effects.length ? effects.slice(0, 4) : [{ label: "Site", text: sentence(row.detail.explanation) }] };
+    return { ...row, reasons: effects.length ? effects.slice(0, 5) : [{ label: "Site", text: sentence(row.detail.explanation) }] };
   });
 }
