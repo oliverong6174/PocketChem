@@ -505,6 +505,22 @@ export type MoleculeHighlightRenderOptions = {
   bondWidthMultiplier?: number;
 };
 
+/** Bond index -> [begin atom, end atom], read from the RDKit molecule JSON; empty if unavailable. */
+export function bondEndpointMap(mol: { get_json?: () => string }): Map<number, [number, number]> {
+  const map = new Map<number, [number, number]>();
+  try {
+    const parsed = JSON.parse(mol.get_json?.() ?? "{}") as {
+      molecules?: Array<{ bonds?: Array<{ atoms?: number[] }> }>;
+    };
+    (parsed.molecules?.[0]?.bonds ?? []).forEach((bond, index) => {
+      if (bond.atoms && bond.atoms.length === 2) map.set(index, [bond.atoms[0], bond.atoms[1]]);
+    });
+  } catch {
+    /* highlighting then falls back to the bond alone */
+  }
+  return map;
+}
+
 export async function getHighlightedMoleculeSvg(
   smiles: string,
   atomIndices: number[],
@@ -526,20 +542,31 @@ export async function getHighlightedMoleculeSvg(
   const selectedBonds =
     selectedBondIndex !== null ? [selectedBondIndex] : [];
 
-  const strongAtomIndices = Array.from(
-    new Set([...selectedAtoms, ...selectedSystemAtomIndices])
-  );
-
   const strongBondIndices = Array.from(
     new Set([...selectedBonds, ...selectedSystemBondIndices])
   );
 
-  const allHighlightedAtoms = Array.from(
-    new Set([...atomIndices, ...strongAtomIndices])
-  );
-
   const allHighlightedBonds = Array.from(
     new Set([...bondIndices, ...strongBondIndices])
+  );
+
+  // A highlighted bond always highlights both of its endpoint atoms, so the
+  // participating atoms of the interaction are identifiable (single, double,
+  // triple and aromatic bonds alike). Only the bonds' own endpoints are added.
+  const endpoints = bondEndpointMap(mol);
+  const endpointsOf = (bonds: number[]) =>
+    bonds.flatMap((bondIndex) => endpoints.get(bondIndex) ?? []);
+
+  const strongAtomIndices = Array.from(
+    new Set([
+      ...selectedAtoms,
+      ...selectedSystemAtomIndices,
+      ...endpointsOf(strongBondIndices),
+    ])
+  );
+
+  const allHighlightedAtoms = Array.from(
+    new Set([...atomIndices, ...strongAtomIndices, ...endpointsOf(bondIndices)])
   );
 
   const softAtomColor: [number, number, number] = [0.65, 0.82, 1.0];
