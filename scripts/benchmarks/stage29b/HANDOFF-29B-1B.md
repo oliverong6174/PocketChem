@@ -80,3 +80,14 @@ Regressions all passing (counts as before plus): moleculeInput 38, resolver 6, i
 - `src/utils/**` prose strings were not swept for decorative dots.
 - Saved Analyses are unchanged in format (persistence suites pass); experimental data is recomputed on open, never saved.
 - The index must be rebuilt locally (`node scripts/buildPkaReferenceIndex.mjs`) on a fresh clone; without it the app shows model estimates only.
+
+## 13. Commits (local, not pushed)
+- `fefa46e` feat(highlight): highlight both endpoint atoms of every highlighted bond
+- `eb9906b` fix(layout): offset sticky content from the measured header height
+- `c592590` feat(acid-base): selected-site workspace, estimated pKa and optional IUPAC experimental reference
+- `4dbbecd` style: remove decorative bullet-like separators; compact tendencies heading
+- `b7a2af7` test(29b-1b): pKa reference tests, live check and handoff
+- Final: `.gitignore` repair (the pKa entry had been appended to the ChEBI line; both entries now work), see `git log`.
+
+## 14. Final Git status
+Untracked only: the pre-existing files (`CLAUDE.md`, `scripts/benchmarks/stage9m/rd-probe.mjs`, `scripts/tests/.probe-names.mjs`, `stage5-changes.patch`, `stage5-status.txt`). `public/data/pka-reference.index.json` exists locally and is git-ignored. The `phase1-synthesis-reliability` stash is intact.

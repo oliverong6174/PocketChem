@@ -31,4 +31,7 @@ dist/
 data/chebi-flat/
 
 # Large uncompressed generated database
-public/data/chemical-names.index.jsonpublic/data/pka-reference.index.json
+public/data/chemical-names.index.json
+
+# Optional locally built pKa index (IUPAC dataset, CC BY-NC 4.0): never commit or redistribute commercially
+public/data/pka-reference.index.json
