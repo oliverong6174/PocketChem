@@ -50,6 +50,8 @@ let indexPromise: Promise<RuntimeChemicalNameIndex> | null = null;
 
 export function normalizeChemicalName(value: string) {
   return value
+    // ChEBI stores small-caps/italics as inline markup ("<small>L</small>-leucine", "(2<i>S</i>)-...").
+    .replace(/<\/?(?:small|i|em|b|strong|sub|sup)>/gi, "")
     .trim()
     .toLocaleLowerCase("en-US")
     .replace(/[αΑ]/g, "alpha")
@@ -269,45 +271,136 @@ function materializeRecord(
   };
 }
 
+type AliasChoice = { target: number | null; candidates: number[] };
+
+function isGenericRecord(index: RuntimeChemicalNameIndex, recordIndex: number) {
+  return Boolean(index.records[recordIndex]?.[1].includes("*"));
+}
+
 function resolveAliasTarget(
   index: RuntimeChemicalNameIndex,
   key: string,
   match: AliasTarget,
-): number | null {
-  if (typeof match === "number") return match;
+): AliasChoice {
+  if (typeof match === "number") return { target: match, candidates: [match] };
 
-  const candidates = [...new Set(match)].filter((recordIndex) => Boolean(index.records[recordIndex]));
-  if (candidates.length === 0) return null;
-  if (candidates.length === 1) return candidates[0];
+  let candidates = [...new Set(match)].filter((recordIndex) => Boolean(index.records[recordIndex]));
+  if (candidates.length === 0) return { target: null, candidates };
+  // A residue or variable-composition entry ("L-leucine residue", "*N[C@@H](...)C(*)=O") borrows the
+  // free amino acid's synonym; the name of the free molecule must not be ambiguous with it.
+  const concrete = candidates.filter((recordIndex) => !isGenericRecord(index, recordIndex));
+  if (concrete.length > 0) candidates = concrete;
+  if (candidates.length === 1) return { target: candidates[0], candidates };
 
   const preferredMatches = candidates.filter(
     (recordIndex) => normalizeChemicalName(index.records[recordIndex]?.[2] ?? "") === key,
   );
-  if (preferredMatches.length === 1) return preferredMatches[0];
+  if (preferredMatches.length === 1) return { target: preferredMatches[0], candidates };
 
   const iupacMatches = candidates.filter(
     (recordIndex) => normalizeChemicalName(index.records[recordIndex]?.[3] ?? "") === key,
   );
-  if (iupacMatches.length === 1) return iupacMatches[0];
+  if (iupacMatches.length === 1) return { target: iupacMatches[0], candidates };
 
   // Identical stored SMILES do not prove identical structures: the lean pack
   // omits InChIKeys and ChEBI SMILES can drop stereodescriptors (e.g. axial
   // allene chirality), so distinct stereoisomers may share a SMILES. Without
   // an identity key the alias stays ambiguous.
-  return null;
+  return { target: null, candidates };
+}
+
+/** The unique record for a name, or the competing concrete records when the name is shared. */
+export async function lookupLocalChemicalNameDetailed(
+  rawName: string,
+): Promise<{ record: LocalChemicalNameRecord | null; candidates: LocalChemicalNameRecord[] }> {
+  const index = await getIndex();
+  const key = normalizeChemicalName(rawName);
+  const match = index.aliases.get(key);
+  if (match === undefined) return { record: null, candidates: [] };
+
+  const choice = resolveAliasTarget(index, key, match);
+  const candidates = choice.candidates
+    .map((i) => materializeRecord(index.records[i]))
+    .filter((record): record is LocalChemicalNameRecord => record !== null);
+  return { record: choice.target === null ? null : materializeRecord(index.records[choice.target]), candidates };
 }
 
 export async function lookupLocalChemicalName(
   rawName: string,
 ): Promise<LocalChemicalNameRecord | null> {
-  const index = await getIndex();
-  const key = normalizeChemicalName(rawName);
-  const match = index.aliases.get(key);
-  if (match === undefined) return null;
+  return (await lookupLocalChemicalNameDetailed(rawName)).record;
+}
 
-  const targetIndex = resolveAliasTarget(index, key, match);
-  if (targetIndex === null) return null;
-  return materializeRecord(index.records[targetIndex]);
+// ---- carbohydrate families -------------------------------------------------------------------
+// ChEBI names a sugar by several structures (open chain "aldehydo-D-glucose", pyranose and furanose
+// rings, alpha/beta anomers, D and L). A bare "glucose" or "D-glucose" does not say which one is meant.
+const SUGAR_NAME = /^(?:(aldehydo|keto)-)?(?:(alpha|beta)-)?(?:([dl])-)?([a-z]{3,}?)(?:ose|o(pyranose|furanose))$/;
+
+export type SugarForm = {
+  open: "aldehydo" | "keto" | null;
+  anomer: "alpha" | "beta" | null;
+  series: "d" | "l" | null;
+  ring: "pyranose" | "furanose" | null;
+  stem: string;
+};
+
+export function parseSugarName(rawName: string): SugarForm | null {
+  const m = SUGAR_NAME.exec(normalizeChemicalName(rawName));
+  if (!m) return null;
+  return {
+    open: (m[1] as SugarForm["open"]) ?? null,
+    anomer: (m[2] as SugarForm["anomer"]) ?? null,
+    series: (m[3] as SugarForm["series"]) ?? null,
+    ring: (m[5] as SugarForm["ring"]) ?? null,
+    stem: m[4],
+  };
+}
+
+export type SugarVariantRecord = { record: LocalChemicalNameRecord; form: SugarForm };
+
+/**
+ * Concrete database records for the sugar a name belongs to. `qualified` is true when the name already
+ * states an open-chain/ring/anomer form, in which case an exact database match is a precise answer.
+ */
+export async function findCarbohydrateVariants(
+  rawName: string,
+  limit = 16,
+): Promise<{ qualified: boolean; variants: SugarVariantRecord[] }> {
+  const query = parseSugarName(rawName);
+  if (!query) return { qualified: false, variants: [] };
+  const qualified = Boolean(query.open || query.anomer || query.ring);
+  const index = await getIndex();
+  const found = new Map<number, SugarForm>();
+  for (const [alias, target] of index.aliases) {
+    const form = parseSugarName(alias);
+    // Only aliases that state D or L describe one configuration series.
+    if (!form || !form.series || form.stem !== query.stem) continue;
+    if (query.series && form.series !== query.series) continue;
+    if (query.open && form.open !== query.open) continue;
+    if (query.anomer && form.anomer !== query.anomer) continue;
+    if (query.ring && form.ring !== query.ring) continue;
+    for (const recordIndex of typeof target === "number" ? [target] : target) {
+      if (!index.records[recordIndex] || isGenericRecord(index, recordIndex)) continue;
+      const known = found.get(recordIndex);
+      found.set(recordIndex, {
+        open: known?.open ?? form.open,
+        anomer: known?.anomer ?? form.anomer,
+        series: form.series,
+        ring: known?.ring ?? form.ring,
+        stem: form.stem,
+      });
+    }
+  }
+  const rank = (f: SugarForm) => [f.series === "d" ? 0 : 1, f.open ? 0 : f.ring === "pyranose" ? 1 : f.ring === "furanose" ? 3 : 2, f.anomer === null ? 0 : f.anomer === "alpha" ? 1 : 2];
+  const variants = [...found.entries()]
+    .map(([recordIndex, form]) => ({ record: materializeRecord(index.records[recordIndex]) as LocalChemicalNameRecord, form }))
+    .filter((entry) => entry.record)
+    .sort((a, b) => {
+      const ra = rank(a.form); const rb = rank(b.form);
+      return ra[0] - rb[0] || ra[1] - rb[1] || ra[2] - rb[2] || a.record.chebiId.localeCompare(b.record.chebiId);
+    })
+    .slice(0, limit);
+  return { qualified, variants };
 }
 
 /**

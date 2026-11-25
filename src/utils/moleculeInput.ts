@@ -18,6 +18,7 @@
 import { getRDKit } from "./rdkit";
 import { normalizeChemicalName } from "./chemicalNameDatabase";
 import {
+  MoleculeNameAmbiguousError,
   MoleculeNameNotFoundError,
   resolveMoleculeName,
   type MoleculeNameResolution,
@@ -35,10 +36,13 @@ export type MoleculeInputErrorCode =
 
 export class MoleculeInputError extends Error {
   code: MoleculeInputErrorCode;
-  constructor(code: MoleculeInputErrorCode, message: string) {
+  /** Supported specific structures to choose from when a name matches several. */
+  variants: MoleculeNameResolution[];
+  constructor(code: MoleculeInputErrorCode, message: string, variants: MoleculeNameResolution[] = []) {
     super(message);
     this.name = "MoleculeInputError";
     this.code = code;
+    this.variants = variants;
   }
 }
 
@@ -209,16 +213,17 @@ export async function resolveMoleculeInput(
   // ---- try both readings -----------------------------------------------------------------
   const parsedPromise = normalize(trimmed);
   const namePromise: Promise<
-    { ok: true; value: MoleculeNameResolution } | { ok: false; notFound: boolean; message: string }
+    { ok: true; value: MoleculeNameResolution } | { ok: false; notFound: boolean; message: string; variants: MoleculeNameResolution[] }
   > =
     trimmed.length > MAX_NAME_LENGTH
-      ? Promise.resolve({ ok: false as const, notFound: true, message: "" })
+      ? Promise.resolve({ ok: false as const, notFound: true, message: "", variants: [] })
       : resolveName(trimmed).then(
           (value) => ({ ok: true as const, value }),
           (error: unknown) => ({
             ok: false as const,
             notFound: error instanceof MoleculeNameNotFoundError,
             message: error instanceof Error ? error.message : "The molecule name could not be resolved.",
+            variants: error instanceof MoleculeNameAmbiguousError ? error.variants : [],
           }),
         );
   const [parsed, named] = await Promise.all([parsedPromise, namePromise]);
@@ -274,6 +279,9 @@ export async function resolveMoleculeInput(
   }
 
   // Neither reading worked.
+  if (!named.ok && named.variants.length > 0) {
+    throw new MoleculeInputError("ambiguous", named.message, named.variants);
+  }
   if (!named.ok && !named.notFound) {
     throw new MoleculeInputError(
       "lookup-failed",
@@ -284,6 +292,14 @@ export async function resolveMoleculeInput(
     "not-found",
     `“${trimmed}” is not a valid SMILES and no unique offline chemical name was found for it. Check the spelling, try another synonym, or type “smiles:” followed by a SMILES string.`,
   );
+}
+
+/** Load a database structure the user picked from an ambiguity list (same normalisation as a typed name). */
+export function inputFromNameResolution(
+  resolution: MoleculeNameResolution,
+  options: MoleculeInputOptions = {},
+): Promise<MoleculeInputResolution> {
+  return fromName(resolution.variantLabel ?? resolution.query, resolution, options.normalize ?? normalizeSmilesWithRdkit, options.maxComponents, []);
 }
 
 async function fromName(

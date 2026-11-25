@@ -861,11 +861,11 @@ export async function analyzeChirality(
       : "PocketChem could not confidently rank all four substituents with the current simplified CIP rules.";
 
     const whyChiralExplanation =
-      "This atom is flagged as a possible chiral center because it is tetrahedral and does not have duplicate hydrogen groups. A tetrahedral atom is chiral when it is attached to four different substituent groups.";
+      "A tetrahedral atom bearing four different substituent groups is a stereocenter.";
 
     const configurationExplanation =
       configuration === "unknown"
-        ? "R/S was not assigned. PocketChem found a possible chiral center, but the stereochemistry or substituent priority ranking was not clear enough for assignment."
+        ? "The configuration is unspecified in this structure (no wedge/dash or isomeric SMILES stereo mark), so R or S is not assigned."
         : `${priorityExplanation}. With the lowest-priority group treated as pointing away, the 1 → 2 → 3 priority order gives ${configuration}.`;
 
     return {
@@ -875,14 +875,14 @@ export async function analyzeChirality(
       assignmentSource,
       label:
         configuration === "unknown"
-          ? "possible chiral center, R/S not assigned"
+          ? "potential stereocenter, configuration unspecified"
           : `${configuration} chiral center`,
       explanation:
         assignmentSource === "rdkit"
           ? `This tetrahedral atom is assigned ${configuration} configuration based on automatic stereochemistry analysis.`
           : assignmentSource === "pocketchem-fallback"
           ? `This tetrahedral atom is assigned ${configuration} configuration by manual stereochemistry analysis using wedge/dash bonds and simplified CIP priority.`
-          : "This atom is a possible chiral center because it is tetrahedral and attached to different groups. R/S configuration was not assigned because no readable wedge/dash stereochemistry was detected or the substituent priorities were too ambiguous for the current fallback.",
+          : "Potential stereocenter: the configuration is unspecified, so R/S is not assigned.",
       whyChiralExplanation,
       configurationExplanation,
     };

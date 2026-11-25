@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { type MoleculeNameResolution } from "../utils/moleculeNameResolver";
-import { loadInputIntoEditor, resolveMoleculeInput } from "../utils/moleculeInput";
+import { inputFromNameResolution, loadInputIntoEditor, MoleculeInputError, resolveMoleculeInput } from "../utils/moleculeInput";
 import { extractKetMolecules, type KetDocument } from "../utils/ketcherKet";
 
 const KetcherEditor = lazy(() => import("./KetcherEditor"));
@@ -204,6 +204,7 @@ function MoleculeDrawer({
   const [nameQuery, setNameQuery] = useState("");
   const [isResolvingName, setIsResolvingName] = useState(false);
   const [nameMessage, setNameMessage] = useState<string | null>(null);
+  const [nameChoices, setNameChoices] = useState<{ action: "add" | "replace"; processAfterApply: boolean; variants: MoleculeNameResolution[] } | null>(null);
   const [nameMessageKind, setNameMessageKind] = useState<"success" | "error" | "info">("info");
   const [hasStructure, setHasStructure] = useState(false);
   const apiRef = useRef<KetcherApi | null>(null);
@@ -351,6 +352,7 @@ function MoleculeDrawer({
   const applyResolvedName = useCallback(async (
     action: "add" | "replace",
     processAfterApply = false,
+    chosen?: MoleculeNameResolution,
   ) => {
     const api = apiRef.current;
     if (!api || isResolvingName) return;
@@ -367,6 +369,7 @@ function MoleculeDrawer({
       return;
     }
 
+    setNameChoices(null);
     setIsResolvingName(true);
     setNameMessageKind("info");
     setNameMessage(`Resolving “${query}”…`);
@@ -374,7 +377,9 @@ function MoleculeDrawer({
     try {
       // A chemical name (offline database) or a SMILES string (validated by RDKit). Ambiguous
       // or invalid input throws with an explanatory message before the editor is touched.
-      const input = await resolveMoleculeInput(query, { maxComponents });
+      const input = chosen
+        ? await inputFromNameResolution(chosen, { maxComponents })
+        : await resolveMoleculeInput(query, { maxComponents });
 
       // Invalidate any previously imported identity before changing Ketcher.
       // Suppress the editor's own change event during this programmatic import;
@@ -416,6 +421,9 @@ function MoleculeDrawer({
       suppressEditorChangeRef.current = false;
       setNameMessageKind("error");
       setNameMessage(error instanceof Error ? error.message : "The molecule input could not be resolved.");
+      if (error instanceof MoleculeInputError && error.variants.length > 0) {
+        setNameChoices({ action, processAfterApply, variants: error.variants });
+      }
     } finally {
       setIsResolvingName(false);
     }
@@ -490,6 +498,7 @@ function MoleculeDrawer({
             onChange={(event) => {
               setNameQuery(event.target.value);
               setNameMessage(null);
+              setNameChoices(null);
             }}
             placeholder="Chemical name or SMILES"
             autoComplete="off"
@@ -529,6 +538,23 @@ function MoleculeDrawer({
             <p className={`molecule-name-message ${nameMessageKind}`} role={nameMessageKind === "error" ? "alert" : undefined}>
               {nameMessage}
             </p>
+          )}
+          {nameChoices && (
+            <ul aria-label="Matching structures" className="molecule-name-choices" data-testid="name-variant-choices">
+              {nameChoices.variants.map((variant) => (
+                <li key={variant.sourceId ?? variant.smiles}>
+                  <button
+                    className="secondary-button"
+                    disabled={isResolvingName}
+                    onClick={() => void applyResolvedName(nameChoices.action, nameChoices.processAfterApply, variant)}
+                    type="button"
+                  >
+                    <strong>{variant.variantLabel ?? variant.title ?? variant.query}</strong>
+                    {variant.variantDetail ? <span> · {variant.variantDetail}</span> : null}
+                  </button>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </form>

@@ -1,8 +1,11 @@
 import type { MoleculeIdentityResult } from "./nomenclatureUtils";
 import {
-  lookupLocalChemicalName,
+  findCarbohydrateVariants,
   findRelatedChemicalNames,
+  lookupLocalChemicalNameDetailed,
   normalizeChemicalName,
+  type LocalChemicalNameRecord,
+  type SugarForm,
 } from "./chemicalNameDatabase";
 import { toPlainChemicalName } from "./chemicalNameText";
 import { getRDKit } from "./rdkit";
@@ -18,6 +21,9 @@ export type MoleculeNameResolution = {
   molecularFormula: string | null;
   inchiKey: string | null;
   source: "chebi";
+  /** Set on choices offered for an ambiguous name: the specific form and a short qualifier. */
+  variantLabel?: string;
+  variantDetail?: string;
 };
 
 /** The offline database has no unique entry for the name (as opposed to a database read failure). */
@@ -25,6 +31,16 @@ export class MoleculeNameNotFoundError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "MoleculeNameNotFoundError";
+  }
+}
+
+/** The name matches several structures; `variants` are the supported specific choices. */
+export class MoleculeNameAmbiguousError extends MoleculeNameNotFoundError {
+  variants: MoleculeNameResolution[];
+  constructor(message: string, variants: MoleculeNameResolution[]) {
+    super(message);
+    this.name = "MoleculeNameAmbiguousError";
+    this.variants = variants;
   }
 }
 
@@ -60,6 +76,40 @@ export function asLookupFailure(error: unknown): Error {
   return new Error("PocketChem could not read its local chemical-name database.", { cause: error });
 }
 
+function toResolution(local: LocalChemicalNameRecord, query: string, variant: { label: string; detail: string } | null): MoleculeNameResolution {
+  const resolution: MoleculeNameResolution = {
+    sourceId: local.chebiId,
+    aliases: [...new Set([query, toPlainChemicalName(local.preferredName), toPlainChemicalName(local.iupacName)].filter((s): s is string => Boolean(s)))],
+    query,
+    smiles: local.smiles,
+    // ChEBI's local structure is already the authoritative imported structure;
+    // a separate online connectivity SMILES is intentionally not requested.
+    connectivitySmiles: null,
+    // ChEBI stores italics as inline HTML ("3<i>S</i>"); show names as plain text.
+    iupacName: toPlainChemicalName(local.iupacName),
+    title: toPlainChemicalName(local.preferredName),
+    molecularFormula: local.molecularFormula,
+    inchiKey: local.inchiKey,
+    source: "chebi",
+  };
+  if (variant) {
+    resolution.variantLabel = variant.label;
+    resolution.variantDetail = variant.detail;
+  }
+  return resolution;
+}
+
+/** A short name and qualifier for a carbohydrate form: "α-D-glucopyranose" / "cyclic six-membered ring, α anomer". */
+function describeSugar(form: SugarForm): { label: string; detail: string } {
+  const series = form.series === "l" ? "L" : "D";
+  const anomer = form.anomer === "alpha" ? "α-" : form.anomer === "beta" ? "β-" : "";
+  const ending = form.ring ? `o${form.ring}` : "ose";
+  const label = `${form.open ? `${form.open}-` : ""}${anomer}${series}-${form.stem}${ending}`;
+  const shape = form.open ? "open chain" : form.ring === "pyranose" ? "six-membered ring (pyranose)" : form.ring === "furanose" ? "five-membered ring (furanose)" : "cyclic form";
+  const configuration = form.anomer ? `${form.anomer} anomer` : form.open ? "" : "anomer unspecified";
+  return { label, detail: [shape, configuration].filter(Boolean).join(", ") };
+}
+
 /**
  * Fully offline name resolution.
  *
@@ -78,34 +128,38 @@ export async function resolveMoleculeName(
   const cached = resolverCache.get(key);
   if (cached) return { ...cached, query };
 
-  let local;
+  let detail: Awaited<ReturnType<typeof lookupLocalChemicalNameDetailed>>;
+  let sugar: Awaited<ReturnType<typeof findCarbohydrateVariants>>;
   try {
-    local = await lookupLocalChemicalName(query);
+    [detail, sugar] = await Promise.all([lookupLocalChemicalNameDetailed(query), findCarbohydrateVariants(query)]);
   } catch (error) {
     throw asLookupFailure(error);
   }
 
+  // "glucose" or "D-glucose" does not say open chain versus ring, anomer or pyranose versus furanose, so the
+  // database's single synonym match is not a safe answer: offer the supported forms instead.
+  const mentionsSeries = sugar.variants.length > 0;
+  if (mentionsSeries && !sugar.qualified && (sugar.variants.length > 1 || !detail.record)) {
+    throw new MoleculeNameAmbiguousError(
+      `“${query}” does not specify one structure. Choose the form you mean.`,
+      sugar.variants.map(({ record, form }) => toResolution(record, query, describeSugar(form))),
+    );
+  }
+
+  const local = detail.record;
   if (!local) {
+    if (detail.candidates.length > 1) {
+      throw new MoleculeNameAmbiguousError(
+        `“${query}” matches several database structures. Choose the one you mean.`,
+        detail.candidates.slice(0, 8).map((record) => toResolution(record, query, null)),
+      );
+    }
     throw new MoleculeNameNotFoundError(
       `No unique offline structure was found for “${query}”. Try another synonym or draw the molecule.`,
     );
   }
 
-  const resolution: MoleculeNameResolution = {
-    sourceId: local.chebiId,
-    aliases: [...new Set([query, toPlainChemicalName(local.preferredName), toPlainChemicalName(local.iupacName)].filter((s): s is string => Boolean(s)))],
-    query,
-    smiles: local.smiles,
-    // ChEBI's local structure is already the authoritative imported structure;
-    // a separate online connectivity SMILES is intentionally not requested.
-    connectivitySmiles: null,
-    // ChEBI stores italics as inline HTML ("3<i>S</i>"); show names as plain text.
-    iupacName: toPlainChemicalName(local.iupacName),
-    title: toPlainChemicalName(local.preferredName),
-    molecularFormula: local.molecularFormula,
-    inchiKey: local.inchiKey,
-    source: "chebi",
-  };
+  const resolution = toResolution(local, query, null);
 
   rememberResolution(key, resolution);
   return resolution;
@@ -221,5 +275,34 @@ export async function findConcreteNameVariants(resolution: MoleculeNameResolutio
       if (variants.length >= 6) break;
     }
   } finally { scaffold.delete(); }
+  return variants;
+}
+
+/** The same connectivity with every tetrahedral and double-bond stereo mark removed (for matching only). */
+export async function flatStructureKey(structure: string): Promise<string | null> {
+  const stripped = structure.replace(/[@/\\]/g, "");
+  return molecularStructureKey(stripped);
+}
+
+/**
+ * Specific stereoisomers of a name whose database structure leaves stereochemistry unspecified
+ * (for example "leucine": L-leucine and D-leucine). Each candidate comes from the same offline database
+ * under its own name and is accepted only when it has exactly the same connectivity. No isomer is chosen for the user.
+ */
+export async function findStereoVariants(resolution: MoleculeNameResolution): Promise<MoleculeNameResolution[]> {
+  if (isGenericResolution(resolution)) return [];
+  const base = (resolution.title ?? resolution.query).trim();
+  if (!base || /^(?:[dl]|dl|\(?[rs]\)?)-/i.test(base)) return [];
+  const flat = await flatStructureKey(resolution.smiles);
+  if (!flat) return [];
+  const variants: MoleculeNameResolution[] = [];
+  for (const prefix of ["L", "D"]) {
+    const name = `${prefix}-${base}`;
+    try {
+      const candidate = await resolveMoleculeName(name);
+      if (candidate.smiles === resolution.smiles || (await flatStructureKey(candidate.smiles)) !== flat) continue;
+      variants.push({ ...candidate, variantLabel: name, variantDetail: "specified stereochemistry" });
+    } catch { /* this stereoisomer is not in the offline database */ }
+  }
   return variants;
 }
