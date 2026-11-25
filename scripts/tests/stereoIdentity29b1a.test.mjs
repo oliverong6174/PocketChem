@@ -191,8 +191,9 @@ test('presentation: contextual notices that prevent a misleading reading are kep
   assert.match(results, /Generic structure/);
   assert.match(results, /molecular weight, exact mass and DBE are unavailable/i);
   assert.match(results, /Stereochemistry unspecified/);
-  assert.match(results, /estimated, not measured/);
-  assert.match(read('src/components/properties/AcidBasePanel.tsx'), /Estimated pKa ranges/);
+  assert.match(read('src/utils/propertiesSections.ts'), /Estimated physicochemical tendencies/);
+  assert.doesNotMatch(results, /estimated, not measured/);
+  assert.match(read('src/components/properties/AcidBasePanel.tsx'), /Aqueous-scale estimates/);
 });
 
 test('concepts: molecule and concept information share one split container that stays side by side', () => {
