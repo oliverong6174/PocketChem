@@ -417,24 +417,24 @@ function getPiOverlap(bondType: BondType): string | null {
   return null;
 }
 
-function getBondExplanation(bondType: BondType, atomA: ParsedAtom, atomB: ParsedAtom) {
+function getBondExplanation(bondType: BondType) {
   if (bondType === "single") {
-    return `Bond ${atomA.atomIndex}-${atomB.atomIndex} is a sigma bond. Rotation is usually possible unless restricted by a ring or resonance.`;
+    return "Rotation is usually possible unless restricted by a ring or resonance.";
   }
 
   if (bondType === "double") {
-    return `Bond ${atomA.atomIndex}-${atomB.atomIndex} contains one sigma bond and one pi bond. Rotation is restricted.`;
+    return "The pi bond restricts rotation.";
   }
 
   if (bondType === "triple") {
-    return `Bond ${atomA.atomIndex}-${atomB.atomIndex} contains one sigma bond and two pi bonds. The atoms are usually linear and sp-hybridized.`;
+    return "The bonded atoms are usually linear and sp-hybridized.";
   }
 
   if (bondType === "aromatic") {
-    return `Bond ${atomA.atomIndex}-${atomB.atomIndex} is part of an aromatic system with delocalized pi electrons.`;
+    return "Part of an aromatic system with delocalized pi electrons.";
   }
 
-  return `Bond ${atomA.atomIndex}-${atomB.atomIndex} has unknown bond type.`;
+  return "Bond type could not be determined.";
 }
 
 export async function getMoleculeAnnotation(
@@ -467,8 +467,6 @@ export async function getMoleculeAnnotation(
 });
 
 const bonds: BondAnnotation[] = parsedMol.bonds.map((bond) => {
-  const rawAtomA = parsedMol.atoms[bond.atomA];
-  const rawAtomB = parsedMol.atoms[bond.atomB];
   const atomA = atoms[bond.atomA];
   const atomB = atoms[bond.atomB];
   const bondType = getBondType(bond.bondOrder);
@@ -491,9 +489,7 @@ const bonds: BondAnnotation[] = parsedMol.bonds.map((bond) => {
         : ["unknown bond orbital"],
     sigmaOverlap,
     piOverlap,
-    explanation: `${getBondExplanation(bondType, rawAtomA, rawAtomB)} Sigma component: ${sigmaOverlap}.${
-      piOverlap ? ` Pi component: ${piOverlap}.` : ""
-    }`,
+    explanation: getBondExplanation(bondType),
   };
 });
 

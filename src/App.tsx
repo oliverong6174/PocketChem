@@ -1780,21 +1780,16 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
           )}
 
           <p>
-            <strong>Sigma overlap:</strong> {" "}
-            {currentAnnotationItem.bond.sigmaOverlap}
+            <strong>σ bond:</strong> {" "}
+            {currentAnnotationItem.bond.sigmaOverlap.replace(/ sigma overlap$/, "")} overlap
           </p>
 
           {currentAnnotationItem.bond.piOverlap && (
             <p>
-              <strong>Pi overlap:</strong> {" "}
+              <strong>π bond:</strong> {" "}
               {currentAnnotationItem.bond.piOverlap}
             </p>
           )}
-
-          <p>
-            <strong>Orbital info:</strong> {" "}
-            {currentAnnotationItem.bond.orbitalInfo.join(", ")}
-          </p>
 
           <p>{currentAnnotationItem.bond.explanation}</p>
         </div>
@@ -1809,47 +1804,23 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
             {currentAnnotationItem.chirality.element}
           </h3>
 
-          <p className="selected-note">Selected chiral center</p>
+          <p className="selected-note">Selected stereocenter</p>
 
           <p>
             <strong>Configuration:</strong> {" "}
             {currentAnnotationItem.chirality.configuration === "unknown"
-              ? "Not assigned"
+              ? "Unspecified (potential stereocenter)"
               : currentAnnotationItem.chirality.configuration}
           </p>
 
-          <p>
-            <strong>Assignment source:</strong> {" "}
-            {currentAnnotationItem.chirality.assignmentSource === "rdkit"
-              ? "Automatic Analysis"
-              : currentAnnotationItem.chirality.assignmentSource ===
-                "pocketchem-fallback"
-              ? "Manual Analysis"
-              : "Unassigned"}
-          </p>
-
-          {currentAnnotationItem.chirality.configuration === "unknown" && (
-            <p className="empty">
-              Add wedge/dash bonds in Ketcher to specify stereochemistry for R/S
-              assignment.
+          {currentAnnotationItem.chirality.configuration === "unknown" ? (
+            <p>
+              No R/S is assigned because the drawing does not specify it. Draw wedge/dash bonds, or load a specific isomer by name (for example L- or D-).
             </p>
+          ) : (
+            <p>{currentAnnotationItem.chirality.configurationExplanation}</p>
           )}
-
-          <p>
-            <strong>Type:</strong> {currentAnnotationItem.chirality.label}
-          </p>
-
-          <p>{currentAnnotationItem.chirality.explanation}</p>
-
-          <p>
-            <strong>Why this is chiral:</strong> {" "}
-            {currentAnnotationItem.chirality.whyChiralExplanation}
-          </p>
-
-          <p>
-            <strong>How the configuration was assigned:</strong> {" "}
-            {currentAnnotationItem.chirality.configurationExplanation}
-          </p>
+          <p>{currentAnnotationItem.chirality.whyChiralExplanation}</p>
         </div>
       );
     }
@@ -2549,12 +2520,9 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
                       </div>
                     )}
 
+                    <div className="pr-concept-split" data-testid="pr-concept-split">
                     {highlightedMoleculeSvg && (
-                      <div className="highlight-preview-wrapper">
-                        <p className="annotation-summary">
-                          Highlighted molecule preview:
-                        </p>
-
+                      <div className="highlight-preview-wrapper pr-concept-visual">
                         <div className="highlight-preview">
                           <div
                             ref={highlightedSvgRef}
@@ -2572,7 +2540,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
                         Analyze a molecule to see concept annotations.
                       </p>
                     ) : (
-                      <div className="annotation-list">
+                      <div className="annotation-list pr-concept-info">
                         {selectedConcept === "hybridization" && (
                           <p className="annotation-summary">
                             Showing {" "}
@@ -2602,8 +2570,8 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
 
                         {selectedConcept === "chirality" && (
                           <p className="annotation-summary">
-                            Showing possible chiral centers. Specific R/S
-                            assignment requires wedge/dash stereochemistry.
+                            Showing stereocenters. R/S needs specified
+                            stereochemistry (wedge/dash or isomeric SMILES).
                           </p>
                         )}
 
@@ -2645,6 +2613,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
                         )}
                       </div>
                     )}
+                    </div>
                   </div>
                 </div>
               )}
