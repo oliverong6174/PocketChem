@@ -226,7 +226,7 @@ export default function AtomicStructurePage({ openRequest = null, onOpenHandled 
             cfg.ok ? (
               <>
                 <Callout tone="info" title={`${ionSymbol(raw.config.Z, raw.config.charge)} (${elementName(raw.config.Z)}, ${chargeText(raw.config.charge)}): ${formatConfiguration(cfg.value.occupation, { noble: true, neutral: raw.config.charge === 0 })}`}>
-                  <p data-testid="cfg-text">{formatConfiguration(cfg.value.occupation, { neutral: raw.config.charge === 0 })} · {cfg.value.electrons} electron{cfg.value.electrons === 1 ? "" : "s"} · {cfg.value.unpaired} unpaired</p>
+                  <p data-testid="cfg-text">{formatConfiguration(cfg.value.occupation, { neutral: raw.config.charge === 0 })}, {cfg.value.electrons} electron{cfg.value.electrons === 1 ? "" : "s"}, {cfg.value.unpaired} unpaired</p>
                   <p>
                     <Badge tone={cfg.value.status === "reference-atom" ? "ok" : "estimate"}>{cfg.value.status === "reference-atom" ? "Curated reference data (NIST)" : cfg.value.status === "removal-rule" ? "Model rule: remove highest n first" : "Model rule: add in Aufbau order"}</Badge>{" "}
                     {cfg.value.isException ? <Badge tone="warn">Exception to the simple Aufbau order</Badge> : null}

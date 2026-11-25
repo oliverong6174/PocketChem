@@ -18,7 +18,7 @@ function Chip({ label, name, svg, tag }: { label: string; name: string; svg?: st
   return (
     <span className="mc-node" title={`${label}: ${name}`}>
       <Thumb svg={svg} />
-      <span className="mc-node-text"><span className="mc-node-label">{label}{tag ? ` · ${tag}` : ""}</span><span className="mc-node-name">{name}</span></span>
+      <span className="mc-node-text"><span className="mc-node-label">{label}{tag ? `, ${tag}` : ""}</span><span className="mc-node-name">{name}</span></span>
     </span>
   );
 }

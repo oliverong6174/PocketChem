@@ -105,7 +105,7 @@ export default function KineticsPage({ openRequest = null, onOpenHandled }: Prop
           { label: "Change the values", detail: "Both plots and every readout update together." },
           { label: "Read the half-life", detail: "Compare how it behaves for each order." },
         ]}
-        aside={<Badge tone="neutral" title="Single reactant, constant temperature unless you use the Arrhenius tab.">1 reactant · n = 0, 1, 2</Badge>}
+        aside={<Badge tone="neutral" title="Single reactant, constant temperature unless you use the Arrhenius tab.">1 reactant, n = 0, 1, 2</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

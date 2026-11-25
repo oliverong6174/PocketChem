@@ -176,7 +176,7 @@ function ConceptSearchDialog({ initialQuery = "", onClose, onOpenDestination, on
           </div>
         )}
         <p className="concept-foot">
-          <kbd>↑</kbd> <kbd>↓</kbd> move · <kbd>Enter</kbd> open · <kbd>Esc</kbd> close
+          <kbd>↑</kbd> <kbd>↓</kbd> move, <kbd>Enter</kbd> open, <kbd>Esc</kbd> close
         </p>
       </div>
     </div>

@@ -14,12 +14,12 @@ export function MapDiagram({ labels, pathway, metabolite, badges, onPath, onMet 
     { id: "pyruvate", kind: "met", met: "pyruvate", x: 398, y: 96, w: 104, label: "Pyruvate", sub: "C3" },
     { id: "pdh", kind: "path", path: "pyruvate-oxidation", x: 610, y: 96, w: 168, label: "Pyruvate oxidation", sub: "matrix" },
     { id: "acetylcoa", kind: "met", met: "acetylcoa", x: 840, y: 96, w: 116, label: "Acetyl-CoA", sub: "C2" },
-    { id: "gng", kind: "path", path: "gluconeogenesis", x: 245, y: 236, w: 170, label: "Gluconeogenesis", sub: "matrix · cytosol · ER" },
+    { id: "gng", kind: "path", path: "gluconeogenesis", x: 245, y: 236, w: 170, label: "Gluconeogenesis", sub: "matrix, cytosol, ER" },
     { id: "oaa", kind: "met", met: "oaa", x: 560, y: 236, w: 124, label: "Oxaloacetate", sub: "C4" },
     { id: "tca", kind: "path", path: "tca", x: 840, y: 236, w: 160, label: "Citric acid cycle", sub: "matrix" },
     { id: "atp", kind: "info", x: 258, y: 420, w: 190, label: "ATP", sub: labels.atp },
     { id: "etc", kind: "path", path: "oxphos", x: 612, y: 420, w: 230, label: "Electron transport + ATP synthase", sub: "inner membrane" },
-    { id: "carriers", kind: "info", x: 842, y: 420, w: 150, label: "NADH · FADH₂", sub: "reduced carriers" },
+    { id: "carriers", kind: "info", x: 842, y: 420, w: 150, label: "NADH, FADH₂", sub: "reduced carriers" },
   ];
   const by = Object.fromEntries(N.map((n) => [n.id, n]));
   const H = 50;

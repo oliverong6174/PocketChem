@@ -19,7 +19,7 @@ import { validateBiologyResults } from "../../utils/persistence/biologyTools";
 
 type Props = { openRequest?: { id: string; recordId: string } | null; onOpenHandled?: (requestId: string) => void; onNavigate?: (id: "bioNeuron" | "bioRegulation") => void };
 
-const SYSTEM_LABEL: Record<SystemId, string> = { gs: "GPCR · Gs", gi: "GPCR · Gi", gq: "GPCR · Gq", rtk: "RTK · EGFR → ERK", lgic: "Ligand-gated channel", nuclear: "Intracellular receptor" };
+const SYSTEM_LABEL: Record<SystemId, string> = { gs: "GPCR, Gs", gi: "GPCR, Gi", gq: "GPCR, Gq", rtk: "RTK, EGFR → ERK", lgic: "Ligand-gated channel", nuclear: "Intracellular receptor" };
 const PHASE_LABEL: Record<Phase, string> = { acute: "Ligand present", prolonged: "Prolonged exposure", removed: "Ligand removed" };
 const AC_TEXT = {
   blocked: "Adenylyl cyclase is blocked: no cAMP is made whatever the G proteins do.",
@@ -61,7 +61,7 @@ export default function SignalingPage({ openRequest = null, onOpenHandled, onNav
   const applyChallenge = () => { if (challenge) update((c) => ({ ...challenge.next, challenge: c.challenge + 1 })); };
   const sel = sys.nodes.find((n) => n.id === raw.selected) ?? null;
   const ac = acContext(ev);
-  const figures = sys.keyNodes.map((id) => { const n = sys.nodes.find((x) => x.id === id)!; const reached = ev.reached[id]; const s = ev.current[id]; return { label: n.label, value: reached ? `${STATUS_SYMBOL[s]} ${STATUS_WORD[s]}` : "· not yet", note: nodeStateText(sys, id, ev).slice(0, 60) }; });
+  const figures = sys.keyNodes.map((id) => { const n = sys.nodes.find((x) => x.id === id)!; const reached = ev.reached[id]; const s = ev.current[id]; return { label: n.label, value: reached ? `${STATUS_SYMBOL[s]} ${STATUS_WORD[s]}` : "not yet", note: nodeStateText(sys, id, ev).slice(0, 60) }; });
   const activeCount = sys.nodes.filter((n) => n.kind !== "terminator" && ev.reached[n.id] && isOn(ev.current[n.id])).length;
 
   return (

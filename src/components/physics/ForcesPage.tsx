@@ -103,7 +103,7 @@ export default function ForcesPage({ openRequest = null, onOpenHandled }: Props)
           { label: "Read the diagram", detail: "Every arrow, table row and graph comes from one calculation." },
           { label: "Predict, then check", detail: "Practice hides the answer first." },
         ]}
-        aside={<Badge tone="neutral" title="One body or a block with a hanging mass; Coulomb friction.">Point body · Coulomb friction</Badge>}
+        aside={<Badge tone="neutral" title="One body or a block with a hanging mass; Coulomb friction.">Point body, Coulomb friction</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

@@ -279,7 +279,7 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
     if (!exampleRequest || !rdkit) return;
     let live = true;
     void resolveWithFallback(exampleRequest.query, { maxComponents: 1, fallback: (text) => parseSystematicName(text, rdkit) }).then(
-      (result) => { if (live) { setExampleNote(`${result.label} · ${result.provenance}`); acceptResolved(result, exampleRequest.mode); } },
+      (result) => { if (live) { setExampleNote(`${result.label}, ${result.provenance}`); acceptResolved(result, exampleRequest.mode); } },
       (error: unknown) => { if (live) setError(error instanceof Error ? error.message : "That example could not be loaded."); },
     );
     return () => { live = false; };
@@ -748,7 +748,7 @@ export default function ConformationsPage({ openRequest = null, onOpenHandled, h
             />
           )}
           <p className="conf-molecule">
-            <span>Molecule: <code>{graph.smiles}</code>{graph.coordsSource === "generated" ? "" : " · drawing coordinates from the editor"}</span>
+            <span>Molecule: <code>{graph.smiles}</code>{graph.coordsSource === "generated" ? "" : ", drawing coordinates from the editor"}</span>
             <EvidenceBadge level="model" />
           </p>
 

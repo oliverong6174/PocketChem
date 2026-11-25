@@ -61,7 +61,7 @@ export function LacDiagram({ input, selected, onSelect, hideLabels }: { input: L
             <ellipse cx={235} cy={31} fill={ev.crpActive ? C.protein : "#ffffff"} rx={70} ry={17} stroke={C.proteinStroke} strokeDasharray={ev.crpActive ? "" : "4 3"} strokeWidth={2} />
             <Txt x={235} y={35} size={11} bold>{input.crp === "-" ? "CRP defective" : ev.crpActive ? L("cAMP high: CRP·cAMP") : L("cAMP low: no complex")}</Txt>
           </Sel>
-          <Txt x={420} y={36} size={11} anchor="start" fill={MUTED}>{`glucose ${input.glucose ? "present" : "absent"} · lactose ${input.lactose ? "present" : "absent"}`}</Txt>
+          <Txt x={420} y={36} size={11} anchor="start" fill={MUTED}>{`glucose ${input.glucose ? "present" : "absent"}, lactose ${input.lactose ? "present" : "absent"}`}</Txt>
         </g>
         {input.copies.map((copy, ci) => {
           const st = ev.copies[ci];

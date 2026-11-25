@@ -66,7 +66,7 @@ export default function ProteinsPage({ openRequest = null, onOpenHandled }: Prop
           { label: "Change one thing", detail: "Length, angle, pH, temperature or a residue." },
           { label: "Practise or predict", detail: "Hide labels, answer questions, or predict a substitution." },
         ]}
-        aside={<Badge tone="neutral" title="Ideal geometry and qualitative rules; no folding prediction.">Illustrative · not a folding predictor</Badge>}
+        aside={<Badge tone="neutral" title="Ideal geometry and qualitative rules; no folding prediction.">Illustrative, not a folding predictor</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

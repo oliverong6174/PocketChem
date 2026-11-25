@@ -161,7 +161,7 @@ export default function EquilibriumPage({ openRequest = null, onOpenHandled }: P
           { label: "Set starting amounts", detail: "The tool compares Q with K and solves for the extent." },
           { label: "Disturb it", detail: "Add, remove or change volume, then see the shift." },
         ]}
-        aside={<Badge tone="neutral" title="Ideal behaviour, constant temperature. See the assumptions below.">Ideal · constant T</Badge>}
+        aside={<Badge tone="neutral" title="Ideal behaviour, constant temperature. See the assumptions below.">Ideal, constant T</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

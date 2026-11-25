@@ -53,7 +53,7 @@ function rolesFor(r: AminoAcidRoles | null, showIonic: boolean): Role[] {
 function ClassButton({ one, active, onPick, mark }: { one: string; active: boolean; onPick: () => void; mark?: string }) {
   const a = AMINO_ACIDS_BY_ONE[one];
   return (
-    <button aria-label={`${a.name}, ${a.three}, ${CLASS_LABEL[a.cls]}`} aria-pressed={active} className={`bc-aa bc-${a.cls}${active ? " is-active" : ""}`} data-testid={`aa-${one}`} onClick={onPick} title={`${a.name} · ${CLASS_LABEL[a.cls]}`} type="button">
+    <button aria-label={`${a.name}, ${a.three}, ${CLASS_LABEL[a.cls]}`} aria-pressed={active} className={`bc-aa bc-${a.cls}${active ? " is-active" : ""}`} data-testid={`aa-${one}`} onClick={onPick} title={`${a.name}, ${CLASS_LABEL[a.cls]}`} type="button">
       <span aria-hidden="true">{CLASS_SHAPE[a.cls]}</span> {a.one} <small>{a.three}</small>{mark ? <em>{mark}</em> : null}
     </button>
   );
@@ -81,7 +81,7 @@ function Properties({ one }: { one: string }) {
       <dt>Formula</dt><dd>{a.formula}</dd>
       <dt>Hydropathy (Kyte–Doolittle)</dt><dd>{a.hydropathy > 0 ? "+" : ""}{a.hydropathy}</dd>
       <dt>Residue volume</dt><dd>{a.volume} Å³</dd>
-      <dt>Ionizable groups (pKa)</dt><dd>{a.groups.map((g) => `${g.label} ${g.pKa}`).join(" · ")}</dd>
+      <dt>Ionizable groups (pKa)</dt><dd>{a.groups.map((g) => `${g.label} ${g.pKa}`).join(", ")}</dd>
       <dt>Isoelectric point</dt><dd>{isoelectricPoint(a.groups).toFixed(2)}</dd>
       <dt>Stereochemistry</dt><dd>{Object.keys(a.stereo).length ? Object.entries(a.stereo).map(([k, v]) => `${k} (${v})`).join(", ") + " — the natural L-form" : "none (achiral)"}</dd>
     </dl>

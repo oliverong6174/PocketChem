@@ -143,7 +143,7 @@ export default function EfieldPage({ openRequest = null, onOpenHandled }: Props)
           { label: "Probe the field", detail: "Move P and read E, V, the force and the energy." },
           { label: "Switch the view", detail: "Field, potential with equipotentials, or uniform-field motion." },
         ]}
-        aside={<Badge tone="neutral" title="Static point charges in vacuum, in a 10 m × 7 m window.">point charges · vacuum</Badge>}
+        aside={<Badge tone="neutral" title="Static point charges in vacuum, in a 10 m × 7 m window.">point charges, vacuum</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

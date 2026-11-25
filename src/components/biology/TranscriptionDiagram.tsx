@@ -250,7 +250,7 @@ export function RnaProcessingDiagram({ model, step, hideLabels }: { model: Trans
             {stopEnd !== undefined ? <><rect fill="none" height={26} rx={5} stroke="#dc2626" strokeWidth={2.4} width={CWR * 3} x={stopEnd - CWR * 2.5} y={Ymain - 14} /><text className="bio-small strong" x={stopEnd - CWR * 2.5} y={Ymain + 46}>stop codon</text></> : null}
           </g>
         ) : null}
-        {!spliceStarted && introns.length ? <text className="bio-small" x={8} y={248}>Blue: exon · grey: intron. Splice sites are GU…AG.</text> : <text className="bio-small" x={8} y={248}>Blue: exon · grey: intron or lariat · yellow: branch-point A · pink: splice-site dinucleotides.</text>}
+        {!spliceStarted && introns.length ? <text className="bio-small" x={8} y={248}>Blue: exon, grey: intron. Splice sites are GU…AG.</text> : <text className="bio-small" x={8} y={248}>Blue: exon, grey: intron or lariat, yellow: branch-point A, pink: splice-site dinucleotides.</text>}
       </svg>
     </div>
   );

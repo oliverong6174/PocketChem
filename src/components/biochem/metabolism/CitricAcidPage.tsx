@@ -36,9 +36,9 @@ function PdhDiagram({ stage }: { stage: number }) {
       <title>Pyruvate dehydrogenase complex</title>
       <rect fill="#fff" height={300} width={640} />
       <text fill={MUTED} fontSize={11} x={12} y={20}>Mitochondrial matrix</text>
-      {box(30, 170, "E1", "pyruvate dehydrogenase · TPP", stage === 1 || stage === 2)}
-      {box(235, 170, "E2", "transacetylase · lipoamide, CoA", stage === 2 || stage === 3)}
-      {box(440, 170, "E3", "dihydrolipoyl DH · FAD, NAD⁺", stage === 4 || stage === 5)}
+      {box(30, 170, "E1", "pyruvate dehydrogenase, TPP", stage === 1 || stage === 2)}
+      {box(235, 170, "E2", "transacetylase, lipoamide, CoA", stage === 2 || stage === 3)}
+      {box(440, 170, "E3", "dihydrolipoyl DH, FAD, NAD⁺", stage === 4 || stage === 5)}
       <path d="M 200 149 H 233" fill="none" stroke="#475569" strokeWidth={2} />
       <path d="M 405 149 H 438" fill="none" stroke="#475569" strokeWidth={2} />
       <g fontSize={12} fontWeight={700}>

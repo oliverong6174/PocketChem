@@ -1610,7 +1610,7 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
       const rawSvg = await getMoleculeSvg(alternative.structure);
       if (!rawSvg) return null;
       const badgeLabel = alternatives.length > 1
-        ? `${selectedMassPeak.previewLabel ?? selectedMassPeak.label} · ${alternative.label}`
+        ? `${selectedMassPeak.previewLabel ?? selectedMassPeak.label}, ${alternative.label}`
         : selectedMassPeak.previewLabel ?? selectedMassPeak.label;
       return {
         label: alternative.label,
@@ -1999,7 +1999,7 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
                 {selectedNmrSignal && (
                   <div id="spectroscopy-selected-assignment" className="annotation-card annotation-card-selected" style={{ cursor: "default" }}>
                     <h3>{selectedNmrSignal.sourceGroup}</h3>
-                    <p><strong>{selectedNmrSignal.shift}</strong>{` · ${(selectedNmrSignal as HNMRSignal).integration ?? "—"} · ${(selectedNmrSignal as HNMRSignal).multiplicity ?? "—"}`}</p>
+                    <p><strong>{selectedNmrSignal.shift}</strong>{`, ${(selectedNmrSignal as HNMRSignal).integration ?? "—"}, ${(selectedNmrSignal as HNMRSignal).multiplicity ?? "—"}`}</p>
                     <p>{selectedNmrSignal.explanation}</p>
                     <p className="selected-note">The atoms responsible for this ¹H signal are highlighted above.</p>
                     {nmrHighlightedSvg && (
@@ -2033,7 +2033,7 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
                 {selectedNmrSignal && (
                   <div id="spectroscopy-selected-assignment" className="annotation-card annotation-card-selected" style={{ cursor: "default" }}>
                     <h3>{selectedNmrSignal.sourceGroup}</h3>
-                    <p><strong>{selectedNmrSignal.shift}</strong>{` · ${(selectedNmrSignal as CNMRSignal).carbonCount ?? 1} equivalent C`}</p>
+                    <p><strong>{selectedNmrSignal.shift}</strong>{`, ${(selectedNmrSignal as CNMRSignal).carbonCount ?? 1} equivalent C`}</p>
                     <p>{selectedNmrSignal.explanation}</p>
                     <p className="selected-note">The carbon environment responsible for this ¹³C signal is highlighted above.</p>
                     {nmrHighlightedSvg && (
@@ -2069,7 +2069,7 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
                     <h3>{selectedIrPeak.label}</h3>
                     <p>
                       <strong>{selectedIrPeak.center === undefined ? selectedIrPeak.range : `${Math.round(selectedIrPeak.center)} cm⁻¹`}</strong>
-                      {` · ${formatIrIntensity(selectedIrPeak.intensity)} · ${formatIrShape(selectedIrPeak.shape)}`}
+                      {`, ${formatIrIntensity(selectedIrPeak.intensity)}, ${formatIrShape(selectedIrPeak.shape)}`}
                     </p>
                     <p>{selectedIrPeak.sourceGroup}: {selectedIrPeak.explanation}</p>
                     {resolvedIrHighlight?.specificity === "vibration" && resolvedIrHighlight.bondIndices.length > 0 ? (
@@ -2132,7 +2132,7 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
                   <div id="spectroscopy-selected-assignment" className="selected-assignment-card">
                     <p className="selected-tag">Selected mass-spectral assignment</p>
                     <h4>{selectedMassPeak.label}</h4>
-                    <p><strong>m/z {selectedMassPeak.mz}</strong> · {selectedMassPeak.relativeIntensity.toFixed(1)}% predicted relative abundance</p>
+                    <p><strong>m/z {selectedMassPeak.mz}</strong>, {selectedMassPeak.relativeIntensity.toFixed(1)}% predicted relative abundance</p>
                     {(selectedMassPeak.pathwayCount ?? 0) > 1 && (
                       <p><strong>{selectedMassPeak.pathwayCount} contributing fragmentation pathways</strong> merge at this m/z.</p>
                     )}
@@ -2159,7 +2159,7 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
                     <ul>
                       {result.massSpec.fragmentCandidates!.map((candidate) => (
                         <li key={`${candidate.ionFormula}-${candidate.mechanism}`}>
-                          <strong>m/z {candidate.mz} · {candidate.ionFormula}⁺</strong>: {candidate.explanation}
+                          <strong>m/z {candidate.mz}, {candidate.ionFormula}⁺</strong>: {candidate.explanation}
                         </li>
                       ))}
                     </ul>

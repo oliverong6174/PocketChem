@@ -37,7 +37,7 @@ export function LedgerBars({ result }: { result: StoichResult }) {
     <div className="ph-diagram" ref={wrapRef}>
       <svg aria-label={`Amount ledger: ${rows.map((r) => `${r.text} ${g(r.initialMol)} mol before, ${g(r.finalMol)} mol after`).join("; ")}. Reaction extent ${g(result.extent)} mol.`} className="ph-svg" height={H} role="img" viewBox={`0 0 ${W} ${H}`} width={W}>
         <rect className="ph-paper" height={H} width={W} x={0} y={0} />
-        <text className="ph-axis-label" x={left} y={18}>grey: before the reaction · colour: after it (mol)</text>
+        <text className="ph-axis-label" x={left} y={18}>grey: before the reaction, colour: after it (mol)</text>
         {rows.map((r, k) => {
           const y = 34 + k * rowH;
           const st = STYLES[k % STYLES.length];

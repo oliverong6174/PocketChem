@@ -183,7 +183,7 @@ export function InteractionDiagram({ outcome, hideLabels }: { outcome: DemoOutco
           </g>
         );
       })}
-      <text fill={MUTED} fontSize={11} x={14} y={H - 8}>✔ intact · ~ weakened · ✖ disrupted (color and symbol). Schematic domain, not a real protein.</text>
+      <text fill={MUTED} fontSize={11} x={14} y={H - 8}>✔ intact, ~ weakened, ✖ disrupted (color and symbol). Schematic domain, not a real protein.</text>
     </svg>
   );
 }

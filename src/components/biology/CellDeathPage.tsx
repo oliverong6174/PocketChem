@@ -44,7 +44,7 @@ function mitoSpec(ev: { values: Record<string, boolean>; forced: Record<string, 
     const n = APOPTOSIS_GRAPH.nodes.find((x) => x.id === s.node)!;
     const on = ev.values[s.node], shown = i < step, isForced = s.node in ev.forced;
     const state: Visual = shown ? (on ? "done" : "dim") : "future";
-    const word = !shown ? "· later" : on ? "✓ occurs" : "✕ does not occur";
+    const word = !shown ? "later" : on ? "✓ occurs" : "✕ does not occur";
     const [x, y] = pos[s.node];
     return { id: s.node, x, y, w: 200, h: 78, lines: [...wrapLabel(n.label, 24).slice(0, 3), word], kind: isForced ? "ketone" : "carbon", state: shown && on ? "active" : state, selected: selected === s.node, badge: shown && !on ? "✕" : isForced ? "▲" : undefined, aria: `${n.label}: ${word}` };
   });
@@ -191,7 +191,7 @@ export default function CellDeathPage({ openRequest = null, onOpenHandled, onNav
           <div className="gc-stage">
             <StepControls locked={mode === "challenge"} max={PATH_STEPS.intrinsic.length} onStep={setStep} player={player} step={apop.step} unit="Event" extra={<button className="secondary-button" data-testid="replay" onClick={() => setStep(0)} type="button">Reset to start</button>} />
             {caption ? <div aria-live="polite" className="bio-caption" data-testid="step-caption"><h3>{caption.title}</h3><p>{caption.text}</p></div> : null}
-            <DiagramFrame caption="Each box is one molecular event. ✓ occurs, ✕ does not occur, · later. The red bar shows pro-survival BCL-2 proteins restraining the BH3 signal." label="Stepwise mitochondrial apoptosis diagram" title="Intrinsic pathway">
+            <DiagramFrame caption="Each box is one molecular event. ✓ occurs, ✕ does not occur,, later. The red bar shows pro-survival BCL-2 proteins restraining the BH3 signal." label="Stepwise mitochondrial apoptosis diagram" title="Intrinsic pathway">
               <GraphDiagram bands={mito.bands} edges={mito.edges} height={mito.height} label="Intrinsic apoptosis steps" minWidth={720} nodes={mito.nodes} onNode={(id) => select(id)} texts={mito.texts} width={mito.width} />
             </DiagramFrame>
             <p className="bio-score" data-testid="path-progress">Pathway reaches step {pathProgress("intrinsic", apEv.values)} of {PATH_STEPS.intrinsic.length}</p>

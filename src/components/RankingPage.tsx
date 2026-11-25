@@ -302,7 +302,7 @@ export default function RankingPage({ openRequest = null, onOpenHandled }: Ranki
   function defaultAnalysisName(): string {
     const l = latestRef.current;
     const mode = getComparisonMode(l.rankingMode);
-    return `Ranking of ${l.comparisonMolecules.length} molecule${l.comparisonMolecules.length === 1 ? "" : "s"} · ${mode.label}`.slice(0, 100);
+    return `Ranking of ${l.comparisonMolecules.length} molecule${l.comparisonMolecules.length === 1 ? "" : "s"}, ${mode.label}`.slice(0, 100);
   }
 
   async function saveCurrentAnalysis(name: string, announce = true): Promise<boolean> {

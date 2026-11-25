@@ -62,7 +62,7 @@ export function CycleDiagram({ inTurn, turnNo, selected, onSelect, onSelectMetab
           >
             <rect fill={hl ? "#fef9c3" : regenerated ? "#dcfce7" : reached || (id === "oaa" && inTurn === 0) ? "#ecfeff" : "#f8fafc"} height={HH * 2} rx={8} stroke={regenerated ? "#15803d" : hl ? "#ca8a04" : reached ? "#0e7490" : "#94a3b8"} strokeWidth={regenerated || hl ? 3 : reached ? 2 : 1.2} width={HW * 2} x={x - HW} y={y - HH} />
             <text fill={INK} fontSize={13.5} fontWeight={700} textAnchor="middle" x={x} y={y + 1}>{m.name}</text>
-            <text fill={MUTED} fontSize={12} textAnchor="middle" x={x} y={y + 16}>C{m.carbons}{regenerated ? " · regenerated ✔" : ""}</text>
+            <text fill={MUTED} fontSize={12} textAnchor="middle" x={x} y={y + 16}>C{m.carbons}{regenerated ? ", regenerated ✔" : ""}</text>
           </g>
         );
       })}

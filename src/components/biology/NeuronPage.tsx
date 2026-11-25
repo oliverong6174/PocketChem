@@ -263,7 +263,7 @@ export default function NeuronPage({ openRequest = null, onOpenHandled, onNaviga
         <p data-testid="reasons">{r.explanation}</p>
         <p>{SYNAPSE_CONTEXT_NOTE}</p>
         <p><strong>Clearance:</strong> {ex.clearance}</p>
-        {onNavigate ? <p className="c23-note">How receptors and G proteins signal: <button className="ghost-button" onClick={() => onNavigate("bioSignaling")} type="button">open Cell signaling</button> · ion movement across membranes: <button className="ghost-button" onClick={() => onNavigate("bioMembrane")} type="button">open Membranes & transport</button></p> : null}
+        {onNavigate ? <p className="c23-note">How receptors and G proteins signal: <button className="ghost-button" onClick={() => onNavigate("bioSignaling")} type="button">open Cell signaling</button>, ion movement across membranes: <button className="ghost-button" onClick={() => onNavigate("bioMembrane")} type="button">open Membranes & transport</button></p> : null}
         <ul className="gc-assumptions">{SYNAPSE_LIMITS.map((l) => <li key={l}>{l}</li>)}</ul>
       </Panel>
     );

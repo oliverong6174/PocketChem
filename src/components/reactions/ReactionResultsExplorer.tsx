@@ -42,7 +42,7 @@ export function ReactionResultsExplorer<T extends ExplorerPathway>({ outcomes, c
   return (
     <div className="rxe" data-testid="reaction-explorer">
       <section aria-labelledby="rxe-overview" className="rxe-overview" data-testid="results-overview">
-        <h3 id="rxe-overview">Results overview{substrate ? <span className="rxe-substrate"> · {substrate}</span> : null}</h3>
+        <h3 id="rxe-overview">Results overview{substrate ? <span className="rxe-substrate">, {substrate}</span> : null}</h3>
         <dl className="rxe-figures">
           <div><dt>Outcomes</dt><dd data-testid="ov-outcomes">{summary.outcomes}</dd></div>
           <div><dt>Distinct products</dt><dd data-testid="ov-products">{summary.distinctProducts}</dd></div>
@@ -60,8 +60,8 @@ export function ReactionResultsExplorer<T extends ExplorerPathway>({ outcomes, c
             Only “computed” products were generated from your structure; the others are representative, generic or conceptual (see each row).
           </li>
           <li>
-            {summary.withSelectivity} with selectivity notes · {summary.withLimitations} with stated limitations · {summary.mixtures} listing more than one product
-            {summary.competing > 0 ? ` · ${summary.competing} in competition with another outcome for the same event` : ""}.
+            {summary.withSelectivity} with selectivity notes, {summary.withLimitations} with stated limitations, {summary.mixtures} listing more than one product
+            {summary.competing > 0 ? `, ${summary.competing} in competition with another outcome for the same event` : ""}.
           </li>
           {summary.noReaction > 0 ? <li>{summary.noReaction} related catalog {summary.noReaction === 1 ? "reaction is" : "reactions are"} predicted <strong>not</strong> to occur for this substrate (listed below the outcomes).</li> : null}
           <li>Predictions are rule-based estimates, not experimental results.</li>

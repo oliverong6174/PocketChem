@@ -105,7 +105,7 @@ export function SignalingDiagram({ system, ev, selected, onSelect }: { system: S
             <Txt anchor="start" bold fill="#475569" size={9} x={b.x + 12} y={b.y + 13}>{KIND_TAG[n.kind]}</Txt>
             <Txt anchor="start" bold size={term ? 11.5 : 13} x={b.x + 12} y={b.y + (term ? 27 : 28)}>{n.label}</Txt>
             {lines.map((l, i) => <Txt anchor="start" fill="#334155" key={i} size={10.5} x={b.x + 12} y={b.y + (term ? 40 : 42) + i * 12}>{l}</Txt>)}
-            {!term ? <Txt anchor="end" bold fill={stroke} size={11} x={b.x + w - 8} y={b.y + 13}>{reached ? `${STATUS_SYMBOL[shown]} ${STATUS_WORD[shown]}` : "· not yet"}</Txt> : <Txt anchor="end" bold fill={stroke} size={10} x={b.x + w - 6} y={b.y + 13}>{s === "blocked" ? "✕ BLOCKED" : "⊣ functional"}</Txt>}
+            {!term ? <Txt anchor="end" bold fill={stroke} size={11} x={b.x + w - 8} y={b.y + 13}>{reached ? `${STATUS_SYMBOL[shown]} ${STATUS_WORD[shown]}` : "not yet"}</Txt> : <Txt anchor="end" bold fill={stroke} size={10} x={b.x + w - 6} y={b.y + 13}>{s === "blocked" ? "✕ BLOCKED" : "⊣ functional"}</Txt>}
             {on ? <rect fill="none" height={h + 8} rx={9} stroke="#1d4ed8" strokeDasharray="5 3" strokeWidth={2.4} width={w + 8} x={b.x - 4} y={b.y - 4} /> : null}
           </SelG>
         );
@@ -123,14 +123,14 @@ export function SignalingCards({ system, ev, selected, onSelect }: { system: Sig
     const s = ev.current[n.id], reached = ev.reached[n.id];
     const term = n.kind === "terminator";
     const cls = term ? (s === "blocked" ? "blocked" : "") : !reached ? "pending" : s === "active" ? "on" : s === "inactive" ? "" : s;
-    const sym = term ? (s === "blocked" ? "✕" : "⊣") : reached ? STATUS_SYMBOL[s] : "·";
+    const sym = term ? (s === "blocked" ? "✕" : "⊣") : reached ? STATUS_SYMBOL[s] : "–";
     const word = term ? (s === "blocked" ? "BLOCKED" : "functional") : reached ? STATUS_WORD[s] : "not yet";
     return (
       <li key={n.id}>
         <button aria-pressed={selected === n.id} className={`c23-card ${cls}`} data-component={n.id} onClick={() => onSelect(selected === n.id ? null : n.id)} type="button">
           <span aria-hidden="true" className="sym">{sym}</span>
-          <span className="name">{n.label} <span className="c23-status">· {word}</span></span>
-          <span className="state">{nodeStateText(system, n.id, ev)}{n.requires.length > 1 ? ` · needs ${n.requires.map((r) => byId.get(r)!.label).join(" and ")}` : ""}</span>
+          <span className="name">{n.label} <span className="c23-status">{word}</span></span>
+          <span className="state">{nodeStateText(system, n.id, ev)}{n.requires.length > 1 ? `, needs ${n.requires.map((r) => byId.get(r)!.label).join(" and ")}` : ""}</span>
         </button>
       </li>
     );

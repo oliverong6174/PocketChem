@@ -72,7 +72,7 @@ export function QuizPanel({ questions, title = "Practice questions", subtitle = 
   const right = answered.filter((x) => answers[x.id] === x.answer).length;
   return (
     <Panel className="bio-quiz" subtitle={subtitle} title={title}>
-      <p className="bio-score" data-testid="quiz-score">Question {i + 1} of {questions.length} · {right} of {answered.length} answered correctly</p>
+      <p className="bio-score" data-testid="quiz-score">Question {i + 1} of {questions.length}, {right} of {answered.length} answered correctly</p>
       <p className="gc-question" data-testid="quiz-prompt">{q.prompt}</p>
       <Options choice={choice} onChoose={(c) => setAnswers((a) => ({ ...a, [q.id]: c }))} q={q} />
       {choice !== null ? (

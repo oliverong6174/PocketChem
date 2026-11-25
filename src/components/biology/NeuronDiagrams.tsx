@@ -143,7 +143,7 @@ export function ChannelDiagram({ tr, index, phase }: { tr: HhTrace; index: numbe
       <rect fill="#fde68a" height={MB - MT + 28} opacity={0.5} width={480} x={0} y={MT - 14} />
       <Txt anchor="start" bold fill={MUTED} size={11} x={8} y={14}>OUTSIDE</Txt>
       <Txt anchor="start" bold fill={MUTED} size={11} x={8} y={262}>INSIDE</Txt>
-      <Txt anchor="end" bold size={12.5} x={472} y={16}>V = {v.toFixed(1)} mV · {tr.t[index].toFixed(2)} ms</Txt>
+      <Txt anchor="end" bold size={12.5} x={472} y={16}>V = {v.toFixed(1)} mV, {tr.t[index].toFixed(2)} ms</Txt>
       {na(130)}{k(350)}
       {iNa < -0.5 ? <line markerEnd="url(#ch-blue)" stroke={COL.na} strokeWidth={Math.min(8, 2 + Math.abs(iNa) / 40)} x1={130} x2={130} y1={34} y2={MB + 12} /> : null}
       {iK > 0.5 ? <line markerEnd="url(#ch-bad)" stroke={COL.k} strokeWidth={Math.min(8, 2 + Math.abs(iK) / 40)} x1={350} x2={350} y1={MB + 12} y2={32} /> : iK < -0.5 ? <line markerEnd="url(#ch-ink)" stroke={COL.k} strokeWidth={3} x1={350} x2={350} y1={34} y2={MB + 12} /> : null}
@@ -219,7 +219,7 @@ export function SynapseDiagram({ input, state }: { input: SynapseInput; state: S
           <Txt bold fill={COL.proteinStroke} size={11} x={Xr - 68} y={234}>M₂</Txt>
           {state.transmitterBound ? <circle cx={Xr - 68} cy={196} fill={COL.glu} r={5} /> : null}
           <ellipse cx={Xr - 40} cy={272} fill={state.receptorActive ? "#bbf7d0" : "#e2e8f0"} rx={38} ry={13} stroke={COL.ok} strokeWidth={1.8} />
-          <Txt bold size={10.5} x={Xr - 40} y={276}>{state.receptorActive ? "Gi · Gβγ freed" : "Gi (inactive)"}</Txt>
+          <Txt bold size={10.5} x={Xr - 40} y={276}>{state.receptorActive ? "Gi, Gβγ freed" : "Gi (inactive)"}</Txt>
           <rect fill={COL.protein} height={66} rx={5} stroke={COL.proteinStroke} strokeWidth={2} width={18} x={Xr + 48} y={198} />
           <rect fill={COL.protein} height={66} rx={5} stroke={COL.proteinStroke} strokeWidth={2} width={18} x={Xr + 84} y={198} />
           <rect fill={state.receptorActive ? "#fed7aa" : "#94a3b8"} height={state.receptorActive ? 64 : 12} width={18} x={Xr + 66} y={state.receptorActive ? 199 : 226} />

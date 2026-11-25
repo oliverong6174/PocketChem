@@ -604,7 +604,7 @@ export default function ReactionsPage({
       setRetroPathways(data.retroPathways);
       setNoReactionOutcomes(data.noReactionOutcomes);
       setReactionError(null);
-      setReactionStatus(`Restored from your previous session · ${data.statusText}`);
+      setReactionStatus(`Restored from your previous session, ${data.statusText}`);
       setResultMeta({
         kind: results.status,
         computedAt: results.computedAt,
@@ -845,7 +845,7 @@ export default function ReactionsPage({
       setPathways(data.pathways);
       setRetroPathways(data.retroPathways);
       setNoReactionOutcomes(data.noReactionOutcomes);
-      setReactionStatus(`Opened saved analysis “${opened.record.name}” · ${data.statusText}`);
+      setReactionStatus(`Opened saved analysis “${opened.record.name}”, ${data.statusText}`);
       setResultMeta({
         kind: results.status,
         computedAt: results.computedAt,
@@ -1525,8 +1525,8 @@ export default function ReactionsPage({
                     <div>
                       <h3>{displayPathwayTitle(pathway)}</h3>
                       <p className="reaction-curriculum">
-                        {courseLabel(pathway.course)} · {pathway.chapter}
-                        {pathway.mechanism ? ` · ${pathway.mechanism}` : ""}
+                        {courseLabel(pathway.course)}, {pathway.chapter}
+                        {pathway.mechanism ? `, ${pathway.mechanism}` : ""}
                       </p>
                     </div>
                     <span
@@ -1665,8 +1665,8 @@ export default function ReactionsPage({
                     <p className="reaction-detail">
                       <strong>Product mixture:</strong>{" "}
                       {pathway.productMixture.kind === "racemic"
-                        ? "Racemic mixture · one enantiomer shown; + mirror-image enantiomer"
-                        : `${pathway.productMixture.label} · ${pathway.productMixture.memberCount} stereoisomer${pathway.productMixture.memberCount === 1 ? "" : "s"} shown`}
+                        ? "Racemic mixture, one enantiomer shown; + mirror-image enantiomer"
+                        : `${pathway.productMixture.label}, ${pathway.productMixture.memberCount} stereoisomer${pathway.productMixture.memberCount === 1 ? "" : "s"} shown`}
                     </p>
                   )}
 
@@ -1695,7 +1695,7 @@ export default function ReactionsPage({
                   {pathway.selectivity.length > 0 && (
                     <p className="reaction-detail">
                       <strong>Selectivity:</strong>{" "}
-                      {pathway.selectivity.join(" · ")}
+                      {pathway.selectivity.join(", ")}
                     </p>
                   )}
 
@@ -1762,8 +1762,8 @@ export default function ReactionsPage({
                   <div>
                     <h3>Retrosynthesis via {displayPathwayTitle(pathway)}</h3>
                     <p className="reaction-curriculum">
-                      {courseLabel(pathway.course)} · {pathway.chapter}
-                      {pathway.mechanism ? ` · ${pathway.mechanism}` : ""}
+                      {courseLabel(pathway.course)}, {pathway.chapter}
+                      {pathway.mechanism ? `, ${pathway.mechanism}` : ""}
                     </p>
                   </div>
                   <span
@@ -1877,14 +1877,14 @@ export default function ReactionsPage({
                             route.reagentNote ? ` (${route.reagentNote})` : ""
                           }`,
                       )
-                      .join(" · ")}
+                      .join(", ")}
                   </p>
                 )}
 
                 {pathway.selectivity.length > 0 && (
                   <p className="reaction-detail">
                     <strong>Forward selectivity:</strong>{" "}
-                    {pathway.selectivity.join(" · ")}
+                    {pathway.selectivity.join(", ")}
                   </p>
                 )}
 

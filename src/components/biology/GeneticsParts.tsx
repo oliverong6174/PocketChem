@@ -103,7 +103,7 @@ export function GameteDiagram({ gametes, individual, title, hideLabels = false }
               return <ChromGlyph chromatids={chroms} height={h.chrom === "Y" ? 44 : 64} hideLabels={hideLabels} key={k} loci={h.chrom === "Y" ? [] : layout.pairs[k]} origin="maternal" x={x} y={h.chrom === "Y" ? 66 : 62} />;
             })}
             <text className="bio-small strong" textAnchor="middle" x={cx} y={146}>{hideLabels ? "?" : g.label}</text>
-            <text className="bio-small" textAnchor="middle" x={cx} y={162}>{frText(g.p)}{g.kind === "recombinant" ? " · recombinant" : parental(g) ? " · parental" : ""}</text>
+            <text className="bio-small" textAnchor="middle" x={cx} y={162}>{frText(g.p)}{g.kind === "recombinant" ? ", recombinant" : parental(g) ? ", parental" : ""}</text>
           </g>
         );
       })}
@@ -117,7 +117,7 @@ export function PunnettTable({ result, hide = false }: { result: CrossResult; hi
       <table className="bio-punnett" data-cells={result.gametes1.length * result.gametes2.length} data-testid="punnett">
         <caption>Punnett square: rows are the gametes of parent 1, columns the gametes of parent 2. Each box is one fertilisation; its probability is the product of the two gamete probabilities.</caption>
         <thead>
-          <tr><th scope="col" className="bio-punnett-corner">parent 1 ↓ · parent 2 →</th>{result.gametes2.map((g) => <th key={g.label} scope="col">{g.label}<small>{frText(g.p)}</small></th>)}</tr>
+          <tr><th scope="col" className="bio-punnett-corner">parent 1 ↓, parent 2 →</th>{result.gametes2.map((g) => <th key={g.label} scope="col">{g.label}<small>{frText(g.p)}</small></th>)}</tr>
         </thead>
         <tbody>
           {result.grid.map((row, i) => (

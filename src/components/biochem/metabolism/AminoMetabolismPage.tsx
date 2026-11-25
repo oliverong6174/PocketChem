@@ -218,7 +218,7 @@ export default function AminoMetabolismPage({ openRequest = null, onOpenHandled 
               {selStep ? <ReactionCard perUnit="per urea" reactionId={selStep} /> : null}
               <Panel subtitle="Atom tracing from the accepted mechanism, consistent with the formulas." title="Nitrogen ledger">
                 <table className="bc-table" data-testid="n-ledger"><thead><tr><th scope="col">Species present after step {raw.ureaStep}</th><th scope="col">Nitrogen atoms and their source</th></tr></thead>
-                  <tbody>{trace.map((t) => <tr key={t.metabolite}><th scope="row">{name(t.metabolite)}</th><td>{t.nitrogens.length ? t.nitrogens.map((n) => n.source).join("; ") : "none"}{t.carbonSource ? ` · carbon: ${t.carbonSource}` : ""}</td></tr>)}</tbody></table>
+                  <tbody>{trace.map((t) => <tr key={t.metabolite}><th scope="row">{name(t.metabolite)}</th><td>{t.nitrogens.length ? t.nitrogens.map((n) => n.source).join("; ") : "none"}{t.carbonSource ? `, carbon: ${t.carbonSource}` : ""}</td></tr>)}</tbody></table>
                 <ul className="gc-assumptions" data-testid="urea-sources"><li>{UREA_NITROGEN_SOURCES.ammonium}.</li><li>{UREA_NITROGEN_SOURCES.aspartate}.</li><li>{UREA_NITROGEN_SOURCES.carbon}.</li></ul>
               </Panel>
               <Panel subtitle="Three ATP molecules, four high-energy bonds." title="Energy accounting">

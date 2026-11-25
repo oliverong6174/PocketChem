@@ -243,7 +243,7 @@ export default function AcidBaseTitrationPage({ openRequest = null, onOpenHandle
           { label: "Change the values", detail: "The pH and the curve update together." },
           { label: "Read the point", detail: "Explanations follow the position you select." },
         ]}
-        aside={<Badge tone="neutral" title="Ideal solutions at 25 °C. See the assumptions below.">25 °C · ideal</Badge>}
+        aside={<Badge tone="neutral" title="Ideal solutions at 25 °C. See the assumptions below.">25 °C, ideal</Badge>}
       />
 
       <WorkspaceNotice notices={workspaceNotices} />

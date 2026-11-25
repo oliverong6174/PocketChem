@@ -142,7 +142,7 @@ export default function MechanicsPage({ openRequest = null, onOpenHandled }: Pro
           { label: "Play or drag time", detail: "Diagram, readouts and graphs share one clock." },
           { label: "Predict, then check", detail: "Practice mode asks before it shows." },
         ]}
-        aside={<Badge tone="neutral" title="Point particle, constant acceleration, no air resistance.">Point particle · no drag</Badge>}
+        aside={<Badge tone="neutral" title="Point particle, constant acceleration, no air resistance.">Point particle, no drag</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

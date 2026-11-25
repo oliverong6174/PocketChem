@@ -325,12 +325,12 @@ function OrderedSequencePanel() {
               >
                 <span>{option.reagents}</span>
                 <small>
-                  {option.title} · {option.family}
+                  {option.title}, {option.family}
                   {option.autoSuppliedReactantLabels.length > 0
-                    ? ` · auto-supplies ${option.autoSuppliedReactantLabels.join(", ")}`
+                    ? `, auto-supplies ${option.autoSuppliedReactantLabels.join(", ")}`
                     : ""}
                   {option.requiresStructuralReactantInput
-                    ? " · additional structural reactant required"
+                    ? ", additional structural reactant required"
                     : ""}
                 </small>
               </button>
@@ -355,10 +355,10 @@ function OrderedSequencePanel() {
                     <small>
                       {condition.title}
                       {condition.autoSuppliedReactantLabels.length > 0
-                        ? ` · ${condition.autoSuppliedReactantLabels.join(", ")} supplied automatically`
+                        ? `, ${condition.autoSuppliedReactantLabels.join(", ")} supplied automatically`
                         : ""}
                       {condition.requiresStructuralReactantInput
-                        ? " · needs an additional structural reactant"
+                        ? ", needs an additional structural reactant"
                         : ""}
                     </small>
                   </div>

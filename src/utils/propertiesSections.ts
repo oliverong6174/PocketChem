@@ -83,7 +83,7 @@ export function buildPropertySections(identity: MoleculeIdentityResult, groups: 
   const sections: PropertySection[] = [
     { id: "composition", title: "Molecular composition", evidenceNote: "Calculated from the structure.", rows: composition },
     { id: "descriptors", title: "Structural descriptors", evidenceNote: "Calculated from the structure.", rows: descriptors },
-    { id: "tendencies", title: "Physicochemical tendencies", evidenceNote: "Qualitative estimates from structural features. Heuristic, not measured values.", rows: tendencies },
+    { id: "tendencies", title: "Estimated physicochemical tendencies", evidenceNote: "Qualitative estimates from structural features. Heuristic, not measured values.", rows: tendencies },
   ];
   const shown = sections.reduce((n, s) => n + s.rows.length, 0);
   return { sections, unavailable, groups: [...groups], stereocenters: [...stereocenters], shown, askedFor: shown + unavailable.length };

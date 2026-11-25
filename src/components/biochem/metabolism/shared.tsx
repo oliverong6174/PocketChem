@@ -61,7 +61,7 @@ export function ReactionCard({ reactionId, reaction, direction: forcedDirection,
             <div className="mt-struct" key={m.id}>
               <MoleculeSvg height={110} label={`${m.name} structure`} smiles={m.structure!.smiles} width={190} />
               <button className="ghost-button mt-struct-name" onClick={() => onSelectMetabolite?.(m.id)} type="button">{m.name}</button>
-              <span className="ph-note">{m.carbons != null ? `C${m.carbons}` : ""}{m.structure!.form === "open-chain" ? " · open-chain form" : ""}</span>
+              <span className="ph-note">{m.carbons != null ? `C${m.carbons}` : ""}{m.structure!.form === "open-chain" ? ", open-chain form" : ""}</span>
             </div>
           ))}
         </div>

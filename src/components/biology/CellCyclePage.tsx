@@ -180,7 +180,7 @@ export default function CellCyclePage({ openRequest = null, onOpenHandled, onNav
             <div className="b26-origins" data-testid="origins">
               {[0, 1, 2].map((i) => <div className="b26-origin" key={i}><strong>Origin {i + 1}</strong><span data-testid={`origin-state-${i}`}>{licEv.origin}</span></div>)}
             </div>
-            <p className="bio-score" data-testid="license-result">Licensing {licEv.values.licensingPermitted ? "PERMITTED" : "blocked"} · firing {licEv.values.firing ? "possible" : "not possible"}{licEv.values.relicensing ? " · RE-LICENSING HAZARD" : ""}</p>
+            <p className="bio-score" data-testid="license-result">Licensing {licEv.values.licensingPermitted ? "PERMITTED" : "blocked"}, firing {licEv.values.firing ? "possible" : "not possible"}{licEv.values.relicensing ? ", RE-LICENSING HAZARD" : ""}</p>
             <DiagramFrame caption="Three brakes stop licensing outside G1: geminin binds Cdt1, Cdt1 is degraded in S, and CDK inactivates Cdc6/ORC." label="Replication licensing regulatory diagram" legend={<GraphLegend items={REG_LEGEND} />} title="Licensing, firing and the brakes on re-licensing">
               <RegDiagram forced={licEv.forced} graph={LICENSE_GRAPH} label="Replication licensing graph" module="licensing" onSelect={select} selected={raw.selected} values={licEv.values} />
             </DiagramFrame>

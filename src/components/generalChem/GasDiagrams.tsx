@@ -94,7 +94,7 @@ export function GasContainerDiagram({ state, initial, maxV, maxP, playing, capti
         <line stroke={INK} strokeWidth={3} x1={x0 + boxW + 7} x2={Math.min(x0 + fullW + 20, x0 + boxW + 36)} y1={y0 + boxH / 2} y2={y0 + boxH / 2} />
         {Array.from({ length: 44 }, (_, i) => (i < count ? <circle fill={color} key={i} r={4.5} ref={(el) => { circles.current[i] = el; }} stroke="#fff" strokeWidth={0.8} /> : <circle key={i} r={0} ref={(el) => { circles.current[i] = el; }} />))}
         <text className="ph-axis-label" x={x0} y={22}>{narrow ? `gas: ${count} dots (schematic)` : `gas (${count} dots stand for ${g(state.n)} mol; schematic)`}</text>
-        <text className="ph-note-text" x={x0} y={y0 + boxH + 20}>V = {g(state.V * 1000)} L · T = {g(state.T)} K ({g(state.T - 273.15)} °C)</text>
+        <text className="ph-note-text" x={x0} y={y0 + boxH + 20}>V = {g(state.V * 1000)} L, T = {g(state.T)} K ({g(state.T - 273.15)} °C)</text>
         <text className="ph-note-text" x={x0} y={y0 + boxH + 38}>dashed outline: the starting volume</text>
         <text className="ph-note-text" x={x0} y={y0 + boxH + 56}>{narrow ? "dot speed rises with √T" : "dot speed rises with √T, so hotter gas looks faster"}</text>
         <text className="ph-axis-label" x={gx - 8} y={22}>pressure</text>

@@ -19,7 +19,7 @@ export function EvidencePanel({ id }: { id: string }) {
   return (
     <section aria-label={`Scientific evidence: ${record.model}`} className="provenance-panel evidence-panel" data-evidence-id={record.id} data-testid="evidence-panel">
       <Disclosure
-        hint={`${KIND_LABEL[record.kind]} · ${SOURCE_LABEL[record.source]}`}
+        hint={`${KIND_LABEL[record.kind]}, ${SOURCE_LABEL[record.source]}`}
         summary="Scientific evidence and assumptions"
       >
         <p className="provenance-note"><strong>{record.model}.</strong> {record.scope}</p>

@@ -113,7 +113,7 @@ export function MoleculeInputField({
             <Icon name="check" size={16} />
             <span>
               <strong>{status.result.label}</strong>
-              <span className="mol-status-sub"> · {status.result.provenance}</span>
+              <span className="mol-status-sub">, {status.result.provenance}</span>
               {status.result.notes.map((note) => (
                 <span className="mol-status-note" key={note}>{note}</span>
               ))}

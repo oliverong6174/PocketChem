@@ -228,7 +228,7 @@ export default function MembranePage({ openRequest = null, onOpenHandled, onNavi
           <p className="c23-note">{PUMP_ELECTROGENIC_NOTE}</p>
         </Panel>
       );
-      detail = <Panel subtitle="Stoichiometry per completed cycle." title="3 Na⁺ out · 2 K⁺ in · 1 ATP"><p data-testid="protein-detail">{PROTEIN_INFO.pump.text}</p></Panel>;
+      detail = <Panel subtitle="Stoichiometry per completed cycle." title="3 Na⁺ out, 2 K⁺ in, 1 ATP"><p data-testid="protein-detail">{PROTEIN_INFO.pump.text}</p></Panel>;
     } else if (sgltOk.ok) {
       const r = evaluateSglt(a.sglt);
       diagram = <SgltScene input={a.sglt} result={r} step={a.sgltStep} step_titles={SGLT_STEPS.map((s) => s.title)} />;
@@ -271,7 +271,7 @@ export default function MembranePage({ openRequest = null, onOpenHandled, onNavi
       </>
     );
     diagram = <OsmosisScene input={o} result={r} />;
-    figures = [{ label: "Osmolarity (all solutes)", value: `${r.osmolarity}`, note: `outside ${r.outTotalOsm.toFixed(0)} · inside ${r.inTotalOsm.toFixed(0)} mOsm/L` }, { label: "Tonicity (impermeant)", value: r.tonicity, note: `outside ${r.outImpermeantOsm.toFixed(0)} · inside ${r.inImpermeantOsm.toFixed(0)} mOsm/L` }, { label: "Initial water movement", value: r.initialWater }, { label: "Idealized equilibrium volume", value: r.relativeVolume === null ? "not reported" : `${r.relativeVolume.toFixed(2)} × V₀` }];
+    figures = [{ label: "Osmolarity (all solutes)", value: `${r.osmolarity}`, note: `outside ${r.outTotalOsm.toFixed(0)}, inside ${r.inTotalOsm.toFixed(0)} mOsm/L` }, { label: "Tonicity (impermeant)", value: r.tonicity, note: `outside ${r.outImpermeantOsm.toFixed(0)}, inside ${r.inImpermeantOsm.toFixed(0)} mOsm/L` }, { label: "Initial water movement", value: r.initialWater }, { label: "Idealized equilibrium volume", value: r.relativeVolume === null ? "not reported" : `${r.relativeVolume.toFixed(2)} × V₀` }];
     explore = (
       <Panel subtitle="Osmolarity counts every particle; tonicity counts only those that cannot cross." title="What the model says">
         {r.disagree ? <Callout tone="warn" title="Osmolarity and tonicity disagree here"><p>The solution is {r.osmolarity} but {r.tonicity} for this cell, because a freely permeant solute adds to osmolarity without holding water.</p></Callout> : null}

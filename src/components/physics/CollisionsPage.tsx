@@ -99,7 +99,7 @@ export default function CollisionsPage({ openRequest = null, onOpenHandled }: Pr
           { label: "Set the collision type", detail: "Elastic, partly elastic or perfectly inelastic." },
           { label: "Compare before and after", detail: "Momentum is conserved; kinetic energy may not be." },
         ]}
-        aside={<Badge tone="neutral" title="Two bodies, one dimension, instantaneous collision.">2 bodies · 1-D</Badge>}
+        aside={<Badge tone="neutral" title="Two bodies, one dimension, instantaneous collision.">2 bodies, 1-D</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

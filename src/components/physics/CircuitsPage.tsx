@@ -69,7 +69,7 @@ export default function CircuitsPage({ openRequest = null, onOpenHandled }: Prop
           { label: "Select a component", detail: "Click it in the diagram or the table." },
           { label: "Check Kirchhoff", detail: "Currents add at junctions; drops add around loops." },
         ]}
-        aside={<Badge tone="neutral" title="Ideal DC source and resistors; series/parallel networks only.">Ideal · series/parallel only</Badge>}
+        aside={<Badge tone="neutral" title="Ideal DC source and resistors; series/parallel networks only.">Ideal, series/parallel only</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

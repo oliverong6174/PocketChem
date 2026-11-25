@@ -74,7 +74,7 @@ export function CycleRing({ phase, verdicts, onPhase, label = "Cell-cycle diagra
       <Txt bold size={16} x={CX} y={CY - 8}>{info.id === "G0" ? "G0" : info.id}</Txt>
       <Txt fill="#334155" size={12} x={CX} y={CY + 10}>{info.process}</Txt>
       <Txt fill="#334155" size={11} x={CX} y={CY + 28}>arcs are not to scale</Txt>
-      <Txt anchor="start" fill="#334155" size={11} x={14} y={450}>✓ proceeds · ⏸ pauses · ! permitted despite a checkpoint signal (unresolved)</Txt>
+      <Txt anchor="start" fill="#334155" size={11} x={14} y={450}>✓ proceeds, ⏸ pauses, ! permitted despite a checkpoint signal (unresolved)</Txt>
     </svg>
   );
 }

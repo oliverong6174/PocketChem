@@ -394,7 +394,7 @@ function MoleculeDrawer({
       setHasStructure(true);
       onStructureLoaded?.();
       const resolvedLabel = input.label;
-      const noteSuffix = input.notes.length > 0 ? ` · ${input.notes.join(" ")}` : "";
+      const noteSuffix = input.notes.length > 0 ? `, ${input.notes.join(" ")}` : "";
 
       // Only a database name carries an identity to install; a SMILES is just a structure.
       if (input.nameResolution) onNameStructureApplied?.(input.nameResolution, action);
@@ -404,13 +404,13 @@ function MoleculeDrawer({
 
       if (processAfterApply && onNameSubmitProcess) {
         setNameMessageKind("info");
-        setNameMessage(`Loaded: ${resolvedLabel} · Processing…`);
+        setNameMessage(`Loaded: ${resolvedLabel}, Processing…`);
         try {
           await onNameSubmitProcess();
         } catch (processError) {
           console.error(`[PocketChem:NameInput:${globalKey}] automatic processing failed`, processError);
           setNameMessageKind("error");
-          setNameMessage(`Loaded: ${resolvedLabel} · Automatic processing failed.`);
+          setNameMessage(`Loaded: ${resolvedLabel}, Automatic processing failed.`);
           return;
         }
       }

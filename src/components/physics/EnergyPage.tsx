@@ -122,7 +122,7 @@ export default function EnergyPage({ openRequest = null, onOpenHandled }: Props)
           { label: "Watch the bars", detail: "Energy moves between forms; friction turns it into heat." },
           { label: "Ask “can it get there?”", detail: "Energy tells you how far it goes." },
         ]}
-        aside={<Badge tone="neutral" title="Constant g, ideal spring, kinetic friction.">Ideal spring · constant friction</Badge>}
+        aside={<Badge tone="neutral" title="Constant g, ideal spring, kinetic friction.">Ideal spring, constant friction</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

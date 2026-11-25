@@ -62,7 +62,7 @@ export default function ReplicationPage({ openRequest = null, onOpenHandled }: P
           { label: "Step through the fork", detail: "Helicase, primase, polymerase, then repair." },
           { label: "Practise or predict", detail: "Hide the labels, or predict the next step." },
         ]}
-        aside={<Badge tone="neutral" title="One fork, a few nucleotides per primer: a simplified teaching model.">One fork · simplified</Badge>}
+        aside={<Badge tone="neutral" title="One fork, a few nucleotides per primer: a simplified teaching model.">One fork, simplified</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

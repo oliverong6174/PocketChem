@@ -89,7 +89,7 @@ export default function ThermodynamicsPage({ openRequest = null, onOpenHandled }
           { label: "Change the values", detail: "Graphs and results update together." },
           { label: "Read the explanation", detail: "It quotes your numbers and your assumptions." },
         ]}
-        aside={<Badge tone="neutral" title="Standard-state quantities with stated assumptions.">Standard state · stated assumptions</Badge>}
+        aside={<Badge tone="neutral" title="Standard-state quantities with stated assumptions.">Standard state, stated assumptions</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

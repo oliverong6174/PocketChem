@@ -187,14 +187,14 @@ export default function SavedAnalysesPage({ onOpen }: Props) {
                     ) : (
                       <strong>{item.name}</strong>
                     )}
-                    <span className="saved-badge">{SUBJECT_LABELS[item.subject] ?? item.subject} · {PAGE_LABELS[item.page] ?? item.page}</span>
+                    <span className="saved-badge">{SUBJECT_LABELS[item.subject] ?? item.subject}, {PAGE_LABELS[item.page] ?? item.page}</span>
                     {item.status && <span className="saved-badge">{STATUS_LABELS[item.status] ?? item.status}</span>}
                     {item.stale && <span className="saved-badge saved-badge-warn">Earlier structures</span>}
                   </div>
                   <p className="saved-item-summary">{item.summary}</p>
                   <p className="saved-item-date">
                     Saved {formatWhen(item.createdAt)}
-                    {item.updatedAt !== item.createdAt ? ` · changed ${formatWhen(item.updatedAt)}` : ""}
+                    {item.updatedAt !== item.createdAt ? `, changed ${formatWhen(item.updatedAt)}` : ""}
                   </p>
                 </div>
                 <div className="saved-item-actions">

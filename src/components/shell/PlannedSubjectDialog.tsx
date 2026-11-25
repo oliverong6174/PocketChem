@@ -13,7 +13,7 @@ export function PlannedSubjectDialog({ subject, onClose }: { subject: SubjectDef
         <div className="dialog-head">
           <span className="dialog-icon"><Icon name={subject.icon} size={26} /></span>
           <div>
-            <p className="dialog-eyebrow">{mode.label} · Planned</p>
+            <p className="dialog-eyebrow">{mode.label}, Planned</p>
             <h2 id="planned-subject-title">{subject.label}</h2>
           </div>
           <button aria-label="Close preview" className="icon-button" data-autofocus onClick={onClose} type="button">

@@ -93,7 +93,7 @@ export function CellDiagram({ stage, selectedId, onSelect, hideLabels, focus }: 
                 </g>
               ) : null}
               {plate ? <g><line stroke="#64748b" strokeDasharray="6 5" strokeWidth={1.2} x1={geo.cx - geo.rx * 0.82} x2={geo.cx + geo.rx * 0.82} y1={geo.cy} y2={geo.cy} />{!hideLabels && n <= 2 ? <text className="bio-small" x={geo.cx + geo.rx * 0.84} y={geo.cy - 4} textAnchor="end">plate</text> : null}</g> : null}
-              <text className="bio-small strong" textAnchor="middle" x={geo.cx} y={H - 8}>{hideLabels ? `Cell ${i + 1}` : `${cell.label} · ${stage.counts[i].chromosomes} chr · ${stage.counts[i].chromatids} chromatid${stage.counts[i].chromatids === 1 ? "" : "s"} · ${stage.counts[i].dnaC}C`}</text>
+              <text className="bio-small strong" textAnchor="middle" x={geo.cx} y={H - 8}>{hideLabels ? `Cell ${i + 1}` : `${cell.label}, ${stage.counts[i].chromosomes} chr, ${stage.counts[i].chromatids} chromatid${stage.counts[i].chromatids === 1 ? "" : "s"}, ${stage.counts[i].dnaC}C`}</text>
             </g>
           );
         })}

@@ -155,24 +155,24 @@ function synthesisStepProductRenderer(step: SynthesisStep) {
 function progressLabel(progress: MultistepSynthesisProgress): string {
   const nodeProgress =
     typeof progress.total === "number" && progress.total > 0
-      ? ` · ${Math.min(progress.processed ?? 0, progress.total)}/${progress.total} frontier nodes`
+      ? `, ${Math.min(progress.processed ?? 0, progress.total)}/${progress.total} frontier nodes`
       : "";
   const candidates =
     typeof progress.candidateCount === "number"
-      ? ` · ${progress.candidateCount} candidates`
+      ? `, ${progress.candidateCount} candidates`
       : "";
 
   if (progress.phase === "forward") {
-    return `Forward reaction search · depth ${progress.depth}/${progress.maxSteps}${nodeProgress}${candidates}`;
+    return `Forward reaction search, depth ${progress.depth}/${progress.maxSteps}${nodeProgress}${candidates}`;
   }
 
   if (progress.phase === "retrosynthesis") {
-    return `Reverse reaction search · depth ${progress.depth}/${progress.maxSteps}${nodeProgress}${candidates}`;
+    return `Reverse reaction search, depth ${progress.depth}/${progress.maxSteps}${nodeProgress}${candidates}`;
   }
 
   const left = progress.processed ?? 0;
   const right = progress.candidateCount ?? 0;
-  return `Connecting search frontiers · testing ${progress.depth}-step routes · ${left} × ${right} states`;
+  return `Connecting search frontiers, testing ${progress.depth}-step routes, ${left} × ${right} states`;
 }
 
 async function moleculeDisplayName(smiles: string): Promise<string> {
@@ -279,7 +279,7 @@ function RouteStructurePanel({ route }: { route: MultistepSynthesisRoute }) {
               (entry) =>
                 `supplied material ${entry.startIndex + 1}: ${entry.consumed} of ${entry.copies} cop${entry.copies === 1 ? "y" : "ies"}`,
             )
-            .join(" · ")}
+            .join(", ")}
         </p>
       )}
       {verification.unusedStartingMaterials.length > 0 && (
@@ -666,7 +666,7 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
       setTargetName(data.targetName);
       setInterruptedNote(data.interruptedNote);
       setSearchElapsedMs(data.elapsedMs);
-      setStatus(`Restored from your previous session · ${data.outcomeMessage}`);
+      setStatus(`Restored from your previous session, ${data.outcomeMessage}`);
       setResultMeta({
         kind: results.status,
         computedAt: results.computedAt,
@@ -810,7 +810,7 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
       setTargetName(data.targetName);
       setInterruptedNote(data.interruptedNote);
       setSearchElapsedMs(data.elapsedMs);
-      setStatus(`Opened saved analysis “${opened.record.name}” · ${data.outcomeMessage}`);
+      setStatus(`Opened saved analysis “${opened.record.name}”, ${data.outcomeMessage}`);
       setResultMeta({
         kind: results.status,
         computedAt: results.computedAt,
@@ -1164,8 +1164,8 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
       const detail = state.progress ? progressLabel(state.progress) : state.stage ?? "Preparing the search";
       setStatus(
         state.routes.length > 0
-          ? `Verified route found · still looking for better routes · ${detail}`
-          : `Searching · ${detail}`,
+          ? `Verified route found, still looking for better routes, ${detail}`
+          : `Searching, ${detail}`,
       );
       return;
     }
@@ -1185,12 +1185,12 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
         break;
       case "found-interrupted":
         setInterruptedNote(outcome.message);
-        setStatus("Search stopped early · verified route kept.");
+        setStatus("Search stopped early, verified route kept.");
         break;
       case "cancelled":
         if (state.routes.length > 0) {
           setInterruptedNote(outcome.message);
-          setStatus("Search cancelled · verified route kept.");
+          setStatus("Search cancelled, verified route kept.");
         } else {
           setStatus("Synthesis search cancelled.");
         }
@@ -1651,7 +1651,7 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
               />
             </div>
             <div className="synthesis-progress-meta">
-              <span>Deterministic reaction-rule search · bar estimates completed search work, not time remaining</span>
+              <span>Deterministic reaction-rule search, bar estimates completed search work, not time remaining</span>
               <span>
                 {(searchElapsedMs / 1000).toFixed(1)}s of {Math.round(UNIFIED_SEARCH_TOTAL_MS / 1000)}s limit
               </span>
@@ -1700,7 +1700,7 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
                   <span className="route-alt-n">Route {index + 1}</span>
                   <span className="route-alt-main">
                     <span className="route-alt-steps">{route.steps.length === 0 ? "A starting material already matches the target" : route.steps.map((step) => step.title).join(" → ")}</span>
-                    <span className="route-alt-meta">{route.steps.length} {route.steps.length === 1 ? "step" : "steps"} · {route.verification?.status === "verified" ? "Structure verified" : route.verification?.status === "connectivity-only" ? "Connectivity verified" : "Not replay-verified"}{route.quality ? ` · ${routeQualityLabel(route.quality.tier)}` : ""}</span>
+                    <span className="route-alt-meta">{route.steps.length} {route.steps.length === 1 ? "step" : "steps"}, {route.verification?.status === "verified" ? "Structure verified" : route.verification?.status === "connectivity-only" ? "Connectivity verified" : "Not replay-verified"}{route.quality ? `, ${routeQualityLabel(route.quality.tier)}` : ""}</span>
                   </span>
                 </button>
               </li>
@@ -1732,7 +1732,7 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
           {route.steps.length > 0 ? (
             <ol aria-label={`Route at a glance, ${route.steps.length} ${route.steps.length === 1 ? "step" : "steps"}`} className="route-glance" data-testid="route-glance">
               {route.steps.map((step) => (
-                <li key={step.id}><span className="route-glance-n">Step {step.stepNumber}</span> <span className="route-glance-title">{step.title}</span>{step.reagentLabel ? <span className="route-glance-reagent"> · {step.reagentLabel}</span> : null}</li>
+                <li key={step.id}><span className="route-glance-n">Step {step.stepNumber}</span> <span className="route-glance-title">{step.title}</span>{step.reagentLabel ? <span className="route-glance-reagent">, {step.reagentLabel}</span> : null}</li>
               ))}
             </ol>
           ) : null}
@@ -1886,8 +1886,8 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
                         )}
                         <h3>{step.title}</h3>
                         <p className="reaction-curriculum">
-                          {courseLabel(step.course)} · {step.chapter}
-                          {step.mechanism ? ` · ${step.mechanism}` : ""}
+                          {courseLabel(step.course)}, {step.chapter}
+                          {step.mechanism ? `, ${step.mechanism}` : ""}
                         </p>
                       </div>
                       <span className="synthesis-source-pill">
@@ -1984,7 +1984,7 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
                     {step.productMixture && (
                       <p className="reaction-detail">
                         <strong>Product mixture:</strong>{" "}
-                        {step.productMixture.label} · {step.productMixture.memberCount}{" "}
+                        {step.productMixture.label}, {step.productMixture.memberCount}{" "}
                         stereoisomer{step.productMixture.memberCount === 1 ? "" : "s"} shown
                       </p>
                     )}
@@ -1997,8 +1997,8 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
                       >
                         <strong>Selectivity:</strong>{" "}
                         {step.selectivityAssessment
-                          ? `${step.selectivityAssessment.label} · ${step.selectivityAssessment.basis.split(";")[0]}`
-                          : step.selectivity.join(" · ")}
+                          ? `${step.selectivityAssessment.label}, ${step.selectivityAssessment.basis.split(";")[0]}`
+                          : step.selectivity.join(", ")}
                       </p>
                     )}
                     {step.limitations.length > 0 && (

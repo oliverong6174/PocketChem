@@ -222,7 +222,7 @@ export function PassiveScene({ input, result, selected, onSelect }: { input: Pas
           <Txt anchor="start" fill={INK} size={11} x={330} y={78}>Electrical (Vm):</Txt>
           {elec === "none" ? <Txt anchor="start" fill={MUTED} size={11} x={430} y={78}>none</Txt> : <g><line markerEnd="url(#pa-ink)" stroke={INK} strokeWidth={2.4} x1={426} x2={426} y1={elec === "in" ? 68 : 84} y2={elec === "in" ? 84 : 68} /><Txt anchor="start" fill={INK} size={11} x={434} y={78}>{elec}</Txt></g>}
           <Txt anchor="start" bold fill={COL.ok} size={11} x={330} y={100}>Net: {result.direction === "none" ? "equilibrium" : result.direction}</Txt>
-          <Txt anchor="start" fill={MUTED} size={10.5} x={330} y={118}>E {result.ion.eMv.toFixed(0)} mV · Vm {input.vmMv} mV</Txt>
+          <Txt anchor="start" fill={MUTED} size={10.5} x={330} y={118}>E {result.ion.eMv.toFixed(0)} mV, Vm {input.vmMv} mV</Txt>
           <Txt anchor="end" bold fill={INK} size={11} x={W - 6} y={MB + 20}>{input.vmMv < 0 ? "inside −" : input.vmMv > 0 ? "inside +" : "Vm = 0"}</Txt>
         </g>
       ) : null}
@@ -259,7 +259,7 @@ export function IonScene({ input, selected, onSelect }: { input: IonExplorerInpu
             {d.direction === "none" ? <Txt bold fill={MUTED} size={11.5} x={x} y={H_MAX - 8}>E = Vm: no net flow</Txt> : (
               <g>
                 <line markerEnd="url(#io-ok)" stroke={COL.ok} strokeWidth={3.2} x1={x + 34} x2={x + 34} y1={d.direction === "inward" ? 128 : 218} y2={d.direction === "inward" ? 218 : 128} />
-                <Txt bold fill={COL.ok} size={11.5} x={x} y={H_MAX - 8}>{d.direction === "inward" ? "net in" : "net out"} · E {Math.round(d.eMv)} mV</Txt>
+                <Txt bold fill={COL.ok} size={11.5} x={x} y={H_MAX - 8}>{d.direction === "inward" ? "net in" : "net out"}, E {Math.round(d.eMv)} mV</Txt>
               </g>
             )}
           </g>
@@ -309,7 +309,7 @@ export function PumpScene({ state }: { state: PumpState }) {
     <svg aria-label={summary} className="c23-svg" role="img" viewBox={`0 0 ${W} ${H_MAX}`}>
       <ArrowMarkers prefix="pu" />
       <Water />
-      <SideLabels extra={<Txt anchor="end" bold fill={INK} size={12.5} x={W - 8} y={16}>{state.conformation} · {state.facing === "occluded" ? "occluded" : `open to ${state.facing}`}</Txt>} />
+      <SideLabels extra={<Txt anchor="end" bold fill={INK} size={12.5} x={W - 8} y={16}>{state.conformation}, {state.facing === "occluded" ? "occluded" : `open to ${state.facing}`}</Txt>} />
       <Bilayer cholesterol={false} gaps={[[X - 40, X + 40]]} lipids="mixed" temperature="moderate" />
       <rect fill={COL.protein} height={112} rx={16} stroke={COL.proteinStroke} strokeWidth={2.2} width={88} x={X - 44} y={MT - 24} />
       {openTop ? cav(MT - 18, true) : null}
@@ -369,7 +369,7 @@ export function SgltScene({ input, result, step, step_titles }: { input: SgltInp
       {none ? <Txt bold fill={MUTED} size={12} x={X} y={H_MAX - 8}>glucose at equilibrium: no net movement</Txt> : (
         <g>
           <line markerEnd="url(#sg-ok)" stroke={COL.ok} strokeWidth={3.4} x1={X - 70} x2={X - 70} y1={rev ? 218 : 124} y2={rev ? 124 : 218} />
-          <Txt bold fill={COL.ok} size={12} x={X} y={H_MAX - 8}>net glucose {rev ? "OUT (cycle reversed)" : "IN"} · no ATP at SGLT1</Txt>
+          <Txt bold fill={COL.ok} size={12} x={X} y={H_MAX - 8}>net glucose {rev ? "OUT (cycle reversed)" : "IN"}, no ATP at SGLT1</Txt>
         </g>
       )}
       <Txt anchor="end" fill={MUTED} italic size={10.5} x={W - 8} y={nMaxOut + 0}>Na⁺ gradient is made by the pump</Txt>
@@ -418,7 +418,7 @@ export function OsmosisScene({ input, result }: { input: OsmosisInput; result: O
       <rect fill="#ffffff" height={58} rx={8} stroke="#cbd5e1" width={196} x={W - 204} y={26} />
       <circle cx={W - 192} cy={42} fill="#475569" r={4} /><Txt anchor="start" size={11} x={W - 182} y={46}>impermeant solute</Txt>
       <rect fill={COL.k} height={8} width={8} x={W - 196} y={58} /><Txt anchor="start" size={11} x={W - 182} y={66}>permeant solute (urea)</Txt>
-      <Txt anchor="start" size={11} x={W - 198} y={80}>inside {result.inImpermeantOsm.toFixed(0)} · outside {result.outImpermeantOsm.toFixed(0)} mOsm/L</Txt>
+      <Txt anchor="start" size={11} x={W - 198} y={80}>inside {result.inImpermeantOsm.toFixed(0)}, outside {result.outImpermeantOsm.toFixed(0)} mOsm/L</Txt>
       {rEq ? <Txt anchor="start" fill={COL.bad} size={11} x={12} y={H_MAX - 10}>dashed: idealized equilibrium size ({result.relativeVolume!.toFixed(2)} × volume)</Txt> : <Txt anchor="start" fill={MUTED} size={11} x={12} y={H_MAX - 10}>no equilibrium size is predicted for these values</Txt>}
     </svg>
   );

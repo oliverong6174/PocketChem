@@ -56,13 +56,13 @@ export function PropertiesIdentity({ identity, smiles, groups, stereocenters, on
       <div className="pr-identity-main">
         <p className="pr-eyebrow">Current molecule</p>
         <h3 className="pr-name">{name}</h3>
-        {source ? <p className="pr-confidence">{derived.namingStatus === "unsupported" ? <>Structure-derived name unavailable · </> : derived.displayName.toLowerCase() !== name.toLowerCase() ? <>Structure-derived name: {derived.displayName} · </> : null}{source.sourceId}</p> : <p className="pr-confidence"><strong>{nomenclature.namingConfidence} confidence</strong> in structure-derived name{nomenclature.commonName && nomenclature.commonName.toLowerCase() !== name.toLowerCase() ? <> · also known as <em>{nomenclature.commonName}</em></> : null}</p>}
+        {source ? <p className="pr-confidence">{derived.namingStatus === "unsupported" ? <span>Structure-derived name unavailable</span> : derived.displayName.toLowerCase() !== name.toLowerCase() ? <span>Structure-derived name: {derived.displayName}</span> : null}<span>{source.sourceId}</span></p> : <p className="pr-confidence"><strong>{nomenclature.namingConfidence} confidence</strong><span>in structure-derived name</span>{nomenclature.commonName && nomenclature.commonName.toLowerCase() !== name.toLowerCase() ? <span>Also known as <em>{nomenclature.commonName}</em></span> : null}</p>}
         <dl className="pr-keyfacts">
           {composition?.rows.filter((row) => ["formula", "mw", "exactMass", "charge"].includes(row.id)).map((row) => (
             <div key={row.id}><dt>{row.label}</dt><dd>{row.value}</dd></div>
           ))}
         </dl>
-        {generic ? <div className="pr-generic" role="note"><strong>Generic structure</strong><p>Molecular weight, exact mass and DBE are unavailable: substituents are unspecified (R is not an element).</p>{variants.length > 0 ? <details><summary>Choose a concrete database entry</summary><p>These entries match the scaffold. Each is a separate choice.</p>{variants.map((variant) => <button className="secondary-button" type="button" key={variant.sourceId} onClick={() => onLoadVariant?.(variant)} disabled={!onLoadVariant}>{variant.title} · {variant.sourceId}</button>)}</details> : null}</div> : null}
+        {generic ? <div className="pr-generic" role="note"><strong>Generic structure</strong><p>Molecular weight, exact mass and DBE are unavailable: substituents are unspecified (R is not an element).</p>{variants.length > 0 ? <details><summary>Choose a concrete database entry</summary><p>These entries match the scaffold. Each is a separate choice.</p>{variants.map((variant) => <button className="secondary-button" type="button" key={variant.sourceId} onClick={() => onLoadVariant?.(variant)} disabled={!onLoadVariant}>{variant.title} <span className="pr-note">{variant.sourceId}</span></button>)}</details> : null}</div> : null}
         {unspecifiedStereo ? <p className="pr-generic" role="note"><strong>Stereochemistry unspecified.</strong>{stereoVariants.length > 0 ? <> Load a specific isomer: {stereoVariants.map((variant) => <button className="secondary-button" type="button" key={variant.sourceId} onClick={() => onLoadVariant?.(variant)} disabled={!onLoadVariant}>{variant.variantLabel ?? variant.title}</button>)}</> : null}</p> : null}
         <p className="pr-smiles"><span className="pr-eyebrow">SMILES</span> <code>{smiles}</code></p>
       </div>
@@ -125,7 +125,7 @@ export function PropertiesSummary({ identity, smiles, groups, stereocenters, inf
 
       {tendencies && tendencies.rows.length > 0 ? (
         <section aria-labelledby="pr-tend" className="pr-block">
-          <h4 id="pr-tend">{tendencies.title} <span className="pr-note">· estimated, not measured</span></h4>
+          <h4 id="pr-tend">{tendencies.title}</h4>
           <div className="pr-tiles">{tendencies.rows.map((row) => <Tile info={info} key={row.id} row={row} />)}</div>
         </section>
       ) : null}

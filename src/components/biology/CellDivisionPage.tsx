@@ -116,7 +116,7 @@ export default function CellDivisionPage({ openRequest = null, onOpenHandled, on
           { label: "Step through the stages", detail: "Select a chromosome to inspect it." },
           { label: "Compare the gametes", detail: "With the Genetics tool's expectation." },
         ]}
-        aside={<Badge tone="neutral" title="2n = 2 or 4. One illustrated meiosis is one random outcome, not a distribution.">Small model · one outcome</Badge>}
+        aside={<Badge tone="neutral" title="2n = 2 or 4. One illustrated meiosis is one random outcome, not a distribution.">Small model, one outcome</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">
@@ -227,7 +227,7 @@ export default function CellDivisionPage({ openRequest = null, onOpenHandled, on
 
           <KeyFigures items={stage.cells.length === 1
             ? [{ label: "Chromosomes (centromeres)", value: String(stage.counts[0].chromosomes) }, { label: "Chromatids (DNA molecules)", value: String(stage.counts[0].chromatids) }, { label: "DNA content", value: `${stage.counts[0].dnaC}C`, note: "1C = one haploid set" }, { label: "Chromosome sets", value: stage.counts[0].sets }]
-            : [{ label: "Cells", value: String(stage.cells.length) }, { label: "Chromosomes per cell", value: stage.counts.map((c) => c.chromosomes).join(" · ") }, { label: "Chromatids per cell", value: stage.counts.map((c) => c.chromatids).join(" · ") }, { label: "DNA content per cell", value: stage.counts.map((c) => `${c.dnaC}C`).join(" · ") }]} />
+            : [{ label: "Cells", value: String(stage.cells.length) }, { label: "Chromosomes per cell", value: stage.counts.map((c) => c.chromosomes).join(", ") }, { label: "Chromatids per cell", value: stage.counts.map((c) => c.chromatids).join(", ") }, { label: "DNA content per cell", value: stage.counts.map((c) => `${c.dnaC}C`).join(", ") }]} />
 
           {selectedChrom ? (
             <Panel subtitle="Chromosome selected in the diagram." title={`Chromosome ${selectedChrom.x.id}`}>
@@ -247,7 +247,7 @@ export default function CellDivisionPage({ openRequest = null, onOpenHandled, on
                 <p>Chromosome number is the number of centromeres; DNA content is the number of chromatids (in units of C, one haploid set). The table follows the first cell through every stage of this run.</p>
                 <table className="bio-dist" data-testid="counts-table">
                   <thead><tr><th scope="col">Stage</th><th scope="col">Chromosomes</th><th scope="col">Chromatids</th><th scope="col">DNA</th></tr></thead>
-                  <tbody>{stages.map((s) => <tr key={s.id}><th scope="row">{s.title}</th><td>{s.counts.map((c) => c.chromosomes).join(" · ")}</td><td>{s.counts.map((c) => c.chromatids).join(" · ")}</td><td>{s.counts.map((c) => `${c.dnaC}C`).join(" · ")}</td></tr>)}</tbody>
+                  <tbody>{stages.map((s) => <tr key={s.id}><th scope="row">{s.title}</th><td>{s.counts.map((c) => c.chromosomes).join(", ")}</td><td>{s.counts.map((c) => c.chromatids).join(", ")}</td><td>{s.counts.map((c) => `${c.dnaC}C`).join(", ")}</td></tr>)}</tbody>
                 </table>
               </Disclosure>
               <Disclosure summary="Homologs versus sister chromatids"><p>Homologous chromosomes are the maternal and the paternal copy of the same chromosome: similar genes, possibly different alleles. Sister chromatids are the two identical copies made by DNA replication of ONE chromosome. {meiosis ? "In meiosis I the homologs separate; in meiosis II the sister chromatids separate." : "In mitosis the homologs never pair; the sister chromatids of every chromosome separate."}</p></Disclosure>

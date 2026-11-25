@@ -2388,7 +2388,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
 
             <p aria-live="polite" className="pr-status" data-testid="pr-status">
               <span className="label">Status</span> <strong>{status}</strong>
-              {moleculeIdentity ? <span className="pr-status-meta"> · {reactionPathways.length} predicted {reactionPathways.length === 1 ? "reaction" : "reactions"}</span> : null}
+              {moleculeIdentity ? <span className="pr-status-meta">{reactionPathways.length} predicted {reactionPathways.length === 1 ? "reaction" : "reactions"}</span> : null}
             </p>
 
             {moleculeIdentity ? (
@@ -2428,7 +2428,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
             <div className="dashboard-panel-scroll" role="tabpanel" id={`properties-panel-${analysisPanel}`} aria-labelledby={`properties-tab-${analysisPanel}`} tabIndex={0}>
               {analysisPanel === "overview" && (
                 <div className="dashboard-panel">
-                  {moleculeIdentity ? <section className="pr-overview-science"><h4>Reactivity at a glance</h4><p><strong>Aromaticity:</strong> {aromaticityOverview?.result?.summary ?? "Reading ring systems…"} <button type="button" onClick={() => setAnalysisPanel("aromaticity")}>Inspect rings</button></p><p><strong>Acid/Base:</strong> {acidityResults.length} acidic · {basicityResults.length} basic sites. {acidityResults[0] ? <>Strongest acid: {acidityResults[0].acidicSite}, est. pKa {acidityResults[0].estimatedPkaRange.join("–")}.</> : null} <button type="button" onClick={() => setAnalysisPanel("acidBase")}>Inspect sites</button></p></section> : null}
+                  {moleculeIdentity ? <section className="pr-overview-science"><h4>Reactivity at a glance</h4><p><strong>Aromaticity:</strong> {aromaticityOverview?.result?.summary ?? "Reading ring systems…"} <button type="button" onClick={() => setAnalysisPanel("aromaticity")}>Inspect rings</button></p><p><strong>Acid/Base:</strong> {acidityResults.length} acidic and {basicityResults.length} basic sites. {acidityResults[0] ? <>Strongest acid: {acidityResults[0].acidicSite}, est. pKa {acidityResults[0].estimatedPkaRange.join("–")}.</> : null} <button type="button" onClick={() => setAnalysisPanel("acidBase")}>Inspect sites</button></p></section> : null}
                   {moleculeIdentity ? (
                     <PropertiesSummary groups={propertyGroups} identity={moleculeIdentity} info={PROPERTY_INFO} smiles={smiles} stereocenters={propertyStereocenters} />
                   ) : (

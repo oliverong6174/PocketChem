@@ -644,7 +644,7 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
         <div className="multicatalytic-result-step-heading">
           <strong>
             Attempt {step.attempt}
-            {step.committedStep !== null ? ` · step ${step.committedStep}` : ""}: {step.title}
+            {step.committedStep !== null ? `, step ${step.committedStep}` : ""}: {step.title}
           </strong>
           <span className={step.status === "reaction" ? "reaction-status reaction-status-computed" : "no-reaction-chip"}>
             {STEP_STATUS_CHIP[step.status]}
@@ -831,8 +831,8 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
                 <p className="multicatalytic-product-name">{label(lot.smiles)}</p>
                 <small className="reaction-note">
                   {workspace ? lotOrigin(workspace, lot) : ""}
-                  {lot.role === "coproduct" ? " · coproduct" : ""}
-                  {lot.stereoMixture ? ` · ${lot.stereoMixture} mixture member` : ""}
+                  {lot.role === "coproduct" ? ", coproduct" : ""}
+                  {lot.stereoMixture ? `, ${lot.stereoMixture} mixture member` : ""}
                 </small>
               </li>
             ))}
@@ -885,8 +885,8 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
               >
                 <span>{option.reagents}</span>
                 <small>
-                  {option.title} · {option.family}
-                  {option.requiresStructuralReactantInput ? " · needs another molecule" : ""}
+                  {option.title}, {option.family}
+                  {option.requiresStructuralReactantInput ? ", needs another molecule" : ""}
                 </small>
               </button>
             ))}
@@ -997,7 +997,7 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
           <div className="multicatalytic-route-steps">
             {workspace.history.map((step, index) => (
               <details className="mc-step-details" data-testid="mc-step-details" key={step.attempt} open={index === workspace.history.length - 1 || isUnresolvedStep(step)}>
-                <summary>Attempt {step.attempt}{step.committedStep !== null ? ` · step ${step.committedStep}` : ""}: {step.title} — {STEP_STATUS_CHIP[step.status]}</summary>
+                <summary>Attempt {step.attempt}{step.committedStep !== null ? `, step ${step.committedStep}` : ""}: {step.title} — {STEP_STATUS_CHIP[step.status]}</summary>
                 {renderStep(step)}
               </details>
             ))}

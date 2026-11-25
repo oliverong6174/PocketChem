@@ -99,7 +99,7 @@ export default function RcPage({ openRequest = null, onOpenHandled }: Props) {
           { label: "Play or drag time", detail: "Diagram, numbers and graphs share one clock." },
           { label: "Find τ on the graph", detail: "63 % of the way after one time constant." },
         ]}
-        aside={<Badge tone="neutral" title="One resistor, one capacitor, one loop.">1 R · 1 C · 1 loop</Badge>}
+        aside={<Badge tone="neutral" title="One resistor, one capacitor, one loop.">1 R, 1 C, 1 loop</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">

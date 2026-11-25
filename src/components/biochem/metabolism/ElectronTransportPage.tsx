@@ -116,7 +116,7 @@ export default function ElectronTransportPage({ openRequest = null, onOpenHandle
                 </div>
               ) : <Callout tone="info" title="Inspect a part"><p>Select a complex, coenzyme Q, cytochrome c or ATP synthase in the diagram.</p></Callout>}
               <KeyFigures items={[
-                { label: "H⁺ pumped per electron pair", value: String(pumped), note: outcome.donors.map((d) => `${DONORS[d.donor].short} ${d.flows ? d.protonsPerPair : "blocked"}`).join(" · ") },
+                { label: "H⁺ pumped per electron pair", value: String(pumped), note: outcome.donors.map((d) => `${DONORS[d.donor].short} ${d.flows ? d.protonsPerPair : "blocked"}`).join(", ") },
                 { label: "Estimated ATP per pair", value: outcome.donors.filter((d) => d.flows).map((d) => atpEstimate(d.donor)).join(" + ") || "0", note: `estimate: H⁺ ÷ ${OXPHOS_ASSUMPTIONS.protonsPerAtp}` },
               ]} />
               {view === "inhibitors" ? (
@@ -135,7 +135,7 @@ export default function ElectronTransportPage({ openRequest = null, onOpenHandle
                     </table>
                     <ul className="gc-assumptions" data-testid="outcome-explanation">{outcome.explanation.map((t) => <li key={t}>{t}</li>)}</ul>
                     {outcome.redox.length ? (
-                      <p data-testid="redox">Redox state of carriers on the blocked route: {outcome.redox.map((r) => `${CARRIER_LABEL[r.carrier]} ${r.state}`).join(" · ")}.</p>
+                      <p data-testid="redox">Redox state of carriers on the blocked route: {outcome.redox.map((r) => `${CARRIER_LABEL[r.carrier]} ${r.state}`).join(", ")}.</p>
                     ) : null}
                   </Panel>
                   <Callout tone="warn" title="Not a cellular simulation"><p>These are qualitative outcomes for a schematic gradient. No oxygen-consumption rate, membrane potential or ATP rate is calculated, and real cells have additional controls (for example ATP-synthase reversal and other electron entry points) that are not modelled.</p></Callout>

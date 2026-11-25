@@ -195,7 +195,7 @@ export default function MagneticPage({ openRequest = null, onOpenHandled }: Prop
           { label: "Read the symbols", detail: "⊙ is out of the screen, ⊗ is into it." },
           { label: "Change one thing", detail: "Reverse a current or a charge and watch the force flip." },
         ]}
-        aside={<Badge tone="neutral" title="Steady currents in vacuum; non-relativistic motion.">steady fields · vacuum</Badge>}
+        aside={<Badge tone="neutral" title="Steady currents in vacuum; non-relativistic motion.">steady fields, vacuum</Badge>}
       />
       {ws.chrome}
       <div className="gc-toolbar">
@@ -496,7 +496,7 @@ export default function MagneticPage({ openRequest = null, onOpenHandled }: Prop
               <KeyFigures items={[
                 { label: "Force F = I L × B", value: formatSI(norm3(Fc), "N"), note: fmtVecSI([Fc.x, Fc.y, Fc.z], "N") },
                 { label: "Check: |I| L B sin θ", value: formatSI(Math.abs(cd.I) * norm3(cd.L) * norm3(cd.B) * Math.sin(((safeAngle(LI, cd.B) ?? 0) * Math.PI) / 180), "N"), note: "agrees with the cross product" },
-                { label: "Length / current", value: `${formatSI(norm3(cd.L), "m")} · ${formatSI(Math.abs(cd.I), "A")}` },
+                { label: "Length / current", value: `${formatSI(norm3(cd.L), "m")}, ${formatSI(Math.abs(cd.I), "A")}` },
               ]} />
             </>
           ) : null}
