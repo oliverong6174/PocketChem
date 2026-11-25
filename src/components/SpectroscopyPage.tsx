@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MolecularFigure } from "./ui/MolecularFigure";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import { readKetcherStructureSnapshot } from "../utils/ketcherSnapshot";
 import {
@@ -1910,21 +1911,21 @@ export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: 
             }}
           >
             {massPreviewSvgs.map((preview, index) => (
-              <div
-                key={`${preview.label}-${index}`}
-                style={{ minWidth: 0, width: "100%", overflow: "hidden" }}
-                dangerouslySetInnerHTML={{ __html: preview.svg }}
-              />
+              <div key={`${preview.label}-${index}`} style={{ minWidth: 0, width: "100%", overflow: "hidden" }}>
+                <MolecularFigure svg={preview.svg} title={preview.label} />
+              </div>
             ))}
           </div>
         ) : displayedStructureSvg && (
-          <div
-            ref={structurePreviewRef}
+          <MolecularFigure
+            containerRef={structurePreviewRef}
+            clickToExpand={false}
+            svg={displayedStructureSvg}
+            title="Structure"
             className={((activeTab === "ir" && irHighlightedSvg) || ((activeTab === "proton" || activeTab === "carbon") && nmrHighlightedSvg) || (activeTab === "mass" && massFragmentSvg)) ? "spectroscopy-structure-preview highlighted-molecule-svg" : "spectroscopy-structure-preview"}
-            title={activeTab === "mass"
+            htmlTitle={activeTab === "mass"
               ? ((selectedMassPeak?.previewStructure || selectedMassPeak?.fragmentSmiles) ? "Selected mass-spectral ion or fragment shown above." : undefined)
               : "Tap an atom or bond to jump to the corresponding spectral assignment. Tap the same site again to cycle through multiple matching assignments."}
-            dangerouslySetInnerHTML={{ __html: displayedStructureSvg }}
           />
         )}
 

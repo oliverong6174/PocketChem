@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MolecularFigure } from "./ui/MolecularFigure";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
@@ -849,9 +850,11 @@ export default function RankingPage({ openRequest = null, onOpenHandled }: Ranki
 
                     <div className="ranking-result-structure">
                       {molecule.structureSvg ? (
-                        <div
+                        <MolecularFigure
                           className="molecule-preview ranking-molecule-preview"
-                          dangerouslySetInnerHTML={{ __html: molecule.structureSvg }}
+                          source={{ smiles: molecule.smiles, label: molecule.label }}
+                          svg={molecule.structureSvg}
+                          title={`Structure of ${molecule.label}`}
                         />
                       ) : (
                         <div className="ranking-no-structure">No preview</div>

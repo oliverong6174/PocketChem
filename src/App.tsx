@@ -25,6 +25,7 @@ import type { CounterpartCandidate } from "./utils/aromaticCounterparts";
 import { molecularStructureKey } from "./utils/moleculeNameResolver";
 import { ConceptSearch } from "./components/shell/ConceptSearch";
 import { NavigationContext } from "./navigation/NavigationContext";
+import { MolecularFigure, MoleculeOriginContext } from "./components/ui/MolecularFigure";
 import type { ConceptDestination } from "./utils/concepts/conceptIndex";
 import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type BiologyToolId, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
   import {
@@ -1973,6 +1974,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
 
   return (
     <NavigationContext.Provider value={navigation}>
+    <MoleculeOriginContext.Provider value={activeSubject === "organic" && activePage !== "saved" ? activePage : null}>
     <main className="app" ref={appShellRef}>
       {activeSubject === "organic" ? (
         <AppShell
@@ -2524,12 +2526,13 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
                     {highlightedMoleculeSvg && (
                       <div className="highlight-preview-wrapper pr-concept-visual">
                         <div className="highlight-preview">
-                          <div
-                            ref={highlightedSvgRef}
+                          <MolecularFigure
+                            containerRef={highlightedSvgRef}
                             className="highlighted-molecule-svg"
-                            dangerouslySetInnerHTML={{
-                              __html: highlightedMoleculeSvg,
-                            }}
+                            clickToExpand={false}
+                            svg={highlightedMoleculeSvg}
+                            title="Structure with highlighted sites"
+                            source={{ smiles: sanitizeDisplayedSmiles(smiles) || null, molfile }}
                           />
                         </div>
                       </div>
@@ -2684,6 +2687,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
     </div>
     </main>
     <ConceptSearch initialQuery={searchState.query} onClose={closeSearch} onOpenDestination={openDestination} onOpenSaved={(analysis) => openSavedAnalysis(analysis)} open={searchState.open} />
+    </MoleculeOriginContext.Provider>
     </NavigationContext.Provider>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { bondEndpointMap } from "../../utils/moleculeAnnotation";
 import { getRDKit } from "../../utils/rdkit";
+import { MolecularFigure } from "../ui/MolecularFigure";
 
 /**
  * RDKit indices are preserved: draw exactly the same source used for the analysis.
@@ -24,5 +25,5 @@ export function MolecularDepiction({ structure, atoms = [], bonds = [], label, i
     }).catch(() => { if (!cancelled) setResult(null); });
     return () => { cancelled = true; };
   }, [structure, key]);
-  return <figure className="pr-depiction" aria-label={label}>{result?.key === key ? <div aria-hidden="true" dangerouslySetInnerHTML={{ __html: result.svg }} /> : <p>Drawing structure…</p>}{caption ? <figcaption>{label}</figcaption> : null}</figure>;
+  return <figure className="pr-depiction" aria-label={label}>{result?.key === key ? <MolecularFigure source={/M {2}END/.test(structure) ? { molfile: structure } : { smiles: structure }} svg={result.svg} title={label} /> : <p>Drawing structure…</p>}{caption ? <figcaption>{label}</figcaption> : null}</figure>;
 }

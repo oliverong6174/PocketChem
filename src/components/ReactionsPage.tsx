@@ -1,5 +1,7 @@
 import { reagentBubbleLabels } from "../utils/reactions/reactionPresentation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { MolecularFigure } from "./ui/MolecularFigure";
+import { componentSource } from "../utils/moleculeTransfer";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
@@ -1549,7 +1551,7 @@ export default function ReactionsPage({
                   <div className="reaction-three-column">
                     <div className="reaction-column">
                       <div className="reaction-svg-box reaction-component-box">
-                        {(reactantSvgs[pathway.id] ?? []).map((svg, index) => (
+                        {(reactantSvgs[pathway.id] ?? []).map((svg, index, all) => (
                           <div
                             className="reaction-component-item"
                             key={`${pathway.id}-reactant-${index}`}
@@ -1557,7 +1559,7 @@ export default function ReactionsPage({
                             {index > 0 && (
                               <span className="reaction-component-plus">+</span>
                             )}
-                            <div dangerouslySetInnerHTML={{ __html: svg }} />
+                            <MolecularFigure source={componentSource(pathway.reactantComponents.length > 0 ? pathway.reactantComponents : pathway.reactantSmiles.split(".").filter(Boolean), all.length, index)} svg={svg} title={`Reactant ${index + 1}`} />
                           </div>
                         ))}
                       </div>
@@ -1625,7 +1627,7 @@ export default function ReactionsPage({
                                 </span>
                               )}
                               <div className="reaction-component-box">
-                                {variantSvgs.map((svg, componentIndex) => (
+                                {variantSvgs.map((svg, componentIndex, all) => (
                                   <div
                                     className="reaction-component-item"
                                     key={`${pathway.id}-product-${variantIndex}-${componentIndex}`}
@@ -1633,7 +1635,7 @@ export default function ReactionsPage({
                                     {componentIndex > 0 && (
                                       <span className="reaction-component-plus">+</span>
                                     )}
-                                    <div dangerouslySetInnerHTML={{ __html: svg }} />
+                                    <MolecularFigure source={componentSource((pathway.productMixture?.memberSmiles?.[variantIndex] ?? pathway.productSmiles ?? "").split(".").filter(Boolean), all.length, componentIndex)} svg={svg} title={`Product ${componentIndex + 1}`} />
                                   </div>
                                 ))}
                               </div>
@@ -1790,7 +1792,7 @@ export default function ReactionsPage({
                           {index > 0 && (
                             <span className="reaction-component-plus">+</span>
                           )}
-                          <div dangerouslySetInnerHTML={{ __html: svg }} />
+                          <MolecularFigure svg={svg} title="Target structure" />
                         </div>
                       ))}
                     </div>
@@ -1857,7 +1859,7 @@ export default function ReactionsPage({
                           {index > 0 && (
                             <span className="reaction-component-plus">+</span>
                           )}
-                          <div dangerouslySetInnerHTML={{ __html: svg }} />
+                          <MolecularFigure svg={svg} title={`Precursor ${index + 1}`} />
                         </div>
                       ))}
                     </div>

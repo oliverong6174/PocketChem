@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { MolecularFigure } from "./ui/MolecularFigure";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import { ToolHeader } from "./ui/primitives";
 import { SequenceRoutePanel } from "./multicatalytic/RouteViews";
@@ -402,7 +403,7 @@ function OrderedSequencePanel() {
       {startingSmiles && (
         <div className="multicatalytic-starting-structure">
           <strong>Starting molecule</strong>
-          {svgs.start && <div className="reaction-svg-box" dangerouslySetInnerHTML={{ __html: svgs.start }} />}
+          {svgs.start && <MolecularFigure className="reaction-svg-box" source={{ smiles: startingSmiles, label: startingName }} svg={svgs.start} title="Starting molecule" />}
           <p>{startingName}</p>
         </div>
       )}
@@ -481,9 +482,10 @@ function OrderedSequencePanel() {
                     ) : (
                       <>
                         {svgs[`${branch.id}-${step.stepNumber}`] && (
-                          <div
+                          <MolecularFigure
                             className="reaction-svg-box multicatalytic-product-svg"
-                            dangerouslySetInnerHTML={{ __html: svgs[`${branch.id}-${step.stepNumber}`] ?? "" }}
+                            svg={svgs[`${branch.id}-${step.stepNumber}`] ?? ""}
+                            title={`Product of step ${step.stepNumber}`}
                           />
                         )}
                         <p className="multicatalytic-product-name">{step.productLabel}</p>

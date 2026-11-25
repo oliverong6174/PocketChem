@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MolecularFigure } from "./ui/MolecularFigure";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
 import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./SavedAnalysisControls";
@@ -827,7 +828,7 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
                   />
                   <strong>{lotLabel(lot)}</strong> <code>{lot.id}</code>
                 </label>
-                {svgs[lot.smiles] && <div className="reaction-svg-box multicatalytic-product-svg" dangerouslySetInnerHTML={{ __html: svgs[lot.smiles] ?? "" }} />}
+                {svgs[lot.smiles] && <MolecularFigure className="reaction-svg-box multicatalytic-product-svg" source={{ smiles: lot.smiles }} svg={svgs[lot.smiles] ?? ""} title={lotLabel(lot)} />}
                 <p className="multicatalytic-product-name">{label(lot.smiles)}</p>
                 <small className="reaction-note">
                   {workspace ? lotOrigin(workspace, lot) : ""}
@@ -960,7 +961,7 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
           <div className="workspace-outcomes">
             {pending.outcomes.map((outcome) => (
               <div className="workspace-outcome" key={outcome.index}>
-                {svgs[outcome.productSmiles] && <div className="reaction-svg-box multicatalytic-product-svg" dangerouslySetInnerHTML={{ __html: svgs[outcome.productSmiles] ?? "" }} />}
+                {svgs[outcome.productSmiles] && <MolecularFigure className="reaction-svg-box multicatalytic-product-svg" source={{ smiles: outcome.productSmiles }} svg={svgs[outcome.productSmiles] ?? ""} title="Predicted product" />}
                 <p className="multicatalytic-product-name">{outcomeSummary(outcome)}</p>
                 <p className={`reaction-note${selectivityIsCaution(outcome.selectivityFinding.class) ? " reaction-limitation" : ""}`}>
                   {selectivityText(outcome.selectivityFinding.class)}

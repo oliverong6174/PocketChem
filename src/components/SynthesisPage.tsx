@@ -1,5 +1,7 @@
 import { reagentBubbleLabels } from "../utils/reactions/reactionPresentation";
 import { useEffect, useRef, useState } from "react";
+import { MolecularFigure } from "./ui/MolecularFigure";
+import { componentSource } from "../utils/moleculeTransfer";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import { rendererForReactionDisplay } from "./reactionProductRenderer";
 import {
@@ -1902,7 +1904,7 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
                     <div className="reaction-three-column">
                       <div className="reaction-column">
                         <div className="reaction-svg-box reaction-component-box">
-                          {(svgs?.reactants ?? []).map((svg, index) => (
+                          {(svgs?.reactants ?? []).map((svg, index, all) => (
                             <div
                               className="reaction-component-item"
                               key={`${step.id}-reactant-${index}`}
@@ -1910,7 +1912,7 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
                               {index > 0 && (
                                 <span className="reaction-component-plus">+</span>
                               )}
-                              <div dangerouslySetInnerHTML={{ __html: svg }} />
+                              <MolecularFigure source={componentSource(step.reactantComponents, all.length, index)} svg={svg} title={`Reactant ${index + 1}`} />
                             </div>
                           ))}
                         </div>
@@ -1965,7 +1967,7 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
 
                       <div className="reaction-column">
                         <div className="reaction-svg-box reaction-component-box">
-                          {(svgs?.products ?? []).map((svg, index) => (
+                          {(svgs?.products ?? []).map((svg, index, all) => (
                             <div
                               className="reaction-component-item"
                               key={`${step.id}-product-${index}`}
@@ -1973,7 +1975,7 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
                               {index > 0 && (
                                 <span className="reaction-component-plus">+</span>
                               )}
-                              <div dangerouslySetInnerHTML={{ __html: svg }} />
+                              <MolecularFigure source={componentSource((step.productMixture?.memberSmiles ?? step.productComponents).flatMap((member) => member.split(".").map((c) => c.trim()).filter(Boolean)), all.length, index)} svg={svg} title={`Product ${index + 1}`} />
                             </div>
                           ))}
                         </div>

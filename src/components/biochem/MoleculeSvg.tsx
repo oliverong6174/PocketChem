@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getRDKit } from "../../utils/rdkit";
+import { MolecularFigure } from "../ui/MolecularFigure";
 import { highlightedSvg, type Highlight } from "../../utils/biochem/aaStructure";
 
 export type Role = { atoms: number[]; color: [number, number, number]; label: string };
@@ -24,7 +25,7 @@ export function MoleculeSvg({ smiles, highlights = [], width = 340, height = 250
   return (
     <figure className="bc-mol">
       <div aria-label={label} className="bc-mol-art" data-testid="molecule-svg" role="img" style={{ minHeight: height }}>
-        {svg ? <div dangerouslySetInnerHTML={{ __html: svg }} /> : failed ? <p className="ph-note">The structure could not be drawn.</p> : <p className="ph-note" role="status">Drawing structure…</p>}
+        {svg ? <MolecularFigure source={{ smiles }} svg={svg} title={label} /> : failed ? <p className="ph-note">The structure could not be drawn.</p> : <p className="ph-note" role="status">Drawing structure…</p>}
       </div>
       {highlights.length ? (
         <figcaption className="bc-mol-legend">

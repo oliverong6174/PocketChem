@@ -65,6 +65,12 @@ const PATHS = {
   refresh: "M20 5v5h-5M4 19v-5h5m11-4a8 8 0 00-14-3M4 14a8 8 0 0014 3",
   flip: "M4 8h13l-3-3m3 3l-3 3M20 16H7l3-3m-3 3l3 3",
   search: "M11 4a7 7 0 100 14 7 7 0 000-14zm5 12l4.5 4.5",
+  expand: "M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7",
+  zoomIn: "M11 4a7 7 0 100 14 7 7 0 000-14zm5 12l4.5 4.5M8 11h6m-3-3v6",
+  zoomOut: "M11 4a7 7 0 100 14 7 7 0 000-14zm5 12l4.5 4.5M8 11h6",
+  fit: "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5M9 9h6v6H9z",
+  copy: "M9 9h10v11H9V9zM5 15V4h10",
+  send: "M4 12h13m0 0l-4-4m4 4l-4 4M20 5v14",
 } as const;
 
 export type IconName = keyof typeof PATHS;

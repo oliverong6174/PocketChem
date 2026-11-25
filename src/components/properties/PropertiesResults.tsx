@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getCondensedSulfonateSvg } from "../../utils/functionalGroups";
 import type { MoleculeIdentityResult } from "../../utils/nomenclatureUtils";
 import { buildPropertySections, type GroupCount, type PropertyRow, type StereoCenter } from "../../utils/propertiesSections";
+import { MolecularFigure } from "../ui/MolecularFigure";
 import { findConcreteNameVariants, findStereoVariants, type MoleculeNameResolution } from "../../utils/moleculeNameResolver";
 
 interface Shared {
@@ -50,7 +51,7 @@ export function PropertiesIdentity({ identity, smiles, groups, stereocenters, on
   return (
     <section aria-label="Molecule identity" className="pr-identity" data-testid="pr-identity">
       <figure aria-label={`Structure of ${name}`} className="pr-structure">
-        {svg ? <div aria-hidden="true" className="pr-structure-svg" dangerouslySetInnerHTML={{ __html: svg }} /> : <div aria-hidden="true" className="pr-structure-svg is-empty">Drawing…</div>}
+        {svg ? <MolecularFigure className="pr-structure-svg" source={{ smiles, label: name }} svg={svg} title={`Structure of ${name}`} /> : <div aria-hidden="true" className="pr-structure-svg is-empty">Drawing…</div>}
         <figcaption className="pc-visually-hidden">{text}</figcaption>
       </figure>
       <div className="pr-identity-main">
