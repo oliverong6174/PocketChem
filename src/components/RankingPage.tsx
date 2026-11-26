@@ -675,11 +675,9 @@ export default function RankingPage({ openRequest = null, onOpenHandled }: Ranki
           <div className="card-header">
             <div>
               <h2>Add molecule</h2>
-              <p>Draw a structure or type a common/IUPAC name below the editor.</p>
+              
             </div>
-            <span className={`status ${ketcher ? "ready" : "loading"}`}>
-              {ketcher ? "Editor ready" : "Loading editor"}
-            </span>
+            {ketcher ? null : <span className="status loading" role="status">Loading editor</span>}
           </div>
 
           <div className="ranking-ketcher-box">

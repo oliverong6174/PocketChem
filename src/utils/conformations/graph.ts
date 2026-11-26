@@ -118,7 +118,8 @@ function parseCoords(molblock: string, atomCount: number): Array<{ x: number; y:
 
 /** Parses SMILES or a molfile into the shared graph. The RDKit objects are always released. */
 export function buildConformationGraph(rdkit: RdKitLike, input: string): GraphResult {
-  const text = input.trim();
+  // A Molfile starts with a title line that is often empty: trimming it shifts the header and the file no longer parses.
+  const text = /M {2}END/.test(input) ? input : input.trim();
   if (!text) return { ok: false, message: "No structure was given." };
   const plain = rdkit.get_mol(text);
   if (!plain || (plain.is_valid && !plain.is_valid())) {

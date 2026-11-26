@@ -50,11 +50,33 @@ export async function exportMolecule(source: MoleculeSource): Promise<MoleculeEx
       // A SMILES has no layout: give it 2D coordinates so the Molfile opens as a readable drawing.
       if (typeof mol.set_new_coords === "function") mol.set_new_coords();
       molfile = mol.get_molblock();
+      // Without the absolute-stereo flag Ketcher reads the centres as an "and" (racemic) group when it is pasted.
+      if (/@/.test(smiles)) molfile = withAbsoluteStereoFlag(molfile);
     }
     return { molfile, smiles, label: source.label ?? null };
   } finally {
     mol.delete();
   }
+}
+
+/** Sets the counts-line chiral flag (V2000 columns 13 to 15, or the fifth V3000 COUNTS value) to 1. */
+export function withAbsoluteStereoFlag(molfile: string): string {
+  const newline = molfile.includes("\r\n") ? "\r\n" : "\n";
+  const lines = molfile.split(/\r?\n/);
+  if (lines.length > 3 && /V2000/.test(lines[3])) {
+    const padded = lines[3].padEnd(15, " ");
+    lines[3] = `${padded.slice(0, 12)}  1${padded.slice(15)}`;
+  } else {
+    const index = lines.findIndex((line) => /^M {2}V30 COUNTS /.test(line));
+    if (index >= 0) {
+      const parts = lines[index].split(/\s+/);
+      if (parts.length >= 8) {
+        parts[7] = "1";
+        lines[index] = parts.join(" ");
+      }
+    }
+  }
+  return lines.join(newline);
 }
 
 export type CopyFormat = "structure" | "smiles" | "image";
@@ -173,4 +195,16 @@ export function subscribeMoleculeTransfer(listener: () => void): () => void {
 /** Source for item `index` of a list of component SMILES, only when the list lines up one to one with the drawings shown. */
 export function componentSource(components: readonly string[], drawn: number, index: number): MoleculeSource | null {
   return components.length === drawn && components[index] ? { smiles: components[index] } : null;
+}
+
+/** Destinations that can take this structure as drawn. */
+export function destinationsAccepting(exported: Pick<MoleculeExport, "smiles">, origin: MoleculeDestinationId | null) {
+  const generic = /\*|\[R\d*[\]#]|\[\*/.test(exported.smiles);
+  const mixture = exported.smiles.includes(".");
+  return MOLECULE_DESTINATIONS.filter((destination) => {
+    if (destination.id === origin) return false;
+    if ((generic || mixture) && (destination.id === "conformations" || destination.id === "spectroscopy" || destination.id === "acidBase")) return false;
+    if (generic && destination.id === "multiCatalytic") return false;
+    return true;
+  });
 }

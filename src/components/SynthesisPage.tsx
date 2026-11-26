@@ -1471,7 +1471,6 @@ export default function SynthesisPage({ openRequest = null, onOpenHandled }: Syn
           title="Multistep Synthesis"
           purpose="Draw all supplied starting materials together on the left and the target on the right. Disconnected structures are treated as separate starting materials."
           ready={editorsReady}
-          readyLabel="Editors ready"
           loadingLabel="Loading editors"
           evidence="rule"
           steps={[

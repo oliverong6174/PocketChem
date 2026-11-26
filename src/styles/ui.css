@@ -1430,3 +1430,5 @@ th {
 .mf-incoming.is-warn { border-left-color: var(--status-warn); }
 .mf-incoming p { margin: 0 0 8px; }
 .mf-incoming .button-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.mf .mf-tools svg, .mf-menu svg { width: 16px; height: 16px; max-width: none; max-height: none; }
+.mf .mf-tools .mf-more svg { width: 14px; height: 14px; }

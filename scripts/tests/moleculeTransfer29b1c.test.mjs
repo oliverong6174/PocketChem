@@ -35,6 +35,12 @@ for (const [name, smiles] of [
   });
 }
 
+test('a generated Molfile of a stereo structure carries the absolute-stereo flag; achiral ones do not', async () => {
+  const flag = (m) => m.split(/\r?\n/)[3].slice(12, 15).trim();
+  assert.equal(flag((await T.exportMolecule({ smiles: 'CC(C)C[C@H](N)C(=O)O' })).molfile), '1');
+  assert.equal(flag((await T.exportMolecule({ smiles: 'NCCCCNCCCN' })).molfile), '0');
+});
+
 test('an existing Molfile is passed through byte for byte', async () => {
   const m = rd.get_mol('C[C@H](N)C(=O)O'); m.set_new_coords(); const molfile = m.get_molblock(); m.delete();
   const out = await T.exportMolecule({ molfile, smiles: 'CC(N)C(=O)O' });
@@ -65,4 +71,12 @@ test('transfer inbox is one-shot and addressed', () => {
   assert.equal(T.takeMoleculeTransfer('acidBase', p.sequence + 1), null, 'a stale sequence does not consume');
   assert.ok(T.takeMoleculeTransfer('acidBase', p.sequence));
   assert.equal(T.takeMoleculeTransfer('acidBase'), null, 'consumed once');
+});
+
+test('a Molfile with an empty title line is accepted by the conformation tools (header is not trimmed away)', async () => {
+  const G = await loadModule('/src/utils/conformations/graph.ts');
+  const out = await T.exportMolecule({ smiles: 'CC(C)C[C@H](N)C(=O)O' });
+  assert.ok(out.molfile.startsWith('\n') || out.molfile.split(/\r?\n/)[0] === '', 'the title line is empty');
+  const built = G.buildConformationGraph(rd, out.molfile);
+  assert.equal(built.ok, true, built.message);
 });

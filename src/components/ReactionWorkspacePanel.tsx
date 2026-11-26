@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MolecularFigure } from "./ui/MolecularFigure";
+import { useIncomingMolecule } from "./ui/useIncomingMolecule";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
 import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./SavedAnalysisControls";
@@ -750,8 +751,11 @@ export default function ReactionWorkspacePanel({ openRequest = null, onOpenHandl
     );
   }
 
+  const incoming = useIncomingMolecule({ destination: "multiCatalytic", api: ketcher, ready: recovery !== null && ketcher !== null, expectRestore: recovery?.kind === "restored" });
+
   return (
     <>
+      {incoming}
       <ToolHeader
         group="Synthesize"
         title="Multi-Catalytic Workspace"

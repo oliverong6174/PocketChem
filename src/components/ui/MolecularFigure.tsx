@@ -1,21 +1,18 @@
-import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useContext, useEffect, useId, useImperativeHandle, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useNavigation } from "../../navigation/NavigationContext";
 import {
-  MOLECULE_DESTINATIONS,
   copyMolecule,
+  destinationsAccepting,
   exportMolecule,
   putMoleculeTransfer,
   type CopyFormat,
   type MoleculeDestinationId,
-  type MoleculeExport,
   type MoleculeSource,
 } from "../../utils/moleculeTransfer";
 import { Icon } from "./Icon";
+import { MoleculeOriginContext } from "./moleculeOrigin";
 import { MoleculeViewer } from "./MoleculeViewer";
-
-/** The workspace a depiction is shown in, so "Open in" can leave that one out. Null outside the organic workspaces. */
-export const MoleculeOriginContext = createContext<MoleculeDestinationId | null>(null);
 
 export type MolecularFigureProps = {
   /** The SVG markup exactly as drawn on the page. */
@@ -40,18 +37,6 @@ export type MolecularFigureProps = {
 
 type MenuName = "copy" | "send" | null;
 
-/** Destinations that can take this structure as drawn. */
-export function destinationsAccepting(exported: Pick<MoleculeExport, "smiles">, origin: MoleculeDestinationId | null) {
-  const generic = /\*|\[R\d*[\]#]|\[\*/.test(exported.smiles);
-  const mixture = exported.smiles.includes(".");
-  return MOLECULE_DESTINATIONS.filter((destination) => {
-    if (destination.id === origin) return false;
-    if ((generic || mixture) && (destination.id === "conformations" || destination.id === "spectroscopy" || destination.id === "acidBase")) return false;
-    if (generic && destination.id === "multiCatalytic") return false;
-    return true;
-  });
-}
-
 /**
  * One molecular depiction with a small toolbar: expand to a zoomable viewer, copy the structure, and open it in another workspace.
  * The root keeps the caller's class, so it drops in where the bare `<div dangerouslySetInnerHTML>` was.
@@ -64,6 +49,7 @@ export function MolecularFigure({ svg, title, source = null, className, clickToE
   const origin = useContext(MoleculeOriginContext);
   const navigation = useNavigation();
   const rootRef = useRef<HTMLDivElement | null>(null);
+  useImperativeHandle(containerRef, () => rootRef.current as HTMLDivElement, []);
   const menuRef = useRef<HTMLUListElement | null>(null);
   const [anchor, setAnchor] = useState<{ right: number; top: number } | null>(null);
   const noteTimer = useRef<number | undefined>(undefined);
@@ -77,8 +63,8 @@ export function MolecularFigure({ svg, title, source = null, className, clickToE
     const close = (event: Event) => { const target = event.target as Node; if (!rootRef.current?.contains(target) && !menuRef.current?.contains(target)) setMenu(null); };
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") { setMenu(null); rootRef.current?.querySelector<HTMLElement>(`[data-menu-button="${menu}"]`)?.focus(); } };
     document.addEventListener("pointerdown", close);
-    document.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("pointerdown", close); document.removeEventListener("keydown", onKey); };
+    document.addEventListener("keydown", onKey, true);
+    return () => { document.removeEventListener("pointerdown", close); document.removeEventListener("keydown", onKey, true); };
   }, [menu]);
 
   const openMenu = (name: Exclude<MenuName, null>, trigger: HTMLElement) => {
@@ -150,7 +136,7 @@ export function MolecularFigure({ svg, title, source = null, className, clickToE
   );
 
   return (
-    <div className={`mf${className ? ` ${className}` : ""}${clickToExpand && !tiny ? " mf-clickable" : ""}`} data-testid="molecular-figure" title={htmlTitle} ref={(node) => { rootRef.current = node; if (typeof containerRef === "function") containerRef(node); else if (containerRef) (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node; }}>
+    <div className={`mf${className ? ` ${className}` : ""}${clickToExpand && !tiny ? " mf-clickable" : ""}`} data-testid="molecular-figure" title={htmlTitle} ref={rootRef}>
       <span
         aria-hidden="true"
         className="mf-art"

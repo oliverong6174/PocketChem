@@ -19,7 +19,7 @@ const openTab = async (label) => {
   await ev(`(() => { const d = [...document.querySelectorAll('.tool-tabs [role=tab]')].find((x) => x.textContent.trim() === ${q(label)} && x.getClientRects().length); if (d) d.click(); else document.querySelector('.shell-menu')?.click(); })()`); await sleep(700);
   await ev(`(() => { const t = [...document.querySelectorAll('.sheet-tool')].find((x) => x.querySelector('.sheet-tool-name')?.textContent.trim() === ${q(label)}); if (t) t.click(); })()`); await sleep(1200);
 };
-const waitInput = () => waitFor(() => ev(`[...document.querySelectorAll('main input')].some((i) => /SMILES/.test(i.placeholder || '')) && /Editor ready/.test(document.body.innerText)`), "name input and ready editor", 90000);
+const waitInput = () => waitFor(() => ev(`[...document.querySelectorAll('main input')].some((i) => /SMILES/.test(i.placeholder || ''))`), "name input and ready editor", 90000);
 async function typeName(name, thenClick) {
   await waitInput(); await sleep(1500);
   await ev(`(() => { const el = [...document.querySelectorAll('main input')].find((i) => /SMILES/.test(i.placeholder || '')); el.focus(); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, ${q(name)}); el.dispatchEvent(new Event('input', { bubbles: true })); })()`);

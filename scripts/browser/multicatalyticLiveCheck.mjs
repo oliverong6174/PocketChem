@@ -160,7 +160,7 @@ async function main() {
       await cdp.evaluate(`window.__pc.clickButton('Multi-Catalytic')`);
       await waitFor(() => cdp.evaluate(`window.__pc.text().includes('Multi-Catalytic Workspace')`), "workspace panel");
     };
-    const editorReady = () => waitFor(() => cdp.evaluate(`Boolean(window.multiCatalyticWorkspaceKetcher) && window.__pc.text().includes('Editor ready')`), "workspace Ketcher editor", 90000);
+    const editorReady = () => waitFor(() => cdp.evaluate(`Boolean(window.multiCatalyticWorkspaceKetcher)`), "workspace Ketcher editor", 90000);
     const addMolecule = async (smiles, expectedCount) => {
       await cdp.evaluate(`window.multiCatalyticWorkspaceKetcher.setMolecule(${JSON.stringify(smiles)})`);
       await sleep(400);

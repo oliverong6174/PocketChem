@@ -1,24 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
+import { svgIntrinsicSize } from "../../utils/svgSize";
 import { Icon } from "./Icon";
 import { useDialog } from "./useDialog";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 24;
 const STEP = 1.25;
-
-/** The SVG's own size: its width and height attributes, else its viewBox. Used for proportions only; the markup itself is never rewritten. */
-export function svgIntrinsicSize(svg: string): { width: number; height: number } {
-  const tag = /<svg\b[^>]*>/i.exec(svg)?.[0] ?? "";
-  const num = (name: string) => {
-    const match = new RegExp(`\\s${name}\\s*=\\s*['"]\\s*([0-9.]+)(?:px)?\\s*['"]`, "i").exec(tag);
-    return match ? Number.parseFloat(match[1]) : null;
-  };
-  const box = /viewBox\s*=\s*['"]\s*([-0-9.eE]+)[\s,]+([-0-9.eE]+)[\s,]+([-0-9.eE]+)[\s,]+([-0-9.eE]+)\s*['"]/i.exec(tag);
-  const width = num("width") ?? (box ? Number.parseFloat(box[3]) : 400);
-  const height = num("height") ?? (box ? Number.parseFloat(box[4]) : 300);
-  return { width: width > 0 ? width : 400, height: height > 0 ? height : 300 };
-}
 
 const clamp = (value: number, low: number, high: number) => Math.min(high, Math.max(low, value));
 

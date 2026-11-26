@@ -26,7 +26,8 @@ import { molecularStructureKey } from "./utils/moleculeNameResolver";
 import { ConceptSearch } from "./components/shell/ConceptSearch";
 import { NavigationContext } from "./navigation/NavigationContext";
 import { useIncomingMolecule } from "./components/ui/useIncomingMolecule";
-import { MolecularFigure, MoleculeOriginContext } from "./components/ui/MolecularFigure";
+import { MolecularFigure } from "./components/ui/MolecularFigure";
+import { MoleculeOriginContext } from "./components/ui/moleculeOrigin";
 import type { ConceptDestination } from "./utils/concepts/conceptIndex";
 import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type BiologyToolId, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
   import {
@@ -1683,7 +1684,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
     return () => {
       cleanupFunctions.forEach((cleanup) => cleanup());
     };
-  }, [highlightedMoleculeSvg, annotationCarouselItems, jumpToAnnotationItem]);
+  }, [highlightedMoleculeSvg, annotationCarouselItems, jumpToAnnotationItem, analysisPanel, activePage]);
 
   const renderCurrentAnnotationCard = () => {
     if (!currentAnnotationItem) return null;

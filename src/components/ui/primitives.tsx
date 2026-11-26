@@ -274,13 +274,12 @@ export interface ToolStep { label: string; detail?: string }
  * The same opening block for every scientific tool: where it sits (group), what it is for, whether the editor is ready,
  * how much to trust its output, and the three-step flow. It replaces each page's ad-hoc intro; it carries no chemistry.
  */
-export function ToolHeader({ group, title, purpose, ready, readyLabel = "Editor ready", loadingLabel = "Loading editor", evidence, steps, aside, headingLevel = 2 }: {
+export function ToolHeader({ group, title, purpose, ready, loadingLabel = "Loading editor", evidence, steps, aside, headingLevel = 2 }: {
   group: "Analyze" | "Synthesize" | "Library" | "Mechanics" | "Waves & optics" | "Electromagnetism" | "Electricity" | "Gene expression" | "Genetics & cell division" | "Cellular biology & physiology" | "Cell organization & regulation" | "Biomolecules" | "Metabolism";
   title: ReactNode;
   purpose: ReactNode;
   /** undefined hides the status chip (tools with no editor). */
   ready?: boolean;
-  readyLabel?: string;
   loadingLabel?: string;
   evidence?: EvidenceLevel;
   steps?: ToolStep[];
@@ -306,7 +305,7 @@ export function ToolHeader({ group, title, purpose, ready, readyLabel = "Editor 
         ) : null}
       </div>
       <div className="ui-tool-header-side">
-        {ready !== undefined ? <span className={`status ${ready ? "ready" : "loading"}`} role="status">{ready ? readyLabel : loadingLabel}</span> : null}
+        {ready === false ? <span className="status loading" role="status">{loadingLabel}</span> : null}
         {evidence ? <EvidenceBadge level={evidence} /> : null}
         {aside}
       </div>
