@@ -37,22 +37,28 @@ test('L/D amino-acid names resolve to the specific stereoisomer, with the expect
   assert.equal(sorted(await cc((await resolve('L-isoleucine')).smiles)), 'SS'); // (2S,3S)
 });
 
-test('glycine has no stereocenter; unqualified leucine/lysine have a potential one, unspecified', async () => {
+// Stage 29B-1C changed the policy: an unqualified name now loads a labelled representative form, and every form the
+// database holds (including the stereo-unspecified record) must stay reachable from it.
+const unspecified = (r) => r.forms.find((f) => /unspecified/.test(f.variantLabel));
+
+test('glycine has no stereocenter; unqualified leucine/lysine load a labelled L form and keep the unspecified record', async () => {
   const gly = await resolve('glycine');
   assert.deepEqual(await cc(gly.smiles), []);
   for (const name of ['leucine', 'lysine']) {
     const r = await resolve(name);
-    assert.doesNotMatch(r.smiles, /@/, `${name} is stored without stereo in the database`);
-    assert.deepEqual(await cc(r.smiles), ['unknown'], name);
+    assert.equal(r.title, `L-${name}`, 'the chosen form is named, never presented as the bare query');
+    assert.deepEqual(await cc(r.smiles), ['S'], name);
+    const flat = unspecified(r);
+    assert.doesNotMatch(flat.smiles, /@/, `${name} is stored without stereo in the database`);
+    assert.deepEqual(await cc(flat.smiles), ['unknown'], name);
   }
 });
 
-test('the database does not silently assign L to an unqualified name; it offers L and D', async () => {
+test('an unqualified amino-acid name still offers L, D and the unspecified form', async () => {
   for (const name of ['leucine', 'lysine', 'alanine']) {
     const r = await resolve(name);
-    const variants = await resolver.findStereoVariants(r);
-    assert.deepEqual(variants.map((v) => v.variantLabel), [`L-${r.title}`, `D-${r.title}`], name);
-    assert.deepEqual(await Promise.all(variants.map((v) => cc(v.smiles))), [['S'], ['R']], name);
+    assert.deepEqual(r.forms.map((v) => v.variantLabel), [`L-${name}`, `D-${name}`, `${name}, stereochemistry unspecified`], name);
+    assert.deepEqual(await Promise.all(r.forms.slice(0, 2).map((v) => cc(v.smiles))), [['S'], ['R']], name);
   }
   assert.deepEqual(await resolver.findStereoVariants(await resolve('L-leucine')), []);
   assert.deepEqual(await resolver.findStereoVariants(await resolve('glycine')), []);
@@ -111,38 +117,39 @@ test('alpha and beta anomers are different identities; the L series is the exact
   assert.notEqual(await key(aL.smiles), await key(a.smiles));
 });
 
-test('glucose, D-glucose and L-glucose are not silently collapsed to one form', async () => {
+test('glucose, D-glucose and L-glucose load the beta pyranose of their series and keep every other form', async () => {
+  const key = (x) => resolver.molecularStructureKey(x);
+  const beta = GLUCOSE_FORMS['beta-D-glucopyranose'].smiles;
+  const loaded = {};
   for (const name of ['glucose', 'D-glucose', 'L-glucose', 'Glucose', 'd-glucose']) {
-    await assert.rejects(() => resolve(name), (e) => {
-      assert.equal(e.name, 'MoleculeNameAmbiguousError', name);
-      assert.ok(e.variants.length >= 3, `${name} offers several forms`);
-      return true;
-    });
+    const r = await resolve(name);
+    const series = name === 'L-glucose' ? 'L' : 'D';
+    assert.equal(await key(r.smiles), await key(series === 'L' ? mirror(beta) : beta), name);
+    assert.match(r.title, new RegExp(`β-${series}-`), `${name} says which form was loaded`);
+    loaded[name] = r.forms;
   }
-  const dErr = await resolve('D-glucose').catch((e) => e);
-  assert.ok(dErr.variants.every((v) => v.variantLabel.includes('D-')), 'D-glucose offers only the D series');
-  const labels = dErr.variants.map((v) => v.variantLabel);
-  for (const want of ['aldehydo-D-glucose', 'α-D-glucopyranose', 'β-D-glucopyranose']) assert.ok(labels.includes(want), `${want} offered`);
-  const lErr = await resolve('L-glucose').catch((e) => e);
-  assert.ok(lErr.variants.every((v) => v.variantLabel.includes('L-')), 'L-glucose offers only the L series');
-  for (const want of ['aldehydo-L-glucose', 'α-L-glucopyranose', 'β-L-glucopyranose']) assert.ok(lErr.variants.map((v) => v.variantLabel).includes(want), `${want} offered`);
-  const both = await resolve('glucose').catch((e) => e);
-  assert.ok(both.variants.some((v) => v.variantLabel.includes('L-')) && both.variants.some((v) => v.variantLabel.includes('D-')));
-  // Every offered variant is a real, concrete, stereo-specified structure with the glucose formula.
-  for (const v of [...dErr.variants, ...lErr.variants]) {
+  const labels = (name) => loaded[name].map((v) => v.variantLabel);
+  assert.ok(labels('D-glucose').every((l) => l.includes('D-')), 'D-glucose offers only the D series');
+  assert.ok(labels('L-glucose').every((l) => l.includes('L-')), 'L-glucose offers only the L series');
+  for (const want of ['aldehydo-D-glucose', 'α-D-glucopyranose', 'β-D-glucopyranose']) assert.ok(labels('D-glucose').includes(want), `${want} offered`);
+  for (const want of ['aldehydo-L-glucose', 'α-L-glucopyranose', 'β-L-glucopyranose']) assert.ok(labels('L-glucose').includes(want), `${want} offered`);
+  assert.ok(labels('glucose').some((l) => l.includes('L-')) && labels('glucose').some((l) => l.includes('D-')));
+  // Every offered form is a real, concrete, stereo-specified structure with the glucose formula.
+  for (const v of [...loaded['D-glucose'], ...loaded['L-glucose']]) {
     assert.ok(!v.smiles.includes('*') && /@/.test(v.smiles), v.variantLabel);
     assert.equal(v.molecularFormula, 'C6H12O6', v.variantLabel);
   }
 });
 
 test('the same carbohydrate behaviour applies to other sugars; unrelated names are unaffected', async () => {
-  for (const name of ['fructose', 'galactose', 'mannose', 'ribose', 'D-ribose']) {
-    const e = await resolve(name).catch((x) => x);
-    assert.equal(e.name, 'MoleculeNameAmbiguousError', name);
-    assert.ok(e.variants.length >= 2, name);
+  const defaults = { fructose: 'β-D-fructopyranose', galactose: 'β-D-galactose', mannose: 'α-D-mannose', ribose: 'β-D-ribose', 'D-ribose': 'β-D-ribose' };
+  for (const [name, title] of Object.entries(defaults)) {
+    const r = await resolve(name);
+    assert.equal(r.title, title, name);
+    assert.ok(r.forms.length >= 2, name);
   }
-  const fru = await resolve('D-fructose').catch((x) => x);
-  assert.ok(fru.variants.map((v) => v.variantLabel).includes('keto-D-fructose'));
+  const fru = await resolve('D-fructose');
+  assert.ok(fru.forms.map((v) => v.variantLabel).includes('keto-D-fructose'));
   assert.equal((await resolve('2-deoxy-D-ribose')).sourceId, 'CHEBI:28816');
   assert.equal((await resolve('deoxyribose')).sourceId, 'CHEBI:28816');
   assert.equal((await resolve('acetone')).smiles, 'CC(C)=O');

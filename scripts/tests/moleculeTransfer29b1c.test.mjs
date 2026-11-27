@@ -80,3 +80,44 @@ test('a Molfile with an empty title line is accepted by the conformation tools (
   const built = G.buildConformationGraph(rd, out.molfile);
   assert.equal(built.ok, true, built.message);
 });
+
+// Enhanced stereochemistry: racemic (&), relative (o) and mixed groups must never be copied as a single enantiomer.
+const cx = (s) => { const m = rd.get_mol(s); try { return m.get_cxsmiles(); } finally { m.delete(); } };
+const groups = (s) => (s.match(/(?:a|[o&]\d+):\d+(?:,\d+(?!:))*/g) ?? []).filter((g) => g[0] !== 'a').map((g) => g[0]).sort().join('');
+
+for (const [name, smiles, kinds] of [
+  ['racemic alanine', 'C[C@H](N)C(=O)O |&1:1|', '&'],
+  ['relative alanine', 'C[C@H](N)C(=O)O |o1:1|', 'o'],
+  ['mixed absolute and racemic', 'C[C@H](O)[C@H](N)C(=O)O |a:1,&1:3|', '&'],
+  ['two centres, one racemic group', 'C[C@H](O)[C@H](N)C(=O)O |&1:1,3|', '&'],
+]) {
+  test(`enhanced stereo survives copying: ${name}`, async () => {
+    const out = await T.exportMolecule({ smiles });
+    assert.equal(groups(out.smiles), kinds, `SMILES keeps the group: ${out.smiles}`);
+    const back = rd.get_mol(out.molfile);
+    assert.ok(back, 'Molfile parses');
+    back.delete();
+    assert.equal(groups(cx(out.molfile)), kinds, 'Molfile keeps the group');
+    assert.match(out.molfile, /^M {2}V30 COUNTS \d+ \d+ \d+ \d+ 0$/m, 'not flagged as absolute');
+    const again = await T.exportMolecule({ molfile: out.molfile });
+    assert.equal(groups(again.smiles), kinds, 'a pasted Molfile source also keeps it');
+  });
+}
+
+test('absolute-only groups stay plain isomeric SMILES', async () => {
+  const out = await T.exportMolecule({ smiles: 'C[C@H](N)C(=O)O |a:1|' });
+  assert.equal(out.smiles, 'C[C@H](N)C(=O)O');
+});
+
+test('unspecified stereochemistry is never specified by copying', async () => {
+  const out = await T.exportMolecule({ smiles: 'CC(C)CC(N)C(=O)O' });
+  assert.doesNotMatch(out.smiles, /@/);
+  assert.equal(out.molfile.split(/\r?\n/)[3].slice(12, 15).trim(), '0');
+  const partial = await T.exportMolecule({ smiles: 'C[C@H](O)C(N)C(=O)O' });
+  assert.equal((partial.smiles.match(/@+/g) ?? []).length, 1, 'the unspecified centre stays unspecified');
+});
+
+test('the V3000 flag setter keeps the line format readable', () => {
+  const v3 = ['', '', '', '  0  0  0  0  0  0  0  0  0  0999 V3000', 'M  V30 BEGIN CTAB', 'M  V30 COUNTS 1 0 0 0 0', 'M  END'].join('\n');
+  assert.match(T.withAbsoluteStereoFlag(v3), /^M {2}V30 COUNTS 1 0 0 0 1$/m);
+});

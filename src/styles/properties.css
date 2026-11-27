@@ -175,3 +175,9 @@
 .properties-workspace .pr-concept-split:has(.pr-concept-visual) { grid-template-columns: minmax(240px, .9fr) minmax(0, 1.1fr); }
 @media (max-width: 1280px) { .properties-workspace .pr-concept-split:has(.pr-concept-visual) { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 600px) { .properties-workspace .compact-concept-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.molecule-forms { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 6px 0 0; font-size: .8rem; }
+.molecule-forms p { margin: 0; }
+.molecule-forms > .secondary-button { font-size: .78rem; padding: 4px 10px; min-height: 0; }
+.molecule-forms .molecule-name-choices, .molecule-forms .molecule-forms-more { flex-basis: 100%; }
+.molecule-name-choices button[aria-current] { outline: 2px solid currentColor; outline-offset: -2px; opacity: 1; }
+.molecule-forms-more { margin: 6px 0 0; padding: 2px 0; background: none; border: 0; color: inherit; font-size: .78rem; text-decoration: underline; cursor: pointer; text-align: left; }

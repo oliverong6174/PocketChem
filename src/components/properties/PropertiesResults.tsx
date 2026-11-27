@@ -23,7 +23,7 @@ function useStructureSvg(smiles: string): string | null {
 }
 
 /** Who this molecule is: structure, name and its confidence, formula, mass and SMILES. Stays above every results tab. */
-export function PropertiesIdentity({ identity, smiles, groups, stereocenters, onLoadVariant }: Shared & { onLoadVariant?: (resolution: MoleculeNameResolution) => void }) {
+export function PropertiesIdentity({ identity, smiles, groups, stereocenters, molfile, onLoadVariant }: Shared & { molfile?: string | null; onLoadVariant?: (resolution: MoleculeNameResolution) => void }) {
   const svg = useStructureSvg(smiles);
   const nomenclature = identity.nomenclature;
   const source = identity.sourceIdentity;
@@ -51,7 +51,7 @@ export function PropertiesIdentity({ identity, smiles, groups, stereocenters, on
   return (
     <section aria-label="Molecule identity" className="pr-identity" data-testid="pr-identity">
       <figure aria-label={`Structure of ${name}`} className="pr-structure">
-        {svg ? <MolecularFigure className="pr-structure-svg" source={{ smiles, label: name }} svg={svg} title={`Structure of ${name}`} /> : <div aria-hidden="true" className="pr-structure-svg is-empty">Drawing…</div>}
+        {svg ? <MolecularFigure className="pr-structure-svg" source={{ smiles, molfile: molfile && /MDLV30\/STE(RAC|REL)/.test(molfile) ? molfile : null, label: name }} svg={svg} title={`Structure of ${name}`} /> : <div aria-hidden="true" className="pr-structure-svg is-empty">Drawing…</div>}
         <figcaption className="pc-visually-hidden">{text}</figcaption>
       </figure>
       <div className="pr-identity-main">

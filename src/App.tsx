@@ -2398,7 +2398,7 @@ const InductionPage = lazy(() => import("./components/physics/InductionPage"));
             </p>
 
             {moleculeIdentity ? (
-              <PropertiesIdentity groups={propertyGroups} identity={moleculeIdentity} smiles={smiles} stereocenters={propertyStereocenters} onLoadVariant={(resolution) => void loadPropertiesVariant(resolution)} />
+              <PropertiesIdentity molfile={molfile} groups={propertyGroups} identity={moleculeIdentity} smiles={smiles} stereocenters={propertyStereocenters} onLoadVariant={(resolution) => void loadPropertiesVariant(resolution)} />
             ) : null}
 
             <div className="dashboard-tab-row" role="tablist" aria-label="Properties results">

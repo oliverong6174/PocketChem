@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:personal": "tsc -b && vite build --mode personal",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "node --test --test-concurrency=2 --test-timeout=300000 scripts/tests/*.test.mjs",

@@ -1,5 +1,6 @@
 import { reagentBubbleLabels } from "../utils/reactions/reactionPresentation";
 import { useIncomingMolecule } from "./ui/useIncomingMolecule";
+import { peekMoleculeTransfer } from "../utils/moleculeTransfer";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MolecularFigure } from "./ui/MolecularFigure";
 import { componentSource } from "../utils/moleculeTransfer";
@@ -1371,6 +1372,8 @@ export default function ReactionsPage({
     setReactionStatus("Structure changed. Predict again when the new input is ready.");
   }, [snapshotTask]);
 
+  // A molecule just sent from Properties has its own confirmation; offering the analysis again would duplicate it.
+  const [sentFromProperties] = useState(() => peekMoleculeTransfer("reactions")?.from === "analysis");
   const incoming = useIncomingMolecule({ destination: "reactions", api: ketcher, ready: recovery !== null && ketcher !== null && !isAdopting, hasWork: pathways.length > 0, expectRestore: recovery?.kind === "restored" });
   return (
     <section className="card reactions-page-card">
@@ -1405,7 +1408,7 @@ export default function ReactionsPage({
         />
       )}
 
-      {recovery !== null && (initialReactantMolfile || handoffSmiles) && handoffOfferAvailable(handoffId, handoffSeen) && (
+      {!sentFromProperties && recovery !== null && (initialReactantMolfile || handoffSmiles) && handoffOfferAvailable(handoffId, handoffSeen) && (
         <div className="workspace-notice workspace-notice-embedded">
           <ul>
             <li className="workspace-notice-info">

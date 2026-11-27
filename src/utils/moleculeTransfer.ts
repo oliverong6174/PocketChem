@@ -43,7 +43,9 @@ export async function exportMolecule(source: MoleculeSource): Promise<MoleculeEx
   if (!mol) return null;
   try {
     if (typeof mol.is_valid === "function" && !mol.is_valid()) return null;
-    const smiles: string = mol.get_smiles();
+    // Plain SMILES cannot say "racemic" or "relative": keep those groups, or a mixture would be copied as one enantiomer.
+    const groups = stereoGroups(mol);
+    const smiles: string = groups ? `${mol.get_smiles()} |${groups}|` : mol.get_smiles();
     let molfile: string;
     if (text === source.molfile) molfile = source.molfile as string;
     else {
@@ -51,12 +53,20 @@ export async function exportMolecule(source: MoleculeSource): Promise<MoleculeEx
       if (typeof mol.set_new_coords === "function") mol.set_new_coords();
       molfile = mol.get_molblock();
       // Without the absolute-stereo flag Ketcher reads the centres as an "and" (racemic) group when it is pasted.
-      if (/@/.test(smiles)) molfile = withAbsoluteStereoFlag(molfile);
+      // Racemic and relative groups carry their own meaning; flagging those absolute would contradict them.
+      if (!groups && /@/.test(smiles)) molfile = withAbsoluteStereoFlag(molfile);
     }
     return { molfile, smiles, label: source.label ?? null };
   } finally {
     mol.delete();
   }
+}
+
+/** The CXSMILES stereo groups of a molecule when any is racemic (&) or relative (o); "" when all stereo is absolute. */
+function stereoGroups(mol: { get_cxsmiles?: () => string }): string {
+  const extension = mol.get_cxsmiles?.().split(" |")[1] ?? "";
+  const found = `|${extension}`.match(/(?<=[|,])(?:a|[o&]\d+):\d+(?:,\d+)*/g) ?? [];
+  return found.some((group) => group[0] !== "a") ? found.join(",") : "";
 }
 
 /** Sets the counts-line chiral flag (V2000 columns 13 to 15, or the fifth V3000 COUNTS value) to 1. */
@@ -69,11 +79,7 @@ export function withAbsoluteStereoFlag(molfile: string): string {
   } else {
     const index = lines.findIndex((line) => /^M {2}V30 COUNTS /.test(line));
     if (index >= 0) {
-      const parts = lines[index].split(/\s+/);
-      if (parts.length >= 8) {
-        parts[7] = "1";
-        lines[index] = parts.join(" ");
-      }
+      lines[index] = lines[index].replace(/^(M {2}V30 COUNTS(?: +\d+){4} +)\d+/, "$11");
     }
   }
   return lines.join(newline);

@@ -4,9 +4,13 @@ import {
   findRelatedChemicalNames,
   lookupLocalChemicalNameDetailed,
   normalizeChemicalName,
+  parseSugarName,
   type LocalChemicalNameRecord,
   type SugarForm,
+  type SugarVariantRecord,
 } from "./chemicalNameDatabase";
+import { NAMED_PREFERENCES, SUGAR_PREFERENCES, type NamedPreference } from "./preferredForms";
+import { restoreAromaticNH } from "./aromaticNH";
 import { toPlainChemicalName } from "./chemicalNameText";
 import { getRDKit } from "./rdkit";
 
@@ -24,6 +28,12 @@ export type MoleculeNameResolution = {
   /** Set on choices offered for an ambiguous name: the specific form and a short qualifier. */
   variantLabel?: string;
   variantDetail?: string;
+  /** Set when the name did not fix one structure and this one was chosen as the representative reading. */
+  representative?: boolean;
+  /** Every supported form of that name, representative first. Not stored with an analysis. */
+  forms?: MoleculeNameResolution[];
+  /** Set when the stored structure had to be completed (see aromaticNH.ts). */
+  structureNote?: string;
 };
 
 /** The offline database has no unique entry for the name (as opposed to a database read failure). */
@@ -110,6 +120,81 @@ function describeSugar(form: SugarForm): { label: string; detail: string } {
   return { label, detail: [shape, configuration].filter(Boolean).join(", ") };
 }
 
+function asRepresentative(choice: MoleculeNameResolution, forms: MoleculeNameResolution[]): MoleculeNameResolution {
+  return forms.length > 1 ? { ...choice, representative: true, forms } : choice;
+}
+
+/** The database record a preference names, or null when this database does not hold exactly one. */
+async function preferredRecord(name: string, query: string, label: string | null): Promise<MoleculeNameResolution | null> {
+  const { record } = await lookupLocalChemicalNameDetailed(name);
+  if (!record) return null;
+  const resolution = toResolution(record, query, null);
+  resolution.aliases = [...new Set([...(resolution.aliases ?? []), name])];
+  resolution.variantLabel = label ?? resolution.title ?? name;
+  return resolution;
+}
+
+async function resolvePreference(query: string, preference: NamedPreference): Promise<MoleculeNameResolution | null> {
+  const stated = (name: string) => (preference.unspecified ? name : null);
+  const [choice, ...rest] = await Promise.all([
+    preferredRecord(preference.load, query, stated(preference.load)),
+    ...preference.others.map((name) => preferredRecord(name, query, stated(name))),
+    ...(preference.unspecified ? [preferredRecord(preference.unspecified, query, `${preference.unspecified}, stereochemistry unspecified`)] : []),
+  ]);
+  if (!choice) return null;
+  const forms = [choice, ...rest.filter((form): form is MoleculeNameResolution => form !== null && form.sourceId !== choice.sourceId)];
+  return asRepresentative(choice, forms);
+}
+
+/** Common alternatives first: pyranose anomers, the open chain, then the rarer ring forms; the stated or D series first. */
+function formOrder(form: SugarForm): number {
+  const shape = form.open ? 1 : form.ring === "pyranose" ? (form.anomer ? 0 : 2) : form.ring === "furanose" ? (form.anomer ? 3 : 4) : 5;
+  return (form.series === "l" ? 100 : 0) + shape * 10 + (form.anomer === "beta" ? 0 : 1);
+}
+
+function preferredSugar(query: string, variants: SugarVariantRecord[]): MoleculeNameResolution | null {
+  const asked = parseSugarName(query);
+  const preference = asked && SUGAR_PREFERENCES[asked.stem];
+  if (!asked || !preference) return null;
+  const ordered = [...variants].sort((a, b) => formOrder(a.form) - formOrder(b.form));
+  const index = ordered.findIndex(({ form }) => form.series === (asked.series ?? "d") && !form.open && form.ring === preference.ring && form.anomer === preference.anomer);
+  if (index < 0) return null;
+  const [chosen] = ordered.splice(index, 1);
+  const forms = [chosen, ...ordered].map(({ record, form }) => toResolution(record, query, describeSugar(form)));
+  return asRepresentative(forms[0], forms);
+}
+
+/** Completes stored structures that no toolkit can read because an aromatic N–H was dropped. */
+async function readable(resolution: MoleculeNameResolution): Promise<MoleculeNameResolution> {
+  if (resolution.structureNote || resolution.smiles.includes("*") || !resolution.smiles.includes("n")) return resolution;
+  let rdkit: Awaited<ReturnType<typeof getRDKit>>;
+  try {
+    rdkit = await getRDKit();
+  } catch {
+    return resolution;
+  }
+  const mol = rdkit.get_mol(resolution.smiles);
+  if (mol) {
+    mol.delete();
+    return resolution;
+  }
+  const restored = restoreAromaticNH(rdkit, resolution.smiles, resolution.molecularFormula);
+  if (!restored) return resolution;
+  return {
+    ...resolution,
+    smiles: restored.smiles,
+    structureNote: restored.tautomer
+      ? "The database entry does not record where the aromatic N–H sits; one tautomer matching its formula is shown."
+      : "The aromatic N–H missing from the database entry was restored to match its formula.",
+  };
+}
+
+async function readableResolution(resolution: MoleculeNameResolution): Promise<MoleculeNameResolution> {
+  if (!resolution.forms) return readable(resolution);
+  const forms = await Promise.all(resolution.forms.map(readable));
+  return { ...forms[0], representative: resolution.representative, forms };
+}
+
 /**
  * Fully offline name resolution.
  *
@@ -120,6 +205,15 @@ function describeSugar(form: SugarForm): { label: string; detail: string } {
 export async function resolveMoleculeName(
   rawQuery: string,
 ): Promise<MoleculeNameResolution> {
+  try {
+    return await readableResolution(await lookUpName(rawQuery));
+  } catch (error) {
+    if (error instanceof MoleculeNameAmbiguousError) error.variants = await Promise.all(error.variants.map(readable));
+    throw error;
+  }
+}
+
+async function lookUpName(rawQuery: string): Promise<MoleculeNameResolution> {
   const query = normalizeNameQuery(rawQuery);
   if (!query) throw new Error("Enter a common or IUPAC molecule name first.");
   if (query.length > 240) throw new Error("That molecule name is too long to resolve safely.");
@@ -128,18 +222,50 @@ export async function resolveMoleculeName(
   const cached = resolverCache.get(key);
   if (cached) return { ...cached, query };
 
+  // "open-chain D-glucose" is the database's aldehydo- (or, for a ketose, keto-) form.
+  const openChain = /^(?:open[- ]chain|acyclic)[- ]+(.+)$/i.exec(query);
+  if (openChain) {
+    for (const prefix of ["aldehydo", "keto"]) {
+      try {
+        return { ...(await resolveMoleculeName(`${prefix}-${openChain[1]}`)), query };
+      } catch (error) {
+        if (!(error instanceof MoleculeNameNotFoundError)) throw error;
+      }
+    }
+  }
+
+  const preference = NAMED_PREFERENCES[key];
+  if (preference) {
+    let preferred: MoleculeNameResolution | null;
+    try {
+      preferred = await resolvePreference(query, preference);
+    } catch (error) {
+      throw asLookupFailure(error);
+    }
+    if (preferred) {
+      rememberResolution(key, preferred);
+      return preferred;
+    }
+  }
+
   let detail: Awaited<ReturnType<typeof lookupLocalChemicalNameDetailed>>;
   let sugar: Awaited<ReturnType<typeof findCarbohydrateVariants>>;
   try {
-    [detail, sugar] = await Promise.all([lookupLocalChemicalNameDetailed(query), findCarbohydrateVariants(query)]);
+    [detail, sugar] = await Promise.all([lookupLocalChemicalNameDetailed(query), findCarbohydrateVariants(query, 32)]);
   } catch (error) {
     throw asLookupFailure(error);
   }
 
   // "glucose" or "D-glucose" does not say open chain versus ring, anomer or pyranose versus furanose, so the
-  // database's single synonym match is not a safe answer: offer the supported forms instead.
+  // database's single synonym match is not a safe answer: load the representative form where one is defined
+  // (keeping every other form reachable), otherwise offer the supported forms.
   const mentionsSeries = sugar.variants.length > 0;
   if (mentionsSeries && !sugar.qualified && (sugar.variants.length > 1 || !detail.record)) {
+    const preferred = preferredSugar(query, sugar.variants);
+    if (preferred) {
+      rememberResolution(key, preferred);
+      return preferred;
+    }
     throw new MoleculeNameAmbiguousError(
       `“${query}” does not specify one structure. Choose the form you mean.`,
       sugar.variants.map(({ record, form }) => toResolution(record, query, describeSugar(form))),
@@ -177,6 +303,14 @@ function comparableName(value: string | null | undefined) {
     .replace(/\s+/g, " ");
 }
 
+/** The identity of one structure, without the chooser data that came with the name. */
+function withoutForms(resolution: MoleculeNameResolution): MoleculeNameResolution {
+  const single = { ...resolution };
+  delete single.forms;
+  delete single.representative;
+  return single;
+}
+
 /** Preserve the exact local database identity that supplied the imported structure. */
 export function applyResolvedNameToIdentity(
   identity: MoleculeIdentityResult,
@@ -205,7 +339,7 @@ export function applyResolvedNameToIdentity(
     sourceIdentity: {
       originalQuery: resolution.query, resolvedName: resolvedTitle || name,
       aliases: [...new Set([...(resolution.aliases ?? []), resolution.query, name])],
-      sourceId: resolution.sourceId ?? null, confidence: "Database match", fullySpecified, resolution,
+      sourceId: resolution.sourceId ?? null, confidence: "Database match", fullySpecified, resolution: withoutForms(resolution),
     },
     properties: fullySpecified ? identity.properties : {
       ...identity.properties, fullySpecified: false, molecularWeight: null, exactMass: null, degreesOfUnsaturation: null,

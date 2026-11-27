@@ -10,6 +10,8 @@ export type KetAtom = {
   charge?: number;
   isotope?: number;
   radical?: number;
+  implicitHCount?: number;
+  stereoLabel?: string;
 };
 
 export type KetBond = {
@@ -112,19 +114,37 @@ export function ketMoleculeToV3000(molecule: KetMolecule): string | null {
     ];
   });
 
+  // An aromatic N-H cannot be inferred from bond types; carry the editor's hydrogen count as the MDL/Indigo data group.
+  const hydrogenLines = atoms
+    .map((atom, index) => ({ atom, number: index + 1 }))
+    .filter(({ atom, number }) => (atom.implicitHCount ?? 0) > 0 && bonds.some((bond) => bond.type === 4 && bond.atoms?.includes(number - 1)))
+    .map(({ atom, number }, group) => `M  V30 ${group + 1} DAT 0 ATOMS=(1 ${number}) FIELDNAME=MRV_IMPLICIT_H FIELDDATA="IMPL_H${atom.implicitHCount}"`);
+
+  // Enhanced stereo groups ("abs", "&1", "or1"): without them a racemic or relative drawing reads as one enantiomer.
+  const stereoGroups = new Map<string, number[]>();
+  atoms.forEach((atom, index) => {
+    const label = /^(abs|&|or)(\d*)$/.exec(atom.stereoLabel ?? "");
+    if (!label) return;
+    const name = label[1] === "abs" ? "STEABS" : `${label[1] === "&" ? "STERAC" : "STEREL"}${label[2] || "1"}`;
+    stereoGroups.set(name, [...(stereoGroups.get(name) ?? []), index + 1]);
+  });
+  const collectionLines = [...stereoGroups].map(([name, members]) => `M  V30 MDLV30/${name} ATOMS=(${members.length} ${members.join(" ")})`);
+
   return [
     "PocketChem",
     "  Ketcher KET export",
     "",
     "  0  0  0  0  0  0            999 V3000",
     "M  V30 BEGIN CTAB",
-    `M  V30 COUNTS ${atoms.length} ${bondLines.length} 0 0 0`,
+    `M  V30 COUNTS ${atoms.length} ${bondLines.length} ${hydrogenLines.length} 0 0`,
     "M  V30 BEGIN ATOM",
     ...atomLines,
     "M  V30 END ATOM",
     "M  V30 BEGIN BOND",
     ...bondLines,
     "M  V30 END BOND",
+    ...(hydrogenLines.length ? ["M  V30 BEGIN SGROUP", ...hydrogenLines, "M  V30 END SGROUP"] : []),
+    ...(collectionLines.length ? ["M  V30 BEGIN COLLECTION", ...collectionLines, "M  V30 END COLLECTION"] : []),
     "M  V30 END CTAB",
     "M  END",
   ].join("\n");

@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { type MoleculeNameResolution } from "../utils/moleculeNameResolver";
+import NameVariantChooser from "./NameVariantChooser";
 import { inputFromNameResolution, loadInputIntoEditor, MoleculeInputError, resolveMoleculeInput } from "../utils/moleculeInput";
 import { extractKetMolecules, type KetDocument } from "../utils/ketcherKet";
 
@@ -186,6 +187,14 @@ const installKetcherScrollLock = () => {
   };
 };
 
+type FormGroup = {
+  action: "add" | "replace";
+  processAfterApply: boolean;
+  forms: MoleculeNameResolution[];
+  current: MoleculeNameResolution;
+  base: string | null;
+};
+
 function MoleculeDrawer({
   onReady,
   onNotReady,
@@ -207,6 +216,8 @@ function MoleculeDrawer({
   const [nameChoices, setNameChoices] = useState<{ action: "add" | "replace"; processAfterApply: boolean; variants: MoleculeNameResolution[] } | null>(null);
   const [nameMessageKind, setNameMessageKind] = useState<"success" | "error" | "info">("info");
   const [hasStructure, setHasStructure] = useState(false);
+  // The forms of the name last loaded. `base` is the drawing before an Add, so another form replaces only that molecule.
+  const [formGroup, setFormGroup] = useState<FormGroup | null>(null);
   const apiRef = useRef<KetcherApi | null>(null);
   const structureCheckVersionRef = useRef(0);
   const suppressEditorChangeRef = useRef(false);
@@ -226,6 +237,8 @@ function MoleculeDrawer({
     setNameMessage(null);
     setNameMessageKind("info");
     setHasStructure(false);
+    setNameChoices(null);
+    setFormGroup(null);
   }, [resetVersion]);
 
   useEffect(() => {
@@ -292,6 +305,8 @@ function MoleculeDrawer({
     if (!suppressEditorChangeRef.current) {
       // A loader status describes a past import, not the identity of an edited drawing.
       setNameMessage(null);
+      // The drawing is no longer just that molecule: switching forms would discard the user's edit.
+      setFormGroup(null);
       onChange?.();
     }
   }, [onChange, refreshHasStructure]);
@@ -353,17 +368,18 @@ function MoleculeDrawer({
     action: "add" | "replace",
     processAfterApply = false,
     chosen?: MoleculeNameResolution,
+    switching?: FormGroup,
   ) => {
     const api = apiRef.current;
     if (!api || isResolvingName) return;
 
     const query = nameQuery.trim();
-    if (!query) {
+    if (!query && !chosen) {
       setNameMessageKind("error");
       setNameMessage("Enter a chemical name or SMILES first.");
       return;
     }
-    if (action === "add" && maxComponents === 1 && hasStructure) {
+    if (action === "add" && maxComponents === 1 && hasStructure && !switching) {
       setNameMessageKind("error");
       setNameMessage("This editor holds a single molecule. Use Replace to change it; Add would create a second, disconnected molecule.");
       return;
@@ -387,7 +403,13 @@ function MoleculeDrawer({
       // after the imported graph is readable.
       onChange?.();
       suppressEditorChangeRef.current = true;
+      setFormGroup(null);
 
+      let base = switching?.base ?? null;
+      if (action === "add") {
+        if (switching?.base) await api.setMolecule(switching.base);
+        else base = await api.getKet();
+      }
       await loadInputIntoEditor(api, input, action);
 
       await waitForReadableStructure(api);
@@ -398,6 +420,8 @@ function MoleculeDrawer({
 
       // Only a database name carries an identity to install; a SMILES is just a structure.
       if (input.nameResolution) onNameStructureApplied?.(input.nameResolution, action);
+      const forms = switching?.forms ?? input.nameResolution?.forms;
+      if (forms && input.nameResolution) setFormGroup({ action, processAfterApply, forms, current: input.nameResolution, base });
       window.setTimeout(() => {
         suppressEditorChangeRef.current = false;
       }, 0);
@@ -419,7 +443,9 @@ function MoleculeDrawer({
       setNameMessage(`${action === "add" ? "Added" : "Loaded"}: ${resolvedLabel}${noteSuffix}`);
     } catch (error) {
       suppressEditorChangeRef.current = false;
-      setNameMessageKind("error");
+      const choices = error instanceof MoleculeInputError && error.variants.length > 0;
+      // A name with several structures is an ordinary question, not a failure.
+      setNameMessageKind(choices ? "info" : "error");
       setNameMessage(error instanceof Error ? error.message : "The molecule input could not be resolved.");
       if (error instanceof MoleculeInputError && error.variants.length > 0) {
         setNameChoices({ action, processAfterApply, variants: error.variants });
@@ -540,21 +566,21 @@ function MoleculeDrawer({
             </p>
           )}
           {nameChoices && (
-            <ul aria-label="Matching structures" className="molecule-name-choices" data-testid="name-variant-choices">
-              {nameChoices.variants.map((variant) => (
-                <li key={variant.sourceId ?? variant.smiles}>
-                  <button
-                    className="secondary-button"
-                    disabled={isResolvingName}
-                    onClick={() => void applyResolvedName(nameChoices.action, nameChoices.processAfterApply, variant)}
-                    type="button"
-                  >
-                    <strong>{variant.variantLabel ?? variant.title ?? variant.query}</strong>
-                    {variant.variantDetail ? <span>{variant.variantDetail}</span> : null}
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <NameVariantChooser
+              busy={isResolvingName}
+              forms={nameChoices.variants}
+              key={nameChoices.variants[0]?.sourceId ?? "choices"}
+              onChoose={(variant) => void applyResolvedName(nameChoices.action, nameChoices.processAfterApply, variant)}
+            />
+          )}
+          {formGroup && !nameChoices && (
+            <NameVariantChooser
+              busy={isResolvingName}
+              current={formGroup.current}
+              forms={formGroup.forms}
+              key={formGroup.forms[0]?.sourceId ?? "forms"}
+              onChoose={(variant) => void applyResolvedName(formGroup.action, formGroup.processAfterApply, variant, formGroup)}
+            />
           )}
         </div>
       </form>

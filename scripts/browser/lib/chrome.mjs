@@ -1,6 +1,6 @@
 // Shared headless-Chrome (CDP) helpers for the Stage 10 browser checks.
 // Starts `vite preview` on the production build and a headless Chrome/Edge, and exposes a tiny CDP client.
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -47,10 +47,20 @@ export class Cdp {
       }
     });
   }
-  send(method, params = {}) {
+  /** Every command is bounded: a page that stops answering (hung script, native dialog) fails with the command that hung. */
+  send(method, params = {}, timeoutMs = 45000) {
     const id = this.id++;
     this.ws.send(JSON.stringify({ id, method, params }));
-    return new Promise((resolve, reject) => this.pending.set(id, { resolve, reject }));
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        reject(new Error(`CDP ${method} did not answer within ${timeoutMs} ms: ${JSON.stringify(params).slice(0, 200)}`));
+      }, timeoutMs);
+      this.pending.set(id, {
+        resolve: (value) => { clearTimeout(timer); resolve(value); },
+        reject: (error) => { clearTimeout(timer); reject(error); },
+      });
+    });
   }
   async evaluate(expression) {
     const result = await this.send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true });
@@ -70,17 +80,28 @@ export async function startBrowser({ port, debugPort }) {
   const preview = spawn(process.execPath, [path.join(root, "node_modules", "vite", "bin", "vite.js"), "preview", "--port", String(port), "--strictPort", "--host", "127.0.0.1"], { cwd: root, stdio: ["pipe", log, log] });
   const chrome = spawn(chromePath, ["--headless=new", `--remote-debugging-port=${debugPort}`, `--user-data-dir=${profile}`, "--no-first-run", "--disable-gpu", "about:blank"], { stdio: "ignore" });
   const url = `http://127.0.0.1:${port}/`;
-  await waitFor(async () => (await fetch(url)).ok, "vite preview");
-  const target = await waitFor(async () => (await (await fetch(`http://127.0.0.1:${debugPort}/json`)).json()).find((t) => t.type === "page"), "Chrome");
-  const cdp = new Cdp(target.webSocketDebuggerUrl);
-  await cdp.ready;
-  await cdp.send("Page.enable");
-  await cdp.send("Runtime.enable");
   const stop = () => {
-    try { chrome.kill(); } catch { /* already closed */ }
+    // Killing only the parent leaves Chrome's children holding the debug port and the profile on Windows.
+    try {
+      if (process.platform === "win32") spawnSync("taskkill", ["/pid", String(chrome.pid), "/t", "/f"], { stdio: "ignore" });
+      else chrome.kill();
+    } catch { /* already closed */ }
     try { preview.kill(); } catch { /* already closed */ }
+    // Each run makes its own profile (tens of MB); left behind they filled the disk.
+    try { fs.rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); } catch (error) { console.warn(`Could not remove ${profile}: ${error.message}`); }
   };
-  return { cdp, url, stop };
+  try {
+    await waitFor(async () => (await fetch(url)).ok, "vite preview");
+    const target = await waitFor(async () => (await (await fetch(`http://127.0.0.1:${debugPort}/json`)).json()).find((t) => t.type === "page"), "Chrome");
+    const cdp = new Cdp(target.webSocketDebuggerUrl);
+    await cdp.ready;
+    await cdp.send("Page.enable");
+    await cdp.send("Runtime.enable");
+    return { cdp, url, stop };
+  } catch (error) {
+    stop(); // a failed start must not leave processes holding the ports for the next run
+    throw error;
+  }
 }
 
 export async function setViewport(cdp, width, height, { mobile = width < 500, scheme = "dark", reducedMotion = false } = {}) {

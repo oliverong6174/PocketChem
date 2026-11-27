@@ -85,7 +85,10 @@ describe("a failing database read versus a name that is not found", () => {
 
   test("[source] the module has no other place that rethrows a replacement error without its cause", () => {
     const source = fs.readFileSync(path.join(root, "src", "utils", "moleculeNameResolver.ts"), "utf8");
-    assert.equal((source.match(/catch \(/g) ?? []).length, 1);
+    // Every replacement error (a new Error built from a caught one) must carry it as the cause.
+    const replacements = source.match(/new Error\([^;]*could not[^;]*;/g) ?? [];
+    assert.equal(replacements.length, 1);
+    assert.doesNotMatch(source, /catch \(\w+\) \{\s*throw new /);
     assert.match(source, /new Error\("PocketChem could not read its local chemical-name database\.", \{ cause: error \}\)/);
   });
 });

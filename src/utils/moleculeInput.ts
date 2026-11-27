@@ -316,6 +316,7 @@ async function fromName(
   const components = normalized?.components ?? resolution.smiles.split(".").filter(Boolean);
   assertComponentLimit(components, maxComponents, `“${query}”`);
   const label = resolution.iupacName || resolution.title || resolution.query;
+  if (resolution.structureNote) notes = [...notes, resolution.structureNote];
   return {
     kind: "name",
     query,
