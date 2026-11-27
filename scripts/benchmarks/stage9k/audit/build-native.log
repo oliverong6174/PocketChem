@@ -1,0 +1,50 @@
+
+> pocketchem@0.0.0 build
+> tsc -b && vite build
+
+vite v8.0.14 building client environment for production...
+[2Ktransforming...✓ 2090 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                       0.84 kB │ gzip:     0.44 kB
+dist/ketcher-frame.html                               0.89 kB │ gzip:     0.39 kB
+dist/assets/preload-helper-BZPzN1LG.css               0.05 kB │ gzip:     0.07 kB
+dist/assets/ketcher-frame-CQIvLqgj.css                0.92 kB │ gzip:     0.30 kB
+dist/assets/app-Cguo2dlp.css                         41.98 kB │ gzip:     8.51 kB
+dist/assets/dist-BjvbX1y1.css                       180.39 kB │ gzip:    28.43 kB
+dist/assets/reactantRoleIndex-CK3EXpnY.js             0.07 kB │ gzip:     0.09 kB
+dist/assets/ketcherFrameProtocol-CiGmLq5Z.js          0.08 kB │ gzip:     0.08 kB
+dist/assets/editorRestore-JKQXjwGB.js                 0.50 kB │ gzip:     0.30 kB
+dist/assets/KetcherEditor-3mSMYDka.js                 1.13 kB │ gzip:     0.57 kB
+dist/assets/reactionPresentation-DX5fN3kb.js          1.38 kB │ gzip:     0.70 kB
+dist/assets/solubility-DiXBvnzc.js                    1.52 kB │ gzip:     0.71 kB
+dist/assets/reactionProductRenderer-Btkwh5Md.js       2.25 kB │ gzip:     0.99 kB
+dist/assets/ketcher-frame-BiHuh11q.js                 3.20 kB │ gzip:     1.45 kB
+dist/assets/IsolatedKetcherEditor-mWeUwzkU.js         3.84 kB │ gzip:     1.58 kB
+dist/assets/anionStability-cZMLydb9.js                4.70 kB │ gzip:     1.83 kB
+dist/assets/SavedAnalysesPage-BgOfSDWE.js             5.65 kB │ gzip:     1.93 kB
+dist/assets/cationStability-BlQUGpul.js               5.96 kB │ gzip:     1.97 kB
+dist/assets/cipPriority-Cw2RfXID.js                   6.45 kB │ gzip:     2.66 kB
+dist/assets/boilingPoint-CkclsgqU.js                  6.89 kB │ gzip:     2.49 kB
+dist/assets/radicalStability-C4qzZyHV.js              7.20 kB │ gzip:     2.31 kB
+dist/assets/nmrPrediction-DXtT8OAU.js                21.84 kB │ gzip:     7.00 kB
+dist/assets/massSpec-DQBsDwby.js                     31.09 kB │ gzip:    10.44 kB
+dist/assets/ReactionsPage-8Rbo3Zlk.js                32.45 kB │ gzip:     9.26 kB
+dist/assets/RankingPage-7XoaxlSG.js                  45.44 kB │ gzip:    15.45 kB
+dist/assets/SynthesisPage-CmLyYwv5.js                56.62 kB │ gzip:    17.49 kB
+dist/assets/irRules-BeGyp7dj.js                      57.74 kB │ gzip:    13.86 kB
+dist/assets/SpectroscopyPage-ChDUOkMo.js             62.10 kB │ gzip:    18.46 kB
+dist/assets/MultiCatalyticPage-DUNqGfc9.js           73.65 kB │ gzip:    20.18 kB
+dist/assets/preload-helper-CnIkCAoD.js              142.92 kB │ gzip:    46.76 kB
+dist/assets/index.modern-78b4d253-dWURuO5r.js       391.48 kB │ gzip:   116.93 kB
+dist/assets/reactionUtils-CUR34gLJ.js               513.20 kB │ gzip:   127.14 kB
+dist/assets/app-ly0dhu6o.js                         541.98 kB │ gzip:   134.69 kB
+dist/assets/index.modern-xl8D9ovm.js              1,221.63 kB │ gzip:   329.57 kB
+dist/assets/dist-DbK4vL5e.js                     28,849.98 kB │ gzip: 8,559.57 kB
+
+✓ built in 2.81s
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

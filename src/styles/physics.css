@@ -1,0 +1,148 @@
+/* Physics laboratories (Stage 13). Reuses the Stage 11/12 General Chemistry layout classes; diagrams sit on paper in both themes. */
+.ph-page .ph-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); min-width: 0; }
+@media (max-width: 1180px) { .ph-page .ph-charts { grid-template-columns: minmax(0, 1fr); } }
+
+/* transport */
+.ph-controls { display: grid; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface-raised); }
+.ph-transport { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+.ph-timeline { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--sp-3); align-items: center; }
+.ph-timeline label { font-size: var(--fs-sm); font-weight: 600; color: var(--text-muted); }
+.ph-timeline input[type="range"], .ph-slider input[type="range"], .ph-vslider input[type="range"] { width: 100%; min-height: var(--touch); accent-color: var(--accent); }
+.ph-time-readout { font-family: var(--font-mono); font-size: var(--fs-sm); white-space: nowrap; }
+@media (max-width: 520px) { .ph-timeline { grid-template-columns: minmax(0, 1fr); } .ph-time-readout { white-space: normal; } }
+.ph-note { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+.ph-toggles { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+
+/* diagrams: always on paper */
+.ph-diagram { width: 100%; min-width: 0; overflow-x: auto; justify-self: stretch; }
+.ph-svg { display: block; max-width: none; user-select: none; }
+.ph-sky { fill: #f6f9fc; }
+.ph-earth { fill: #e5dfd0; }
+.ph-paper { fill: #fbfaf7; }
+.ph-grid { stroke: #d6dde6; stroke-width: 1; }
+.ph-ground { stroke: #6b5b3e; stroke-width: 2.4; }
+.ph-tick { fill: #334155; font-size: 12px; font-family: var(--font-body, system-ui); }
+.ph-axis-label { fill: #0f172a; font-size: 13px; font-weight: 600; font-family: var(--font-body, system-ui); }
+.ph-note-text { fill: #475569; font-size: 12px; font-family: var(--font-body, system-ui); }
+.ph-path-future { stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 6 5; }
+.ph-path-past { stroke: #0b6a72; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.ph-step-dot { fill: #0f172a; opacity: 0.55; }
+.ph-particle { fill: #be123c; stroke: #ffffff; stroke-width: 2.5; }
+.ph-mark { fill: #0f172a; stroke: #ffffff; stroke-width: 2; }
+.ph-mark.apex { fill: #b45309; }
+.ph-mark.land { fill: #6b5b3e; }
+.ph-dim line { stroke: #0f172a; stroke-width: 1.4; }
+.ph-dim text { fill: #0f172a; font-size: 12px; font-weight: 600; font-family: var(--font-body, system-ui); }
+.ph-dim.soft line { stroke: #64748b; stroke-dasharray: 3 3; }
+.ph-dim.soft text { fill: #475569; font-weight: 500; }
+.ph-vec-label { font-size: 14px; font-weight: 700; font-style: italic; font-family: var(--font-body, system-ui); }
+.ph-vec-label.v { fill: #0b6a72; }
+.ph-vec-label.a { fill: #b45309; }
+.ph-diagram .ph-note { color: #475569; }
+.ph-legend-line { display: flex; flex-wrap: wrap; gap: 4px var(--sp-3); align-items: center; margin-top: var(--sp-2); }
+.ph-key { display: inline-block; width: 16px; height: 0; border-top: 3px solid; margin-right: 5px; vertical-align: middle; }
+.ph-key.v { border-color: #0b6a72; } .ph-key.a { border-color: #b45309; } .ph-key.c { border-color: #475569; border-top-style: dashed; }
+.ph-key.dot { width: 6px; height: 6px; border: 0; border-radius: 50%; background: #0f172a; opacity: 0.6; }
+
+/* circuits and RC */
+.ph-wire { stroke: #0f172a; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+.ph-zigzag { stroke: #0f172a; stroke-width: 2.6; stroke-linejoin: round; stroke-linecap: round; }
+.ph-plate { stroke: #0f172a; stroke-width: 3.4; stroke-linecap: round; }
+.ph-plate.long { stroke-width: 3.8; }
+.ph-sign { fill: #0f172a; font-size: 16px; font-weight: 700; font-family: var(--font-body, system-ui); }
+.ph-sign.small { font-size: 12px; fill: #475569; }
+.ph-comp-label { fill: #0f172a; font-size: 13px; font-weight: 700; font-family: var(--font-body, system-ui); }
+.ph-val { fill: #1e293b; font-size: 12px; font-family: var(--font-mono, ui-monospace, monospace); }
+.ph-val.strong { font-weight: 700; fill: #0b6a72; font-size: 13px; }
+.ph-i-label { fill: #be123c; font-size: 12px; font-weight: 700; font-family: var(--font-body, system-ui); }
+.ph-hit { fill: transparent; stroke: transparent; cursor: pointer; }
+.ph-resistor:hover .ph-hit { fill: rgba(11, 106, 114, 0.07); }
+.ph-resistor:focus { outline: none; }
+.ph-resistor:focus-visible .ph-hit { stroke: #0f172a; stroke-width: 2; stroke-dasharray: 4 3; }
+.ph-resistor.is-selected .ph-hit { fill: rgba(180, 83, 9, 0.14); stroke: #b45309; stroke-width: 2; }
+.ph-resistor.is-selected .ph-zigzag { stroke: #b45309; }
+.ph-group-hl { fill: rgba(180, 83, 9, 0.09); stroke: #b45309; stroke-width: 2; stroke-dasharray: 6 4; }
+.ph-cap-fill { fill: #0b6a72; }
+.ph-circuit-wrap { overflow-x: auto; }
+
+/* circuit editor */
+.ph-group { background: var(--surface-sunken, transparent); }
+.ph-group.is-parallel { border-style: dashed; }
+.ph-group .ph-group { margin-top: var(--sp-1); }
+.ph-res-row { display: grid; gap: var(--sp-2); padding: var(--sp-2); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-raised); }
+.ph-res-row.is-selected { border-color: var(--accent); background: var(--accent-soft); }
+.ph-row-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; }
+.ph-row-button { background: none; border: 0; padding: 4px 6px; font: inherit; color: inherit; text-align: left; cursor: pointer; min-height: 32px; text-decoration: underline dotted; text-underline-offset: 3px; }
+.ph-row-button[aria-pressed="true"] { font-weight: 700; text-decoration: none; }
+.ph-group-row th, .ph-group-row td { color: var(--text-muted); }
+.ph-table td, .ph-table th { white-space: nowrap; }
+.ph-page .gc-pair { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); }
+.ph-page .gc-inputs > *, .ph-page .gc-stage > * { min-width: 0; }
+.ph-page .gc-stage .ui-figure dd { overflow-wrap: anywhere; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ph-page * { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
+
+/* Stage 14: forces, energy, collisions */
+.ph-block { fill: #e6edf3; stroke: #0f172a; stroke-width: 2.2; }
+.ph-block.a { fill: #cfe8ea; stroke: #0b6a72; }
+.ph-block.b { fill: #f6e3c8; stroke: #b45309; }
+.ph-block.hang { fill: #e9e4f5; stroke: #6d28d9; }
+.ph-block-label { fill: #0f172a; font-size: 12px; font-weight: 700; font-family: var(--font-body, system-ui); }
+.ph-force-label { font-size: 12px; font-weight: 700; font-family: var(--font-body, system-ui); paint-order: stroke; stroke: #f6f9fc; stroke-width: 3px; }
+.ph-force { cursor: pointer; }
+.ph-force:focus { outline: none; }
+.ph-force:focus-visible line { stroke-width: 5; }
+.ph-force.is-selected line { stroke-width: 5; filter: drop-shadow(0 0 3px rgba(15, 23, 42, 0.45)); }
+.ph-dim-line { stroke: #64748b; stroke-width: 1.4; fill: none; }
+.ph-angle { stroke: #475569; stroke-width: 1.6; }
+.ph-pulley { fill: #f1f5f9; stroke: #0f172a; stroke-width: 2.4; }
+.ph-wall { fill: #94a3b8; stroke: #0f172a; stroke-width: 1.6; }
+.ph-cm { fill: #0f172a; stroke: #ffffff; stroke-width: 1.5; }
+.ph-bar { stroke: #0f172a; stroke-width: 1; }
+.ph-bar.ke { fill: #0b6a72; } .ph-bar.peg { fill: #b45309; } .ph-bar.pes { fill: #6d28d9; } .ph-bar.q { fill: #be123c; } .ph-bar.total { fill: #475569; }
+.ph-bars { max-width: 100%; }
+.ph-page .ph-charts .ui-diagram { min-width: 0; }
+.ph-clear { margin-top: var(--sp-2); }
+.ph-group-heading { margin: var(--sp-3) 0 var(--sp-2); font-family: var(--font-display); font-size: var(--fs-lg); }
+
+
+/* Stage 21: waves, optics, interference */
+.ph-harmonics { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.ph-harmonics .gc-chip[disabled] { opacity: 0.4; cursor: not-allowed; }
+.ph-swatch { height: 12px; border-radius: 6px; border: 1px solid var(--border); margin: calc(-1 * var(--sp-1)) 0 var(--sp-2); }
+.ph-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--border); vertical-align: middle; }
+.ph-drag-handle { cursor: ew-resize; touch-action: none; stroke-opacity: 0; }
+.ph-drag-handle:focus-visible { stroke-opacity: 1; outline: none; }
+.ph-challenge .gc-scenario-pick { margin-bottom: var(--sp-3); }
+.ph-page .gc-fieldset { border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-3); display: grid; gap: var(--sp-2); min-width: 0; }
+.ph-page .gc-fieldset legend { font-weight: 600; padding: 0 var(--sp-2); }
+/* Stage 24: electric fields, magnetic fields, induction */
+.ph-axis-line { stroke: #64748b; stroke-width: 1.4; }
+.ph-contour { stroke: #0b6a72; stroke-width: 2; stroke-dasharray: 7 4; stroke-linecap: round; }
+.ph-contour-label { fill: #0b6a72; font-weight: 700; font-family: var(--font-mono, ui-monospace, monospace); paint-order: stroke; stroke: #fbfaf7; stroke-width: 3px; }
+.ph-fline { fill: none; stroke: #6d28d9; stroke-width: 1.5; opacity: 0.62; stroke-linejoin: round; }
+.ph-fline-head { fill: #6d28d9; opacity: 0.8; }
+.ph-charge, .ph-probe { cursor: grab; touch-action: none; outline: none; }
+.ph-charge:active, .ph-probe:active { cursor: grabbing; }
+.ph-hit-ring { fill: transparent; stroke: transparent; }
+.ph-sel-ring { fill: none; stroke: #b45309; stroke-width: 2.6; stroke-dasharray: 5 3; }
+.ph-charge:focus-visible .ph-hit-ring, .ph-probe:focus-visible .ph-hit-ring { stroke: #0f172a; stroke-width: 2.4; stroke-dasharray: 4 3; }
+.ph-charge:hover .ph-hit-ring, .ph-probe:hover .ph-hit-ring { fill: rgba(11, 106, 114, 0.08); }
+.ph-charge-sign { fill: #ffffff; font-size: 19px; font-weight: 800; font-family: var(--font-body, system-ui); pointer-events: none; }
+.ph-charge-sign.small { font-size: 14px; }
+.ph-charge-label { fill: #0f172a; font-size: 12px; font-weight: 700; font-family: var(--font-body, system-ui); paint-order: stroke; stroke: #fbfaf7; stroke-width: 3px; pointer-events: none; }
+.ph-probe-dot { fill: #fbfaf7; stroke: #0f172a; stroke-width: 2.6; }
+.ph-probe-label { fill: #0f172a; font-weight: 800; font-family: var(--font-body, system-ui); pointer-events: none; }
+.ph-start { fill: #fbfaf7; stroke: #0f172a; stroke-width: 2; }
+.ph-resistor-box { fill: #f1f5f9; stroke: #0f172a; stroke-width: 2.2; }
+.ph-coil { stroke: #0f172a; stroke-width: 2.6; stroke-linecap: round; }
+.mg-mark { pointer-events: none; }
+.ph-chargelist { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.ph-vec-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: var(--sp-2); min-width: 0; }
+.ph-vec-fields > * { min-width: 0; }
+@media (prefers-reduced-motion: reduce) { .ph-charge, .ph-probe { cursor: pointer; } }
+
+/* Stage 24: a paper-coloured halo keeps labels legible where they cross field glyphs or lines (diagrams are always ink on paper). */
+.ph-halo { paint-order: stroke; stroke: #fbfaf7; stroke-width: 3.5px; stroke-linejoin: round; }

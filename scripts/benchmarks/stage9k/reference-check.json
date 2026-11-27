@@ -1,0 +1,723 @@
+{
+  "tool": "Independent Python RDKit 2026.09.1; structure validation, not PocketChem prediction",
+  "checks": [
+    {
+      "id": "NM-01",
+      "smiles": "CCC(C)C(C)C",
+      "canonical": "CCC(C)C(C)C",
+      "formula": "C7H16",
+      "centers": [
+        [
+          2,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "NM-02",
+      "smiles": "CCCC(CC)CC",
+      "canonical": "CCCC(CC)CC",
+      "formula": "C8H18",
+      "centers": []
+    },
+    {
+      "id": "NM-04",
+      "smiles": "CCCC(C)C(=O)C",
+      "canonical": "CCCC(C)C(C)=O",
+      "formula": "C7H14O",
+      "centers": [
+        [
+          3,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "NM-05",
+      "smiles": "CCC(C)CC(=O)C",
+      "canonical": "CCC(C)CC(C)=O",
+      "formula": "C7H14O",
+      "centers": [
+        [
+          2,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "NM-06",
+      "smiles": "CCC(C)(C)C(=O)O",
+      "canonical": "CCC(C)(C)C(=O)O",
+      "formula": "C6H12O2",
+      "centers": []
+    },
+    {
+      "id": "NM-07",
+      "smiles": "CC(C)(C)CC(=O)O",
+      "canonical": "CC(C)(C)CC(=O)O",
+      "formula": "C6H12O2",
+      "centers": []
+    },
+    {
+      "id": "NM-08",
+      "smiles": "CCC(CC)C(=O)O",
+      "canonical": "CCC(CC)C(=O)O",
+      "formula": "C6H12O2",
+      "centers": []
+    },
+    {
+      "id": "NM-09",
+      "smiles": "CCC(C)C(=O)OCC",
+      "canonical": "CCOC(=O)C(C)CC",
+      "formula": "C7H14O2",
+      "centers": [
+        [
+          2,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "NM-10",
+      "smiles": "CCC(C)CC(=O)OC",
+      "canonical": "CCC(C)CC(=O)OC",
+      "formula": "C7H14O2",
+      "centers": [
+        [
+          2,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "NM-11",
+      "smiles": "CCC(=O)NCC",
+      "canonical": "CCNC(=O)CC",
+      "formula": "C5H11NO",
+      "centers": []
+    },
+    {
+      "id": "NM-12",
+      "smiles": "CN(C)C(=O)C1=CC=CC=C1",
+      "canonical": "CN(C)C(=O)c1ccccc1",
+      "formula": "C9H11NO",
+      "centers": []
+    },
+    {
+      "id": "NM-13",
+      "smiles": "C1=CC(=CC(=C1)Br)C(=O)O",
+      "canonical": "O=C(O)c1cccc(Br)c1",
+      "formula": "C7H5BrO2",
+      "centers": []
+    },
+    {
+      "id": "NM-15",
+      "smiles": "COC1=CC=CC(=C1)C(=O)O",
+      "canonical": "COc1cccc(C(=O)O)c1",
+      "formula": "C8H8O3",
+      "centers": []
+    },
+    {
+      "id": "NM-16",
+      "smiles": "CCC(CO)N",
+      "canonical": "CCC(N)CO",
+      "formula": "C4H11NO",
+      "centers": [
+        [
+          2,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "NM-17",
+      "smiles": "CCC[C@H](C)Cl",
+      "canonical": "CCC[C@H](C)Cl",
+      "formula": "C5H11Cl",
+      "centers": [
+        [
+          3,
+          "S"
+        ]
+      ]
+    },
+    {
+      "id": "NM-18",
+      "smiles": "CCC/C=C/CC",
+      "canonical": "CC/C=C/CCC",
+      "formula": "C7H14",
+      "centers": []
+    },
+    {
+      "id": "NM-19",
+      "smiles": "CCC/C=C\\CC",
+      "canonical": "CC/C=C\\CCC",
+      "formula": "C7H14",
+      "centers": []
+    },
+    {
+      "id": "MS-04",
+      "smiles": "C1=CC=NN=C1",
+      "canonical": "c1ccnnc1",
+      "formula": "C4H4N2",
+      "centers": []
+    },
+    {
+      "id": "MS-05",
+      "smiles": "C1=CN=CN=C1",
+      "canonical": "c1cncnc1",
+      "formula": "C4H4N2",
+      "centers": []
+    },
+    {
+      "id": "MS-06",
+      "smiles": "C1=CN=CC=N1",
+      "canonical": "c1cnccn1",
+      "formula": "C4H4N2",
+      "centers": []
+    },
+    {
+      "id": "MS-07",
+      "smiles": "C1CCCC(=O)CC1",
+      "canonical": "O=C1CCCCCC1",
+      "formula": "C7H12O",
+      "centers": []
+    },
+    {
+      "id": "MS-09",
+      "smiles": "CCCCCCCC(=O)C",
+      "canonical": "CCCCCCCC(C)=O",
+      "formula": "C9H18O",
+      "centers": []
+    },
+    {
+      "id": "MS-10",
+      "smiles": "CCCCCCCCC=O",
+      "canonical": "CCCCCCCCC=O",
+      "formula": "C9H18O",
+      "centers": []
+    },
+    {
+      "id": "MS-11",
+      "smiles": "CCCCCCC(=O)OC",
+      "canonical": "CCCCCCC(=O)OC",
+      "formula": "C8H16O2",
+      "centers": []
+    },
+    {
+      "id": "MS-12",
+      "smiles": "CCCCCCC(=O)OCC",
+      "canonical": "CCCCCCC(=O)OCC",
+      "formula": "C9H18O2",
+      "centers": []
+    },
+    {
+      "id": "MS-14",
+      "smiles": "CCCCCCCCC#N",
+      "canonical": "CCCCCCCCC#N",
+      "formula": "C9H17N",
+      "centers": []
+    },
+    {
+      "id": "MS-15",
+      "smiles": "CCCCCCCCCCO",
+      "canonical": "CCCCCCCCCCO",
+      "formula": "C10H22O",
+      "centers": []
+    },
+    {
+      "id": "MS-17",
+      "smiles": "CCCN(CCC)CCC",
+      "canonical": "CCCN(CCC)CCC",
+      "formula": "C9H21N",
+      "centers": []
+    },
+    {
+      "id": "RX-01",
+      "smiles": "C=CCCCCCCC",
+      "canonical": "C=CCCCCCCC",
+      "formula": "C9H18",
+      "centers": []
+    },
+    {
+      "id": "RX-01",
+      "smiles": "CC(Br)CCCCCCC",
+      "canonical": "CCCCCCCC(C)Br",
+      "formula": "C9H19Br",
+      "centers": [
+        [
+          1,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "RX-01",
+      "smiles": "BrCCCCCCCCC",
+      "canonical": "CCCCCCCCCBr",
+      "formula": "C9H19Br",
+      "centers": []
+    },
+    {
+      "id": "RX-02",
+      "smiles": "C=CCCCCCCCC",
+      "canonical": "C=CCCCCCCCC",
+      "formula": "C10H20",
+      "centers": []
+    },
+    {
+      "id": "RX-02",
+      "smiles": "OCCCCCCCCCC",
+      "canonical": "CCCCCCCCCCO",
+      "formula": "C10H22O",
+      "centers": []
+    },
+    {
+      "id": "RX-02",
+      "smiles": "CC(O)CCCCCCCC",
+      "canonical": "CCCCCCCCC(C)O",
+      "formula": "C10H22O",
+      "centers": [
+        [
+          1,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "RX-03",
+      "smiles": "C=CC1CCCC1",
+      "canonical": "C=CC1CCCC1",
+      "formula": "C7H12",
+      "centers": []
+    },
+    {
+      "id": "RX-03",
+      "smiles": "OCCC1CCCC1",
+      "canonical": "OCCC1CCCC1",
+      "formula": "C7H14O",
+      "centers": []
+    },
+    {
+      "id": "RX-03",
+      "smiles": "CC(O)C1CCCC1",
+      "canonical": "CC(O)C1CCCC1",
+      "formula": "C7H14O",
+      "centers": [
+        [
+          1,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "RX-04",
+      "smiles": "C=CCCCCCCCCC",
+      "canonical": "C=CCCCCCCCCC",
+      "formula": "C11H22",
+      "centers": []
+    },
+    {
+      "id": "RX-04",
+      "smiles": "CC(Br)CCCCCCCCC",
+      "canonical": "CCCCCCCCCC(C)Br",
+      "formula": "C11H23Br",
+      "centers": [
+        [
+          1,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "RX-04",
+      "smiles": "BrCCCCCCCCCCC",
+      "canonical": "CCCCCCCCCCCBr",
+      "formula": "C11H23Br",
+      "centers": []
+    },
+    {
+      "id": "RX-06",
+      "smiles": "C1=CCCCCCC1",
+      "canonical": "C1=CCCCCCC1",
+      "formula": "C8H14",
+      "centers": []
+    },
+    {
+      "id": "RX-06",
+      "smiles": "Br[C@H]1[C@H](Br)CCCCCC1",
+      "canonical": "Br[C@@H]1CCCCCC[C@H]1Br",
+      "formula": "C8H14Br2",
+      "centers": [
+        [
+          1,
+          "R"
+        ],
+        [
+          2,
+          "R"
+        ]
+      ]
+    },
+    {
+      "id": "RX-07",
+      "smiles": "CC1=C(C)CCCCC1",
+      "canonical": "CC1=C(C)CCCCC1",
+      "formula": "C9H16",
+      "centers": []
+    },
+    {
+      "id": "RX-07",
+      "smiles": "C[C@H]1[C@@H](C)CCCCC1",
+      "canonical": "C[C@@H]1CCCCC[C@@H]1C",
+      "formula": "C9H18",
+      "centers": [
+        [
+          1,
+          "R"
+        ],
+        [
+          2,
+          "S"
+        ]
+      ]
+    },
+    {
+      "id": "RX-08",
+      "smiles": "CCC#CCCCC",
+      "canonical": "CCC#CCCCC",
+      "formula": "C8H14",
+      "centers": []
+    },
+    {
+      "id": "RX-08",
+      "smiles": "CC/C=C\\CCCC",
+      "canonical": "CC/C=C\\CCCC",
+      "formula": "C8H16",
+      "centers": []
+    },
+    {
+      "id": "RX-09",
+      "smiles": "CCC#CCCCC",
+      "canonical": "CCC#CCCCC",
+      "formula": "C8H14",
+      "centers": []
+    },
+    {
+      "id": "RX-09",
+      "smiles": "CC/C=C/CCCC",
+      "canonical": "CC/C=C/CCCC",
+      "formula": "C8H16",
+      "centers": []
+    },
+    {
+      "id": "RX-10",
+      "smiles": "C[C@H](Br)CCCC",
+      "canonical": "CCCC[C@H](C)Br",
+      "formula": "C6H13Br",
+      "centers": [
+        [
+          1,
+          "S"
+        ]
+      ]
+    },
+    {
+      "id": "RX-10",
+      "smiles": "C[C@@H](C#N)CCCC",
+      "canonical": "CCCC[C@@H](C)C#N",
+      "formula": "C7H13N",
+      "centers": [
+        [
+          1,
+          "R"
+        ]
+      ]
+    },
+    {
+      "id": "RX-11",
+      "smiles": "C[C@@H](Br)CCCCC",
+      "canonical": "CCCCC[C@@H](C)Br",
+      "formula": "C7H15Br",
+      "centers": [
+        [
+          1,
+          "R"
+        ]
+      ]
+    },
+    {
+      "id": "RX-11",
+      "smiles": "C[C@H](I)CCCCC",
+      "canonical": "CCCCC[C@H](C)I",
+      "formula": "C7H15I",
+      "centers": [
+        [
+          1,
+          "S"
+        ]
+      ]
+    },
+    {
+      "id": "RX-12",
+      "smiles": "CC(Br)CCCCCC",
+      "canonical": "CCCCCCC(C)Br",
+      "formula": "C8H17Br",
+      "centers": [
+        [
+          1,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "RX-12",
+      "smiles": "CC=CCCCCC",
+      "canonical": "CC=CCCCCC",
+      "formula": "C8H16",
+      "centers": []
+    },
+    {
+      "id": "RX-12",
+      "smiles": "C=CCCCCCC",
+      "canonical": "C=CCCCCCC",
+      "formula": "C8H16",
+      "centers": []
+    },
+    {
+      "id": "RX-13",
+      "smiles": "CC(Br)CCCCCCC",
+      "canonical": "CCCCCCCC(C)Br",
+      "formula": "C9H19Br",
+      "centers": [
+        [
+          1,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "RX-13",
+      "smiles": "CC=CCCCCCC",
+      "canonical": "CC=CCCCCCC",
+      "formula": "C9H18",
+      "centers": []
+    },
+    {
+      "id": "RX-13",
+      "smiles": "C=CCCCCCCC",
+      "canonical": "C=CCCCCCCC",
+      "formula": "C9H18",
+      "centers": []
+    },
+    {
+      "id": "RX-14",
+      "smiles": "CCCCCCCBr",
+      "canonical": "CCCCCCCBr",
+      "formula": "C7H15Br",
+      "centers": []
+    },
+    {
+      "id": "RX-14",
+      "smiles": "CCCCCCCC#N",
+      "canonical": "CCCCCCCC#N",
+      "formula": "C8H15N",
+      "centers": []
+    },
+    {
+      "id": "RQ-01",
+      "smiles": "CCCCCCCCCC=O",
+      "canonical": "CCCCCCCCCC=O",
+      "formula": "C10H20O",
+      "centers": []
+    },
+    {
+      "id": "RQ-01",
+      "smiles": "CCCCCCCCCCO",
+      "canonical": "CCCCCCCCCCO",
+      "formula": "C10H22O",
+      "centers": []
+    },
+    {
+      "id": "RQ-02",
+      "smiles": "CC(=O)CC(C)CC",
+      "canonical": "CCC(C)CC(C)=O",
+      "formula": "C7H14O",
+      "centers": [
+        [
+          4,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "RQ-02",
+      "smiles": "CC(O)CC(C)CC",
+      "canonical": "CCC(C)CC(C)O",
+      "formula": "C7H16O",
+      "centers": [
+        [
+          1,
+          "?"
+        ],
+        [
+          4,
+          "?"
+        ]
+      ]
+    },
+    {
+      "id": "RQ-03",
+      "smiles": "CCCCCCCCC(=O)OC",
+      "canonical": "CCCCCCCCC(=O)OC",
+      "formula": "C10H20O2",
+      "centers": []
+    },
+    {
+      "id": "RQ-03",
+      "smiles": "CCCCCCCCCO.CO",
+      "canonical": "CCCCCCCCCO.CO",
+      "formula": "C10H24O2",
+      "centers": []
+    },
+    {
+      "id": "RQ-04",
+      "smiles": "Cc1ccccc1C(=O)O",
+      "canonical": "Cc1ccccc1C(=O)O",
+      "formula": "C8H8O2",
+      "centers": []
+    },
+    {
+      "id": "RQ-04",
+      "smiles": "CO",
+      "canonical": "CO",
+      "formula": "CH4O",
+      "centers": []
+    },
+    {
+      "id": "RQ-04",
+      "smiles": "Cc1ccccc1C(=O)OC",
+      "canonical": "COC(=O)c1ccccc1C",
+      "formula": "C9H10O2",
+      "centers": []
+    },
+    {
+      "id": "RQ-05",
+      "smiles": "CCCCCCCCCBr",
+      "canonical": "CCCCCCCCCBr",
+      "formula": "C9H19Br",
+      "centers": []
+    },
+    {
+      "id": "RQ-05",
+      "smiles": "[C-]#N",
+      "canonical": "[C-]#N",
+      "formula": "CN-",
+      "centers": []
+    },
+    {
+      "id": "RQ-05",
+      "smiles": "CCCCCCCCCC#N",
+      "canonical": "CCCCCCCCCC#N",
+      "formula": "C10H19N",
+      "centers": []
+    },
+    {
+      "id": "RQ-06",
+      "smiles": "CCCCCCCCCC(=O)OCC",
+      "canonical": "CCCCCCCCCC(=O)OCC",
+      "formula": "C12H24O2",
+      "centers": []
+    },
+    {
+      "id": "RQ-06",
+      "smiles": "CCCCCCCCCCO.CCO",
+      "canonical": "CCCCCCCCCCO.CCO",
+      "formula": "C12H28O2",
+      "centers": []
+    },
+    {
+      "id": "RQ-07",
+      "smiles": "OCCCBr",
+      "canonical": "OCCCBr",
+      "formula": "C3H7BrO",
+      "centers": []
+    },
+    {
+      "id": "RQ-07",
+      "smiles": "OCCC[Mg]Br",
+      "canonical": "OCC[CH2][Mg][Br]",
+      "formula": "C3H7BrMgO",
+      "centers": []
+    },
+    {
+      "id": "RQ-08",
+      "smiles": "OCCCCBr",
+      "canonical": "OCCCCBr",
+      "formula": "C4H9BrO",
+      "centers": []
+    },
+    {
+      "id": "RQ-08",
+      "smiles": "OCCCC[Mg]Br",
+      "canonical": "OCCC[CH2][Mg][Br]",
+      "formula": "C4H9BrMgO",
+      "centers": []
+    },
+    {
+      "id": "RQ-09",
+      "smiles": "CCC(=O)CCC(=O)OCC",
+      "canonical": "CCOC(=O)CCC(=O)CC",
+      "formula": "C8H14O3",
+      "centers": []
+    },
+    {
+      "id": "RQ-09",
+      "smiles": "CCC(=O)CCCO.CCO",
+      "canonical": "CCC(=O)CCCO.CCO",
+      "formula": "C8H18O3",
+      "centers": []
+    },
+    {
+      "id": "RQ-10",
+      "smiles": "CCC(=O)CCCC(=O)OC",
+      "canonical": "CCC(=O)CCCC(=O)OC",
+      "formula": "C8H14O3",
+      "centers": []
+    },
+    {
+      "id": "RQ-10",
+      "smiles": "CCC(=O)CCCCO.CO",
+      "canonical": "CCC(=O)CCCCO.CO",
+      "formula": "C8H18O3",
+      "centers": []
+    },
+    {
+      "id": "RQ-12",
+      "smiles": "COC(=O)c1ccc(N)cc1",
+      "canonical": "COC(=O)c1ccc(N)cc1",
+      "formula": "C8H9NO2",
+      "centers": []
+    },
+    {
+      "id": "RQ-12",
+      "smiles": "CC(=O)Cl",
+      "canonical": "CC(=O)Cl",
+      "formula": "C2H3ClO",
+      "centers": []
+    },
+    {
+      "id": "RQ-12",
+      "smiles": "COC(=O)c1cc(C(C)=O)c(N)cc1",
+      "canonical": "COC(=O)c1ccc(N)c(C(C)=O)c1",
+      "formula": "C10H11NO3",
+      "centers": []
+    }
+  ],
+  "stereoReasoning": {
+    "RX-06": "Adjacent identical Br substituents on unsubstituted ring: R,R / S,S = trans; R,S = cis. Target is R,R.",
+    "RX-07": "Adjacent identical methyl substituents: R,S = cis for this symmetric ring. Syn H2 addition leaves methyls cis.",
+    "RX-08/09": "Opposite slash types along linear traversal denote Z; matching slash types denote E.",
+    "RX-10/11": "Same atom traversal with nucleophile replacing Br and @ inverted specifies backside inversion; R/S letter alone is insufficient when priority changes."
+  }
+}

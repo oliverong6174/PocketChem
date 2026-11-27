@@ -114,6 +114,8 @@ export async function predictGeneralFragmentation(parentSmiles: string | null): 
         const label = `m/z ${mz} · ${bondLabel(graph, bond.index)}`;
         const explanation = describeCleavagePathway(graph, bond.index, orientation.chargeCenter, orientation.ion);
         const peak: MassSpectrumPeak = {
+          channelKey: fragmentSmiles ? `direct:${fragmentSmiles}` : undefined,
+          channelSource: "graph",
           mz,
           relativeIntensity: rawScore,
           label,

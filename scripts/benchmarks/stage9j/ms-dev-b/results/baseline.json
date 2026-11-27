@@ -1,0 +1,262 @@
+{
+ "summary": {
+  "label": "baseline",
+  "cases": 8,
+  "molecularIon": "6/6",
+  "basePeak": "5/8",
+  "strictFragments": "0/7",
+  "basePeakWhenCommitted": "0/0",
+  "uncertain": 8,
+  "uncertainButCandidateSetHit": 0
+ },
+ "records": [
+  {
+   "id": "MB-01",
+   "category": "ketone",
+   "title": "2-octanone",
+   "expectedBasePeak": 43,
+   "engineBasePeak": 43,
+   "basePeakCertainty": "supported",
+   "candidateBasePeaks": null,
+   "top": [
+    "43:100",
+    "58:93",
+    "113:87",
+    "57:64"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41 (1/2 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":2,\"present\":1}"
+    }
+   }
+  },
+  {
+   "id": "MB-02",
+   "category": "aromatic",
+   "title": "butylbenzene",
+   "expectedBasePeak": 91,
+   "engineBasePeak": 91,
+   "basePeakCertainty": "supported",
+   "candidateBasePeaks": null,
+   "top": [
+    "91:100",
+    "77:43",
+    "134:37",
+    "57:12"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 92 (0/1 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":1,\"present\":0}"
+    }
+   }
+  },
+  {
+   "id": "MB-03",
+   "category": "amine",
+   "title": "dibutylamine",
+   "expectedBasePeak": 86,
+   "engineBasePeak": 86,
+   "basePeakCertainty": "supported",
+   "candidateBasePeaks": null,
+   "top": [
+    "86:100",
+    "72:83",
+    "57:57",
+    "29:27"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 30, 44 (1/3 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":3,\"present\":1}"
+    }
+   }
+  },
+  {
+   "id": "MB-04",
+   "category": "ester",
+   "title": "ethyl butanoate",
+   "expectedBasePeak": 71,
+   "engineBasePeak": 71,
+   "basePeakCertainty": "heuristic",
+   "candidateBasePeaks": null,
+   "top": [
+    "71:100",
+    "73:55",
+    "29:47",
+    "88:46"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 27 (3/4 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":3}"
+    }
+   }
+  },
+  {
+   "id": "MB-05",
+   "category": "ester",
+   "title": "ethyl hexanoate",
+   "expectedBasePeak": 88,
+   "engineBasePeak": 99,
+   "basePeakCertainty": "heuristic",
+   "candidateBasePeaks": null,
+   "top": [
+    "99:100",
+    "73:55",
+    "88:46",
+    "29:45"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "99 vs 88"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 27 (3/4 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":3}"
+    }
+   }
+  },
+  {
+   "id": "MB-06",
+   "category": "nitrile",
+   "title": "octanenitrile",
+   "expectedBasePeak": 82,
+   "engineBasePeak": 41,
+   "basePeakCertainty": "heuristic",
+   "candidateBasePeaks": null,
+   "top": [
+    "41:100",
+    "125:39",
+    "26:37",
+    "40:35"
+   ],
+   "dimensions": {
+    "basePeak": {
+     "status": "wrong",
+     "detail": "41 vs 82"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 55 (3/4 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":3}"
+    }
+   }
+  },
+  {
+   "id": "MB-07",
+   "category": "acid",
+   "title": "octanoic acid",
+   "expectedBasePeak": 60,
+   "engineBasePeak": 127,
+   "basePeakCertainty": "heuristic",
+   "candidateBasePeaks": null,
+   "top": [
+    "127:100",
+    "45:84",
+    "60:71",
+    "17:29"
+   ],
+   "dimensions": {
+    "basePeak": {
+     "status": "wrong",
+     "detail": "127 vs 60"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41, 55 (2/4 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":2}"
+    }
+   }
+  },
+  {
+   "id": "MB-08",
+   "category": "aromatic",
+   "title": "propylbenzene",
+   "expectedBasePeak": 91,
+   "engineBasePeak": 91,
+   "basePeakCertainty": "supported",
+   "candidateBasePeaks": null,
+   "top": [
+    "91:100",
+    "77:43",
+    "120:37",
+    "43:12"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    }
+   }
+  }
+ ]
+}

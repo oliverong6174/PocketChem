@@ -1,0 +1,353 @@
+{
+  "id": "NM-13",
+  "startedUTC": "2026-11-06T18:21:46.017Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "3-bromobenzoic acid",
+      "commonName": null,
+      "displayName": "3-bromobenzoic acid",
+      "namingConfidence": "High",
+      "namingStatus": "systematic",
+      "parentChain": "benzene",
+      "parentChainLength": 6,
+      "mainSuffix": "-oic acid",
+      "prefixes": [
+        "fluoro, chloro, bromo, iodo"
+      ],
+      "motifs": [
+        "aromatic benzene ring",
+        "bromobenzene motif",
+        "benzoic acid motif"
+      ],
+      "explanation": "Detected benzene-like aromatic ring as the parent structure. carboxylicAcid chosen as highest-priority functional group. Detected 1 substituent(s).",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ]
+    },
+    "properties": {
+      "molecularFormula": "C7H5O2Br",
+      "exactMass": "199.9473",
+      "molecularWeight": "201.02",
+      "degreesOfUnsaturation": 5,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 7
+        },
+        {
+          "element": "H",
+          "count": 5
+        },
+        {
+          "element": "Br",
+          "count": 1
+        },
+        {
+          "element": "O",
+          "count": 2
+        }
+      ],
+      "heavyAtomCount": 10,
+      "hydrogenBondDonors": 1,
+      "hydrogenBondAcceptors": 1,
+      "rotatableBonds": 1,
+      "topologicalPolarSurfaceArea": "37.30",
+      "logP": "2.15",
+      "ringCount": 1,
+      "boilingPointTendency": {
+        "level": "Medium",
+        "score": 4.5,
+        "factors": [
+          "High molecular weight strongly raises boiling point.",
+          "Hydrogen-bond donors raise boiling point.",
+          "Hydrogen-bond acceptors increase intermolecular attraction."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Low",
+        "score": 2.5,
+        "factors": [
+          "Low TPSA means less polar surface area.",
+          "Moderate logP gives a balance between water and lipid solubility.",
+          "Hydrogen-bond donors increase water solubility.",
+          "Hydrogen-bond acceptors help the molecule interact with water."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "Medium",
+        "score": 3.5,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility.",
+          "Large molecules tend to be less volatile."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Benzoic acid",
+      "priority": 1.2,
+      "nomenclaturePriority": 1.2,
+      "confidence": "High",
+      "suffix": "benzoic acid",
+      "prefix": "carboxy",
+      "equivalentNames": [
+        "benzenecarboxylic acid"
+      ],
+      "count": 1,
+      "mcatNote": "Benzoic acid is an aromatic carboxylic acid with a carboxyl group directly attached to a benzene ring: Ph-CO2H.",
+      "matches": [
+        {
+          "atoms": [
+            1,
+            0,
+            5,
+            4,
+            3,
+            2,
+            7,
+            8,
+            9
+          ],
+          "bonds": [
+            0,
+            9,
+            4,
+            3,
+            2,
+            6,
+            7,
+            8,
+            1
+          ]
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            2,
+            7,
+            8,
+            9
+          ],
+          "bonds": [
+            6,
+            7,
+            8
+          ]
+        }
+      ],
+      "displaySmarts": "[cR1][CX3](=[OX1])[OX2H1]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Benzoic acid",
+        "priority": 1.2,
+        "nomenclaturePriority": 1.2,
+        "confidence": "High",
+        "suffix": "benzoic acid",
+        "prefix": "carboxy",
+        "equivalentNames": [
+          "benzenecarboxylic acid"
+        ],
+        "count": 1,
+        "mcatNote": "Benzoic acid is an aromatic carboxylic acid with a carboxyl group directly attached to a benzene ring: Ph-CO2H.",
+        "matches": [
+          {
+            "atoms": [
+              1,
+              0,
+              5,
+              4,
+              3,
+              2,
+              7,
+              8,
+              9
+            ],
+            "bonds": [
+              0,
+              9,
+              4,
+              3,
+              2,
+              6,
+              7,
+              8,
+              1
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              2,
+              7,
+              8,
+              9
+            ],
+            "bonds": [
+              6,
+              7,
+              8
+            ]
+          }
+        ],
+        "displaySmarts": "[cR1][CX3](=[OX1])[OX2H1]",
+        "category": "functionalGroup"
+      },
+      {
+        "name": "Aryl halide",
+        "priority": 27.5,
+        "nomenclaturePriority": 21.1,
+        "confidence": "High",
+        "suffix": "Never suffix",
+        "prefix": "fluoro, chloro, bromo, iodo",
+        "equivalentNames": [
+          "halobenzene"
+        ],
+        "count": 1,
+        "mcatNote": "Aryl halides have a halogen directly attached to an aromatic ring.",
+        "matches": [
+          {
+            "atoms": [
+              4,
+              6
+            ],
+            "bonds": [
+              5
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              4,
+              6
+            ],
+            "bonds": [
+              5
+            ]
+          }
+        ],
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Benzoic acid",
+        "priority": 1.2,
+        "nomenclaturePriority": 1.2,
+        "confidence": "High",
+        "suffix": "benzoic acid",
+        "prefix": "carboxy",
+        "equivalentNames": [
+          "benzenecarboxylic acid"
+        ],
+        "count": 1,
+        "mcatNote": "Benzoic acid is an aromatic carboxylic acid with a carboxyl group directly attached to a benzene ring: Ph-CO2H.",
+        "matches": [
+          {
+            "atoms": [
+              1,
+              0,
+              5,
+              4,
+              3,
+              2,
+              7,
+              8,
+              9
+            ],
+            "bonds": [
+              0,
+              9,
+              4,
+              3,
+              2,
+              6,
+              7,
+              8,
+              1
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              2,
+              7,
+              8,
+              9
+            ],
+            "bonds": [
+              6,
+              7,
+              8
+            ]
+          }
+        ],
+        "displaySmarts": "[cR1][CX3](=[OX1])[OX2H1]",
+        "category": "functionalGroup"
+      },
+      {
+        "name": "Aryl halide",
+        "priority": 27.5,
+        "nomenclaturePriority": 21.1,
+        "confidence": "High",
+        "suffix": "Never suffix",
+        "prefix": "fluoro, chloro, bromo, iodo",
+        "equivalentNames": [
+          "halobenzene"
+        ],
+        "count": 1,
+        "mcatNote": "Aryl halides have a halogen directly attached to an aromatic ring.",
+        "matches": [
+          {
+            "atoms": [
+              4,
+              6
+            ],
+            "bonds": [
+              5
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              4,
+              6
+            ],
+            "bonds": [
+              5
+            ]
+          }
+        ],
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:21:47.453Z"
+}

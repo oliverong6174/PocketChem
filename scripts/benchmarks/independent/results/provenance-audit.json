@@ -1,0 +1,743 @@
+{
+ "rows": [
+  {
+   "id": "SE-01",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "hamburg-sn2:supported",
+    "ncstate-sn2:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "SE-02",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "development-guided",
+   "sources": [
+    "reusch-e2:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "SE-03",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "development-guided",
+   "sources": [
+    "reusch-e2:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "SE-04",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [
+    "ncstate-sn2:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "SE-05",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AL-01",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AL-02",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AL-03",
+   "claimed": "verified-secondary",
+   "audited": "source-not-inspected",
+   "category": "source-unconfirmed",
+   "sources": [
+    "ubc-hbo:unreadable"
+   ],
+   "changed": true,
+   "note": ""
+  },
+  {
+   "id": "AL-04",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "jove-oxymerc:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AL-05",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "development-guided",
+   "sources": [
+    "jove-oxymerc:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AL-06",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AL-07",
+   "claimed": "verified-secondary",
+   "audited": "source-partial",
+   "category": "existing-fixture-overlap",
+   "sources": [
+    "ncstate-halogenation:partial"
+   ],
+   "changed": true,
+   "note": ""
+  },
+  {
+   "id": "AL-08",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "existing-fixture-overlap",
+   "sources": [
+    "libretexts-syn-diol:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AL-09",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "verified-development-informed",
+   "sources": [
+    "libretexts-syn-diol:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AL-10",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "verified-development-informed",
+   "sources": [
+    "jove-epoxidation:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AL-11",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AY-01",
+   "claimed": "verified-secondary",
+   "audited": "source-not-inspected",
+   "category": "source-unconfirmed",
+   "sources": [
+    "vanderbilt-alkynes:unreadable"
+   ],
+   "changed": true,
+   "note": ""
+  },
+  {
+   "id": "AY-02",
+   "claimed": "verified-secondary",
+   "audited": "source-not-inspected",
+   "category": "source-unconfirmed",
+   "sources": [
+    "vanderbilt-alkynes:unreadable"
+   ],
+   "changed": true,
+   "note": ""
+  },
+  {
+   "id": "AY-03",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "libretexts-alkyne-red:supported",
+    "wikipedia-semihydrog:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AY-04",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "libretexts-alkyne-red:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AY-05",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "CB-01",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "CB-02",
+   "claimed": "verified-secondary",
+   "audited": "source-not-inspected",
+   "category": "source-unconfirmed",
+   "sources": [
+    "ic-os3:unreadable"
+   ],
+   "changed": true,
+   "note": ""
+  },
+  {
+   "id": "CB-03",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "orgosolver-dibal:supported",
+    "pmc-dibal:unreachable"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "CB-04",
+   "claimed": "verified-secondary",
+   "audited": "source-not-inspected",
+   "category": "source-unconfirmed",
+   "sources": [
+    "ic-os3:unreadable"
+   ],
+   "changed": true,
+   "note": ""
+  },
+  {
+   "id": "CB-05",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [
+    "ic-os3:unreadable"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "CB-06",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "wikipedia-mch:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "CB-07",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "existing-fixture-overlap",
+   "sources": [],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AR-01",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "development-guided",
+   "sources": [
+    "uis-eas:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AR-02",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "uis-eas:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AR-03",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "existing-fixture-overlap",
+   "sources": [
+    "uis-eas:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AR-04",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "AR-05",
+   "claimed": "verified-secondary",
+   "audited": "source-partial",
+   "category": "development-guided",
+   "sources": [
+    "ncstate-fc:partial"
+   ],
+   "changed": true,
+   "note": ""
+  },
+  {
+   "id": "OM-01",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "chemguide-grignard:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "OM-02",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "development-guided",
+   "sources": [
+    "chemguide-grignard:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "OM-03",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "development-guided",
+   "sources": [],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "OM-04",
+   "claimed": "verified-primary",
+   "audited": "source-not-inspected",
+   "category": "source-unconfirmed",
+   "sources": [
+    "suzuki-1979:unreadable"
+   ],
+   "changed": true,
+   "note": "Labelled primary; no primary-paper text could be read (scanned PDF, bot-wall or secondary summary)."
+  },
+  {
+   "id": "OM-05",
+   "claimed": "verified-primary",
+   "audited": "source-not-inspected",
+   "category": "source-unconfirmed",
+   "sources": [
+    "sonogashira-1975:unreachable"
+   ],
+   "changed": true,
+   "note": "Labelled primary; no primary-paper text could be read (scanned PDF, bot-wall or secondary summary)."
+  },
+  {
+   "id": "OM-06",
+   "claimed": "verified-secondary",
+   "audited": "source-partial",
+   "category": "source-unconfirmed",
+   "sources": [
+    "libretexts-grignard:partial"
+   ],
+   "changed": true,
+   "note": ""
+  },
+  {
+   "id": "OR-01",
+   "claimed": "verified-primary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "corey-suggs-1975:supported",
+    "ucla-pcc:partial",
+    "moc-pcc:partial"
+   ],
+   "changed": true,
+   "note": "Labelled primary; the readable source is a secondary page."
+  },
+  {
+   "id": "OR-02",
+   "claimed": "verified-secondary",
+   "audited": "source-partial",
+   "category": "source-unconfirmed",
+   "sources": [
+    "moc-pcc:partial"
+   ],
+   "changed": true,
+   "note": ""
+  },
+  {
+   "id": "OR-03",
+   "claimed": "verified-secondary",
+   "audited": "source-not-inspected",
+   "category": "source-unconfirmed",
+   "sources": [
+    "iupac-birch:unreachable"
+   ],
+   "changed": true,
+   "note": ""
+  },
+  {
+   "id": "OR-04",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "ncstate-amines:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "OR-05",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "ncstate-amines:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "OR-06",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "ncstate-amines:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "CP-01",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "openstax-conj:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "CP-02",
+   "claimed": "verified-secondary",
+   "audited": "source-not-inspected",
+   "category": "existing-fixture-overlap",
+   "sources": [
+    "rsc-naphthalene-fc:unreachable"
+   ],
+   "changed": true,
+   "note": ""
+  },
+  {
+   "id": "US-01",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "existing-fixture-overlap",
+   "sources": [
+    "libretexts-wacker:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "US-02",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "existing-fixture-overlap",
+   "sources": [],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "US-03",
+   "claimed": "verified-primary",
+   "audited": "verified-secondary",
+   "category": "unsupported-probe",
+   "sources": [
+    "katsuki-sharpless-1980:supported"
+   ],
+   "changed": true,
+   "note": "Labelled primary; the readable source is a secondary page."
+  },
+  {
+   "id": "US-04",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "unsupported-probe",
+   "sources": [
+    "orgosolver-bv:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "US-05",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "unsupported-probe",
+   "sources": [
+    "namereaction-mitsunobu:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "RT-01",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [
+    "jove-oxymerc:supported",
+    "ucla-pcc:partial"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "RT-02",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "uis-eas:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "RT-03",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [
+    "uis-eas:supported"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "WS-01",
+   "claimed": "provisional",
+   "audited": "provisional",
+   "category": "provisional",
+   "sources": [
+    "suzuki-1979:unreadable"
+   ],
+   "changed": false,
+   "note": ""
+  },
+  {
+   "id": "WS-02",
+   "claimed": "verified-secondary",
+   "audited": "verified-secondary",
+   "category": "independent-held-out",
+   "sources": [
+    "sonogashira-1975:unreachable",
+    "libretexts-alkyne-red:supported"
+   ],
+   "changed": false,
+   "note": ""
+  }
+ ],
+ "summary": {
+  "independent-held-out": [
+   "SE-01",
+   "AL-04",
+   "AY-03",
+   "AY-04",
+   "CB-03",
+   "CB-06",
+   "AR-02",
+   "OM-01",
+   "OR-01",
+   "OR-04",
+   "OR-05",
+   "OR-06",
+   "CP-01",
+   "RT-02",
+   "WS-02"
+  ],
+  "development-guided": [
+   "SE-02",
+   "SE-03",
+   "AL-05",
+   "AR-01",
+   "AR-05",
+   "OM-02",
+   "OM-03"
+  ],
+  "provisional": [
+   "SE-04",
+   "SE-05",
+   "AL-01",
+   "AL-02",
+   "AL-06",
+   "AL-11",
+   "AY-05",
+   "CB-01",
+   "CB-05",
+   "AR-04",
+   "RT-01",
+   "RT-03",
+   "WS-01"
+  ],
+  "source-unconfirmed": [
+   "AL-03",
+   "AY-01",
+   "AY-02",
+   "CB-02",
+   "CB-04",
+   "OM-04",
+   "OM-05",
+   "OM-06",
+   "OR-02",
+   "OR-03"
+  ],
+  "existing-fixture-overlap": [
+   "AL-07",
+   "AL-08",
+   "CB-07",
+   "AR-03",
+   "CP-02",
+   "US-01",
+   "US-02"
+  ],
+  "verified-development-informed": [
+   "AL-09",
+   "AL-10"
+  ],
+  "unsupported-probe": [
+   "US-03",
+   "US-04",
+   "US-05"
+  ]
+ },
+ "strict": [
+  "SE-01",
+  "AL-04",
+  "AY-03",
+  "AY-04",
+  "CB-03",
+  "CB-06",
+  "AR-02",
+  "OM-01",
+  "OR-01",
+  "OR-04",
+  "OR-05",
+  "OR-06",
+  "CP-01",
+  "RT-02",
+  "WS-02"
+ ],
+ "looseOriginal": [
+  "SE-01",
+  "SE-02",
+  "SE-03",
+  "AL-03",
+  "AL-04",
+  "AL-09",
+  "AL-10",
+  "AY-01",
+  "AY-02",
+  "AY-03",
+  "AY-04",
+  "CB-02",
+  "CB-03",
+  "CB-04",
+  "CB-06",
+  "AR-01",
+  "AR-02",
+  "AR-05",
+  "OM-01",
+  "OM-02",
+  "OM-04",
+  "OM-05",
+  "OM-06",
+  "OR-01",
+  "OR-02",
+  "OR-03",
+  "OR-04",
+  "OR-05",
+  "OR-06",
+  "CP-01",
+  "US-03",
+  "US-04",
+  "US-05",
+  "RT-02",
+  "WS-02"
+ ]
+}

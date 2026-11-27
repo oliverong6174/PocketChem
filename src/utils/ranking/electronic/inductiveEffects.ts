@@ -29,7 +29,7 @@ export function applyInductiveMetrics(
   metrics.inductiveWithdrawal = metric(
     strongestInductive.score || null,
     strongestInductive.name
-      ? `${strongestInductive.name} · ${strongestInductive.score.toFixed(1)}/5`
+      ? `${strongestInductive.name}, ${strongestInductive.score.toFixed(1)}/5`
       : "No strong −I group detected",
     "Higher score indicates stronger qualitative sigma-bond electron withdrawal.",
   );

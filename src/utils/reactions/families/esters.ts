@@ -93,6 +93,7 @@ export const esterReactionRules: ReactionRule[] = [
   },
   {
     id: "ester-lah-reduction",
+    conditions: { hydride: true, anhydrous: true },
     family: "esters",
     reactionType: "reduction",
     title: "LiAlH₄ Reduction of an Ester",
@@ -129,6 +130,7 @@ export const esterReactionRules: ReactionRule[] = [
   },
   {
     id: "ester-dibal-reduction",
+    conditions: { hydride: true, anhydrous: true },
     family: "esters",
     reactionType: "reduction",
     title: "DIBAL-H Partial Reduction",
@@ -148,6 +150,7 @@ export const esterReactionRules: ReactionRule[] = [
   },
   {
     id: "ester-grignard-addition",
+    conditions: { organometallic: true, anhydrous: true },
     family: "esters",
     reactionType: "addition",
     title: "Organometallic Addition",

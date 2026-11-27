@@ -1,0 +1,21 @@
+{
+  "note": "Expert chemical assessment of the OBSERVED routes, kept apart from the observed results in observed-results.json. These are the assessor's judgements, not reference-validated facts.",
+  "known_failure_cases": {
+    "C7":  "Best route used DIBAL on methyl acrylate (-> acrolein + MeOH) before a Heck coupling. Structurally valid; chemically questionable (acrylate/DIBAL selectivity, acrolein handling). Labelled 'verified' (structural replay only).",
+    "C9":  "Best route used a Heck coupling of bromobenzene with propene that the engine returned as the branched alpha-methylstyrene. The rule enumerates linear and branched attachments without ranking (its own limitation text says so); the linear product is the normally expected one.",
+    "C11": "At a 25 s budget the best route was anti-dihydroxylation then pinacol rearrangement to 2-octanone. For a terminal 1,2-diol the aldehyde (octanal) is the normally favoured pinacol outcome; the methyl ketone comes from the primary-cation pathway. At a 15 s budget the planner returned alkene hydration then PCC oxidation, which is chemically sound.",
+    "C8":  "alkene-epoxidation returns the same meso (cis) epoxide for both (E)- and (Z)-2-butene (status 'representative'); the E alkene should give the chiral trans epoxide. Not on the returned route, but it breaks the expected stereochemical route. alkene-syn-dihydroxylation, in contrast, gives the racemic chiral diol from the E alkene and the meso diol from the Z alkene."
+  },
+  "missing_reaction_coverage": {
+    "grignard_formation_from_aryl_halide": "no rule produces ArMgX (C9 branch B)",
+    "wacker_tsuji_oxidation": "no rule (C11)",
+    "ring_closing_metathesis": "no rule (C12)"
+  },
+  "classification_of_observed_best_routes": {
+    "C1": "correct and supported", "C2": "correct and supported", "C3": "correct and supported (valid non-catalytic alternative)",
+    "C4": "correct and supported", "C5": "correct and supported", "C6": "correct and supported (valid shorter alternative)",
+    "C7": "target reached but chemically questionable", "C8": "correct and supported (valid alternative; verification connectivity-only because the target had no stereo)",
+    "C9": "target reached but chemically questionable", "C10": "correct and supported",
+    "C11": "target reached but chemically questionable (budget dependent: 15 s correct, 25 s questionable)", "C12": "unsupported chemistry (reported as a search timeout)"
+  }
+}

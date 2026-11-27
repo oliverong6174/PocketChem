@@ -1,0 +1,1744 @@
+{
+ "cases": [
+  {
+   "id": "MS-01",
+   "capability": "ms",
+   "category": "alkyl halide",
+   "title": "1-bromo-2-methylpropane",
+   "evidence": "reference-database",
+   "smiles": "CC(C)CBr",
+   "formula": "C4H9Br",
+   "source": {
+    "id": "C78773",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C78773&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C78773&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/1-bromo-2-methylpropane.json",
+    "sha256": "fef9d79e6bb8ef38bcec8dabdfa7f5fdc5344971affa129160c0aae26d5fcd49",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 136,
+    "molecular_ion_rel": 2.3,
+    "base_peak_mz": 57,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 57
+     },
+     {
+      "mz": 43,
+      "rel": 32
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-02",
+   "capability": "ms",
+   "category": "substituted benzene",
+   "title": "1-bromo-4-chlorobenzene",
+   "evidence": "reference-database",
+   "smiles": "C1=CC(=CC=C1Cl)Br",
+   "formula": "C6H4BrCl",
+   "source": {
+    "id": "C106398",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106398&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C106398&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/1-bromo-4-chlorobenzene.json",
+    "sha256": "4a0015a3f6b9c01eb54da32b0e7cbbc1dfae423b818cf08b1b2fa5cbb7d91853",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 190,
+    "molecular_ion_rel": 75.3,
+    "base_peak_mz": 192,
+    "key_fragments": [
+     {
+      "mz": 75,
+      "rel": 43
+     },
+     {
+      "mz": 111,
+      "rel": 71
+     },
+     {
+      "mz": 113,
+      "rel": 23
+     },
+     {
+      "mz": 194,
+      "rel": 24
+     }
+    ],
+    "m_plus_2_ratio": 1.328
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-03",
+   "capability": "ms",
+   "category": "alkyl halide",
+   "title": "1-bromohexane",
+   "evidence": "reference-database",
+   "smiles": "CCCCCCBr",
+   "formula": "C6H13Br",
+   "source": {
+    "id": "C111251",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C111251&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111251&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/1-bromohexane.json",
+    "sha256": "0ff00e83a015ebe07c410ac646d178b94c90c7e223003d792a51a46d720f53e0",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 164,
+    "molecular_ion_rel": 2.5,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 56
+     },
+     {
+      "mz": 55,
+      "rel": 49
+     },
+     {
+      "mz": 85,
+      "rel": 51
+     },
+     {
+      "mz": 135,
+      "rel": 42
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-04",
+   "capability": "ms",
+   "category": "alkyl halide",
+   "title": "1-chloro-2-methylpropane",
+   "evidence": "reference-database",
+   "smiles": "CC(C)CCl",
+   "formula": "C4H9Cl",
+   "source": {
+    "id": "C513360",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C513360&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C513360&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/1-chloro-2-methylpropane.json",
+    "sha256": "6bfdd089b136451e0aa7dd7a860409442a3e4732aed18bdc47cbeaa9cc92727c",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.3,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 50
+     },
+     {
+      "mz": 42,
+      "rel": 46
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-05",
+   "capability": "ms",
+   "category": "alkyl halide",
+   "title": "1-chloropentane",
+   "evidence": "reference-database",
+   "smiles": "CCCCCCl",
+   "formula": "C5H11Cl",
+   "source": {
+    "id": "C543599",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C543599&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C543599&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/1-chloropentane.json",
+    "sha256": "9fd70299a8df67380258b43b706a7b5616ccac2774a83afbebb8378bc5dde712",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 106,
+    "molecular_ion_rel": 1.7,
+    "base_peak_mz": 55,
+    "key_fragments": [
+     {
+      "mz": 29,
+      "rel": 61
+     },
+     {
+      "mz": 41,
+      "rel": 85
+     },
+     {
+      "mz": 42,
+      "rel": 92
+     },
+     {
+      "mz": 70,
+      "rel": 89
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-06",
+   "capability": "ms",
+   "category": "alcohol",
+   "title": "1-hexanol",
+   "evidence": "reference-database",
+   "smiles": "CCCCCCO",
+   "formula": "C6H14O",
+   "source": {
+    "id": "C111273",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C111273&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111273&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/1-hexanol.json",
+    "sha256": "e99df60621a9946950b60245ab63f3843c6f57b85a3292c28b1f4a7b5611baf0",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.1,
+    "base_peak_mz": 56,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 59
+     },
+     {
+      "mz": 42,
+      "rel": 53
+     },
+     {
+      "mz": 43,
+      "rel": 83
+     },
+     {
+      "mz": 55,
+      "rel": 57
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-07",
+   "capability": "ms",
+   "category": "nitro",
+   "title": "1-nitropropane",
+   "evidence": "reference-database",
+   "smiles": "CCC[N+](=O)[O-]",
+   "formula": "C3H7NO2",
+   "source": {
+    "id": "C108032",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C108032&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108032&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/1-nitropropane.json",
+    "sha256": "8945f9f7b0418fb7202bd9937aa376cf390e23b356fa2d66a8a543a111338681",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 71
+     },
+     {
+      "mz": 41,
+      "rel": 79
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-08",
+   "capability": "ms",
+   "category": "alkyl halide",
+   "title": "2-bromo-2-methylpropane",
+   "evidence": "reference-database",
+   "smiles": "CC(C)(C)Br",
+   "formula": "C4H9Br",
+   "source": {
+    "id": "C507197",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C507197&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C507197&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/2-bromo-2-methylpropane.json",
+    "sha256": "0c9a42cb9a440d0a3baa1cb1710046399aa2187397f4d0cecc88639d10989b30",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0,
+    "base_peak_mz": 57,
+    "key_fragments": [
+     {
+      "mz": 29,
+      "rel": 35
+     },
+     {
+      "mz": 41,
+      "rel": 60
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-09",
+   "capability": "ms",
+   "category": "alcohol",
+   "title": "2-methyl-2-butanol",
+   "evidence": "reference-database",
+   "smiles": "CCC(C)(C)O",
+   "formula": "C5H12O",
+   "source": {
+    "id": "C75854",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C75854&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C75854&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/2-methyl-2-butanol.json",
+    "sha256": "96150f86ac2c56f7b28ab731e838490ffcca58a2457ee00dbcb51f0faa5716cf",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0,
+    "base_peak_mz": 59,
+    "key_fragments": [
+     {
+      "mz": 31,
+      "rel": 26
+     },
+     {
+      "mz": 43,
+      "rel": 28
+     },
+     {
+      "mz": 55,
+      "rel": 40
+     },
+     {
+      "mz": 73,
+      "rel": 58
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-10",
+   "capability": "ms",
+   "category": "aldehyde",
+   "title": "2-methylpropanal",
+   "evidence": "reference-database",
+   "smiles": "CC(C)C=O",
+   "formula": "C4H8O",
+   "source": {
+    "id": "C78842",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C78842&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C78842&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/2-methylpropanal.json",
+    "sha256": "806735feb1bdf2d52242a99b37f2ad20ba92d33849ea1bd191ef7d096c216ad9",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 72,
+    "molecular_ion_rel": 54.7,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 32
+     },
+     {
+      "mz": 29,
+      "rel": 26
+     },
+     {
+      "mz": 39,
+      "rel": 33
+     },
+     {
+      "mz": 41,
+      "rel": 87
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-11",
+   "capability": "ms",
+   "category": "nitro",
+   "title": "2-nitropropane",
+   "evidence": "reference-database",
+   "smiles": "CC(C)[N+](=O)[O-]",
+   "formula": "C3H7NO2",
+   "source": {
+    "id": "C79469",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C79469&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C79469&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/2-nitropropane.json",
+    "sha256": "e166c283be7dd08a9314b52c6f2783f246f57801eacf8802ca6f4deb2d92a696",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.1,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 63
+     },
+     {
+      "mz": 39,
+      "rel": 36
+     },
+     {
+      "mz": 41,
+      "rel": 86
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-12",
+   "capability": "ms",
+   "category": "alcohol",
+   "title": "2-pentanol",
+   "evidence": "reference-database",
+   "smiles": "CCCC(C)O",
+   "formula": "C5H12O",
+   "source": {
+    "id": "C26184623",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C26184623&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C26184623&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/2-pentanol.json",
+    "sha256": "d1fbc5402dd0fcddcb96b27d39ff23aa7f0201909adb063b9253d00b162abf0f",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0,
+    "base_peak_mz": 45,
+    "key_fragments": [],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-13",
+   "capability": "ms",
+   "category": "alkyl halide",
+   "title": "3-bromopentane",
+   "evidence": "reference-database",
+   "smiles": "CCC(CC)Br",
+   "formula": "C5H11Br",
+   "source": {
+    "id": "C1809105",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C1809105&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C1809105&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/3-bromopentane.json",
+    "sha256": "245b0b7c41fb57bac942ca7852f8c6dbcea307f4e074d307ac3e36e82d563fc5",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.4,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 24
+     },
+     {
+      "mz": 39,
+      "rel": 27
+     },
+     {
+      "mz": 41,
+      "rel": 41
+     },
+     {
+      "mz": 71,
+      "rel": 90
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-14",
+   "capability": "ms",
+   "category": "substituted benzene",
+   "title": "3-chlorotoluene",
+   "evidence": "reference-database",
+   "smiles": "CC1=CC(=CC=C1)Cl",
+   "formula": "C7H7Cl",
+   "source": {
+    "id": "C108418",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C108418&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108418&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/3-chlorotoluene.json",
+    "sha256": "98a47ce1fc57c4bb55d86b82414bf1ac34cd695f619dd2c19df4e89f7c486052",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 126,
+    "molecular_ion_rel": 33.8,
+    "base_peak_mz": 91,
+    "key_fragments": [],
+    "m_plus_2_ratio": 0.308
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-15",
+   "capability": "ms",
+   "category": "ketone",
+   "title": "3-hexanone",
+   "evidence": "reference-database",
+   "smiles": "CCCC(=O)CC",
+   "formula": "C6H12O",
+   "source": {
+    "id": "C589388",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C589388&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C589388&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/3-hexanone.json",
+    "sha256": "feeb2e023b366cf3de0a0c4e4eb630668b61a982875e6aa242a0cdf4d24ba0c7",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 100,
+    "molecular_ion_rel": 23.5,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 36
+     },
+     {
+      "mz": 29,
+      "rel": 51
+     },
+     {
+      "mz": 57,
+      "rel": 83
+     },
+     {
+      "mz": 71,
+      "rel": 51
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-16",
+   "capability": "ms",
+   "category": "alcohol",
+   "title": "3-methyl-1-butanol",
+   "evidence": "reference-database",
+   "smiles": "CC(C)CCO",
+   "formula": "C5H12O",
+   "source": {
+    "id": "C123513",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C123513&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C123513&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/3-methyl-1-butanol.json",
+    "sha256": "d60f1bc3205a9928222bd8a30d737e2360e4b438105b282f1f998bfc86bc0757",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.1,
+    "base_peak_mz": 55,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 81
+     },
+     {
+      "mz": 42,
+      "rel": 90
+     },
+     {
+      "mz": 43,
+      "rel": 82
+     },
+     {
+      "mz": 70,
+      "rel": 71
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-17",
+   "capability": "ms",
+   "category": "nitro",
+   "title": "3-nitrotoluene",
+   "evidence": "reference-database",
+   "smiles": "CC1=CC(=CC=C1)[N+](=O)[O-]",
+   "formula": "C7H7NO2",
+   "source": {
+    "id": "C99081",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C99081&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C99081&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/3-nitrotoluene.json",
+    "sha256": "76ca80f8b46543e27dc7474bd7a69ca082f0029d2c325276f7769e7200bdad20",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 137,
+    "molecular_ion_rel": 51.2,
+    "base_peak_mz": 91,
+    "key_fragments": [
+     {
+      "mz": 65,
+      "rel": 46
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-18",
+   "capability": "ms",
+   "category": "substituted benzene",
+   "title": "4-bromotoluene",
+   "evidence": "reference-database",
+   "smiles": "CC1=CC=C(C=C1)Br",
+   "formula": "C7H7Br",
+   "source": {
+    "id": "C106387",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106387&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C106387&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/4-bromotoluene.json",
+    "sha256": "1e2c4fc2db4d64f7d70f59e46214e275d7c967484a948d131ca93249af35de03",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 170,
+    "molecular_ion_rel": 23.8,
+    "base_peak_mz": 91,
+    "key_fragments": [
+     {
+      "mz": 172,
+      "rel": 23
+     }
+    ],
+    "m_plus_2_ratio": 0.963
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-19",
+   "capability": "ms",
+   "category": "substituted benzene",
+   "title": "4-chloroaniline",
+   "evidence": "reference-database",
+   "smiles": "C1=CC(=CC=C1N)Cl",
+   "formula": "C6H6ClN",
+   "source": {
+    "id": "C106478",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106478&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C106478&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/4-chloroaniline.json",
+    "sha256": "ace03d2482a0c1424b634958584f073391e760fd43b5949adc817bf1ec7bb00d",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 127,
+    "molecular_ion_rel": 100,
+    "base_peak_mz": 127,
+    "key_fragments": [
+     {
+      "mz": 65,
+      "rel": 25
+     },
+     {
+      "mz": 129,
+      "rel": 36
+     }
+    ],
+    "m_plus_2_ratio": 0.355
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-20",
+   "capability": "ms",
+   "category": "substituted benzene",
+   "title": "4-chlorobenzaldehyde",
+   "evidence": "reference-database",
+   "smiles": "C1=CC(=CC=C1C=O)Cl",
+   "formula": "C7H5ClO",
+   "source": {
+    "id": "C104881",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C104881&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C104881&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/4-chlorobenzaldehyde.json",
+    "sha256": "b65718479e289383403968fddbb269d73047e6b1e18ac9e709e04e7eef57415c",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 140,
+    "molecular_ion_rel": 72.4,
+    "base_peak_mz": 139,
+    "key_fragments": [
+     {
+      "mz": 50,
+      "rel": 28
+     },
+     {
+      "mz": 75,
+      "rel": 33
+     },
+     {
+      "mz": 111,
+      "rel": 60
+     },
+     {
+      "mz": 141,
+      "rel": 38
+     }
+    ],
+    "m_plus_2_ratio": 0.33
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-21",
+   "capability": "ms",
+   "category": "substituted benzene",
+   "title": "4-fluorotoluene",
+   "evidence": "reference-database",
+   "smiles": "CC1=CC=C(C=C1)F",
+   "formula": "C7H7F",
+   "source": {
+    "id": "C352329",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C352329&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C352329&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/4-fluorotoluene.json",
+    "sha256": "02fb1f8183af3fc216a52f60835fe356613f523c0c1635835108215f727c4f2e",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 110,
+    "molecular_ion_rel": 63.8,
+    "base_peak_mz": 109,
+    "key_fragments": [],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-22",
+   "capability": "ms",
+   "category": "substituted benzene",
+   "title": "4-methylbenzoic acid",
+   "evidence": "reference-database",
+   "smiles": "CC1=CC=C(C=C1)C(=O)O",
+   "formula": "C8H8O2",
+   "source": {
+    "id": "C99945",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C99945&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C99945&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/4-methylbenzoic-acid.json",
+    "sha256": "849936775c5f5605a04563e0844dd9a3381489b778cc01c766aaa8d89add7cc7",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 136,
+    "molecular_ion_rel": 89.6,
+    "base_peak_mz": 91,
+    "key_fragments": [
+     {
+      "mz": 119,
+      "rel": 64
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-23",
+   "capability": "ms",
+   "category": "substituted benzene",
+   "title": "4-methylbenzonitrile",
+   "evidence": "reference-database",
+   "smiles": "CC1=CC=C(C=C1)C#N",
+   "formula": "C8H7N",
+   "source": {
+    "id": "C104858",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C104858&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C104858&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/4-methylbenzonitrile.json",
+    "sha256": "6484189364a2104c94cb817233c2b09ebf4463989051ffafd6671ecbbaff7240",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 117,
+    "molecular_ion_rel": 100,
+    "base_peak_mz": 117,
+    "key_fragments": [
+     {
+      "mz": 90,
+      "rel": 30
+     },
+     {
+      "mz": 116,
+      "rel": 58
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-24",
+   "capability": "ms",
+   "category": "nitrile",
+   "title": "adiponitrile",
+   "evidence": "reference-database",
+   "smiles": "C(CCC#N)CC#N",
+   "formula": "C6H8N2",
+   "source": {
+    "id": "C111693",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C111693&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111693&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/adiponitrile.json",
+    "sha256": "b7a56addc877ac813b94ebef220cc6b56e5ed04ef8286ab691ca747869d2134a",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0,
+    "base_peak_mz": 41,
+    "key_fragments": [
+     {
+      "mz": 54,
+      "rel": 43
+     },
+     {
+      "mz": 55,
+      "rel": 21
+     },
+     {
+      "mz": 68,
+      "rel": 54
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-25",
+   "capability": "ms",
+   "category": "amine",
+   "title": "benzylamine",
+   "evidence": "reference-database",
+   "smiles": "C1=CC=C(C=C1)CN",
+   "formula": "C7H9N",
+   "source": {
+    "id": "C100469",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C100469&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C100469&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/benzylamine.json",
+    "sha256": "78dd376e7dbe6693afbff98f5d3538dd6871e17a83d028934fb253a63b673998",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 107,
+    "molecular_ion_rel": 74.2,
+    "base_peak_mz": 106,
+    "key_fragments": [
+     {
+      "mz": 30,
+      "rel": 23
+     },
+     {
+      "mz": 79,
+      "rel": 37
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-26",
+   "capability": "ms",
+   "category": "alkyl halide",
+   "title": "bromocyclohexane",
+   "evidence": "reference-database",
+   "smiles": "C1CCC(CC1)Br",
+   "formula": "C6H11Br",
+   "source": {
+    "id": "C108850",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C108850&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108850&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/bromocyclohexane.json",
+    "sha256": "2417b9626a0ffcd2e7514c6d33fe6775d23521e57ccd9d8fabf70882c299e8e9",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.7,
+    "base_peak_mz": 83,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 24
+     },
+     {
+      "mz": 55,
+      "rel": 51
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-27",
+   "capability": "ms",
+   "category": "alkyl halide",
+   "title": "bromocyclopentane",
+   "evidence": "reference-database",
+   "smiles": "C1CCC(C1)Br",
+   "formula": "C5H9Br",
+   "source": {
+    "id": "C137439",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C137439&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C137439&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/bromocyclopentane.json",
+    "sha256": "be152dd31dad9c6f63f489d83065c786cff89ab7c570402bddcdded7711c5dbf",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.8,
+    "base_peak_mz": 69,
+    "key_fragments": [
+     {
+      "mz": 39,
+      "rel": 26
+     },
+     {
+      "mz": 41,
+      "rel": 55
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-28",
+   "capability": "ms",
+   "category": "cyclic / other",
+   "title": "butyrolactone",
+   "evidence": "reference-database",
+   "smiles": "C1CC(=O)OC1",
+   "formula": "C4H6O2",
+   "source": {
+    "id": "C96480",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C96480&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C96480&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/butyrolactone.json",
+    "sha256": "8d4fe732a44e472714b5740f1f49523a8b3033a050d2f966f7ee0001662da6f1",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 86,
+    "molecular_ion_rel": 25.4,
+    "base_peak_mz": 42,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 42
+     },
+     {
+      "mz": 28,
+      "rel": 68
+     },
+     {
+      "mz": 29,
+      "rel": 50
+     },
+     {
+      "mz": 41,
+      "rel": 61
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-29",
+   "capability": "ms",
+   "category": "nitrile",
+   "title": "butyronitrile",
+   "evidence": "reference-database",
+   "smiles": "CCCC#N",
+   "formula": "C4H7N",
+   "source": {
+    "id": "C109740",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C109740&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109740&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/butyronitrile.json",
+    "sha256": "3b1fa17785fbac4cc2d529c7eaf914bd03f29afeaa111f3a7642632caf162be5",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.1,
+    "base_peak_mz": 41,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 29
+     },
+     {
+      "mz": 29,
+      "rel": 66
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-30",
+   "capability": "ms",
+   "category": "ether",
+   "title": "dipropyl ether",
+   "evidence": "reference-database",
+   "smiles": "CCCOCCC",
+   "formula": "C6H14O",
+   "source": {
+    "id": "C111433",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C111433&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111433&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/dipropyl-ether.json",
+    "sha256": "a99c25f8e33f485e2c478f10c103f37164470d2f246284c30dc2bdc0c0fac1a1",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 102,
+    "molecular_ion_rel": 9.5,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 33
+     },
+     {
+      "mz": 41,
+      "rel": 32
+     },
+     {
+      "mz": 73,
+      "rel": 21
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-31",
+   "capability": "ms",
+   "category": "amine",
+   "title": "dipropylamine",
+   "evidence": "reference-database",
+   "smiles": "CCCNCCC",
+   "formula": "C6H15N",
+   "source": {
+    "id": "C142847",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C142847&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C142847&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/dipropylamine.json",
+    "sha256": "aabb4754b36bbc01a3077a0ee339ff919683d8b2db5871a6b2bf8868817c2c4c",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 101,
+    "molecular_ion_rel": 16.3,
+    "base_peak_mz": 72,
+    "key_fragments": [
+     {
+      "mz": 30,
+      "rel": 65
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-32",
+   "capability": "ms",
+   "category": "ester",
+   "title": "ethyl benzoate",
+   "evidence": "reference-database",
+   "smiles": "CCOC(=O)C1=CC=CC=C1",
+   "formula": "C9H10O2",
+   "source": {
+    "id": "C93890",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C93890&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C93890&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/ethyl-benzoate.json",
+    "sha256": "e93c4d25b71a5f395c763d19c74b50dba5000c37290c4fadc701fd3be23e6557",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 150,
+    "molecular_ion_rel": 21.8,
+    "base_peak_mz": 105,
+    "key_fragments": [
+     {
+      "mz": 77,
+      "rel": 41
+     },
+     {
+      "mz": 122,
+      "rel": 31
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-33",
+   "capability": "ms",
+   "category": "ether",
+   "title": "ethyl vinyl ether",
+   "evidence": "reference-database",
+   "smiles": "CCOC=C",
+   "formula": "C4H8O",
+   "source": {
+    "id": "C109922",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C109922&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109922&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/ethyl-vinyl-ether.json",
+    "sha256": "16214f31632dd9e58f53ce6666b28afec3d83410dd4255c60b815109279397f1",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 72,
+    "molecular_ion_rel": 42.6,
+    "base_peak_mz": 44,
+    "key_fragments": [
+     {
+      "mz": 15,
+      "rel": 32
+     },
+     {
+      "mz": 27,
+      "rel": 68
+     },
+     {
+      "mz": 29,
+      "rel": 76
+     },
+     {
+      "mz": 43,
+      "rel": 88
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-34",
+   "capability": "ms",
+   "category": "aldehyde",
+   "title": "hexanal",
+   "evidence": "reference-database",
+   "smiles": "CCCCCC=O",
+   "formula": "C6H12O",
+   "source": {
+    "id": "C66251",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C66251&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C66251&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/hexanal.json",
+    "sha256": "51824784072c22155ae677f022928a0c39ab517bf3a9995fd84ee9fe88248c08",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.4,
+    "base_peak_mz": 44,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 69
+     },
+     {
+      "mz": 43,
+      "rel": 55
+     },
+     {
+      "mz": 56,
+      "rel": 82
+     },
+     {
+      "mz": 57,
+      "rel": 38
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-35",
+   "capability": "ms",
+   "category": "cyclic / other",
+   "title": "indane",
+   "evidence": "reference-database",
+   "smiles": "C1CC2=CC=CC=C2C1",
+   "formula": "C9H10",
+   "source": {
+    "id": "C496117",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C496117&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C496117&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/indane.json",
+    "sha256": "4d496c5eddd71945ea0b74c4c68bdb0ae8a6f1dd89d79be04502a23b09940270",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 118,
+    "molecular_ion_rel": 69.3,
+    "base_peak_mz": 117,
+    "key_fragments": [
+     {
+      "mz": 115,
+      "rel": 27
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-36",
+   "capability": "ms",
+   "category": "ester",
+   "title": "isobutyl acetate",
+   "evidence": "reference-database",
+   "smiles": "CC(C)COC(=O)C",
+   "formula": "C6H12O2",
+   "source": {
+    "id": "C110190",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C110190&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110190&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/isobutyl-acetate.json",
+    "sha256": "86c04ac336c38698cbe9c3fcb1b5d84bb1106cd54d865ce594e3907a66b080bc",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.1,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 23
+     },
+     {
+      "mz": 56,
+      "rel": 45
+     },
+     {
+      "mz": 73,
+      "rel": 33
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-37",
+   "capability": "ms",
+   "category": "acid",
+   "title": "isobutyric acid",
+   "evidence": "reference-database",
+   "smiles": "CC(C)C(=O)O",
+   "formula": "C4H8O2",
+   "source": {
+    "id": "C79312",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C79312&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C79312&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/isobutyric-acid.json",
+    "sha256": "811fc85fa9a20d81883ffe1062433a3a767d04f8b4e83a62a8bd7e97ed22cdaf",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 88,
+    "molecular_ion_rel": 8,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 24
+     },
+     {
+      "mz": 41,
+      "rel": 39
+     },
+     {
+      "mz": 73,
+      "rel": 26
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-38",
+   "capability": "ms",
+   "category": "ether",
+   "title": "isopropyl ether",
+   "evidence": "reference-database",
+   "smiles": "CC(C)OC(C)C",
+   "formula": "C6H14O",
+   "source": {
+    "id": "C108203",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C108203&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108203&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/isopropyl-ether.json",
+    "sha256": "b838f730fc33bd9936313e8929bd47cda4ad347190803914bc08f943ed7f125a",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.5,
+    "base_peak_mz": 45,
+    "key_fragments": [
+     {
+      "mz": 43,
+      "rel": 40
+     },
+     {
+      "mz": 87,
+      "rel": 22
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-39",
+   "capability": "ms",
+   "category": "ester",
+   "title": "methyl butanoate",
+   "evidence": "reference-database",
+   "smiles": "CCCC(=O)OC",
+   "formula": "C5H10O2",
+   "source": {
+    "id": "C623427",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C623427&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C623427&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/methyl-butanoate.json",
+    "sha256": "7c3f48093f786e157e92fa9ea843a45be813e174938aecdcf2f6909a4c985c28",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 102,
+    "molecular_ion_rel": 1.7,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 32
+     },
+     {
+      "mz": 41,
+      "rel": 38
+     },
+     {
+      "mz": 71,
+      "rel": 55
+     },
+     {
+      "mz": 74,
+      "rel": 77
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-40",
+   "capability": "ms",
+   "category": "cyclic / other",
+   "title": "morpholine",
+   "evidence": "reference-database",
+   "smiles": "C1COCCN1",
+   "formula": "C4H9NO",
+   "source": {
+    "id": "C110918",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C110918&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110918&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/morpholine.json",
+    "sha256": "a0a9bd9f76a4ff9a29aaf786df38192668c4c2ea15a2004b1080ca77a8e2dc8b",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 87,
+    "molecular_ion_rel": 58.6,
+    "base_peak_mz": 57,
+    "key_fragments": [
+     {
+      "mz": 28,
+      "rel": 35
+     },
+     {
+      "mz": 29,
+      "rel": 48
+     },
+     {
+      "mz": 56,
+      "rel": 50
+     },
+     {
+      "mz": 86,
+      "rel": 28
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-41",
+   "capability": "ms",
+   "category": "cyclic / other",
+   "title": "N-methylpyrrolidone",
+   "evidence": "reference-database",
+   "smiles": "CN1CCCC1=O",
+   "formula": "C5H9NO",
+   "source": {
+    "id": "C872504",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C872504&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C872504&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/n-methylpyrrolidone.json",
+    "sha256": "605733ca03566151ff69ba8f9cd2594b34586cca067b6b917da975609ac06af1",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 99,
+    "molecular_ion_rel": 100,
+    "base_peak_mz": 99,
+    "key_fragments": [
+     {
+      "mz": 28,
+      "rel": 53
+     },
+     {
+      "mz": 42,
+      "rel": 84
+     },
+     {
+      "mz": 44,
+      "rel": 93
+     },
+     {
+      "mz": 98,
+      "rel": 69
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-42",
+   "capability": "ms",
+   "category": "aldehyde",
+   "title": "pentanal",
+   "evidence": "reference-database",
+   "smiles": "CCCCC=O",
+   "formula": "C5H10O",
+   "source": {
+    "id": "C110623",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C110623&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110623&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/pentanal.json",
+    "sha256": "ff11de3f055fe9cfbbbc2165a48f636dc093d01eb654ff4c5c887205e5b6e8f2",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 86,
+    "molecular_ion_rel": 5.7,
+    "base_peak_mz": 44,
+    "key_fragments": [
+     {
+      "mz": 29,
+      "rel": 41
+     },
+     {
+      "mz": 41,
+      "rel": 31
+     },
+     {
+      "mz": 57,
+      "rel": 30
+     },
+     {
+      "mz": 58,
+      "rel": 49
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-43",
+   "capability": "ms",
+   "category": "aldehyde",
+   "title": "phenylacetaldehyde",
+   "evidence": "reference-database",
+   "smiles": "C1=CC=C(C=C1)CC=O",
+   "formula": "C8H8O",
+   "source": {
+    "id": "C122781",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C122781&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C122781&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/phenylacetaldehyde.json",
+    "sha256": "59113694c80839fa3f2e31af64823ad0b6c1de65423e1f1658c9efdb1ee066bf",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 120,
+    "molecular_ion_rel": 28.3,
+    "base_peak_mz": 91,
+    "key_fragments": [
+     {
+      "mz": 92,
+      "rel": 29
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-44",
+   "capability": "ms",
+   "category": "ketone",
+   "title": "propiophenone",
+   "evidence": "reference-database",
+   "smiles": "CCC(=O)C1=CC=CC=C1",
+   "formula": "C9H10O",
+   "source": {
+    "id": "C93550",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C93550&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C93550&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/propiophenone.json",
+    "sha256": "e2e6da9f87c8d347bc8ff92a2f9ba0c697b5f0e00eae82928477829af2074a8a",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 134,
+    "molecular_ion_rel": 16.5,
+    "base_peak_mz": 105,
+    "key_fragments": [
+     {
+      "mz": 51,
+      "rel": 22
+     },
+     {
+      "mz": 77,
+      "rel": 59
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-45",
+   "capability": "ms",
+   "category": "ester",
+   "title": "propyl acetate",
+   "evidence": "reference-database",
+   "smiles": "CCCOC(=O)C",
+   "formula": "C5H10O2",
+   "source": {
+    "id": "C109604",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C109604&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C109604&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/propyl-acetate.json",
+    "sha256": "4ed3a9f5bea65cf5af4c1c1e76129c8c34ff97142d49e821f715c6ef7fea4771",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 61,
+      "rel": 27
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-46",
+   "capability": "ms",
+   "category": "ether",
+   "title": "tetrahydropyran",
+   "evidence": "reference-database",
+   "smiles": "C1CCOCC1",
+   "formula": "C5H10O",
+   "source": {
+    "id": "C142687",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C142687&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C142687&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/tetrahydropyran.json",
+    "sha256": "8f381d3787719ea8ec7054386a2f04e049f0e78d4711296b78ed7938df30329f",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 86,
+    "molecular_ion_rel": 49.4,
+    "base_peak_mz": 41,
+    "key_fragments": [
+     {
+      "mz": 28,
+      "rel": 44
+     },
+     {
+      "mz": 45,
+      "rel": 64
+     },
+     {
+      "mz": 56,
+      "rel": 64
+     },
+     {
+      "mz": 85,
+      "rel": 55
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-47",
+   "capability": "ms",
+   "category": "nitrile",
+   "title": "valeronitrile",
+   "evidence": "reference-database",
+   "smiles": "CCCCC#N",
+   "formula": "C5H9N",
+   "source": {
+    "id": "C110598",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C110598&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110598&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/valeronitrile.json",
+    "sha256": "4c7ccb58b6acdf236a006eaf371722750d3c73ba53fef884fb0b492830e0ce83",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.4,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 30
+     },
+     {
+      "mz": 41,
+      "rel": 98
+     },
+     {
+      "mz": 54,
+      "rel": 70
+     },
+     {
+      "mz": 55,
+      "rel": 29
+     }
+    ],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  },
+  {
+   "id": "MS-48",
+   "capability": "ms",
+   "category": "ester",
+   "title": "vinyl acetate",
+   "evidence": "reference-database",
+   "smiles": "CC(=O)OC=C",
+   "formula": "C4H6O2",
+   "source": {
+    "id": "C108054",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C108054&Units=SI&Mask=200#Mass-Spec",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C108054&Index=0&Type=Mass",
+    "snapshot": "snapshots/nist-ms/vinyl-acetate.json",
+    "sha256": "115262d4b3905ea59adb8ca9919da91f9b5f6e06afc8ae46bb975af2f265e695",
+    "inspected": "NIST WebBook JCAMP-DX EI spectrum fetched and saved; peaks parsed programmatically"
+   },
+   "expected": {
+    "molecular_ion_mz": 86,
+    "molecular_ion_rel": 6.6,
+    "base_peak_mz": 43,
+    "key_fragments": [],
+    "m_plus_2_ratio": null
+   },
+   "uncertainty": "Single NIST library spectrum (70 eV EI); relative intensities vary between instruments. Pass requires m/z agreement only."
+  }
+ ]
+}

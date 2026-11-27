@@ -168,6 +168,10 @@ export type MassSpectrumPeakKind =
   | "diagnostic";
 
 export type MassSpectrumPeak = {
+  /** Same physical channel described by multiple generators; counted once. */
+  channelKey?: string;
+  /** Keep distinct graph cleavage sites; diagnostics are alternate descriptions. */
+  channelSource?: "graph" | "diagnostic";
   mz: number;
   relativeIntensity: number;
   label: string;
@@ -196,11 +200,34 @@ export type MassSpectrumPeak = {
   }>;
 };
 
+export type MassSpectrumFragmentCandidate = {
+  mz: number;
+  ionFormula: string;
+  charge: 1;
+  /** Total neutral/radical composition lost, possibly in several steps. */
+  neutralLossFormula: string;
+  mechanism: string;
+  explanation: string;
+};
+
 export type MassSpectrumResult = {
+  /** Mechanistic possibilities with no abundance prediction; never chart bars. */
+  fragmentCandidates?: MassSpectrumFragmentCandidate[];
   formula: string;
   molecularIonMz: number | null;
   nominalMass: number | null;
   basePeakMz: number | null;
+  /**
+   * How far the base-peak call can be trusted (Stage 9I). "supported": a dominant, well-established mechanism decides it
+   * (stable aromatic M+•, benzylic/benzoyl ion, tertiary halide cation, amine α-cleavage, acetyl/methyl-ketone acylium).
+   * "heuristic": the engine's top ion among several comparable channels. "unreliable": a saturated aliphatic compound whose
+   * spectrum is dominated by alkyl/alkenyl ion families and H-rearrangements the engine does not model quantitatively.
+   * Absent on results saved before Stage 9I.
+   */
+  basePeakCertainty?: "supported" | "heuristic" | "unreliable";
+  /** Up to three m/z values that are plausible base peaks, strongest predicted first. */
+  basePeakCandidates?: number[];
+  basePeakBasis?: string;
   peaks: MassSpectrumPeak[];
   notes: string[];
 };

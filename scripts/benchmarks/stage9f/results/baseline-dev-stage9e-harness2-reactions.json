@@ -1,0 +1,1052 @@
+{
+ "meta": {
+  "set": "dev",
+  "engineCommit": "85b041df12af9668b0f24227650fa0d5e2a88936",
+  "dirtySrc": false,
+  "runAt": "2026-11-03T21:24:38.526Z",
+  "node": "v24.21.0",
+  "peakRssMB": 313,
+  "cases": 30,
+  "manifestHash": "b9c9e29f16de38390515b7dfdecdcda760b71fc97d6890809dc8b32119113c31"
+ },
+ "summary": {
+  "reactions": {
+   "connectivity [verified]": {
+    "abstained": 5,
+    "correct": 11,
+    "wrong": 4
+   },
+   "connectivity [inferred]": {
+    "correct": 3,
+    "abstained": 2,
+    "wrong": 3
+   },
+   "regiochemistry [inferred]": {
+    "correct": 3,
+    "abstained": 2
+   },
+   "ranking [inferred]": {
+    "abstained": 3,
+    "correct": 1
+   },
+   "regiochemistry [verified]": {
+    "correct": 3,
+    "abstained": 7
+   },
+   "ranking [verified]": {
+    "correct": 1,
+    "abstained": 5
+   },
+   "ambiguity [inferred]": {
+    "wrong": 1
+   },
+   "stereochemistry [verified]": {
+    "correct": 3
+   },
+   "stereochemistry [inferred]": {
+    "correct": 1
+   },
+   "unsupported [inferred]": {
+    "correct-abstention": 1,
+    "supported-correct": 1
+   }
+  }
+ },
+ "records": [
+  {
+   "id": "RX-02",
+   "capability": "reactions",
+   "category": "epoxide opening (base)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "abstained",
+     "detail": "no rule claims reagents naome/methoxide/sodiummethoxide/meoh; reference product arises under other rules"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": [
+     "[O-]C",
+     "CO"
+    ],
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 2815
+  },
+  {
+   "id": "RX-03",
+   "capability": "reactions",
+   "category": "epoxide opening (base, benzylic epoxide)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "abstained",
+     "detail": "no rule claims reagents naome/methoxide/sodiummethoxide/meoh; reference product arises under other rules"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": [
+     "[O-]C",
+     "CO"
+    ],
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 2282
+  },
+  {
+   "id": "RX-04",
+   "capability": "reactions",
+   "category": "epoxide opening (acid, benzylic epoxide)",
+   "evidence": "inferred",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": [
+     "CO"
+    ],
+    "claimingRules": [
+     "epoxide-acid-alcohol-opening"
+    ],
+    "offered": [
+     "COC(CO)c1ccccc1"
+    ],
+    "levels": [
+     "COC(CO)c1ccccc1:none"
+    ]
+   },
+   "ms": 2598
+  },
+  {
+   "id": "RX-08",
+   "capability": "reactions",
+   "category": "epoxide opening (allylic / vinyl epoxide)",
+   "evidence": "inferred",
+   "dimensions": {
+    "connectivity": {
+     "status": "abstained",
+     "detail": "no rule claims reagents naome/methoxide/sodiummethoxide/meoh"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": [
+     "[O-]C",
+     "CO"
+    ],
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 6313
+  },
+  {
+   "id": "RX-10",
+   "capability": "reactions",
+   "category": "E2 (Zaitsev)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ranking": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "haloalkane-e2-hydroxide",
+     "haloalkane-e2-zaitsev"
+    ],
+    "offered": [
+     "CC=C(C)C",
+     "C=C(C)CC"
+    ],
+    "levels": [
+     "CC=C(C)C:major",
+     "C=C(C)CC:minor",
+     "CC=C(C)C:major",
+     "C=C(C)CC:minor"
+    ]
+   },
+   "ms": 1422
+  },
+  {
+   "id": "RX-14",
+   "capability": "reactions",
+   "category": "SN2 / E2 competition",
+   "evidence": "inferred",
+   "dimensions": {
+    "connectivity": {
+     "status": "wrong",
+     "detail": "missing CCOC(C)CC; offered CC=CC, C=CCC"
+    },
+    "ambiguity": {
+     "status": "wrong",
+     "detail": "engine declares a major where the source says condition dependent"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "haloalkane-e2-hydroxide",
+     "haloalkane-e2-zaitsev"
+    ],
+    "offered": [
+     "C/C=C/C",
+     "C=CCC"
+    ],
+    "levels": [
+     "C/C=C/C:major",
+     "C=CCC:minor",
+     "C/C=C/C:major",
+     "C=CCC:minor"
+    ]
+   },
+   "ms": 2104
+  },
+  {
+   "id": "RX-15",
+   "capability": "reactions",
+   "category": "Hofmann elimination",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "abstained",
+     "detail": "no rule claims reagents hofmann/ag2o/silveroxide/quaternaryammonium/trimethylammonium"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 29
+  },
+  {
+   "id": "RX-16",
+   "capability": "reactions",
+   "category": "EAS (halobenzene)",
+   "evidence": "inferred",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "aromatic-nitration",
+     "aromatic-sulfonation",
+     "aromatic-halogenation-iodination"
+    ],
+    "offered": [
+     "O=[N+]([O-])c1ccccc1Cl",
+     "O=[N+]([O-])c1ccc(Cl)cc1",
+     "O=S(=O)(O)c1ccccc1Cl",
+     "O=S(=O)(O)c1ccc(Cl)cc1",
+     "Clc1ccccc1I",
+     "Clc1ccc(I)cc1"
+    ],
+    "levels": [
+     "O=[N+]([O-])c1ccccc1Cl:none",
+     "O=[N+]([O-])c1ccc(Cl)cc1:none",
+     "O=S(=O)(O)c1ccccc1Cl:none",
+     "O=S(=O)(O)c1ccc(Cl)cc1:none",
+     "Clc1ccccc1I:none",
+     "Clc1ccc(I)cc1:none"
+    ]
+   },
+   "ms": 1938
+  },
+  {
+   "id": "RX-20",
+   "capability": "reactions",
+   "category": "EAS (competing directors)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "aromatic-halogenation-bromination",
+     "benzylic-bromination"
+    ],
+    "offered": [
+     "COc1ccc(C)cc1Br",
+     "COc1ccc(CBr)cc1"
+    ],
+    "levels": [
+     "COc1ccc(C)cc1Br:none",
+     "COc1ccc(CBr)cc1:none"
+    ]
+   },
+   "ms": 953
+  },
+  {
+   "id": "RX-21",
+   "capability": "reactions",
+   "category": "EAS (cooperative donor/acceptor)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "aromatic-halogenation-bromination"
+    ],
+    "offered": [
+     "COc1ccc([N+](=O)[O-])cc1Br"
+    ],
+    "levels": [
+     "COc1ccc([N+](=O)[O-])cc1Br:none"
+    ]
+   },
+   "ms": 727
+  },
+  {
+   "id": "RX-22",
+   "capability": "reactions",
+   "category": "EAS (heteroaromatic)",
+   "evidence": "inferred",
+   "dimensions": {
+    "connectivity": {
+     "status": "abstained",
+     "detail": "no rule claims reagents ac2o/acetyl/sncl4/alcl3/friedel/acylation"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 13
+  },
+  {
+   "id": "RX-23",
+   "capability": "reactions",
+   "category": "negative control (EAS on strongly deactivated ring)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": "no rule claims these reagents; nothing forbidden offered"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": [
+     "CCl"
+    ],
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 1807
+  },
+  {
+   "id": "RX-24",
+   "capability": "reactions",
+   "category": "carbocation rearrangement (hydride shift, alkene + HX)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "wrong",
+     "detail": "offers forbidden CC(Br)C(C)C"
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alkene-hx-addition-hbr",
+     "alkene-hbr-peroxide",
+     "alkene-dibromocyclopropanation"
+    ],
+    "offered": [
+     "CC(C)C(C)Br",
+     "CCC(C)(C)Br",
+     "CC(C)CCBr",
+     "CC(C)C1CC1(Br)Br"
+    ],
+    "levels": [
+     "CC(C)C(C)Br:none",
+     "CCC(C)(C)Br:none",
+     "CC(C)CCBr:none",
+     "CC(C)C1CC1(Br)Br:none"
+    ]
+   },
+   "ms": 2809
+  },
+  {
+   "id": "RX-25",
+   "capability": "reactions",
+   "category": "carbocation rearrangement (alcohol + HX)",
+   "evidence": "inferred",
+   "dimensions": {
+    "connectivity": {
+     "status": "wrong",
+     "detail": "offers forbidden CC(Br)C(C)C"
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alcohol-hbr-substitution-sn1"
+    ],
+    "offered": [
+     "CCC(C)(C)Br",
+     "CC(C)[C@@H](C)Br",
+     "CC(C)[C@H](C)Br"
+    ],
+    "levels": [
+     "CCC(C)(C)Br:none",
+     "CC(C)[C@@H](C)Br:none"
+    ]
+   },
+   "ms": 2149
+  },
+  {
+   "id": "RX-26",
+   "capability": "reactions",
+   "category": "Wagner-Meerwein (bicyclic)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "wrong",
+     "detail": "offers forbidden CC1(C)C2CCC1(C)C=C2"
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alcohol-dehydration-alkene",
+     "secondary-alcohol-oxidation-jones",
+     "alcohol-phosphate-ester"
+    ],
+    "offered": [
+     "CC1=C2CCC(C2)C1(C)C",
+     "CC1=C2CC(CC1)C2(C)C",
+     "CC1=C2CCC(C1)C2(C)C",
+     "CC12C=CC(CC1)C2(C)C",
+     "C=C1C2CCC(C2)C1(C)C",
+     "C=C1CCC2CC1C2(C)C",
+     "CC1=CCC2CC1C2(C)C",
+     "CC1CC2CC=C1C2(C)C",
+     "CC12CCC(CC1=O)C2(C)C",
+     "CC1(C)C2CCC1(C)C(OP(=O)(O)O)C2"
+    ],
+    "levels": [
+     "CC1=C2CCC(C2)C1(C)C:none",
+     "CC1=C2CC(CC1)C2(C)C:none",
+     "CC1=C2CCC(C1)C2(C)C:none",
+     "CC12C=CC(CC1)C2(C)C:none",
+     "C=C1C2CCC(C2)C1(C)C:none",
+     "C=C1CCC2CC1C2(C)C:none",
+     "CC1=CCC2CC1C2(C)C:none",
+     "CC1CC2CC=C1C2(C)C:none",
+     "CC12CCC(CC1=O)C2(C)C:none",
+     "CC1(C)C2CCC1(C)C(OP(=O)(O)O)C2:none"
+    ]
+   },
+   "ms": 6050
+  },
+  {
+   "id": "RX-27",
+   "capability": "reactions",
+   "category": "pinacol rearrangement",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "pinacol-rearrangement",
+     "vicinal-diol-periodate-cleavage",
+     "alcohol-phosphate-ester"
+    ],
+    "offered": [
+     "CC(=O)C(C)(C)C",
+     "CC(C)=O",
+     "CC(C)(O)C(C)(C)OP(=O)(O)O"
+    ],
+    "levels": [
+     "CC(=O)C(C)(C)C:none",
+     "CC(C)=O.CC(C)=O:none",
+     "CC(C)(O)C(C)(C)OP(=O)(O)O:none"
+    ]
+   },
+   "ms": 1453
+  },
+  {
+   "id": "RX-29",
+   "capability": "reactions",
+   "category": "halogen addition (anti, racemic)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "stereochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alkene-hx-addition-hbr",
+     "alkene-hbr-peroxide",
+     "alkene-halogenation-bromine",
+     "alkene-halohydrin-formation",
+     "alkene-allylic-bromination"
+    ],
+    "offered": [
+     "CCC(C)Br",
+     "C[C@@H](Br)[C@@H](C)Br",
+     "C[C@H](Br)[C@H](C)Br",
+     "C[C@@H](O)[C@@H](C)Br",
+     "C[C@H](O)[C@H](C)Br",
+     "C/C=C\\CBr"
+    ],
+    "levels": [
+     "CCC(C)Br:none",
+     "CCC(C)Br:none",
+     "C[C@@H](Br)[C@@H](C)Br:none",
+     "C[C@@H](O)[C@@H](C)Br:none",
+     "C/C=C\\CBr:none"
+    ]
+   },
+   "ms": 2325
+  },
+  {
+   "id": "RX-30",
+   "capability": "reactions",
+   "category": "halogen addition (anti, meso)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "stereochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alkene-hx-addition-hbr",
+     "alkene-hbr-peroxide",
+     "alkene-halogenation-bromine",
+     "alkene-halohydrin-formation",
+     "alkene-allylic-bromination"
+    ],
+    "offered": [
+     "CCC(C)Br",
+     "C[C@H](Br)[C@@H](C)Br",
+     "C[C@H](Br)[C@@H](C)O",
+     "C[C@H](O)[C@@H](C)Br",
+     "C/C=C/CBr"
+    ],
+    "levels": [
+     "CCC(C)Br:none",
+     "CCC(C)Br:none",
+     "C[C@H](Br)[C@@H](C)Br:none",
+     "C[C@H](Br)[C@@H](C)O:none",
+     "C/C=C/CBr:none"
+    ]
+   },
+   "ms": 1843
+  },
+  {
+   "id": "RX-32",
+   "capability": "reactions",
+   "category": "SN2 inversion",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "stereochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "haloalkane-sn2-azide"
+    ],
+    "offered": [
+     "CC[C@@H](C)N=[N+]=[N-]"
+    ],
+    "levels": [
+     "CC[C@@H](C)N=[N+]=[N-]:none"
+    ]
+   },
+   "ms": 749
+  },
+  {
+   "id": "RX-33",
+   "capability": "reactions",
+   "category": "halohydrin formation (anti, Markovnikov)",
+   "evidence": "inferred",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "correct",
+     "detail": ""
+    },
+    "stereochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alkane-radical-bromination",
+     "alkene-halogenation-bromine",
+     "alkene-halohydrin-formation",
+     "alkene-acid-hydration",
+     "alkene-hydroboration-oxidation",
+     "alkene-oxymercuration-demercuration",
+     "alkene-syn-dihydroxylation",
+     "alkene-ozonolysis-reductive",
+     "alkene-ozonolysis-oxidative",
+     "alkene-allylic-bromination"
+    ],
+    "offered": [
+     "CC1=CC(Br)CC1",
+     "CC1=CCC(Br)C1",
+     "CC1=CCCC1Br",
+     "BrCC1=CCCC1",
+     "C[C@]1(Br)CCC[C@@H]1Br",
+     "C[C@@]1(Br)CCC[C@H]1Br",
+     "C[C@]1(O)CCC[C@@H]1Br",
+     "C[C@@]1(O)CCC[C@H]1Br",
+     "CC1(O)CCCC1",
+     "CC1CCCC1O",
+     "C[C@]1(O)CCC[C@H]1O",
+     "C[C@@]1(O)CCC[C@@H]1O",
+     "CC(=O)CCCC=O",
+     "CCCC(=O)O",
+     "CCCC(C)=O"
+    ],
+    "levels": [
+     "CC1=CC(Br)CC1:competitive",
+     "CC1=CCC(Br)C1:competitive",
+     "CC1=CCCC1Br:competitive",
+     "BrCC1=CCCC1:trace",
+     "C[C@]1(Br)CCC[C@@H]1Br:none",
+     "C[C@]1(O)CCC[C@@H]1Br:none",
+     "CC1(O)CCCC1:none",
+     "CC1CCCC1O:none",
+     "CC1(O)CCCC1:none",
+     "C[C@]1(O)CCC[C@H]1O:none",
+     "CC(=O)CCCC=O:none",
+     "CCCC(=O)O.CCCC(C)=O:none",
+     "CC1=CC(Br)CC1:none",
+     "BrCC1=CCCC1:none",
+     "CC1=CCCC1Br:none"
+    ]
+   },
+   "ms": 1500
+  },
+  {
+   "id": "RX-37",
+   "capability": "reactions",
+   "category": "protecting-group logic",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "acetal-acid-hydrolysis",
+     "ester-lah-reduction"
+    ],
+    "offered": [
+     "CCOC(=O)CCC(C)=O",
+     "CC1(CCCO)OCCO1",
+     "CCO"
+    ],
+    "levels": [
+     "CCOC(=O)CCC(C)=O:none",
+     "CC1(CCCO)OCCO1.CCO:none"
+    ]
+   },
+   "ms": 812
+  },
+  {
+   "id": "RX-39",
+   "capability": "reactions",
+   "category": "1,2- vs 1,4-addition (Grignard)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": ""
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    },
+    "ranking": {
+     "status": "abstained",
+     "detail": "outcomes unranked"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": [
+     "C[Mg]Br"
+    ],
+    "claimingRules": [
+     "alkene-epoxidation-organometallic-opening",
+     "aldehyde-organometallic-addition"
+    ],
+    "offered": [
+     "C[C@@H]1CCC(=O)[C@H]1O",
+     "C[C@H]1CCC(=O)[C@@H]1O",
+     "C[C@@H]1C(=O)CC[C@H]1O",
+     "C[C@H]1C(=O)CC[C@@H]1O",
+     "CC1(O)C=CCC1"
+    ],
+    "levels": [
+     "C[C@@H]1CCC(=O)[C@H]1O:none",
+     "C[C@@H]1C(=O)CC[C@H]1O:none",
+     "CC1(O)C=CCC1:none"
+    ]
+   },
+   "ms": 3953
+  },
+  {
+   "id": "RX-40",
+   "capability": "reactions",
+   "category": "kinetic enolate alkylation",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "abstained",
+     "detail": "no rule claims reagents lda/lithiumdiisopropylamide/kinetic/78/mei/iodomethane"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 997
+  },
+  {
+   "id": "RX-41",
+   "capability": "reactions",
+   "category": "thermodynamic enolate alkylation",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "abstained",
+     "detail": "no rule claims reagents naoet/nah/thermodynamic/equilibrat/mei/iodomethane"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": [
+     "CC[O-]"
+    ],
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 2554
+  },
+  {
+   "id": "RX-42",
+   "capability": "reactions",
+   "category": "Claisen rearrangement",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "wrong",
+     "detail": "missing C=CCc1ccccc1O; offered O=C(O)COc1ccccc1, O=C=O, C=CCBr, Oc1ccccc1, C=CCI, C=CCOC1CCCCC1"
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alkene-oxidative-cleavage",
+     "aryl-alkyl-ether-cleavage-hbr",
+     "aryl-alkyl-ether-cleavage-hi",
+     "aromatic-catalytic-hydrogenation"
+    ],
+    "offered": [
+     "O=C(O)COc1ccccc1",
+     "O=C=O",
+     "C=CCBr",
+     "Oc1ccccc1",
+     "C=CCI",
+     "C=CCOC1CCCCC1"
+    ],
+    "levels": [
+     "O=C(O)COc1ccccc1.O=C=O:none",
+     "C=CCBr.Oc1ccccc1:none",
+     "C=CCI.Oc1ccccc1:none",
+     "C=CCOC1CCCCC1:none"
+    ]
+   },
+   "ms": 4195
+  },
+  {
+   "id": "RX-43",
+   "capability": "reactions",
+   "category": "Cope rearrangement",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "wrong",
+     "detail": "missing CC=CCCC=C; offered C=CCC(C)C(=O)O, O=C=O, C=CC(C)CC(=O)O"
+    },
+    "regiochemistry": {
+     "status": "abstained",
+     "detail": "several outcomes, none ranked major"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alkene-oxidative-cleavage"
+    ],
+    "offered": [
+     "C=CCC(C)C(=O)O",
+     "O=C=O",
+     "C=CC(C)CC(=O)O"
+    ],
+    "levels": [
+     "C=CCC(C)C(=O)O.O=C=O:none",
+     "C=CC(C)CC(=O)O.O=C=O:none"
+    ]
+   },
+   "ms": 2489
+  },
+  {
+   "id": "RX-44",
+   "capability": "reactions",
+   "category": "radical halogenation (selectivity)",
+   "evidence": "inferred",
+   "dimensions": {
+    "connectivity": {
+     "status": "wrong",
+     "detail": "offers forbidden CC(C)CCBr"
+    },
+    "regiochemistry": {
+     "status": "correct",
+     "detail": ""
+    },
+    "ranking": {
+     "status": "correct",
+     "detail": ""
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "alkane-radical-bromination",
+     "alkane-radical-chlorination"
+    ],
+    "offered": [
+     "CCC(C)(C)Br",
+     "CC(C)C(C)Br",
+     "CC(C)CCBr",
+     "CCC(C)CBr",
+     "CCC(C)(C)Cl",
+     "CC(C)C(C)Cl",
+     "CC(C)CCCl",
+     "CCC(C)CCl"
+    ],
+    "levels": [
+     "CCC(C)(C)Br:major",
+     "CC(C)C(C)Br:minor",
+     "CC(C)CCBr:trace",
+     "CCC(C)CBr:trace",
+     "CCC(C)(C)Cl:competitive",
+     "CC(C)C(C)Cl:competitive",
+     "CC(C)CCCl:minor",
+     "CCC(C)CCl:competitive"
+    ]
+   },
+   "ms": 174
+  },
+  {
+   "id": "RX-45",
+   "capability": "reactions",
+   "category": "asymmetric catalysis (honest abstention)",
+   "evidence": "inferred",
+   "dimensions": {
+    "unsupported": {
+     "status": "correct-abstention",
+     "detail": "no rule claims these reagents"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 2460
+  },
+  {
+   "id": "RX-46",
+   "capability": "reactions",
+   "category": "cross-coupling (honest abstention)",
+   "evidence": "inferred",
+   "dimensions": {
+    "unsupported": {
+     "status": "supported-correct",
+     "detail": "produced by heck-coupling, heck-coupling"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": null,
+    "claimingRules": [
+     "heck-coupling"
+    ],
+    "offered": [
+     "COC(=O)/C=C/c1ccccc1",
+     "C=C(C(=O)OC)c1ccccc1"
+    ],
+    "levels": [
+     "COC(=O)/C=C/c1ccccc1:major",
+     "C=C(C(=O)OC)c1ccccc1:minor"
+    ]
+   },
+   "ms": 172
+  },
+  {
+   "id": "RX-47",
+   "capability": "reactions",
+   "category": "negative control (no reduction)",
+   "evidence": "verified",
+   "dimensions": {
+    "connectivity": {
+     "status": "correct",
+     "detail": "no rule claims these reagents; nothing forbidden offered"
+    }
+   },
+   "engine": {
+    "suppliedReagentMolecules": [
+     "CO"
+    ],
+    "claimingRules": [],
+    "offered": [],
+    "levels": []
+   },
+   "ms": 344
+  }
+ ]
+}

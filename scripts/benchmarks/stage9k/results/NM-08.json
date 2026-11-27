@@ -1,0 +1,218 @@
+{
+  "id": "NM-08",
+  "startedUTC": "2026-11-06T18:21:37.575Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "2-ethylbutanoic acid",
+      "commonName": null,
+      "displayName": "2-ethylbutanoic acid",
+      "namingConfidence": "Medium",
+      "namingStatus": "systematic",
+      "parentChain": "butane",
+      "parentChainLength": 4,
+      "mainSuffix": "-oic acid",
+      "prefixes": [],
+      "motifs": [],
+      "explanation": "Parent chain contains 4 carbons. carboxylicAcid chosen as highest-priority functional group. Detected 1 substituent(s).",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ]
+    },
+    "properties": {
+      "molecularFormula": "C6H12O2",
+      "exactMass": "116.0837",
+      "molecularWeight": "116.16",
+      "degreesOfUnsaturation": 1,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 6
+        },
+        {
+          "element": "H",
+          "count": 12
+        },
+        {
+          "element": "O",
+          "count": 2
+        }
+      ],
+      "heavyAtomCount": 8,
+      "hydrogenBondDonors": 1,
+      "hydrogenBondAcceptors": 1,
+      "rotatableBonds": 3,
+      "topologicalPolarSurfaceArea": "37.30",
+      "logP": "1.51",
+      "ringCount": 0,
+      "boilingPointTendency": {
+        "level": "High",
+        "score": 7.5,
+        "factors": [
+          "Larger molecular weight raises boiling point.",
+          "Carboxylic acids have high boiling points because they can form strong hydrogen-bonded dimers.",
+          "Hydrogen-bond donors raise boiling point.",
+          "Hydrogen-bond acceptors increase intermolecular attraction."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "High",
+        "score": 5.5,
+        "factors": [
+          "Low TPSA means less polar surface area.",
+          "Moderate logP gives a balance between water and lipid solubility.",
+          "Hydrogen-bond donors increase water solubility.",
+          "Hydrogen-bond acceptors help the molecule interact with water.",
+          "Carboxylic acids are polar and can hydrogen bond with water."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "Low",
+        "score": 2.5,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Carboxylic acid",
+      "priority": 1,
+      "nomenclaturePriority": 1,
+      "confidence": "High",
+      "suffix": "-oic acid",
+      "prefix": "carboxy",
+      "count": 1,
+      "mcatNote": "Carboxylic acids are acidic because their conjugate base is resonance-stabilized. At physiological pH, they are often negatively charged carboxylates.",
+      "matches": [
+        {
+          "atoms": [
+            5,
+            6,
+            7
+          ],
+          "bonds": [
+            5,
+            6
+          ]
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            5,
+            6,
+            7
+          ],
+          "bonds": [
+            5,
+            6
+          ]
+        }
+      ],
+      "displaySmarts": "[CX3](=O)[OX2H1]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Carboxylic acid",
+        "priority": 1,
+        "nomenclaturePriority": 1,
+        "confidence": "High",
+        "suffix": "-oic acid",
+        "prefix": "carboxy",
+        "count": 1,
+        "mcatNote": "Carboxylic acids are acidic because their conjugate base is resonance-stabilized. At physiological pH, they are often negatively charged carboxylates.",
+        "matches": [
+          {
+            "atoms": [
+              5,
+              6,
+              7
+            ],
+            "bonds": [
+              5,
+              6
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              5,
+              6,
+              7
+            ],
+            "bonds": [
+              5,
+              6
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3](=O)[OX2H1]",
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Carboxylic acid",
+        "priority": 1,
+        "nomenclaturePriority": 1,
+        "confidence": "High",
+        "suffix": "-oic acid",
+        "prefix": "carboxy",
+        "count": 1,
+        "mcatNote": "Carboxylic acids are acidic because their conjugate base is resonance-stabilized. At physiological pH, they are often negatively charged carboxylates.",
+        "matches": [
+          {
+            "atoms": [
+              5,
+              6,
+              7
+            ],
+            "bonds": [
+              5,
+              6
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              5,
+              6,
+              7
+            ],
+            "bonds": [
+              5,
+              6
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3](=O)[OX2H1]",
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:21:38.961Z"
+}

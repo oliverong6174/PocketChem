@@ -1,0 +1,2 @@
+# Validation transcripts are raw tool output, including trailing spaces.
+*.txt -text whitespace=-blank-at-eol

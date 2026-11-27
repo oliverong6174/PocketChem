@@ -43,14 +43,14 @@ export function applyResonanceEffectMetrics(
   metrics.resonanceDonation = metric(
     strongestResDonor.score || null,
     strongestResDonor.name
-      ? `${strongestResDonor.name} · ${strongestResDonor.score.toFixed(1)}/5`
+      ? `${strongestResDonor.name}, ${strongestResDonor.score.toFixed(1)}/5`
       : "No strong +R donor detected",
     "Only groups with a plausible resonance-donating motif receive substantial credit.",
   );
   metrics.resonanceWithdrawal = metric(
     strongestResWithdrawer.score || null,
     strongestResWithdrawer.name
-      ? `${strongestResWithdrawer.name} · ${strongestResWithdrawer.score.toFixed(1)}/5`
+      ? `${strongestResWithdrawer.name}, ${strongestResWithdrawer.score.toFixed(1)}/5`
       : "No strong −R group detected",
     "Higher score indicates a stronger qualitative pi-accepting substituent effect.",
   );

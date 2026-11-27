@@ -1,0 +1,2289 @@
+
+> pocketchem@0.0.0 test
+> node --test --test-concurrency=2 --test-timeout=300000 scripts/tests/*.test.mjs
+
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ analyses object store: creation and migration
+  ✔ [db] a fresh database gets both object stores at version 2 (9.1813ms)
+  ✔ [db] upgrading a version 1 database adds 'analyses' and keeps every existing workspace record (10.3028ms)
+  ✔ [db] opening an already upgraded database again creates nothing and loses nothing (7.3644ms)
+  ✔ [db] without IndexedDB the library is simply unavailable and reports it (3.0245ms)
+  ✔ [db] an open or write error becomes a typed library error, never an exception (8.0076ms)
+✔ analyses object store: creation and migration (12406.9632ms)
+▶ library operations
+  ✔ [save/list/open] a saved synthesis comes back exactly, across a simulated restart, without any recalculation (17.9054ms)
+  ✔ [verification] verification, inventory provenance, compatibility findings and route steps are carried over unchanged (4.068ms)
+  ✔ [save] saving the same analysis again makes a separate record; nothing is overwritten silently (8.3695ms)
+  ✔ [update] overwriting is a separate, explicit call; it keeps id, name and creation time (8.0405ms)
+  ✔ [list] newest first, with each page type, status and summary (4.2702ms)
+  ✔ [rename] changes only the name and modification time; chemistry and metadata are byte-identical (4.0604ms)
+  ✔ [duplicate] a new id and name, with every result and its original metadata preserved (3.1027ms)
+  ✔ [delete] removes exactly one record; other analyses and the page workspaces stay (4.9417ms)
+  ✔ [immutable] editing the live workspace or the original objects afterwards never changes a saved analysis (3.1993ms)
+  ✔ [limits] too large, unserializable, unnamed and over-capacity saves are refused cleanly (8.0105ms)
+  ✔ [quota] a full browser store loses nothing: the failed save stores nothing and earlier analyses stay (15.3387ms)
+✔ library operations (86.5529ms)
+▶ damaged and incompatible records
+  ✔ [damaged] bad entries are listed as problems and can be deleted; the library, other entries and PocketChem keep working (15.0609ms)
+  ✔ [open] damaged results are dropped with the structures kept; unusable structures and unknown pages are errors (10.0286ms)
+  ✔ [versions] results from another engine version are flagged and kept as saved; an older record format migrates (5.8929ms)
+✔ damaged and incompatible records (32.0034ms)
+▶ opening a saved analysis into the two editors
+  ✔ [open] both editors receive their structures and are verified; the workspace is replaced in one later write (26.7834ms)
+  ✔ [open] a saved analysis with an empty editor clears that editor (5.9833ms)
+  ✔ [failure] the second editor failing after the first changed rolls both back, verified, and the workspace is untouched (19.5617ms)
+  ✔ [failure] a structure that arrives but is not the saved one counts as failed (8.7956ms)
+  ✔ [failure] if an editor cannot be put back, saving stops, the stored workspace is kept, and Clear starts over (2.7249ms)
+  ✔ [race] a pending autosave cannot land during or after opening, and a record still loading is superseded (30.0737ms)
+  ✔ [reload] after opening, the opened analysis is what comes back; after a failed open, the previous workspace does (20.1703ms)
+✔ opening a saved analysis into the two editors (180.8564ms)
+▶ Synthesis and navigation integration
+  ✔ [save] Save Analysis needs a finished search, reads the latest editors first, and always creates a new analysis (4.8516ms)
+  ✔ [open] opening restores structures and results without searching, and is labelled as a saved analysis (2.0105ms)
+  ✔ [open] it waits for recovery and both editors, handles each request once, and never overwrites unsaved work silently (1.2693ms)
+  ✔ [open] a search in progress, an open in progress and a drawing restore all block each other (0.5367ms)
+  ✔ [navigation] the Saved page is in the navigation; a pending open is forgotten by any other page change (1.1908ms)
+  ✔ [ui] the library lists name, page, date, summary and status; has Open, Rename, Duplicate and a confirmed Delete; handles empty and error states (3.2733ms)
+  ✔ [scope] the analysis pages and the Multi-Catalytic workspace save into the library; the chemistry layers import none of it (35.695ms)
+  ✔ [recovery] the automatic workspace stays independent: separate object store, no library calls in the workspace code (8.5519ms)
+  ✔ [summary] the list line says what was found, how, and whether it is a snapshot (8.0855ms)
+✔ Synthesis and navigation integration (67.6141ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+CHIRALITY DEBUG {
+  atomIndex0Based: 1,
+  atomIndexDisplayed: 2,
+  element: 'C',
+  decision: 'ACCEPTED: stereo bond attached',
+  explicitH: 0,
+  implicitH: 1,
+  totalH: 1,
+  hasStereoBond: true,
+  neighbors: [
+    {
+      bondIndex: 0,
+      neighborAtomIndex: 1,
+      neighborElement: 'C',
+      bondOrder: 1,
+      stereoCode: 6,
+      ownedStereoBonds: [Array]
+    },
+    {
+      bondIndex: 1,
+      neighborAtomIndex: 3,
+      neighborElement: 'N',
+      bondOrder: 1,
+      stereoCode: 0,
+      ownedStereoBonds: [Array]
+    },
+    {
+      bondIndex: 2,
+      neighborAtomIndex: 4,
+      neighborElement: 'C',
+      bondOrder: 1,
+      stereoCode: 0,
+      ownedStereoBonds: [Array]
+    }
+  ],
+  substituents: [
+    {
+      atomIndexDisplayed: 1,
+      element: 'C',
+      prioritySignature: [Array],
+      vector: [Object]
+    },
+    {
+      atomIndexDisplayed: 3,
+      element: 'N',
+      prioritySignature: [Array],
+      vector: [Object]
+    },
+    {
+      atomIndexDisplayed: 4,
+      element: 'C',
+      prioritySignature: [Array],
+      vector: [Object]
+    },
+    {
+      atomIndexDisplayed: 'implicit H',
+      element: 'H',
+      prioritySignature: [Array],
+      vector: [Object]
+    }
+  ],
+  hasFourDifferentSubstituentPriorities: true
+}
+▶ properties saved analyses
+  ✔ [save/open] structure, groups, acid/base, resonance, chirality, annotation, name, properties and reactions come back exactly (158.2742ms)
+  ✔ [structure] disconnected components, charges, isotopes and wedge stereo in the drawing keep their identity (268.0963ms)
+  ✔ [immutable] later edits do not change the record; Rename, Duplicate and Delete work; no recalculation is involved (167.3688ms)
+  ✔ [versions] stale and older-engine results keep their flags; damaged results drop but the structure survives (64.9037ms)
+  ✔ [source] Properties saves a finished analysis, opens in one transaction, and recalculates nothing (43.2664ms)
+✔ properties saved analyses (29376.4318ms)
+▶ reactions saved analyses
+  ✔ [save/open] predicted products, mixtures, explanations, ordering and NO REACTION outcomes come back exactly (66.5306ms)
+  ✔ [modes] a multi-reactant canvas, a needs-input prediction and a retrosynthesis are all saved faithfully (65.6764ms)
+  ✔ [outcomes] a result with nothing found and an interrupted-run drawing both open without inventing results (12.9107ms)
+  ✔ [images] no rendered drawings are stored; they are rebuilt from the saved structures when opened (35.8774ms)
+  ✔ [handoff] opening a saved analysis never adopts a Properties molecule and never runs a prediction (21.0036ms)
+  ✔ [precedence] an opened analysis replaces the older automatic workspace in one write and wins on reload (53.5451ms)
+  ✔ [versions] stale and older-engine results keep their flags; damaged pathways drop but the drawing survives (24.3029ms)
+✔ reactions saved analyses (289.9012ms)
+▶ the library across all five pages
+  ✔ [independence] five records, one per page, list together, open on the right type, and never touch each other or the page workspaces (140.9187ms)
+  ✔ [routing] every saved type opens on its own page, and the app wires all six (the Multi-Catalytic workspace was added in Stage 9B-2B) (16.9737ms)
+  ✔ [flow] every page uses the same open flow: refused for another page's record, asks before replacing, reports once (30.1998ms)
+  ▶ properties: opening into the editor
+    ✔ success: the structure arrives and is verified; the record is untouched until the one replacing write (7.5529ms)
+    ✔ failure, even after the editor changed: the previous drawing is back and the workspace record is byte-identical (5.462ms)
+    ✔ an editor that cannot be restored stops saving and keeps the stored workspace; Clear starts over (2.3779ms)
+    ✔ late asynchronous restoration and pending autosaves cannot overwrite the opened analysis (12.5817ms)
+  ✔ properties: opening into the editor (33.0083ms)
+  ▶ reactions: opening into the editor
+    ✔ success: the structure arrives and is verified; the record is untouched until the one replacing write (5.2493ms)
+    ✔ failure, even after the editor changed: the previous drawing is back and the workspace record is byte-identical (8.2594ms)
+    ✔ an editor that cannot be restored stops saving and keeps the stored workspace; Clear starts over (3.4948ms)
+    ✔ late asynchronous restoration and pending autosaves cannot overwrite the opened analysis (3.9962ms)
+  ✔ reactions: opening into the editor (30.1255ms)
+  ✔ [storage] unavailable, full or failing storage and damaged or newer records are reported, never thrown, for the new pages too (44.5266ms)
+  ✔ [existing] the Synthesis, Ranking and Spectroscopy library flows are unchanged (46.5981ms)
+✔ the library across all five pages (346.2876ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ ranking saved analyses
+  ✔ [save/open] five molecules with ties, an unranked entry, profiles and explanations come back exactly (67.4366ms)
+  ✔ [order] the opened profiles sort to the saved order: A and C tie for first, B is third, D fourth, E unranked (27.5437ms)
+  ✔ [settings] compare-only modes, the category and the drawing come back; real ethanol output validates (39.937ms)
+  ✔ [immutable] editing or clearing the live comparison never changes a saved analysis; Rename, Duplicate and Delete work (141.7619ms)
+  ✔ [versions] older-engine results are flagged; damaged profiles drop the results but keep the drawing; a newer format is not opened (196.1408ms)
+✔ ranking saved analyses (15361.9621ms)
+▶ spectroscopy saved analyses
+  ✔ [save/open] IR, ¹H, ¹³C and mass data, assignments, intensities, name, formula, tab and zoom come back exactly (43.361ms)
+  ✔ [assignments] every saved atom index points at an atom of the saved structure source (35.2134ms)
+  ✔ [only computed] nothing is invented: an inputs-only snapshot opens with no spectra, and no rendered images are stored (47.773ms)
+  ✔ [stale/versions] a stale snapshot stays stale, an older engine is flagged, damaged spectra drop but the structure survives (48.1876ms)
+  ✔ [immutable] a saved spectroscopy analysis is unaffected by later workspace edits; duplicate keeps every result (73.2713ms)
+✔ spectroscopy saved analyses (285.3883ms)
+▶ shared open flow
+  ✔ [flow] an empty workspace opens at once; the request is reported handled exactly once (80.1737ms)
+  ✔ [unsaved work] the user is asked; Replace opens, Cancel changes nothing, Save-first saves then opens, a failed save opens nothing (40.3687ms)
+  ✔ [refused] a busy page, another page's record, a missing record and a damaged record never touch the workspace (81.0294ms)
+  ✔ [failure] when applying fails the page keeps its workspace and the request is still reported handled once (17.8637ms)
+  ✔ [storage] unavailable or failing storage is reported on the page, not thrown (69.1321ms)
+  ▶ ranking: opening into the editor
+    ✔ success: the editor shows the saved structure; the old callbacks are invalid; the record is untouched until the one replacing write (39.1589ms)
+    ✔ failure (even after the editor changed): the previous drawing is back, verified, and the workspace record is byte-identical (18.2259ms)
+    ✔ failure with an editor that cannot be restored: saving stops, the stored workspace stays, Clear starts over (18.5417ms)
+    ✔ races: a pending autosave is dropped, and a recovery still loading is superseded by the opened analysis (17.3922ms)
+  ✔ ranking: opening into the editor (202.6842ms)
+  ▶ spectroscopy: opening into the editor
+    ✔ success: the editor shows the saved structure; the old callbacks are invalid; the record is untouched until the one replacing write (24.0301ms)
+    ✔ failure (even after the editor changed): the previous drawing is back, verified, and the workspace record is byte-identical (9.4714ms)
+    ✔ failure with an editor that cannot be restored: saving stops, the stored workspace stays, Clear starts over (18.3047ms)
+    ✔ races: a pending autosave is dropped, and a recovery still loading is superseded by the opened analysis (21.9886ms)
+  ✔ spectroscopy: opening into the editor (87.1245ms)
+✔ shared open flow (601.4489ms)
+▶ navigation and page wiring
+  ✔ [navigation] each saved type opens on its own page; the page ids exist in the navigation (9.4277ms)
+  ✔ [wiring] both pages use the shared flow, wait for recovery and the editor, and register their validators in one library (13.1878ms)
+  ✔ [no recalculation] opening a saved Ranking or Spectroscopy analysis runs no prediction (5.6077ms)
+  ✔ [safety] Save Analysis needs a finished analysis and reads the latest editor first; opening is blocked while one runs (6.2564ms)
+  ✔ [scope] Multi-Catalytic stays outside the library; the Synthesis library flow is unchanged (2.1175ms)
+✔ navigation and page wiring (50.0573ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ spectators and coproducts
+  ✔ [engine] an unreacting component survives a single-component transformation (2626.7021ms)
+  ✔ [engine] spectator tracking does not depend on component order (311.552ms)
+  ✔ [confirmed] coproducts of ester reduction are both kept in the carried state (269.7086ms)
+  ✔ [engine] a coproduct left unchanged by the next step is carried forward, not discarded (400.1042ms)
+  ✔ [engine] identical components do not create duplicate outcomes (state identity) (144.8433ms)
+  ⚠ [known-gap] two equally reactive components should both react under excess reagent (746.4593ms) # TODO
+✔ spectators and coproducts (26311.9251ms)
+▶ ranking and truncation
+  ✔ [engine] without a limit nothing is excluded and every outcome has a rank basis (837.974ms)
+  ✔ [heuristic] the branch limit removes the lowest-ranked outcomes, not the latest ones (829.7231ms)
+  ✔ [engine] truncation is fully accounted for: kept + excluded equals the untruncated count (2349.7105ms)
+  ✔ [engine] kept outcomes are always a ranked prefix (metamorphic: lower limit is a subset) (907.0124ms)
+  ✔ [engine] per-step selectivity estimates are carried into the step and multiply along the branch (136.2232ms)
+  ✔ [engine] outcomes without any estimate keep engine order and are not labeled as ranked (86.3193ms)
+  ✔ [engine] runSequentialSynthesis is the detailed result's branch list (718.023ms)
+✔ ranking and truncation (5880.0132ms)
+▶ reaction mixtures
+  ✔ [engine] members of one racemate share a single branch slot (131.8784ms)
+  ✔ [engine] the racemate flag survives later steps instead of becoming a pure compound (110.0392ms)
+✔ reaction mixtures (242.5986ms)
+▶ Phase 1 distinctions are preserved
+  ✔ [engine] NO REACTION still carries a mixture state forward unchanged (100.0607ms)
+  ✔ [engine] diagnostic mode: unresolved statuses keep their meaning when spectators exist (129.1147ms)
+✔ Phase 1 distinctions are preserved (229.8286ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ the curated role table is traceable to the registry
+  ✔ every curated rule exists, and every piece of evidence appears in that rule's own reagent text or note (5.3254ms)
+  ✔ a catalyst claim always comes from registry text, never from the textbook table (1.4018ms)
+  ✔ the registry's own reagent text is preserved byte-for-byte for every rule (6.722ms)
+  ✔ a rule with no curated entry asserts no role beyond its structural reactants, and says so (2.936ms)
+  ✔ only a minority of the registry is structured: coverage is not overstated (3.6804ms)
+✔ the curated role table is traceable to the registry (21368.4079ms)
+▶ catalyst identity is explicit only where the registry gives it
+  ✔ named: Pd/C, Lindlar catalyst, sulfuric acid (1.2621ms)
+  ✔ generic: 'Pd catalyst' and 'acid catalyst' do not identify a species (2.0399ms)
+  ✔ none: PCC and hydride reductions declare no catalyst, and their reagents are consumed, not catalytic (0.9572ms)
+  ✔ stoichiometric Hg(OAc)₂ (oxymercuration) is not confused with catalytic Hg²⁺ (alkyne hydration) (2.331ms)
+  ✔ listed alternatives stay alternatives (Pt or Pd/C; NaBH₄ or LiAlH₄) (1.2775ms)
+  ✔ structural reactants come from the registry's partner requirements, including copies (0.9605ms)
+✔ catalyst identity is explicit only where the registry gives it (11.4537ms)
+▶ condition combinations are documented, incomplete or unassessed, never silently compatible
+  ✔ a clash between declared conditions is a documented conflict (1.3824ms)
+  ✔ two rules that declare conditions with no clash are INCOMPLETE, not compatible (0.53ms)
+  ✔ a rule without declared conditions makes the pair unassessed (0.51ms)
+  ✔ no pair of real rules is ever reported as documented-compatible (none is curated) (6.7623ms)
+✔ condition combinations are documented, incomplete or unassessed, never silently compatible (10.2813ms)
+▶ workspace catalysis assessment
+  ✔ [engine] Sonogashira -> Lindlar -> Pd/C hydrogenation: three catalytic steps, identities reported as they are (2729.1113ms)
+  ✔ [engine] a reagent-only route (Grignard, PCC) has no catalytic step and says so (483.522ms)
+  ✔ [engine] steps that were not completed carry roles too, and do not enter the catalysis summary (11.1826ms)
+  ✔ [engine] the roles stored with a step win over the current table (restored work is described as saved) (175.5628ms)
+  ✔ [engine] a workspace saved before roles existed validates and is described as unassessed (127.683ms)
+  ✔ a malformed roles value is rejected by the workspace validator (144.268ms)
+✔ workspace catalysis assessment (3672.8901ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ declared conditions are machine-readable metadata
+  ✔ [engine] annotated rules carry structured conditions, not keywords from the reagent text (12.5634ms)
+  ✔ [engine] a rule without conditions is unassessed (null), not compatible (1.4478ms)
+✔ declared conditions are machine-readable metadata (18269.5341ms)
+▶ strong bases and acidic hydrogens
+  ✔ [engine] acetylide alkylation next to a free phenol is a model constraint (1035.8929ms)
+  ✔ [engine] the same step with a protected phenol (aryl ether) is not flagged (28.3165ms)
+  ✔ [engine] the terminal alkyne being alkylated is the reaction centre, not a spectator (13.6779ms)
+  ✔ [engine] a carboxylic acid is a model constraint, an alcohol only a plausible warning, with a strong base (24.0059ms)
+  ✔ [engine] mild base: Williamson O-methylation of a phenol is clean; a carboxylic acid spectator is only plausible (16.2151ms)
+✔ strong bases and acidic hydrogens (1122.4063ms)
+▶ organometallic reagents and protic or electrophilic groups
+  ✔ [engine] Grignard formation from a bromo-alcohol: the alcohol quenches the reagent (model constraint) (24.0391ms)
+  ✔ [engine] Grignard addition to an aldehyde carrying a phenol: phenol quench is flagged (98.1638ms)
+  ✔ [engine] organolithium addition: a spectator ketone is a competing electrophile (54.6888ms)
+  ✔ [engine] a simple Grignard addition is not flagged (the aldehyde is consumed) (31.8222ms)
+  ✔ [engine] hydride reduction: a spectator alcohol is a plausible warning only (35.1345ms)
+✔ organometallic reagents and protic or electrophilic groups (245.6391ms)
+▶ benzylic versus aromatic halogenation and other competing reactivity
+  ✔ [engine] benzylic bromination of an alkoxy-arene is not flagged (19.869ms)
+  ✔ [engine] benzylic bromination with a free phenol warns of competing ring bromination (17.2243ms)
+  ✔ [engine] radical halogenation with a spectator alkene warns of halogen addition (19.697ms)
+  ✔ [engine] a strong oxidant with a spectator alkene is flagged; consuming the alcohol is not (19.7182ms)
+✔ benzylic versus aromatic halogenation and other competing reactivity (77.6603ms)
+▶ route-level assessment and ranking
+  ✔ [engine] a route summary lists warnings by step and the unassessed rules separately (12.3884ms)
+  ✔ [engine] route length prices findings, so a clean route can beat a slightly shorter flagged one (5.7965ms)
+✔ route-level assessment and ranking (18.8242ms)
+▶ planner preference (Deep budget)
+  ✖ [engine] p-cresol + CH3Br + acetylene -> estragole is ordered so no step has a model constraint (45320.8703ms)
+✖ planner preference (Deep budget) (45326.2086ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ declared conditions are traceable to the rule's own text
+  ✔ every curated condition appears literally in the rule's reagents or note (8.9342ms)
+  ✔ [engine] DIBAL states −78 °C; a Grignard formation states dry ether and is anhydrous (9.852ms)
+  ✔ [engine] what a rule does not state is listed as not stated, never filled in (4.7406ms)
+  ✔ [engine] workup reagents belong to the step that lists them (5.4068ms)
+✔ declared conditions are traceable to the rule's own text (8787.2747ms)
+▶ in-vessel intolerances come only from declared conditions
+  ✔ [engine] a Grignard formation cannot coexist with acidic groups and water in one vessel (7.0484ms)
+  ✔ [engine] a rule that declares no conditions is unassessed, which is not the same as tolerant (4.592ms)
+  ✔ [engine] a rule that declares conditions with nothing to exclude says so (0.938ms)
+✔ in-vessel intolerances come only from declared conditions (13.7055ms)
+▶ isolation boundary: acid-catalyzed step, then base-mediated step
+  ✔ [engine] the two reactions could not share a vessel (1.6303ms)
+  ✔ [engine] yet run as successive isolated steps, the workspace executes both and reports no conflict (2033.6381ms)
+  ✔ [engine] the boundary is reported as an isolation requirement, not as a conflict (224.1879ms)
+  ✔ [engine] only when the user declares one vessel are the steps judged as a one-pot pair (139.9133ms)
+  ✔ [engine] a declared vessel with no clash is 'no documented conflict', never 'compatible' (224.8352ms)
+  ✔ [engine] independent branches have no boundary between them (240.0189ms)
+  ✔ [engine] a join gives one boundary per feeding branch (440.077ms)
+✔ isolation boundary: acid-catalyzed step, then base-mediated step (3307.2203ms)
+▶ persistence and presentation of conditions
+  ✔ [engine] conditions are stored with each attempt, including attempts that did not complete (3.7788ms)
+  ✔ [engine] old saves without conditions validate and are described as unassessed; malformed conditions are rejected (114.2633ms)
+  ✔ [engine] the condition lines keep the reagent text and list what is not stated (4.6647ms)
+✔ persistence and presentation of conditions (123.7429ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ fixture: fischer-isopropyl-propanoate
+  ✔ [engine] step 1 (aldehyde-oxidation) gives the recorded product (898.3639ms)
+  ✔ [engine] step 1 lists structural reactants only (no reagents or catalysts) (0.8861ms)
+  ✔ [engine] step 2 (ketone-reduction) gives the recorded product (12.1043ms)
+  ✔ [engine] step 2 lists structural reactants only (no reagents or catalysts) (0.4534ms)
+  ✔ [engine] step 3 (fischer-esterification) gives the recorded product (25.3999ms)
+  ✔ [engine] step 3 lists structural reactants only (no reagents or catalysts) (0.6173ms)
+  ✔ [engine] step 3 does not depend on the order of its reactants (26.949ms)
+  ✔ [engine] step 3 needs every structural partner (nothing is invented) (7.3325ms)
+  ✔ [engine] every reactant is a supplied copy or an earlier product, and none is over-used (13.2737ms)
+  ✔ [engine] the target is present once the last step is done (17.9376ms)
+  ✔ [engine] chemical limitations are recorded (0.5609ms)
+✔ fixture: fischer-isopropyl-propanoate (8387.0815ms)
+▶ fixture: williamson-cyclohexyl-propyl-ether
+  ✔ [engine] step 1 (alkene-hbr-peroxide) gives the recorded product (30.2817ms)
+  ✔ [engine] step 1 lists structural reactants only (no reagents or catalysts) (0.2936ms)
+  ✔ [engine] step 2 (ketone-reduction) gives the recorded product (42.0529ms)
+  ✔ [engine] step 2 lists structural reactants only (no reagents or catalysts) (3.9795ms)
+  ✔ [engine] step 3 (alcohol-williamson-ether) gives the recorded product (26.6427ms)
+  ✔ [engine] step 3 lists structural reactants only (no reagents or catalysts) (0.2983ms)
+  ✔ [engine] step 3 does not depend on the order of its reactants (17.107ms)
+  ✔ [engine] step 3 needs every structural partner (nothing is invented) (2.2521ms)
+  ✔ [engine] every reactant is a supplied copy or an earlier product, and none is over-used (7.0767ms)
+  ✔ [engine] the target is present once the last step is done (7.5365ms)
+  ✔ [engine] chemical limitations are recorded (0.1921ms)
+✔ fixture: williamson-cyclohexyl-propyl-ether (141.0602ms)
+▶ fixture: grignard-2-butanol-from-ethanol
+  ✔ [engine] step 1 (primary-alcohol-mild-oxidation) gives the recorded product (8.022ms)
+  ✔ [engine] step 1 lists structural reactants only (no reagents or catalysts) (0.2204ms)
+  ✔ [engine] step 2 (alcohol-hbr-substitution-primary) gives the recorded product (7.7206ms)
+  ✔ [engine] step 2 lists structural reactants only (no reagents or catalysts) (0.2033ms)
+  ✔ [engine] step 3 (haloalkane-grignard-formation-bromide) gives the recorded product (7.7473ms)
+  ✔ [engine] step 3 lists structural reactants only (no reagents or catalysts) (0.1908ms)
+  ✔ [engine] step 4 (aldehyde-organometallic-addition) gives the recorded product (17.1678ms)
+  ✔ [engine] step 4 lists structural reactants only (no reagents or catalysts) (0.2359ms)
+  ✔ [engine] step 4 does not depend on the order of its reactants (22.592ms)
+  ✔ [engine] step 4 needs every structural partner (nothing is invented) (3.6597ms)
+  ✔ [engine] every reactant is a supplied copy or an earlier product, and none is over-used (10.5693ms)
+  ✔ [engine] the target is present once the last step is done (19.5863ms)
+  ✔ [engine] chemical limitations are recorded (0.1868ms)
+✔ fixture: grignard-2-butanol-from-ethanol (99.5828ms)
+▶ fixture: ester-reduction-coproduct
+  ✔ [engine] step 1 (ester-lah-reduction) gives the recorded product (45.3016ms)
+  ✔ [engine] step 1 lists structural reactants only (no reagents or catalysts) (0.3256ms)
+  ✔ [engine] every reactant is a supplied copy or an earlier product, and none is over-used (4.9902ms)
+  ✔ [engine] the target is present once the last step is done (7.2488ms)
+  ✔ [engine] chemical limitations are recorded (0.2097ms)
+✔ fixture: ester-reduction-coproduct (58.7978ms)
+▶ fixture: racemic-diol-coupling
+  ✔ [engine] step 1 (alkene-syn-dihydroxylation) gives the recorded product (177.6455ms)
+  ✔ [engine] step 1 lists structural reactants only (no reagents or catalysts) (0.3562ms)
+  ✔ [engine] step 2 (fischer-esterification) gives the recorded product (32.5319ms)
+  ✔ [engine] step 2 lists structural reactants only (no reagents or catalysts) (0.2321ms)
+  ✔ [engine] step 2 does not depend on the order of its reactants (18.867ms)
+  ✔ [engine] step 2 needs every structural partner (nothing is invented) (3.3485ms)
+  ✔ [engine] every reactant is a supplied copy or an earlier product, and none is over-used (12.6089ms)
+  ✔ [engine] the target is present once the last step is done (11.2966ms)
+  ✔ [engine] chemical limitations are recorded (0.186ms)
+✔ fixture: racemic-diol-coupling (259.0965ms)
+▶ fixture-specific chemistry
+  ✔ [engine] the Grignard fixture needs two copies of ethanol: one copy cannot supply both branches (8.7781ms)
+  ✔ [engine] the Fischer fixture is genuinely convergent: neither half can be built from the other (6.0356ms)
+  ✔ [engine] ester reduction yields both alcohols; one equals the 2-propanol of the other fixture (10.2226ms)
+  ✔ [confirmed] syn-dihydroxylation of (E)-2-butene is reported as a racemic pair (39.0239ms)
+  ✔ [known-gap] Grignard addition to acetaldehyde is not reported as a racemic mixture (4.1155ms)
+  ✔ [engine] Grignard formation output is the same species as the hand-written CC[Mg]Br (5.1746ms)
+✔ fixture-specific chemistry (74.2072ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ convergent lane: fischer-isopropyl-propanoate
+  ✔ [engine] finds the independently validated route and it replays as verified (6085.5302ms)
+  ✔ [engine] the route is convergent: both supplied materials feed the target through a join (3399.0546ms)
+  ✔ [engine] inventory: each supplied copy is consumed exactly once (3750.7821ms)
+  ✔ [engine] result does not depend on the order of the supplied materials (3986.9771ms)
+  ✔ [engine] an irrelevant third material is a spectator and is reported unused (2660.0169ms)
+  ✔ [engine] coproducts and leftovers are reported, not dropped (1953.0696ms)
+✔ convergent lane: fischer-isopropyl-propanoate (27361.2892ms)
+▶ convergent lane: williamson-cyclohexyl-propyl-ether
+  ✔ [engine] finds the independently validated route and it replays as verified (6277.603ms)
+  ✔ [engine] the route is convergent: both supplied materials feed the target through a join (10784.052ms)
+  ✔ [engine] inventory: each supplied copy is consumed exactly once (10530.1429ms)
+  ✔ [engine] result does not depend on the order of the supplied materials (19795.8409ms)
+  ✔ [engine] an irrelevant third material is a spectator and is reported unused (9168.2545ms)
+  ✔ [engine] coproducts and leftovers are reported, not dropped (11683.9342ms)
+✔ convergent lane: williamson-cyclohexyl-propyl-ether (68244.5259ms)
+▶ convergent lane: inventory and availability
+  ✔ [engine] one copy of a material cannot be reused: the two-copy route is not returned (2.9867ms)
+  ✔ [engine] two copies of one material support the route that uses it twice (57821.0098ms)
+  ✔ [engine] a coupling that needs a structural reactant nobody supplied is rejected (4331.7051ms)
+✔ convergent lane: inventory and availability (62157.4202ms)
+▶ convergent lane: stereochemistry and honesty of labels
+  ✔ [heuristic] a racemic intermediate yields a connectivity-level label, never 'verified' (4163.6643ms)
+  ✔ [engine] every returned route carries a replay and none has a failed status (2084.9302ms)
+✔ convergent lane: stereochemistry and honesty of labels (6253.1566ms)
+▶ convergent lane: budgets, cancellation, opt-in
+  ✔ [engine] an exhausted execution budget stops the search and returns nothing unproven (197.7044ms)
+  ✔ [engine] an exhausted expansion budget stops the search (540.7514ms)
+  ✔ [engine] the depth budget bounds the steps considered (6647.9295ms)
+  ✔ [engine] an already-aborted signal returns immediately with a cancelled stop (116.0412ms)
+  ✔ [engine] a deadline in the past stops the search before any reaction runs (80.0705ms)
+  ✔ [engine] the lane is opt-in: without the option the public search never calls it (6873.8377ms)
+  ✔ [engine] through the public entry point, convergentSearch returns the verified convergent route (1700.3059ms)
+✔ convergent lane: budgets, cancellation, opt-in (16161.7361ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ parity rule sanity
+  ✔ cis-1,2-dimethylcyclohexane (same symbols, second atom closes the ring first) is meso; the other is chiral (95.02ms)
+✔ parity rule sanity (2450.5543ms)
+▶ activated dienophile adds endo: substituents all on one face
+  ✔ (E,E)-hexa-2,4-diene + methyl acrylate gives the all-cis adduct (76.9426ms)
+  ✔ the exo diastereomer (ester trans to both methyls) is NOT what the engine returns (15.1439ms)
+  ✔ negative control: an unactivated dienophile (propene) keeps the previous projection (methyl trans to the diene methyls) (22.264ms)
+✔ activated dienophile adds endo: substituents all on one face (115.1468ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ epoxide + HX: benzylic and allylic carbons are attacked like tertiary ones
+  ✔ styrene oxide + HBr: bromide on the benzylic carbon, not on CH2 (1003.0656ms)
+  ✔ HCl and HI behave the same (134.6233ms)
+  ✔ a secondary benzylic carbon beats an alkyl secondary carbon (83.0726ms)
+  ✔ an allylic carbon (vinyl epoxide) is attacked (28.1425ms)
+  ✔ both carbons stabilized (tertiary + benzylic): both regioisomers are kept, neither dropped (56.3137ms)
+  ✔ negative controls: unstabilized epoxides keep the Stage 9E behaviour (111.6886ms)
+  ✔ a ring-fused epoxide still gives the trans halohydrin as a racemate (259.7438ms)
+  ✔ base-promoted opening is not changed by this rule (methoxide attacks the less hindered CH2 of styrene oxide) (46.4719ms)
+  ✔ backside attack: the benzylic carbon is inverted, so the product is neither the retention product nor its mirror image (284.3002ms)
+✔ epoxide + HX: benzylic and allylic carbons are attacked like tertiary ones (4655.7068ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ runReactionRegressionSuite
+  ✔ suite executes and returns results (1564.1346ms)
+  ✔ no new failures beyond the documented baseline (4.2582ms)
+  ✔ documented pre-existing failures (tracked, not hidden) (0.6283ms) # TODO
+✔ runReactionRegressionSuite (3958.2122ms)
+▶ runMechanisticStereoRegressionSuite
+  ✔ suite executes and returns results (322.2621ms)
+  ✔ no new failures beyond the documented baseline (0.3024ms)
+  ✔ documented pre-existing failures (tracked, not hidden) (0.2688ms) # TODO
+✔ runMechanisticStereoRegressionSuite (323.5754ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ registry: Stage 9M rules are well-formed and reachable
+  ✔ [engine] wacker-tsuji-oxidation is registered, executable and states its limits (0.9212ms)
+  ✔ [engine] ring-closing-metathesis-5 is registered, executable and states its limits (0.3364ms)
+  ✔ [engine] ring-closing-metathesis-6 is registered, executable and states its limits (0.1423ms)
+  ✔ [engine] ring-closing-metathesis-7 is registered, executable and states its limits (0.1006ms)
+  ✔ [engine] ring-closing-metathesis-8 is registered, executable and states its limits (0.1366ms)
+  ✔ [engine] mitsunobu-secondary-inversion is registered, executable and states its limits (0.0869ms)
+  ✔ [engine] mitsunobu-primary is registered, executable and states its limits (0.2943ms)
+  ✔ [engine] benzilic-acid-rearrangement is registered, executable and states its limits (0.2331ms)
+  ✔ [engine] benzilic-acid-ring-contraction is registered, executable and states its limits (0.1707ms)
+  ✔ [engine] pinacol-coupling is registered, executable and states its limits (0.188ms)
+  ✔ [engine] ketonic-decarboxylation is registered, executable and states its limits (0.0981ms)
+  ✔ [engine] dieckmann-condensation-5 is registered, executable and states its limits (0.0606ms)
+  ✔ [engine] dieckmann-condensation-6 is registered, executable and states its limits (0.0391ms)
+  ✔ [engine] dieckmann-condensation-7 is registered, executable and states its limits (0.0393ms)
+  ✔ [engine] acetoacetic-ester-alkylation is registered, executable and states its limits (0.0435ms)
+  ✔ [engine] malonic-ester-alkylation is registered, executable and states its limits (0.0379ms)
+  ✔ [engine] beta-keto-ester-hydrolysis-decarboxylation is registered, executable and states its limits (0.0369ms)
+  ✔ [engine] malonic-ester-hydrolysis-decarboxylation is registered, executable and states its limits (0.0472ms)
+  ✔ [engine] structural partners are user-supplied, never invented (0.3178ms)
+✔ registry: Stage 9M rules are well-formed and reachable (2601.5492ms)
+▶ Wacker–Tsuji oxidation
+  ✔ [engine] 1-heptene gives 2-heptanone (400.1217ms)
+  ✔ [engine] styrene gives acetophenone (second, structurally different substrate) (108.4527ms)
+  ✔ [engine] only the terminal alkene reacts when an internal one is also present (77.6325ms)
+  ✔ [engine] a stereocentre elsewhere is carried through unchanged (81.1526ms)
+  ✔ [scope] internal, cyclic, conjugated and heteroatom-substituted alkenes are refused (104.8753ms)
+  ✔ [engine] it does not manufacture the anti-Markovnikov aldehyde (24.6843ms)
+✔ Wacker–Tsuji oxidation (804.5866ms)
+▶ ring-closing metathesis
+  ✔ [engine] cyclopentene from 1,6-heptadiene (32.5295ms)
+  ✔ [engine] cyclohexene from 1,7-octadiene (17.2869ms)
+  ✔ [engine] cycloheptene from 1,8-nonadiene (14.6759ms)
+  ✔ [engine] cis-cyclooctene skeleton from 1,9-decadiene (15.2338ms)
+  ✔ [engine] 3,6-dihydro-2H-pyran (heteroatom in the tether) (12.3019ms)
+  ✔ [engine] N-Boc-3-pyrroline (17.9204ms)
+  ✔ [engine] indene (aryl-fused ring) (22.1177ms)
+  ✔ [scope] the ring-size rule only fires for its own tether length (11.1846ms)
+  ✔ [scope] internal alkenes and conjugated dienes are refused (26.7377ms)
+  ✔ [stereo] a tether stereocentre survives and the metathesis creates no stereo label of its own (316.1379ms)
+  ✔ [stereo] a diene whose tether stereocentre becomes symmetric loses the label (4-methylcyclopentene) (29.8173ms)
+  ✔ [alternatives] a triene keeps its third alkene and each ring size is its own rule (24.9177ms)
+✔ ring-closing metathesis (543.7084ms)
+▶ Mitsunobu substitution
+  ✔ [stereo] a secondary alcohol is inverted: (R)-butan-2-ol + AcOH gives the (S)-acetate (31.3919ms)
+  ✔ [stereo] the enantiomer inverts the other way, and Fischer esterification retains (contrast) (57.4981ms)
+  ✔ [stereo] a ring carbinol is inverted too (cis/trans-relevant substrate) (32.7915ms)
+  ✔ [engine] phenol and imide pronucleophiles give the aryl ether and N-alkyl imide, also with inversion (52.886ms)
+  ✔ [engine] a primary alcohol is substituted without any stereo claim (30.0128ms)
+  ✔ [engine] an achiral secondary alcohol still reacts (no stereo is invented) (11.4233ms)
+  ✔ [scope] tertiary alcohols, non-acidic nucleophiles and a missing partner give nothing (18.5168ms)
+  ✔ [inventory] the alcohol and the pronucleophile are consumed; no reagent or by-product lots appear (347.3852ms)
+✔ Mitsunobu substitution (583.0119ms)
+▶ benzilic acid rearrangement
+  ✔ [engine] benzil gives benzilic acid (43.7965ms)
+  ✔ [engine] pivalil (2,2,5,5-tetramethylhexane-3,4-dione) gives the tertiary alpha-hydroxy acid (46.5539ms)
+  ✔ [engine] an unsymmetrical diaryl diketone gives the unsymmetrical product with no stereo label (79.0566ms)
+  ✔ [engine] 9,10-phenanthrenequinone ring-contracts to 9-hydroxyfluorene-9-carboxylic acid (39.8056ms)
+  ✔ [engine] cyclohexane-1,2-dione and cycloheptane-1,2-dione ring-contract by one carbon (47.1961ms)
+  ✔ [scope] enolizable acyclic diketones, 1,3-diketones and 1,2-diketones in 5-rings are refused (17.2927ms)
+  ✔ [engine] atom accounting: product = diketone + H2O (the hydroxide contribution is the only added atoms) (25.0198ms)
+✔ benzilic acid rearrangement (300.0394ms)
+▶ pinacol coupling
+  ✔ [engine] acetone coupled with itself gives pinacol (15.2931ms)
+  ✔ [engine] benzaldehyde coupled with itself gives hydrobenzoin (stereo not assigned) (19.5866ms)
+  ✔ [engine] two different carbonyls give the crossed diol only (27.039ms)
+  ✔ [scope] enones, esters, acids and a single carbonyl give nothing (42.2365ms)
+  ✔ [inventory] homocoupling consumes two copies of the ketone, one product remains (117.0542ms)
+✔ pinacol coupling (222.0815ms)
+▶ ketonic decarboxylation
+  ✔ [engine] two acetic acids give acetone (14.4407ms)
+  ✔ [engine] two propanoic acids give pentan-3-one (15.6906ms)
+  ✔ [alternatives] two different acids give the crossed ketone (both role assignments; one constitution here) (21.1319ms)
+  ✔ [engine] an aryl acid with acetic acid gives acetophenone (23.45ms)
+  ✔ [scope] a single acid, an ester or an acid chloride give nothing (11.9138ms)
+✔ ketonic decarboxylation (87.4428ms)
+▶ Dieckmann condensation
+  ✔ [engine] diethyl adipate gives ethyl 2-oxocyclopentanecarboxylate (26.3293ms)
+  ✔ [engine] diethyl pimelate gives the six-membered ring (second substrate and ring size) (17.5362ms)
+  ✔ [engine] dimethyl suberate gives the seven-membered ring (11.9982ms)
+  ✔ [alternatives] an unsymmetrical 3-methyladipate closes in both directions, unranked (12.0207ms)
+  ✔ [scope] a wrong tether length, a malonate and a mono-ester give nothing (6.312ms)
+✔ Dieckmann condensation (75.0529ms)
+▶ acetoacetic ester and malonic ester syntheses (now executable)
+  ✔ [engine] ethyl acetoacetate + ethyl bromide alkylates at the active carbon (14.77ms)
+  ✔ [engine] a cyclic beta-keto ester + benzyl bromide gives the quaternary alpha-benzyl product (30.6473ms)
+  ✔ [engine] diethyl malonate + allyl bromide (41.9812ms)
+  ✔ [engine] hydrolysis/decarboxylation gives the ketone and the carboxylic acid respectively (110.4817ms)
+  ✔ [scope] secondary halides, the wrong active-methylene class and plain esters give nothing (31.6367ms)
+  ✔ [scope] the old concept-only entry is untouched and still produces no structure (0.5998ms)
+✔ acetoacetic ester and malonic ester syntheses (now executable) (233.517ms)
+▶ retrosynthesis proposes the disconnections
+  ✔ [retro] cyclohexene from 1,7-octadiene (RCM) (1316.121ms)
+  ✔ [retro] 2-heptanone from 1-heptene (Wacker-Tsuji) (879.4345ms)
+  ✔ [retro] inverted ester from the alcohol and the acid (Mitsunobu) (866.8739ms)
+  ✔ [retro] benzilic acid from benzil (897.6955ms)
+  ✔ [retro] pinacol from two acetones (1433.8012ms)
+  ✔ [retro] ethyl 2-oxocyclopentanecarboxylate from an adipate diester (Dieckmann) (1096.5155ms)
+  ✔ [retro] 2-benzylcyclopentanone from a beta-keto ester (acetoacetic decarboxylation) (2067.2234ms)
+✔ retrosynthesis proposes the disconnections (8564.4615ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+✔ syn reduction of a fresh small-ring alkene gives the cis meso product (4471.401ms)
+✔ pre-existing center survives; both new face alternatives are retained (325.6622ms)
+✔ unsupported alkene geometry gets an explicit stereo limitation (27.9207ms)
+✔ an unspecified pre-existing stereocenter is not silently treated as achiral (72.5463ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ integrated synthesis: two catalytic branches, Heck join, Pd/C hydrogenation
+  ✔ [engine] the join stops for a choice (major and minor offered) before anything is consumed (5.1318ms)
+  ✔ [engine] every intermediate is the expected structure, with E geometry on the coupled alkene (9.419ms)
+  ✔ [engine] provenance: the final molecule descends from all three starting materials; branches share no ancestor before the join (0.7996ms)
+  ✔ [engine] structure replay is verified; dependencies show two independent branches then a join (0.2887ms)
+  ✔ [engine] four distinct catalyst systems, with the Heck palladium reported as type-only (2.8109ms)
+  ✔ [engine] condition assessment is conservative: no pair is compatible, no cross-step conflict is reported (2.3501ms)
+  ✔ [engine] the whole workspace survives validation as saved data and replays from its action log (831.5576ms)
+✔ integrated synthesis: two catalytic branches, Heck join, Pd/C hydrogenation (9993.4067ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ stable aromatic molecular ion
+  ✔ Nc1ccccc1 has its molecular ion as the base peak (m/z 93) (1245.7436ms)
+  ✔ Oc1ccccc1 has its molecular ion as the base peak (m/z 94) (96.6134ms)
+  ✔ COc1ccccc1 has its molecular ion as the base peak (m/z 108) (96.7007ms)
+  ✔ N#Cc1ccccc1 has its molecular ion as the base peak (m/z 103) (157.561ms)
+  ✔ Clc1ccccc1 has its molecular ion as the base peak (m/z 112) (202.334ms)
+  ✔ toluene is excluded: the benzylic/tropylium ion m/z 91 stays the base peak (42.0439ms)
+✔ stable aromatic molecular ion (12811.4949ms)
+▶ secondary alkyl bromide
+  ✔ isopropyl bromide: loss of Br gives the isopropyl cation, m/z 43 (37.9209ms)
+✔ secondary alkyl bromide (38.9129ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ McLafferty ion m/z (acceptor fragment + the transferred H)
+  ✔ straight-chain acid: CCCCC(=O)O shows m/z 60 (4081.768ms)
+  ✔ methyl ester: CCCCC(=O)OC shows m/z 74 (277.2361ms)
+  ✔ ethyl ester: CCCCC(=O)OCC shows m/z 88 (299.7875ms)
+  ✔ aldehyde: CCCCC=O shows m/z 44 (150.4692ms)
+  ✔ 2-alkanone: CCCC(=O)C shows m/z 58 (62.0132ms)
+  ✔ nitrile: CCCCC#N shows m/z 41 (50.3383ms)
+  ✔ primary amide: CCCC(=O)N shows m/z 59 (92.661ms)
+  ✔ no gamma hydrogen, no McLafferty ion (acetic acid, pivalic acid) (186.9957ms)
+✔ McLafferty ion m/z (acceptor fragment + the transferred H) (30607.6165ms)
+▶ base-peak certainty
+  ✔ saturated aliphatic halide/alcohol/ether are unreliable and the molecular ion is not forced to dominate a long chain (539.4166ms)
+  ✔ benzylic and acetate classes are supported (188.1719ms)
+  ✔ alcohol alpha cleavage favours loss of the largest alkyl radical (91.2406ms)
+✔ base-peak certainty (820.2541ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ McLafferty: eligible structures give the hand-derived m/z
+  ✔ hexanoic acid (764.8012ms)
+  ✔ methyl hexanoate (6.1527ms)
+  ✔ ethyl butanoate (3.1223ms)
+  ✔ hexanenitrile (8.7511ms)
+  ✔ butanal (7.2953ms)
+  ✔ heptan-2-one (6.1703ms)
+  ✔ pentanamide (6.2663ms)
+  ✔ butyrophenone (54.2665ms)
+✔ McLafferty: eligible structures give the hand-derived m/z (11791.734ms)
+▶ McLafferty: ineligible structures give none
+  ✔ propanal (no gamma carbon) (11.7463ms)
+  ✔ acetone (4.1593ms)
+  ✔ pentan-3-one (ethyl groups: no gamma) (5.1805ms)
+  ✔ 2-methylpropanal (no gamma) (4.9451ms)
+  ✔ benzaldehyde (aromatic acceptor side, no sp3 alpha) (6.5396ms)
+  ✔ acetophenone (8.4006ms)
+  ✔ cyclohexanone (alpha-beta bond is in a ring: no neutral alkene can leave) (6.3488ms)
+  ✔ acetic acid (4.4344ms)
+  ✔ tert-butyl acetate (gamma carbons exist only on the alkoxy side, not the acyl side) (8.9302ms)
+✔ McLafferty: ineligible structures give none (66.0856ms)
+▶ McLafferty: mass and charge bookkeeping
+  ✔ CCCCCC(=O)O: M - ion = neutral CnH2n (10.2288ms)
+  ✔ CCCCCC(=O)OC: M - ion = neutral CnH2n (5.656ms)
+  ✔ CCCC(=O)OCC: M - ion = neutral CnH2n (7.4334ms)
+  ✔ CCCCCC#N: M - ion = neutral CnH2n (5.0372ms)
+  ✔ CCCC=O: M - ion = neutral CnH2n (4.0638ms)
+  ✔ CCCCCC(C)=O: M - ion = neutral CnH2n (4.6453ms)
+  ✔ CCCCC(N)=O: M - ion = neutral CnH2n (2.4123ms)
+  ✔ CCCCCCCC(=O)O: M - ion = neutral CnH2n (5.2218ms)
+  ✔ CCCCCCC(C)=O: M - ion = neutral CnH2n (5.4886ms)
+  ✔ every McLafferty peak is reported as heuristic-intensity fragment with an explanation that says so (10.7042ms)
+✔ McLafferty: mass and charge bookkeeping (68.4664ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+✔ a methyl diazine cannot produce a six-carbon phenyl ion (7658.6322ms)
+✔ duplicate descriptions of one direct-cleavage ion do not inflate its abundance (1.3669ms)
+✔ new rearrangement candidates conserve composition without invented intensities (13.5383ms)
+✔ unsupported isotope, charge, branched alcohol and polycycle inputs do not get linear-chain candidates (17.8148ms)
+✔ the result separates unranked candidates from chart intensities and certainty (238.8717ms)
+✔ unranked competing channels prevent a supported base-peak claim (35.9866ms)
+✔ saved candidate compositions round-trip; malformed candidates are rejected (223.6486ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ electrophilic aromatic substitution keeps ortho and para and does not rank them
+  ✔ toluene gives o- and p-nitrotoluene and no meta isomer (2323.274ms)
+  ✔ anisole and chlorobenzene (ortho/para directors) give both positions (72.1779ms)
+  ✔ meta directors still give only the meta product (82.8841ms)
+  ✔ no outcome is labelled major or minor: the ortho:para ratio is not predicted (36.7727ms)
+  ✔ the rule no longer claims para is preferred (1.7516ms)
+  ✔ a fully equivalent substrate still gives one product (p-xylene) (26.153ms)
+  ✔ fused rings fall back to unranked enumeration (naphthalene keeps both positions) (66.9082ms)
+  ✔ other EAS electrophiles share the behaviour (bromination of toluene) (31.0676ms)
+✔ electrophilic aromatic substitution keeps ortho and para and does not rank them (5579.7129ms)
+▶ E2/E1: Zaitsev and Hofmann alkenes are both kept and ranked only where the sources support it
+  ✔ small alkoxide on 2-bromo-2,3-dimethylbutane: tetrasubstituted alkene major, terminal alkene minor (Reusch 80:20) (68.8263ms)
+  ✔ tert-butoxide on the same tertiary bromide: terminal alkene major, the Zaitsev alkene stays competitive (Reusch 25:75) (48.9473ms)
+  ✔ 2-bromobutane + tert-butoxide: both alkenes kept, neither called major (documented cases are tertiary halides) (102.6037ms)
+  ✔ hydroxide / ethoxide on 2-bromobutane: 2-butene major, 1-butene minor (150.1298ms)
+  ✔ E1 dehydration of 3-methylbutan-2-ol: the shifted, tertiary-derived alkene is offered and is the major one (242.3346ms)
+  ✔ ring substrates are not ranked (anti-periplanar access decides, not substitution) (116.8354ms)
+  ✔ a conjugated alternative is not outranked by substitution count (2-bromo-1-phenylpropane) (179.9833ms)
+  ✔ a single possible alkene stays a single, unlabelled outcome (tert-butyl bromide) (31.3798ms)
+  ✔ quaternary-ammonium Hofmann elimination keeps its documented single least-substituted product (8.423ms)
+✔ E2/E1: Zaitsev and Hofmann alkenes are both kept and ranked only where the sources support it (953.5548ms)
+▶ carbocation rearrangements in alkene hydration and HX addition
+  ✔ 3,3-dimethylbut-1-ene hydration lists the direct and the methyl-shifted alcohol, unranked (48.1602ms)
+  ✔ 3-methylbut-1-ene hydration lists the hydride-shifted tertiary alcohol as well (36.5726ms)
+  ✔ HCl adds with the same two outcomes (textbook: about an equal mixture, so unranked) (36.9183ms)
+  ✔ no downhill shift exists for propene or 1-butene: one product, as before (31.1077ms)
+  ✔ an already tertiary Markovnikov product does not rearrange (2-methylbut-2-ene) (45.3605ms)
+  ✔ rules without the ionic mechanism are unaffected: hydroboration and oxymercuration of 3,3-dimethylbut-1-ene (27.2562ms)
+  ✔ peroxide HBr (radical) does not rearrange (13.8997ms)
+  ✔ stereochemistry elsewhere in the molecule is not invented: no chirality tag appears on a rearranged product (40.953ms)
+✔ carbocation rearrangements in alkene hydration and HX addition (281.471ms)
+▶ Friedel-Crafts alkylation lists carbocation-rearranged products
+  ✔ benzene + neopentyl chloride gives neopentylbenzene and 2-methyl-2-phenylbutane (55.4591ms)
+  ✔ benzene + 1-chloropropane gives propyl- and isopropylbenzene (hydride shift) (65.9428ms)
+  ✔ tert-butyl chloride cannot rearrange further: one product (47.4451ms)
+  ✔ benzene + isopropyl chloride: one product (26.432ms)
+  ✔ rearranged products are not labelled major or minor by the ring-position model (29.9098ms)
+  ✔ the rule text no longer says the rearrangement is unmodelled (0.4295ms)
+✔ Friedel-Crafts alkylation lists carbocation-rearranged products (226.7009ms)
+▶ the Reactions-page layer shows the same alternatives for a single drawn molecule
+  ✔ acid hydration of 3,3-dimethylbut-1-ene on the page offers both alcohols (1800.8011ms)
+  ✔ nitration of toluene on the page offers ortho and para (667.6623ms)
+✔ the Reactions-page layer shows the same alternatives for a single drawn molecule (2469.2142ms)
+▶ epoxide opening by hydrogen halides follows the sourced regiochemistry (LibreTexts Wade 15.08, Nassau 8.14)
+  ✔ primary/secondary epoxide carbons: the halide attacks the LESS substituted carbon (propylene oxide gives 1-bromopropan-2-ol) (48.3536ms)
+  ✔ one tertiary epoxide carbon: the halide attacks the tertiary carbon (19.962ms)
+  ✔ the rule holds for HCl and HI too (15.3836ms)
+  ✔ a symmetric epoxide gives one constitution, and stereo-defined ones keep the inversion rule (12.1398ms)
+  ✔ other openings are unchanged: methoxide still attacks the less substituted carbon, acid/methanol the more substituted one (86.0479ms)
+  ✔ the rule text no longer claims the more substituted carbon is attacked (0.4739ms)
+✔ epoxide opening by hydrogen halides follows the sourced regiochemistry (LibreTexts Wade 15.08, Nassau 8.14) (183.089ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ names and SMILES
+  ✔ [engine] a chemical name resolves through the existing name lookup, unchanged (166.1316ms)
+  ✔ [engine] a single-molecule SMILES is validated by RDKit and normalised (1.5648ms)
+  ✔ [engine] the smiles: prefix forces SMILES and is not part of the structure (0.9675ms)
+✔ names and SMILES (2588.5943ms)
+▶ dot-separated starting materials
+  ✔ [engine] p-cresol . bromomethane . acetylene load as three separate components (7.2122ms)
+  ✔ [engine] no component is duplicated or merged: the same molecule twice stays two components (0.9002ms)
+  ✔ [engine] the target editor rejects multiple components outright instead of dropping any (3.4643ms)
+  ✔ [engine] the error for a multi-component target says what happened (0.8712ms)
+✔ dot-separated starting materials (12.961ms)
+▶ structure fidelity
+  ✔ [engine] explicit stereochemistry is kept; enantiomers and E/Z stay distinct (4.7366ms)
+  ✔ [engine] aromaticity is represented consistently (Kekulé input becomes aromatic) (2.0907ms)
+  ✔ [engine] formal charges and isotopes are preserved (1.4386ms)
+  ✔ [engine] explicit-hydrogen and ordinary forms of the same molecule have one identity (3.8953ms)
+  ✔ [engine] a database entry written with explicit hydrogens loads in the ordinary form, the stored entry untouched (0.6605ms)
+✔ structure fidelity (13.3541ms)
+▶ ambiguous and invalid input
+  ✔ [engine] a short string that is both a SMILES and a different database name is rejected, never chosen silently (0.9571ms)
+  ✔ [engine] when SMILES and name describe the same structure there is nothing to choose between (0.5828ms)
+  ✔ [engine] invalid SMILES, unknown names, spaces and empty input get clear, distinct errors (0.8097ms)
+  ✔ [engine] text RDKit would read as a SMILES plus a title is not accepted as a SMILES (0.165ms)
+  ✔ [engine] valence errors are invalid SMILES (0.8173ms)
+  ✔ [engine] a failing name database does not block SMILES, but is reported when it matters (0.6837ms)
+✔ ambiguous and invalid input (4.3273ms)
+▶ loading into the editor: Replace and Add
+  ✔ [engine] Replace swaps the whole content, components together (1.484ms)
+  ✔ [engine] Add keeps existing content and adds each component as its own fragment (0.9417ms)
+  ✔ [engine] without addFragment, Add appends to the current SMILES instead of replacing it (0.7214ms)
+  ✔ [source] the drawer says 'Chemical name or SMILES', refuses a second molecule in a single-molecule editor, and the target uses it (1.2651ms)
+  ✔ [engine] Add of separate names keeps every earlier material (one fragment each) (1.7712ms)
+  ✔ [engine] Add of separate SMILES keeps earlier materials, stereochemistry and components (0.968ms)
+  ✔ [engine] Add of a dot-separated SMILES appends every component, and Replace still replaces all (1.8087ms)
+  ✔ [engine] Add keeps duplicates as separate drawn molecules (inventory = one copy per drawn molecule) (0.511ms)
+  ✔ [source] Add is enabled only for the starting-material editor; target and other pages are unchanged (4.3654ms)
+✔ loading into the editor: Replace and Add (14.4176ms)
+▶ real name database and editor-to-synthesis transfer
+  ✔ [engine] existing name behavior: common and IUPAC names still resolve from the offline index (7863.5952ms)
+  ✔ [engine] the starting materials and target from the task are accepted as SMILES (14.443ms)
+  ✔ [engine] the same three materials entered by name or by SMILES reach the synthesis page identically (22.6429ms)
+  ✔ [engine] short real strings are never silently resolved to a conflicting reading (10.8317ms)
+  ✔ [engine] one trivial search runs from an explicit-hydrogen start exactly as from the ordinary form (1417.4721ms)
+✔ real name database and editor-to-synthesis transfer (9331.9703ms)
+▶ short aliases and name display
+  ✔ [engine] a SMILES-looking synonym that expands to a far larger molecule is refused, with a case hint (5.9519ms)
+  ✔ [engine] the policy is size-based, not a list: real abbreviations, formulas and exact primary names still resolve (11.1115ms)
+  ✔ [engine] SMILES stays case-sensitive and the smiles: prefix still forces SMILES (13.7717ms)
+  ✔ [engine] real index: cc / CC / CO / Cl / O / smiles:CC behave by one policy (23.5147ms)
+  ✔ [engine] chemical names are shown as plain text: tags removed, entities decoded, nothing interpreted (1.0822ms)
+✔ short aliases and name display (61.7263ms)
+▶ starting-material inventory
+  ✔ [engine] each drawn component is its own supplied material; duplicates are never merged (0.6299ms)
+✔ starting-material inventory (1.1501ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ asLookupFailure
+  ✔ an Error is passed on unchanged (same object, same message, same cause) (0.7277ms)
+  ✔ anything else becomes the plain user-facing message with the original value kept as cause (0.4127ms)
+✔ asLookupFailure (2403.6227ms)
+▶ a failing database read versus a name that is not found
+  ✔ [engine] a database that cannot be read is an Error, not a 'not found'; the message is the existing one (1.0688ms)
+  ✔ [engine] the input layer still reports it as lookup-failed (valid SMILES still load, with a note) (176.077ms)
+  ✔ [engine] a real database still distinguishes 'not found' from a failure, and still resolves names (6868.581ms)
+  ✔ [source] the module has no other place that rethrows a replacement error without its cause (4.7095ms)
+✔ a failing database read versus a name that is not found (7052.5319ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ real workspaces are plain data and validate
+  ✔ [engine] a convergent workspace with its assessment round-trips through validation unchanged (25.1882ms)
+  ✔ [engine] failed and pending attempts survive with their explanations and statuses (2.4703ms)
+  ✔ [engine] inputs (the action log and selection) validate (0.9705ms)
+  ✔ malformed inputs are rejected (0.7102ms)
+✔ real workspaces are plain data and validate (6889.1049ms)
+▶ a damaged or inconsistent workspace is never shown as whole
+  ✔ a step that names a lot which does not exist (3.6246ms)
+  ✔ a consumed lot without the step that consumed it (1.4989ms)
+  ✔ records that do not match the committed steps (2.1402ms)
+  ✔ history that claims more completed steps than the shelf recorded (1.2444ms)
+  ✔ a failed attempt that claims to have consumed material (0.9568ms)
+  ✔ duplicate lot ids, bad roles and a wrong assessment shape (5.8517ms)
+  ✔ the supplied-copy count must match the starting materials (3.6255ms)
+✔ a damaged or inconsistent workspace is never shown as whole (20.8475ms)
+▶ automatic workspace recovery
+  ✔ [engine] a workspace saved before a restart is restored exactly, with nothing recomputed (24.7392ms)
+  ✔ [engine] a workspace saved while a step is pending a choice restores as pending, unconsumed (6.7333ms)
+  ✔ results that fail validation are dropped but the action log is kept so the workspace can be recomputed (173.7708ms)
+  ✔ an engine-version mismatch is flagged and the saved result is not rewritten (3.9933ms)
+  ✔ clearing deletes the saved workspace (4.3355ms)
+✔ automatic workspace recovery (214.5349ms)
+▶ Saved Analyses library
+  ✔ [engine] saving and opening a workspace gives back the same steps, lots and assessment (10.3774ms)
+  ✔ a saved analysis is a copy: later changes to the live workspace do not reach it (2.526ms)
+  ✔ the app registers the page, opens it on the Multi-Catalytic page, and lists it as openable (4.2427ms)
+  ✔ the description counts molecules, completed steps and steps that did not complete (0.3769ms)
+  ✔ older saved analyses of other pages still open (the new page changed nothing for them) (4.0854ms)
+✔ Saved Analyses library (22.4268ms)
+▶ presentation wording
+  ✔ a single offered outcome is never described as major (1.3949ms)
+  ✔ verification wording never claims experimental validation (0.7679ms)
+  ✔ [engine] every non-reaction status has a visible heading that says nothing was consumed or run (0.5508ms)
+  ✔ [engine] pendingSelection finds a trailing choice and nothing else (1.546ms)
+  ✔ [engine] lot labels and origins describe provenance in plain words (0.9038ms)
+✔ presentation wording (5.8992ms)
+▶ page structure
+  ✔ the original ordered-sequence tool is still present and uses its own editor (1.3629ms)
+  ✔ restoring a workspace never runs a reaction (0.4363ms)
+  ✔ leaving the page waits for a running step before the final save (0.3492ms)
+  ✔ steps run through the engine one at a time (0.3453ms)
+✔ page structure (3.0142ms)
+▶ accepted: alternative spellings of the same structure
+  ✔ (R)-butan-2-ol = (2R)-butan-2-ol (2.5023ms)
+  ✔ ethanoic acid = acetic acid (0.2881ms)
+  ✔ methyl ethanoate = methyl acetate (0.242ms)
+  ✔ ethyl methanoate = ethyl formate (0.1852ms)
+  ✔ 1-(2-methylpropyl)benzene = 1-2-methylpropylbenzene (0.2955ms)
+  ✔ cyclohex-1-ene = cyclohexene (0.1912ms)
+  ✔ trans-(1R,2R)-cyclohexane-1,2-diol = (1R,2R)-cyclohexane-1,2-diol (0.17ms)
+  ✔ (2E)-but-2-ene = (E)-but-2-ene (0.1119ms)
+  ✔ trans-cyclohexane-1,2-diol = trans-cyclohexane-1,2-diol (0.2807ms)
+  ✔ sodium ethanoate = sodium acetate (0.3964ms)
+  ✔ 1-phenylethan-1-one = 1-phenylethanone (1.5337ms)
+  ✔ ethanedioic acid = oxalic acid (0.2176ms)
+  ✔ 2-methoxy-4-(prop-2-en-1-yl)phenol = 2-methoxy-4-prop-2-enylphenol (0.1862ms)
+✔ accepted: alternative spellings of the same structure (8.8312ms)
+▶ rejected: names of different molecules
+  ✔ (R)-butan-2-ol != (S)-butan-2-ol (0.4197ms)
+  ✔ (2E)-but-2-ene != (2Z)-but-2-ene (0.1661ms)
+  ✔ (1R,2R)-cyclohexane-1,2-diol != (1R,2S)-cyclohexane-1,2-diol (0.1769ms)
+  ✔ (2R,3S)-butane-2,3-diol != (2S,3R)-butane-2,3-diol (0.0617ms)
+  ✔ cis-cyclohexane-1,2-diol != trans-cyclohexane-1,2-diol (0.0552ms)
+  ✔ methyl ethanoate != ethyl methanoate (0.049ms)
+  ✔ propan-1-ol != propan-2-ol (0.0456ms)
+  ✔ 2-methylbutane != 2-methylpropane (0.0371ms)
+  ✔ ethanoic acid != methanoic acid (0.0522ms)
+  ✔ cyclohexanone != cyclohexanol (0.0437ms)
+  ✔ 2-chloropropane != 1-chloropropane (0.0417ms)
+  ✔ (R)-butan-2-ol != butan-2-ol (0.0402ms)
+  ✔ sodium methanoate != sodium acetate (0.0855ms)
+  ✔ ethanedioic acid != propanedioic acid (0.0944ms)
+  ✔ 1-phenylethan-1-ol != 1-phenylethanone (0.1152ms)
+✔ rejected: names of different molecules (1.9309ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ lowest locants
+  ✔ CC(C)CC(C)(C)C is 2,2,4-trimethylpentane (812.5874ms)
+  ✔ CC(C)(C)CC(C)C is 2,2,4-trimethylpentane (21.3188ms)
+  ✔ CCC(C)(C)CC(C)C is 2,4,4-trimethylhexane (23.6472ms)
+  ✔ CC(C)C(C)(C)C is 2,2,3-trimethylbutane (35.9268ms)
+  ✔ CCC(C)C(C)C is 2,3-dimethylpentane (44.3192ms)
+✔ lowest locants (5750.274ms)
+▶ small heterocycles number the heteroatom as 1 and give the substituents the lowest locants
+  ✔ CC1OC1(C)C is 2,2,3-trimethyloxirane (48.7186ms)
+  ✔ CCC1(C)CO1 is 2-ethyl-2-methyloxirane (22.3115ms)
+  ✔ CC1CN1 is 2-methylaziridine (13.9103ms)
+  ✔ CC1CCO1 is 2-methyloxetane (11.546ms)
+  ✔ Cc1cccs1 is 2-methylthiophene (15.0782ms)
+  ✔ O=Cc1ccco1 is furan-2-carbaldehyde (15.2093ms)
+✔ small heterocycles number the heteroatom as 1 and give the substituents the lowest locants (128.2587ms)
+▶ naphthalene is recognised, with substituent locants
+  ✔ c1ccc2ccccc2c1 is naphthalene (26.3793ms)
+  ✔ Cc1ccc2ccccc2c1 is 2-methylnaphthalene (26.6338ms)
+  ✔ Cc1cccc2ccccc12 is 1-methylnaphthalene (22.3124ms)
+  ✔ Brc1cccc2c(Cl)cccc12 is 1-bromo-5-chloronaphthalene (22.0398ms)
+✔ naphthalene is recognised, with substituent locants (99.9204ms)
+▶ a non-principal aldehyde in the chain is an oxo group, not a second carbon
+  ✔ OC(=O)CCC=O is 4-oxobutanoic acid (38.5029ms)
+  ✔ O=CCCC(=O)OC is methyl 4-oxobutanoate (40.2841ms)
+  ✔ O=CCC(=O)C is 3-oxobutanal (25.7999ms)
+✔ a non-principal aldehyde in the chain is an oxo group, not a second carbon (106.4732ms)
+▶ structures the builders cannot name are reported as unsupported, not named wrongly
+  ✔ cyclohexene oxide (fused epoxide): status unsupported and no name shown as an answer (46.4773ms)
+  ✔ substituted cyclohexene oxide: status unsupported and no name shown as an answer (18.0163ms)
+  ✔ cubane: status unsupported and no name shown as an answer (36.5356ms)
+  ✔ 18-crown-6: status unsupported and no name shown as an answer (41.2352ms)
+  ✔ spiro[4.5]decane: status unsupported and no name shown as an answer (40.4097ms)
+  ✔ spiro ketal: status unsupported and no name shown as an answer (34.1119ms)
+  ✔ alpha-pinene (bridged, substituted): status unsupported and no name shown as an answer (28.4397ms)
+  ✔ acetone-d6 (isotope labels): status unsupported and no name shown as an answer (13.6375ms)
+  ✔ bicyclohexyl (ring assembly): status unsupported and no name shown as an answer (30.6002ms)
+  ✔ biphenyl (ring assembly): status unsupported and no name shown as an answer (17.092ms)
+  ✔ diphenylmethane: status unsupported and no name shown as an answer (58.3757ms)
+  ✔ methylidenecyclopentane (exocyclic C=C): status unsupported and no name shown as an answer (17.6822ms)
+✔ structures the builders cannot name are reported as unsupported, not named wrongly (384.2418ms)
+▶ negative controls: names that were right stay right
+  ✔ CCO (23.8601ms)
+  ✔ Cc1ccccc1 (24.7265ms)
+  ✔ COc1ccccc1 (15.2583ms)
+  ✔ c1ccc2[nH]cnc2c1 (11.0734ms)
+  ✔ c1ccc2ncccc2c1 (11.5821ms)
+  ✔ C1CC2CCC1C2 (15.952ms)
+  ✔ CC=CC (10.3318ms)
+  ✔ C1CCOC1 (17.6145ms)
+  ✔ CCS (18.123ms)
+✔ negative controls: names that were right stay right (149.7383ms)
+▶ formula, isotopes and degrees of unsaturation
+  ✔ [13CH4]: [13C]H4, DBE 0 (14.7561ms)
+  ✔ [2H]C(Cl)(Cl)Cl: C[2H]Cl3, DBE 0 (19.442ms)
+  ✔ [13CH3]C(=O)O: C[13C]H4O2, DBE 1 (19.4557ms)
+  ✔ [2H]O[2H]: [2H]2O, DBE 0 (14.5716ms)
+  ✔ CC(=O)[O-]: C2H3O2, DBE 1 (14.2896ms)
+  ✔ [NH4+]: H4N, DBE 0 (13.8396ms)
+  ✔ c1ccc(cc1)P(c1ccccc1)c1ccccc1: C18H15P, DBE 12 (32.7064ms)
+  ✔ CC(=O)O: C2H4O2, DBE 1 (19.203ms)
+  ✔ c1ccccc1: C6H6, DBE 4 (20.3312ms)
+✔ formula, isotopes and degrees of unsaturation (169.7991ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ two-carbon unsaturated substituents are ethenyl and ethynyl (P-32.3.2)
+  ✔ C#Cc1ccccc1C is 1-ethynyl-2-methylbenzene (838.5873ms)
+  ✔ C=Cc1ccccc1C is 1-ethenyl-2-methylbenzene (41.3797ms)
+  ✔ C=CC1CCCCC1 is ethenylcyclohexane (47.7626ms)
+  ✔ C#CC1CCCCC1 is ethynylcyclohexane (69.8708ms)
+  ✔ C#Cc1ccc(Cl)cc1 is 1-chloro-4-ethynylbenzene (152.7613ms)
+  ✔ C=Cc1ccc(C=C)c(C)c1 is 1,4-diethenyl-2-methylbenzene (148.2588ms)
+✔ two-carbon unsaturated substituents are ethenyl and ethynyl (P-32.3.2) (7333.3618ms)
+▶ the terminal e of a ring parent is kept before a consonant suffix and lost before a vowel (P-16.7.1)
+  ✔ O=C1CCCC(=O)O1 is oxane-2,6-dione (83.3501ms)
+  ✔ O=C1COC(=O)CO1 is 1,4-dioxane-2,5-dione (91.96ms)
+  ✔ O=C1CCCO1 is oxolan-2-one (48.3251ms)
+  ✔ O=C1CCCN1 is pyrrolidin-2-one (55.3533ms)
+✔ the terminal e of a ring parent is kept before a consonant suffix and lost before a vowel (P-16.7.1) (281.2898ms)
+▶ aryl ketones are ketones: the chain bearing C=O is the parent and the ring is a (substituted) phenyl prefix (P-64.3)
+  ✔ CC(=O)c1ccccc1O is 1-(2-hydroxyphenyl)ethan-1-one (65.0167ms)
+  ✔ CC(=O)c1ccc(Cl)cc1 is 1-(4-chlorophenyl)ethan-1-one (130.0788ms)
+  ✔ CCC(=O)c1ccccc1 is 1-phenylpropan-1-one (92.7274ms)
+  ✔ CC(C)C(=O)c1ccccc1 is 2-methyl-1-phenylpropan-1-one (98.7805ms)
+  ✔ CC(=O)Cc1ccccc1 is 1-phenylpropan-2-one (27.0835ms)
+  ✔ O=C(c1ccccc1)CCl is 2-chloro-1-phenylethan-1-one (50.1703ms)
+✔ aryl ketones are ketones: the chain bearing C=O is the parent and the ring is a (substituted) phenyl prefix (P-64.3) (466.1476ms)
+✔ an unsymmetrical diaryl ketone cites both aryl groups (parentheses optional in 2013 usage) (161.4683ms)
+▶ benzophenone-type and one-carbon parents carry no locants (P-14.3.4.2)
+  ✔ O=C(c1ccccc1)c1ccccc1 (151.0768ms)
+  ✔ ClC(Cl)Cl (101.6629ms)
+  ✔ ClCCl (89.496ms)
+  ✔ BrC(Cl)F (48.2646ms)
+  ✔ ClC(Cl)(Cl)Cl (37.6914ms)
+✔ benzophenone-type and one-carbon parents carry no locants (P-14.3.4.2) (433.4713ms)
+▶ a ketone locant is always cited unless the parent has one carbon (P-64.3)
+  ✔ CC(C)=O is propan-2-one (53.7748ms)
+  ✔ CC(=O)CC is butan-2-one (48.3216ms)
+  ✔ CC(=O)CBr is 1-bromopropan-2-one (88.8461ms)
+  ✔ ClCC(=O)CCl is 1,3-dichloropropan-2-one (49.8231ms)
+✔ a ketone locant is always cited unless the parent has one carbon (P-64.3) (242.5549ms)
+▶ a ring ketone carries the suffix on the ring, not an acyclic chain (cyclohexanone was withheld as 'hexan-1-one')
+  ✔ O=C1CCCCC1 is cyclohexanone (47.5158ms)
+  ✔ O=C1CCCC1 is cyclopentanone (92.7089ms)
+  ✔ CC1CCCC(=O)C1 is 3-methylcyclohexanone (104.2887ms)
+  ✔ O=C1CCCCC1C is 2-methylcyclohexanone (170.0419ms)
+  ✔ O=C1C=C(C)CCC1 is 3-methylcyclohex-2-enone (69.2835ms)
+  ✔ CC1=CC[C@H](CC1=O)C(=C)C is (R)-2-methyl-5-(prop-1-en-2-yl)cyclohex-2-enone (53.4299ms)
+✔ a ring ketone carries the suffix on the ring, not an acyclic chain (cyclohexanone was withheld as 'hexan-1-one') (540.5752ms)
+▶ a ketone, not an aldehyde, is the principal group of an enone (principal group gets the lowest locant, P-31.1.4)
+  ✔ CC(=O)C=C is but-3-en-2-one (30.7133ms)
+  ✔ CC=CC(C)=O is pent-3-en-2-one (19.5902ms)
+  ✔ CC(=O)C=C(C)C is 4-methylpent-3-en-2-one (41.2896ms)
+  ✔ C=CC(=O)CC is pent-1-en-3-one (102.0851ms)
+✔ a ketone, not an aldehyde, is the principal group of an enone (principal group gets the lowest locant, P-31.1.4) (196.7719ms)
+▶ three or more acid groups are cited as -carboxylic acids on the carbon skeleton (P-44.1.1, P-65.1.1)
+  ✔ OC(=O)CC(CC(=O)O)C(=O)O (151.5231ms)
+  ✔ OC(=O)CC(C(=O)O)C(C(=O)O)CC(=O)O (176.9332ms)
+  ✔ OC(=O)CCC(C(=O)O)C(=O)O (72.9716ms)
+  ✔ OC(=O)C(O)(CC(=O)O)CC(=O)O (59.344ms)
+  ✔ two acid groups stay a -dioic acid (83.0307ms)
+✔ three or more acid groups are cited as -carboxylic acids on the carbon skeleton (P-44.1.1, P-65.1.1) (545.8351ms)
+▶ salts name the cation (P-73)
+  ✔ CC(=O)[O-].[Na+] is sodium ethanoate (14.8231ms)
+  ✔ CCCC(=O)[O-].[K+] is potassium butanoate (9.7022ms)
+  ✔ O=C([O-])c1ccccc1.[Na+] is sodium benzoate (10.9185ms)
+  ✔ [NH4+].[Cl-] is azanium chloride (10.5532ms)
+  ✔ [Na+].[Br-] is sodium bromide (7.8676ms)
+  ✔ [Li+].[I-] is lithium iodide (18.7332ms)
+  ✔ the common alias keeps the cation (18.163ms)
+  ✔ a component is never silently dropped: an unrecognised mixture is withheld (73.2928ms)
+✔ salts name the cation (P-73) (165.4238ms)
+▶ a name that drops part of the structure is withheld, not shown
+  ✔ N-N bond (phenylhydrazine read as aniline) (75.4ms)
+  ✔ a C=O the ring builder lost (acylpyridine read as alkylpyridine) (33.4879ms)
+  ✔ an aromatic heteroatom the name never mentions (triazine read as benzene) (26.853ms)
+  ✔ multiple bonds the structure does not have (benzhydrol read as a polyene) (87.5212ms)
+  ✔ a diacid with a double bond is no longer called acrylic acid (24.9855ms)
+✔ a name that drops part of the structure is withheld, not shown (249.1615ms)
+▶ a template parent may not swallow a further fused ring
+  ✔ anthracene is anthracene, not a substituted naphthalene (43.0404ms)
+  ✔ a methylanthracene is withheld rather than called a naphthalene (59.5473ms)
+  ✔ naphthalene itself and a simple substituted naphthalene are unchanged (39.9151ms)
+✔ a template parent may not swallow a further fused ring (143.3155ms)
+▶ conjugated-carbonyl classification (root cause of the enone numbering defect)
+  ✔ a methyl vinyl ketone is an enone, not acrolein (12.6527ms)
+  ✔ acrylic acid is CH2=CH-COOH only (36.6212ms)
+✔ conjugated-carbonyl classification (root cause of the enone numbering defect) (49.6306ms)
+▶ names that were already right are unchanged (regression guard)
+  ✔ CC(C)CC(C)(C)C is 2,2,4-trimethylpentane (25.9269ms)
+  ✔ CCO is ethanol (17.1701ms)
+  ✔ C=CC=C is buta-1,3-diene (20.5222ms)
+  ✔ CC(=O)O is ethanoic acid (16.3523ms)
+  ✔ OC(=O)c1ccc(Cl)cc1 is 4-chlorobenzoic acid (19.4774ms)
+  ✔ CC(=O)Oc1ccccc1 is phenyl ethanoate (16.0899ms)
+  ✔ CC(C)(O)c1ccccc1 is 2-phenylpropan-2-ol (14.4144ms)
+  ✔ CC(=O)CCc1ccc(Cl)cc1 is 4-(4-chlorophenyl)butan-2-one (17.3933ms)
+  ✔ ClCC(Cl) is 1,2-dichloroethane (9.4142ms)
+  ✔ CC(Cl)C(Br)CC is 3-bromo-2-chloropentane (11.1742ms)
+✔ names that were already right are unchanged (regression guard) (169.2844ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ two-ring molecules named with a single ring stem are withheld
+  ✔ CN1CCCC1c1cccnc1 abstains instead of a chain name (783.148ms)
+  ✔ C1CCNC1c1cccnc1 abstains instead of a chain name (43.1758ms)
+✔ two-ring molecules named with a single ring stem are withheld (6347.6323ms)
+▶ negative controls: correct single-ring and multiplied names are kept
+  ✔ c1ccncc1 (13.6643ms)
+  ✔ CN1CCCC1 (13.8481ms)
+  ✔ Cc1ccc(C)nc1 (11.4456ms)
+  ✔ NCCCCN (28.2721ms)
+  ✔ C1CCC(CC1)C1CCCCC1 (59.788ms)
+✔ negative controls: correct single-ring and multiplied names are kept (128.1518ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ workspace store
+  ✔ [store] saves and loads a record; a simulated reload (new store, same disk) recovers it (3.5965ms)
+  ✔ [store] pages are independent: saving, clearing or corrupting one never touches another (0.4587ms)
+  ✔ [store] malformed records are corrupt, set aside and removed, never half-loaded (0.4371ms)
+  ✔ [store] a newer schema is incompatible (kept aside); older schemas migrate; a missing migration is incompatible (0.4377ms)
+  ✔ [store] oversized, quota, unavailable and unserializable writes fail safely and do not throw (0.9509ms)
+  ✔ [store] the persisted record never contains runtime objects (source guard) (0.9493ms)
+✔ workspace store (2475.9287ms)
+▶ workspace persistence lifecycle
+  ✔ [lifecycle] nothing is written before recovery finishes (empty defaults cannot overwrite saved work) (0.7531ms)
+  ✔ [lifecycle] saved work is recovered; saving the recovered state again writes nothing new (0.8575ms)
+  ✔ [lifecycle] between reading a saved record and the page applying it, nothing is written (defaults cannot replace it) (0.4373ms)
+  ✔ [lifecycle] a failed editor restore can stop saving so the saved copy is never overwritten (0.3613ms)
+  ✔ [lifecycle] rapid changes are coalesced into one write (0.2447ms)
+  ✔ [stale] Clear during a slow recovery wins: the late record is never applied and is deleted (0.2774ms)
+  ✔ [reset] discard cancels a scheduled save, so a cleared page cannot be resurrected (0.2409ms)
+  ✔ [reset] a write that was already queued when Clear happens cannot land after it (0.2291ms)
+  ✔ [reset] capturing nothing removes the record (0.1997ms)
+  ✔ [failure] quota errors are reported, never thrown, and the next successful write clears the error (0.271ms)
+  ✔ [failure] results that are too large are dropped but the inputs are still saved, and the page is told (0.3532ms)
+  ✔ [failure] unavailable storage disables saving and does not break recovery (0.1689ms)
+  ✔ [versions] older-engine results are flagged, damaged results are dropped but inputs survive, damaged inputs are rejected (0.3572ms)
+  ✔ [lifecycle] leaving the page flushes the pending save instead of dropping it (0.1816ms)
+  ✔ [lifecycle] recover() is idempotent (StrictMode double effects) and sees one read (0.2116ms)
+  ✔ [pages] two controllers on two pages keep independent records and lifecycles (0.2853ms)
+✔ workspace persistence lifecycle (6.1477ms)
+▶ structure fidelity and input/result consistency
+  ✔ [structure] KET text survives the store byte-for-byte, including stereo wedges, isotopes, charges and components (190.206ms)
+  ✔ [structure] the identity key sees stereochemistry, isotopes, charges and components but not coordinates or order (9.3772ms)
+  ✔ [consistency] the input key changes with structures or the copies setting, so old results are not treated as current (0.1923ms)
+✔ structure fidelity and input/result consistency (200.1012ms)
+▶ synthesis workspace (one real, trivial route)
+  ✔ [results] a real route is plain data, survives the store unchanged and passes validation (2.2887ms)
+  ✔ [results] damaged, incomplete or oversized results are refused as a whole (1.4228ms)
+  ✔ [inputs] saved inputs are validated: type errors, non-KET text and oversized KET are rejected (0.693ms)
+  ✔ [status] only meaningful outcomes can be saved; errors and stalls are not results (0.3146ms)
+✔ synthesis workspace (one real, trivial route) (1139.611ms)
+CHIRALITY DEBUG {
+  atomIndex0Based: 1,
+  atomIndexDisplayed: 2,
+  element: 'C',
+  decision: 'ACCEPTED: stereo bond attached',
+  explicitH: 0,
+  implicitH: 1,
+  totalH: 1,
+  hasStereoBond: true,
+  neighbors: [
+    {
+      bondIndex: 0,
+      neighborAtomIndex: 1,
+      neighborElement: 'C',
+      bondOrder: 1,
+      stereoCode: 6,
+      ownedStereoBonds: [Array]
+    },
+    {
+      bondIndex: 1,
+      neighborAtomIndex: 3,
+      neighborElement: 'N',
+      bondOrder: 1,
+      stereoCode: 0,
+      ownedStereoBonds: [Array]
+    },
+    {
+      bondIndex: 2,
+      neighborAtomIndex: 4,
+      neighborElement: 'C',
+      bondOrder: 1,
+      stereoCode: 0,
+      ownedStereoBonds: [Array]
+    }
+  ],
+  substituents: [
+    {
+      atomIndexDisplayed: 1,
+      element: 'C',
+      prioritySignature: [Array],
+      vector: [Object]
+    },
+    {
+      atomIndexDisplayed: 3,
+      element: 'N',
+      prioritySignature: [Array],
+      vector: [Object]
+    },
+    {
+      atomIndexDisplayed: 4,
+      element: 'C',
+      prioritySignature: [Array],
+      vector: [Object]
+    },
+    {
+      atomIndexDisplayed: 'implicit H',
+      element: 'H',
+      prioritySignature: [Array],
+      vector: [Object]
+    }
+  ],
+  hasFourDifferentSubstituentPriorities: true
+}
+▶ properties workspace (one small real analysis)
+  ✔ [results] real Properties output is plain data, round-trips through the store unchanged and validates (8.1395ms)
+  ✔ [results] damaged Properties results and inputs are refused (43.6145ms)
+✔ properties workspace (one small real analysis) (2330.3408ms)
+▶ page integration
+  ✔ [source] Synthesis, Properties, Ranking, Spectroscopy, Reactions and the Multi-Catalytic workspace use persistence (the ordered-sequence tool does not) (61.1456ms)
+  ✔ [source] Clear and Reset discard the saved workspace and invalidate pending restoration (0.8917ms)
+  ✔ [source] progress updates never trigger a save: saves depend on settled state only (0.4484ms)
+  ✔ [source] results are marked as restored and never re-run automatically (0.3694ms)
+✔ page integration (64.8215ms)
+▶ IndexedDB backend
+  ✔ [idb] creates its store once, writes durably, reads, overwrites and deletes (45.4891ms)
+  ✔ [idb] a full WorkspaceStore works on it, including a simulated browser restart (6.0338ms)
+  ✔ [idb] quota and open failures become typed errors instead of exceptions (8.4294ms)
+  ✔ [idb] no IndexedDB at all means persistence is simply unavailable (3.965ms)
+✔ IndexedDB backend (66.1213ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ ranking workspace
+  ✔ [ranking] real comparison output is plain data and validates; up to five molecules round-trip exactly (16.9918ms)
+  ✔ [ranking] order and ties: the saved ranking equals what the same ordering code derives from the saved profiles (3.6322ms)
+  ✔ [ranking] compare-only modes keep insertion order and have no ranks (2.705ms)
+  ✔ [ranking] switching modes after a restore needs no recalculation: every mode's metric was saved (3.0548ms)
+  ✔ [ranking] validation: limit of five, duplicates, missing modes, unsafe SMILES, damaged shown-ranking (50.17ms)
+  ✔ [ranking] inputs: category, mode and the drawing are validated (3.4358ms)
+  ✔ [ranking] reload and page switching: state comes back from storage alone, and Clear all removes only ranking (14.027ms)
+  ✔ [ranking] a new molecule added after a restore changes only the saved list; others keep their saved profiles (13.2152ms)
+✔ ranking workspace (7059.382ms)
+▶ spectroscopy workspace
+  ✔ [spectroscopy] a real prediction is plain data; peaks, intensities and assignments survive a reload exactly (31.9564ms)
+  ✔ [spectroscopy] no rendered images are stored: the saved record is small and contains no SVG (5.5914ms)
+  ✔ [spectroscopy] only computed data is saved: no result means no spectra on restore (5.094ms)
+  ✔ [spectroscopy] the active tab and the ¹H zoom window are restored; invalid ones are rejected (0.9421ms)
+  ✔ [spectroscopy] damaged results are refused as a whole (14.0138ms)
+  ✔ [spectroscopy] editing the structure makes the key differ, so saved spectra are recognised as stale (27.9461ms)
+✔ spectroscopy workspace (86.7515ms)
+▶ shared lifecycle
+  ✔ [unmount] a save requested after the page was left is written at once (a late editor read is not lost) (0.8007ms)
+  ✔ [unmount] rapid switching: leave hooks finish the last read and save before the next mount reads storage (2.5031ms)
+  ✔ [debounce] DebouncedTask coalesces, can be flushed, waits for a running task and swallows its errors (1.2814ms)
+  ✔ [leave] hooks run together, a failing or hung hook cannot block navigation, unregistering works (33.8064ms)
+  ✔ [stale] a restore finishing after Clear/Reset is invalidated, and the editor restore never overwrites newer drawing (11.7206ms)
+  ✔ [failure] malformed, newer-format and oversized ranking/spectroscopy records are handled without throwing (3.6813ms)
+  ✔ [failure] quota exceeded on ranking results: reported, inputs kept when only results are too big, page keeps working (10.1805ms)
+  ✔ [failure] unavailable storage leaves both pages functional (nothing scheduled, status reports it) (1.2403ms)
+✔ shared lifecycle (67.0092ms)
+▶ page integration
+  ✔ [source] Ranking and Spectroscopy use the shared persistence layer; Multi-Catalytic does not (3.1086ms)
+  ✔ [source] restoring never recomputes: no analysis call in the restore code, previews are only re-rendered (2.7648ms)
+  ✔ [source] the ranking order comes from one shared function used by both display and restore (0.9818ms)
+  ✔ [source] autosave watches settled state only (no selections, plots, SVGs or progress) (3.2566ms)
+  ✔ [source] the page switch waits for every page's leave hook, and Synthesis/Properties use the same debounced mirror (4.6167ms)
+✔ page integration (15.9901ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ reactions workspace content
+  ✔ [results] real forward, multi-reactant and retrosynthesis output is plain data and validates (19.6313ms)
+  ✔ [results] a forward analysis survives a simulated browser restart exactly (products, mixtures, explanations, order) (18.226ms)
+  ✔ [stereo] the stereodefined input and every product keep their stereodescriptors byte-for-byte (3.8055ms)
+  ✔ [multi] disconnected reactants stay separate and every component molfile is kept (1.8432ms)
+  ✔ [needs-input] pathways that still need a reactant keep that status and the missing-reactant list (1.9927ms)
+  ✔ [retro] retrosynthetic routes keep precursors, confidence, alternatives and explanations (3.1304ms)
+  ✔ [outcomes] no-reaction and unsupported outcomes are saved as results, errors and unknown kinds are not (0.8153ms)
+  ✔ [validation] damaged results, a result mixing both modes, and unsafe inputs are refused (35.967ms)
+✔ reactions workspace content (8107.1911ms)
+▶ reactions recovery behavior
+  ✔ [restore] a reload returns the saved analysis from storage alone, with the saved mode and expansion (9.6681ms)
+  ✔ [stale] saved results are current only when the saved drawing is the structure they came from (0.3449ms)
+  ✔ [stale] an edited structure has a different identity, so edited input never inherits old results (15.6484ms)
+  ✔ [interrupted] a prediction that was running is recorded as interrupted, never as a finished result (0.7318ms)
+  ✔ [interrupted] an inputs-only record (a drawing but no prediction yet) restores no results (0.5912ms)
+  ✔ [versions] results from another engine version are flagged and kept as saved; damaged results are dropped but the drawing survives (4.0286ms)
+  ✔ [lifecycle] nothing is written between reading the saved record and the page applying it (1.863ms)
+✔ reactions recovery behavior (35.3066ms)
+▶ reactions clear, discard and stale restoration
+  ✔ [clear] Clear Analysis deletes only the reactions record and cancels a pending save (2.1404ms)
+  ✔ [discard] discarding while a slow restore is still reading wins: the late record is never applied (1.2919ms)
+  ✔ [stale-restore] a drawing made before the saved one arrives wins, and the editor is never overwritten (1.4405ms)
+  ✔ [switching] a last-moment edit is read and saved before the page unmounts; a late read is written at once (1.3957ms)
+✔ reactions clear, discard and stale restoration (6.7521ms)
+▶ reactions storage failures
+  ✔ [records] corrupt, wrong-page, newer-format and oversized reactions records never throw (1.369ms)
+  ✔ [records] unusable saved inputs are set aside and the page starts clean (0.6833ms)
+  ✔ [quota] results too large to store are dropped but the drawing is kept, and the page is told; a full quota is reported (2.3026ms)
+  ✔ [unavailable] without IndexedDB the page still works: nothing is scheduled and the status says so (0.3765ms)
+✔ reactions storage failures (5.1871ms)
+▶ reactions page integration
+  ✔ [source] the page uses the shared persistence layer, the leave gate and the resume-after-restore rule (0.8802ms)
+  ✔ [source] restoring never reruns a prediction (0.4232ms)
+  ✔ [source] restoring the drawing is not mistaken for an edit, and a newer drawing discards the restored results (0.3439ms)
+  ✔ [source] Clear Analysis discards the saved workspace; an unfinished prediction is saved as interrupted, not as a result (0.2828ms)
+  ✔ [source] autosave watches settled state only (no rendered drawings, status text or progress) (0.2976ms)
+  ✔ [source] the reaction engine and the other pages' storage are untouched by this stage (5.2651ms)
+✔ reactions page integration (8.0797ms)
+▶ reactions: "Use in Reactions" is an explicit, transactional action
+  ✔ [offer] a Properties analysis is offered only until this workspace has adopted it (0.6548ms)
+  ✔ [inputs] the adopted-analysis id is saved, defaults to none for older records, and is bounded (0.2886ms)
+  ✔ [normal navigation] opening the page restores the saved workspace and saving resumes at once, whatever Properties holds (2.7603ms)
+  ✔ [success] the editor gets the molecule, the old callbacks are invalidated, and the record is untouched until the one replacing write (3.4267ms)
+  ✔ [failure] a load that throws leaves the editor and the saved workspace exactly as they were (4.7452ms)
+  ✔ [failure] a partly applied load followed by an error is rolled back and verified (3.9824ms)
+  ✔ [failure] a load that 'succeeds' without a real structure counts as failed; an empty previous editor is restored empty (7.3221ms)
+  ✔ [failure] if the previous drawing cannot be put back, saving stops and the stored workspace is kept; Clear starts over (7.0165ms)
+  ✔ [failure] an editor that cannot even be read leaves the workspace alone (4.1833ms)
+  ✔ [pending save] a save scheduled before the transfer cannot land during it; after a failure normal saving resumes, after a success the old save is gone (16.7824ms)
+  ✔ [late restoration] a record that finishes loading during a successful transfer is dropped (7.9014ms)
+  ✔ [late restoration] a record that finishes loading while the transfer is in flight is held back, then applied only if the transfer fails (3599.3038ms)
+  ✔ [reload] after a successful transfer the adopted molecule comes back with no old predictions and is not offered again (5.427ms)
+  ✔ [reload] after a failed transfer the previous workspace, structures and predictions, comes back unchanged and the offer returns (14.1113ms)
+  ✔ [storage] if the replacing write fails the old record is still intact and the error is reported; without storage the transfer still works (11.5659ms)
+  ✔ [controller] suspend/resume/replaceWorkspace: suspension is reversible, replacement keeps the record until overwritten (5.5995ms)
+  ✔ [duplicate] a second press while a transfer runs, or after it succeeded, does nothing (6.5942ms)
+  ✔ [source] the page never discards the saved workspace to adopt; it uses the transaction and defers a late recovery (3.3236ms)
+  ✔ [source] old prediction cards cannot appear for the adopted molecule: every previous result is replaced on success (7.7794ms)
+  ✔ [source] opening the page seeds nothing from the Properties props and Clear makes the offer available again (4.8621ms)
+  ✔ [source] the shared helper stays page-agnostic and touches no chemistry (1.6264ms)
+✔ reactions: "Use in Reactions" is an explicit, transactional action (3764.2831ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ boiling point ranking
+  ✔ n-butanol > sec-butanol > tert-butanol (compactness breaks the tie) (2968.2358ms)
+  ✔ pentane > butane (same qualitative score; molecular mass breaks the tie) (184.4769ms)
+  ✔ pentane > isopentane > neopentane (compactness) (282.4205ms)
+  ✔ negative control: unrelated molecules keep the qualitative order (an alcohol outranks an alkane of lower mass) (290.4994ms)
+  ✔ identical skeletons still tie (383.0464ms)
+✔ boiling point ranking (28810.3526ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ Joback boiling-point estimate
+  ✔ group sums reproduce the hand-calculated Joback values (3560.1358ms)
+  ✔ 1-propanol > hexane > acetone > diethyl ether (experimental 97.2, 68.7, 56, 34.6 degC) (621.1087ms)
+  ✔ cis-2-butene > trans-2-butene > butane (3.7, 0.9, -0.5 degC) (481.2301ms)
+  ✔ amides are not ranked (the method has no amide group and underestimates them badly) (91.2911ms)
+✔ Joback boiling-point estimate (11620.5342ms)
+▶ Hammett sigma-p substituent strength (Hansch, Leo & Taft 1991)
+  ✔ EWG order nitrobenzene (0.78) > benzonitrile (0.66) > acetophenone (0.50) > chlorobenzene (0.23) > toluene (none) (878.0443ms)
+  ✔ EDG order dimethylaniline (-0.83) > aniline (-0.66) > anisole (-0.27) > toluene (-0.17) (661.3404ms)
+  ✔ a molecule with no tabulated donor is unranked, not given a zero (159.9142ms)
+✔ Hammett sigma-p substituent strength (Hansch, Leo & Taft 1991) (1708.0302ms)
+▶ alkene stability geometry
+  ✔ trans-2-butene > cis-2-butene > propene (heats of hydrogenation -115, -119, -125 kJ/mol) (357.2152ms)
+✔ alkene stability geometry (361.0784ms)
+▶ water solubility ties
+  ✔ tert-butanol > 1-butanol > pentane > hexane (miscible, 68 g/L, 0.038 g/L, 0.0095 g/L) (477.5893ms)
+✔ water solubility ties (478.1088ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ rule role profiles
+  ✔ [engine] arity counts the primary reactant plus every additional reactant (12.6436ms)
+  ✔ [engine] rules that need a drawn partner cannot run on a single lot (0.9873ms)
+  ✔ [engine] reagents the rule supplies itself do not make a rule multi-lot (4.2734ms)
+  ✔ [engine] equivalents belong to a slot, they do not add lots (5.4657ms)
+  ✔ [engine] profiles agree with the user-structure partners the fixtures rely on (8.8206ms)
+✔ rule role profiles (8323.4028ms)
+▶ fixture steps are proposed by the index
+  ✔ [engine] fischer-isopropyl-propanoate: fischer-esterification is proposed for exactly its reactants, in any input order (1621.3903ms)
+  ✔ [engine] fischer-isopropyl-propanoate: fischer-esterification is still proposed when unrelated spectators are present (182.5152ms)
+  ✔ [engine] williamson-cyclohexyl-propyl-ether: alcohol-williamson-ether is proposed for exactly its reactants, in any input order (137.8619ms)
+  ✔ [engine] williamson-cyclohexyl-propyl-ether: alcohol-williamson-ether is still proposed when unrelated spectators are present (134.5689ms)
+  ✔ [engine] grignard-2-butanol-from-ethanol: aldehyde-organometallic-addition is proposed for exactly its reactants, in any input order (147.6867ms)
+  ✔ [engine] grignard-2-butanol-from-ethanol: aldehyde-organometallic-addition is still proposed when unrelated spectators are present (68.6474ms)
+  ✔ [engine] racemic-diol-coupling: fischer-esterification is proposed for exactly its reactants, in any input order (121.2013ms)
+  ✔ [engine] racemic-diol-coupling: fischer-esterification is still proposed when unrelated spectators are present (46.1891ms)
+  ✔ [engine] a coupling rule is not proposed when one partner is missing (12.4414ms)
+  ✔ [engine] maxArity 1 proposes no multi-lot rule (4.7498ms)
+✔ fixture steps are proposed by the index (2480.2535ms)
+▶ role assignment semantics
+  ✔ [engine] one lot cannot fill two roles (105.0004ms)
+  ✔ [engine] interchangeable copies are not enumerated repeatedly (94.0593ms)
+  ✔ [engine] assignment does not depend on the order lots are listed (143.178ms)
+  ✔ [engine] reagents are never required as lots: a lone bromide still offers the cyanide substitution (31.639ms)
+  ✔ [engine] ruleSubset and reactantInput feed the engine the right pieces (94.2148ms)
+  ✔ [engine] results are cached: asking again evaluates nothing new (82.0773ms)
+✔ role assignment semantics (551.7945ms)
+    recall sweep: 45 pairs, 41 engine pathways, 42 proposals (0.91 rules per pair of 91 multi-lot rules)
+▶ recall against the real engine
+  ✔ [engine] every multi-structure application the engine finds for a pair is proposed (100% recall) (8816.8571ms)
+  ✔ [engine] every single-structure application the engine finds is proposed (100% recall) (1600.7382ms)
+✔ recall against the real engine (10421.7597ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ workspace creation and inventory
+  ✔ each input becomes one lot; the same molecule entered twice is two copies (1906.7412ms)
+  ✔ an unparsable input is reported and no workspace is created (10.8308ms)
+  ✔ a disconnected input stays as separate lots with every component preserved (4.3198ms)
+  ✔ addMaterial adds a lot and leaves earlier lots and history untouched (758.4323ms)
+✔ workspace creation and inventory (10753.9553ms)
+▶ D1: single-material sequential synthesis
+  ✔ [engine] 1-butene -> 2-butanol -> butanone -> 2-butanol consumes and propagates each intermediate (409.7259ms)
+✔ D1: single-material sequential synthesis (410.512ms)
+▶ D2: two-material coupling
+  ✔ [engine] Fischer esterification consumes both supplied materials (166.5389ms)
+  ✔ [engine] a second molecule that is not selected is retained untouched (67.884ms)
+✔ D2: two-material coupling (235.4668ms)
+▶ D3 + D4: two transformed branches, convergence, post-convergence modification
+  ✔ [engine] BuBr -> BuMgBr and BuOH -> butanal join to octan-4-ol, which is then oxidised (672.1442ms)
+✔ D3 + D4: two transformed branches, convergence, post-convergence modification (672.8176ms)
+▶ D5: several catalytic transformations
+  ✔ [engine] Sonogashira, Lindlar and Pd/C hydrogenation run as separate sequential steps (686.9356ms)
+✔ D5: several catalytic transformations (687.2248ms)
+▶ D6: competing products and explicit selection
+  ✔ [engine] radical bromination stops for a choice and consumes nothing until one is made (485.5835ms)
+  ✔ [engine] unranked regioisomers are never called major and need an explicit choice (451.8922ms)
+  ✔ an out-of-range outcome is rejected without consuming anything (295.4938ms)
+  ✔ a single offered outcome is committed as the only option, not as a ranked winner (38.6047ms)
+  ✔ outcomes are bounded by maxOutcomes and the omission is reported (211.8733ms)
+✔ D6: competing products and explicit selection (1484.7682ms)
+▶ D7 + D8: missing partners and failed intermediates
+  ✔ [engine] a missing structural partner is needs-input and nothing is substituted (3.6538ms)
+  ✔ [engine] a rule that gives no reaction consumes nothing; dependents do not run (13.6869ms)
+  ✔ [engine] an independent branch still runs when an unrelated branch fails (42.9952ms)
+  ✔ a consumed lot cannot be used a second time (39.5772ms)
+  ✔ an unknown rule and a concept-only rule change nothing (2.4405ms)
+  ✔ duplicate, extra and nonexistent selections are rejected (2.7522ms)
+  ✔ [engine] a selected molecule the rule does not use is rejected, not silently dropped (11.3235ms)
+✔ D7 + D8: missing partners and failed intermediates (117.9048ms)
+▶ partner equivalents are supplied copies, never invented
+  ✔ [engine] an acetal needs two copies of the alcohol (131.6059ms)
+  ✔ [engine] candidateLotSelections offers structural fits only, including copies (25.0678ms)
+✔ partner equivalents are supplied copies, never invented (157.3122ms)
+▶ D9: molecular identity fidelity
+  ✔ [engine] SN2 inversion keeps a specified stereocentre (188.9868ms)
+  ✔ [engine] an isotope label is carried to the product (130.9555ms)
+  ✔ [engine] an ion pair's components are separate lots; unselected ions stay on the shelf (35.995ms)
+  ✔ a stereoisomer and its enantiomer are distinct lots (3.7881ms)
+✔ D9: molecular identity fidelity (361.1481ms)
+▶ D10: inventory, coproducts and provenance
+  ✔ [engine] ester reduction gives a primary product and a coproduct lot, both on the shelf (160.4159ms)
+  ✔ [engine] copies are a count, so using one of two copies leaves the other available (58.714ms)
+  ✔ failed attempts are recorded in history but never in the replayed route (69.1367ms)
+✔ D10: inventory, coproducts and provenance (289.1557ms)
+▶ verification is a replay, not a rubber stamp
+  ✔ [engine] pointing a step at the wrong lot fails the replay (99.888ms)
+  ✔ [engine] structure verification is separate from compatibility and selectivity (187.0635ms)
+✔ verification is a replay, not a rubber stamp (287.4268ms)
+▶ workspace values are immutable
+  ✔ executing a step returns a new workspace and leaves the input unchanged (95.4444ms)
+✔ workspace values are immutable (95.9957ms)
+▶ action log and replay
+  ✔ [engine] replaying the action log rebuilds an identical workspace, failures included (1243.9939ms)
+  ✔ a script-only dependency failure is not an action, so replay does not invent a request (2.3874ms)
+  ✔ replay refuses an action log that does not start with a material (0.759ms)
+✔ action log and replay (1248.0497ms)
+✔ route report separates replay, bookkeeping, chemical findings and exclusions (2.6621ms)
+✔ MS coverage uses real confidence enums, eligible denominators and numerical abstention (1.2299ms)
+✔ Wilson intervals use their actual fixed denominator (0.2622ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ bidirectional: fischer-isopropyl-propanoate
+  ✔ [engine] forward-only search fails at this budget, bidirectional finds the verified route (11.149ms)
+  ✔ [engine] the route came from matching a retro goal set, and the work is reported (2.7942ms)
+  ✔ [engine] both precursor branches execute independently and jointly consume the inventory (0.8819ms)
+  ✔ [engine] the result does not depend on the order of the supplied materials (0.6938ms)
+✔ bidirectional: fischer-isopropyl-propanoate (25844.6362ms)
+▶ bidirectional: williamson-cyclohexyl-propyl-ether
+  ✔ [engine] forward-only search fails at this budget, bidirectional finds the verified route (1.3525ms)
+  ✔ [engine] the route came from matching a retro goal set, and the work is reported (0.4075ms)
+  ✔ [engine] both precursor branches execute independently and jointly consume the inventory (0.343ms)
+  ✔ [engine] the result does not depend on the order of the supplied materials (0.4901ms)
+✔ bidirectional: williamson-cyclohexyl-propyl-ether (24223.8888ms)
+▶ bidirectional: rejection of unsupported routes
+  ✔ [engine] an unresolved precursor goal is never invented: no supplied route to the acid half (3975.8765ms)
+  ✔ [engine] a structurally valid join that needs a second copy nobody supplied is rejected (2881.5463ms)
+  ✔ [heuristic] a racemic intermediate stays connectivity-level under bidirectional search (9680.4003ms)
+✔ bidirectional: rejection of unsupported routes (16538.7563ms)
+▶ retro goal sets: structure of the proposals
+  ✔ [engine] goal sets are multisets with several goals, no cycles, and consistent dependencies (2281.2502ms)
+  ✔ [engine] the retro search stops with an accurate reason when its call budget is spent (2093.0948ms)
+✔ retro goal sets: structure of the proposals (4377.6069ms)
+▶ bidirectional: budgets, cancellation, opt-in
+  ✔ [engine] default search is unchanged: no retro work without the option (1980.4443ms)
+  ✔ [engine] a small retro call budget stops the retro side and reports it, returning nothing unproven (10454.2303ms)
+  ✔ [engine] an exhausted retro expansion budget is reported as such (1511.2088ms)
+  ✔ [engine] an already-aborted signal does no retro or forward work (18.713ms)
+  ✔ [engine] a deadline in the past stops before any engine work (18.5379ms)
+  ✔ [engine] cancellation in the middle of a search stops it promptly (748.1771ms)
+  ✔ [engine] through the public entry point, bidirectional returns the verified convergent route (3955.3057ms)
+✔ bidirectional: budgets, cancellation, opt-in (18691.434ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ convergent routes replay with independent branches
+  ✔ [engine] Fischer fixture: two independent branches join in the last step (1084.4107ms)
+  ✔ [engine] the supplied order of the starting materials does not matter (70.6544ms)
+  ✔ [engine] Williamson fixture verifies and reports every supplied material consumed once (185.3044ms)
+  ✔ [engine] a side branch that never feeds the target is reported as unused, and its product as a leftover (70.2164ms)
+✔ convergent routes replay with independent branches (8659.4758ms)
+▶ starting-material copies
+  ✔ [engine] with one copy, using ethanol twice is rejected and says how many copies exist (85.6919ms)
+  ✔ [engine] with two copies the same route verifies and both lots are accounted for (77.628ms)
+  ✔ [engine] supplying the same material twice in the starting SMILES is equivalent to two copies (70.6519ms)
+  ✔ [engine] a per-component copy array is indexed by component order (32.5651ms)
+  ✔ [engine] a third use of a twice-supplied material is rejected (78.8459ms)
+  ✔ [engine] nonsense copy counts fall back to one copy (257.623ms)
+✔ starting-material copies (605.0953ms)
+▶ routes that must be rejected
+  ✔ [engine] an intermediate that no step produced is invented (23.501ms)
+  ✔ [engine] a coupling cannot run before one of its branches exists (13.9869ms)
+  ✔ [engine] a forged coupling product is rejected even though both reactants exist (31.3163ms)
+  ✔ [engine] a missing coupling partner is not made up from a supplied material of another kind (20.4786ms)
+✔ routes that must be rejected (90.2094ms)
+▶ lot provenance (reactantLotIds)
+  ✔ [engine] named lots are consumed exactly as named (29.9919ms)
+  ✔ [engine] naming a lot that an earlier step consumed is rejected (18.3711ms)
+  ✔ [engine] naming a lot with the wrong structure or a lot that does not exist is rejected (29.2942ms)
+  ✔ [engine] two lots with one structure but different histories stay distinguishable (68.8493ms)
+✔ lot provenance (reactantLotIds) (147.3127ms)
+▶ stereochemical and mixture classification is preserved
+  ✔ [confirmed] a racemic intermediate coupled onward keeps its mixture marker: the target is a member, not a pure product (403.2568ms)
+  ✔ [engine] a pure coupling product is not marked as a mixture (61.2382ms)
+  ✔ [engine] the wrong enantiomeric family is not a verified target of the racemic coupling (381.0037ms)
+✔ stereochemical and mixture classification is preserved (846.2593ms)
+▶ coproducts and leftovers carry provenance
+  ✔ [confirmed] ester reduction: the target is exact and the other alcohol is a leftover with lineage (87.0321ms)
+  ✔ [engine] every fixture route replays; the Grignard one only with two copies (484.9396ms)
+  ✔ [engine] results without options keep the pre-existing fields intact (16.6495ms)
+✔ coproducts and leftovers carry provenance (589.3534ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ route-quality tier is separate from structural replay
+  ✔ [quality] replay status is reported unchanged beside the tier (723.5706ms)
+  ✔ [quality] a failed replay is contradicted, never a success tier (5.9587ms)
+  ✔ [quality] without compatibility or selectivity summaries the best tier is structure-verified, not supported (4.691ms)
+  ✔ [quality] chemically-supported needs every step assessed and unambiguous (and is rare) (149.1935ms)
+✔ route-quality tier is separate from structural replay (4481.5634ms)
+▶ generic chemistry checks with real rules
+  ✔ [quality] halogenation of a free arylamine or phenol that leaves an open ortho/para site is a concern (12.0501ms)
+  ✔ [quality] protected (acylated/sulfonylated) nitrogen and ethers are not flagged as over-halogenation (7.7314ms)
+  ✔ [quality] a fully substituted activated ring has no open site, so no over-halogenation concern (5.8672ms)
+  ✔ [quality] direct nitration of a free arylamine is a concern; the acetanilide is not (6.307ms)
+  ✔ [quality] Friedel-Crafts alkylation always carries the polyalkylation/rearrangement concern (2.193ms)
+  ✔ [quality] a beta-keto acid used as an isolated intermediate is a concern unless the next step decarboxylates it (10.3082ms)
+  ✔ [quality] base-mediated alkylation with a beta-halo carbonyl electrophile is a concern; a plain halide is not (18.2272ms)
+✔ generic chemistry checks with real rules (64.9178ms)
+▶ atom sourcing
+  ✔ [quality] a documented reagent that supplies an element is not unsourced (HBr -> bromoalkane) (5.9624ms)
+  ✔ [quality] an element with no source in reactants or reagent text is a contradiction (5.3641ms)
+  ✔ [quality] carbon appearing from nowhere is a contradiction unless the reagent text names a carbon reagent (3.518ms)
+  ✔ [quality] Wittig: ylide carbon comes from the alkyl-halide partner; Ph3P is a documented, untracked reagent (24.7974ms)
+✔ atom sourcing (40.7788ms)
+▶ selectivity classification of unranked outcomes
+  ✔ [quality] HBr addition to an equally substituted internal alkene is a regioisomer-mixture concern (114.2539ms)
+  ✔ [quality] electrophilic substitution of toluene with unranked o/p outcomes is a regioisomer concern (69.248ms)
+  ✔ [quality] radical halogenation of an alkane with several equivalent-class C-H sites is a mixture concern (76.0114ms)
+  ✔ [quality] unranked outcomes with no documented reason stay 'incomplete', not a known concern (7.8488ms)
+✔ selectivity classification of unranked outcomes (270.1128ms)
+▶ quality labels
+  ✔ [quality] every tier has a distinct human label and none reads as an unqualified success (0.7803ms)
+✔ quality labels (1.4484ms)
+▶ saved results
+  ✔ [quality] a saved route without a quality field still restores, and a malformed quality field is rejected (34.5332ms)
+✔ saved results (35.0872ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ beta-halo carbonyl under a strong-base haloalkane rule
+  ✔ 4-chlorobutan-2-one + hydroxide is flagged (E1cB competes) (799.225ms)
+  ✔ negative control: 1-bromobutane + hydroxide is not flagged for this reason (59.0266ms)
+  ✔ negative control: a weakly basic nucleophile (cyanide) on the beta-halo ketone is not flagged by this check (71.441ms)
+✔ beta-halo carbonyl under a strong-base haloalkane rule (3554.9575ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+✔ capitalized prose and saved labels cannot supply product atoms (2551.9807ms)
+✔ complete chemical formulas remain recognized; Ph3P cannot supply ligand carbon (2.3917ms)
+✔ explicit source metadata is authoritative and unknown provenance is disclosed (1.3362ms)
+✔ declared phosphate donor remains a valid atom source for its real rule (64.9037ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ replay of valid routes
+  ✔ [heuristic] acetone -> methyl acetate -> ethanol replays as verified (250.8272ms)
+  ✔ [engine] a rule's own auto-supplied reagent is not treated as an invented reactant (32.9443ms)
+  ✔ [engine] a starting material the route never uses is reported, not hidden (10.684ms)
+  ✔ [confirmed] ester reduction gives ethanol AND methanol: the target is exact, the coproduct is reported (26.4078ms)
+  ✔ [engine] a zero-step route is valid only if a supplied material already is the target (4.4565ms)
+✔ replay of valid routes (2617.6695ms)
+▶ routes that must be rejected
+  ✔ [engine] a structural reactant that was never supplied is detected as invented (4.6533ms)
+  ✔ [engine] a material consumed by an earlier step cannot be reused (13.0945ms)
+  ✔ [engine] a recorded product the rule does not give for the available materials is rejected (8.4147ms)
+  ✔ [engine] a route that does not end at the target is rejected (11.9509ms)
+  ✔ [engine] an unknown rule id fails the replay instead of being skipped (3.6921ms)
+  ✔ [engine] steps run in order: a later product cannot be consumed by an earlier step (5.8948ms)
+✔ routes that must be rejected (48.743ms)
+▶ stereochemical distinctions
+  ✔ [confirmed] a racemic product that includes the requested enantiomer is a mixture member, not a pure product (252.49ms)
+  ✔ [confirmed] the meso diastereomer is not a valid target for the trans-alkene racemate (100.3429ms)
+  ✔ [engine] a target without stereo is matched exactly by an unspecified product (10.3377ms)
+✔ stereochemical distinctions (363.7191ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ in-source scientific regression suites
+  ✔ reaction regression suite passes completely (1265.0137ms)
+  ✔ IR regression suite passes completely (1267.9852ms)
+  ✔ mechanistic stereo regression suite passes completely (Stage 9J fixed the endo/exo Diels-Alder defect it used to document) (262.313ms)
+  ✔ nomenclature regression suite: only the documented defects fail (1323.4653ms)
+✔ in-source scientific regression suites (6415.5799ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ structure identity keeps isotopes, charges and components while ignoring only stereochemistry
+  ✔ isotopologues have different connectivity keys and never compare as 'connectivity-only' (187.2601ms)
+  ✔ stereoisomers still share one connectivity key and keep their documented comparison (5.0785ms)
+  ✔ a labelled stereoisomer keeps its label in the stereo-free key (1.9525ms)
+  ✔ charges and disconnected components survive the stereo-free key (4.1795ms)
+  ✔ equivalent spellings of one structure agree (3.1466ms)
+✔ structure identity keeps isotopes, charges and components while ignoring only stereochemistry (2534.1088ms)
+▶ a supported one-step transformation is found as one step, whatever the rule id sorts like
+  ✔ CCO -> CC=O uses primary-alcohol-mild-oxidation and nothing else (2422.3589ms)
+  ✔ CCCCO -> CCCC=O uses primary-alcohol-mild-oxidation and nothing else (2657.0064ms)
+  ✔ OCc1ccccc1 -> O=Cc1ccccc1 uses benzylic-allylic-alcohol-oxidation and nothing else (2544.0385ms)
+  ✔ CCBr -> CCO uses haloalkane-sn2-hydroxide and nothing else (1288.4404ms)
+  ✔ CC(O)C -> CC(C)=O uses secondary-alcohol-oxidation-pcc and nothing else (2156.1841ms)
+  ✔ CCO -> CC(=O)O uses primary-alcohol-strong-oxidation and nothing else (1718.4454ms)
+  ✔ equivalent spellings of the same transformation give the same route (5163.2871ms)
+  ✔ [13CH3]CO -> [13CH3]C=O is found, verified, and keeps the label on the same carbon (1437.4088ms)
+  ✔ a label on the other carbon is a different compound: [13CH3]CO cannot be converted to C[13CH]=O by relabelling (8022.0229ms)
+  ✔ stereochemistry survives: (S)-butan-2-ol -> butanone is still found as one step (2531.1987ms)
+  ✔ multi-component starting inventories still search (acid + alcohol -> ester) (847.6335ms)
+✔ a supported one-step transformation is found as one step, whatever the rule id sorts like (30793.0757ms)
+▶ the linear lane resumes once when every first-pass candidate fails replay
+  ✔ all candidates failed: one widened exhaustive pass is run and its new verified route is kept (1.3469ms)
+  ✔ a route that already passed makes the second pass unnecessary (0.5234ms)
+  ✔ a failed route is not replayed twice (0.5305ms)
+  ✔ a cancelled search does not start the second pass (0.4634ms)
+  ✔ no first-pass candidates at all does not trigger a widened pass (0.2489ms)
+✔ the linear lane resumes once when every first-pass candidate fails replay (3.6512ms)
+▶ a rule with several unranked outcomes does not hide the one the goal needs
+  ✔ toluene -> 2-nitrotoluene and toluene -> 4-nitrotoluene are both one-step routes (4283.4295ms)
+  ✔ toluene -> 4-nitrobenzoic acid is found (nitrate, then oxidise the methyl group) (4411.6946ms)
+  ✔ the Zaitsev AND the Hofmann alkene are both reachable targets (2-bromo-2,3-dimethylbutane) (8017.9297ms)
+✔ a rule with several unranked outcomes does not hide the one the goal needs (16713.7072ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ shared budget
+  ✔ [unit] a slice is clamped to the time that is left and ends at the overall deadline (5.1504ms)
+  ✔ [unit] a slice shorter than the remaining time ends as a slice limit; the budget is still open (3.3107ms)
+  ✔ [unit] cancelling the parent aborts every open slice; a slice opened afterwards is already aborted (1.949ms)
+  ✔ [unit] released slices stop their timers (no detached work is left behind) (0.2773ms)
+✔ shared budget (2639.0873ms)
+▶ route book: admission, identity and ranking
+  ✔ [unit] failed or never-replayed routes are not admitted; connectivity-only routes are (1.0336ms)
+  ✔ [unit] the same reactions in a different step order or numbering are one route (0.4126ms)
+  ✔ [unit] a different rule, reagent label, stereoisomer or inventory provenance is a different route (0.7782ms)
+  ✔ [unit] ranking keeps the verifier's distinctions: exact, mixture member, connectivity-only (1.3704ms)
+  ✔ [unit] compatibility prices length but never becomes a pass/fail: a flagged route needs a real length advantage (0.4123ms)
+  ✔ [unit] unassessed stays unknown: not 'no findings', not a finding; fewer unassessed steps breaks ties only (0.3134ms)
+  ✔ [unit] unused starting materials are reported but never disqualify a verified route (0.2124ms)
+  ✔ [unit] the list is capped, keeps the best, and closed books ignore late offers (0.486ms)
+✔ route book: admission, identity and ranking (5.8199ms)
+▶ scheduler: budget and time allocation
+  ✔ [unit] sequential lanes can never add up to more than the overall budget (4.505ms)
+  ✔ [unit] a later lane's reserve cannot be taken by an earlier lane (3.6616ms)
+  ✔ [unit] time an early lane does not use flows to the next lane (1.1417ms)
+  ✔ [unit] a lane that cannot get its minimum useful time is skipped and reported as such (0.8025ms)
+  ✔ [unit] a lane that ignores its slice is reported as an overrun, and no further lane starts after the deadline (0.3832ms)
+  ✔ [unit] a lane that throws is reported and the next lane still runs (0.8062ms)
+✔ scheduler: budget and time allocation (11.9978ms)
+▶ scheduler: early delivery, stopping and escalation
+  ✔ [unit] a route is published the moment a lane reports it, before the lane returns (1.1802ms)
+  ✔ [unit] a clean verified route ends the search as 'satisfied' without claiming optimality (0.6957ms)
+  ✔ [unit] a route with a model-constraint is published but the search keeps looking, and a clean route displaces it (0.532ms)
+  ✔ [unit] connectivity-only is improvable: a later exact route is searched for and ranks first (0.6386ms)
+  ✔ [unit] once a route exists, the improvement slice is bounded by a multiple of the time the first one took (0.6258ms)
+  ✔ [unit] a convergent-style lane is not suppressed by a linear-style route: the earlier lane always runs first (0.5807ms)
+✔ scheduler: early delivery, stopping and escalation (4.7698ms)
+▶ scheduler: inventory, cancellation and stale results
+  ✔ [unit] copies default to one for every lane and are never escalated after a failed search (4.3167ms)
+  ✔ [unit] two copies are used only when the user selected them, for every lane (0.71ms)
+  ✔ [unit] cancellation keeps routes found so far, stops later lanes, and ignores reports made afterwards (1.9798ms)
+  ✔ [unit] cancelling before any route is found is 'cancelled', not a failure to find a route (0.9656ms)
+  ✔ [unit] a superseded search (isCurrent false) neither publishes nor keeps late routes (0.5533ms)
+  ✔ [unit] a report made after the lane returned is counted as late and never added (0.5015ms)
+✔ scheduler: inventory, cancellation and stale results (9.6703ms)
+▶ scheduler: incomplete-search outcomes
+  ✔ [unit] every lane finishing inside its bounds with nothing found is 'within bounds', never 'impossible' (0.9883ms)
+  ✔ [unit] a lane cut short by its own cap or by time makes the outcome 'within budget' (1.1205ms)
+  ✔ [unit] a skipped lane also prevents a 'within bounds' claim (0.4654ms)
+✔ scheduler: incomplete-search outcomes (3.0329ms)
+▶ engine lanes (structure, plus one trivial real search)
+  ✔ [engine] a single material gets only the linear lane; two or more get the convergent lane first (0.7796ms)
+  ✔ [engine] one material with two user-selected copies can still join two lots, so it gets the convergent lane (0.2058ms)
+  ✔ [engine] workload-aware sizing keeps at least 70% of the overall time for the linear lane (0.29ms)
+  ✔ [engine] a shorter total budget shrinks the convergent lane proportionally; the total is not raised (0.1766ms)
+  ✔ [engine] heavy-atom estimate counts atom tokens only (0.0948ms)
+  ✔ [engine] one real, trivial problem end to end: ethanol -> acetaldehyde is found, verified and ranked (3188.2452ms)
+✔ engine lanes (structure, plus one trivial real search) (3203.9498ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ Heck coupling: E geometry and qualitative regiochemistry (Beletskaya & Cheprakov, Chem. Rev. 2000, 100, 3009)
+  ✔ [engine] aryl bromide + methyl acrylate: (E)-methyl cinnamate is major, the alpha-aryl acrylate is minor (1754.9251ms)
+  ✔ [engine] styrene gives (E)-stilbene as the major product (561.8675ms)
+  ✔ [engine] alkyl and electron-rich alkenes stay unranked: no preference is claimed without a source (389.512ms)
+  ✔ [engine] alkenes the templates do not cover keep the plain behavior (every site, no geometry invented) (166.8175ms)
+  ✔ the rule documents what it does not model (1.2392ms)
+✔ Heck coupling: E geometry and qualitative regiochemistry (Beletskaya & Cheprakov, Chem. Rev. 2000, 100, 3009) (9825.9464ms)
+▶ Friedel-Crafts: ring positions ranked by directing effects, qualitatively
+  ✔ [engine] toluene + 2-chloropropane: para favored, ortho competitive, meta disfavored (403.7571ms)
+  ✔ [engine] anisole acylation: 4-methoxyacetophenone is the favored product (419.3909ms)
+  ✔ [engine] chlorobenzene (an o/p-directing deactivator) acylates para (184.0126ms)
+  ✔ [engine] benzene has one product, so nothing is ranked and it is a single outcome (201.7773ms)
+  ✔ [engine] naphthalene is outside the simple benzene model: left unranked, not guessed (260.9067ms)
+✔ Friedel-Crafts: ring positions ranked by directing effects, qualitatively (1474.0735ms)
+▶ pinacol rearrangement: the more stable carbocation forms first, then H > aryl > alkyl migrate
+  ✔ [engine] propane-1,2-diol gives propanal (secondary cation, hydride shift) (304.6716ms)
+  ✔ [engine] octane-1,2-diol gives octanal (231.4518ms)
+  ✔ [engine] 2-methylpropane-1,2-diol gives isobutyraldehyde (tertiary cation) (101.405ms)
+  ✔ [engine] 1-phenylethane-1,2-diol gives phenylacetaldehyde (benzylic cation) (364.4656ms)
+  ✔ [engine] pinacol gives pinacolone (methyl shift) (355.9479ms)
+  ✔ [engine] 3-methylbutane-2,3-diol gives 3-methylbutan-2-one (tertiary cation, hydride shift) (81.0295ms)
+  ✔ [engine] cyclopentane-1,2-diol gives cyclopentanone (hydride shift, ring kept) (435.7234ms)
+  ✔ [engine] the previously unranked aldehyde-or-ketone choice for a terminal 1,2-diol is gone (242.2766ms)
+  ✔ [engine] a symmetric diol is unaffected (both orientations are the same product) (107.078ms)
+✔ pinacol rearrangement: the more stable carbocation forms first, then H > aryl > alkyl migrate (2227.535ms)
+▶ epoxidation is stereospecific in the alkene geometry (syn addition of oxygen)
+  ✔ [engine] Z-2-butene gives meso (cis) 2,3-dimethyloxirane, one compound (1038.7105ms)
+  ✔ [engine] E-2-butene gives the trans epoxide as a racemate: (2R,3R) and (2S,3S) (176.8197ms)
+  ✔ [engine] E and Z give different diastereomers (the earlier behavior gave the same product for both) (232.6985ms)
+  ✔ [engine] trans-stilbene gives trans-stilbene oxide, (R,R)/(S,S) (reference configuration) (204.8077ms)
+  ✔ [engine] cis-stilbene gives meso cis-stilbene oxide, (R,S) (202.5003ms)
+  ✔ [engine] E and Z with different substituents keep the cis/trans relationship (2-pentene) (253.804ms)
+  ✔ [engine] a ring alkene gives the cis-fused epoxide (cyclohexene oxide is meso) (143.0618ms)
+  ✔ [engine] with no defined geometry nothing is invented: the epoxide is constitution only (141.3307ms)
+  ✔ [engine] a second alkene in the molecule is still offered, not swallowed by the geometry template (216.2154ms)
+  ✔ [engine] the stereo-defined epoxide replays through the workspace verifier (619.1584ms)
+✔ epoxidation is stereospecific in the alkene geometry (syn addition of oxygen) (3232.9231ms)
+▶ Friedel-Crafts steric limit (Stage 9D)
+  ✔ [engine] m-xylene: the position between the two methyl groups is disfavored, 4-position favored (299.0086ms)
+  ✔ [engine] halogenation keeps its purely electronic ranking (the penalty applies to Friedel-Crafts only) (154.5195ms)
+✔ Friedel-Crafts steric limit (Stage 9D) (454.1748ms)
+▶ Heck regiochemistry and geometry generalize across the substrate class (Stage 9D)
+  ✔ [engine] acrylonitrile: E-linear product is major (E geometry assigned), alpha-aryl product minor (221.8651ms)
+  ✔ [engine] N,N-dimethylacrylamide: E-linear product is major (E geometry assigned), alpha-aryl product minor (158.9795ms)
+  ✔ [engine] phenyl vinyl sulfone: E-linear product is major (E geometry assigned), alpha-aryl product minor (201.5941ms)
+  ✔ [engine] 4-methylstyrene: E-linear product is major (E geometry assigned), alpha-aryl product minor (385.4473ms)
+  ✔ [engine] ethyl acrylate with an electron-poor aryl bromide: E-linear product is major (E geometry assigned), alpha-aryl product minor (341.6499ms)
+  ✔ [engine] a 1,1-disubstituted alkene can only be arylated at CH2: one outcome, not ranked, no geometry claimed (117.1826ms)
+  ✔ [engine] a 1,2-disubstituted alkene keeps every attachment site, unranked (uncertainty retained) (108.7015ms)
+✔ Heck regiochemistry and geometry generalize across the substrate class (Stage 9D) (1538.4715ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ halobenzene nitration
+  ✔ Clbenzene: para major, ortho minor, meta not offered (1226.4195ms)
+  ✔ Brbenzene: para major, ortho minor, meta not offered (177.2511ms)
+  ✔ toluene: ortho and para stay unranked (about 58% ortho, 38% para, so neither is declared major) (107.9254ms)
+✔ halobenzene nitration (9252.8174ms)
+▶ [3,3]-sigmatropic rearrangements
+  ✔ allyl phenyl ether gives 2-allylphenol (allyl group on the ortho carbon, terminus attached) (40.4302ms)
+  ✔ 3-methylhexa-1,5-diene gives hepta-1,5-diene (15.6532ms)
+  ✔ a molecule without a 1,5-diene is not offered the Cope rearrangement (6.793ms)
+✔ [3,3]-sigmatropic rearrangements (63.9382ms)
+▶ kinetic versus thermodynamic enolate alkylation
+  ✔ 2-methylcyclohexanone + MeI: LDA gives 2,6-dimethyl, equilibrating base gives 2,2-dimethyl (57.021ms)
+  ✔ butan-2-one + MeI: kinetic alkylation at the methyl (pentan-3-one), thermodynamic at the methylene (3-methylbutan-2-one) (55.8292ms)
+  ✔ a symmetric ketone has no kinetic/thermodynamic distinction and is not offered either rule (11.1554ms)
+✔ kinetic versus thermodynamic enolate alkylation (125.3031ms)
+▶ Hofmann elimination of a preformed quaternary ammonium
+  ✔ sec-butyltrimethylammonium gives 1-butene (least substituted alkene) (21.3962ms)
+  ✔ a neutral hydrocarbon is not offered the rule (7.7482ms)
+✔ Hofmann elimination of a preformed quaternary ammonium (30.7673ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ substitution vs elimination
+  ✔ primary halide + hydroxide: SN2 major, E2 minor (1144.2253ms)
+  ✔ secondary halide + hydroxide: both retained and competitive (73.499ms)
+  ✔ tertiary halide + hydroxide: the lone E2 outcome is not ranked (no competing pathway, so no evidence of 'major') (36.6162ms)
+  ✔ secondary halide + cyanide: SN2 major (weakly basic nucleophile) (14.7675ms)
+  ✔ bulky base: elimination major even for a primary halide (30.3963ms)
+  ✔ secondary + small alkoxide: E2 major; the less substituted alkene stays minor (279.3243ms)
+  ✔ negative controls: benzylic, allylic and beta-branched primary halides are NOT ranked (263.9876ms)
+  ✔ no numeric fraction is ever produced (188.3932ms)
+✔ substitution vs elimination (7194.2927ms)
+▶ Friedel-Crafts
+  ✔ acylation of toluene: ortho is sterically disfavored (minor), para major (107.2245ms)
+  ✔ tert-butylation of toluene: ortho minor, para major (88.6022ms)
+  ✔ isopropylation (not bulky enough for the steric rule) keeps ortho competitive when activated equally (98.0904ms)
+  ✔ primary alkyl halide: direct and rearranged products both kept, neither called major (169.7482ms)
+  ✔ a tertiary or secondary halide (no hydride-shift ambiguity) is not labelled condition-dependent (131.2176ms)
+✔ Friedel-Crafts (597.189ms)
+▶ aldol
+  ✔ acetone + acetaldehyde: the ketone-electrophile adduct is minor; the aldehyde adduct is NOT promoted to major (86.6648ms)
+  ✔ two ketones, no aldehyde: nothing is ranked (39.4372ms)
+✔ aldol (126.9186ms)
+▶ acid-catalysed epoxide opening by an alcohol
+  ✔ propylene oxide (primary/secondary): both regioisomers kept and left unranked (54.0966ms)
+  ✔ 2-methyl-1,2-epoxypropane (tertiary carbon): tertiary attack only (68.1197ms)
+  ✔ styrene oxide (benzylic carbon): benzylic attack only (191.7237ms)
+  ✔ symmetric epoxide: a single constitution (143.8164ms)
+✔ acid-catalysed epoxide opening by an alcohol (462.1586ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+[PocketChem:ReactionEngine] Skipping rule synthetic-bad-handler after execution failure. TypeError: handlers[handler] is not a function
+    at runCustomHandler (<repo>/src/utils/reactions/engine/handlers/index.ts:50:40)
+    at applyRule (<repo>/src/utils/reactions/engine/reactionEngine.ts:127:69)
+    at createExecutedPathways (<repo>/src/utils/reactions/engine/reactionEngine.ts:200:26)
+    at predictReactionPathwaysFromRules (<repo>/src/utils/reactions/engine/reactionEngine.ts:452:27)
+    at async runSequentialSynthesisDetailed (<repo>/src/utils/reactions/engine/sequentialSynthesis.ts:365:19)
+    at async Module.runSequentialSynthesis (<repo>/src/utils/reactions/engine/sequentialSynthesis.ts:261:10)
+    at async TestContext.<anonymous> (file:///<repo>/scripts/tests/sequential.test.mjs:232:27)
+    at async Test.run (node:internal/test_runner/test:1409:7)
+    at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7)
+▶ valid single-step reactions
+  ✔ [confirmed] catalytic hydrogenation of propene (4504.566ms)
+  ✔ [confirmed] HBr addition follows Markovnikov (propene) (506.1178ms)
+  ✔ [confirmed] HBr addition to 2-methylpropene gives the tertiary bromide (341.7595ms)
+  ✔ [confirmed] HBr/peroxide addition is anti-Markovnikov (127.1343ms)
+  ✔ [confirmed] reductive ozonolysis of 2-butene gives two acetaldehyde (444.1067ms)
+  ✔ [confirmed] Lindlar reduction of 2-butyne is syn (Z-alkene) (214.9654ms)
+  ✔ [confirmed] dissolving-metal reduction of 2-butyne is anti (E-alkene) (159.8618ms)
+✔ valid single-step reactions (20816.9056ms)
+▶ nonreactive substrates are a chemical NO REACTION
+  ✔ [confirmed] ethanol has no C=C to hydrogenate (69.1304ms)
+  ✔ [confirmed] propane does not add HBr (37.8072ms)
+✔ nonreactive substrates are a chemical NO REACTION (112.7121ms)
+▶ missing additional structural reactants
+  ✔ [engine] substrate fits but ROH partner is missing -> needs-input, nothing invented (28.1147ms)
+  ✔ [engine] substrate does NOT fit the rule -> NO REACTION, not needs-input (16.4654ms)
+  ✔ [engine] needs-input is distinct from unsupported (14.9725ms)
+✔ missing additional structural reactants (62.5131ms)
+▶ unsupported outcomes
+  ✔ [engine] concept-only rule -> unsupported, molecule carried forward (5.9203ms)
+  ✔ [engine] rule matches but generator yields no product -> unsupported, NOT no-reaction (30.7971ms)
+✔ unsupported outcomes (38.2837ms)
+▶ unknown reaction ids
+  ✔ [engine] diagnostic mode: an unknown id keeps its slot, is explained, and later steps still run (197.8366ms)
+  ✔ [engine] diagnostic mode: unknown id at the start leaves the starting molecule intact (199.6663ms)
+✔ unknown reaction ids (400.6627ms)
+▶ engine failures are never reported as chemical nonreactivity
+  ✔ [engine] uncompilable reaction SMARTS -> execution-error with diagnostics (93.9242ms)
+  ✔ [engine] uncompilable trigger SMARTS -> execution-error with diagnostics (17.6345ms)
+  ✔ [engine] custom handler that throws -> execution-error with diagnostics (32.1324ms)
+  ✔ [engine] an unparsable starting structure is an error, not NO REACTION (10.6153ms)
+  ✔ [engine] diagnostic mode: an errored step does not block later steps, which are marked unresolved (227.2582ms)
+  ✔ [engine] the failure sink does not alter results of working rules (781.8548ms)
+✔ engine failures are never reported as chemical nonreactivity (1169.1967ms)
+▶ sequential reagent application
+  ✔ [engine] NO REACTION preserves the molecule and the next step runs on it (91.266ms)
+  ✔ [confirmed] two reactions in sequence: 2-butyne -> Lindlar -> HBr gives 2-bromobutane (224.4638ms)
+  ✔ [metamorphic] reagent order is meaningful (340.9031ms)
+  ✔ [metamorphic] inserting a verified NO-REACTION condition leaves the outcome unchanged (2178.5398ms)
+✔ sequential reagent application (2838.7185ms)
+▶ stereochemical and multi-product behaviour
+  ✔ [confirmed] syn-dihydroxylation of (E)-2-butene gives the racemic (R,R)/(S,S) diol pair (526.338ms)
+  ✔ [engine] chirality survives into the next step (no stereo-loss in propagation) (224.3608ms)
+  ✔ [confirmed] Lindlar and dissolving-metal reductions give opposite alkene geometries (185.9966ms)
+  ✔ [confirmed] reductive ozonolysis keeps both carbonyl products in the carried-forward state (351.2696ms)
+  ✔ [known-gap] syn-dihydroxylation of (Z)-2-butene should give only meso-2,3-butanediol (284.9687ms) # TODO
+  ✔ [known-gap] epoxidation of (Z)-2-butene should retain cis stereochemistry (meso epoxide) (204.7317ms) # TODO
+  ✔ [known-gap] anti-Br2 addition to (Z)-2-butene should give a specific racemic pair (628.7636ms) # TODO
+✔ stereochemical and multi-product behaviour (2409.0567ms)
+▶ registry integrity (a broken rule must not masquerade as nonreactivity)
+  ✔ rule ids are unique (9.743ms)
+  ✔ every reaction SMARTS and trigger SMARTS compiles in RDKit (399.5416ms)
+✔ registry integrity (a broken rule must not masquerade as nonreactivity) (409.8009ms)
+▶ registry-wide sweep
+  ✔ [engine] no shipped rule produces an engine failure on common substrates (25774.048ms)
+✔ registry-wide sweep (25774.4991ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ default policy: a branch stops when an intermediate was not formed
+  ✔ [engine] an unknown condition: the next step is not run and nothing is applied to the unchanged molecule (4105.2552ms)
+  ✔ [engine] a step that needs a structural partner stops the branch (no silent substitution) (39.4767ms)
+  ✔ [engine] unknown at the start: every later step is not run, and the root cause is still the one named (8.9583ms)
+  ✔ [engine] a concept-only (unsupported) step stops the branch (11.7493ms)
+  ✔ [engine] an internal engine failure stops the branch and is not presented as a chemical result (90.0401ms)
+  ✔ [engine] NO REACTION is a chemical conclusion: the unchanged molecule still continues (378.0395ms)
+  ✔ [engine] an ordinary multi-step sequence is unchanged by the policy (1326.3191ms)
+✔ default policy: a branch stops when an intermediate was not formed (20480.2924ms)
+▶ independent branches continue when an unrelated branch fails
+  ✔ [engine] one branch stops at needs-input while the other runs its remaining steps (469.7609ms)
+  ✔ [engine] diagnostic mode lets the stopped branch continue provisionally and nothing else changes (392.9981ms)
+✔ independent branches continue when an unrelated branch fails (866.019ms)
+▶ diagnostic mode is the previous behavior, explicitly requested
+  ✔ [engine] later steps run on the unchanged molecule and are marked provisional (75.6599ms)
+✔ diagnostic mode is the previous behavior, explicitly requested (76.2858ms)
+▶ the page wires the policy and names the new state
+  ✔ [source] default is stop; diagnostic mode is an explicit, unchecked-by-default opt-in (3.9347ms)
+✔ the page wires the policy and names the new state (4.4278ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ pool construction and inventory
+  ✔ [engine] every supplied copy is its own live lot with a stable id and lineage (934.7091ms)
+  ✔ [engine] nonsense copy counts fall back to one copy (5.057ms)
+  ✔ [engine] consuming a lot spends exactly one copy (10.487ms)
+✔ pool construction and inventory (21650.9474ms)
+▶ step application rules
+  ✔ [engine] a step produces new lots with unioned lineage and deterministic ids (3.8655ms)
+  ✔ [engine] invalid steps are refused and never mutate the state (6.58ms)
+  ✔ [engine] spectators are untouched by a step (6.1184ms)
+✔ step application rules (19.8411ms)
+▶ coproducts keep availability and provenance
+  ✔ [engine] both products of an ester reduction stay live, with roles and lineage (8.2421ms)
+  ✔ [engine] a coproduct is not discarded for being small: methanol is a live lot and can be consumed (6.8856ms)
+  ✔ [engine] budgets shelve by the caller's score, never by molecular size (14.5836ms)
+  ✔ [engine] a shelved lot stays present, stays in the key, and cannot be consumed (5.5159ms)
+  ✔ [engine] supplied lots are never shelved, so inventory cannot change silently (4.7584ms)
+  ✔ [engine] without a budget nothing is shelved (2.8891ms)
+✔ coproducts keep availability and provenance (45.0058ms)
+▶ state identity
+  ✔ [engine] independent branches in either order give one state (order independence) (21.1443ms)
+  ✔ [engine] the order of the supplied materials does not change the key (10.2506ms)
+  ✔ [engine] using a different equivalent copy gives the same state (2.5173ms)
+  ✔ [engine] remaining inventory distinguishes states with the same product (20.6786ms)
+  ✔ [engine] an untouched spectator distinguishes otherwise equal states (2.2699ms)
+  ✔ [engine] a mixture member and a pure compound of the same structure are different states (42.3702ms)
+  ✔ [engine] mixtures with different known members are different states (17.9741ms)
+  ✔ [engine] equal futures with different material histories merge by default and separate in history mode (5.3802ms)
+  ✔ [engine] consumed lots do not appear in the key (1.9441ms)
+✔ state identity (126.1679ms)
+▶ mixture propagation
+  ✔ [engine] pure parents give a pure product (1.321ms)
+  ✔ [engine] a racemic parent makes a stereoisomeric (not enantiopure) product (1.0899ms)
+  ✔ [engine] two mixture parents can only be called stereoisomeric (0.3225ms)
+  ✔ [engine] the mixture a rule reports for its own products wins (0.3144ms)
+  ✔ [engine] a product that loses all specified stereo is no longer a mixture (0.5152ms)
+✔ mixture propagation (4.3346ms)
+▶ ancestry and verifier agreement
+  ✔ [engine] lotAncestry follows consumption back to supplied lots (612.2471ms)
+  ✔ [engine] fischer-isopropyl-propanoate: lot ids from the pool are accepted by the route verifier and agree with its bookkeeping (208.2449ms)
+  ✔ [engine] williamson-cyclohexyl-propyl-ether: lot ids from the pool are accepted by the route verifier and agree with its bookkeeping (313.7156ms)
+  ✔ [engine] grignard-2-butanol-from-ethanol: lot ids from the pool are accepted by the route verifier and agree with its bookkeeping (237.7926ms)
+  ✔ [engine] ester-reduction-coproduct: lot ids from the pool are accepted by the route verifier and agree with its bookkeeping (47.0022ms)
+  ✔ [engine] racemic-diol-coupling: lot ids from the pool are accepted by the route verifier and agree with its bookkeeping (365.0009ms)
+  ✔ [engine] the pool refuses the single-copy Grignard route at the step the verifier rejects (18.5551ms)
+✔ ancestry and verifier agreement (1811.6499ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ strongly perturbed monosubstituted rings show separate ortho / meta / para signals
+  ✔ Oc1ccccc1: 4 proton signals (952.2486ms)
+  ✔ Nc1ccccc1: 4 proton signals (7.7481ms)
+  ✔ COc1ccccc1: 4 proton signals (6.9992ms)
+  ✔ O=[N+]([O-])c1ccccc1: 3 proton signals (9.315ms)
+  ✔ COC(=O)c1ccccc1: 4 proton signals (5.7142ms)
+✔ strongly perturbed monosubstituted rings show separate ortho / meta / para signals (7549.7077ms)
+▶ weakly perturbed rings stay one overlapping multiplet (negative controls)
+  ✔ Cc1ccccc1: 2 proton signals (6.9997ms)
+  ✔ CCc1ccccc1: 3 proton signals (8.2405ms)
+  ✔ Clc1ccccc1: 1 proton signals (5.6917ms)
+  ✔ CC(C)c1ccccc1: 3 proton signals (7.8519ms)
+✔ weakly perturbed rings stay one overlapping multiplet (negative controls) (30.8304ms)
+▶ symmetry-equivalent rings share signals
+  ✔ benzophenone: ortho (4H), meta (4H), para (2H) = 3 signals; 5 carbon signals (17.6304ms)
+  ✔ biphenyl: 3 proton and 4 carbon signals (5.0588ms)
+  ✔ naphthalene is aromatic in both rings (no 'vinylic' protons): 2 proton and 3 carbon signals (9.865ms)
+✔ symmetry-equivalent rings share signals (34.1716ms)
+▶ nitro is a withdrawing substituent, not an amine-type donor
+  ✔ nitrobenzene: ortho protons above 8 ppm, para/meta below them; ipso carbon near 148 (4.2919ms)
+  ✔ aniline keeps donor behaviour: ortho/para upfield of meta (7.0066ms)
+✔ nitro is a withdrawing substituent, not an amine-type donor (12.4382ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ anti bromination is stereospecific (OpenStax 8.2: bromonium ion, anti addition)
+  ✔ [engine] E-2-butene gives the meso dibromide (2R,3S), one compound (3006.0447ms)
+  ✔ [engine] Z-2-butene gives the racemic (2R,3R)/(2S,3S) dibromide (1418.1857ms)
+  ✔ [engine] cyclohexene gives trans-1,2-dibromocyclohexane as a racemate, never the cis compound (1773.4052ms)
+  ✔ [engine] E-2-pentene (unsymmetrical) keeps the same relationship as E-2-butene: (R,S)-type, racemic pair (72.4383ms)
+  ✔ [engine] unspecified geometry stays unspecified in both layers (no invented diastereomer) (2284.1642ms)
+✔ anti bromination is stereospecific (OpenStax 8.2: bromonium ion, anti addition) (14913.9286ms)
+▶ Simmons-Smith and dihalocyclopropanation keep the alkene's cis/trans relationship
+  ✔ [engine] Z-2-butene gives cis-1,2-dimethylcyclopropane (meso); E gives the trans racemate (2603.399ms)
+  ✔ [engine] cyclohexene gives cis-fused norcarane only (1338.28ms)
+  ✔ [engine] dichloro- and dibromocyclopropanation follow the same rule (101.3183ms)
+  ✔ [engine] unspecified geometry and terminal alkenes stay unspecified (8.226ms)
+✔ Simmons-Smith and dihalocyclopropanation keep the alkene's cis/trans relationship (4052.5155ms)
+▶ ring alkene dihydroxylation: only the relationship the mechanism allows
+  ✔ [engine] syn (OsO4) gives the cis diol alone; anti (epoxide opening) gives trans as a racemate alone (3163.8134ms)
+  ✔ [engine] cyclopentene behaves the same (5-membered ring) (44.1896ms)
+  ✔ [engine] acyclic E/Z behavior is unchanged (113.0077ms)
+✔ ring alkene dihydroxylation: only the relationship the mechanism allows (3326.0248ms)
+▶ the Reactions page shows enantiomeric mixtures honestly
+  ✔ [engine] a terminal alkene epoxide is a racemate with both enantiomers, not one arbitrary enantiomer (2106.7729ms)
+  ✔ [engine] unspecified acyclic alkenes are not given an arbitrary diastereomer by the page layer (2500.507ms)
+  ✔ [engine] defined-geometry results agree between the two layers (19992.2665ms)
+✔ the Reactions page shows enantiomeric mixtures honestly (24600.9538ms)
+▶ corrections preserve identity and material accounting
+  ✔ [engine] isotopes and charges survive the stereospecific templates (83.7269ms)
+  ✔ [engine] connectivity equals the plain constitutional product (stereo is added, nothing else changes) (169.6889ms)
+  ✔ [engine] in the workspace a racemate is one lot that consumed exactly one alkene, and replay verifies (150.34ms)
+✔ corrections preserve identity and material accounting (407.1174ms)
+▶ defects found by the held-out benchmark (Stage 9D)
+  ✔ [engine] Gilman 1,4-addition reaches cyclic, acyclic and ester Michael acceptors (the rule no longer depends on a classifier name) (193.9848ms)
+  ✔ [engine] a saturated ketone or a carboxylic acid is not a Michael acceptor for the Gilman rule (11.1309ms)
+  ✔ [engine] epoxide opening works for aryl, vinyl and alkyl Grignard reagents (391.2915ms)
+  ✔ [engine] a trisubstituted allylic-alcohol epoxide gets no invented stereochemistry on the Reactions page (2583.1928ms)
+✔ defects found by the held-out benchmark (Stage 9D) (3180.3368ms)
+▶ oxidation of stereo-defined alcohols (found by INT-2; previously the product was silently dropped)
+  ✔ [engine] both enantiomers of butan-2-ol are oxidised by every secondary-alcohol oxidant rule (298.5508ms)
+  ✔ [engine] a second stereocentre survives and the destroyed one does not leave a stray tag (75.6166ms)
+  ✔ [engine] a diol with two stereocentres: only the oxidised centre loses its tag (92.2155ms)
+  ✔ [engine] valid stereo products are untouched by the repair (SN2 inversion, epoxidation) (1183.1632ms)
+  ✔ [engine] the planner finds (S)-butan-2-ol to butanone, which it could not before (2682.5718ms)
+  ✔ [engine] isotope-labelled [13CH3]CO to [13CH3]C=O is found as the one-step oxidation (Stage 9E: isotopes kept in the identity key; goal-reaching pathways are not pruned) (1649.6568ms)
+✔ oxidation of stereo-defined alcohols (found by INT-2; previously the product was silently dropped) (5985.1927ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ epoxide opening inverts the attacked carbon (acyclic, stereo-defined)
+  ✔ epoxide-base-hydroxide-opening: trans-2,3-epoxybutane gives the meso diol, from either enantiomer (740.5397ms)
+  ✔ epoxide-base-hydroxide-opening: cis (meso) epoxide gives both (R,R) and (S,S) diol (104.2875ms)
+  ✔ epoxide-acid-water-opening: trans-2,3-epoxybutane gives the meso diol, from either enantiomer (35.4494ms)
+  ✔ epoxide-acid-water-opening: cis (meso) epoxide gives both (R,R) and (S,S) diol (28.4985ms)
+  ✔ hydrogen bromide: trans epoxide gives one bromohydrin stereoisomer; cis gives an enantiomer pair (98.6874ms)
+  ✔ the configuration of the carbon whose C-O bond is kept is not changed (trans epoxide, hydroxide: product is not (R,R)) (16.5018ms)
+  ✔ a stereocentre away from the reaction site is preserved (terminal epoxide, attack at CH2) (28.79ms)
+  ✔ an unspecified acyclic epoxide stays unspecified: cis/trans is unknown, so no relationship is invented (63.6061ms)
+  ✔ a tertiary attacked carbon is inverted too (acid opening of a trisubstituted stereo-defined epoxide keeps one defined centre) (26.338ms)
+✔ epoxide opening inverts the attacked carbon (acyclic, stereo-defined) (6068.6089ms)
+▶ cyclic epoxides: anti opening gives the trans racemate; other rings are left unspecified
+  ✔ cyclopentene oxide + hydroxide gives only trans-1,2-diol: (R,R) and (S,S), never the cis meso form (58.9294ms)
+  ✔ cyclohexene oxide + hydroxide gives only trans-1,2-diol: (R,R) and (S,S), never the cis meso form (48.9886ms)
+  ✔ cycloheptene oxide + hydroxide gives only trans-1,2-diol: (R,R) and (S,S), never the cis meso form (101.0082ms)
+  ✔ cyclohexene oxide + HBr / NH3: trans-2-substituted cyclohexanols as enantiomer pairs (122.2499ms)
+  ✔ substituents elsewhere on the ring do not add invented stereocentres (3-methylcyclohexene oxide) (61.06ms)
+  ✔ cyclooctene oxide and norbornene oxide are not completed: a trans epoxide / bridged face is possible, so nothing is assigned (50.4527ms)
+  ✔ a stereo-defined ring epoxide is not re-enumerated: only the opening site inverts (31.1571ms)
+  ✔ the Reactions page labels the ring product a racemate and the cis acyclic product a racemate, the trans one single (3684.1748ms)
+✔ cyclic epoxides: anti opening gives the trans racemate; other rings are left unspecified (4159.7023ms)
+▶ an achiral reaction cannot choose an enantiomer
+  ✔ halohydrin formation: E-2-butene, cyclohexene and a terminal alkene give racemates (4055.9082ms)
+  ✔ halohydrin formation on E-2-butene is the anti product: (2R,3S)-type relative configuration, as for the dibromide (1394.3031ms)
+  ✔ a single new stereocentre in a Diels-Alder product is a racemate (468.2778ms)
+  ✔ meso products are not mislabelled as mixtures (cyclohexene epoxide, cis-diol, E-2-butene dibromide) (4323.7066ms)
+  ✔ an alkene of undefined geometry keeps every stereoisomer the mechanism allows (no single arbitrary one) (2268.6596ms)
+  ✔ a reactant stereocentre prevents the racemate inference (chiral allylic alcohol halohydrin stays unspecified at the new centres) (2239.3872ms)
+  ✔ 1-butene bromination, epoxidation and halohydrin remain racemates as before (3054.661ms)
+✔ an achiral reaction cannot choose an enantiomer (17806.6933ms)
+▶ alkene geometry is used where the engine can use it, and declared unknown where it cannot
+  ✔ halohydrin formation distinguishes E from Z: the two geometries give different diastereomers (they used to give the same one) (2520.0169ms)
+  ✔ halohydrin stereo-pattern equals the anti diol and the anti dibromide of the same alkene (O/Br swapped in the same slot) (5097.9797ms)
+  ✔ acyclic tri- and tetrasubstituted alkenes: the geometry cannot be mapped, so NO diastereomer is chosen and the reason is stated (10100.5292ms)
+  ✔ no rule gives (E)- and (Z)-2-butene the same defined stereoisomers (2558.716ms)
+  ✔ a ring trisubstituted alkene (1-methylcyclohexene) gives the racemic cis diol for syn and trans diol for anti addition (5426.0508ms)
+✔ alkene geometry is used where the engine can use it, and declared unknown where it cannot (25706.8795ms)
+▶ carbonyl additions never assign a configuration they cannot support
+  ✔ Grignard addition to 2-butanone, hydride reduction, cyanide addition and aldol give unspecified or labelled products only (1230.0606ms)
+✔ carbonyl additions never assign a configuration they cannot support (1230.9333ms)
+▶ isotopes, charges and geometry survive the Stage 9E templates
+  ✔ an isotope label on an epoxide substituent is kept through HX, hydroxide and alkoxide openings (45.2473ms)
+  ✔ a labelled stereo-defined epoxide is still inverted at the attacked carbon, label intact (70.7488ms)
+  ✔ a charged substituent is untouched by ring opening and by the ring-completion templates (50.2761ms)
+  ✔ halohydrin keeps an isotope label and a defined geometry's diastereomer (325.698ms)
+  ✔ E2 keeps the E geometry of the alkene it forms (2-bromobutane + ethoxide gives (E)-2-butene as the major product) (217.7558ms)
+  ✔ E1/E2 labelled substrates keep the isotope (labelled 2-bromobutane gives labelled 2-butene) (370.4103ms)
+✔ isotopes, charges and geometry survive the Stage 9E templates (1081.5916ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+✔ meso mirror identity is not an enantiomeric pair (4825.8704ms)
+✔ atom maps do not change chemical identity or tetrahedral configuration (4.7142ms)
+✔ R/S, E/Z, diastereomers and unspecified stereo remain distinct (23.8578ms)
+✔ a racemic mixture cannot verify a pure synthesis target (8.591ms)
+✔ partially specified tetrahedral or alkene geometry cannot prove an enantiomer pair (163.1896ms)
+✔ name comparison retains stereogenic unit locants and relative contradictions (38.9211ms)
+✔ independently resolved structures recognize the meso names despite descriptor order (5.0241ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ L1: the reaction engine executes supported transformations
+  ✔ [engine] O-methylation of a phenol (phenol-williamson-ether) (2139.6807ms)
+  ✔ [engine] benzylic bromination (benzylic-bromination) (492.9372ms)
+  ✔ [engine] acetylide alkylation (acetylene itself) (terminal-alkyne-alkylation) (451.9407ms)
+  ✔ [engine] partial alkyne hydrogenation (alkyne-lindlar-reduction-terminal) (292.6951ms)
+  ✔ [engine] alcohol oxidation (primary-alcohol-mild-oxidation) (111.4182ms)
+  ✔ [engine] ketone reduction (ketone-reduction) (44.9136ms)
+  ✔ [engine] Grignard addition (aldehyde-organometallic-addition) (108.2934ms)
+  ✔ [engine] alkene hydration (alkene-acid-hydration) (217.0389ms)
+  ✔ [engine] aldehyde oxidation (aldehyde-oxidation) (45.8486ms)
+  ✔ [engine] Fischer esterification (fischer-esterification) (151.9122ms)
+  ✔ [engine] alcohol Williamson ether (alcohol-williamson-ether) (121.0988ms)
+  ✔ [engine] SN2 substitution (haloalkane-sn2-hydroxide) (200.3188ms)
+  ✔ [engine] E2 elimination (Hofmann) (haloalkane-e2-hofmann) (533.3334ms)
+  ✔ [engine] tertiary halide does not O-alkylate a phenol (250.6921ms)
+  ✔ [engine] an internal alkyne is not a terminal-alkyne reduction substrate (118.0805ms)
+  ✔ [engine] benzene has no benzylic position (87.0314ms)
+  ✔ [engine] an ether is not a phenol (14.084ms)
+  ✔ [engine] repeated and re-ordered calls give identical pathways (caches never change results) (622.5198ms)
+✔ L1: the reaction engine executes supported transformations (9211.1205ms)
+▶ L2: retrosynthesis proposes the disconnection under planner candidate caps
+  ✔ [engine] Lindlar disconnection of a terminal alkene (3104.598ms)
+  ✔ [engine] acetylene mono-alkylation (terminal alkyne product) (1178.949ms)
+  ✔ [engine] benzylic bromide from the methylarene (712.1736ms)
+  ✔ [engine] phenol O-methylation (620.9143ms)
+  ✔ [engine] ketone reduction (759.4457ms)
+  ✔ [engine] budget monotonicity: raising the caps never loses a disconnection (by rule) (16860.685ms)
+  ✔ [engine] a rule's many variants cannot starve other rules of the result budget (5120.9228ms)
+✔ L2: retrosynthesis proposes the disconnection under planner candidate caps (28360.1491ms)
+▶ L3: estragole from p-cresol + bromomethane + acetylene (Deep search budget)
+  ✖ [engine] a verified route is found before the 45 s deadline, using all three materials (3.4566ms)
+  ✔ [engine] the starting-material order does not change the rules used (1.5296ms)
+  ✔ [engine] every returned route replayed forward without failure (0.3884ms)
+✖ L3: estragole from p-cresol + bromomethane + acetylene (Deep search budget) (77984.3291ms)
+▶ negative: no route within budget is reported as such, never as a failure
+  ✔ [engine] without the acetylene the target cannot be built; the search ends empty at its budget (6014.728ms)
+✔ negative: no route within budget is reported as such, never as a failure (6015.2013ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+[PocketChem:Synthesis] search-state listener failed; continuing. Error: listener failure
+    at file:///<repo>/scripts/tests/synthesisSearchRun.test.mjs:273:13
+    at SearchRunController.publish (<repo>/src/utils/reactions/engine/synthesisSearchRun.ts:106:5)
+    at SearchRunController.start (<repo>/src/utils/reactions/engine/synthesisSearchRun.ts:164:8)
+    at TestContext.<anonymous> (file:///<repo>/scripts/tests/synthesisSearchRun.test.mjs:275:29)
+    at Test.runInAsyncScope (node:async_hooks:227:14)
+    at Test.run (node:internal/test_runner/test:1402:25)
+    at Suite.processPendingSubtests (node:internal/test_runner/test:974:18)
+    at Test.postRun (node:internal/test_runner/test:1542:19)
+    at Test.run (node:internal/test_runner/test:1467:12)
+    at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7)
+[PocketChem:Synthesis] search-state listener failed; continuing. Error: listener failure
+    at file:///<repo>/scripts/tests/synthesisSearchRun.test.mjs:273:13
+    at SearchRunController.publish (<repo>/src/utils/reactions/engine/synthesisSearchRun.ts:106:5)
+    at SearchRunController.finish (<repo>/src/utils/reactions/engine/synthesisSearchRun.ts:284:8)
+    at SearchRunController.start (<repo>/src/utils/reactions/engine/synthesisSearchRun.ts:234:9)
+    at async TestContext.<anonymous> (file:///<repo>/scripts/tests/synthesisSearchRun.test.mjs:277:5)
+    at async Test.run (node:internal/test_runner/test:1409:7)
+    at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7)
+▶ single search: invocation and inventory
+  ✔ [unit] one start() runs the scheduler once, with the 45 s limit and one copy by default (1.5485ms)
+  ✔ [unit] two copies are passed through only when the user chose them, unchanged (0.3155ms)
+  ✔ [unit] the controller passes the supplied structures and rules to the runner unchanged (0.2087ms)
+✔ single search: invocation and inventory (2624.8529ms)
+▶ progress and route display
+  ✔ [unit] a verified route is in the state the moment it is reported, before the search ends (1.3191ms)
+  ✔ [unit] progress is monotonic, the stage label is shown, and engine progress is forwarded (0.5932ms)
+  ✔ [unit] the shown confidence follows replay: verified, or connectivity-verified; never 'unverified' (0.4347ms)
+  ✔ [unit] Stage 7 compatibility annotations and verification metadata are carried through untouched (0.3322ms)
+  ✔ [unit] a starting material that already is the target is reported as such (0.4649ms)
+✔ progress and route display (3.7635ms)
+▶ cancel, Clear and stale callbacks
+  ✔ [unit] Cancel keeps the verified routes found so far and says the search did not finish (0.5783ms)
+  ✔ [unit] Cancel with no route found is a plain cancellation (0.2224ms)
+  ✔ [unit] Clear forgets everything and later reports from the cleared run are ignored (0.4043ms)
+  ✔ [unit] a finished older search can never overwrite a newer search's state (0.4889ms)
+  ✔ [unit] a throwing subscriber does not break the run (0.8157ms)
+✔ cancel, Clear and stale callbacks (2.893ms)
+▶ search outcomes
+  ✔ [unit] a deadline-limited search with routes keeps them and is not described as complete (0.2828ms)
+  ✔ [unit] a completed search says the routes are the best found, not proven optimal (0.1846ms)
+  ✔ [unit] no route within the budget is not chemical impossibility; within bounds is qualified too (0.19ms)
+  ✔ [unit] an engine error is reported with its details and keeps routes verified before it (0.2118ms)
+✔ search outcomes (1.0319ms)
+▶ watchdogs (small limits)
+  ✔ [unit] a stalled engine is stopped after the stall limit; verified routes are kept; late reports are ignored (134.408ms)
+  ✔ [unit] any lane activity re-arms the stall guard (163.0976ms)
+  ✔ [unit] the hard backstop abandons an engine that ignores the 45 s deadline (no routes: a budget stop) (165.3014ms)
+✔ watchdogs (small limits) (464.2368ms)
+▶ real scheduler through the controller
+  ✔ [engine] ethanol -> acetaldehyde: one Search finds a verified route and reports it while running or at the end (3110.9575ms)
+✔ real scheduler through the controller (3111.5874ms)
+▶ SynthesisPage wiring (source checks)
+  ✔ [source] one Search button; no Deep, Search deeper or algorithm-selection controls remain (1.7866ms)
+  ✔ [source] the copies selector defaults to one, offers one or two, and is the value handed to the controller (0.3369ms)
+  ✔ [source] Cancel, Clear, unmount and the 45 s limit go through the controller (0.2545ms)
+  ✔ [source] Stage 7 compatibility notes and verification labels are still rendered (0.3511ms)
+  ✔ [source] the editors and their ready/clearing guards are untouched (0.2689ms)
+✔ SynthesisPage wiring (source checks) (3.4675ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ step selectivity classes
+  ✔ [engine] two constitutional outcomes the engine does not rank are 'unranked', with the count (924.1771ms)
+  ✔ [engine] an unranked coupling regioisomer never gets major-product standing (41.2426ms)
+  ✔ [engine] a step with one constitutional outcome is 'single-outcome' (nothing to rank), not 'major' (13.6617ms)
+  ✔ [engine] a product-specific estimate decides major versus disfavored; competitive is not called major (1.0449ms)
+  ✔ [engine] a rule missing from the registry, or a product the rule cannot reproduce, is 'unassessed' - not a concern (3.1794ms)
+  ✔ [engine] a representative rule is flagged as such (the stereo-incomplete epoxidation keeps its uncertainty) (157.7343ms)
+  ✔ [engine] a rule's documented limitation travels with the finding (over-reduction caveat stays visible) (32.7692ms)
+✔ step selectivity classes (4852.7928ms)
+▶ ranking uses selectivity without treating unknown as wrong
+  ✔ a documented disfavored step ranks below an equal-length route without one (6.9744ms)
+  ✔ a disfavored step outranks length: a longer route without it is preferred (0.8882ms)
+  ✔ an unranked step does not outrank length (a shorter route is kept first) but loses a tie (1.1056ms)
+  ✔ unassessed steps are neither a concern nor a reason to keep searching (2.2476ms)
+  ✔ a disfavored step keeps a route adequate but improvable; an unranked one does not make it improvable (0.8979ms)
+  ✔ a major-supported or single-outcome route is not improvable on selectivity grounds (1.3012ms)
+  ✔ a documented condition conflict is still its own judgement, independent of selectivity (0.7202ms)
+  ✔ a route saved before selectivity existed ranks as before (no concerns) (0.5813ms)
+✔ ranking uses selectivity without treating unknown as wrong (22.0993ms)
+▶ extra search is reserved for documented concerns
+  ✔ only disfavored rules of the first verified route are avoided; unranked and unassessed are not (1.076ms)
+✔ extra search is reserved for documented concerns (3.2278ms)
+▶ scheduler: a lane that only found an unranked route does not cause more lanes to run
+  ✔ unranked: the next lane is skipped as satisfied (5.3636ms)
+  ✔ disfavored: the next lane is allowed to run (2.9412ms)
+✔ scheduler: a lane that only found an unranked route does not cause more lanes to run (9.3909ms)
+▶ equivalent spellings of the same molecule
+  ✖ [engine] start and target spelled differently give the same selected route (33802.8073ms)
+✖ equivalent spellings of the same molecule (33805.8461ms)
+▶ end to end (bounded)
+  ✔ [engine] a known correct two-step route stays accepted, with no selectivity concern (3916.2197ms)
+  ✔ [engine] a convergent route with both branches transformed gets a finding for every step and no spurious concern (3275.1173ms)
+✔ end to end (bounded) (7195.984ms)
+▶ a route with an unranked step is ranked, not re-searched
+  ✖ [engine] 1-octene -> 2-octanone: the selected route is hydration + oxidation, with no unranked step (7890.9872ms)
+✖ a route with an unranked step is ranked, not re-searched (7893.4284ms)
+▶ candidate comparison with real rule metadata (no search)
+  ✔ [engine] the old anti-dihydroxylation -> pinacol route to 2-octanone is no longer reproduced (Stage 9C) (48.0993ms)
+  ✔ [engine] the route whose steps are not ranked-ambiguous ranks first, whichever was discovered first (37.0855ms)
+  ✔ [engine] the conclusion rests on 'unranked' only: it is not evidence that an unranked product is minor (3.4078ms)
+  ✔ [engine] canonical forms: equivalent spellings agree; distinct stereoisomers, charges and isotopes stay distinct (21.8971ms)
+  ✔ [engine] searches rooted at canonical forms keep stereochemistry and isotopes in the route (8582.3203ms)
+✔ candidate comparison with real rule metadata (no search) (8697.025ms)
+PocketChem Functional Group Validator: 3 errors, 39 warnings
+  Groups loaded: 244
+▶ UI options: defaults are the ordinary search
+  ✔ [engine] with advanced search off, options match the previous Normal and Deep settings (5.4711ms)
+  ✔ [engine] advanced settings map to engine options and stay inside the hard limit (0.7322ms)
+✔ UI options: defaults are the ordinary search (5067.2301ms)
+▶ UI options request the fischer-isopropyl-propanoate convergent route
+  ✔ [engine] verified convergent route found with the UI-facing options (1.0147ms)
+  ✔ [engine] branch structure and final product are represented from replay metadata (2.2406ms)
+✔ UI options request the fischer-isopropyl-propanoate convergent route (4000.6395ms)
+▶ UI options request the williamson-cyclohexyl-propyl-ether convergent route
+  ✔ [engine] verified convergent route found with the UI-facing options (5.3404ms)
+  ✔ [engine] branch structure and final product are represented from replay metadata (0.9102ms)
+✔ UI options request the williamson-cyclohexyl-propyl-ether convergent route (7697.0893ms)
+▶ UI options: inventory copies
+  ✔ [engine] one copy rejects the route that needs ethanol twice (6.0462ms)
+  ✔ [engine] an explicit two-copy inventory permits the route when budgets allow (17256.7408ms)
+✔ UI options: inventory copies (17264.0451ms)
+▶ best-so-far routes
+  ✔ [engine] a verified route reported before a forced stop stays accessible (1437.5191ms)
+[PocketChem:Synthesis] onRouteFound callback failed; continuing. Error: callback failure
+    at Object.onRouteFound (file:///<repo>/scripts/tests/synthesisUi.test.mjs:156:13)
+    at acceptHit (<repo>/src/utils/reactions/engine/convergentSearch.ts:452:23)
+    at async lookahead (<repo>/src/utils/reactions/engine/convergentSearch.ts:473:20)
+    at async searchConvergentRoutesCore (<repo>/src/utils/reactions/engine/convergentSearch.ts:708:4)
+    at async TestContext.<anonymous> (file:///<repo>/scripts/tests/synthesisUi.test.mjs:154:24)
+    at async Test.run (node:internal/test_runner/test:1409:7)
+    at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7)
+[PocketChem:Synthesis] onRouteFound callback failed; continuing. Error: callback failure
+    at Object.onRouteFound (file:///<repo>/scripts/tests/synthesisUi.test.mjs:156:13)
+    at acceptHit (<repo>/src/utils/reactions/engine/convergentSearch.ts:452:23)
+    at async lookahead (<repo>/src/utils/reactions/engine/convergentSearch.ts:473:20)
+    at async searchConvergentRoutesCore (<repo>/src/utils/reactions/engine/convergentSearch.ts:708:4)
+    at async TestContext.<anonymous> (file:///<repo>/scripts/tests/synthesisUi.test.mjs:154:24)
+    at async Test.run (node:internal/test_runner/test:1409:7)
+    at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ✔ [engine] only routes that passed replay are reported, and a throwing callback does not break the search (1331.8302ms)
+  ✔ [engine] a superseded or cancelled run cannot add routes to the current results (0.7744ms)
+  ✔ [engine] a kept route's confidence label follows its replay, not the planner's label (0.2995ms)
+  ✔ [engine] a search that ends without a route reports a budget stop, not a reaction failure (396.2055ms)
+✔ best-so-far routes (3167.6487ms)
+▶ route structure: nothing is invented
+  ✔ [engine] a route without replay metadata is 'unknown' and shows no inputs or branches (0.3427ms)
+  ✔ [engine] a linear chain of dependencies is linear, with no join (0.295ms)
+  ✔ [engine] branches that share an ancestor are not presented as independent (0.4996ms)
+✔ route structure: nothing is invented (1.4177ms)
+▶ name/SMILES input label layout
+  ✔ the label does not wrap on wide screens and the hint drops below instead of squeezing it (1.3287ms)
+  ✔ narrow screens stack the copy block and let the label wrap; input row still wraps (0.3425ms)
+  ✔ one shared drawer renders the label, so every molecular editor gets the same layout (0.1668ms)
+✔ name/SMILES input label layout (2.7628ms)
+▶ editor vertical resizing
+  ✔ the synthesis editor box is user-resizable with no upper cap, in both layouts (0.3125ms)
+  ✔ the box height reaches the real canvas: stack, shell and iframe all fill their parent (0.2847ms)
+  ✔ each editor is its own box with its own frame id, and no JavaScript resize machinery was added (2.7251ms)
+✔ editor vertical resizing (3.555ms)
+▶ clipboard shortcuts
+  ✔ Ketcher's own handlers provide every required shortcut (verified in the installed package) (13.2497ms)
+  ✔ PocketChem adds no clipboard or shortcut handlers of its own (no duplicates) (0.9374ms)
+  ✔ the same-origin editor frame is explicitly allowed to use the async clipboard (0.3951ms)
+  ✔ the name/SMILES field is an ordinary input in the parent document, outside the frame (0.4705ms)
+✔ clipboard shortcuts (15.517ms)
+▶ synthesis page: diagnostics and copies text
+  ✔ the frontier diagnostics panel is gone from the UI but the engine still reports frontier data (2.0411ms)
+  ✔ progress, cancel, verified routes and the time limit remain (0.4688ms)
+  ✔ the copies selector is kept (one default, two) with the concise explanation (0.3402ms)
+  ✔ Add/Replace stays on the starting-material editor only (0.2419ms)
+✔ synthesis page: diagnostics and copies text (3.4724ms)
+ℹ tests 1358
+ℹ suites 266
+ℹ pass 1348
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 6
+ℹ duration_ms 692897.8345
+
+✖ failing tests:
+
+test at scripts\tests\branches.test.mjs:91:3
+⚠ [known-gap] two equally reactive components should both react under excess reagent (746.4593ms) # TODO
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(branches.some((b) => state(b.finalSmiles) === state("CC(C)Br.CCC(C)Br")))
+  
+      at TestContext.<anonymous> (file:///<repo>/scripts/tests/branches.test.mjs:93:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at scripts\tests\compatibility.test.mjs:166:3
+✖ [engine] p-cresol + CH3Br + acetylene -> estragole is ordered so no step has a model constraint (45320.8703ms)
+  AssertionError [ERR_ASSERTION]: hit the deadline after 45311 ms
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///<repo>/scripts/tests/compatibility.test.mjs:175:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Promise.all (index 0)
+      at async Suite.run (node:internal/test_runner/test:1905:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts\tests\synthesisReliability.test.mjs:198:3
+✖ [engine] a verified route is found before the 45 s deadline, using all three materials (3.4566ms)
+  AssertionError [ERR_ASSERTION]: search hit the hard deadline
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///<repo>/scripts/tests/synthesisReliability.test.mjs:199:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at async Promise.all (index 0)
+      at async Suite.run (node:internal/test_runner/test:1905:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts\tests\synthesisSelectivity.test.mjs:232:3
+✖ [engine] start and target spelled differently give the same selected route (33802.8073ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  +   'wacker-tsuji-oxidation'
+  -   'alkene-acid-hydration>secondary-alcohol-oxidation-pcc'
+    ]
+  
+      at TestContext.<anonymous> (file:///<repo>/scripts/tests/synthesisSelectivity.test.mjs:237:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Promise.all (index 0)
+      at async Suite.run (node:internal/test_runner/test:1905:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'wacker-tsuji-oxidation' ],
+    expected: [ 'alkene-acid-hydration>secondary-alcohol-oxidation-pcc' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at scripts\tests\synthesisSelectivity.test.mjs:270:3
+✖ [engine] 1-octene -> 2-octanone: the selected route is hydration + oxidation, with no unranked step (7890.9872ms)
+  AssertionError [ERR_ASSERTION]: ["wacker-tsuji-oxidation"]
+  + actual - expected
+  
+  + 'wacker-tsuji-oxidation'
+  - 'alkene-acid-hydration>secondary-alcohol-oxidation-pcc'
+  
+      at TestContext.<anonymous> (file:///<repo>/scripts/tests/synthesisSelectivity.test.mjs:275:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Promise.all (index 0)
+      at async Suite.run (node:internal/test_runner/test:1905:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'wacker-tsuji-oxidation',
+    expected: 'alkene-acid-hydration>secondary-alcohol-oxidation-pcc',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+npm exit 1

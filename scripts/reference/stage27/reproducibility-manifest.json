@@ -1,0 +1,484 @@
+{
+  "manifestVersion": 1,
+  "stage": 27,
+  "purpose": "Machine-readable record of the scientific reference data, model assumptions, evidence statuses, reference cases and verification runs behind the Stage 27 scientific-reliability milestone. Evidence statuses are copied by hand and checked against src/utils/evidence/evidence27.ts by scripts/tests/reproducibilityManifest27.test.mjs; they are never generated. Nothing here is a runtime dependency.",
+  "baseRevision": "013fdd7",
+  "baseRevisionNote": "Stage 26 final commit. The Stage 27 commits follow it on branch stage10-ui-overhaul; the exact hashes are in scripts/benchmarks/stage27/HANDOFF-27.md because a commit cannot contain its own hash.",
+  "referenceData": [
+    {
+      "id": "ciaaw-atomic-weights-2024",
+      "file": "scripts/reference/stage27/ciaaw-atomic-weights-2024.json",
+      "sha256": "3b6bc83a6cd3741c482d82d60a68f46021ea8c9703b27122a4f50f43b2564ab6",
+      "retrieved": "2026-11-23",
+      "status": "source-verified",
+      "urls": [
+        "https://ciaaw.org/atomic-weights.htm",
+        "https://ciaaw.org/abridged-atomic-weights.htm"
+      ],
+      "convention": "Abridged conventional standard atomic weight; elements with an interval use the CIAAW conventional value."
+    },
+    {
+      "id": "standard-reduction-potentials-crosscheck",
+      "file": "scripts/reference/stage27/standard-reduction-potentials.json",
+      "sha256": "87e23c3005b74a3159f649ced6082792e01666a3fe6ba409d6c57e786fe4d14f",
+      "retrieved": "2026-11-23",
+      "status": "secondary-compilation",
+      "urls": [
+        "https://en.wikipedia.org/wiki/Standard_electrode_potential_(data_page)"
+      ],
+      "convention": "V vs SHE, 298.15 K, unit activity, gases at 101.325 kPa; tolerance 0.025 V. The CRC Handbook and Bard-Parsons-Jordan were not opened."
+    },
+    {
+      "id": "nist-codata-2022",
+      "file": "scripts/reference/stage27/physical-constants.json",
+      "sha256": "b35cdab056f1cd745e2b3da876cff59e1c0ef73bbb0120eb3eee301d82450789",
+      "retrieved": "2026-11-23",
+      "status": "source-verified",
+      "urls": [
+        "https://physics.nist.gov/cuu/Constants/Table/allascii.txt"
+      ],
+      "convention": "SI units; exact constants compared to 1e-12 relative, measured constants to 2e-9 relative."
+    }
+  ],
+  "modules": [
+    {
+      "id": "gc-elements",
+      "file": "src/utils/generalChem/elements.ts",
+      "referenceData": "ciaaw-atomic-weights-2024"
+    },
+    {
+      "id": "gc-electrochem",
+      "file": "src/utils/generalChem/electrochem.ts",
+      "referenceData": "standard-reduction-potentials-crosscheck"
+    },
+    {
+      "id": "gc-gas",
+      "file": "src/utils/generalChem/gas.ts",
+      "referenceData": "nist-codata-2022"
+    },
+    {
+      "id": "bio-membrane",
+      "file": "src/utils/biology/membrane23.ts",
+      "referenceData": "nist-codata-2022"
+    },
+    {
+      "id": "bio-neuron-hh",
+      "file": "src/utils/biology/neuron23.ts",
+      "referenceData": null
+    },
+    {
+      "id": "bio-provenance",
+      "file": "src/utils/biology/provenance26.ts",
+      "referenceData": null
+    },
+    {
+      "id": "biochem-lipids",
+      "file": "src/utils/biochem/metabolism/lipids.ts",
+      "referenceData": null
+    },
+    {
+      "id": "biochem-nitrogen",
+      "file": "src/utils/biochem/metabolism/nitrogen.ts",
+      "referenceData": null
+    },
+    {
+      "id": "biochem-provenance",
+      "file": "src/utils/biochem/metabolism/provenance.ts",
+      "referenceData": null
+    },
+    {
+      "id": "evidence",
+      "file": "src/utils/evidence/evidence27.ts",
+      "referenceData": null
+    }
+  ],
+  "constants": {
+    "R": {
+      "value": 8.314462618,
+      "unit": "J mol^-1 K^-1",
+      "basis": "exact (SI 2019)"
+    },
+    "F": {
+      "value": 96485.33212,
+      "unit": "C mol^-1",
+      "basis": "exact (SI 2019)"
+    },
+    "kB": {
+      "value": 1.380649e-23,
+      "unit": "J K^-1",
+      "basis": "exact (SI 2019)"
+    },
+    "NA": {
+      "value": 6.02214076e+23,
+      "unit": "mol^-1",
+      "basis": "exact (SI 2019)"
+    },
+    "e": {
+      "value": 1.602176634e-19,
+      "unit": "C",
+      "basis": "exact (SI 2019)"
+    },
+    "c": {
+      "value": 299792458,
+      "unit": "m s^-1",
+      "basis": "exact"
+    },
+    "eps0_mu0_particleMasses": {
+      "value": null,
+      "unit": "",
+      "basis": "labelled CODATA 2018 in code; differ from 2022 by < 2e-9 relative; not updated"
+    }
+  },
+  "unitConventions": [
+    "Atomic mass in g/mol (conventional abridged standard atomic weights).",
+    "Standard electrode potentials in volts versus SHE, written as reductions, never multiplied by stoichiometric coefficients.",
+    "Membrane potential Vm = phi_inside - phi_outside in mV; ion concentrations in mM; temperature in degrees C converted to K internally.",
+    "Hodgkin-Huxley in the modern convention: rest -65 mV, depolarisation positive, time in ms, current density in uA/cm2, conductance in mS/cm2, capacitance 1 uF/cm2, squid giant axon at 6.3 C.",
+    "ATP equivalents: 2.5 per NADH, 1.5 per FADH2, 10 per acetyl-CoA through the citric acid cycle; high-energy bonds counted as phosphoanhydride bonds (ATP 2, ADP 1, PPi 1).",
+    "Physics in SI units internally; optics distances in cm with the Cartesian sign convention used by the tool."
+  ],
+  "evidence": [
+    {
+      "id": "gc-atomic-masses",
+      "kind": "reference-data",
+      "source": "source-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "gc-stoichiometry",
+      "kind": "textbook-approximation",
+      "source": "partly-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "gc-ideal-gas",
+      "kind": "textbook-approximation",
+      "source": "partly-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "gc-electrode-potentials",
+      "kind": "reference-data",
+      "source": "partly-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "gc-nernst-cell",
+      "kind": "textbook-approximation",
+      "source": "partly-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "bio-membrane",
+      "kind": "textbook-approximation",
+      "source": "partly-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "bio-hodgkin-huxley",
+      "kind": "numerical-model",
+      "source": "not-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "physics-constants",
+      "kind": "reference-data",
+      "source": "source-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "physics-closed-forms",
+      "kind": "textbook-approximation",
+      "source": "not-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "biochem-fatty-acid-atp",
+      "kind": "textbook-approximation",
+      "source": "partly-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "biochem-urea-cycle",
+      "kind": "textbook-approximation",
+      "source": "partly-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "bio-apoptosis",
+      "kind": "curated-mechanism",
+      "source": "partly-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "bio-cell-cycle",
+      "kind": "curated-mechanism",
+      "source": "partly-verified",
+      "calc": "independently-checked"
+    },
+    {
+      "id": "bio-organelles-trafficking",
+      "kind": "curated-mechanism",
+      "source": "partly-verified",
+      "calc": "not-checked"
+    }
+  ],
+  "referenceCases": [
+    "CHEM-ATOMIC-1",
+    "CHEM-ATOMIC-2",
+    "CHEM-ATOMIC-3",
+    "CHEM-ATOMIC-4",
+    "CHEM-MASS",
+    "CHEM-BALANCE",
+    "CHEM-GAS-1",
+    "CHEM-GAS-2",
+    "CHEM-GAS-3",
+    "CHEM-ELECTRO-1",
+    "CHEM-ELECTRO-2",
+    "CHEM-ELECTRO-3",
+    "CHEM-ELECTRO-4",
+    "CHEM-ELECTRO-5",
+    "CHEM-ELECTRO-6",
+    "CHEM-ELECTRO-7",
+    "CHEM-ELECTRO-8",
+    "PHYS-CONST",
+    "PHYS-WAVE-1",
+    "PHYS-WAVE-2",
+    "PHYS-OPT-1",
+    "PHYS-OPT-2",
+    "PHYS-OPT-3",
+    "PHYS-OPT-4",
+    "PHYS-DIFF-1",
+    "PHYS-DIFF-2",
+    "PHYS-FIELD-1",
+    "PHYS-FIELD-2",
+    "PHYS-MAG-1",
+    "PHYS-IND-1",
+    "PHYS-IND-2",
+    "BIO-NERNST-1",
+    "BIO-NERNST-2",
+    "BIO-NERNST-3",
+    "BIO-NERNST-4",
+    "BIO-ION",
+    "BIO-HH-1",
+    "BIO-HH-2",
+    "BIO-HH-3",
+    "BIO-HH-4",
+    "BIO-HH-5",
+    "BIO-HH-6",
+    "BIO-HH-7",
+    "BIO-MECH-1",
+    "BIO-MECH-2",
+    "BIO-MECH-3",
+    "BIO-MECH-4",
+    "BIO-MECH-5",
+    "BIO-MECH-6",
+    "BIO-MECH-7",
+    "BIO-MECH-8",
+    "BIOCHEM-FA-4",
+    "BIOCHEM-FA-8",
+    "BIOCHEM-FA-12",
+    "BIOCHEM-FA-16",
+    "BIOCHEM-FA-18",
+    "BIOCHEM-FA-16b",
+    "BIOCHEM-UREA-1",
+    "BIOCHEM-UREA-2",
+    "BIOCHEM-UREA-3"
+  ],
+  "tests": [
+    {
+      "id": "reference-cases",
+      "file": "scripts/tests/scientificReference27.test.mjs",
+      "command": "node --test --test-timeout=250000 scripts/tests/scientificReference27.test.mjs"
+    },
+    {
+      "id": "manifest",
+      "file": "scripts/tests/reproducibilityManifest27.test.mjs",
+      "command": "node --test --test-timeout=250000 scripts/tests/reproducibilityManifest27.test.mjs"
+    },
+    {
+      "id": "gc-stoichiometry",
+      "file": "scripts/tests/generalChemStoich22.test.mjs",
+      "command": "node --test scripts/tests/generalChemStoich22.test.mjs"
+    },
+    {
+      "id": "gc-gas",
+      "file": "scripts/tests/generalChemGas22.test.mjs",
+      "command": "node --test scripts/tests/generalChemGas22.test.mjs"
+    },
+    {
+      "id": "gc-electro",
+      "file": "scripts/tests/generalChemElectro22.test.mjs",
+      "command": "node --test scripts/tests/generalChemElectro22.test.mjs"
+    },
+    {
+      "id": "bio-membrane",
+      "file": "scripts/tests/biologyMembrane23.test.mjs",
+      "command": "node --test scripts/tests/biologyMembrane23.test.mjs"
+    },
+    {
+      "id": "bio-neuron",
+      "file": "scripts/tests/biologyNeuron23.test.mjs",
+      "command": "node --test scripts/tests/biologyNeuron23.test.mjs"
+    },
+    {
+      "id": "bio-platform-26",
+      "file": "scripts/tests/biologyPlatform26.test.mjs",
+      "command": "node --test scripts/tests/biologyPlatform26.test.mjs"
+    },
+    {
+      "id": "biochem-25",
+      "file": "scripts/tests/biochemMetabolism25.test.mjs",
+      "command": "node --test scripts/tests/biochemMetabolism25.test.mjs"
+    },
+    {
+      "id": "biochem-provenance-19",
+      "file": "scripts/tests/biochemProvenance19.test.mjs",
+      "command": "node --test scripts/tests/biochemProvenance19.test.mjs"
+    }
+  ],
+  "browserChecks": [
+    {
+      "id": "stage27",
+      "file": "scripts/browser/stage27LiveCheck.mjs",
+      "command": "npm run build && node scripts/browser/stage27LiveCheck.mjs"
+    },
+    {
+      "id": "stage15",
+      "file": "scripts/browser/stage15LiveCheck.mjs",
+      "command": "node scripts/browser/stage15LiveCheck.mjs"
+    },
+    {
+      "id": "stage16",
+      "file": "scripts/browser/stage16LiveCheck.mjs",
+      "command": "node scripts/browser/stage16LiveCheck.mjs"
+    }
+  ],
+  "results": [
+    {
+      "name": "scientificReference27 (node --test)",
+      "passed": 86,
+      "total": 86,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "biologyNeuron23",
+      "passed": 49,
+      "total": 49,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "biologyMembrane23",
+      "passed": 66,
+      "total": 66,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "generalChemGas22",
+      "passed": 30,
+      "total": 30,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "generalChemStoich22",
+      "passed": 58,
+      "total": 58,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "generalChemElectro22",
+      "passed": 39,
+      "total": 39,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "biologyPlatform26",
+      "passed": 27,
+      "total": 27,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "biochemMetabolism25",
+      "passed": 57,
+      "total": 57,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "biochemProvenance19",
+      "passed": 12,
+      "total": 12,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "stereo9d (isolated, 198 s)",
+      "passed": 28,
+      "total": 28,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "browser stage27",
+      "passed": 112,
+      "total": 112,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "browser stage15",
+      "passed": 60,
+      "total": 60,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "browser stage16",
+      "passed": 124,
+      "total": 124,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "browser stage18",
+      "passed": 108,
+      "total": 108,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "browser stage21",
+      "passed": 79,
+      "total": 79,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "browser stage22",
+      "passed": 159,
+      "total": 159,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "browser stage23",
+      "passed": 152,
+      "total": 152,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "browser stage25",
+      "passed": 150,
+      "total": 150,
+      "run": "2026-11-23"
+    },
+    {
+      "name": "browser stage26",
+      "passed": 192,
+      "total": 192,
+      "run": "2026-11-23"
+    }
+  ],
+  "unsupportedScenarios": [
+    "Isotope-specific atomic masses and elements without a standard atomic weight.",
+    "Temperature-corrected standard potentials, basic-medium half-reactions, complexation and precipitation.",
+    "Real-gas behaviour.",
+    "The Hodgkin-Huxley model at other temperatures or as a mammalian neuron.",
+    "The resting potential of a specific cell type; E_Cl of a specific neuron.",
+    "Quantitative cell-cycle, trafficking or apoptosis kinetics, cell-survival probabilities, clinical phenotypes.",
+    "Measured cellular ATP yield; tissue- and compartment-specific transport costs.",
+    "Odd-chain and unsaturated fatty-acid ATP totals beyond what the Stage 25 engine already restricts.",
+    "Source verification of the Stage 26 mechanisms listed as not-checked in provenance26.ts."
+  ]
+}

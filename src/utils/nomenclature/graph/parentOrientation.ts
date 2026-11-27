@@ -2,30 +2,29 @@ import type { FunctionalGroupResult } from "../../functionalGroups/types";
 import type { ParentDescriptor, ParsedMol } from "../types";
 
 import { getOtherAtom } from "../molParser";
-import { getNamingIntent } from "../nameBuilder/namingIntent";
 
 import {
   getChainUnsaturation,
   getParentCandidateAtomsForPrimaryGroup,
 } from "./parentSelection";
 
-function getSubstituentBearingAtoms(parsedMol: ParsedMol, path: number[]) {
+/**
+ * Locants of every substituent occurrence along a numbered path, repeats included. IUPAC compares the full set of locants, so a carbon
+ * that carries two substituents contributes its locant twice (2,2,4-trimethylpentane beats 2,4,4-); the earlier per-atom list ignored the
+ * multiplicity and left such chains in drawing order.
+ */
+function getSubstituentOccurrenceLocants(parsedMol: ParsedMol, path: number[]) {
   const parentSet = new Set(path);
-  const atoms: number[] = [];
-
-  for (const parentAtom of path) {
+  const locants: number[] = [];
+  path.forEach((parentAtom, index) => {
     for (const bond of parsedMol.adjacency.get(parentAtom) ?? []) {
       const other = getOtherAtom(bond, parentAtom);
       const otherAtom = parsedMol.atoms[other];
-
-      if (!otherAtom) continue;
-      if (parentSet.has(other)) continue;
-
-      atoms.push(parentAtom);
+      if (!otherAtom || parentSet.has(other)) continue;
+      locants.push(index + 1);
     }
-  }
-
-  return Array.from(new Set(atoms));
+  });
+  return locants.sort((a, b) => a - b);
 }
 
 function getLocantsForAtoms(path: number[], atomIndexes: number[]) {
@@ -92,16 +91,8 @@ export function orientParentForPrimaryGroup(
   if (unsaturationComparison < 0) return { ...parent, path: reversePath };
   if (unsaturationComparison > 0) return { ...parent, path: forwardPath };
 
-  const substituentAtoms = getSubstituentBearingAtoms(parsedMol, parent.path);
-
-  const forwardSubstituentLocants = getLocantsForAtoms(
-    forwardPath,
-    substituentAtoms
-  );
-  const reverseSubstituentLocants = getLocantsForAtoms(
-    reversePath,
-    substituentAtoms
-  );
+  const forwardSubstituentLocants = getSubstituentOccurrenceLocants(parsedMol, forwardPath);
+  const reverseSubstituentLocants = getSubstituentOccurrenceLocants(parsedMol, reversePath);
 
   return compareLocants(reverseSubstituentLocants, forwardSubstituentLocants) < 0
     ? { ...parent, path: reversePath }

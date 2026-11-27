@@ -45,32 +45,48 @@ export function connectivityKeyFromCanonicalSmiles(smiles: string): string {
     .join(".");
 }
 
+/**
+ * Canonical SMILES with R/S and E/Z removed but isotopes and charges kept.
+ *
+ * RDKit's `doIsomericSmiles: false` also drops isotope labels, so `[13CH3]CO` and
+ * `C[13CH2]O` shared one "connectivity" key and an isotopologue was treated as the
+ * same compound with unspecified stereochemistry. Isotope labels are part of a
+ * structure's identity here, so the stereo tokens are removed from the isomeric
+ * string and the result is re-canonicalized (stereo can influence atom order).
+ */
+function stereoFreeKey(rdkit: Awaited<ReturnType<typeof getRDKit>>, isomeric: string): string | null {
+  if (!smilesHasSpecifiedStereo(isomeric)) return isomeric;
+  const stripped = isomeric.replace(/@@?/g, "").replace(/[\\/]/g, "");
+  const mol = rdkit.get_mol(stripped);
+  if (!mol) return null;
+  try {
+    const key = mol.get_smiles?.();
+    return typeof key === "string" && key.trim() ? key.trim() : null;
+  } finally {
+    mol.delete?.();
+  }
+}
+
 export async function canonicalizeStereoStructure(
   smiles: string,
 ): Promise<CanonicalStereoStructure | null> {
   const rdkit = await getRDKit();
-  const mol = rdkit.get_mol(smiles);
+  // Atom maps describe reaction provenance, not molecular identity. Normalize
+  // only this comparison copy; the original reactants/products retain maps.
+  const mol = rdkit.get_mol(smiles.replace(/:\d+(?=\])/g, ""));
   if (!mol) return null;
 
   try {
     const isomeric = mol.get_smiles?.();
-    const connectivity = mol.get_smiles?.(
-      JSON.stringify({ doIsomericSmiles: false }),
-    );
-
-    if (
-      typeof isomeric !== "string" ||
-      !isomeric.trim() ||
-      typeof connectivity !== "string" ||
-      !connectivity.trim()
-    ) {
-      return null;
-    }
+    if (typeof isomeric !== "string" || !isomeric.trim()) return null;
 
     const normalizedIsomeric = isomeric.trim();
+    const connectivity = stereoFreeKey(rdkit, normalizedIsomeric);
+    if (!connectivity) return null;
+
     return {
       isomeric: normalizedIsomeric,
-      connectivity: connectivity.trim(),
+      connectivity,
       hasSpecifiedStereo: smilesHasSpecifiedStereo(normalizedIsomeric),
     };
   } catch {
@@ -195,6 +211,38 @@ export function invertTetrahedralSmiles(smiles: string): string {
   return smiles.replace(/@@|@/g, (tag) => (tag === "@" ? "@@" : "@"));
 }
 
+/** Stereo completeness for assertions about a pure enantiomer. Unknown atom
+ * stereo is exposed by RDKit. Potential internal C=C stereo is checked against
+ * assigned E/Z bonds; ordinary endocyclic 3-7 member alkenes are constrained.
+ * Symmetric nonstereogenic internal alkenes can conservatively return unknown.
+ */
+export async function stereoSpecification(smiles: string): Promise<{ unknown: boolean; atomCenters: number }> {
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(smiles);
+  if (!mol) return { unknown: true, atomCenters: 0 };
+  const queries: Array<{ delete: () => void }> = [];
+  try {
+    const descriptors = JSON.parse(mol.get_descriptors());
+    const atomCenters = Number(descriptors.NumAtomStereoCenters);
+    if (!Number.isFinite(atomCenters) || !Number.isFinite(descriptors.NumUnspecifiedAtomStereoCenters)) return { unknown: true, atomCenters: 0 };
+    if (descriptors.NumUnspecifiedAtomStereoCenters > 0) return { unknown: true, atomCenters };
+    const tags = JSON.parse(mol.get_stereo_tags());
+    const bondKey = (a: number,b: number) => [a,b].sort((x,y)=>x-y).join("-");
+    const assigned = new Set<string>((tags.CIP_bonds ?? []).filter((b: unknown[]) => /[EZ]/.test(String(b[2])))
+      .map((b: number[]) => bondKey(b[0],b[1])));
+    const pairs = (smarts: string): number[][] => {
+      const q = rdkit.get_qmol(smarts);
+      if (!q) return [];
+      queries.push(q);
+      return parseSubstructureMatches(mol.get_substruct_matches(q));
+    };
+    const constrained = new Set(pairs("[C;r3,r4,r5,r6,r7]=@[C;r3,r4,r5,r6,r7]").map(p=>bondKey(p[0],p[1])));
+    const unknown = pairs("[C;H0,H1]=[C;H0,H1]").some(p=>!assigned.has(bondKey(p[0],p[1])) && !constrained.has(bondKey(p[0],p[1])));
+    return { unknown, atomCenters };
+  } catch { return { unknown: true, atomCenters: 0 }; }
+  finally { for (const q of queries) q.delete(); mol.delete(); }
+}
+
 /**
  * Test whether two already-canonicalized structures are exact mirror images.
  *
@@ -207,12 +255,17 @@ export async function areCanonicalEnantiomers(
   left: CanonicalStereoStructure,
   right: CanonicalStereoStructure,
 ): Promise<boolean> {
+  // A meso molecule is superposable on its mirror, hence is not an enantiomer
+  // of itself. This also excludes identical members of any purported racemate.
+  if (left.isomeric === right.isomeric) return false;
   if (left.connectivity !== right.connectivity) return false;
   if (!left.hasSpecifiedStereo || !right.hasSpecifiedStereo) return false;
 
   // Pure E/Z alternatives are geometric isomers, not enantiomers. At least one
   // tetrahedral descriptor must be present before mirroring is meaningful here.
   if (!/@/.test(left.isomeric) || !/@/.test(right.isomeric)) return false;
+  const completeness = await Promise.all([stereoSpecification(left.isomeric), stereoSpecification(right.isomeric)]);
+  if (completeness.some(s => s.unknown)) return false;
 
   const mirrored = await canonicalizeStereoStructure(
     invertTetrahedralSmiles(left.isomeric),

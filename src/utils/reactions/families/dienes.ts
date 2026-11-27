@@ -449,4 +449,53 @@ export const dieneReactionRules: ReactionRule[] = [
     mechanism: "Chain-growth polymerization",
     priority: 730,
   },
+  {
+    id: "claisen-aromatic-rearrangement",
+    family: "dienes",
+    reactionType: "pericyclic",
+    title: "Aromatic Claisen Rearrangement",
+    reagents: "heat (about 200 °C)",
+    reagentNote: "Thermal [3,3]-sigmatropic shift of an allyl aryl ether",
+    productHint: "Ortho-allylphenol",
+    explanation:
+      "On heating, an allyl aryl ether undergoes a concerted [3,3]-sigmatropic shift: the allyl group migrates from oxygen to the ortho ring carbon with allylic inversion, and tautomerisation of the dienone restores the aromatic phenol.",
+    trigger: { includeSmarts: ["[c][OX2][CH2][CH]=[CH2]"] },
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[O:3]([c:1]:[cH:2])[CH2:4][CH:5]=[CH2:6]>>[OH:3][c:1]:[c:2][CH2:6][CH:5]=[CH2:4]",
+      maxProducts: 4,
+    },
+    productStatus: "representative",
+    mechanism: "Concerted [3,3]-sigmatropic (Claisen) rearrangement",
+    selectivity: [
+      "The allyl group bonds to an ortho carbon through its far terminus (allylic inversion). If both ortho positions are free the two products are identical by symmetry; if both are blocked a para (Cope-Claisen) product is possible and is not modeled.",
+      "Alkyl substitution on the allyl unit and ring-substituent effects on the ortho:ortho' ratio are not modeled.",
+    ],
+    limitations: ["Only the unsubstituted-allyl (O-CH2-CH=CH2) case is covered; the chair-transition-state alkene geometry is not predicted."],
+    priority: 735,
+  },
+  {
+    id: "cope-rearrangement",
+    family: "dienes",
+    reactionType: "pericyclic",
+    title: "Cope Rearrangement",
+    reagents: "heat (about 300 °C)",
+    reagentNote: "Thermal [3,3]-sigmatropic shift of a 1,5-diene",
+    productHint: "Isomeric 1,5-diene",
+    explanation:
+      "A 1,5-hexadiene undergoes a concerted [3,3]-sigmatropic shift: the C3-C4 sigma bond breaks while a C1-C6 sigma bond forms and both pi bonds move. The reaction is reversible and the equilibrium favors the thermodynamically more stable (usually more substituted or conjugated) diene.",
+    trigger: { includeSmarts: ["[C;!a]=[C;!a]-[C;!a;X4]-[C;!a;X4]-[C;!a]=[C;!a]"] },
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C:1]=[C:2]-[C;X4:3]-[C;X4:4]-[C:5]=[C:6]>>[C:3]=[C:2]-[C:1]-[C:6]-[C:5]=[C:4]",
+      maxProducts: 6,
+    },
+    productStatus: "representative",
+    mechanism: "Concerted [3,3]-sigmatropic (Cope) rearrangement",
+    selectivity: [
+      "Reversible: the product listed is one side of an equilibrium, and the direction is set by the relative stability of the two dienes. For example 3-methylhexa-1,5-diene gives hepta-1,5-diene because the product has an internal, more substituted double bond.",
+    ],
+    limitations: ["The relative stabilities of the two dienes are not computed, so the equilibrium direction is not ranked; E/Z geometry of the new alkene is not predicted (chair transition states usually favor E)."],
+    priority: 736,
+  },
 ];

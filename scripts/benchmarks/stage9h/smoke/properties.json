@@ -1,0 +1,1 @@
+{"cases":[{"id":"SMK-PR","category":"smoke","evidence":"smoke","smiles":"CCO","reference":{"formula":"C2H6O","molecular_weight":46.07,"exact_mass":46.0419,"formal_charge":0},"logp_exp":{"value":-0.31}}]}

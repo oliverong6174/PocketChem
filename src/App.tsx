@@ -16,9 +16,22 @@
     type KeyboardEvent as ReactKeyboardEvent,
   } from "react";
 import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
-  import MoleculeDrawer from "./components/MoleculeDrawer";
+  import MoleculeDrawer, { type KetcherApi } from "./components/MoleculeDrawer";
+import { AcidBasePanel } from "./components/properties/AcidBasePanel";
+import { AromaticityPanel } from "./components/properties/AromaticityPanel";
+import { useAromaticity } from "./components/properties/useAromaticity";
+import { CounterpartExplorer, type CounterpartOriginal } from "./components/properties/CounterpartExplorer";
+import type { CounterpartCandidate } from "./utils/aromaticCounterparts";
+import { molecularStructureKey } from "./utils/moleculeNameResolver";
+import { ConceptSearch } from "./components/shell/ConceptSearch";
+import { NavigationContext } from "./navigation/NavigationContext";
+import { useIncomingMolecule } from "./components/ui/useIncomingMolecule";
+import { MolecularFigure } from "./components/ui/MolecularFigure";
+import { MoleculeOriginContext } from "./components/ui/moleculeOrigin";
+import type { ConceptDestination } from "./utils/concepts/conceptIndex";
+import { SUBJECT_TOOLS, parseRoute, routeHash, type BiochemistryToolId, type BiologyToolId, type PhysicsToolId, type SubjectId, type SubjectToolId } from "./navigation/subjects";
   import {
-    applyResolvedNameToIdentity,
+    resolveStructureIdentity,
     type MoleculeNameResolution,
   } from "./utils/moleculeNameResolver";
   import {
@@ -33,6 +46,13 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     type ResonanceResult,
   } from "./utils/resonanceUtils";
   import "./App.css";
+  import "./styles/ui.css";
+  import "./styles/concepts.css";
+  import "./styles/organic.css";
+  import "./styles/properties.css";
+  import { PropertiesDetail, PropertiesIdentity, PropertiesSummary } from "./components/properties/PropertiesResults";
+  import { countGroups } from "./utils/propertiesSections";
+  import { AppShell } from "./components/shell/AppShell";
   import {
     analyzeChirality,
     type ChiralityResult,
@@ -51,14 +71,87 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   } from "./utils/ranking/acidBase/analyzeBasicity";
 
   import type { ReactionPathway } from "./utils/reactionUtils";
+  import WorkspaceNotice, { type WorkspaceNoticeItem } from "./components/WorkspaceNotice";
+  import { DebouncedTask } from "./utils/persistence/debouncedTask";
+  import { runLeaveHooks } from "./utils/persistence/leaveGate";
+  import { ANALYSIS_APP_PAGE } from "./utils/persistence/analysisLibraryApp";
+  import { useWorkspacePersistence } from "./utils/persistence/useWorkspacePersistence";
+  import { ketHasStructureText, ketIdentityKey } from "./utils/persistence/ketIdentity";
+  import {
+    PROPERTIES_ENGINE_VERSION,
+    describePropertiesAnalysis,
+    validatePropertiesInputs,
+    validatePropertiesResults,
+    type PropertiesWorkspaceInputs,
+    type PropertiesWorkspaceResults,
+  } from "./utils/persistence/propertiesWorkspace";
+  import type { Capture, RecoveryOutcome } from "./utils/persistence/workspacePersistence";
+  import type { WorkspaceResults } from "./utils/persistence/workspaceStore";
+  import { getAppAnalysisLibrary } from "./utils/persistence/analysisLibraryApp";
+  import type { OpenedAnalysis } from "./utils/persistence/analysisLibrary";
+  import { transferIntoEditors } from "./utils/persistence/handoffTransfer";
+  import { useSavedAnalysisOpen } from "./utils/persistence/useSavedAnalysisOpen";
+  import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./components/SavedAnalysisControls";
 
   import { initializeFunctionalGroups } from "./utils/functionalGroups/bootstrap";
 
   const ReactionsPage = lazy(() => import("./components/ReactionsPage"));
   const AcidBasePage = lazy(() => import("./components/RankingPage"));
   const SynthesisPage = lazy(() => import("./components/SynthesisPage"));
+  const SavedAnalysesPage = lazy(() => import("./components/SavedAnalysesPage"));
   const MultiCatalyticPage = lazy(() => import("./components/MultiCatalyticPage"));
   const SpectroscopyPage = lazy(() => import("./components/SpectroscopyPage"));
+  const ConformationsPage = lazy(() => import("./components/ConformationsPage"));
+  const AcidBaseTitrationPage = lazy(() => import("./components/generalChem/AcidBaseTitrationPage"));
+  const GeneralChemistryOverview = lazy(() => import("./components/generalChem/GeneralChemistryOverview"));
+  const EquilibriumPage = lazy(() => import("./components/generalChem/EquilibriumPage"));
+  const KineticsPage = lazy(() => import("./components/generalChem/KineticsPage"));
+  const ThermodynamicsPage = lazy(() => import("./components/generalChem/ThermodynamicsPage"));
+  const AtomicStructurePage = lazy(() => import("./components/generalChem/AtomicStructurePage"));
+  const BondingGeometryPage = lazy(() => import("./components/generalChem/BondingGeometryPage"));
+  const MolecularOrbitalsPage = lazy(() => import("./components/generalChem/MolecularOrbitalsPage"));
+  const StoichiometryPage = lazy(() => import("./components/generalChem/StoichiometryPage"));
+  const GasLawsPage = lazy(() => import("./components/generalChem/GasLawsPage"));
+  const ElectrochemistryPage = lazy(() => import("./components/generalChem/ElectrochemistryPage"));
+  const PhysicsOverview = lazy(() => import("./components/physics/PhysicsOverview"));
+  const MechanicsPage = lazy(() => import("./components/physics/MechanicsPage"));
+  const CircuitsPage = lazy(() => import("./components/physics/CircuitsPage"));
+  const RcPage = lazy(() => import("./components/physics/RcPage"));
+  const ForcesPage = lazy(() => import("./components/physics/ForcesPage"));
+  const EnergyPage = lazy(() => import("./components/physics/EnergyPage"));
+  const CollisionsPage = lazy(() => import("./components/physics/CollisionsPage"));
+const WavesPage = lazy(() => import("./components/physics/WavesPage"));
+const OpticsPage = lazy(() => import("./components/physics/OpticsPage"));
+const InterferencePage = lazy(() => import("./components/physics/InterferencePage"));
+const EfieldPage = lazy(() => import("./components/physics/EfieldPage"));
+const MagneticPage = lazy(() => import("./components/physics/MagneticPage"));
+const InductionPage = lazy(() => import("./components/physics/InductionPage"));
+  const BiologyOverview = lazy(() => import("./components/biology/BiologyOverview"));
+  const ReplicationPage = lazy(() => import("./components/biology/ReplicationPage"));
+  const TranscriptionPage = lazy(() => import("./components/biology/TranscriptionPage"));
+  const TranslationPage = lazy(() => import("./components/biology/TranslationPage"));
+  const CentralDogmaPage = lazy(() => import("./components/biology/CentralDogmaPage"));
+  const RegulationPage = lazy(() => import("./components/biology/RegulationPage"));
+  const GeneticsPage = lazy(() => import("./components/biology/GeneticsPage"));
+  const CellDivisionPage = lazy(() => import("./components/biology/CellDivisionPage"));
+  const MembranePage = lazy(() => import("./components/biology/MembranePage"));
+  const SignalingPage = lazy(() => import("./components/biology/SignalingPage"));
+  const OrganellesPage = lazy(() => import("./components/biology/OrganellesPage"));
+  const CellCyclePage = lazy(() => import("./components/biology/CellCyclePage"));
+  const CellDeathPage = lazy(() => import("./components/biology/CellDeathPage"));
+  const NeuronPage = lazy(() => import("./components/biology/NeuronPage"));
+  const BiochemOverview = lazy(() => import("./components/biochem/BiochemOverview"));
+  const AminoAcidsPage = lazy(() => import("./components/biochem/AminoAcidsPage"));
+  const ProteinsPage = lazy(() => import("./components/biochem/ProteinsPage"));
+  const EnzymesPage = lazy(() => import("./components/biochem/EnzymesPage"));
+  const GlycolysisPage = lazy(() => import("./components/biochem/metabolism/GlycolysisPage"));
+  const GluconeogenesisPage = lazy(() => import("./components/biochem/metabolism/GluconeogenesisPage"));
+  const CitricAcidPage = lazy(() => import("./components/biochem/metabolism/CitricAcidPage"));
+  const ElectronTransportPage = lazy(() => import("./components/biochem/metabolism/ElectronTransportPage"));
+  const MetabolicMapPage = lazy(() => import("./components/biochem/metabolism/MetabolicMapPage"));
+  const FattyAcidPage = lazy(() => import("./components/biochem/metabolism/FattyAcidPage"));
+  const AminoMetabolismPage = lazy(() => import("./components/biochem/metabolism/AminoMetabolismPage"));
+  const FuelMetabolismPage = lazy(() => import("./components/biochem/metabolism/FuelMetabolismPage"));
 
 
   type AnnotationCarouselItem =
@@ -84,8 +177,24 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
       };
     
 
-  type AnalysisPanel = "overview" | "acidBase" | "concepts" | "properties";
-  type AppPage = "analysis" | "acidBase" | "reactions" | "spectroscopy" | "multiStep" | "multiCatalytic";
+  type AnalysisPanel = "overview" | "acidBase" | "aromaticity" | "concepts" | "properties";
+  type AppPage = "analysis" | "acidBase" | "reactions" | "spectroscopy" | "multiStep" | "multiCatalytic" | "conformations" | "saved";
+
+  /** What the page knows about the dashboard results on screen. */
+  type PropertiesResultMeta = {
+    computedAt: string;
+    engineVersion: number;
+    /** Chemistry identity of the structure that was analyzed. */
+    structureKey: string;
+    /** Loaded from a previous session instead of computed in this one. */
+    restored: boolean;
+    /** Saved by an earlier version of the analysis code; shown as saved, never re-computed. */
+    engineMismatch: boolean;
+    /** The drawn structure changed after this analysis. */
+    stale: boolean;
+    /** Set when the results were opened from the Saved Analyses library. */
+    opened?: { name: string; savedAt: string } | null;
+  };
 
   const APP_PAGES: Array<{ id: AppPage; label: string }> = [
     { id: "analysis", label: "Properties" },
@@ -94,13 +203,16 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     { id: "spectroscopy", label: "Spectroscopy" },
     { id: "multiStep", label: "Multi-Step" },
     { id: "multiCatalytic", label: "Multi-Catalytic" },
+    { id: "conformations", label: "Conformations" },
+    { id: "saved", label: "Saved" },
   ];
 
   const ANALYSIS_PANELS: Array<{ id: AnalysisPanel; label: string }> = [
-    { id: "overview", label: "Overview" },
+    { id: "overview", label: "Summary" },
     { id: "acidBase", label: "Acid/Base" },
+    { id: "aromaticity", label: "Aromaticity" },
     { id: "concepts", label: "Concepts" },
-    { id: "properties", label: "Properties" },
+    { id: "properties", label: "All Properties" },
   ];
 
   const CONCEPT_OPTIONS: Array<{ id: AnnotationConcept; label: string }> = [
@@ -114,36 +226,6 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     { id: "chirality", label: "Chirality" },
   ];
 
-  type PropertyTileProps = {
-    label: string;
-    value: string | number;
-    info: string;
-  };
-
-  function PropertyTile({ label, value, info }: PropertyTileProps) {
-    return (
-      <div className="property-tile">
-        <div className="property-tile-header">
-          <span>{label}</span>
-
-          <button
-            type="button"
-            className="info-button"
-            aria-label={`What is ${label}?`}
-            title={info}
-          >
-            ?
-          </button>
-        </div>
-
-        <strong>{value}</strong>
-      </div>
-    );
-  }
-
-  function formatPkaRange(range: readonly [number, number]) {
-    return `${range[0]}–${range[1]}`;
-  }
 
   function App() {
     //useState calls
@@ -187,13 +269,275 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     const [moleculeIdentity, setMoleculeIdentity] =
     useState<MoleculeIdentityResult | null>(null);
 
-    const [activePage, setActivePage] = useState<AppPage>("analysis");
+    // Subject and tool: the URL hash (#/organic/reactions, #/general/acid-base-titration) selects them on load and follows them.
+    const initialRoute = useMemo(() => (typeof window === "undefined" ? null : parseRoute(window.location.hash)), []);
+    const [activeSubject, setActiveSubject] = useState<SubjectId>(initialRoute?.subject ?? "organic");
+    const [generalTool, setGeneralTool] = useState<SubjectToolId>(initialRoute && initialRoute.subject !== "organic" ? (initialRoute.toolId as SubjectToolId) : "gcOverview");
+    const [activePage, setActivePage] = useState<AppPage>(initialRoute?.subject === "organic" ? (initialRoute.toolId as AppPage) : "analysis");
     const [analysisPanel, setAnalysisPanel] = useState<AnalysisPanel>("overview");
     const [reactionPathways, setReactionPathways] = useState<ReactionPathway[]>([]);
     const appShellRef = useRef<HTMLElement | null>(null);
+    const switchRequestRef = useRef(0);
+    const openSequenceRef = useRef(0);
 
-    const handleMainEditorReady = useCallback(() => {
+    // ---- workspace recovery for the Properties page (Stage 8B-1) --------------------------------
+    // The drawn structure and the completed analysis are saved and come back after a reload or a
+    // visit to another page. Restored results are a saved snapshot: nothing is recomputed, and they
+    // are labelled as stale as soon as the structure no longer matches the one that was analyzed.
+    const [snapshotTask] = useState(() => new DebouncedTask(async () => undefined));
+    const { controller: persistence, recovery, status: persistenceStatus } = useWorkspacePersistence<
+      PropertiesWorkspaceInputs,
+      PropertiesWorkspaceResults
+    >({
+      page: "properties",
+      engineVersion: PROPERTIES_ENGINE_VERSION,
+      validateInputs: validatePropertiesInputs,
+      validateResults: validatePropertiesResults,
+      // Leaving the page finishes reading the editor first, so a last-moment edit is not lost.
+      beforeLeave: () => snapshotTask.flushNow(),
+    });
+    const [resultMeta, setResultMeta] = useState<PropertiesResultMeta | null>(null);
+    const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
+    const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
+    const mainEditorApiRef = useRef<KetcherApi | null>(null);
+    const propsSnapshotRef = useRef<{ ket: string | null; key: string | null }>({ ket: null, key: null });
+    const propsRestoringRef = useRef(false);
+    const openingRef = useRef(false);
+    const propsRestoreBusyRef = useRef(0);
+    const appliedRecoveryRef = useRef<unknown>(null);
+    const applyRestoreRef = useRef<((outcome: RecoveryOutcome<PropertiesWorkspaceInputs, PropertiesWorkspaceResults>) => void) | null>(null);
+    const requestPersistRef = useRef<() => void>(() => undefined);
+    const restoreMainEditorRef = useRef<() => void>(() => undefined);
+    const scheduleSnapshotRef = useRef<() => void>(() => undefined);
+    const latestRef = useRef({
+      smiles, molfile, functionalGroups, acidityResults, basicityResults, resonanceResults, chiralityResults,
+      moleculeAnnotation, moleculeIdentity, reactionPathways, analysisPanel, selectedConcept,
+      selectedHybridization, selectedBondType, resultMeta, isAnalyzing,
+    });
+
+    function capturePropertiesWorkspace(): Capture<PropertiesWorkspaceInputs, PropertiesWorkspaceResults> | null {
+      const latest = latestRef.current;
+      const snapshot = propsSnapshotRef.current;
+      const inputs: PropertiesWorkspaceInputs = {
+        ket: snapshot.ket,
+        key: snapshot.key,
+        analysisPanel: latest.analysisPanel,
+        selectedConcept: latest.selectedConcept,
+        selectedHybridization: latest.selectedHybridization,
+        selectedBondType: latest.selectedBondType,
+      };
+      let results: WorkspaceResults<PropertiesWorkspaceResults> | null = null;
+      const meta = latest.resultMeta;
+      // Only a finished analysis is a result; a half-filled dashboard is never saved.
+      if (meta && !latest.isAnalyzing) {
+        results = {
+          computedAt: meta.computedAt,
+          engineVersion: meta.engineVersion,
+          stale: meta.stale,
+          status: "complete",
+          data: {
+            inputKey: meta.structureKey,
+            smiles: latest.smiles,
+            molfile: latest.molfile,
+            functionalGroups: latest.functionalGroups,
+            acidityResults: latest.acidityResults,
+            basicityResults: latest.basicityResults,
+            resonanceResults: latest.resonanceResults,
+            chiralityResults: latest.chiralityResults,
+            moleculeAnnotation: latest.moleculeAnnotation,
+            moleculeIdentity: latest.moleculeIdentity,
+            reactionPathways: latest.reactionPathways,
+          },
+        };
+      }
+      if (!inputs.ket && !results) return null;
+      return { inputs, results };
+    }
+
+    function requestPersist() {
+      persistence.requestSave(capturePropertiesWorkspace);
+    }
+
+    /** Reads the editor and refreshes the saved structure and the stale-result check. */
+    async function takePropertiesSnapshot() {
+      const api = mainEditorApiRef.current;
+      if (!api || analyzeInFlightRef.current || propsRestoringRef.current) return;
+      const token = persistence.token();
+      try {
+        const ket = await Promise.race([
+          api.getKet(),
+          new Promise<never>((_resolve, reject) => setTimeout(() => reject(new Error("Timed out reading the editor.")), 8000)),
+        ]);
+        const key = await ketIdentityKey(ket);
+        if (!persistence.isCurrent(token) || analyzeInFlightRef.current || propsRestoringRef.current) return;
+        propsSnapshotRef.current = { ket: ketHasStructureText(ket) ? ket : null, key };
+        const analyzedIdentity = latestRef.current.moleculeIdentity;
+        if (analyzedIdentity && analyzedIdentity.structureKey !== key && latestRef.current.resultMeta?.structureKey !== key) {
+          importedNameResolutionRef.current = null;
+          setMoleculeIdentity(null);
+          setStatus("Structure changed - analyze to refresh identity and results");
+        }
+        setResultMeta((meta) => (meta && !meta.stale && meta.structureKey !== key ? { ...meta, stale: true } : meta));
+        requestPersist();
+      } catch (snapshotError) {
+        console.warn("[PocketChem:Properties] Could not read the editor for workspace recovery.", snapshotError);
+      }
+    }
+
+    function schedulePropertiesSnapshot() {
+      if (propsRestoringRef.current) return;
+      snapshotTask.schedule();
+    }
+
+    /**
+     * Puts the saved structure into a (new, empty) editor: after a reload, and whenever the page is
+     * revisited, because leaving the page unmounts the editor. A structure the user already drew wins.
+     */
+    async function restoreMainEditor() {
+      const api = mainEditorApiRef.current;
+      const saved = propsSnapshotRef.current;
+      if (!api || !saved.ket || propsRestoringRef.current || openingRef.current) return;
+      const token = persistence.token();
+      // Opening a saved analysis invalidates a drawing restore, exactly like Clear does.
+      const stillWanted = () => persistence.isCurrent(token) && !openingRef.current;
+      propsRestoreBusyRef.current += 1;
+      propsRestoringRef.current = true;
+      let userContentWon = false;
+      try {
+        if (ketHasStructureText(await api.getKet())) {
+          userContentWon = true;
+          return;
+        }
+        if (!stillWanted()) return;
+        await api.setMolecule(saved.ket, { needZoom: true });
+        const actual = await ketIdentityKey(await api.getKet());
+        if (!stillWanted()) return;
+        if (saved.key && actual !== saved.key) throw new Error("The restored structure does not match the saved one.");
+      } catch (restoreError) {
+        console.warn("[PocketChem:Properties] Could not restore the saved structure.", restoreError);
+        if (persistence.isCurrent(token)) {
+          // Do not let an editor that failed to restore overwrite the saved copy.
+          persistence.disable();
+          setRecoveryNotices((notices) => [
+            ...notices,
+            { tone: "warn", text: "The saved structure could not be restored into the editor. Your saved work was kept and will not be overwritten; use Clear Analysis to start over." },
+          ]);
+        }
+      } finally {
+        propsRestoreBusyRef.current -= 1;
+        window.setTimeout(() => {
+          if (propsRestoreBusyRef.current === 0) propsRestoringRef.current = false;
+          if (userContentWon) void takePropertiesSnapshot();
+        }, 500);
+      }
+    }
+
+    function applyRestoredProperties(outcome: RecoveryOutcome<PropertiesWorkspaceInputs, PropertiesWorkspaceResults>) {
+      if (appliedRecoveryRef.current === outcome) return;
+      appliedRecoveryRef.current = outcome;
+      if (outcome.kind === "rejected") {
+        setRecoveryNotices([{ tone: "warn", text: `Saved work from a previous session could not be used (${outcome.message}). It was set aside and the page started clean.` }]);
+        return;
+      }
+      if (outcome.kind !== "restored" || !persistence.isCurrent(outcome.epoch)) return;
+
+      const latest = latestRef.current;
+      if (latestAnalyzeRunRef.current > 0 || latest.resultMeta || latest.smiles !== "Not analyzed yet") {
+        setRecoveryNotices([{ tone: "info", text: "Saved work from a previous session was not restored because you had already started new work on this page." }]);
+        return;
+      }
+
+      const { inputs, results } = outcome;
+      const notices: WorkspaceNoticeItem[] = [];
+      setAnalysisPanel(inputs.analysisPanel);
+      setSelectedConcept(inputs.selectedConcept);
+      setSelectedHybridization(inputs.selectedHybridization);
+      setSelectedBondType(inputs.selectedBondType);
+      propsSnapshotRef.current = { ket: inputs.ket, key: inputs.key };
+
+      if (results) {
+        const data = results.data;
+        setSmiles(data.smiles);
+        setMolfile(data.molfile);
+        setFunctionalGroups(data.functionalGroups);
+        setAcidityResults(data.acidityResults);
+        setBasicityResults(data.basicityResults);
+        setResonanceResults(data.resonanceResults);
+        setChiralityResults(data.chiralityResults);
+        setMoleculeAnnotation(data.moleculeAnnotation);
+        setMoleculeIdentity(data.moleculeIdentity);
+        importedNameResolutionRef.current = data.moleculeIdentity?.sourceIdentity?.resolution ?? null;
+        setReactionPathways(data.reactionPathways);
+        setStatus("Restored from your previous session");
+        setResultMeta({
+          computedAt: results.computedAt,
+          engineVersion: results.engineVersion,
+          structureKey: data.inputKey,
+          restored: true,
+          engineMismatch: outcome.engineMismatch,
+          // A record whose results do not match its own saved structure is never presented as current.
+          stale: results.stale || inputs.key === null || inputs.key !== data.inputKey,
+        });
+      } else if (inputs.ket) {
+        setInputsOnlyRestored(true);
+        setStatus("Restored your drawn structure from your previous session.");
+      }
+      if (outcome.resultsDropped) {
+        notices.push({ tone: "warn", text: "Saved results could not be validated and were not restored. Your structure was." });
+      }
+      if (outcome.migratedFrom !== null) {
+        notices.push({ tone: "info", text: "Your saved workspace was upgraded from an older storage format." });
+      }
+      setRecoveryNotices(notices);
+      if (inputs.ket) restoreMainEditorRef.current();
+    }
+
+    useEffect(() => {
+      requestPersistRef.current = requestPersist;
+      snapshotTask.setTask(takePropertiesSnapshot);
+      restoreMainEditorRef.current = () => void restoreMainEditor();
+      scheduleSnapshotRef.current = schedulePropertiesSnapshot;
+      applyRestoreRef.current = applyRestoredProperties;
+      latestRef.current = {
+        smiles, molfile, functionalGroups, acidityResults, basicityResults, resonanceResults, chiralityResults,
+        moleculeAnnotation, moleculeIdentity, reactionPathways, analysisPanel, selectedConcept,
+        selectedHybridization, selectedBondType, resultMeta, isAnalyzing,
+      };
+    });
+
+    // Autosave: only settled state is watched (the debounce and the completed-analysis rule keep
+    // half-finished dashboards and rapid edits out of storage).
+    useEffect(() => {
+      requestPersistRef.current();
+    }, [
+      smiles, molfile, functionalGroups, acidityResults, basicityResults, resonanceResults, chiralityResults,
+      moleculeAnnotation, moleculeIdentity, reactionPathways, analysisPanel, selectedConcept,
+      selectedHybridization, selectedBondType, resultMeta, isAnalyzing,
+    ]);
+
+    useEffect(() => {
+      if (!recovery) return;
+      try {
+        applyRestoreRef.current?.(recovery);
+      } finally {
+        // Saving starts only after the recovered record has been applied (or deliberately skipped).
+        persistence.resumeAfterRestore();
+      }
+    }, [recovery, persistence]);
+
+    useEffect(() => {
+      // Leaving the page unmounts its editor; the next visit gets a new one.
+      if (activePage !== "analysis") mainEditorApiRef.current = null;
+    }, [activePage]);
+
+    useEffect(() => {
+      return () => snapshotTask.cancel();
+    }, [snapshotTask]);
+
+    const handleMainEditorReady = useCallback((api?: KetcherApi) => {
+      if (api) mainEditorApiRef.current = api;
       setIsMainEditorReady(true);
+      restoreMainEditorRef.current();
       window.setTimeout(() => {
         void getRDKit().catch((error) => {
           console.warn("RDKit warm-up was deferred after a load failure.", error);
@@ -202,9 +546,8 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     }, []);
 
     const handleMainEditorChange = useCallback(() => {
-      // Any manual edit means the previously resolved name is no longer
-      // guaranteed to describe the current graph.
-      importedNameResolutionRef.current = null;
+      // The settled snapshot compares chemical identity, including stereo and charge.
+      scheduleSnapshotRef.current();
     }, []);
 
     const handleMainNameApplied = useCallback((
@@ -232,9 +575,294 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
 
     };
 
-    const switchPage = (page: AppPage) => {
-      setActivePage(page);
+    // A saved analysis chosen on the Saved page, waiting for its page to open it. Any other way of
+    // changing page forgets it, so it can never be applied later by surprise.
+    const [pendingOpen, setPendingOpen] = useState<{ id: string; recordId: string; page: AppPage | SubjectToolId } | null>(null);
+
+    const switchPage = (page: AppPage, options?: { keepOpenRequest?: boolean }) => {
+      if (!options?.keepOpenRequest) setPendingOpen(null);
+      // Let the page being left finish reading its editor and saving before it is unmounted.
+      const request = (switchRequestRef.current += 1);
+      void runLeaveHooks().then(() => {
+        if (switchRequestRef.current === request) {
+          // Leaving Properties unmounts its editor; the next visit gets a new one.
+          if (page !== "analysis") setIsMainEditorReady(false);
+          setActivePage(page);
+        }
+      });
     };
+
+    // General Chemistry navigation. Leaving a tool lets it finish saving first, exactly like switchPage.
+    const switchGeneralTool = (tool: SubjectToolId, options?: { keepOpenRequest?: boolean }) => {
+      if (!options?.keepOpenRequest) setPendingOpen(null);
+      const request = (switchRequestRef.current += 1);
+      void runLeaveHooks().then(() => {
+        if (switchRequestRef.current === request) setGeneralTool(tool);
+      });
+    };
+
+    const switchSubject = (subject: SubjectId, options?: { keepOpenRequest?: boolean; tool?: SubjectToolId; page?: AppPage }) => {
+      if (subject === activeSubject && !options?.tool) return;
+      // The tool shown in a non-Organic subject: the requested one, else the one already open if it belongs to that subject, else its Overview.
+      const subjectTools = SUBJECT_TOOLS[subject];
+      const toolFor: SubjectToolId | undefined = options?.tool ?? (subjectTools.some((entry) => entry.id === generalTool) ? generalTool : (subjectTools[0]?.id as SubjectToolId | undefined));
+      if (!options?.keepOpenRequest) setPendingOpen(null);
+      const request = (switchRequestRef.current += 1);
+      void runLeaveHooks().then(() => {
+        if (switchRequestRef.current !== request) return;
+        // Leaving Organic Chemistry unmounts the Properties editor; the next visit gets a new one.
+        if (subject !== "organic") setIsMainEditorReady(false);
+        if (subject !== "organic" && toolFor) setGeneralTool(toolFor);
+        if (subject === "organic" && options?.page) setActivePage(options.page);
+        setActiveSubject(subject);
+      });
+    };
+
+    const openSavedAnalysis = (analysis: { id: string; page: string }) => {
+      const target = ANALYSIS_APP_PAGE[analysis.page as keyof typeof ANALYSIS_APP_PAGE];
+      if (!target) return;
+      openSequenceRef.current += 1;
+      setPendingOpen({ id: `open-${openSequenceRef.current}`, recordId: analysis.id, page: target });
+      if (target === "gcAcidBase" || target === "gcEquilibrium" || target === "gcKinetics" || target === "gcThermo" || target === "gcStoichiometry" || target === "gcGas" || target === "gcElectro" || target === "gcAtomic" || target === "gcBonding" || target === "gcMO") {
+        if (activeSubject === "general") switchGeneralTool(target, { keepOpenRequest: true });
+        else switchSubject("general", { keepOpenRequest: true, tool: target });
+        return;
+      }
+      if (target === "phMechanics" || target === "phCircuits" || target === "phRc" || target === "phForces" || target === "phEnergy" || target === "phCollisions" || target === "phWaves" || target === "phOptics" || target === "phInterference" || target === "phEfield" || target === "phMagnetic" || target === "phInduction") {
+        if (activeSubject === "physics") switchGeneralTool(target, { keepOpenRequest: true });
+        else switchSubject("physics", { keepOpenRequest: true, tool: target });
+        return;
+      }
+      if (target === "bcAminoAcids" || target === "bcProteins" || target === "bcEnzymes" || target === "bcGlycolysis" || target === "bcGluconeogenesis" || target === "bcTca" || target === "bcEtc" || target === "bcMetabolism" || target === "bcFattyAcids" || target === "bcAminoMetabolism" || target === "bcFuel") {
+        if (activeSubject === "biochemistry") switchGeneralTool(target, { keepOpenRequest: true });
+        else switchSubject("biochemistry", { keepOpenRequest: true, tool: target });
+        return;
+      }
+      if (target === "bioReplication" || target === "bioTranscription" || target === "bioTranslation" || target === "bioDogma" || target === "bioRegulation" || target === "bioGenetics" || target === "bioDivision" || target === "bioMembrane" || target === "bioSignaling" || target === "bioNeuron" || target === "bioOrganelles" || target === "bioCellCycle" || target === "bioCellDeath") {
+        if (activeSubject === "biology") switchGeneralTool(target, { keepOpenRequest: true });
+        else switchSubject("biology", { keepOpenRequest: true, tool: target });
+        return;
+      }
+      if (activeSubject !== "organic") {
+        switchSubject("organic", { keepOpenRequest: true, page: target });
+        return;
+      }
+      switchPage(target, { keepOpenRequest: true });
+    };
+
+    // Keep the address bar in step with the subject and tool, and follow back/forward.
+    const routeFirstRef = useRef(true);
+    const navRef = useRef<(route: { subject: SubjectId; toolId: string }) => void>(() => undefined);
+    useEffect(() => {
+      navRef.current = (route) => {
+        if (route.subject !== activeSubject) {
+          switchSubject(route.subject, route.subject === "organic" ? { page: route.toolId as AppPage } : { tool: route.toolId as SubjectToolId });
+        } else if (route.subject === "organic") switchPage(route.toolId as AppPage);
+        else switchGeneralTool(route.toolId as SubjectToolId);
+      };
+    });
+    useEffect(() => {
+      const hash = routeHash({ subject: activeSubject, toolId: activeSubject === "organic" ? activePage : generalTool });
+      if (window.location.hash !== hash) {
+        if (routeFirstRef.current) window.history.replaceState(null, "", hash);
+        else window.history.pushState(null, "", hash);
+      }
+      routeFirstRef.current = false;
+    }, [activeSubject, activePage, generalTool]);
+    useEffect(() => {
+      const onPop = () => {
+        const route = parseRoute(window.location.hash);
+        if (route) navRef.current(route);
+      };
+      window.addEventListener("popstate", onPop);
+      return () => window.removeEventListener("popstate", onPop);
+    }, []);
+
+
+    // ---- Stage 19: global concept search and cross-subject navigation --------------------------------
+    const [searchState, setSearchState] = useState<{ open: boolean; query: string }>({ open: false, query: "" });
+    const openSearch = useCallback((query = "") => setSearchState({ open: true, query }), []);
+    const closeSearch = useCallback(() => setSearchState((current) => ({ ...current, open: false })), []);
+    // Opens a tool of any subject through the same switch functions as the tab bar, so unsaved work is flushed first and
+    // Back/Forward follow the address bar. Opening a tool never changes another tool's inputs.
+    const openDestination = (destination: ConceptDestination) => {
+      if (destination.subject === "organic") {
+        if (activeSubject === "organic") switchPage(destination.toolId as AppPage);
+        else switchSubject("organic", { page: destination.toolId as AppPage });
+      } else if (destination.subject === activeSubject) switchGeneralTool(destination.toolId as SubjectToolId);
+      else switchSubject(destination.subject, { tool: destination.toolId as SubjectToolId });
+    };
+    const openDestinationRef = useRef(openDestination);
+    useEffect(() => { openDestinationRef.current = openDestination; });
+    const navigation = useMemo(() => ({ openDestination: (destination: ConceptDestination) => openDestinationRef.current(destination), openSearch }), [openSearch]);
+    useEffect(() => {
+      const onKey = (event: KeyboardEvent) => {
+        if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === "k") {
+          event.preventDefault();
+          setSearchState((current) => (current.open ? current : { open: true, query: "" }));
+        }
+      };
+      window.addEventListener("keydown", onKey);
+      return () => window.removeEventListener("keydown", onKey);
+    }, []);
+
+    // ---- Saved Analyses for Properties (Stage 8B-3B-2) ---------------------------------------------
+    // "Save Analysis" copies the finished analysis (structure, groups, acid/base, resonance,
+    // chirality, annotation, name and properties, predicted reactions) into the library; opening one
+    // puts it back without recomputing anything.
+    const [isOpening, setIsOpening] = useState(false);
+    const [saveForm, setSaveForm] = useState<{ name: string } | null>(null);
+    const [saveBusy, setSaveBusy] = useState(false);
+    const [saveMessage, setSaveMessage] = useState<WorkspaceNoticeItem | null>(null);
+
+    function defaultAnalysisName(): string {
+      const l = latestRef.current;
+      const nomenclature = l.moleculeIdentity?.nomenclature;
+      return `Properties of ${nomenclature?.displayName || nomenclature?.estimatedName || l.smiles}`.slice(0, 100);
+    }
+
+    async function saveCurrentAnalysis(analysisName: string, announce = true): Promise<boolean> {
+      setSaveBusy(true);
+      try {
+        await snapshotTask.flushNow();
+        const capture = capturePropertiesWorkspace();
+        if (!capture || !capture.results || latestRef.current.isAnalyzing) {
+          setSaveMessage({ tone: "warn", text: "Analyze a molecule before saving an analysis." });
+          return false;
+        }
+        const saved = await getAppAnalysisLibrary().save("properties", {
+          name: analysisName,
+          summary: describePropertiesAnalysis(capture.results.data),
+          inputs: capture.inputs,
+          results: capture.results,
+        });
+        if (!saved.ok) {
+          setSaveMessage({ tone: "warn", text: `The analysis was not saved: ${saved.error.message}` });
+          return false;
+        }
+        if (announce) setSaveMessage({ tone: "info", text: `Saved “${saved.value.name}” to Saved analyses.` });
+        return true;
+      } finally {
+        setSaveBusy(false);
+      }
+    }
+
+    /** Replaces the Properties workspace with a saved analysis, as one transaction (see transferIntoEditors). */
+    async function applySavedAnalysis(opened: OpenedAnalysis<PropertiesWorkspaceInputs, PropertiesWorkspaceResults>): Promise<boolean> {
+      const api = mainEditorApiRef.current;
+      if (!api || openingRef.current || analyzeInFlightRef.current) return false;
+      openingRef.current = true;
+      setIsOpening(true);
+      snapshotTask.cancel();
+      propsRestoringRef.current = true;
+      const { inputs, results } = opened;
+      const outcome = await transferIntoEditors(
+        [{ api, source: inputs.ket, expectKey: inputs.ket ? inputs.key : null }],
+        persistence,
+      );
+      if (outcome.kind !== "adopted") {
+        if (outcome.kind === "rolled-back") {
+          setRecoveryNotices((notices) => [
+            ...notices,
+            { tone: "warn", text: `“${opened.record.name}” could not be opened. Your Properties workspace is unchanged.` },
+          ]);
+          requestPersistRef.current();
+        } else {
+          // The editor may have changed, so the results on screen no longer describe it.
+          setResultMeta(null);
+          setRecoveryNotices([
+            { tone: "warn", text: `“${opened.record.name}” could not be opened and the editor could not be restored. Your saved workspace is unchanged; reload this page to bring it back.` },
+          ]);
+        }
+        openingRef.current = false;
+        setIsOpening(false);
+        window.setTimeout(() => {
+          propsRestoringRef.current = false;
+        }, 500);
+        return false;
+      }
+
+      // Success: the old workspace's callbacks are invalid and the saved analysis is the workspace now.
+      importedNameResolutionRef.current = null;
+      latestAnalyzeRunRef.current += 1;
+      propsSnapshotRef.current = { ket: outcome.editors[0].ket, key: outcome.editors[0].key };
+      setAnalysisPanel(inputs.analysisPanel);
+      setSelectedConcept(inputs.selectedConcept);
+      setSelectedHybridization(inputs.selectedHybridization);
+      setSelectedBondType(inputs.selectedBondType);
+      setSelectedAtomIndex(null);
+      setSelectedBondIndex(null);
+      setAnnotationCardIndex(0);
+      setHighlightedMoleculeSvg(null);
+      setInputsOnlyRestored(false);
+      setRecoveryNotices(
+        opened.resultsDropped ? [{ tone: "warn", text: "The saved results could not be validated and were not opened. The structure was." }] : [],
+      );
+      if (results) {
+        const data = results.data;
+        setSmiles(data.smiles);
+        setMolfile(data.molfile);
+        setFunctionalGroups(data.functionalGroups);
+        setAcidityResults(data.acidityResults);
+        setBasicityResults(data.basicityResults);
+        setResonanceResults(data.resonanceResults);
+        setChiralityResults(data.chiralityResults);
+        setMoleculeAnnotation(data.moleculeAnnotation);
+        setMoleculeIdentity(data.moleculeIdentity);
+        importedNameResolutionRef.current = data.moleculeIdentity?.sourceIdentity?.resolution ?? null;
+        setReactionPathways(data.reactionPathways);
+        setStatus(`Opened saved analysis “${opened.record.name}”`);
+        setResultMeta({
+          computedAt: results.computedAt,
+          engineVersion: results.engineVersion,
+          structureKey: data.inputKey,
+          restored: false,
+          opened: { name: opened.record.name, savedAt: opened.record.updatedAt },
+          engineMismatch: opened.engineMismatch,
+          // Whatever was true when it was saved stays true; an inconsistent record is never shown as current.
+          stale: results.stale || inputs.key === null || inputs.key !== data.inputKey,
+        });
+      } else {
+        setSmiles("Not analyzed yet");
+        setMolfile(null);
+        setMainGroup(null);
+        setFunctionalGroups([]);
+        setAcidityResults([]);
+        setBasicityResults([]);
+        setResonanceResults([]);
+        setChiralityResults([]);
+        setMoleculeAnnotation(null);
+        setMoleculeIdentity(null);
+        setReactionPathways([]);
+        setResultMeta(null);
+        setStatus(`Opened saved analysis “${opened.record.name}” (structure only).`);
+      }
+      // One write replaces the automatic workspace with the opened analysis.
+      persistence.requestSave(() => ({ inputs: opened.inputs, results: opened.results }));
+      await persistence.flush();
+      openingRef.current = false;
+      setIsOpening(false);
+      window.setTimeout(() => {
+        propsRestoringRef.current = false;
+        schedulePropertiesSnapshot();
+      }, 500);
+      return true;
+    }
+
+    const savedOpen = useSavedAnalysisOpen<PropertiesWorkspaceInputs, PropertiesWorkspaceResults>({
+      page: "properties",
+      openRequest: pendingOpen?.page === "analysis" ? pendingOpen : null,
+      onOpenHandled: (requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current)),
+      ready: recovery !== null && activePage === "analysis" && isMainEditorReady,
+      busyReason: () =>
+        latestRef.current.isAnalyzing || openingRef.current ? "Wait for the current analysis to finish before opening a saved one." : null,
+      hasUnsavedWork: () => capturePropertiesWorkspace() !== null,
+      canSaveCurrent: () => Boolean(latestRef.current.resultMeta),
+      saveCurrent: (analysisName) => saveCurrentAnalysis(analysisName, false),
+      defaultName: defaultAnalysisName,
+      apply: applySavedAnalysis,
+      notify: (item) => setRecoveryNotices((notices) => [...notices, item]),
+    });
 
     const handlePageTabKeyDown = (
       event: ReactKeyboardEvent<HTMLButtonElement>,
@@ -257,9 +885,24 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
       });
     };
 
+    const handleGeneralTabKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, current: SubjectToolId) => {
+      const tools = SUBJECT_TOOLS[activeSubject];
+      const index = tools.findIndex((tool) => tool.id === current);
+      let next = index;
+      if (event.key === "ArrowRight") next = (index + 1) % tools.length;
+      if (event.key === "ArrowLeft") next = (index - 1 + tools.length) % tools.length;
+      if (event.key === "Home") next = 0;
+      if (event.key === "End") next = tools.length - 1;
+      if (next === index) return;
+      event.preventDefault();
+      const id = tools[next].id as SubjectToolId;
+      switchGeneralTool(id);
+      requestAnimationFrame(() => document.getElementById(`page-tab-${id}`)?.focus());
+    };
+
     useLayoutEffect(() => {
       scrollToAppTop();
-    }, [activePage]);
+    }, [activePage, activeSubject, generalTool]);
 
     const PROPERTY_INFO: Record<string, string> = {
     formula:
@@ -347,7 +990,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     }
 
     const analyzeMolecule = async () => {
-      if (analyzeInFlightRef.current) return;
+      if (analyzeInFlightRef.current || openingRef.current) return;
 
       const editor = window.ketcher;
       if (!editor) {
@@ -359,6 +1002,9 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
       latestAnalyzeRunRef.current = runId;
       analyzeInFlightRef.current = true;
       setIsAnalyzing(true);
+      setResultMeta(null);
+      setInputsOnlyRestored(false);
+      setRecoveryNotices([]);
       setStatus("Reading the structure…");
 
       try {
@@ -366,6 +1012,14 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
         const result = editorSnapshot?.smiles ?? "";
         const currentMolfile = editorSnapshot?.molfile ?? null;
         const safeSmiles = sanitizeDisplayedSmiles(result);
+        // The structure this analysis is about; results are tied to it.
+        let analyzedKet: string | null = null;
+        try {
+          analyzedKet = await editor.getKet();
+        } catch {
+          analyzedKet = null;
+        }
+        const analyzedKey = await ketIdentityKey(analyzedKet);
 
         if (!safeSmiles) {
           setSmiles("No molecule detected");
@@ -423,14 +1077,26 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
 
         if (latestAnalyzeRunRef.current !== runId) return;
 
+        const resolvedIdentity = identity ? await resolveStructureIdentity(safeSmiles, identity, importedNameResolutionRef.current) : null;
+        if (latestAnalyzeRunRef.current !== runId) return;
+        if (!resolvedIdentity?.sourceIdentity) importedNameResolutionRef.current = null;
         setReactionPathways(pathways);
-        setMoleculeIdentity(
-          identity
-            ? applyResolvedNameToIdentity(identity, importedNameResolutionRef.current)
-            : null,
-        );
+        setMoleculeIdentity(resolvedIdentity);
         setAcidityResults(acidity);
         setBasicityResults(basicity);
+        if (analyzedKey) {
+          propsSnapshotRef.current = { ket: ketHasStructureText(analyzedKet) ? analyzedKet : null, key: analyzedKey };
+          setResultMeta({
+            computedAt: new Date().toISOString(),
+            engineVersion: PROPERTIES_ENGINE_VERSION,
+            structureKey: analyzedKey,
+            restored: false,
+            engineMismatch: false,
+            stale: false,
+          });
+          // Edits made while the analysis ran are caught by this re-check.
+          scheduleSnapshotRef.current();
+        }
         setStatus("Analysis complete");
       } catch (error) {
         console.error("Analyze error:", error);
@@ -1018,7 +1684,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     return () => {
       cleanupFunctions.forEach((cleanup) => cleanup());
     };
-  }, [highlightedMoleculeSvg, annotationCarouselItems, jumpToAnnotationItem]);
+  }, [highlightedMoleculeSvg, annotationCarouselItems, jumpToAnnotationItem, analysisPanel, activePage]);
 
   const renderCurrentAnnotationCard = () => {
     if (!currentAnnotationItem) return null;
@@ -1117,21 +1783,16 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
           )}
 
           <p>
-            <strong>Sigma overlap:</strong> {" "}
-            {currentAnnotationItem.bond.sigmaOverlap}
+            <strong>σ bond:</strong> {" "}
+            {currentAnnotationItem.bond.sigmaOverlap.replace(/ sigma overlap$/, "")} overlap
           </p>
 
           {currentAnnotationItem.bond.piOverlap && (
             <p>
-              <strong>Pi overlap:</strong> {" "}
+              <strong>π bond:</strong> {" "}
               {currentAnnotationItem.bond.piOverlap}
             </p>
           )}
-
-          <p>
-            <strong>Orbital info:</strong> {" "}
-            {currentAnnotationItem.bond.orbitalInfo.join(", ")}
-          </p>
 
           <p>{currentAnnotationItem.bond.explanation}</p>
         </div>
@@ -1146,47 +1807,23 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
             {currentAnnotationItem.chirality.element}
           </h3>
 
-          <p className="selected-note">Selected chiral center</p>
+          <p className="selected-note">Selected stereocenter</p>
 
           <p>
             <strong>Configuration:</strong> {" "}
             {currentAnnotationItem.chirality.configuration === "unknown"
-              ? "Not assigned"
+              ? "Unspecified (potential stereocenter)"
               : currentAnnotationItem.chirality.configuration}
           </p>
 
-          <p>
-            <strong>Assignment source:</strong> {" "}
-            {currentAnnotationItem.chirality.assignmentSource === "rdkit"
-              ? "Automatic Analysis"
-              : currentAnnotationItem.chirality.assignmentSource ===
-                "pocketchem-fallback"
-              ? "Manual Analysis"
-              : "Unassigned"}
-          </p>
-
-          {currentAnnotationItem.chirality.configuration === "unknown" && (
-            <p className="empty">
-              Add wedge/dash bonds in Ketcher to specify stereochemistry for R/S
-              assignment.
+          {currentAnnotationItem.chirality.configuration === "unknown" ? (
+            <p>
+              No R/S is assigned because the drawing does not specify it. Draw wedge/dash bonds, or load a specific isomer by name (for example L- or D-).
             </p>
+          ) : (
+            <p>{currentAnnotationItem.chirality.configurationExplanation}</p>
           )}
-
-          <p>
-            <strong>Type:</strong> {currentAnnotationItem.chirality.label}
-          </p>
-
-          <p>{currentAnnotationItem.chirality.explanation}</p>
-
-          <p>
-            <strong>Why this is chiral:</strong> {" "}
-            {currentAnnotationItem.chirality.whyChiralExplanation}
-          </p>
-
-          <p>
-            <strong>How the configuration was assigned:</strong> {" "}
-            {currentAnnotationItem.chirality.configurationExplanation}
-          </p>
+          <p>{currentAnnotationItem.chirality.whyChiralExplanation}</p>
         </div>
       );
     }
@@ -1232,6 +1869,13 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
   };
 
   const clearAnalysis = () => {
+    // Clearing also discards the saved workspace and invalidates any restoration still in flight.
+    void persistence.discard();
+    propsSnapshotRef.current = { ket: null, key: null };
+    snapshotTask.cancel();
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
     importedNameResolutionRef.current = null;
     analyzeInFlightRef.current = false;
     latestAnalyzeRunRef.current += 1;
@@ -1263,68 +1907,418 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
     setMainEditorResetVersion((version) => version + 1);
   };
 
+  // What was recovered, what is only a saved snapshot, and what could not be saved.
+  const propertiesNotices: WorkspaceNoticeItem[] = [...recoveryNotices];
+  if (resultMeta?.restored) {
+    propertiesNotices.push({
+      tone: "info",
+      text: `Restored from your previous session (analyzed ${new Date(resultMeta.computedAt).toLocaleString()}). These results were not recomputed.`,
+    });
+  } else if (inputsOnlyRestored) {
+    propertiesNotices.push({ tone: "info", text: "Restored your drawn structure from your previous session." });
+  }
+  if (resultMeta?.opened) {
+    propertiesNotices.push({
+      tone: "info",
+      text: `Opened saved analysis “${resultMeta.opened.name}” (saved ${new Date(resultMeta.opened.savedAt).toLocaleString()}; analyzed ${new Date(resultMeta.computedAt).toLocaleString()}). These results were not recomputed.`,
+    });
+  }
+  if (saveMessage) propertiesNotices.push(saveMessage);
+  if (resultMeta?.engineMismatch) {
+    propertiesNotices.push({
+      tone: "warn",
+      text: "These results were saved by an earlier version of the analysis code. They are shown as saved and have not been recomputed.",
+    });
+  }
+  if (resultMeta?.stale) {
+    propertiesNotices.push({
+      tone: "warn",
+      text: `The structure changed after this analysis. The results below describe the earlier structure (${smiles}); analyze again to update them.`,
+    });
+  }
+  if (!persistenceStatus.available) {
+    propertiesNotices.push({ tone: "warn", text: "Browser storage is unavailable, so your work on this page will not be saved." });
+  }
+  if (persistenceStatus.saveError) {
+    propertiesNotices.push({
+      tone: "warn",
+      text: persistenceStatus.saveError.code === "quota"
+        ? "Your latest changes could not be saved because browser storage is full."
+        : `Your latest changes could not be saved (${persistenceStatus.saveError.message}).`,
+    });
+  }
+  if (persistenceStatus.resultsOmitted) {
+    propertiesNotices.push({ tone: "warn", text: "The results were too large to save; your structure was saved without them." });
+  }
+
+  const propertyGroups = useMemo(() => countGroups(functionalGroupOccurrences), [functionalGroupOccurrences]);
+  const propertyStereocenters = useMemo(() => chiralityResults.map((result) => ({ label: result.label, configuration: result.configuration, atom: result.atomIndex + 1 })), [chiralityResults]);
+  const aromaticityOverview = useAromaticity(moleculeIdentity ? smiles : "");
+
+  async function loadPropertiesVariant(resolution: MoleculeNameResolution) {
+    if (!window.ketcher || isAnalyzing) return;
+    await window.ketcher.setMolecule(resolution.smiles);
+    importedNameResolutionRef.current = resolution;
+    await analyzeMolecule();
+  }
+
+  async function changePropertiesCounterpart(structure: string, expectedKey: string, resolution: MoleculeNameResolution | null) {
+    const editor = window.ketcher;
+    if (!editor || isAnalyzing) throw new Error("Wait for the editor and analysis to finish.");
+    const snapshot = await readKetcherStructureSnapshot(editor);
+    if (await molecularStructureKey(snapshot?.smiles ?? "") !== expectedKey) throw new Error("The editor changed after the preview. Analyze it and generate a fresh comparison before replacing the drawing.");
+    await editor.setMolecule(structure);
+    importedNameResolutionRef.current = resolution;
+    await analyzeMolecule();
+  }
+
+  const incomingMolecule = useIncomingMolecule({ destination: "analysis", api: window.ketcher ?? null, ready: recovery !== null && activePage === "analysis" && isMainEditorReady && Boolean(window.ketcher), hasWork: Boolean(resultMeta), expectRestore: recovery?.kind === "restored" });
+
   {/*RETURN STATEMENT*/}
 
   return (
+    <NavigationContext.Provider value={navigation}>
+    <MoleculeOriginContext.Provider value={activeSubject === "organic" && activePage !== "saved" ? activePage : null}>
     <main className="app" ref={appShellRef}>
-      <a className="skip-link" href="#page-panel-analysis">
-        Skip to molecule workspace
-      </a>
+      {activeSubject === "organic" ? (
+        <AppShell
+          activeToolId={activePage}
+          onSelectTool={(id) => switchPage(id as AppPage)}
+          onToolKeyDown={(event, id) => handlePageTabKeyDown(event, id as AppPage)}
+          onOpenSearch={() => openSearch()}
+          onSelectSubject={(id) => switchSubject(id)}
+        />
+      ) : (
+        <AppShell
+          activeSubject={activeSubject}
+          activeToolId={generalTool}
+          onOpenSearch={() => openSearch()}
+          onSelectSubject={(id) => switchSubject(id)}
+          onSelectTool={(id) => switchGeneralTool(id as SubjectToolId)}
+          onToolKeyDown={(event, id) => handleGeneralTabKeyDown(event, id as SubjectToolId)}
+          tools={SUBJECT_TOOLS[activeSubject]}
+        />
+      )}
 
-      <header className="hero">
-        <div>
-          <div className="brand-row">
-            <h1>PocketChem</h1>
-            <p className="eyebrow">Organic chemistry workspace</p>
-          </div>
-          <p className="subtitle">
-            Draw, analyze, compare, and predict reactions in one workspace.
-          </p>
-        </div>
-      </header>
-
-      <nav className="page-tabs" aria-label="PocketChem tools" role="tablist">
-        {APP_PAGES.map((page) => (
-          <button
-            aria-controls={`page-panel-${page.id}`}
-            aria-selected={activePage === page.id}
-            className={activePage === page.id ? "page-tab active" : "page-tab"}
-            id={`page-tab-${page.id}`}
-            key={page.id}
-            onClick={() => switchPage(page.id)}
-            onKeyDown={(event) => handlePageTabKeyDown(event, page.id)}
-            role="tab"
-            tabIndex={activePage === page.id ? 0 : -1}
-            type="button"
-          >
-            {page.label}
-          </button>
-        ))}
-      </nav>
-
-      {activePage === "analysis" ? (
+      <div id="main-content" tabIndex={-1} className="main-content">
+      {activeSubject === "biochemistry" ? (
+        <section
+          aria-labelledby={`page-tab-${generalTool}`}
+          className="page-panel"
+          id={`page-panel-${generalTool}`}
+          role="tabpanel"
+        >
+          <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
+            {generalTool === "bcAminoAcids" ? (
+              <AminoAcidsPage
+                openRequest={pendingOpen?.page === "bcAminoAcids" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcProteins" ? (
+              <ProteinsPage
+                openRequest={pendingOpen?.page === "bcProteins" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcEnzymes" ? (
+              <EnzymesPage
+                openRequest={pendingOpen?.page === "bcEnzymes" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcGlycolysis" ? (
+              <GlycolysisPage
+                openRequest={pendingOpen?.page === "bcGlycolysis" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcGluconeogenesis" ? (
+              <GluconeogenesisPage
+                openRequest={pendingOpen?.page === "bcGluconeogenesis" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcTca" ? (
+              <CitricAcidPage
+                openRequest={pendingOpen?.page === "bcTca" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcEtc" ? (
+              <ElectronTransportPage
+                openRequest={pendingOpen?.page === "bcEtc" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcMetabolism" ? (
+              <MetabolicMapPage
+                openRequest={pendingOpen?.page === "bcMetabolism" ? pendingOpen : null}
+                onOpenTool={(id: BiochemistryToolId) => switchGeneralTool(id)}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcFattyAcids" ? (
+              <FattyAcidPage
+                openRequest={pendingOpen?.page === "bcFattyAcids" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcAminoMetabolism" ? (
+              <AminoMetabolismPage
+                openRequest={pendingOpen?.page === "bcAminoMetabolism" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcFuel" ? (
+              <FuelMetabolismPage
+                openRequest={pendingOpen?.page === "bcFuel" ? pendingOpen : null}
+                onOpenTool={(id: BiochemistryToolId) => switchGeneralTool(id)}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bcSaved" ? (
+              <SavedAnalysesPage onOpen={openSavedAnalysis} />
+            ) : (
+              <BiochemOverview onOpenTool={(id: BiochemistryToolId) => switchGeneralTool(id)} />
+            )}
+          </Suspense>
+        </section>
+      ) : activeSubject === "biology" ? (
+        <section
+          aria-labelledby={`page-tab-${generalTool}`}
+          className="page-panel"
+          id={`page-panel-${generalTool}`}
+          role="tabpanel"
+        >
+          <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
+            {generalTool === "bioReplication" ? (
+              <ReplicationPage
+                openRequest={pendingOpen?.page === "bioReplication" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioTranscription" ? (
+              <TranscriptionPage
+                openRequest={pendingOpen?.page === "bioTranscription" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioTranslation" ? (
+              <TranslationPage
+                onOpenPeptide={() => switchSubject("biochemistry", { tool: "bcAminoAcids" })}
+                openRequest={pendingOpen?.page === "bioTranslation" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioDogma" ? (
+              <CentralDogmaPage
+                openRequest={pendingOpen?.page === "bioDogma" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioRegulation" ? (
+              <RegulationPage
+                openRequest={pendingOpen?.page === "bioRegulation" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioGenetics" ? (
+              <GeneticsPage
+                onNavigate={(id: BiologyToolId) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioGenetics" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioDivision" ? (
+              <CellDivisionPage
+                onNavigate={(id: BiologyToolId) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioDivision" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioMembrane" ? (
+              <MembranePage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioMembrane" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioSignaling" ? (
+              <SignalingPage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioSignaling" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioNeuron" ? (
+              <NeuronPage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioNeuron" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioOrganelles" ? (
+              <OrganellesPage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioOrganelles" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioCellCycle" ? (
+              <CellCyclePage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioCellCycle" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioCellDeath" ? (
+              <CellDeathPage
+                onNavigate={(id) => switchGeneralTool(id)}
+                openRequest={pendingOpen?.page === "bioCellDeath" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "bioSaved" ? (
+              <SavedAnalysesPage onOpen={openSavedAnalysis} />
+            ) : (
+              <BiologyOverview onOpenTool={(id: BiologyToolId) => switchGeneralTool(id)} />
+            )}
+          </Suspense>
+        </section>
+      ) : activeSubject === "physics" ? (
+        <section
+          aria-labelledby={`page-tab-${generalTool}`}
+          className="page-panel"
+          id={`page-panel-${generalTool}`}
+          role="tabpanel"
+        >
+          <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
+            {generalTool === "phMechanics" ? (
+              <MechanicsPage
+                openRequest={pendingOpen?.page === "phMechanics" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phCircuits" ? (
+              <CircuitsPage
+                openRequest={pendingOpen?.page === "phCircuits" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phForces" ? (
+              <ForcesPage
+                openRequest={pendingOpen?.page === "phForces" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phEnergy" ? (
+              <EnergyPage
+                openRequest={pendingOpen?.page === "phEnergy" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phCollisions" ? (
+              <CollisionsPage
+                openRequest={pendingOpen?.page === "phCollisions" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phWaves" ? (
+              <WavesPage
+                openRequest={pendingOpen?.page === "phWaves" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phOptics" ? (
+              <OpticsPage
+                openRequest={pendingOpen?.page === "phOptics" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phInterference" ? (
+              <InterferencePage
+                openRequest={pendingOpen?.page === "phInterference" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phEfield" ? (
+              <EfieldPage
+                openRequest={pendingOpen?.page === "phEfield" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phMagnetic" ? (
+              <MagneticPage
+                openRequest={pendingOpen?.page === "phMagnetic" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phInduction" ? (
+              <InductionPage
+                openRequest={pendingOpen?.page === "phInduction" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phRc" ? (
+              <RcPage
+                openRequest={pendingOpen?.page === "phRc" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "phSaved" ? (
+              <SavedAnalysesPage onOpen={openSavedAnalysis} />
+            ) : (
+              <PhysicsOverview onOpenTool={(id: PhysicsToolId) => switchGeneralTool(id)} />
+            )}
+          </Suspense>
+        </section>
+      ) : activeSubject === "general" ? (
+        <section
+          aria-labelledby={`page-tab-${generalTool}`}
+          className="page-panel"
+          id={`page-panel-${generalTool}`}
+          role="tabpanel"
+        >
+          <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
+            {generalTool === "gcOverview" ? (
+              <GeneralChemistryOverview onOpenTool={(id) => switchGeneralTool(id)} />
+            ) : generalTool === "gcSaved" ? (
+              <SavedAnalysesPage onOpen={openSavedAnalysis} />
+            ) : generalTool === "gcEquilibrium" ? (
+              <EquilibriumPage
+                openRequest={pendingOpen?.page === "gcEquilibrium" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcKinetics" ? (
+              <KineticsPage
+                openRequest={pendingOpen?.page === "gcKinetics" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcAtomic" ? (
+              <AtomicStructurePage
+                openRequest={pendingOpen?.page === "gcAtomic" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcBonding" ? (
+              <BondingGeometryPage
+                openRequest={pendingOpen?.page === "gcBonding" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcMO" ? (
+              <MolecularOrbitalsPage
+                openRequest={pendingOpen?.page === "gcMO" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcStoichiometry" ? (
+              <StoichiometryPage
+                openRequest={pendingOpen?.page === "gcStoichiometry" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcGas" ? (
+              <GasLawsPage
+                openRequest={pendingOpen?.page === "gcGas" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcElectro" ? (
+              <ElectrochemistryPage
+                openRequest={pendingOpen?.page === "gcElectro" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : generalTool === "gcThermo" ? (
+              <ThermodynamicsPage
+                openRequest={pendingOpen?.page === "gcThermo" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : (
+              <AcidBaseTitrationPage
+                openRequest={pendingOpen?.page === "gcAcidBase" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            )}
+          </Suspense>
+        </section>
+      ) : activePage === "analysis" ? (
         <section
           aria-labelledby="page-tab-analysis"
-          className="workspace workspace-compact"
+          className="workspace workspace-compact properties-workspace"
           id="page-panel-analysis"
           role="tabpanel"
         >
           <div className="card molecule-card molecule-card-compact">
-            <div className="card-header">
-              <div>
-                <h2>Molecule Drawer</h2>
-                <p>Properties — draw a molecule to review its overview, acid/base sites, concepts, and molecular properties.</p>
-              </div>
-              <span className={`status ${isMainEditorReady ? "ready" : "loading"}`}>
-                {isMainEditorReady ? "Editor ready" : "Loading editor"}
-              </span>
-            </div>
+            <header className="pr-editor-header"><h2>Properties</h2>{isMainEditorReady ? null : <span>Loading editor…</span>}</header>
+            {incomingMolecule}
 
             <div className="drawer-placeholder drawer-placeholder-compact">
               <MoleculeDrawer
                 key={`main-editor-${mainEditorResetVersion}`}
                 onReady={handleMainEditorReady}
                 onChange={handleMainEditorChange}
+                onStructureLoaded={schedulePropertiesSnapshot}
                 onNameStructureApplied={handleMainNameApplied}
                 onNameSubmitProcess={analyzeMolecule}
               />
@@ -1348,57 +2342,81 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
               >
                 Clear Analysis
               </button>
+
+              <button
+                className="secondary-button"
+                onClick={() => {
+                  setSaveMessage(null);
+                  setSaveForm({ name: defaultAnalysisName() });
+                }}
+                disabled={!resultMeta || isAnalyzing || isOpening || saveBusy}
+                title={resultMeta ? "Keep this analysis in Saved analyses" : "Analyze a molecule first"}
+                type="button"
+              >
+                Save Analysis
+              </button>
             </div>
+
+            {saveForm && (
+              <SaveAnalysisForm
+                name={saveForm.name}
+                busy={saveBusy}
+                onChange={(analysisName) => setSaveForm({ name: analysisName })}
+                onCancel={() => setSaveForm(null)}
+                onSubmit={() => {
+                  void saveCurrentAnalysis(saveForm.name).then((saved) => {
+                    if (saved) setSaveForm(null);
+                  });
+                }}
+              />
+            )}
           </div>
 
           <div className="card analysis-card analysis-dashboard-card">
-            <div className="dashboard-header">
-              <div>
-                <h2>Properties Dashboard</h2>
-                <p>
-                  {moleculeIdentity
-                    ? moleculeIdentity.nomenclature.displayName ||
-                      moleculeIdentity.nomenclature.estimatedName
-                    : "Analyze a molecule to fill this dashboard."}
-                </p>
-              </div>
+            <div className="dashboard-header"><h2>Analysis</h2></div>
 
-              <span className="status">
-                {functionalGroupOccurrences.length} group
-                {functionalGroupOccurrences.length === 1 ? "" : "s"}
-              </span>
-            </div>
+            <WorkspaceNotice
+              embedded
+              notices={propertiesNotices}
+              onDiscard={resultMeta?.restored || inputsOnlyRestored ? clearAnalysis : undefined}
+              discardDisabled={isAnalyzing}
+            />
 
-            <div className="dashboard-mini-grid">
-              <div>
-                <p className="label">Status</p>
-                <strong aria-live="polite">{status}</strong>
-              </div>
+            {savedOpen.prompt && (
+              <ReplaceWorkspacePrompt
+                embedded
+                name={savedOpen.prompt.opened.record.name}
+                canSaveFirst={Boolean(resultMeta) && !isAnalyzing}
+                busy={savedOpen.saveBusy}
+                onChoose={(choice) => void savedOpen.resolve(choice)}
+              />
+            )}
 
-              <div>
-                <p className="label">Formula</p>
-                <strong>
-                  {moleculeIdentity?.properties.molecularFormula ?? "—"}
-                </strong>
-              </div>
+            <p aria-live="polite" className="pr-status" data-testid="pr-status">
+              <span className="label">Status</span> <strong>{status}</strong>
+              {moleculeIdentity ? <span className="pr-status-meta">{reactionPathways.length} predicted {reactionPathways.length === 1 ? "reaction" : "reactions"}</span> : null}
+            </p>
 
-              <div>
-                <p className="label">DBE</p>
-                <strong>
-                  {moleculeIdentity?.properties.degreesOfUnsaturation ?? "—"}
-                </strong>
-              </div>
+            {moleculeIdentity ? (
+              <PropertiesIdentity molfile={molfile} groups={propertyGroups} identity={moleculeIdentity} smiles={smiles} stereocenters={propertyStereocenters} onLoadVariant={(resolution) => void loadPropertiesVariant(resolution)} />
+            ) : null}
 
-              <div>
-                <p className="label">Reactions</p>
-                <strong>{reactionPathways.length}</strong>
-              </div>
-            </div>
-
-            <div className="dashboard-tab-row">
+            <div className="dashboard-tab-row" role="tablist" aria-label="Properties results">
               {ANALYSIS_PANELS.map((panel) => (
                 <button
-                  aria-pressed={analysisPanel === panel.id}
+                  role="tab"
+                  id={`properties-tab-${panel.id}`}
+                  aria-controls={`properties-panel-${panel.id}`}
+                  aria-selected={analysisPanel === panel.id}
+                  tabIndex={analysisPanel === panel.id ? 0 : -1}
+                  onKeyDown={(event) => {
+                    const index = ANALYSIS_PANELS.findIndex((p) => p.id === panel.id);
+                    const next = event.key === "ArrowRight" ? (index + 1) % ANALYSIS_PANELS.length : event.key === "ArrowLeft" ? (index + ANALYSIS_PANELS.length - 1) % ANALYSIS_PANELS.length : event.key === "Home" ? 0 : event.key === "End" ? ANALYSIS_PANELS.length - 1 : null;
+                    if (next === null) return;
+                    event.preventDefault();
+                    setAnalysisPanel(ANALYSIS_PANELS[next].id);
+                    document.getElementById(`properties-tab-${ANALYSIS_PANELS[next].id}`)?.focus();
+                  }}
                   key={panel.id}
                   className={
                     analysisPanel === panel.id
@@ -1413,191 +2431,27 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
               ))}
             </div>
 
-            <div className="dashboard-panel-scroll">
+            <div className="dashboard-panel-scroll" role="tabpanel" id={`properties-panel-${analysisPanel}`} aria-labelledby={`properties-tab-${analysisPanel}`} tabIndex={0}>
               {analysisPanel === "overview" && (
                 <div className="dashboard-panel">
-                  <div className="analysis-section compact-section">
-                    <p className="label">SMILES</p>
-                    <p className="smiles-output">{smiles}</p>
-                  </div>
-
-                  <div className="analysis-section compact-section">
-                    <p className="label">Identity</p>
-
-                    {!moleculeIdentity ? (
-                      <p className="empty">
-                        Analyze a molecule to estimate its name, formula, DBE,
-                        and molecular properties.
-                      </p>
-                    ) : (
-                      <div className="group-card">
-                        <div className="group-card-header">
-                          <h3>
-                            {moleculeIdentity.nomenclature.displayName ||
-                              moleculeIdentity.nomenclature.estimatedName}
-                          </h3>
-                          <span>
-                            {moleculeIdentity.nomenclature.namingConfidence} {" "}
-                            confidence
-                          </span>
-                        </div>
-
-                        {moleculeIdentity.nomenclature.commonName && (
-                          <p>
-                            <strong>Common name:</strong> {" "}
-                            {moleculeIdentity.nomenclature.commonName}
-                          </p>
-                        )}
-
-                        <p>
-                          <strong>Main suffix:</strong> {" "}
-                          {moleculeIdentity.nomenclature.mainSuffix ??
-                            "Hydrocarbon / no suffix group detected"}
-                        </p>
-
-                        <p>{moleculeIdentity.nomenclature.explanation}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="analysis-section compact-section">
-                    <p className="label">Quick Counts</p>
-
-                    <div className="property-grid compact-properties">
-                      <PropertyTile
-                        label="Functional groups"
-                        value={functionalGroupOccurrences.length}
-                        info="Number of detected functional-group occurrences."
-                      />
-
-                      <PropertyTile
-                        label="Chiral centers"
-                        value={chiralityResults.length}
-                        info="Possible stereocenters detected from the structure."
-                      />
-
-                      <PropertyTile
-                        label="H-bond donors"
-                        value={
-                          moleculeIdentity?.properties.hydrogenBondDonors ?? "N/A"
-                        }
-                        info={PROPERTY_INFO.hbd}
-                      />
-
-                      <PropertyTile
-                        label="H-bond acceptors"
-                        value={
-                          moleculeIdentity?.properties.hydrogenBondAcceptors ??
-                          "N/A"
-                        }
-                        info={PROPERTY_INFO.hba}
-                      />
-                    </div>
-                  </div>
+                  {moleculeIdentity ? <section className="pr-overview-science"><h4>Reactivity at a glance</h4><p><strong>Aromaticity:</strong> {aromaticityOverview?.result?.summary ?? "Reading ring systems…"} <button type="button" onClick={() => setAnalysisPanel("aromaticity")}>Inspect rings</button></p><p><strong>Acid/Base:</strong> {acidityResults.length} acidic and {basicityResults.length} basic sites. {acidityResults[0] ? <>Strongest acid: {acidityResults[0].acidicSite}, est. pKa {acidityResults[0].estimatedPkaRange.join("–")}.</> : null} <button type="button" onClick={() => setAnalysisPanel("acidBase")}>Inspect sites</button></p></section> : null}
+                  {moleculeIdentity ? (
+                    <PropertiesSummary groups={propertyGroups} identity={moleculeIdentity} info={PROPERTY_INFO} smiles={smiles} stereocenters={propertyStereocenters} />
+                  ) : (
+                    <p className="empty">Analyze a molecule to estimate its name, formula, DBE, and molecular properties.</p>
+                  )}
                 </div>
               )}
 
               {analysisPanel === "acidBase" && (
                 <div className="dashboard-panel">
-                  <div className="analysis-section compact-section">
-                    <p className="label">Acid/Base Sites & Estimates</p>
-
-                    <div className="acid-base-summary-grid">
-                      <div className="acid-base-summary-card">
-                        <span>Strongest acidic site</span>
-                        <strong>
-                          {acidityResults[0]
-                            ? `${acidityResults[0].acidicSite} (atom ${acidityResults[0].siteAtomIndex + 1})`
-                            : "None detected"}
-                        </strong>
-                        <p>
-                          {acidityResults[0]
-                            ? `Estimated pKa ${acidityResults[0].estimatedPka} · typical range ${formatPkaRange(acidityResults[0].estimatedPkaRange)} · ${acidityResults[0].confidence.toLowerCase()} confidence`
-                            : "Analyze a molecule first."}
-                        </p>
-                      </div>
-
-                      <div className="acid-base-summary-card">
-                        <span>Strongest basic site</span>
-                        <strong>
-                          {basicityResults[0]
-                            ? `${basicityResults[0].basicSite} (atom ${basicityResults[0].siteAtomIndex + 1})`
-                            : "None detected"}
-                        </strong>
-                        <p>
-                          {basicityResults[0]
-                            ? `Conjugate acid pKa ${basicityResults[0].conjugateAcidPka} · ${basicityResults[0].confidence.toLowerCase()} confidence`
-                            : "Analyze a molecule first."}
-                        </p>
-                      </div>
-
-                      <div className="acid-base-summary-card">
-                        <span>Detected groups</span>
-                        <strong>{functionalGroups.length}</strong>
-                        <p>
-                          {functionalGroups.length > 0
-                            ? functionalGroups.map((group) => group.name).join(", ")
-                            : "No groups loaded yet."}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="analysis-section compact-section">
-                    <p className="label">Acidity Estimate</p>
-                    {acidityResults.length === 0 ? (
-                      <p className="empty">No acidic sites estimated yet.</p>
-                    ) : (
-                      <div className="group-list compact-group-list">
-                        {acidityResults.map((result, index) => (
-                          <div className="group-card" key={`${result.relatedGroup}-${result.acidicSite}-${index}`}>
-                            <div className="group-card-header">
-                              <h3>{index === 0 ? "Strongest acidic site" : "Weaker acidic site"}: {result.acidicSite}</h3>
-                              <span>pKa {result.estimatedPka}</span>
-                            </div>
-                            <p><strong>Related group:</strong> {result.relatedGroup}</p>
-                            <p><strong>Detected atom:</strong> Atom {result.siteAtomIndex + 1} · {result.confidence.toLowerCase()} confidence</p>
-                            <p><strong>Typical pKa range:</strong> {formatPkaRange(result.estimatedPkaRange)}</p>
-                            <p><strong>A — Atom:</strong> {result.atom}</p>
-                            <p><strong>R — Resonance:</strong> {result.resonance}</p>
-                            <p><strong>I — Induction:</strong> {result.induction}</p>
-                            <p><strong>O — Orbital:</strong> {result.orbital}</p>
-                            <p>{result.explanation}</p>
-                            {result.modifiers.length > 0 && (
-                              <p><strong>pKa modifier:</strong> {result.modifiers.join(" ")}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="analysis-section compact-section">
-                    <p className="label">Basicity Estimate</p>
-                    {basicityResults.length === 0 ? (
-                      <p className="empty">No basic sites estimated yet.</p>
-                    ) : (
-                      <div className="group-list compact-group-list">
-                        {basicityResults.map((result, index) => (
-                          <div className="group-card" key={`${result.relatedGroup}-${result.basicSite}-${index}`}>
-                            <div className="group-card-header">
-                              <h3>{index === 0 ? "Strongest basic site" : "Weaker basic site"}: {result.basicSite}</h3>
-                              <span>conj. acid pKa {result.conjugateAcidPka}</span>
-                            </div>
-                            <p><strong>Related group:</strong> {result.relatedGroup}</p>
-                            <p><strong>Detected atom:</strong> Atom {result.siteAtomIndex + 1} · {result.confidence.toLowerCase()} confidence</p>
-                            <p><strong>Typical conjugate-acid pKa range:</strong> {formatPkaRange(result.conjugateAcidPkaRange)}</p>
-                            <p>{result.explanation}</p>
-                            {result.modifiers.length > 0 && (
-                              <p><strong>Basicity modifier:</strong> {result.modifiers.join(" ")}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <AcidBasePanel smiles={smiles} acids={acidityResults} bases={basicityResults} generic={moleculeIdentity?.properties.fullySpecified === false} />
                 </div>
               )}
+
+              <div hidden={analysisPanel !== "aromaticity"}>
+                <div className="dashboard-panel">{moleculeIdentity ? <AromaticityPanel smiles={smiles}><CounterpartExplorer smiles={smiles} resolution={moleculeIdentity.sourceIdentity?.resolution ?? null} onApply={(candidate: CounterpartCandidate, key) => changePropertiesCounterpart(candidate.molfile,key,null)} onRestore={(original: CounterpartOriginal, key) => changePropertiesCounterpart(original.ket,key,original.resolution)} /></AromaticityPanel> : <p>Analyze a molecule to inspect aromaticity.</p>}</div>
+              </div>
 
               {analysisPanel === "concepts" && (
                 <div className="dashboard-panel">
@@ -1672,19 +2526,17 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
                       </div>
                     )}
 
+                    <div className="pr-concept-split" data-testid="pr-concept-split">
                     {highlightedMoleculeSvg && (
-                      <div className="highlight-preview-wrapper">
-                        <p className="annotation-summary">
-                          Highlighted molecule preview:
-                        </p>
-
+                      <div className="highlight-preview-wrapper pr-concept-visual">
                         <div className="highlight-preview">
-                          <div
-                            ref={highlightedSvgRef}
+                          <MolecularFigure
+                            containerRef={highlightedSvgRef}
                             className="highlighted-molecule-svg"
-                            dangerouslySetInnerHTML={{
-                              __html: highlightedMoleculeSvg,
-                            }}
+                            clickToExpand={false}
+                            svg={highlightedMoleculeSvg}
+                            title="Structure with highlighted sites"
+                            source={{ smiles: sanitizeDisplayedSmiles(smiles) || null, molfile }}
                           />
                         </div>
                       </div>
@@ -1695,7 +2547,7 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
                         Analyze a molecule to see concept annotations.
                       </p>
                     ) : (
-                      <div className="annotation-list">
+                      <div className="annotation-list pr-concept-info">
                         {selectedConcept === "hybridization" && (
                           <p className="annotation-summary">
                             Showing {" "}
@@ -1725,8 +2577,8 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
 
                         {selectedConcept === "chirality" && (
                           <p className="annotation-summary">
-                            Showing possible chiral centers. Specific R/S
-                            assignment requires wedge/dash stereochemistry.
+                            Showing stereocenters. R/S needs specified
+                            stereochemistry (wedge/dash or isomeric SMILES).
                           </p>
                         )}
 
@@ -1768,191 +2620,18 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
                         )}
                       </div>
                     )}
+                    </div>
                   </div>
                 </div>
               )}
 
               {analysisPanel === "properties" && (
                 <div className="dashboard-panel">
-                  <div className="analysis-section compact-section">
-                    <p className="label">Nomenclature & Core Properties</p>
-
-                    {!moleculeIdentity ? (
-                      <p className="empty">
-                        Analyze a molecule to estimate its name, formula, DBE,
-                        and molecular properties.
-                      </p>
-                    ) : (
-                      <div className="group-list">
-                        <div className="group-card">
-                          <div className="group-card-header">
-                            <h3>
-                              {moleculeIdentity.nomenclature.displayName ||
-                                moleculeIdentity.nomenclature.estimatedName}
-                            </h3>
-
-                            <span>
-                              {moleculeIdentity.nomenclature.namingConfidence} {" "}
-                              confidence
-                            </span>
-                          </div>
-
-                          {moleculeIdentity.nomenclature.commonName && (
-                            <p>
-                              <strong>Common name:</strong> {" "}
-                              {moleculeIdentity.nomenclature.commonName}
-                            </p>
-                          )}
-
-                          <p>
-                            <strong>Parent chain:</strong> {" "}
-                            {moleculeIdentity.nomenclature.parentChain ??
-                              "Not assigned"}
-                            {moleculeIdentity.nomenclature.parentChainLength > 0
-                              ? ` (${moleculeIdentity.nomenclature.parentChainLength} C)`
-                              : ""}
-                          </p>
-
-                          <p>
-                            <strong>Main suffix:</strong> {" "}
-                            {moleculeIdentity.nomenclature.mainSuffix ??
-                              "Hydrocarbon / no suffix group detected"}
-                          </p>
-
-                          {moleculeIdentity.nomenclature.prefixes.length > 0 && (
-                            <p>
-                              <strong>Detected prefixes:</strong> {" "}
-                              {moleculeIdentity.nomenclature.prefixes.join(", ")}
-                            </p>
-                          )}
-
-                          <p>{moleculeIdentity.nomenclature.explanation}</p>
-
-                          <div className="limitation-list">
-                            {moleculeIdentity.nomenclature.limitations.map(
-                              (limitation) => (
-                                <p className="empty" key={limitation}>
-                                  {limitation}
-                                </p>
-                              )
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="property-grid compact-properties">
-                          <PropertyTile
-                            label="Formula"
-                            value={moleculeIdentity.properties.molecularFormula}
-                            info={PROPERTY_INFO.formula}
-                          />
-
-                          <PropertyTile
-                            label="DBE / unsaturation"
-                            value={
-                              moleculeIdentity.properties
-                                .degreesOfUnsaturation ?? "N/A"
-                            }
-                            info={PROPERTY_INFO.dbe}
-                          />
-
-                          <PropertyTile
-                            label="Molecular weight"
-                            value={
-                              moleculeIdentity.properties.molecularWeight
-                                ? `${moleculeIdentity.properties.molecularWeight} g/mol`
-                                : "N/A"
-                            }
-                            info={PROPERTY_INFO.molecularWeight}
-                          />
-
-                          <PropertyTile
-                            label="Exact mass"
-                            value={moleculeIdentity.properties.exactMass ?? "N/A"}
-                            info={PROPERTY_INFO.exactMass}
-                          />
-
-                          <PropertyTile
-                            label="Formal charge"
-                            value={moleculeIdentity.properties.formalCharge}
-                            info={PROPERTY_INFO.formalCharge}
-                          />
-
-                          <PropertyTile
-                            label="Heavy atoms"
-                            value={moleculeIdentity.properties.heavyAtomCount}
-                            info={PROPERTY_INFO.heavyAtoms}
-                          />
-
-                          <PropertyTile
-                            label="Water solubility"
-                            value={
-                              moleculeIdentity.properties.waterSolubilityTendency
-                                .level
-                            }
-                            info={PROPERTY_INFO.waterSolubility}
-                          />
-
-                          <PropertyTile
-                            label="Membrane permeability"
-                            value={
-                              moleculeIdentity.properties
-                                .membranePermeabilityTendency.level
-                            }
-                            info={PROPERTY_INFO.membranePermeability}
-                          />
-
-                          <PropertyTile
-                            label="Boiling point tendency"
-                            value={
-                              moleculeIdentity.properties.boilingPointTendency
-                                .level
-                            }
-                            info={PROPERTY_INFO.boilingPoint}
-                          />
-
-                          <PropertyTile
-                            label="Volatility"
-                            value={
-                              moleculeIdentity.properties.volatilityTendency.level
-                            }
-                            info={PROPERTY_INFO.volatility}
-                          />
-
-                          <PropertyTile
-                            label="H-bond donors"
-                            value={
-                              moleculeIdentity.properties.hydrogenBondDonors ??
-                              "N/A"
-                            }
-                            info={PROPERTY_INFO.hbd}
-                          />
-
-                          <PropertyTile
-                            label="H-bond acceptors"
-                            value={
-                              moleculeIdentity.properties.hydrogenBondAcceptors ??
-                              "N/A"
-                            }
-                            info={PROPERTY_INFO.hba}
-                          />
-
-                          <PropertyTile
-                            label="Rotatable bonds"
-                            value={
-                              moleculeIdentity.properties.rotatableBonds ?? "N/A"
-                            }
-                            info={PROPERTY_INFO.rotatableBonds}
-                          />
-
-                          <PropertyTile
-                            label="Rings"
-                            value={moleculeIdentity.properties.ringCount ?? "N/A"}
-                            info={PROPERTY_INFO.rings}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  {moleculeIdentity ? (
+                    <PropertiesDetail groups={propertyGroups} identity={moleculeIdentity} info={PROPERTY_INFO} smiles={smiles} stereocenters={propertyStereocenters} />
+                  ) : (
+                    <p className="empty">Analyze a molecule to estimate its name, formula, DBE, and molecular properties.</p>
+                  )}
                 </div>
               )}
             </div>
@@ -1967,23 +2646,53 @@ import { readKetcherStructureSnapshot } from "./utils/ketcherSnapshot";
         >
           <Suspense fallback={<div className="card page-loading" role="status"><span className="loading-spinner" aria-hidden="true" />Loading tool…</div>}>
             {activePage === "acidBase" ? (
-              <AcidBasePage />
+              <AcidBasePage
+                openRequest={pendingOpen?.page === "acidBase" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
             ) : activePage === "reactions" ? (
               <ReactionsPage
                 initialPathways={reactionPathways}
                 initialReactantMolfile={molfile}
+                handoffId={reactionPathways.length > 0 || molfile ? (resultMeta?.computedAt ?? `unsaved:${smiles}`) : null}
+                handoffLabel={moleculeIdentity?.nomenclature.displayName || moleculeIdentity?.nomenclature.estimatedName || null}
+                handoffSmiles={sanitizeDisplayedSmiles(smiles) || null}
+                openRequest={pendingOpen?.page === "reactions" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
               />
             ) : activePage === "spectroscopy" ? (
-              <SpectroscopyPage />
+              <SpectroscopyPage
+                openRequest={pendingOpen?.page === "spectroscopy" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
             ) : activePage === "multiStep" ? (
-              <SynthesisPage />
+              <SynthesisPage
+                openRequest={pendingOpen?.page === "multiStep" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
+            ) : activePage === "conformations" ? (
+              <ConformationsPage
+                openRequest={pendingOpen?.page === "conformations" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+                handoffSmiles={sanitizeDisplayedSmiles(smiles) || null}
+                handoffMolfile={molfile || null}
+              />
+            ) : activePage === "saved" ? (
+              <SavedAnalysesPage onOpen={openSavedAnalysis} />
             ) : (
-              <MultiCatalyticPage />
+              <MultiCatalyticPage
+                openRequest={pendingOpen?.page === "multiCatalytic" ? pendingOpen : null}
+                onOpenHandled={(requestId) => setPendingOpen((current) => (current?.id === requestId ? null : current))}
+              />
             )}
           </Suspense>
         </section>
       )}
+    </div>
     </main>
+    <ConceptSearch initialQuery={searchState.query} onClose={closeSearch} onOpenDestination={openDestination} onOpenSaved={(analysis) => openSavedAnalysis(analysis)} open={searchState.open} />
+    </MoleculeOriginContext.Provider>
+    </NavigationContext.Provider>
   );
 }
 

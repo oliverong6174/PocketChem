@@ -321,6 +321,7 @@ export const alkyneReactionRules: ReactionRule[] = [
   },
   {
     id: "alkyne-lindlar-reduction-terminal",
+    conditions: {},
     family: "alkynes",
     reactionType: "reduction",
     title: "Lindlar Reduction (Syn)",
@@ -784,6 +785,7 @@ export const alkyneReactionRules: ReactionRule[] = [
   // ---------------------------------------------------------------------------
   {
     id: "terminal-alkyne-deprotonation",
+    conditions: { reactionCentre: ["terminal-alkyne"], base: "strong", anhydrous: true },
     family: "alkynes",
     reactionType: "acidBase",
     title: "Terminal Alkyne Deprotonation: Acetylide Ion Formation",
@@ -824,6 +826,7 @@ export const alkyneReactionRules: ReactionRule[] = [
   },
   {
     id: "terminal-alkyne-alkylation",
+    conditions: { reactionCentre: ["terminal-alkyne"], base: "strong", anhydrous: true },
     family: "alkynes",
     reactionType: "substitution",
     reactionClass: "acetylide SN2 alkylation",

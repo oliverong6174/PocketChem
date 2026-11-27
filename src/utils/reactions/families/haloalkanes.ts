@@ -247,6 +247,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "sn2", reagent: "hydroxide" },
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
@@ -279,6 +280,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "sn2", reagent: "nucleophile" },
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
@@ -382,6 +384,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "sn2", reagent: "nucleophile" },
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
@@ -413,6 +416,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "SN2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "sn2", reagent: "nucleophile" },
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       mixture: "single",
     },
@@ -458,6 +462,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   },
   {
     id: "haloalkane-williamson-ether",
+    conditions: { base: "mild" },
     family: "haloalkanes",
     reactionType: "substitution",
     reactionClass: "nucleophilic substitution",
@@ -497,6 +502,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   },
   {
     id: "haloalkane-acetylide-alkylation",
+    conditions: { organometallic: true, anhydrous: true },
     family: "haloalkanes",
     reactionType: "substitution",
     reactionClass: "nucleophilic substitution",
@@ -714,10 +720,11 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "E2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "e2", reagent: "hydroxide" },
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
     },
     selectivity: ["Anti-periplanar beta H / leaving-group geometry", "Usually Zaitsev"],
     limitations: [
@@ -754,10 +761,11 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "E2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "e2", reagent: "alkoxide" },
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
     },
     selectivity: ["Anti-periplanar geometry", "Usually Zaitsev"],
     limitations: [
@@ -794,10 +802,11 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "E2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "e2", reagent: "bulky-base" },
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "hofmann", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
     },
     selectivity: ["Anti-periplanar geometry", "Often Hofmann with a bulky base"],
     limitations: [
@@ -833,10 +842,11 @@ export const haloalkaneReactionRules: ReactionRule[] = [
     },
     mechanism: "E2",
     selectivityProfile: {
+      substitutionElimination: { pathway: "e2", reagent: "bulky-base" },
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
     },
     selectivity: ["Anti-periplanar geometry", "Often Zaitsev with a small strong base"],
     limitations: [
@@ -883,7 +893,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
       allowsRearrangement: true,
     },
     selectivity: ["Usually Zaitsev", "Carbocation rearrangements are possible"],
@@ -926,7 +936,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
       allowsRearrangement: true,
     },
     selectivity: ["Usually Zaitsev", "Carbocation rearrangements are possible"],
@@ -969,6 +979,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
 
   {
     id: "haloalkane-grignard-formation-bromide",
+    conditions: { organometallic: true, anhydrous: true },
     family: "haloalkanes",
     reactionType: "substitution",
     title: "Grignard Reagent Formation",
@@ -995,6 +1006,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   },
   {
     id: "haloalkane-grignard-formation-chloride",
+    conditions: { organometallic: true, anhydrous: true },
     family: "haloalkanes",
     reactionType: "substitution",
     title: "Grignard Reagent Formation",
@@ -1022,6 +1034,7 @@ export const haloalkaneReactionRules: ReactionRule[] = [
   },
   {
     id: "haloalkane-grignard-formation-iodide",
+    conditions: { organometallic: true, anhydrous: true },
     family: "haloalkanes",
     reactionType: "substitution",
     title: "Grignard Reagent Formation",

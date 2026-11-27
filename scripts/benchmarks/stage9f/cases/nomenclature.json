@@ -1,0 +1,1760 @@
+{
+ "capability": "nomenclature",
+ "authored_on": "2026-11-03",
+ "sources": {
+  "nm-pubchem-names": {
+   "cite": "PubChem compound records, computed IUPAC names (PUG REST property IUPACName), NCBI",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName/JSON",
+   "snapshot": "nm-pubchem-names.txt",
+   "fetched": true,
+   "says": "Gives the IUPAC name PubChem computes for each exact SMILES, including stereodescriptors."
+  },
+  "nm-pubchem-synonyms": {
+   "cite": "PubChem compound records, deposited synonyms (PUG REST synonyms)",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/synonyms/JSON",
+   "snapshot": "nm-pubchem-synonyms.txt",
+   "fetched": true,
+   "says": "Lists retained/common names and alternative systematic names deposited for each compound."
+  }
+ },
+ "cases": [
+  {
+   "id": "NM-01",
+   "category": "acyclic",
+   "title": "Name the structure (2,2,4-trimethylpentane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(C)CC(C)(C)C",
+   "accepted_names": [
+    "2,2,4-trimethylpentane",
+    "isooctane",
+    "iso-octane",
+    "pentane, 2,2,4-trimethyl-"
+   ],
+   "preferred_name": "2,2,4-trimethylpentane",
+   "features": [
+    "acyclic",
+    "alkane",
+    "quaternary-carbon",
+    "branched"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-02",
+   "category": "acyclic",
+   "title": "Name the structure ((3R,4S)-3,4-dimethylhexane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): meso-3,4-dimethylhexane; (3R,4S)-3,4-dimethylhexane. Meso compound: both descriptor sets (e.g. 3R,4S and 3S,4R) describe the same structure.",
+   "smiles": "CC[C@H](C)[C@H](C)CC",
+   "accepted_names": [
+    "(3R,4S)-3,4-dimethylhexane",
+    "(3S,4R)-3,4-dimethylhexane",
+    "meso-3,4-dimethylhexane"
+   ],
+   "preferred_name": "(3R,4S)-3,4-dimethylhexane",
+   "features": [
+    "acyclic",
+    "alkane",
+    "stereo-RS",
+    "meso"
+   ],
+   "tool_may_abstain": false,
+   "audit": "downgraded before freeze: the stereo-defined name does not literally occur in the saved PubChem records (author replaced the original candidate)"
+  },
+  {
+   "id": "NM-03",
+   "category": "acyclic",
+   "title": "Name the structure ((E)-4-methylpent-2-ene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C/C=C/C(C)C",
+   "accepted_names": [
+    "(E)-4-methylpent-2-ene",
+    "(2E)-4-methylpent-2-ene",
+    "trans-4-methyl-2-pentene",
+    "(E)-4-methyl-2-pentene"
+   ],
+   "preferred_name": "(E)-4-methylpent-2-ene",
+   "features": [
+    "acyclic",
+    "alkene",
+    "stereo-EZ"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-04",
+   "category": "acyclic",
+   "title": "Name the structure ((Z)-3-methylpent-2-ene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C/C=C(/C)CC",
+   "accepted_names": [
+    "(Z)-3-methylpent-2-ene",
+    "(2Z)-3-methylpent-2-ene",
+    "cis-3-methyl-2-pentene",
+    "(Z)-3-methyl-2-pentene"
+   ],
+   "preferred_name": "(Z)-3-methylpent-2-ene",
+   "features": [
+    "acyclic",
+    "alkene",
+    "stereo-EZ"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-05",
+   "category": "acyclic",
+   "title": "Name the structure (4,4-dimethylpent-2-yne)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC#CC(C)(C)C",
+   "accepted_names": [
+    "4,4-dimethylpent-2-yne",
+    "4,4-dimethyl-2-pentyne"
+   ],
+   "preferred_name": "4,4-dimethylpent-2-yne",
+   "features": [
+    "acyclic",
+    "alkyne",
+    "quaternary-carbon"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-06",
+   "category": "acyclic",
+   "title": "Name the structure (2-methylbuta-1,3-diene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C=CC(C)=C",
+   "accepted_names": [
+    "2-methylbuta-1,3-diene",
+    "isoprene",
+    "2-methyl-1,3-butadiene"
+   ],
+   "preferred_name": "2-methylbuta-1,3-diene",
+   "features": [
+    "acyclic",
+    "diene",
+    "conjugated"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-07",
+   "category": "acyclic",
+   "title": "Name the structure (2-methylhex-3-yne)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CCC#CC(C)C",
+   "accepted_names": [
+    "2-methylhex-3-yne",
+    "2-methyl-3-hexyne"
+   ],
+   "preferred_name": "2-methylhex-3-yne",
+   "features": [
+    "acyclic",
+    "alkyne"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-08",
+   "category": "acyclic",
+   "title": "Name the structure ((3R)-3-methylpent-1-ene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): (R)-3-methylpent-1-ene; (R)-3-methyl-1-pentene; (3R)-3-methyl-1-pentene. PubChem computed name (3R) agrees with RDKit CIP; one PubChem synonym carries the (S) label, treated as a deposit error.",
+   "smiles": "C=C[C@H](C)CC",
+   "accepted_names": [
+    "(3R)-3-methylpent-1-ene",
+    "(R)-3-methylpent-1-ene",
+    "(R)-3-methyl-1-pentene",
+    "(3R)-3-methyl-1-pentene"
+   ],
+   "preferred_name": "(3R)-3-methylpent-1-ene",
+   "features": [
+    "acyclic",
+    "alkene",
+    "stereo-RS"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-09",
+   "category": "acyclic",
+   "title": "Name the structure ((2E,4E)-hexa-2,4-diene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C/C=C/C=C/C",
+   "accepted_names": [
+    "(2E,4E)-hexa-2,4-diene",
+    "(2E,4E)-2,4-hexadiene",
+    "trans,trans-2,4-hexadiene",
+    "trans,trans-hexa-2,4-diene",
+    "(E,E)-2,4-hexadiene"
+   ],
+   "preferred_name": "(2E,4E)-hexa-2,4-diene",
+   "features": [
+    "acyclic",
+    "diene",
+    "conjugated",
+    "stereo-EZ"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-10",
+   "category": "acyclic",
+   "title": "Name the structure (2,2,5,5-tetramethylhex-3-yne)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): di-tert-butylacetylene.",
+   "smiles": "CC(C)(C)C#CC(C)(C)C",
+   "accepted_names": [
+    "2,2,5,5-tetramethylhex-3-yne",
+    "di-tert-butylacetylene",
+    "di-tert-butylethyne",
+    "2,2,5,5-tetramethyl-3-hexyne"
+   ],
+   "preferred_name": "2,2,5,5-tetramethylhex-3-yne",
+   "features": [
+    "acyclic",
+    "alkyne",
+    "quaternary-carbon"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-11",
+   "category": "acyclic",
+   "title": "Name the structure (pent-1-en-4-yne)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C#CCC=C",
+   "accepted_names": [
+    "pent-1-en-4-yne",
+    "1-penten-4-yne",
+    "allylacetylene"
+   ],
+   "preferred_name": "pent-1-en-4-yne",
+   "features": [
+    "acyclic",
+    "enyne",
+    "alkyne",
+    "alkene"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-12",
+   "category": "acyclic",
+   "title": "Name the structure (4-ethylheptane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CCCC(CC)CCC",
+   "accepted_names": [
+    "4-ethylheptane",
+    "heptane, 4-ethyl-"
+   ],
+   "preferred_name": "4-ethylheptane",
+   "features": [
+    "acyclic",
+    "alkane",
+    "branched"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-13",
+   "category": "cycloalkane",
+   "title": "Name the structure (trans-1,4-dimethylcyclohexane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): trans-p-dimethylcyclohexane. PubChem record under the trans-name carries no stereo; the trans configuration of the SMILES was assigned by a 3D-embedding check, the trans name itself is not a fetched record.",
+   "smiles": "C[C@H]1CC[C@H](C)CC1",
+   "accepted_names": [
+    "trans-1,4-dimethylcyclohexane",
+    "(1r,4r)-1,4-dimethylcyclohexane",
+    "trans-p-dimethylcyclohexane",
+    "1,4-dimethylcyclohexane"
+   ],
+   "preferred_name": "trans-1,4-dimethylcyclohexane",
+   "features": [
+    "cycloalkane",
+    "ring-substituent",
+    "stereo-cis-trans"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-14",
+   "category": "cycloalkane",
+   "title": "Name the structure (propan-2-ylcyclopentane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(C)C1CCCC1",
+   "accepted_names": [
+    "propan-2-ylcyclopentane",
+    "(propan-2-yl)cyclopentane",
+    "isopropylcyclopentane",
+    "(1-methylethyl)cyclopentane"
+   ],
+   "preferred_name": "propan-2-ylcyclopentane",
+   "features": [
+    "cycloalkane",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-15",
+   "category": "cycloalkene",
+   "title": "Name the structure (1,4-dimethylcyclohexene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC1=CCC(C)CC1",
+   "accepted_names": [
+    "1,4-dimethylcyclohexene",
+    "1,4-dimethylcyclohex-1-ene",
+    "1,4-dimethyl-1-cyclohexene"
+   ],
+   "preferred_name": "1,4-dimethylcyclohexene",
+   "features": [
+    "cycloalkene",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-16",
+   "category": "cycloalkene",
+   "title": "Name the structure (cycloheptene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C1CC/C=C\\CC1",
+   "accepted_names": [
+    "cycloheptene",
+    "(Z)-cycloheptene",
+    "cis-cycloheptene"
+   ],
+   "preferred_name": "cycloheptene",
+   "features": [
+    "cycloalkene",
+    "stereo-EZ"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-17",
+   "category": "cycloalkene",
+   "title": "Name the structure (4-methylcyclopentene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): 4-methyl-1-cyclopentene.",
+   "smiles": "CC1CC=CC1",
+   "accepted_names": [
+    "4-methylcyclopentene",
+    "4-methylcyclopent-1-ene",
+    "4-methyl-1-cyclopentene"
+   ],
+   "preferred_name": "4-methylcyclopentene",
+   "features": [
+    "cycloalkene",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-18",
+   "category": "cycloalkane",
+   "title": "Name the structure (cyclopropylcyclopropane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C1CC1C1CC1",
+   "accepted_names": [
+    "cyclopropylcyclopropane",
+    "bicyclopropyl",
+    "1,1'-bi(cyclopropane)",
+    "1,1'-bicyclopropyl"
+   ],
+   "preferred_name": "cyclopropylcyclopropane",
+   "features": [
+    "cycloalkane",
+    "ring-assembly",
+    "small-ring"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-19",
+   "category": "cycloalkane",
+   "title": "Name the structure (1,1-dimethylcyclohexane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC1(C)CCCCC1",
+   "accepted_names": [
+    "1,1-dimethylcyclohexane",
+    "gem-dimethylcyclohexane"
+   ],
+   "preferred_name": "1,1-dimethylcyclohexane",
+   "features": [
+    "cycloalkane",
+    "quaternary-carbon",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-20",
+   "category": "cycloalkane",
+   "title": "Name the structure ((1R,3S)-1,3-dimethylcyclohexane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): (1S,3R)-1,3-dimethylcyclohexane. Meso compound: both descriptor sets (e.g. 3R,4S and 3S,4R) describe the same structure.",
+   "smiles": "C[C@H]1CCC[C@@H](C)C1",
+   "accepted_names": [
+    "(1R,3S)-1,3-dimethylcyclohexane",
+    "cis-(1R,3S)-1,3-dimethylcyclohexane",
+    "cis-1,3-dimethylcyclohexane",
+    "(1S,3R)-1,3-dimethylcyclohexane"
+   ],
+   "preferred_name": "(1R,3S)-1,3-dimethylcyclohexane",
+   "features": [
+    "cycloalkane",
+    "ring-substituent",
+    "stereo-RS",
+    "meso"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-21",
+   "category": "cycloalkene",
+   "title": "Name the structure (methylidenecyclopentane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C=C1CCCC1",
+   "accepted_names": [
+    "methylidenecyclopentane",
+    "methylenecyclopentane"
+   ],
+   "preferred_name": "methylidenecyclopentane",
+   "features": [
+    "cycloalkane",
+    "exocyclic-alkene"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-22",
+   "category": "cycloalkane",
+   "title": "Name the structure (tert-butylcyclohexane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): (2-methylpropan-2-yl)cyclohexane.",
+   "smiles": "CC(C)(C)C1CCCCC1",
+   "accepted_names": [
+    "tert-butylcyclohexane",
+    "(2-methylpropan-2-yl)cyclohexane",
+    "(1,1-dimethylethyl)cyclohexane",
+    "t-butylcyclohexane"
+   ],
+   "preferred_name": "tert-butylcyclohexane",
+   "features": [
+    "cycloalkane",
+    "ring-substituent",
+    "quaternary-carbon"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-23",
+   "category": "epoxide",
+   "title": "Name the structure (2,2,3-trimethyloxirane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC1OC1(C)C",
+   "accepted_names": [
+    "2,2,3-trimethyloxirane",
+    "trimethyloxirane",
+    "trimethylethylene oxide"
+   ],
+   "preferred_name": "2,2,3-trimethyloxirane",
+   "features": [
+    "epoxide",
+    "small-ring",
+    "quaternary-carbon",
+    "trisubstituted"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-24",
+   "category": "epoxide",
+   "title": "Name the structure ((2R,3S)-2,3-dimethyloxirane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Meso compound: both descriptor sets (e.g. 3R,4S and 3S,4R) describe the same structure.",
+   "smiles": "C[C@H]1O[C@H]1C",
+   "accepted_names": [
+    "(2R,3S)-2,3-dimethyloxirane",
+    "(2S,3R)-2,3-dimethyloxirane",
+    "cis-2,3-dimethyloxirane",
+    "cis-2,3-epoxybutane",
+    "meso-2,3-epoxybutane"
+   ],
+   "preferred_name": "(2R,3S)-2,3-dimethyloxirane",
+   "features": [
+    "epoxide",
+    "small-ring",
+    "stereo-RS",
+    "meso",
+    "2,3-disubstituted"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-25",
+   "category": "epoxide",
+   "title": "Name the structure ((1S,6R)-7-oxabicyclo[4.1.0]heptane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): cis-7-oxabicyclo[4.1.0]heptane; cis-1,2-epoxycyclohexane. Meso compound: both descriptor sets (e.g. 3R,4S and 3S,4R) describe the same structure.",
+   "smiles": "C1CC[C@H]2O[C@H]2C1",
+   "accepted_names": [
+    "(1S,6R)-7-oxabicyclo[4.1.0]heptane",
+    "(1R,6S)-7-oxabicyclo[4.1.0]heptane",
+    "cis-7-oxabicyclo[4.1.0]heptane",
+    "cis-cyclohexene oxide",
+    "cis-1,2-epoxycyclohexane"
+   ],
+   "preferred_name": "(1S,6R)-7-oxabicyclo[4.1.0]heptane",
+   "features": [
+    "epoxide",
+    "fused-ring",
+    "bicyclic",
+    "stereo-RS",
+    "meso"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-26",
+   "category": "epoxide",
+   "title": "Name the structure (3-methyl-7-oxabicyclo[4.1.0]heptane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): 1,2-epoxy-4-methylcyclohexane; 4-methyl-1,2-epoxycyclohexane.",
+   "smiles": "CC1CCC2OC2C1",
+   "accepted_names": [
+    "3-methyl-7-oxabicyclo[4.1.0]heptane",
+    "1,2-epoxy-4-methylcyclohexane",
+    "4-methyl-1,2-epoxycyclohexane"
+   ],
+   "preferred_name": "3-methyl-7-oxabicyclo[4.1.0]heptane",
+   "features": [
+    "epoxide",
+    "fused-ring",
+    "bicyclic",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-27",
+   "category": "epoxide",
+   "title": "Name the structure ((2S)-2-phenyloxirane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): (S)-(epoxyethyl)benzene.",
+   "smiles": "C1O[C@H]1c1ccccc1",
+   "accepted_names": [
+    "(2S)-2-phenyloxirane",
+    "(S)-2-phenyloxirane",
+    "(S)-styrene oxide",
+    "(S)-(epoxyethyl)benzene"
+   ],
+   "preferred_name": "(2S)-2-phenyloxirane",
+   "features": [
+    "epoxide",
+    "benzylic",
+    "stereo-RS",
+    "2-substituted"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-28",
+   "category": "epoxide",
+   "title": "Name the structure (2-ethyl-2-methyloxirane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CCC1(C)CO1",
+   "accepted_names": [
+    "2-ethyl-2-methyloxirane",
+    "1,2-epoxy-2-methylbutane"
+   ],
+   "preferred_name": "2-ethyl-2-methyloxirane",
+   "features": [
+    "epoxide",
+    "small-ring",
+    "2,2-disubstituted",
+    "quaternary-carbon"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-29",
+   "category": "epoxide",
+   "title": "Name the structure (2,2,3,3-tetramethyloxirane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC1(C)OC1(C)C",
+   "accepted_names": [
+    "2,2,3,3-tetramethyloxirane",
+    "tetramethyloxirane",
+    "tetramethylethylene oxide"
+   ],
+   "preferred_name": "2,2,3,3-tetramethyloxirane",
+   "features": [
+    "epoxide",
+    "small-ring",
+    "quaternary-carbon",
+    "tetrasubstituted"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-30",
+   "category": "three-membered-heterocycle",
+   "title": "Name the structure (2-methylaziridine)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC1CN1",
+   "accepted_names": [
+    "2-methylaziridine",
+    "propyleneimine",
+    "propylenimine",
+    "methylaziridine"
+   ],
+   "preferred_name": "2-methylaziridine",
+   "features": [
+    "aziridine",
+    "small-ring",
+    "heterocycle",
+    "amine"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-31",
+   "category": "four-membered-heterocycle",
+   "title": "Name the structure (2-methyloxetane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC1CCO1",
+   "accepted_names": [
+    "2-methyloxetane",
+    "1,3-epoxybutane"
+   ],
+   "preferred_name": "2-methyloxetane",
+   "features": [
+    "oxetane",
+    "small-ring",
+    "four-membered-heterocycle"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-32",
+   "category": "epoxide",
+   "title": "Name the structure ((2R)-2-(chloromethyl)oxirane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): (2R)-epichlorohydrin.",
+   "smiles": "ClC[C@H]1CO1",
+   "accepted_names": [
+    "(2R)-2-(chloromethyl)oxirane",
+    "(R)-2-(chloromethyl)oxirane",
+    "(R)-epichlorohydrin",
+    "(R)-(chloromethyl)oxirane",
+    "(2R)-epichlorohydrin"
+   ],
+   "preferred_name": "(2R)-2-(chloromethyl)oxirane",
+   "features": [
+    "epoxide",
+    "halide",
+    "stereo-RS",
+    "2-substituted",
+    "polyfunctional"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-33",
+   "category": "polyfunctional",
+   "title": "Name the structure (4-oxobutanoic acid)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "OC(=O)CCC=O",
+   "accepted_names": [
+    "4-oxobutanoic acid",
+    "succinic semialdehyde",
+    "succinic acid semialdehyde",
+    "3-formylpropanoic acid"
+   ],
+   "preferred_name": "4-oxobutanoic acid",
+   "features": [
+    "polyfunctional",
+    "carboxylic-acid",
+    "aldehyde"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-34",
+   "category": "polyfunctional",
+   "title": "Name the structure (ethyl 3-oxobutanoate)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(=O)CC(=O)OCC",
+   "accepted_names": [
+    "ethyl 3-oxobutanoate",
+    "ethyl acetoacetate",
+    "ethyl 3-oxobutyrate"
+   ],
+   "preferred_name": "ethyl 3-oxobutanoate",
+   "features": [
+    "polyfunctional",
+    "ester",
+    "ketone"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-35",
+   "category": "polyfunctional",
+   "title": "Name the structure (2-amino-N-ethylacetamide)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "NCC(=O)NCC",
+   "accepted_names": [
+    "2-amino-N-ethylacetamide",
+    "N-ethylglycinamide"
+   ],
+   "preferred_name": "2-amino-N-ethylacetamide",
+   "features": [
+    "polyfunctional",
+    "amide",
+    "amine"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-36",
+   "category": "polyfunctional",
+   "title": "Name the structure (3-hydroxypropanamide)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "NC(=O)CCO",
+   "accepted_names": [
+    "3-hydroxypropanamide",
+    "3-hydroxypropionamide"
+   ],
+   "preferred_name": "3-hydroxypropanamide",
+   "features": [
+    "polyfunctional",
+    "amide",
+    "alcohol"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-37",
+   "category": "polyfunctional",
+   "title": "Name the structure (3-hydroxybutan-2-one)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(O)C(C)=O",
+   "accepted_names": [
+    "3-hydroxybutan-2-one",
+    "acetoin",
+    "3-hydroxy-2-butanone",
+    "acetyl methyl carbinol"
+   ],
+   "preferred_name": "3-hydroxybutan-2-one",
+   "features": [
+    "polyfunctional",
+    "ketone",
+    "alcohol"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-38",
+   "category": "polyfunctional",
+   "title": "Name the structure (4-aminobutan-2-ol)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(O)CCN",
+   "accepted_names": [
+    "4-aminobutan-2-ol",
+    "4-amino-2-butanol"
+   ],
+   "preferred_name": "4-aminobutan-2-ol",
+   "features": [
+    "polyfunctional",
+    "alcohol",
+    "amine"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-39",
+   "category": "polyfunctional",
+   "title": "Name the structure ((2S)-2-amino-3-methylbutanoic acid)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): (2S)-2-amino-3-methylbutyric acid.",
+   "smiles": "CC(C)[C@H](N)C(=O)O",
+   "accepted_names": [
+    "(2S)-2-amino-3-methylbutanoic acid",
+    "L-valine",
+    "valine",
+    "(S)-valine",
+    "(S)-2-amino-3-methylbutanoic acid",
+    "(2S)-2-amino-3-methylbutyric acid"
+   ],
+   "preferred_name": "(2S)-2-amino-3-methylbutanoic acid",
+   "features": [
+    "polyfunctional",
+    "carboxylic-acid",
+    "amine",
+    "stereo-RS"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-40",
+   "category": "polyfunctional",
+   "title": "Name the structure (methyl 2-cyanoacetate)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "COC(=O)CC#N",
+   "accepted_names": [
+    "methyl 2-cyanoacetate",
+    "methyl cyanoacetate",
+    "methyl cyanoethanoate"
+   ],
+   "preferred_name": "methyl 2-cyanoacetate",
+   "features": [
+    "polyfunctional",
+    "ester",
+    "nitrile"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-41",
+   "category": "polyfunctional",
+   "title": "Name the structure ((2E)-but-2-enedioic acid)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "OC(=O)/C=C/C(=O)O",
+   "accepted_names": [
+    "(2E)-but-2-enedioic acid",
+    "(E)-but-2-enedioic acid",
+    "fumaric acid",
+    "trans-butenedioic acid",
+    "trans-but-2-enedioic acid"
+   ],
+   "preferred_name": "(2E)-but-2-enedioic acid",
+   "features": [
+    "polyfunctional",
+    "dicarboxylic-acid",
+    "stereo-EZ"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-42",
+   "category": "polyfunctional",
+   "title": "Name the structure (propane-1,2,3-triol)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "OCC(O)CO",
+   "accepted_names": [
+    "propane-1,2,3-triol",
+    "glycerol",
+    "glycerin",
+    "glycerine"
+   ],
+   "preferred_name": "propane-1,2,3-triol",
+   "features": [
+    "polyfunctional",
+    "polyol"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-43",
+   "category": "polyfunctional",
+   "title": "Name the structure (4-hydroxy-4-methylpentan-2-one)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(=O)CC(C)(C)O",
+   "accepted_names": [
+    "4-hydroxy-4-methylpentan-2-one",
+    "diacetone alcohol",
+    "4-hydroxy-4-methyl-2-pentanone"
+   ],
+   "preferred_name": "4-hydroxy-4-methylpentan-2-one",
+   "features": [
+    "polyfunctional",
+    "ketone",
+    "alcohol",
+    "tertiary-alcohol"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-44",
+   "category": "polyfunctional",
+   "title": "Name the structure (ethyl 4-chloro-3-hydroxybutanoate)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CCOC(=O)CC(O)CCl",
+   "accepted_names": [
+    "ethyl 4-chloro-3-hydroxybutanoate",
+    "ethyl 4-chloro-3-hydroxybutyrate"
+   ],
+   "preferred_name": "ethyl 4-chloro-3-hydroxybutanoate",
+   "features": [
+    "polyfunctional",
+    "ester",
+    "alcohol",
+    "halide"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-45",
+   "category": "aromatic",
+   "title": "Name the structure (1,3,5-trimethylbenzene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "Cc1cc(C)cc(C)c1",
+   "accepted_names": [
+    "1,3,5-trimethylbenzene",
+    "mesitylene",
+    "sym-trimethylbenzene"
+   ],
+   "preferred_name": "1,3,5-trimethylbenzene",
+   "features": [
+    "aromatic",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-46",
+   "category": "aromatic",
+   "title": "Name the structure (4-chlorophenol)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "Clc1ccc(O)cc1",
+   "accepted_names": [
+    "4-chlorophenol",
+    "p-chlorophenol",
+    "para-chlorophenol"
+   ],
+   "preferred_name": "4-chlorophenol",
+   "features": [
+    "aromatic",
+    "phenol",
+    "halide",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-47",
+   "category": "aromatic",
+   "title": "Name the structure (4-aminobenzoic acid)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "Nc1ccc(C(=O)O)cc1",
+   "accepted_names": [
+    "4-aminobenzoic acid",
+    "p-aminobenzoic acid",
+    "para-aminobenzoic acid",
+    "paba"
+   ],
+   "preferred_name": "4-aminobenzoic acid",
+   "features": [
+    "aromatic",
+    "carboxylic-acid",
+    "amine",
+    "ring-substituent",
+    "polyfunctional"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-48",
+   "category": "heteroaromatic",
+   "title": "Name the structure (2-chloro-5-methylpyridine)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "Cc1ccc(Cl)nc1",
+   "accepted_names": [
+    "2-chloro-5-methylpyridine"
+   ],
+   "preferred_name": "2-chloro-5-methylpyridine",
+   "features": [
+    "heteroaromatic",
+    "pyridine",
+    "halide",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-49",
+   "category": "heteroaromatic",
+   "title": "Name the structure (furan-2-carbaldehyde)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "O=Cc1ccco1",
+   "accepted_names": [
+    "furan-2-carbaldehyde",
+    "furfural",
+    "2-furaldehyde",
+    "furfuraldehyde"
+   ],
+   "preferred_name": "furan-2-carbaldehyde",
+   "features": [
+    "heteroaromatic",
+    "furan",
+    "aldehyde"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-50",
+   "category": "heteroaromatic",
+   "title": "Name the structure (2-methylthiophene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "Cc1cccs1",
+   "accepted_names": [
+    "2-methylthiophene"
+   ],
+   "preferred_name": "2-methylthiophene",
+   "features": [
+    "heteroaromatic",
+    "thiophene",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-51",
+   "category": "heteroaromatic",
+   "title": "Name the structure (3-methyl-1H-indole)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "Cc1c[nH]c2ccccc12",
+   "accepted_names": [
+    "3-methyl-1H-indole",
+    "skatole",
+    "3-methylindole",
+    "scatole"
+   ],
+   "preferred_name": "3-methyl-1H-indole",
+   "features": [
+    "heteroaromatic",
+    "indole",
+    "fused-ring",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-52",
+   "category": "heteroaromatic",
+   "title": "Name the structure (6-chloroquinoline)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "Clc1ccc2ncccc2c1",
+   "accepted_names": [
+    "6-chloroquinoline"
+   ],
+   "preferred_name": "6-chloroquinoline",
+   "features": [
+    "heteroaromatic",
+    "quinoline",
+    "fused-ring",
+    "halide",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-53",
+   "category": "bicyclic",
+   "title": "Name the structure (bicyclo[2.2.1]heptane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C1CC2CCC1C2",
+   "accepted_names": [
+    "bicyclo[2.2.1]heptane",
+    "norbornane",
+    "norcamphane"
+   ],
+   "preferred_name": "bicyclo[2.2.1]heptane",
+   "features": [
+    "bicyclic",
+    "bridged"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-54",
+   "category": "bicyclic",
+   "title": "Name the structure ((1R,5R)-2,6,6-trimethylbicyclo[3.1.1]hept-2-ene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC1=CC[C@@H]2C[C@H]1C2(C)C",
+   "accepted_names": [
+    "(1R,5R)-2,6,6-trimethylbicyclo[3.1.1]hept-2-ene",
+    "(+)-alpha-pinene",
+    "(1R)-(+)-alpha-pinene",
+    "(1R)-alpha-pinene"
+   ],
+   "preferred_name": "(1R,5R)-2,6,6-trimethylbicyclo[3.1.1]hept-2-ene",
+   "features": [
+    "bicyclic",
+    "bridged",
+    "alkene",
+    "quaternary-carbon",
+    "stereo-RS"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-55",
+   "category": "spiro",
+   "title": "Name the structure (spiro[4.5]decane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C1CCC2(C1)CCCCC2",
+   "accepted_names": [
+    "spiro[4.5]decane",
+    "spiro(4.5)decane"
+   ],
+   "preferred_name": "spiro[4.5]decane",
+   "features": [
+    "spiro",
+    "bicyclic"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-56",
+   "category": "fused",
+   "title": "Name the structure (trans-decahydronaphthalene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "inferred",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): trans-1,2,3,4,4a,5,6,7,8,8a-decahydronaphthalene. PubChem record under the trans-name carries no stereo; the trans configuration of the SMILES was assigned by a 3D-embedding check, the trans name itself is not a fetched record.",
+   "smiles": "C1CC[C@H]2CCCC[C@@H]2C1",
+   "accepted_names": [
+    "trans-decahydronaphthalene",
+    "trans-decalin",
+    "trans-1,2,3,4,4a,5,6,7,8,8a-decahydronaphthalene",
+    "trans-perhydronaphthalene",
+    "1,2,3,4,4a,5,6,7,8,8a-decahydronaphthalene"
+   ],
+   "preferred_name": "trans-decahydronaphthalene",
+   "features": [
+    "fused-ring",
+    "bicyclic",
+    "stereo-cis-trans"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-57",
+   "category": "fused",
+   "title": "Name the structure (1-methyl-1,2,3,4-tetrahydronaphthalene)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): alpha-methyltetralin.",
+   "smiles": "CC1CCCc2ccccc12",
+   "accepted_names": [
+    "1-methyl-1,2,3,4-tetrahydronaphthalene",
+    "1-methyltetralin",
+    "alpha-methyltetralin"
+   ],
+   "preferred_name": "1-methyl-1,2,3,4-tetrahydronaphthalene",
+   "features": [
+    "fused-ring",
+    "benzylic",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-58",
+   "category": "spiro",
+   "title": "Name the structure (1,4-dioxaspiro[4.5]decane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C1CCC2(CC1)OCCO2",
+   "accepted_names": [
+    "1,4-dioxaspiro[4.5]decane",
+    "cyclohexanone ethylene ketal",
+    "cyclohexanone ethylene acetal"
+   ],
+   "preferred_name": "1,4-dioxaspiro[4.5]decane",
+   "features": [
+    "spiro",
+    "ketal",
+    "heterocycle"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-59",
+   "category": "stereo",
+   "title": "Name the structure ((2R,3R)-2,3-dihydroxybutanedioic acid)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "O[C@H]([C@@H](O)C(=O)O)C(=O)O",
+   "accepted_names": [
+    "(2R,3R)-2,3-dihydroxybutanedioic acid",
+    "L-tartaric acid",
+    "L-(+)-tartaric acid",
+    "(+)-tartaric acid",
+    "(R,R)-tartaric acid",
+    "(2R,3R)-tartaric acid",
+    "(2R,3R)-2,3-dihydroxysuccinic acid"
+   ],
+   "preferred_name": "(2R,3R)-2,3-dihydroxybutanedioic acid",
+   "features": [
+    "stereo-RS",
+    "polyfunctional",
+    "dicarboxylic-acid",
+    "polyol"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-60",
+   "category": "stereo",
+   "title": "Name the structure ((2R,3S)-2,3-dihydroxybutanedioic acid)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): (2S,3R)-2,3-dihydroxybutanedioic acid. Meso compound: both descriptor sets (e.g. 3R,4S and 3S,4R) describe the same structure.",
+   "smiles": "O[C@H]([C@H](O)C(=O)O)C(=O)O",
+   "accepted_names": [
+    "(2R,3S)-2,3-dihydroxybutanedioic acid",
+    "meso-tartaric acid",
+    "mesotartaric acid",
+    "(2S,3R)-2,3-dihydroxybutanedioic acid",
+    "(2R,3S)-tartaric acid"
+   ],
+   "preferred_name": "(2R,3S)-2,3-dihydroxybutanedioic acid",
+   "features": [
+    "stereo-RS",
+    "meso",
+    "polyfunctional",
+    "dicarboxylic-acid"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-61",
+   "category": "stereo",
+   "title": "Name the structure ((2S,3R)-2-amino-3-hydroxybutanoic acid)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C[C@@H](O)[C@H](N)C(=O)O",
+   "accepted_names": [
+    "(2S,3R)-2-amino-3-hydroxybutanoic acid",
+    "L-threonine",
+    "threonine",
+    "(2S,3R)-2-amino-3-hydroxybutyric acid"
+   ],
+   "preferred_name": "(2S,3R)-2-amino-3-hydroxybutanoic acid",
+   "features": [
+    "stereo-RS",
+    "multiple-stereocentres",
+    "polyfunctional",
+    "amino-acid"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-62",
+   "category": "stereo",
+   "title": "Name the structure ((2E)-3-phenylprop-2-enoic acid)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "OC(=O)/C=C/c1ccccc1",
+   "accepted_names": [
+    "(2E)-3-phenylprop-2-enoic acid",
+    "(E)-3-phenylprop-2-enoic acid",
+    "trans-cinnamic acid",
+    "(E)-cinnamic acid",
+    "cinnamic acid",
+    "(E)-3-phenylacrylic acid"
+   ],
+   "preferred_name": "(2E)-3-phenylprop-2-enoic acid",
+   "features": [
+    "stereo-EZ",
+    "aromatic",
+    "carboxylic-acid",
+    "conjugated"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-63",
+   "category": "stereo",
+   "title": "Name the structure ((2Z)-but-2-ene-1,4-diol)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "OC/C=C\\CO",
+   "accepted_names": [
+    "(2Z)-but-2-ene-1,4-diol",
+    "(Z)-but-2-ene-1,4-diol",
+    "cis-2-butene-1,4-diol",
+    "(Z)-2-butene-1,4-diol",
+    "cis-but-2-ene-1,4-diol"
+   ],
+   "preferred_name": "(2Z)-but-2-ene-1,4-diol",
+   "features": [
+    "stereo-EZ",
+    "diol",
+    "allylic"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-64",
+   "category": "stereo",
+   "title": "Name the structure ((1R,2S,5R)-5-methyl-2-(propan-2-yl)cyclohexan-1-ol)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "CC(C)[C@@H]1CC[C@@H](C)C[C@H]1O",
+   "accepted_names": [
+    "(1R,2S,5R)-5-methyl-2-(propan-2-yl)cyclohexan-1-ol",
+    "(1R,2S,5R)-5-methyl-2-propan-2-ylcyclohexan-1-ol",
+    "(1R,2S,5R)-2-isopropyl-5-methylcyclohexanol",
+    "L-menthol",
+    "(-)-menthol",
+    "levomenthol"
+   ],
+   "preferred_name": "(1R,2S,5R)-5-methyl-2-(propan-2-yl)cyclohexan-1-ol",
+   "features": [
+    "stereo-RS",
+    "multiple-stereocentres",
+    "cycloalkane",
+    "alcohol",
+    "ring-substituent"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-65",
+   "category": "difficult",
+   "title": "Name the structure (cubane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C12C3C4C1C5C2C3C45",
+   "accepted_names": [
+    "cubane",
+    "pentacyclo[4.2.0.02,5.03,8.04,7]octane"
+   ],
+   "preferred_name": "cubane",
+   "features": [
+    "polycyclic",
+    "cage",
+    "strained"
+   ],
+   "tool_may_abstain": true
+  },
+  {
+   "id": "NM-66",
+   "category": "difficult",
+   "title": "Name the structure (adamantane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C1C2CC3CC1CC(C2)C3",
+   "accepted_names": [
+    "adamantane",
+    "tricyclo[3.3.1.13,7]decane",
+    "tricyclo[3.3.1.1(3,7)]decane"
+   ],
+   "preferred_name": "adamantane",
+   "features": [
+    "polycyclic",
+    "cage",
+    "bridged"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-67",
+   "category": "difficult",
+   "title": "Name the structure (1,1,1,3,3,3-hexadeuteriopropan-2-one)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Forms not literally in the PubChem name/synonym record (formed by IUPAC punctuation/locant rules or standard usage): (2H6)propan-2-one; propan-2-one-d6. Isotopic-modification naming has several accepted styles (CAS acetone-d6; IUPAC deuterio prefixes).",
+   "smiles": "[2H]C([2H])([2H])C(=O)C([2H])([2H])[2H]",
+   "accepted_names": [
+    "1,1,1,3,3,3-hexadeuteriopropan-2-one",
+    "acetone-d6",
+    "hexadeuterioacetone",
+    "perdeuterioacetone",
+    "(2H6)propan-2-one",
+    "(2H6)acetone",
+    "propan-2-one-d6"
+   ],
+   "preferred_name": "1,1,1,3,3,3-hexadeuteriopropan-2-one",
+   "features": [
+    "isotope",
+    "ketone"
+   ],
+   "tool_may_abstain": true
+  },
+  {
+   "id": "NM-68",
+   "category": "difficult",
+   "title": "Name the structure (tetramethylazanium)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "Blue Book PIN is tetramethylazanium; ammonium form is the common name.",
+   "smiles": "C[N+](C)(C)C",
+   "accepted_names": [
+    "tetramethylazanium",
+    "tetramethylammonium",
+    "tetramethylammonium ion",
+    "N,N,N-trimethylmethanaminium"
+   ],
+   "preferred_name": "tetramethylazanium",
+   "features": [
+    "charged",
+    "cation",
+    "quaternary-nitrogen"
+   ],
+   "tool_may_abstain": false
+  },
+  {
+   "id": "NM-69",
+   "category": "difficult",
+   "title": "Name the structure (bicyclo[1.1.1]pentane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C1C2CC1C2",
+   "accepted_names": [
+    "bicyclo[1.1.1]pentane"
+   ],
+   "preferred_name": "bicyclo[1.1.1]pentane",
+   "features": [
+    "bicyclic",
+    "bridged",
+    "strained",
+    "small-ring"
+   ],
+   "tool_may_abstain": true
+  },
+  {
+   "id": "NM-70",
+   "category": "difficult",
+   "title": "Name the structure (1,4,7,10,13,16-hexaoxacyclooctadecane)",
+   "source_ids": [
+    "nm-pubchem-names",
+    "nm-pubchem-synonyms"
+   ],
+   "evidence": "verified",
+   "uncertainty": "",
+   "smiles": "C1COCCOCCOCCOCCOCCO1",
+   "accepted_names": [
+    "1,4,7,10,13,16-hexaoxacyclooctadecane",
+    "18-crown-6"
+   ],
+   "preferred_name": "1,4,7,10,13,16-hexaoxacyclooctadecane",
+   "features": [
+    "macrocycle",
+    "polyether",
+    "heterocycle"
+   ],
+   "tool_may_abstain": true
+  }
+ ]
+}

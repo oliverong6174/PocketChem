@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useIncomingMolecule } from "./ui/useIncomingMolecule";
+import { MolecularFigure } from "./ui/MolecularFigure";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
@@ -9,12 +11,33 @@ import {
   COMPARISON_CATEGORIES,
   COMPARISON_MODES,
   getComparisonMode,
-  rankComparisonEntries,
   type ComparisonCategory,
-  type ComparisonMetric,
   type ComparisonModeId,
   type ComparisonProfile,
 } from "../utils/ranking/comparisonAnalysis";
+import { deriveRanking, displayedRankingSnapshot } from "../utils/ranking/rankingDisplay";
+import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
+import { ToolHeader } from "./ui/primitives";
+import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
+import { DebouncedTask } from "../utils/persistence/debouncedTask";
+import { restoreEditorContent } from "../utils/persistence/editorRestore";
+import { ketHasStructureText, ketIdentityKey } from "../utils/persistence/ketIdentity";
+import {
+  RANKING_ENGINE_VERSION,
+  validateRankingInputs,
+  validateRankingResults,
+  type DisplayedRanking,
+  type RankingWorkspaceInputs,
+  type RankingWorkspaceResults,
+} from "../utils/persistence/rankingWorkspace";
+import type { Capture, RecoveryOutcome } from "../utils/persistence/workspacePersistence";
+import type { WorkspaceResults } from "../utils/persistence/workspaceStore";
+import { getAppAnalysisLibrary } from "../utils/persistence/analysisLibraryApp";
+import type { OpenedAnalysis } from "../utils/persistence/analysisLibrary";
+import { transferIntoEditors } from "../utils/persistence/handoffTransfer";
+import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./SavedAnalysisControls";
+import { useSavedAnalysisOpen } from "../utils/persistence/useSavedAnalysisOpen";
+import { describeRankingAnalysis } from "../utils/persistence/rankingWorkspace";
 
 type ComparisonMolecule = {
   id: number;
@@ -55,24 +78,45 @@ function sanitizeDisplayedSmiles(value: unknown) {
   return trimmed;
 }
 
-function metricsTie(
-  first: ComparisonMetric,
-  second: ComparisonMetric,
-  tolerance = 1e-9,
-) {
-  if (first.sortVector || second.sortVector) {
-    if (!first.sortVector || !second.sortVector) return false;
-    if (first.sortVector.length !== second.sortVector.length) return false;
-    return first.sortVector.every(
-      (value, index) => value === second.sortVector?.[index],
-    );
-  }
+/** What the page knows about the comparison on screen. */
+type RankingResultMeta = {
+  computedAt: string;
+  engineVersion: number;
+  /** The set was loaded from a previous session instead of built in this one. */
+  restored: boolean;
+  /** Saved by an earlier version of the ranking code, or no longer sorts as it was shown. */
+  engineMismatch: boolean;
+  /** Set when the comparison was opened from the Saved Analyses library. */
+  opened?: { name: string; savedAt: string } | null;
+};
 
-  if (first.score === null || second.score === null) return false;
-  return Math.abs(first.score - second.score) <= tolerance;
+type RankingPageProps = {
+  /** A saved analysis the user chose on the Saved page; opened once recovery has finished. */
+  openRequest?: { id: string; recordId: string } | null;
+  onOpenHandled?: (requestId: string) => void;
+};
+
+/** Explains how the order below was decided, from the same rows the cards use (presentation only). */
+function OrderingBasis({ direction, total, ranked, distinctRanks }: { direction: string; total: number; ranked: number; distinctRanks: number }) {
+  const unranked = total - ranked;
+  const ties = ranked - distinctRanks;
+  return (
+    <section aria-label="How the order was decided" className="card ranking-basis" data-testid="ranking-basis">
+      <p className="label">How the order was decided</p>
+      {direction === "none" ? (
+        <p>This is a side-by-side comparison, not a ranking: molecules are labelled A, B, C in the order you added them and no order is implied.</p>
+      ) : (
+        <ul>
+          <li>Molecules are ordered by the criterion above, {direction === "asc" ? "lowest value first" : "highest value first"}. Values come from PocketChem's estimation models, not measurements.</li>
+          <li><strong>{ranked}</strong> of {total} {total === 1 ? "molecule is" : "molecules are"} ranked{ties > 0 ? `; ${ties} ${ties === 1 ? "shares" : "share"} a rank with another because the values are equal` : ""}.</li>
+          {unranked > 0 ? <li><strong>{unranked}</strong> {unranked === 1 ? "molecule is" : "molecules are"} not ranked: no tabulated or computed value exists for this criterion, so it is left out of the order rather than given an invented one.</li> : null}
+        </ul>
+      )}
+    </section>
+  );
 }
 
-export default function RankingPage() {
+export default function RankingPage({ openRequest = null, onOpenHandled }: RankingPageProps) {
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [status, setStatus] = useState("Add a molecule to begin comparing.");
@@ -86,36 +130,415 @@ export default function RankingPage() {
     [activeCategory],
   );
 
-  const rankedRows = useMemo(() => {
-    const rows = comparisonMolecules.map((molecule) => ({
-      molecule,
-      metric: molecule.profile.metrics[rankingMode],
-    }));
-    return rankComparisonEntries(rows, activeMode);
-  }, [activeMode, comparisonMolecules, rankingMode]);
+  const { rankedRows, rankById } = useMemo(
+    () => deriveRanking(comparisonMolecules, rankingMode),
+    [comparisonMolecules, rankingMode],
+  );
 
-  const rankById = useMemo(() => {
-    const map = new Map<number, number>();
-    if (activeMode.direction === "none") return map;
+  // ---- workspace recovery (Stage 8B-2A) --------------------------------------------------------
+  // The comparison set (with each molecule's computed profile), the chosen category and mode, and
+  // the structure in the editor are saved and come back after a reload or a visit to another page.
+  // Restored profiles are not recalculated: the page orders them with the same code as before.
+  const [snapshotTask] = useState(() => new DebouncedTask(async () => undefined));
+  const { controller: persistence, recovery, status: persistenceStatus } = useWorkspacePersistence<
+    RankingWorkspaceInputs,
+    RankingWorkspaceResults
+  >({
+    page: "ranking",
+    engineVersion: RANKING_ENGINE_VERSION,
+    validateInputs: validateRankingInputs,
+    validateResults: validateRankingResults,
+    beforeLeave: () => snapshotTask.flushNow(),
+  });
+  const [resultMeta, setResultMeta] = useState<RankingResultMeta | null>(null);
+  const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
+  const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
+  const [editorRestoreVersion, setEditorRestoreVersion] = useState(0);
+  const [isOpening, setIsOpening] = useState(false);
+  const [saveForm, setSaveForm] = useState<{ name: string } | null>(null);
+  const [saveBusy, setSaveBusy] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<WorkspaceNoticeItem | null>(null);
+  const openingRef = useRef(false);
+  const ketcherRef = useRef<KetcherApi | null>(null);
+  const snapshotRef = useRef<{ ket: string | null; key: string | null }>({ ket: null, key: null });
+  const pendingEditorRef = useRef<{ ket: string; key: string | null; token: number } | null>(null);
+  const restoringRef = useRef(false);
+  const svgAttemptedRef = useRef(new Set<number>());
+  const appliedRecoveryRef = useRef<unknown>(null);
+  const applyRestoreRef = useRef<((outcome: RecoveryOutcome<RankingWorkspaceInputs, RankingWorkspaceResults>) => void) | null>(null);
+  const requestPersistRef = useRef<() => void>(() => undefined);
+  const restoreEditorRef = useRef<() => void>(() => undefined);
+  const latestRef = useRef({ comparisonMolecules, activeCategory, rankingMode, resultMeta, displayed: null as DisplayedRanking | null, isAnalyzing });
 
-    let previousMetric: ComparisonMetric | null = null;
-    let previousRank = 0;
-    let rankablePosition = 0;
+  function captureRanking(): Capture<RankingWorkspaceInputs, RankingWorkspaceResults> | null {
+    const latest = latestRef.current;
+    const snapshot = snapshotRef.current;
+    const inputs: RankingWorkspaceInputs = {
+      editorKet: snapshot.ket,
+      editorKey: snapshot.key,
+      activeCategory: latest.activeCategory,
+      rankingMode: latest.rankingMode,
+    };
+    let results: WorkspaceResults<RankingWorkspaceResults> | null = null;
+    const meta = latest.resultMeta;
+    if (latest.comparisonMolecules.length > 0 && meta) {
+      results = {
+        computedAt: meta.computedAt,
+        engineVersion: meta.engineVersion,
+        stale: false,
+        status: "complete",
+        data: {
+          molecules: latest.comparisonMolecules.map(({ id, label, smiles, profile }) => ({ id, label, smiles, profile })),
+          displayed: latest.displayed,
+        },
+      };
+    }
+    if (!inputs.editorKet && !results) return null;
+    return { inputs, results };
+  }
 
-    for (const row of rankedRows) {
-      if (row.metric.score === null && !row.metric.sortVector) continue;
-      rankablePosition += 1;
-      const tied =
-        previousMetric !== null &&
-        metricsTie(row.metric, previousMetric, activeMode.tieTolerance ?? 1e-9);
-      const rank = tied ? previousRank : rankablePosition;
-      map.set(row.molecule.id, rank);
-      previousMetric = row.metric;
-      previousRank = rank;
+  function requestPersist() {
+    persistence.requestSave(captureRanking);
+  }
+
+  /** Reads the editor and refreshes the saved drawing. */
+  async function takeEditorSnapshot() {
+    const api = ketcherRef.current;
+    if (!api || restoringRef.current || pendingEditorRef.current) return;
+    const token = persistence.token();
+    try {
+      const ket = await Promise.race([
+        api.getKet(),
+        new Promise<never>((_resolve, reject) => setTimeout(() => reject(new Error("Timed out reading the editor.")), 8000)),
+      ]);
+      const key = await ketIdentityKey(ket);
+      if (!persistence.isCurrent(token) || restoringRef.current || pendingEditorRef.current) return;
+      snapshotRef.current = { ket: ketHasStructureText(ket) ? ket : null, key };
+      requestPersist();
+    } catch (snapshotError) {
+      console.warn("[PocketChem:Ranking] Could not read the editor for workspace recovery.", snapshotError);
+    }
+  }
+
+  async function restoreEditor() {
+    const pending = pendingEditorRef.current;
+    const api = ketcherRef.current;
+    if (!pending || !api || restoringRef.current || openingRef.current) return;
+    restoringRef.current = true;
+    const { token } = pending;
+    // Opening a saved analysis invalidates a drawing restore, exactly like Clear does.
+    const outcome = await restoreEditorContent(api, { ket: pending.ket, key: pending.key }, () => persistence.isCurrent(token) && !openingRef.current);
+    if (persistence.isCurrent(token)) {
+      pendingEditorRef.current = null;
+      if (outcome.kind === "failed") {
+        // Do not let an editor that failed to restore overwrite the saved copy.
+        persistence.disable();
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: "The saved drawing could not be restored into the editor. Your saved work was kept and will not be overwritten; use Clear all to start over." },
+        ]);
+      }
+    }
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      if (outcome.kind === "user-content-kept") snapshotTask.schedule();
+    }, 500);
+  }
+
+  function applyRestoredRanking(outcome: RecoveryOutcome<RankingWorkspaceInputs, RankingWorkspaceResults>) {
+    if (appliedRecoveryRef.current === outcome) return;
+    appliedRecoveryRef.current = outcome;
+    if (outcome.kind === "rejected") {
+      setRecoveryNotices([{ tone: "warn", text: `Saved work from a previous session could not be used (${outcome.message}). It was set aside and the page started clean.` }]);
+      return;
+    }
+    if (outcome.kind !== "restored" || !persistence.isCurrent(outcome.epoch)) return;
+    if (latestRef.current.comparisonMolecules.length > 0 || isAnalyzing) {
+      setRecoveryNotices([{ tone: "info", text: "Saved work from a previous session was not restored because you had already started new work on this page." }]);
+      return;
     }
 
-    return map;
-  }, [activeMode, rankedRows]);
+    const { inputs, results } = outcome;
+    const notices: WorkspaceNoticeItem[] = [];
+    setActiveCategory(inputs.activeCategory);
+    setRankingMode(inputs.rankingMode);
+    snapshotRef.current = { ket: inputs.editorKet, key: inputs.editorKey };
+    if (inputs.editorKet) {
+      pendingEditorRef.current = { ket: inputs.editorKet, key: inputs.editorKey, token: outcome.epoch };
+      setEditorRestoreVersion((version) => version + 1);
+    }
+
+    if (results) {
+      const molecules: ComparisonMolecule[] = results.data.molecules.map((molecule) => ({ ...molecule, structureSvg: null }));
+      // The saved profiles are ordered again by the page's own code; a different outcome than the
+      // one that was shown means the ordering code changed, and the user is told.
+      const saved = results.data.displayed;
+      const again = deriveRanking(molecules, inputs.rankingMode);
+      const derived = displayedRankingSnapshot(again.rankedRows, again.rankById, inputs.rankingMode);
+      const orderChanged = Boolean(saved && saved.modeId === derived.modeId && JSON.stringify(saved) !== JSON.stringify(derived));
+      setComparisonMolecules(molecules);
+      setResultMeta({
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        restored: true,
+        engineMismatch: outcome.engineMismatch || orderChanged,
+      });
+      setStatus(`Restored ${molecules.length} molecule${molecules.length === 1 ? "" : "s"} from your previous session. Nothing was recalculated.`);
+    } else if (inputs.editorKet) {
+      setInputsOnlyRestored(true);
+      setStatus("Restored your drawing from your previous session.");
+    }
+    if (outcome.resultsDropped) {
+      notices.push({ tone: "warn", text: "Saved comparison results could not be validated and were not restored." });
+    }
+    if (outcome.migratedFrom !== null) {
+      notices.push({ tone: "info", text: "Your saved workspace was upgraded from an older storage format." });
+    }
+    setRecoveryNotices(notices);
+  }
+
+  // ---- Saved Analyses (Stage 8B-3B-1) -----------------------------------------------------------
+  // "Save Analysis" copies the comparison (every molecule's computed profile and the ranking as it
+  // was shown) into the library; opening one puts it back without recalculating anything.
+
+  function defaultAnalysisName(): string {
+    const l = latestRef.current;
+    const mode = getComparisonMode(l.rankingMode);
+    return `Ranking of ${l.comparisonMolecules.length} molecule${l.comparisonMolecules.length === 1 ? "" : "s"}, ${mode.label}`.slice(0, 100);
+  }
+
+  async function saveCurrentAnalysis(name: string, announce = true): Promise<boolean> {
+    setSaveBusy(true);
+    try {
+      await snapshotTask.flushNow();
+      const capture = captureRanking();
+      if (!capture || !capture.results || latestRef.current.isAnalyzing) {
+        setSaveMessage({ tone: "warn", text: "Add at least one molecule to the comparison before saving." });
+        return false;
+      }
+      const saved = await getAppAnalysisLibrary().save("ranking", {
+        name,
+        summary: describeRankingAnalysis(capture.results.data, capture.inputs.rankingMode),
+        inputs: capture.inputs,
+        results: capture.results,
+      });
+      if (!saved.ok) {
+        setSaveMessage({ tone: "warn", text: `The analysis was not saved: ${saved.error.message}` });
+        return false;
+      }
+      if (announce) setSaveMessage({ tone: "info", text: `Saved “${saved.value.name}” to Saved analyses.` });
+      return true;
+    } finally {
+      setSaveBusy(false);
+    }
+  }
+
+  /** Replaces the Ranking workspace with a saved analysis, as one transaction (see transferIntoEditors). */
+  async function applySavedAnalysis(opened: OpenedAnalysis<RankingWorkspaceInputs, RankingWorkspaceResults>): Promise<boolean> {
+    const api = ketcherRef.current;
+    if (!api || openingRef.current) return false;
+    openingRef.current = true;
+    setIsOpening(true);
+    snapshotTask.cancel();
+    restoringRef.current = true;
+    const { inputs, results } = opened;
+    const outcome = await transferIntoEditors(
+      [{ api, source: inputs.editorKet, expectKey: inputs.editorKet ? inputs.editorKey : null }],
+      persistence,
+    );
+    if (outcome.kind !== "adopted") {
+      setRecoveryNotices((notices) => [
+        ...notices,
+        {
+          tone: "warn",
+          text:
+            outcome.kind === "rolled-back"
+              ? `“${opened.record.name}” could not be opened. Your Ranking workspace is unchanged.`
+              : `“${opened.record.name}” could not be opened and the editor could not be restored. Your saved workspace is unchanged; reload this page to bring it back.`,
+        },
+      ]);
+      if (outcome.kind === "rolled-back") requestPersistRef.current();
+      openingRef.current = false;
+      setIsOpening(false);
+      window.setTimeout(() => {
+        restoringRef.current = false;
+      }, 500);
+      return false;
+    }
+
+    // Success: the old workspace's callbacks are invalid and the saved analysis is the workspace now.
+    pendingEditorRef.current = null;
+    snapshotRef.current = { ket: outcome.editors[0].ket, key: outcome.editors[0].key };
+    svgAttemptedRef.current.clear(); // previews are drawn again for the opened molecules
+    setActiveCategory(inputs.activeCategory);
+    setRankingMode(inputs.rankingMode);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices(
+      opened.resultsDropped ? [{ tone: "warn", text: "The saved comparison could not be validated and was not opened. The drawing was." }] : [],
+    );
+    if (results) {
+      const molecules: ComparisonMolecule[] = results.data.molecules.map((molecule) => ({ ...molecule, structureSvg: null }));
+      const saved = results.data.displayed;
+      const again = deriveRanking(molecules, inputs.rankingMode);
+      const derived = displayedRankingSnapshot(again.rankedRows, again.rankById, inputs.rankingMode);
+      const orderChanged = Boolean(saved && saved.modeId === derived.modeId && JSON.stringify(saved) !== JSON.stringify(derived));
+      setComparisonMolecules(molecules);
+      setResultMeta({
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        restored: false,
+        opened: { name: opened.record.name, savedAt: opened.record.updatedAt },
+        engineMismatch: opened.engineMismatch || orderChanged,
+      });
+      setStatus(`Opened saved analysis “${opened.record.name}” with ${molecules.length} molecule${molecules.length === 1 ? "" : "s"}. Nothing was recalculated.`);
+    } else {
+      setComparisonMolecules([]);
+      setResultMeta(null);
+      setStatus(`Opened saved analysis “${opened.record.name}” (drawing only).`);
+    }
+    // One write replaces the automatic workspace with the opened analysis.
+    persistence.requestSave(() => ({ inputs: opened.inputs, results: opened.results }));
+    await persistence.flush();
+    openingRef.current = false;
+    setIsOpening(false);
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      snapshotTask.schedule();
+    }, 500);
+    return true;
+  }
+
+  const savedOpen = useSavedAnalysisOpen<RankingWorkspaceInputs, RankingWorkspaceResults>({
+    page: "ranking",
+    openRequest,
+    onOpenHandled,
+    ready: recovery !== null && ketcher !== null,
+    busyReason: () =>
+      latestRef.current.isAnalyzing || openingRef.current ? "Wait for the current analysis to finish before opening a saved one." : null,
+    hasUnsavedWork: () => captureRanking() !== null,
+    canSaveCurrent: () => Boolean(latestRef.current.resultMeta) && latestRef.current.comparisonMolecules.length > 0,
+    saveCurrent: (name) => saveCurrentAnalysis(name, false),
+    defaultName: defaultAnalysisName,
+    apply: applySavedAnalysis,
+    notify: (item) => setRecoveryNotices((notices) => [...notices, item]),
+  });
+
+  useEffect(() => {
+    ketcherRef.current = ketcher;
+    requestPersistRef.current = requestPersist;
+    restoreEditorRef.current = () => void restoreEditor();
+    applyRestoreRef.current = applyRestoredRanking;
+    snapshotTask.setTask(takeEditorSnapshot);
+    latestRef.current = {
+      comparisonMolecules,
+      activeCategory,
+      rankingMode,
+      resultMeta,
+      displayed: displayedRankingSnapshot(rankedRows, rankById, rankingMode),
+      isAnalyzing,
+    };
+  });
+
+  // Autosave: only settled state is watched (the debounce keeps rapid edits out of storage).
+  useEffect(() => {
+    requestPersistRef.current();
+  }, [comparisonMolecules, activeCategory, rankingMode, resultMeta]);
+
+  useEffect(() => {
+    if (!recovery) return;
+    try {
+      applyRestoreRef.current?.(recovery);
+    } finally {
+      // Saving starts only after the recovered record has been applied (or deliberately skipped).
+      persistence.resumeAfterRestore();
+    }
+  }, [recovery, persistence]);
+
+  useEffect(() => {
+    if (ketcher && pendingEditorRef.current) restoreEditorRef.current();
+  }, [ketcher, editorRestoreVersion]);
+
+  // Previews are drawn again from the saved SMILES (they are not stored).
+  useEffect(() => {
+    const missing = comparisonMolecules.filter((m) => m.structureSvg === null && !svgAttemptedRef.current.has(m.id));
+    if (missing.length === 0) return;
+    missing.forEach((m) => svgAttemptedRef.current.add(m.id));
+    void Promise.all(
+      missing.map(async (m) => ({ id: m.id, smiles: m.smiles, svg: await getMoleculeSvg(m.smiles).catch(() => null) })),
+    ).then((entries) => {
+      setComparisonMolecules((previous) =>
+        previous.map((m) => {
+          const entry = entries.find((candidate) => candidate.id === m.id && candidate.smiles === m.smiles);
+          return entry && entry.svg && m.structureSvg === null ? { ...m, structureSvg: entry.svg } : m;
+        }),
+      );
+    });
+  }, [comparisonMolecules]);
+
+  useEffect(() => {
+    return () => snapshotTask.cancel();
+  }, [snapshotTask]);
+
+  function handleEditorChange() {
+    // Programmatic restores are not user edits.
+    if (restoringRef.current) return;
+    snapshotTask.schedule();
+  }
+
+  async function discardRecovered() {
+    void persistence.discard();
+    pendingEditorRef.current = null;
+    snapshotRef.current = { ket: null, key: null };
+    snapshotTask.cancel();
+    setComparisonMolecules([]);
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
+    setStatus("Recovered work discarded.");
+    try {
+      await ketcher?.setMolecule("");
+    } catch {
+      // The editor will simply keep its content.
+    }
+  }
+
+  // What was recovered and what could not be saved.
+  const workspaceNotices: WorkspaceNoticeItem[] = [...recoveryNotices];
+  if (resultMeta?.restored) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Molecules restored from your previous session (computed ${new Date(resultMeta.computedAt).toLocaleString()}) were not recalculated.`,
+    });
+  } else if (inputsOnlyRestored) {
+    workspaceNotices.push({ tone: "info", text: "Restored your drawing from your previous session." });
+  }
+  if (resultMeta?.opened) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Opened saved analysis “${resultMeta.opened.name}” (saved ${new Date(resultMeta.opened.savedAt).toLocaleString()}; computed ${new Date(resultMeta.computedAt).toLocaleString()}). The profiles were not recalculated.`,
+    });
+  }
+  if (saveMessage) workspaceNotices.push(saveMessage);
+  if (resultMeta?.engineMismatch) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: "These results were saved by an earlier version of the ranking code, or they no longer sort the way they did. They are shown as saved profiles and were not recalculated.",
+    });
+  }
+  if (!persistenceStatus.available) {
+    workspaceNotices.push({ tone: "warn", text: "Browser storage is unavailable, so your work on this page will not be saved." });
+  }
+  if (persistenceStatus.saveError) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: persistenceStatus.saveError.code === "quota"
+        ? "Your latest changes could not be saved because browser storage is full."
+        : `Your latest changes could not be saved (${persistenceStatus.saveError.message}).`,
+    });
+  }
+  if (persistenceStatus.resultsOmitted) {
+    workspaceNotices.push({ tone: "warn", text: "The comparison was too large to save; your drawing was saved without it." });
+  }
 
   async function addCurrentMoleculeToComparison(throwOnError = false) {
     if (!ketcher) {
@@ -123,7 +546,7 @@ export default function RankingPage() {
       return;
     }
 
-    if (isAnalyzing) return;
+    if (isAnalyzing || openingRef.current) return;
     if (comparisonMolecules.length >= 5) {
       setStatus("Comparison list is full. You can compare up to 5 molecules.");
       return;
@@ -167,6 +590,9 @@ export default function RankingPage() {
       };
 
       setComparisonMolecules((previous) => [...previous, newMolecule]);
+      // The first molecule of a set starts its record; a restored set keeps its original details.
+      setResultMeta((meta) => meta ?? { computedAt: new Date().toISOString(), engineVersion: RANKING_ENGINE_VERSION, restored: false, engineMismatch: false });
+      setInputsOnlyRestored(false);
       setStatus(`${nextLabel} added. All comparison categories are ready.`);
     } catch (error) {
       console.error("Ranking comparison analysis error:", error);
@@ -178,17 +604,25 @@ export default function RankingPage() {
   }
 
   function deleteComparisonMolecule(id: number) {
+    if (comparisonMolecules.length <= 1) setResultMeta(null);
     setComparisonMolecules((previous) => previous.filter((molecule) => molecule.id !== id));
     setStatus("Molecule removed from comparison.");
   }
 
   async function clearCurrentMolecule() {
     await ketcher?.setMolecule("");
+    snapshotTask.schedule();
     setStatus("Editor cleared. Your comparison set is unchanged.");
   }
 
   function clearComparison() {
+    // Clear all also discards the saved comparison and invalidates any restoration still in flight.
+    void persistence.discard();
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
     setComparisonMolecules([]);
+    snapshotTask.schedule();
     setStatus("Comparison set cleared.");
   }
 
@@ -198,39 +632,60 @@ export default function RankingPage() {
     if (firstMode) setRankingMode(firstMode.id);
   }
 
+  const incoming = useIncomingMolecule({ destination: "acidBase", api: ketcher, ready: recovery !== null && ketcher !== null, expectRestore: recovery?.kind === "restored" });
   return (
     <section className="ranking-page">
+{incoming}
       <div className="ranking-hero">
-        <div>
-          <p className="ranking-eyebrow">Organic chemistry comparison workspace</p>
-          <h1>Ranking</h1>
-          <p>
-            Add up to five molecules once, then compare electronic effects,
-            stability, mechanisms, spectroscopy, physical properties, and more.
-          </p>
-        </div>
+        <ToolHeader
+          group="Analyze"
+          title="Ranking"
+          headingLevel={1}
+          purpose="Add up to five molecules once, then compare electronic effects, stability, mechanisms, spectroscopy, physical properties, and more."
+          evidence="estimate"
+          steps={[
+            { label: "Add molecules", detail: "Up to five, by drawing or by name." },
+            { label: "Pick a comparison", detail: "Choose a category, then a ranking." },
+            { label: "Read the order", detail: "Ties share a rank; reasons are listed." },
+          ]}
+        />
         <div className="ranking-count-card" aria-label={`${comparisonMolecules.length} comparison molecules`}>
           <strong>{comparisonMolecules.length}</strong>
           <span>/ 5 molecules</span>
         </div>
       </div>
 
+      <WorkspaceNotice
+        notices={workspaceNotices}
+        onDiscard={resultMeta?.restored || inputsOnlyRestored ? () => void discardRecovered() : undefined}
+        discardDisabled={isAnalyzing}
+      />
+
+      {savedOpen.prompt && (
+        <ReplaceWorkspacePrompt
+          name={savedOpen.prompt.opened.record.name}
+          canSaveFirst={Boolean(resultMeta) && comparisonMolecules.length > 0 && !isAnalyzing}
+          busy={savedOpen.saveBusy}
+          onChoose={(choice) => void savedOpen.resolve(choice)}
+        />
+      )}
+
       <div className="ranking-workspace">
         <aside className="card ranking-editor-card">
           <div className="card-header">
             <div>
               <h2>Add molecule</h2>
-              <p>Draw a structure or type a common/IUPAC name below the editor.</p>
+              
             </div>
-            <span className={`status ${ketcher ? "ready" : "loading"}`}>
-              {ketcher ? "Editor ready" : "Loading editor"}
-            </span>
+            {ketcher ? null : <span className="status loading" role="status">Loading editor</span>}
           </div>
 
           <div className="ranking-ketcher-box">
             <MoleculeDrawer
               globalKey="rankingKetcher"
               onReady={setKetcher}
+              onChange={handleEditorChange}
+              onStructureLoaded={() => snapshotTask.schedule()}
               onNameSubmitProcess={() => addCurrentMoleculeToComparison(true)}
             />
           </div>
@@ -257,7 +712,32 @@ export default function RankingPage() {
             >
               Clear all
             </button>
+            <button
+              className="secondary-button"
+              onClick={() => {
+                setSaveMessage(null);
+                setSaveForm({ name: defaultAnalysisName() });
+              }}
+              disabled={!resultMeta || comparisonMolecules.length === 0 || isAnalyzing || isOpening || saveBusy}
+              title={comparisonMolecules.length > 0 ? "Keep this comparison in Saved analyses" : "Add a molecule first"}
+            >
+              Save Analysis
+            </button>
           </div>
+
+          {saveForm && (
+            <SaveAnalysisForm
+              name={saveForm.name}
+              busy={saveBusy}
+              onChange={(name) => setSaveForm({ name })}
+              onCancel={() => setSaveForm(null)}
+              onSubmit={() => {
+                void saveCurrentAnalysis(saveForm.name).then((saved) => {
+                  if (saved) setSaveForm(null);
+                });
+              }}
+            />
+          )}
 
           <p className="reaction-progress ranking-status" aria-live="polite">
             {isAnalyzing && <span className="loading-spinner" aria-hidden="true" />}
@@ -348,6 +828,8 @@ export default function RankingPage() {
               </p>
             </section>
           ) : (
+            <>
+            <OrderingBasis direction={activeMode.direction} total={rankedRows.length} ranked={rankedRows.filter(({ molecule, metric }) => (metric.score !== null || Boolean(metric.sortVector)) && rankById.get(molecule.id) !== undefined).length} distinctRanks={new Set(rankedRows.map(({ molecule }) => rankById.get(molecule.id)).filter((rank) => rank !== undefined)).size} />
             <section className="ranking-results-list" aria-label={`${activeMode.label} results`}>
               {rankedRows.map(({ molecule, metric }) => {
                 const displayRank = rankById.get(molecule.id);
@@ -363,15 +845,17 @@ export default function RankingPage() {
                           <strong>#{displayRank}</strong>
                         </>
                       ) : (
-                        <span>—</span>
+                        <span className="ranking-unranked" title="No ranking for this comparison: the molecule has no tabulated or computed value for it."><span aria-hidden="true">—</span><span className="pc-visually-hidden">Not ranked</span></span>
                       )}
                     </div>
 
                     <div className="ranking-result-structure">
                       {molecule.structureSvg ? (
-                        <div
+                        <MolecularFigure
                           className="molecule-preview ranking-molecule-preview"
-                          dangerouslySetInnerHTML={{ __html: molecule.structureSvg }}
+                          source={{ smiles: molecule.smiles, label: molecule.label }}
+                          svg={molecule.structureSvg}
+                          title={`Structure of ${molecule.label}`}
                         />
                       ) : (
                         <div className="ranking-no-structure">No preview</div>
@@ -416,6 +900,7 @@ export default function RankingPage() {
                 );
               })}
             </section>
+            </>
           )}
         </main>
       </div>

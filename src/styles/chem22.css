@@ -1,0 +1,34 @@
+/* Stage 22: Stoichiometry, Gas laws and Electrochemistry. Builds on generalChem.css and physics.css; colours come from the same tokens. */
+.chem-h3 { margin: var(--sp-3) 0 var(--sp-2); font-size: var(--fs-md, 1rem); }
+.chem-amounts { display: grid; gap: var(--sp-3); }
+.chem-amount { display: grid; gap: var(--sp-2); border: 1px solid var(--border); border-radius: var(--radius-md, 8px); padding: var(--sp-3); margin: 0; min-width: 0; }
+.chem-amount legend { padding: 0 6px; font-weight: 600; }
+.chem-amount-mode { display: grid; gap: 4px; min-width: 0; }
+.chem-amount-mode select, .chem-yield-row select, .chem-select select, .chem-unit-row select { min-height: var(--touch, 44px); padding: 4px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm, 6px); background: var(--surface, transparent); color: inherit; font: inherit; max-width: 100%; }
+.chem-equation { font-family: var(--font-mono); font-size: 1.05rem; overflow-wrap: anywhere; margin: 0 0 var(--sp-2); }
+.chem-coeff-row { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-3); align-items: flex-end; margin-bottom: var(--sp-3); }
+.chem-coeff { display: grid; gap: 2px; justify-items: start; position: relative; }
+.chem-coeff label { font-size: var(--fs-xs, 0.75rem); color: var(--text-muted); position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.chem-coeff input { width: 4.2rem; min-height: var(--touch, 44px); padding: 4px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm, 6px); background: var(--surface, transparent); color: inherit; font: inherit; font-family: var(--font-mono); }
+.chem-coeff-formula { font-family: var(--font-mono); font-size: var(--fs-sm); }
+.chem-arrow, .chem-plus { position: absolute; left: -1.1rem; top: 10px; color: var(--text-muted); }
+.chem-coeff { margin-left: 1.2rem; }
+.chem-yield-row { display: flex; flex-wrap: wrap; gap: var(--sp-3) var(--sp-4); align-items: flex-end; }
+.gc-check { display: inline-flex; gap: 8px; align-items: center; min-height: var(--touch, 44px); }
+.chem-dil-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--sp-3); }
+.gc-answer-row { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-3); align-items: center; }
+.gc-answer-row input { min-height: var(--touch, 44px); width: 10rem; padding: 4px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm, 6px); background: var(--surface, transparent); color: inherit; font: inherit; font-family: var(--font-mono); }
+.gc-choice-group { display: grid; gap: var(--sp-2); }
+.gc-choice { display: flex; gap: 8px; align-items: center; min-height: var(--touch, 44px); }
+.chem-unit-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--sp-2); align-items: end; }
+.chem-select { display: grid; gap: 4px; min-width: 0; }
+.chem-select select { width: 100%; text-overflow: ellipsis; }
+.chem-gas-row { display: grid; gap: var(--sp-3); grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-items: end; }
+.chem-law-note { font-family: var(--font-mono); font-size: var(--fs-sm); overflow-wrap: anywhere; }
+.chem-mix-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp-2); align-items: end; }
+.chem-charts { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+.chem-vs { display: grid; gap: var(--sp-3); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.chem-vs-card { border: 1px solid var(--border); border-radius: var(--radius-md, 8px); padding: var(--sp-3); }
+.chem-vs-card h4 { margin: 0 0 6px; font-size: var(--fs-sm); }
+.chem-half-pick { display: grid; gap: var(--sp-2); }
+.chem-conc-list { display: grid; gap: var(--sp-2); }

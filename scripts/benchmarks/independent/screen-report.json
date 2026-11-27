@@ -1,0 +1,59 @@
+{
+  "cases": 57,
+  "byCategory": {
+    "substitution-elimination": 5,
+    "alkenes": 11,
+    "alkynes": 5,
+    "carbonyl": 7,
+    "aromatic-substitution": 5,
+    "organometallic": 6,
+    "oxidation-reduction": 6,
+    "competing-pathways": 2,
+    "unsupported": 5,
+    "multistep-route": 3,
+    "multicatalytic": 2
+  },
+  "byProvenance": {
+    "verified-primary": 4,
+    "verified-secondary": 35,
+    "provisional": 18
+  },
+  "problems": [],
+  "overlapping": {
+    "AL-07": [
+      "scripts\\tests\\stereo9d.test.mjs"
+    ],
+    "AL-08": [
+      "scripts\\tests\\stereo9d.test.mjs"
+    ],
+    "CB-07": [
+      "scripts\\tests\\reactantRoleIndex.test.mjs"
+    ],
+    "AR-03": [
+      "scripts\\tests\\selectivity9c.test.mjs",
+      "scripts\\benchmarks\\multicatalyticBenchmark.mjs",
+      "scripts\\benchmarks\\results\\multicatalytic-workspace.json"
+    ],
+    "CP-02": [
+      "scripts\\tests\\selectivity9c.test.mjs"
+    ],
+    "US-01": [
+      "scripts\\tests\\synthesisSelectivity.test.mjs",
+      "scripts\\benchmarks\\baseline\\9a0\\observed-results.json",
+      "scripts\\benchmarks\\baseline\\9a0\\runner-as-run.mjs",
+      "scripts\\benchmarks\\results\\9b1-after.json",
+      "scripts\\benchmarks\\results\\9b1a-after.json",
+      "scripts\\benchmarks\\results\\multicatalytic-audit.full.json",
+      "scripts\\benchmarks\\results\\multicatalytic-audit.json"
+    ],
+    "US-02": [
+      "scripts\\benchmarks\\baseline\\9a0\\observed-results.json",
+      "scripts\\benchmarks\\baseline\\9a0\\runner-as-run.mjs",
+      "scripts\\benchmarks\\results\\9b1-after.json",
+      "scripts\\benchmarks\\results\\9b1a-after.json",
+      "scripts\\benchmarks\\results\\multicatalytic-audit.full.json",
+      "scripts\\benchmarks\\results\\multicatalytic-audit.json"
+    ]
+  },
+  "heldOut": 50
+}

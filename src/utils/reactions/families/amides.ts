@@ -57,6 +57,7 @@ export const amideReactionRules: ReactionRule[] = [
   },
   {
     id: "amide-lah-reduction",
+    conditions: { hydride: true, anhydrous: true },
     family: "amides",
     reactionType: "reduction",
     title: "Amide Reduction",

@@ -1,0 +1,12 @@
+{
+  "startedUTC": "2026-11-06T18:21:25.558Z",
+  "engineCommit": "7f4cdc021790f1d047f96ff9f2c89352ba4c58ee",
+  "executionCommit": "03e017bdb9992cffbe1706f0f646d07820ef80c0",
+  "srcTree": "145051126e3c69d4dfd67d4a2cd6ace599cd1f23",
+  "node": "v24.21.0",
+  "platform": "win32",
+  "timeoutMs": 45000,
+  "concurrency": 1,
+  "attemptsPerCase": 1,
+  "mode": "isolated-process-per-case, fixed family filters, no target-dependent fallback"
+}

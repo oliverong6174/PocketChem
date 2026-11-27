@@ -4,6 +4,7 @@ import { classifyCarbonyl } from "./carbonylUtils";
 import { epoxideOrganometallicOpening } from "./ring";
 import { totalAlkeneSubstitutionScore } from "../productSelectivity";
 import { filterProductsByRelativeSubstituentFace } from "../stereochemistry";
+import { enumerateCarbocationPrecursors } from "./carbocationUtils";
 
 export type OneTwoAdditionNucleophile = "water" | "cyanide";
 export type AlkeneAdditionRegioselectivity =
@@ -426,6 +427,32 @@ async function epoxidationThenOrganometallicOpening(
   return [...products];
 }
 
+/**
+ * Adds the products of favorable 1,2-hydride/alkyl shifts of the carbocation that the Markovnikov product
+ * implies. The alcohol (or halide) product is the virtual precursor of that cation, so the shared
+ * SN1/E1 shift enumerator applies directly; shifts that only trade equally stable cations are not
+ * generated. Direct and rearranged products are all returned and none is ranked. Only rules that declare
+ * `rearrangement: "carbocation"` (the ionic mechanisms) use this; hydroboration and oxymercuration do not.
+ */
+async function addCarbocationRearrangements(
+  products: string[],
+  leavingGroup: "alcohol" | "halide",
+  options?: Record<string, unknown>,
+): Promise<string[]> {
+  if (options?.rearrangement !== "carbocation") return products;
+  const all = new Set(products);
+  for (const product of products) {
+    const shifted = await enumerateCarbocationPrecursors(product, {
+      leavingGroup,
+      includeUnrearranged: false,
+      maxShiftDepth: 2,
+      maxCandidates: 4,
+    });
+    for (const precursor of shifted) all.add(precursor.smiles);
+  }
+  return [...all];
+}
+
 async function alkeneHydration(
   reactantSmiles: string,
   options?: Record<string, unknown>,
@@ -451,7 +478,7 @@ async function alkeneHydration(
     }
   }
 
-  return [...products];
+  return addCarbocationRearrangements([...products], "alcohol", options);
 }
 
 async function alkeneHydrohalogenation(
@@ -488,7 +515,7 @@ async function alkeneHydrohalogenation(
     }
   }
 
-  return [...products];
+  return addCarbocationRearrangements([...products], "halide", options);
 }
 
 
@@ -676,35 +703,6 @@ type ConjugatedCarbonMetrics = {
   maxConjugatedDoubleBondSpan: number;
 };
 
-type RankedDieneProduct = {
-  product: string;
-  orientationRank: number;
-  carbonDoubleBondCount: number;
-  maxConjugatedDoubleBondSpan: number;
-  alkeneScore: number;
-};
-
-function parseMatches(raw: string): number[][] {
-  try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-
-    return parsed
-      .map((entry) => {
-        if (Array.isArray(entry)) {
-          return entry.map(Number).filter(Number.isFinite);
-        }
-        if (entry && typeof entry === "object" && Array.isArray((entry as { atoms?: unknown[] }).atoms)) {
-          return (entry as { atoms: unknown[] }).atoms.map(Number).filter(Number.isFinite);
-        }
-        return [];
-      })
-      .filter((entry) => entry.length > 0);
-  } catch {
-    return [];
-  }
-}
-
 function parseV2000Graph(molBlock: string): ParsedV2000Graph | null {
   if (!molBlock || molBlock.includes("V3000")) return null;
 
@@ -827,36 +825,6 @@ async function conjugatedCarbonMetrics(smiles: string): Promise<ConjugatedCarbon
   }
 }
 
-async function ringJunctionAlkeneCount(smiles: string): Promise<number> {
-  const rdkit = await getRDKit();
-  const molecule = rdkit.get_mol(smiles);
-  if (!molecule) return 0;
-
-  const queries = ["[C;R2]=[C]", "[C]=[C;R2]"];
-  const seenBonds = new Set<string>();
-
-  try {
-    for (const smarts of queries) {
-      const query = rdkit.get_qmol(smarts);
-      if (!query) continue;
-      try {
-        const matches = parseMatches(molecule.get_substruct_matches?.(query) ?? "[]");
-        for (const match of matches) {
-          if (match.length < 2) continue;
-          const [first, second] = match;
-          const key = first < second ? `${first}-${second}` : `${second}-${first}`;
-          seenBonds.add(key);
-        }
-      } finally {
-        query.delete?.();
-      }
-    }
-    return seenBonds.size;
-  } finally {
-    molecule.delete?.();
-  }
-}
-
 /**
  * Electrophilic HX addition to an isolated conjugated diene.
  *
@@ -908,6 +876,24 @@ async function alkeneHalohydrin(
   if (!halogen) {
     console.warn("Addition halohydrin requires Cl, Br, or I.", options);
     return [];
+  }
+
+  // Anti addition (bromonium ion opening) is stereospecific in the alkene geometry: the tag pairs are the ones used for
+  // Br2 addition (E: (@,@) / (@@,@@); Z: (@,@@) / (@@,@)), with OH and X in the two positions. Only H1=H1 alkenes are
+  // covered; the product carries the right diastereomer for the geometry drawn instead of one chosen by a drawing convention.
+  const geometry = await alkeneGeometry(reactantSmiles);
+  if (geometry === "E" || geometry === "Z") {
+    const tags = geometry === "E" ? [["@", "@"], ["@@", "@@"]] : [["@", "@@"], ["@@", "@"]];
+    const stereoProducts = new Set<string>();
+    for (const [first, second] of tags) {
+      for (const hydroxylFirst of [true, false]) {
+        const smarts = hydroxylFirst
+          ? `[C;H1:1]=[C;H1:2]>>[C${first}:1]([OH])[C${second}:2]([${halogen}])`
+          : `[C;H1:1]=[C;H1:2]>>[C${first}:1]([${halogen}])[C${second}:2]([OH])`;
+        for (const product of await runReactionSmarts(reactantSmiles, smarts, 8)) stereoProducts.add(product);
+      }
+    }
+    if (stereoProducts.size > 0) return [...stereoProducts];
   }
 
   const products = new Set<string>();
@@ -993,9 +979,31 @@ async function alkeneGeometry(smiles: string): Promise<"E" | "Z" | null> {
  * pattern does not create two tetrahedral centers), PocketChem falls back to
  * the constitutionally correct diol without inventing stereochemistry.
  */
+/**
+ * A 5-7 membered ring alkene can only be cis, so syn addition gives the cis diol (meso) and anti addition the
+ * trans diol (a racemate). Equal chirality tags give the (R,S)/cis relationship and opposite tags (R,R)/(S,S)/trans
+ * (checked on cyclopentene and cyclohexene). Without this, the unspecified-geometry fallback enumerated both
+ * relationships, including ones the mechanism forbids.
+ */
+const RING_ALKENE_LHS = "[C;H1;r5,r6,r7:1]=@[C;H1;r5,r6,r7:2]";
+async function ringDihydroxylation(reactantSmiles: string, relationship: "syn" | "anti"): Promise<string[]> {
+  const tags: Array<[string, string]> = relationship === "syn" ? [["@", "@"], ["@@", "@@"]] : [["@", "@@"], ["@@", "@"]];
+  const products = new Set<string>();
+  for (const [a, b] of tags) {
+    for (const product of await runReactionSmarts(reactantSmiles, `${RING_ALKENE_LHS}>>[C${a}:1]([OH])[C${b}:2]([OH])`, 8)) {
+      products.add(product);
+    }
+  }
+  return [...products];
+}
+
 async function synDihydroxylation(reactantSmiles: string): Promise<string[]> {
   const geometry = await alkeneGeometry(reactantSmiles);
   const products = new Set<string>();
+  if (geometry === null) {
+    const ring = await ringDihydroxylation(reactantSmiles, "syn");
+    if (ring.length > 0) return ring;
+  }
 
   let stereoSmarts: string[] = [];
   if (geometry === "E") {
@@ -1060,6 +1068,10 @@ async function synDihydroxylation(reactantSmiles: string): Promise<string[]> {
 async function antiDihydroxylation(reactantSmiles: string): Promise<string[]> {
   const geometry = await alkeneGeometry(reactantSmiles);
   const products = new Set<string>();
+  if (geometry === null) {
+    const ring = await ringDihydroxylation(reactantSmiles, "anti");
+    if (ring.length > 0) return ring;
+  }
 
   let stereoSmarts: string[] = [];
   if (geometry === "E") {

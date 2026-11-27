@@ -3,6 +3,8 @@ import { getRDKit } from "../rdkit";
 import type { MassSpectrumPeak, MassSpectrumResult } from "./types";
 import { predictGeneralFragmentation } from "./massSpec/fragmentationEngine";
 import { mergeAndNormalizePeaks } from "./massSpec/peakNormalization";
+import { predictMcLaffertyPeaks } from "./massSpec/mclafferty";
+import { predictFragmentCandidates } from "./massSpec/fragmentCandidates";
 
 type Isotope = { shift: number; abundance: number };
 
@@ -105,6 +107,10 @@ const FRAGMENT_REACTIONS = {
   // Keep Br/Cl separate so the surviving carbon skeleton has no fake isotope
   // label attached to it.
   arylBromineLoss: "[c:1]-[Br:2]>>[c+:1]",
+  // Heterolysis of a C-Br or C-I bond that leaves a SECONDARY or TERTIARY carbocation is the dominant EI channel of such halides (isopropyl
+  // bromide m/z 43, tert-butyl bromide m/z 57; McLafferty & Turecek, Interpretation of Mass Spectra). Primary halides do not lose X as readily.
+  alkylBromineLoss: "[C;X4;H0,H1:1]-[Br:2]>>[C+:1]",
+  alkylIodineLoss: "[C;X4;H0,H1:1]-[I:2]>>[C+:1]",
   arylChlorineLoss: "[c:1]-[Cl:2]>>[c+:1]",
 } as const;
 
@@ -567,6 +573,11 @@ async function alcoholAlphaCleavagePeaks(
     fragmentSets.push(...await runFragmentReactionSets(parentSmiles, reactionSmarts));
   }
   const peaksByMass = new Map<number, MassSpectrumPeak>();
+  let maxLoss = 0;
+  for (const fragmentSet of fragmentSets) {
+    const mzCandidate = fragmentSet[0] ? await nominalMzForFragment(fragmentSet[0]) : null;
+    if (mzCandidate !== null && parentNominalMass !== null && mzCandidate > 10) maxLoss = Math.max(maxLoss, parentNominalMass - mzCandidate);
+  }
 
   for (const fragmentSet of fragmentSets) {
     const fragmentSmiles = fragmentSet[0];
@@ -591,9 +602,11 @@ async function alcoholAlphaCleavagePeaks(
       ? `Alcohol α-cleavage breaks a C–C bond directly adjacent to the carbinol carbon. The oxygen-containing side retains the charge and is displayed in the course-style carbocation form R₂C(+)-OH so the drawing matches the fragment assignment typically written by hand. The complementary neutral radical responsible for the mass difference (${neutralLossMass}) is shown alongside the ion fragment; its radical dot is retained at the bond-cleavage site.`
       : "Alcohol α-cleavage breaks a C–C bond directly adjacent to the carbinol carbon. The oxygen-containing side retains the charge and is displayed in the course-style carbocation form R₂C(+)-OH; the complementary neutral partner is a radical. Symmetry-equivalent cleavages are merged.";
 
+    // Alpha cleavage preferentially expels the LARGEST alkyl radical (Stevenson-type rule; McLafferty & Turecek): the ion left after losing
+    // the heaviest neutral is the strongest, others are weaker.
     const peak: MassSpectrumPeak = {
       mz,
-      relativeIntensity: 65,
+      relativeIntensity: neutralLossMass !== null && neutralLossMass >= maxLoss ? 65 : 30,
       label: `m/z ${mz} · α-cleavage`,
       kind: "fragment",
       explanation,
@@ -668,6 +681,8 @@ async function reactionFragmentPeaks(
     const peak: MassSpectrumPeak = {
       mz,
       relativeIntensity: intensity,
+      channelKey: `direct:${fragmentSmiles}`,
+      channelSource: "diagnostic",
       label: `m/z ${mz} · ${label}`,
       kind: "fragment",
       explanation,
@@ -680,6 +695,112 @@ async function reactionFragmentPeaks(
   }
 
   return peaks;
+}
+
+/**
+ * Aromatic compounds whose only substituents are OH, NH2, OCH3, C#N or a halogen give an intense molecular ion that is usually the base peak:
+ * benzene, halobenzenes, phenol, aniline, anisole, benzonitrile and fused aromatic hydrocarbons (McLafferty & Turecek, Interpretation of Mass
+ * Spectra: the molecular ion is strong for aromatic rings, and there is no weak benzylic or alpha bond to cleave). Substituents that fragment
+ * readily (alkyl, carbonyl, nitro, ethoxy and larger ethers) are deliberately excluded.
+ */
+async function hasStableAromaticMolecularIon(parentSmiles: string | null): Promise<boolean> {
+  if (!parentSmiles) return false;
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(parentSmiles);
+  if (!mol) return false;
+  try {
+    const heavy = mol.get_num_atoms?.() ?? 0;
+    if (!heavy) return false;
+    const claimed = new Set<number>();
+    const patterns = ["c", "[OX2H1]c", "[NX3H2]c", "[F,Cl,Br,I]c", "[CX2](#[NX1])c", "[CH3][OX2]c"];
+    for (const smarts of patterns) {
+      const query = rdkit.get_qmol(smarts);
+      if (!query) continue;
+      try {
+        const parsed: unknown = JSON.parse(mol.get_substruct_matches?.(query) ?? "[]");
+        for (const entry of Array.isArray(parsed) ? parsed : []) {
+          const atoms: number[] = Array.isArray(entry) ? entry : entry?.atoms ?? [];
+          // the substituent atoms are the leading ones; the ring carbon is the last atom of each pattern
+          const members = smarts === "c" ? atoms : smarts.endsWith("c") ? atoms.slice(0, atoms.length - 1) : atoms;
+          members.forEach((atom) => claimed.add(atom));
+        }
+      } finally {
+        query.delete?.();
+      }
+    }
+    return claimed.size === heavy && claimed.size > 0;
+  } catch {
+    return false;
+  } finally {
+    mol.delete?.();
+  }
+}
+
+/** Raises the molecular ion (and its isotope companions) just above the strongest fragment, then renormalizes so the base peak is 100. */
+function promoteMolecularIon(peaks: MassSpectrumPeak[]): MassSpectrumPeak[] {
+  const molecular = peaks.find((peak) => peak.kind === "molecular-ion");
+  if (!molecular) return peaks;
+  const strongestOther = Math.max(0, ...peaks.filter((peak) => peak.kind !== "molecular-ion" && peak.kind !== "isotope").map((peak) => peak.relativeIntensity));
+  const factor = Math.max(1, (1.15 * strongestOther) / Math.max(molecular.relativeIntensity, 1e-9));
+  if (factor === 1) return peaks;
+  const scaled = peaks.map((peak) =>
+    peak.kind === "molecular-ion" || peak.kind === "isotope" ? { ...peak, relativeIntensity: peak.relativeIntensity * factor } : peak,
+  );
+  const top = Math.max(...scaled.map((peak) => peak.relativeIntensity));
+  return scaled.map((peak) => ({ ...peak, relativeIntensity: Number(((peak.relativeIntensity / top) * 100).toFixed(1)) }));
+}
+
+/**
+ * Separates fragment generation from intensity ranking. Only structure classes with a dominant, textbook channel are `supported`;
+ * saturated aliphatic compounds (spectra built from CnH2n+1+/CnH2n-1+ families and H-rearrangements) are `unreliable`.
+ */
+async function classifyBasePeak(
+  parentSmiles: string | null,
+  peaks: MassSpectrumPeak[],
+  basePeak: MassSpectrumPeak | null,
+): Promise<{ basePeakCertainty?: "supported" | "heuristic" | "unreliable"; basePeakCandidates?: number[]; basePeakBasis?: string }> {
+  if (!parentSmiles || !basePeak) return {};
+  const candidates = [...peaks]
+    .filter((peak) => peak.kind !== "isotope")
+    .sort((a, b) => b.relativeIntensity - a.relativeIntensity)
+    .slice(0, 3)
+    .map((peak) => Math.round(peak.mz));
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(parentSmiles);
+  if (!mol) return { basePeakCandidates: candidates };
+  const has = (smarts: string) => {
+    const q = rdkit.get_qmol(smarts);
+    if (!q) return false;
+    try {
+      const m = JSON.parse(mol.get_substruct_matches(q));
+      return Array.isArray(m) && m.length > 0;
+    } finally {
+      q.delete?.();
+    }
+  };
+  try {
+    const aromatic = has("[a]");
+    const supportedBasis =
+      (aromatic && (has("c[CX4;!R]") || has("c[CX3](=O)[#6,#8]"))) ? "Aromatic ring with a benzylic or aroyl site: the benzyl/tropylium or aroyl ion is the established dominant channel." :
+      (aromatic && !has("[CX3]=O") && !has("[CX4]") ) ? "Aromatic compound with no readily cleaved side chain: the molecular ion is usually the base peak." :
+      has("[CX4;H0]([CH3])([CH3])([CH3])[Br,I,Cl]") ? "Tertiary alkyl halide: loss of X• gives the tert-butyl-type cation." :
+      has("[NX3;!$(N-C=O)]-[CX4]") ? "Aliphatic amine: α-cleavage to the iminium ion dominates." :
+      has("[CH3][CX3](=O)[#6]") ? "Methyl ketone: the acetyl ion m/z 43 is characteristic." :
+      has("[CH3][CX3](=O)O[#6]") ? "Acetate ester: the acetyl ion m/z 43 is characteristic." :
+      null;
+    if (supportedBasis) return { basePeakCertainty: "supported", basePeakCandidates: candidates, basePeakBasis: supportedBasis };
+    const saturatedAliphatic = !aromatic && !has("[#6]=,#[#6,#8,#7]") ;
+    if (saturatedAliphatic) {
+      return {
+        basePeakCertainty: "unreliable",
+        basePeakCandidates: candidates,
+        basePeakBasis: "Saturated aliphatic compound: the spectrum is dominated by alkyl/alkenyl ion families and hydrogen rearrangements whose relative abundances this engine does not model quantitatively. The m/z set is informative; the single base peak is not.",
+      };
+    }
+    return { basePeakCertainty: "heuristic", basePeakCandidates: candidates, basePeakBasis: "Top ion among several comparable predicted channels; abundances are class-based heuristics." };
+  } finally {
+    mol.delete?.();
+  }
 }
 
 export async function predictMassSpectrum(
@@ -754,6 +875,7 @@ export async function predictMassSpectrum(
     }
 
     peaks.push(...generalFragmentation.peaks);
+    peaks.push(...await predictMcLaffertyPeaks(parentSmiles));
 
     const fragments: Array<MassSpectrumPeak | null> = [];
 
@@ -828,6 +950,26 @@ export async function predictMassSpectrum(
       ));
     }
 
+    if ((counts.Br ?? 0) > 0) {
+      peaks.push(...await reactionFragmentPeaks(
+        parentSmiles,
+        FRAGMENT_REACTIONS.alkylBromineLoss,
+        "M − Br• (sec/tert alkyl)",
+        "A secondary or tertiary alkyl bromide readily loses Br• to give a stabilized carbocation, usually the base peak.",
+        90,
+      ));
+    }
+
+    if ((counts.I ?? 0) > 0) {
+      peaks.push(...await reactionFragmentPeaks(
+        parentSmiles,
+        FRAGMENT_REACTIONS.alkylIodineLoss,
+        "M − I• (sec/tert alkyl)",
+        "A secondary or tertiary alkyl iodide readily loses I• to give a stabilized carbocation, usually the base peak.",
+        90,
+      ));
+    }
+
     if ((counts.Cl ?? 0) > 0) {
       peaks.push(...await reactionFragmentPeaks(
         parentSmiles,
@@ -851,7 +993,10 @@ export async function predictMassSpectrum(
       });
     }
 
-    if (hasGroup(functionalGroups, ["Benzene", "Phenol", "Aniline", "Aryl ether", "Aryl halide", "Nitrobenzene"])) {
+    // An aromatic classification alone does not prove a six-carbon ring:
+    // diazines were incorrectly drawn as C6H5+ despite having only four carbons.
+    if (hasGroup(functionalGroups, ["Benzene", "Phenol", "Aniline", "Aryl ether", "Aryl halide", "Nitrobenzene"]) &&
+        (counts.C ?? 0) >= 6 && (counts.H ?? 0) >= 5 && await containsPhenylRing(parentSmiles)) {
       peaks.push({
         mz: 77,
         relativeIntensity: 32,
@@ -871,15 +1016,33 @@ export async function predictMassSpectrum(
   if ((counts.Br ?? 0) > 0) notes.push("Bromine gives a diagnostic M:M+2 isotope pattern of roughly 1:1 for one Br atom.");
   if ((counts.N ?? 0) % 2 === 1 && nominal !== null) notes.push("Nitrogen rule: an odd nominal molecular mass is consistent with an odd number of nitrogens for typical closed-shell organic molecules.");
 
-  const finalPeaks = mergeAndNormalizePeaks(peaks);
+  let finalPeaks = mergeAndNormalizePeaks(peaks);
+  if (await hasStableAromaticMolecularIon(parentSmiles)) finalPeaks = promoteMolecularIon(finalPeaks);
   const basePeak = finalPeaks.reduce<MassSpectrumPeak | null>((best, peak) => !best || peak.relativeIntensity > best.relativeIntensity ? peak : best, null);
 
+  const certainty = await classifyBasePeak(parentSmiles, finalPeaks, basePeak);
+  const fragmentCandidates = await predictFragmentCandidates(parentSmiles);
+  if (fragmentCandidates.length && certainty.basePeakCertainty === "supported") {
+    certainty.basePeakCertainty = "heuristic";
+    certainty.basePeakBasis = "Additional competing fragmentation channels have unknown abundance. The chart's strongest ion is a heuristic ranking, not a supported base-peak assignment.";
+  }
+  if (fragmentCandidates.length) notes.push("Additional unranked fragment candidates are listed separately. Their composition follows supported fragmentation channels; their abundance and exact ion connectivity are not predicted, so they are excluded from the intensity plot and base-peak ranking.");
   return {
+    fragmentCandidates,
     formula,
     molecularIonMz: molecularIon === null ? null : Number(molecularIon.toFixed(4)),
     nominalMass: nominal,
     basePeakMz: basePeak?.mz ?? null,
+    ...certainty,
     peaks: finalPeaks,
     notes,
   };
+}
+
+async function containsPhenylRing(smiles: string | null): Promise<boolean> {
+  if (!smiles) return false;
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(smiles), query = rdkit.get_qmol("c1ccccc1");
+  try { return Boolean(mol && query && JSON.parse(mol.get_substruct_matches(query)).length); }
+  finally { mol?.delete(); query?.delete(); }
 }

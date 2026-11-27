@@ -1,0 +1,2554 @@
+{
+ "cases": [
+  {
+   "id": "RX-01",
+   "capability": "reactions",
+   "category": "hydrohalogenation, Markovnikov",
+   "title": "alkene-hbr-markovnikov",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00069",
+     "title": "OpenStax Organic Chemistry, module m00069: Electrophilic Addition Reactions of Alkenes",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00069/index.cnxml",
+     "snapshot": "snapshots/openstax/m00069.cnxml",
+     "sha256": "73679b5af707392478f18ab1f56d0ceb26dbcec393262164a51b4462ebc46916",
+     "quote": "reaction of 2-methylpropene with HBr yields 2-bromo-2-methylpropane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "C=C(C)C"
+   ],
+   "reagents": "HBr",
+   "reagent_tokens": [
+    "hbr",
+    "hydrobromic",
+    "hydrogenbromide",
+    "hydrohalogenation",
+    "hx"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(C)(C)Br",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "BrCC(C)C"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "nameChecks": [
+    {
+     "name": "2-methylpropene",
+     "status": "match",
+     "pubchem": "CC(=C)C"
+    },
+    {
+     "name": "2-bromo-2-methylpropane",
+     "status": "match",
+     "pubchem": "CC(C)(C)Br"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-02",
+   "capability": "reactions",
+   "category": "hydroboration-oxidation, syn stereochemistry",
+   "title": "hydroboration-trans",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00093",
+     "title": "OpenStax Organic Chemistry, module m00093: Predicting the Products of a Hydration Reaction",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00093/index.cnxml",
+     "snapshot": "snapshots/openstax/m00093.cnxml",
+     "sha256": "4d5effc8fced360c3fba18e384630dced89de785089db6affb6a63ab577f8358",
+     "quote": "hydroboration–oxidation of 1-methylcyclopentene yields trans -2-methylcyclopentanol",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC1=CCCC1"
+   ],
+   "reagents": "1. BH3, THF; 2. H2O2, NaOH",
+   "reagent_tokens": [
+    "bh3",
+    "borane",
+    "hydroboration",
+    "b2h6",
+    "thf"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C[C@@H]1CCC[C@H]1O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CC1(O)CCCC1",
+     "C[C@@H]1CCC[C@@H]1O"
+    ],
+    "stereo": "racemic"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry",
+    "stereochemistry"
+   ],
+   "nameChecks": [
+    {
+     "name": "1-methylcyclopentene",
+     "status": "match",
+     "pubchem": "CC1=CCCC1"
+    },
+    {
+     "name": "2-methylcyclopentanol",
+     "status": "match",
+     "pubchem": "CC1CCCC1O"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-03",
+   "capability": "reactions",
+   "category": "acid-catalysed hydration, Markovnikov, racemic product",
+   "title": "butene-hydration",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00100",
+     "title": "OpenStax Organic Chemistry, module m00100: undefined",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00100/index.cnxml",
+     "snapshot": "snapshots/openstax/m00100.cnxml",
+     "sha256": "fd7eed4bdccb9cfad6e3f5cebb17d7777b3c5e3542709697b41eba4a7a8a50fe",
+     "quote": "acid-catalyzed addition of H 2 O to 1-butene in the laboratory yields 2-butanol, a chiral alcohol",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "C=CCC"
+   ],
+   "reagents": "H2O, H2SO4 (cat.)",
+   "reagent_tokens": [
+    "h2o",
+    "h3o",
+    "hydration",
+    "h2so4",
+    "acidcatalyzed"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(O)CC",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "OCCCC"
+    ],
+    "stereo": "racemic"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry",
+    "stereochemistry"
+   ],
+   "nameChecks": [
+    {
+     "name": "1-butene",
+     "status": "match",
+     "pubchem": "CCC=C"
+    },
+    {
+     "name": "2-butanol",
+     "status": "match",
+     "pubchem": "CCC(C)O"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-04",
+   "capability": "reactions",
+   "category": "alkyne double hydrohalogenation, Markovnikov",
+   "title": "hexyne-2hbr",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00105",
+     "title": "OpenStax Organic Chemistry, module m00105: Problems",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00105/index.cnxml",
+     "snapshot": "snapshots/openstax/m00105.cnxml",
+     "sha256": "12e5466365c335a6a9e51a1fd8970c9a9195d06fd0458e6eee0dd852fe879ca8",
+     "quote": "reaction of 1-hexyne with 2 equivalents of HBr yields 2,2-dibromohexane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CCCCC#C"
+   ],
+   "reagents": "2 HBr",
+   "reagent_tokens": [
+    "hbr",
+    "hydrobromic",
+    "hydrohalogenation",
+    "hx"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCCCC(C)(Br)Br",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CCCCC(Br)CBr",
+     "CCCCCC(Br)Br"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "nameChecks": [
+    {
+     "name": "1-hexyne",
+     "status": "match",
+     "pubchem": "CCCCC#C"
+    },
+    {
+     "name": "2,2-dibromohexane",
+     "status": "match",
+     "pubchem": "CCCCC(C)(Br)Br"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-05",
+   "capability": "reactions",
+   "category": "carbocation rearrangement (hydride shift)",
+   "title": "methylbutene-hcl-rearr",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00073",
+     "title": "OpenStax Organic Chemistry, module m00073: Evidence for the Mechanism of Electrophilic Additions: Carbocation Rearrangements",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00073/index.cnxml",
+     "snapshot": "snapshots/openstax/m00073.cnxml",
+     "sha256": "af57bfd44dc6f21a2d449d191db927a2e23c76592fd7bb50c1d4a51ec0cdacff",
+     "quote": "reaction of HCl with 3-methyl-1-butene yields a substantial amount of 2-chloro-2-methylbutane in addition to the “expected” product, 2-chloro-3-methylbutane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "C=CC(C)C"
+   ],
+   "reagents": "HCl",
+   "reagent_tokens": [
+    "hcl",
+    "hydrochloric",
+    "hydrogenchloride",
+    "hydrohalogenation",
+    "hx"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(Cl)C(C)C",
+      "role": "formed"
+     },
+     {
+      "smiles": "CCC(C)(C)Cl",
+      "role": "formed"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "3-methyl-1-butene",
+     "status": "match",
+     "pubchem": "CC(C)C=C"
+    },
+    {
+     "name": "2-chloro-2-methylbutane",
+     "status": "match",
+     "pubchem": "CCC(C)(C)Cl"
+    },
+    {
+     "name": "2-chloro-3-methylbutane",
+     "status": "match",
+     "pubchem": "CC(C)C(C)Cl"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-06",
+   "capability": "reactions",
+   "category": "carbocation rearrangement (methyl shift), equal mixture",
+   "title": "dimethylbutene-hcl",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00073",
+     "title": "OpenStax Organic Chemistry, module m00073: Evidence for the Mechanism of Electrophilic Additions: Carbocation Rearrangements",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00073/index.cnxml",
+     "snapshot": "snapshots/openstax/m00073.cnxml",
+     "sha256": "af57bfd44dc6f21a2d449d191db927a2e23c76592fd7bb50c1d4a51ec0cdacff",
+     "quote": "reaction of 3,3-dimethyl-1-butene with HCl leads to an equal mixture of unrearranged 3-chloro-2,2-dimethylbutane and rearranged 2-chloro-2,3-dimethylbutane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "C=CC(C)(C)C"
+   ],
+   "reagents": "HCl",
+   "reagent_tokens": [
+    "hcl",
+    "hydrochloric",
+    "hydrogenchloride",
+    "hydrohalogenation",
+    "hx"
+   ],
+   "expected": {
+    "outcome": "ambiguous",
+    "products": [
+     {
+      "smiles": "CC(Cl)C(C)(C)C",
+      "role": "formed"
+     },
+     {
+      "smiles": "CC(C)C(C)(C)Cl",
+      "role": "formed"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "ambiguity"
+   ],
+   "nameChecks": [
+    {
+     "name": "3,3-dimethyl-1-butene",
+     "status": "match",
+     "pubchem": "CC(C)(C)C=C"
+    },
+    {
+     "name": "3-chloro-2,2-dimethylbutane",
+     "status": "match",
+     "pubchem": "CC(C(C)(C)C)Cl"
+    },
+    {
+     "name": "2-chloro-2,3-dimethylbutane",
+     "status": "match",
+     "pubchem": "CC(C)C(C)(C)Cl"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-07",
+   "capability": "reactions",
+   "category": "epoxide opening with HX, unsymmetrical (secondary/primary)",
+   "title": "propene-oxide-hcl",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00252",
+     "title": "OpenStax Organic Chemistry, module m00252: Reactions of Epoxides: Ring-Opening",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00252/index.cnxml",
+     "snapshot": "snapshots/openstax/m00252.cnxml",
+     "sha256": "35d07ab38a334b36589177c7f5602b0af9f9521f7226485bf453ec4bc030ed75",
+     "quote": "1,2-epoxypropane reacts with HCl to give primarily 1-chloro-2-propanol",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC1CO1"
+   ],
+   "reagents": "HCl",
+   "reagent_tokens": [
+    "hcl",
+    "hydrochloric",
+    "hydrogenchloride",
+    "hx",
+    "epoxide"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(O)CCl",
+      "role": "major"
+     },
+     {
+      "smiles": "CC(Cl)CO",
+      "role": "minor"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry",
+    "ranking"
+   ],
+   "nameChecks": [
+    {
+     "name": "1,2-epoxypropane",
+     "status": "match",
+     "pubchem": "CC1CO1"
+    },
+    {
+     "name": "1-chloro-2-propanol",
+     "status": "match",
+     "pubchem": "CC(CCl)O"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-08",
+   "capability": "reactions",
+   "category": "epoxide opening with HX, tertiary carbon",
+   "title": "isobutylene-oxide-hcl",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00252",
+     "title": "OpenStax Organic Chemistry, module m00252: Reactions of Epoxides: Ring-Opening",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00252/index.cnxml",
+     "snapshot": "snapshots/openstax/m00252.cnxml",
+     "sha256": "35d07ab38a334b36589177c7f5602b0af9f9521f7226485bf453ec4bc030ed75",
+     "quote": "2-methyl-1,2-epoxypropane gives 2-chloro-2-methyl-1- propanol as the major product",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC1(C)CO1"
+   ],
+   "reagents": "HCl",
+   "reagent_tokens": [
+    "hcl",
+    "hydrochloric",
+    "hydrogenchloride",
+    "hx",
+    "epoxide"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "OCC(C)(C)Cl",
+      "role": "major"
+     },
+     {
+      "smiles": "CC(C)(O)CCl",
+      "role": "minor"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry",
+    "ranking"
+   ],
+   "nameChecks": [
+    {
+     "name": "2-methyl-1,2-epoxypropane",
+     "status": "match",
+     "pubchem": "CC1(CO1)C"
+    },
+    {
+     "name": "2-chloro-2-methyl-1-propanol",
+     "status": "match",
+     "pubchem": "CC(C)(CO)Cl"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-09",
+   "capability": "reactions",
+   "category": "epoxide opening with alkoxide, SN2 at the less substituted carbon",
+   "title": "propene-oxide-ethoxide",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00252",
+     "title": "OpenStax Organic Chemistry, module m00252: Reactions of Epoxides: Ring-Opening",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00252/index.cnxml",
+     "snapshot": "snapshots/openstax/m00252.cnxml",
+     "sha256": "35d07ab38a334b36589177c7f5602b0af9f9521f7226485bf453ec4bc030ed75",
+     "quote": "1,2-epoxypropane reacts with ethoxide ion exclusively at the less highly substituted, primary carbon to give 1-ethoxy-2-propanol",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC1CO1"
+   ],
+   "reagents": "NaOEt, EtOH",
+   "reagent_tokens": [
+    "naoet",
+    "ethoxide",
+    "etoh",
+    "alkoxide",
+    "nucleophile",
+    "ro",
+    "epoxide"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCOCC(C)O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CCOC(C)CO"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "nameChecks": [
+    {
+     "name": "1,2-epoxypropane",
+     "status": "match",
+     "pubchem": "CC1CO1"
+    },
+    {
+     "name": "1-ethoxy-2-propanol",
+     "status": "match",
+     "pubchem": "CCOCC(C)O"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-10",
+   "capability": "reactions",
+   "category": "Friedel-Crafts alkylation",
+   "title": "fc-cumene",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00191",
+     "title": "OpenStax Organic Chemistry, module m00191: Alkylation and Acylation of Aromatic Rings: The Friedel–Crafts Reaction",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00191/index.cnxml",
+     "snapshot": "snapshots/openstax/m00191.cnxml",
+     "sha256": "6828901c1e0b0ce0774dacb9128f7f706de1d4668f140562edf7baae7773b13e",
+     "quote": "Friedel–Crafts alkylation reaction of benzene with 2-chloropropane to yield isopropylbenzene (cumene)",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "c1ccccc1",
+    "CC(C)Cl"
+   ],
+   "reagents": "AlCl3",
+   "reagent_tokens": [
+    "alcl3",
+    "friedel",
+    "alkylation"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(C)c1ccccc1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "isopropylbenzene",
+     "status": "match",
+     "pubchem": "CC(C)C1=CC=CC=C1"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-11",
+   "capability": "reactions",
+   "category": "Friedel-Crafts alkylation with carbocation rearrangement",
+   "title": "fc-butyl-rearr",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00191",
+     "title": "OpenStax Organic Chemistry, module m00191: Alkylation and Acylation of Aromatic Rings: The Friedel–Crafts Reaction",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00191/index.cnxml",
+     "snapshot": "snapshots/openstax/m00191.cnxml",
+     "sha256": "6828901c1e0b0ce0774dacb9128f7f706de1d4668f140562edf7baae7773b13e",
+     "quote": "Treatment of benzene with 1-chlorobutane at 0 °C, for instance, gives an approximately 2 : 1 ratio of rearranged ( sec -butyl) to unrearranged (butyl) products",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "c1ccccc1",
+    "CCCCCl"
+   ],
+   "reagents": "AlCl3, 0 C",
+   "reagent_tokens": [
+    "alcl3",
+    "friedel",
+    "alkylation"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCC(C)c1ccccc1",
+      "role": "major"
+     },
+     {
+      "smiles": "CCCCc1ccccc1",
+      "role": "minor"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry",
+    "ranking"
+   ],
+   "nameChecks": [
+    {
+     "name": "sec-butylbenzene",
+     "status": "match",
+     "pubchem": "CCC(C)C1=CC=CC=C1"
+    },
+    {
+     "name": "butylbenzene",
+     "status": "match",
+     "pubchem": "CCCCC1=CC=CC=C1"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-12",
+   "capability": "reactions",
+   "category": "Friedel-Crafts acylation",
+   "title": "fc-acylation",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00191",
+     "title": "OpenStax Organic Chemistry, module m00191: Alkylation and Acylation of Aromatic Rings: The Friedel–Crafts Reaction",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00191/index.cnxml",
+     "snapshot": "snapshots/openstax/m00191.cnxml",
+     "sha256": "6828901c1e0b0ce0774dacb9128f7f706de1d4668f140562edf7baae7773b13e",
+     "quote": "reaction of benzene with acetyl chloride yields the ketone acetophenone",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "c1ccccc1",
+    "CC(=O)Cl"
+   ],
+   "reagents": "AlCl3",
+   "reagent_tokens": [
+    "alcl3",
+    "friedel",
+    "acylation",
+    "acetylchloride"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(=O)c1ccccc1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "acetophenone",
+     "status": "match",
+     "pubchem": "CC(=O)C1=CC=CC=C1"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-13",
+   "capability": "reactions",
+   "category": "Friedel-Crafts polyalkylation",
+   "title": "fc-polyalkylation",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00191",
+     "title": "OpenStax Organic Chemistry, module m00191: Alkylation and Acylation of Aromatic Rings: The Friedel–Crafts Reaction",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00191/index.cnxml",
+     "snapshot": "snapshots/openstax/m00191.cnxml",
+     "sha256": "6828901c1e0b0ce0774dacb9128f7f706de1d4668f140562edf7baae7773b13e",
+     "quote": "Reaction of benzene with 1 mol equivalent of 2-chloro-2-methylpropane, for example, yields p -di- tert -butylbenzene as the major product, along with small amounts of tert -butylbenzene and unreacted benzene",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "c1ccccc1",
+    "CC(C)(C)Cl"
+   ],
+   "reagents": "AlCl3 (1 equiv. alkyl halide)",
+   "reagent_tokens": [
+    "alcl3",
+    "friedel",
+    "alkylation"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(C)(C)c1ccc(cc1)C(C)(C)C",
+      "role": "major"
+     },
+     {
+      "smiles": "CC(C)(C)c1ccccc1",
+      "role": "minor"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry",
+    "ranking"
+   ],
+   "nameChecks": [
+    {
+     "name": "tert-butylbenzene",
+     "status": "match",
+     "pubchem": "CC(C)(C)C1=CC=CC=C1"
+    },
+    {
+     "name": "1,4-di-tert-butylbenzene",
+     "status": "match",
+     "pubchem": "CC(C)(C)C1=CC=C(C=C1)C(C)(C)C"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-14",
+   "capability": "reactions",
+   "category": "SNAr, activated aryl chloride",
+   "title": "snar-picric",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00194",
+     "title": "OpenStax Organic Chemistry, module m00194: Nucleophilic Aromatic Substitution",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00194/index.cnxml",
+     "snapshot": "snapshots/openstax/m00194.cnxml",
+     "sha256": "c93b8ef5d0f84120f2d51b7f079b1df49cf825520f2013723a0711bde603bb4d",
+     "quote": "2,4,6-trinitrochlorobenzene reacts with aqueous NaOH at room temperature to give 2,4,6-trinitrophenol",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "Clc1c([N+](=O)[O-])cc([N+](=O)[O-])cc1[N+](=O)[O-]"
+   ],
+   "reagents": "NaOH (aq), 25 C",
+   "reagent_tokens": [
+    "naoh",
+    "hydroxide",
+    "snar",
+    "nucleophilicaromatic"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "Oc1c([N+](=O)[O-])cc([N+](=O)[O-])cc1[N+](=O)[O-]",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "2,4,6-trinitrophenol",
+     "status": "match",
+     "pubchem": "C1=C(C=C(C(=C1[N+](=O)[O-])O)[N+](=O)[O-])[N+](=O)[O-]"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-15",
+   "capability": "reactions",
+   "category": "SNAr, positional isomers (para)",
+   "title": "snar-para",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00194",
+     "title": "OpenStax Organic Chemistry, module m00194: Nucleophilic Aromatic Substitution",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00194/index.cnxml",
+     "snapshot": "snapshots/openstax/m00194.cnxml",
+     "sha256": "c93b8ef5d0f84120f2d51b7f079b1df49cf825520f2013723a0711bde603bb4d",
+     "quote": "p -chloronitrobenzene and o -chloronitrobenzene react with hydroxide ion at 130 °C to yield substitution products, but m -chloronitrobenzene is inert to OH –",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "Clc1ccc(cc1)[N+](=O)[O-]"
+   ],
+   "reagents": "NaOH (aq), 130 C",
+   "reagent_tokens": [
+    "naoh",
+    "hydroxide",
+    "snar",
+    "nucleophilicaromatic"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "Oc1ccc(cc1)[N+](=O)[O-]",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "4-nitrophenol",
+     "status": "match",
+     "pubchem": "C1=CC(=CC=C1[N+](=O)[O-])O"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-16",
+   "capability": "reactions",
+   "category": "SNAr, positional isomers (ortho)",
+   "title": "snar-ortho",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00194",
+     "title": "OpenStax Organic Chemistry, module m00194: Nucleophilic Aromatic Substitution",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00194/index.cnxml",
+     "snapshot": "snapshots/openstax/m00194.cnxml",
+     "sha256": "c93b8ef5d0f84120f2d51b7f079b1df49cf825520f2013723a0711bde603bb4d",
+     "quote": "p -chloronitrobenzene and o -chloronitrobenzene react with hydroxide ion at 130 °C to yield substitution products, but m -chloronitrobenzene is inert to OH –",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "Clc1ccccc1[N+](=O)[O-]"
+   ],
+   "reagents": "NaOH (aq), 130 C",
+   "reagent_tokens": [
+    "naoh",
+    "hydroxide",
+    "snar",
+    "nucleophilicaromatic"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "Oc1ccccc1[N+](=O)[O-]",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "2-nitrophenol",
+     "status": "match",
+     "pubchem": "C1=CC=C(C(=C1)[N+](=O)[O-])O"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-17",
+   "capability": "reactions",
+   "category": "SNAr, positional isomers (meta, negative control)",
+   "title": "snar-meta-inert",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00194",
+     "title": "OpenStax Organic Chemistry, module m00194: Nucleophilic Aromatic Substitution",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00194/index.cnxml",
+     "snapshot": "snapshots/openstax/m00194.cnxml",
+     "sha256": "c93b8ef5d0f84120f2d51b7f079b1df49cf825520f2013723a0711bde603bb4d",
+     "quote": "p -chloronitrobenzene and o -chloronitrobenzene react with hydroxide ion at 130 °C to yield substitution products, but m -chloronitrobenzene is inert to OH –",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "Clc1cccc(c1)[N+](=O)[O-]"
+   ],
+   "reagents": "NaOH (aq), 130 C",
+   "reagent_tokens": [
+    "naoh",
+    "hydroxide",
+    "snar",
+    "nucleophilicaromatic"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [],
+    "forbidden": [
+     "Oc1cccc(c1)[N+](=O)[O-]"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "3-nitrophenol",
+     "status": "match",
+     "pubchem": "C1=CC(=CC(=C1)O)[N+](=O)[O-]"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-18",
+   "capability": "reactions",
+   "category": "benzyne (elimination-addition)",
+   "title": "benzyne-aniline",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00195",
+     "title": "OpenStax Organic Chemistry, module m00195: Benzyne",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00195/index.cnxml",
+     "snapshot": "snapshots/openstax/m00195.cnxml",
+     "sha256": "834d39e9e89bb4ee3cf369604681bb03ac08f8b9707dded36c099d167c53f8bc",
+     "quote": "Treatment of bromobenzene with potassium amide (KNH 2 ) in liquid NH 3 solvent, for instance, gives aniline",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "Brc1ccccc1"
+   ],
+   "reagents": "KNH2, NH3 (l)",
+   "reagent_tokens": [
+    "knh2",
+    "nanh2",
+    "amide",
+    "benzyne"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "Nc1ccccc1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "aniline",
+     "status": "match",
+     "pubchem": "C1=CC=C(C=C1)N"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-19",
+   "capability": "reactions",
+   "category": "E2 versus SN2 competition (secondary halide, strong base)",
+   "title": "e2-over-sn2-acetylide",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00110",
+     "title": "OpenStax Organic Chemistry, module m00110: Alkylation of Acetylide Anions",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00110/index.cnxml",
+     "snapshot": "snapshots/openstax/m00110.cnxml",
+     "sha256": "d60855cd0676db6ae2a2691b706b6775db856fa9aacc21ca7f1fbfcf152236e9",
+     "quote": "reaction of bromocyclohexane with propyne anion yields the elimination product cyclohexene rather than the substitution product 1-propynylcyclohexane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "BrC1CCCCC1"
+   ],
+   "reagents": "CH3C≡C- Na+",
+   "reagent_tokens": [
+    "acetylide",
+    "alkynide",
+    "propynide",
+    "e2",
+    "elimination",
+    "dehydrohalogenation",
+    "base"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C1=CCCCC1",
+      "role": "major"
+     }
+    ],
+    "forbidden": [
+     "CC#CC1CCCCC1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "nameChecks": [
+    {
+     "name": "cyclohexene",
+     "status": "match",
+     "pubchem": "C1CCC=CC1"
+    },
+    {
+     "name": "bromocyclohexane",
+     "status": "match",
+     "pubchem": "C1CCC(CC1)Br"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-20",
+   "capability": "reactions",
+   "category": "SN2 alkylation of acetylide",
+   "title": "acetylide-alkylation",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00110",
+     "title": "OpenStax Organic Chemistry, module m00110: Alkylation of Acetylide Anions",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00110/index.cnxml",
+     "snapshot": "snapshots/openstax/m00110.cnxml",
+     "sha256": "d60855cd0676db6ae2a2691b706b6775db856fa9aacc21ca7f1fbfcf152236e9",
+     "quote": "mechanism for the alkylation reaction of acetylide anion with bromomethane to give propyne",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "C#[C-]",
+    "CBr"
+   ],
+   "reagents": "HC≡C- Na+, CH3Br",
+   "reagent_tokens": [
+    "acetylide",
+    "alkynide",
+    "sn2",
+    "alkylation"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC#C",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "propyne",
+     "status": "match",
+     "pubchem": "CC#C"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-21",
+   "capability": "reactions",
+   "category": "SN2 stereochemical inversion",
+   "title": "sn2-inversion",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00123",
+     "title": "OpenStax Organic Chemistry, module m00123: MECHANISM",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00123/index.cnxml",
+     "snapshot": "snapshots/openstax/m00123.cnxml",
+     "sha256": "0991df8bf5e08d33643d34003166be3947c7f262cecfb90d2d5b1bc0cb6b50b6",
+     "quote": "reaction of ( S )-2-bromobutane with HO – to give ( R )-2-butanol",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC[C@H](C)Br"
+   ],
+   "reagents": "NaOH (aq)",
+   "reagent_tokens": [
+    "naoh",
+    "hydroxide",
+    "sn2",
+    "oh"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC[C@@H](C)O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "specific"
+   },
+   "criteria": [
+    "connectivity",
+    "stereochemistry"
+   ],
+   "nameChecks": [
+    {
+     "name": "2-butanol",
+     "status": "match",
+     "pubchem": "CCC(C)O"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-22",
+   "capability": "reactions",
+   "category": "SN1 solvolysis",
+   "title": "sn1-tertiary-water",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00125",
+     "title": "OpenStax Organic Chemistry, module m00125: MECHANISM",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00125/index.cnxml",
+     "snapshot": "snapshots/openstax/m00125.cnxml",
+     "sha256": "58568702a310cbeeb9e2c14a26e6639317dc9b710decd95045c3a1c2f4606ad9",
+     "quote": "The reaction of the tertiary halide 2-bromo-2-methylpropane (CH 3 ) 3 CBr with H 2 O to give the alcohol 2-methyl-2-propanol",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC(C)(C)Br"
+   ],
+   "reagents": "H2O",
+   "reagent_tokens": [
+    "h2o",
+    "water",
+    "sn1",
+    "solvolysis",
+    "hydrolysis"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(C)(C)O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "2-methyl-2-propanol",
+     "status": "match",
+     "pubchem": "CC(C)(C)O"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-23",
+   "capability": "reactions",
+   "category": "Hofmann elimination, anti-Zaitsev",
+   "title": "hofmann-pentene",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00295",
+     "title": "OpenStax Organic Chemistry, module m00295: Reactions of Amines",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00295/index.cnxml",
+     "snapshot": "snapshots/openstax/m00295.cnxml",
+     "sha256": "d0aff98ed9e761a521c3356597e612307b33f3c39e49f94b2bd153e4c27625da",
+     "quote": "the major product of Hofmann elimination is the less highly substituted alkene rather than the more highly substituted one, as shown by the reaction of (1-methylbutyl)trimethylammonium hydroxide to give 1-pentene rather than the alternative 2-pentene",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CCCC(C)[N+](C)(C)C",
+    "[OH-]"
+   ],
+   "reagents": "heat",
+   "reagent_tokens": [
+    "hofmann",
+    "quaternary",
+    "ammonium",
+    "elimination"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C=CCCC",
+      "role": "major"
+     },
+     {
+      "smiles": "CC=CCC",
+      "role": "minor"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry",
+    "ranking"
+   ],
+   "nameChecks": [
+    {
+     "name": "1-pentene",
+     "status": "match",
+     "pubchem": "CCCC=C"
+    },
+    {
+     "name": "2-pentene",
+     "status": "match",
+     "pubchem": "CCC=CC"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-24",
+   "capability": "reactions",
+   "category": "Wittig olefination",
+   "title": "wittig-methylenecyclohexane",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00222",
+     "title": "OpenStax Organic Chemistry, module m00222: Nucleophilic Addition of Phosphorus Ylides: The Wittig Reaction",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00222/index.cnxml",
+     "snapshot": "snapshots/openstax/m00222.cnxml",
+     "sha256": "6ebff4a4da26f95719be75c10257f2513fb6c5e0140ebf4894f614cc8f37471f",
+     "quote": "Wittig reaction of cyclohexanone with methylenetriphenylphosphorane yields only the single alkene product methylenecyclohexane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "O=C1CCCCC1"
+   ],
+   "reagents": "Ph3P=CH2",
+   "reagent_tokens": [
+    "wittig",
+    "ylide",
+    "phosphorane",
+    "ph3p"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "C=C1CCCCC1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CC1=CCCCC1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "nameChecks": [
+    {
+     "name": "methylenecyclohexane",
+     "status": "match",
+     "pubchem": "C=C1CCCCC1"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-25",
+   "capability": "reactions",
+   "category": "acetal formation",
+   "title": "acetal-cyclohexanone",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00221",
+     "title": "OpenStax Organic Chemistry, module m00221: Nucleophilic Addition of Alcohols: Acetal Formation",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00221/index.cnxml",
+     "snapshot": "snapshots/openstax/m00221.cnxml",
+     "sha256": "e2ba2075b68f06cfe450e3c7db212a7d2e7c9f1429fa17332fd5f134aa438f3b",
+     "quote": "Cyclohexanone, for instance, reacts with methanol in the presence of HCl to give the corresponding dimethyl acetal",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "O=C1CCCCC1"
+   ],
+   "reagents": "MeOH (excess), HCl (cat.)",
+   "reagent_tokens": [
+    "meoh",
+    "methanol",
+    "acetal",
+    "ketal",
+    "hcl",
+    "alcohol"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "COC1(OC)CCCCC1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "1,1-dimethoxycyclohexane",
+     "status": "match",
+     "pubchem": "COC1(CCCCC1)OC"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-26",
+   "capability": "reactions",
+   "category": "Sandmeyer cyanation",
+   "title": "sandmeyer-tolunitrile",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00296",
+     "title": "OpenStax Organic Chemistry, module m00296: Reactions of Arylamines",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00296/index.cnxml",
+     "snapshot": "snapshots/openstax/m00296.cnxml",
+     "sha256": "078f319dae229ecf5153e735d167ed72ce8313284e060d1b71b18867aef8b1ad",
+     "quote": "Sandmeyer reaction of o -methylbenzenediazonium bisulfate with CuCN yields o -methylbenzonitrile",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "Cc1ccccc1[N+]#N"
+   ],
+   "reagents": "CuCN",
+   "reagent_tokens": [
+    "cucn",
+    "sandmeyer",
+    "cyanide",
+    "diazonium"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "Cc1ccccc1C#N",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "2-methylbenzonitrile",
+     "status": "match",
+     "pubchem": "CC1=CC=CC=C1C#N"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-27",
+   "capability": "reactions",
+   "category": "aldol addition",
+   "title": "aldol-acetaldehyde",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00276",
+     "title": "OpenStax Organic Chemistry, module m00276: Carbonyl Condensations: The Aldol Reaction",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00276/index.cnxml",
+     "snapshot": "snapshots/openstax/m00276.cnxml",
+     "sha256": "423c309faf9618d233336575d44369ea53b6d5cc74c9afc6a3207f84a9c80cb2",
+     "quote": "treatment of acetaldehyde with a base such as sodium ethoxide or sodium hydroxide in a protic solvent leads to rapid and reversible formation of 3-hydroxybutanal",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC=O"
+   ],
+   "reagents": "NaOH or NaOEt, protic solvent",
+   "reagent_tokens": [
+    "naoh",
+    "naoet",
+    "aldol",
+    "base",
+    "hydroxide",
+    "ethoxide"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(O)CC=O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "racemic"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "3-hydroxybutanal",
+     "status": "match",
+     "pubchem": "CC(CC=O)O"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-28",
+   "capability": "reactions",
+   "category": "mixed aldol (four products, ambiguous)",
+   "title": "mixed-aldol",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00280",
+     "title": "OpenStax Organic Chemistry, module m00280: Mixed Aldol Reactions",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00280/index.cnxml",
+     "snapshot": "snapshots/openstax/m00280.cnxml",
+     "sha256": "865d61b7546702519a42c334c41825e2a479de0a5b04686732264a92c762eb19",
+     "quote": "base treatment of a mixture of acetaldehyde and propanal gives a complex product mixture containing two “symmetrical” aldol products and two “mixed” aldol products",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC=O",
+    "CCC=O"
+   ],
+   "reagents": "NaOH",
+   "reagent_tokens": [
+    "naoh",
+    "aldol",
+    "base",
+    "hydroxide"
+   ],
+   "expected": {
+    "outcome": "ambiguous",
+    "products": [
+     {
+      "smiles": "CC(O)CC=O",
+      "role": "formed"
+     },
+     {
+      "smiles": "CCC(O)C(C)C=O",
+      "role": "formed"
+     },
+     {
+      "smiles": "CC(O)C(C)C=O",
+      "role": "formed"
+     },
+     {
+      "smiles": "CCC(O)CC=O",
+      "role": "formed"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "ambiguity"
+   ],
+   "nameChecks": [
+    {
+     "name": "3-hydroxybutanal",
+     "status": "match",
+     "pubchem": "CC(CC=O)O"
+    },
+    {
+     "name": "3-hydroxy-2-methylpentanal",
+     "status": "match",
+     "pubchem": "CCC(C(C)C=O)O"
+    },
+    {
+     "name": "3-hydroxy-2-methylbutanal",
+     "status": "match",
+     "pubchem": "CC(C=O)C(C)O"
+    },
+    {
+     "name": "3-hydroxypentanal",
+     "status": "match",
+     "pubchem": "CCC(CC=O)O"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-29",
+   "capability": "reactions",
+   "category": "organocuprate coupling (organometallic)",
+   "title": "gilman-iododecane",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00119",
+     "title": "OpenStax Organic Chemistry, module m00119: Organometallic Coupling Reactions",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00119/index.cnxml",
+     "snapshot": "snapshots/openstax/m00119.cnxml",
+     "sha256": "053d6a301ec290b677c8cb1a75cb1b4c177bb74c57d313e1b79025b16419be10",
+     "quote": "Lithium dimethylcopper, for instance, reacts with 1-iododecane to give undecane in a 90% yield",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CCCCCCCCCCI"
+   ],
+   "reagents": "(CH3)2CuLi",
+   "reagent_tokens": [
+    "gilman",
+    "cuprate",
+    "me2culi",
+    "dimethylcopper",
+    "organocuprate"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCCCCCCCCCC",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "undecane",
+     "status": "match",
+     "pubchem": "CCCCCCCCCCC"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-30",
+   "capability": "reactions",
+   "category": "free-radical halogenation",
+   "title": "methane-chlorination",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00079",
+     "title": "OpenStax Organic Chemistry, module m00079: Radical Reactions",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00079/index.cnxml",
+     "snapshot": "snapshots/openstax/m00079.cnxml",
+     "sha256": "8c406efedf8cf41300873d4f34fc95fef2a911b38fa5ec3cbd300a3d7efd0a3c",
+     "quote": "reaction of chlorine with methane to yield chloromethane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "C"
+   ],
+   "reagents": "Cl2, hv",
+   "reagent_tokens": [
+    "cl2",
+    "chlorination",
+    "radical",
+    "hv"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCl",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "chloromethane",
+     "status": "match",
+     "pubchem": "CCl"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-31",
+   "capability": "reactions",
+   "category": "conjugated diene, 1,2- versus 1,4-addition (ambiguous)",
+   "title": "butadiene-hbr",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00172",
+     "title": "OpenStax Organic Chemistry, module m00172: Electrophilic Additions to Conjugated Dienes: Allylic Carbocations",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00172/index.cnxml",
+     "snapshot": "snapshots/openstax/m00172.cnxml",
+     "sha256": "c2cf506fddbed3239ac86d9b9d88894c85b39938e465b89804d33f2869b5743c",
+     "quote": "Addition of HBr to 1,3-butadiene, for instance, yields a mixture of two products (not counting cis–trans isomers). 3-Bromo-1-butene is the typical Markovnikov product of 1,2-addition to a double bond, but 1-bromo-2-butene",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "C=CC=C"
+   ],
+   "reagents": "HBr",
+   "reagent_tokens": [
+    "hbr",
+    "hydrobromic",
+    "hydrogenbromide",
+    "hydrohalogenation",
+    "hx",
+    "conjugate"
+   ],
+   "expected": {
+    "outcome": "ambiguous",
+    "products": [
+     {
+      "smiles": "C=CC(C)Br",
+      "role": "formed"
+     },
+     {
+      "smiles": "CC=CCBr",
+      "role": "formed"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "ambiguity"
+   ],
+   "nameChecks": [
+    {
+     "name": "3-bromo-1-butene",
+     "status": "match",
+     "pubchem": "CC(C=C)Br"
+    },
+    {
+     "name": "1-bromo-2-butene",
+     "status": "match",
+     "pubchem": "CC=CCBr"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-32",
+   "capability": "reactions",
+   "category": "nonconjugated diene, double Markovnikov addition",
+   "title": "pentadiene-2hcl",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00172",
+     "title": "OpenStax Organic Chemistry, module m00172: Electrophilic Additions to Conjugated Dienes: Allylic Carbocations",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00172/index.cnxml",
+     "snapshot": "snapshots/openstax/m00172.cnxml",
+     "sha256": "c2cf506fddbed3239ac86d9b9d88894c85b39938e465b89804d33f2869b5743c",
+     "quote": "addition of 2 equivalents of HCl to the nonconjugated diene 1,4-pentadiene yields 2,4-dichloropentane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "C=CCC=C"
+   ],
+   "reagents": "2 HCl",
+   "reagent_tokens": [
+    "hcl",
+    "hydrochloric",
+    "hydrogenchloride",
+    "hydrohalogenation",
+    "hx"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(Cl)CC(C)Cl",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "nameChecks": [
+    {
+     "name": "1,4-pentadiene",
+     "status": "match",
+     "pubchem": "C=CCC=C"
+    },
+    {
+     "name": "2,4-dichloropentane",
+     "status": "match",
+     "pubchem": "CC(CC(C)Cl)Cl"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-33",
+   "capability": "reactions",
+   "category": "halogen addition to alkene",
+   "title": "cyclohexene-br2",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00182",
+     "title": "OpenStax Organic Chemistry, module m00182: Structure and Stability of Benzene",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00182/index.cnxml",
+     "snapshot": "snapshots/openstax/m00182.cnxml",
+     "sha256": "4ca0b4e8fffb772fec9992784c9a15dcf723a927c38c28cec86083012d4737dd",
+     "quote": "Cyclohexene, for instance, reacts rapidly with Br 2 and gives the addition product 1,2-dibromocyclohexane",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "C1=CCCCC1"
+   ],
+   "reagents": "Br2",
+   "reagent_tokens": [
+    "br2",
+    "bromine",
+    "halogenation",
+    "dibromide"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "BrC1CCCCC1Br",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "1,2-dibromocyclohexane",
+     "status": "match",
+     "pubchem": "C1CCC(C(C1)Br)Br"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-34",
+   "capability": "reactions",
+   "category": "aromatic substitution rather than addition",
+   "title": "benzene-br2-substitution",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00182",
+     "title": "OpenStax Organic Chemistry, module m00182: Structure and Stability of Benzene",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00182/index.cnxml",
+     "snapshot": "snapshots/openstax/m00182.cnxml",
+     "sha256": "4ca0b4e8fffb772fec9992784c9a15dcf723a927c38c28cec86083012d4737dd",
+     "quote": "benzene reacts slowly with Br 2 and gives the substitution product C 6 H 5 Br rather than the addition product",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "c1ccccc1"
+   ],
+   "reagents": "Br2, FeBr3",
+   "reagent_tokens": [
+    "br2",
+    "febr3",
+    "bromination",
+    "bromine"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "Brc1ccccc1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "BrC1C=CC=CC1Br"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "bromobenzene",
+     "status": "match",
+     "pubchem": "C1=CC=C(C=C1)Br"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-35",
+   "capability": "reactions",
+   "category": "aromatic nitration",
+   "title": "benzene-nitration",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00190",
+     "title": "OpenStax Organic Chemistry, module m00190: Other Aromatic Substitutions",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00190/index.cnxml",
+     "snapshot": "snapshots/openstax/m00190.cnxml",
+     "sha256": "0ea036095bcd4a81c39a7d6774d6ee6dc1ea1e8a91813fefc206bcb7361570cb",
+     "quote": "The nitronium ion reacts with benzene to yield a carbocation intermediate, and loss of H + from this intermediate gives the neutral substitution product, nitrobenzene",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "c1ccccc1"
+   ],
+   "reagents": "HNO3, H2SO4",
+   "reagent_tokens": [
+    "hno3",
+    "nitration",
+    "nitric",
+    "nitronium",
+    "h2so4"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "O=[N+]([O-])c1ccccc1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "nitrobenzene",
+     "status": "match",
+     "pubchem": "C1=CC=C(C=C1)[N+](=O)[O-]"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-36",
+   "capability": "reactions",
+   "category": "side-chain oxidation, no benzylic hydrogen (negative control)",
+   "title": "tbutylbenzene-kmno4-inert",
+   "evidence": "verified-textbook-direct",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00196",
+     "title": "OpenStax Organic Chemistry, module m00196: Oxidation of Aromatic Compounds",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00196/index.cnxml",
+     "snapshot": "snapshots/openstax/m00196.cnxml",
+     "sha256": "746c7adf6233cb6e1bdcb09f2790c6e0278fc35f857b7d2c7a2d02540fb799df",
+     "quote": "tert -Butylbenzene has no benzylic hydrogens, however, and is therefore inert",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC(C)(C)c1ccccc1"
+   ],
+   "reagents": "KMnO4, H2O, heat",
+   "reagent_tokens": [
+    "kmno4",
+    "permanganate",
+    "oxidation",
+    "sidechain"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [],
+    "forbidden": [
+     "OC(=O)c1ccccc1"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "benzoic acid",
+     "status": "match",
+     "pubchem": "C1=CC=C(C=C1)C(=O)O"
+    }
+   ],
+   "uncertainty": "The quoted sentence names the substrate and the product. Textbook statement, not a primary literature report; yields/selectivities are as stated qualitatively."
+  },
+  {
+   "id": "RX-37",
+   "capability": "reactions",
+   "category": "side-chain oxidation of an alkylbenzene",
+   "title": "rule-ethylbenzene-kmno4",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00234",
+     "title": "OpenStax Organic Chemistry, module m00234: Preparing Carboxylic Acids",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00234/index.cnxml",
+     "snapshot": "snapshots/openstax/m00234.cnxml",
+     "sha256": "d7e0a84a7ca74418976bb6bd8fad9803ac3799329b7c7c77634c93214c751057",
+     "quote": "Oxidation of a substituted alkylbenzene with KMnO 4 gives a substituted benzoic acid",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CCc1ccccc1"
+   ],
+   "reagents": "KMnO4, H2O, heat",
+   "reagent_tokens": [
+    "kmno4",
+    "permanganate",
+    "oxidation",
+    "sidechain"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "OC(=O)c1ccccc1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "benzoic acid",
+     "status": "match",
+     "pubchem": "C1=CC=C(C=C1)C(=O)O"
+    }
+   ],
+   "uncertainty": "The quoted sentence gives a general rule; the substrate and product were chosen by the author (a model) by applying it. Provisional: excluded from reference-validated accuracy."
+  },
+  {
+   "id": "RX-38",
+   "capability": "reactions",
+   "category": "ester reduction",
+   "title": "rule-ester-lah",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00244",
+     "title": "OpenStax Organic Chemistry, module m00244: Chemistry of Esters",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00244/index.cnxml",
+     "snapshot": "snapshots/openstax/m00244.cnxml",
+     "sha256": "22f74827899270ef7856e8caf3ea2830983cf28765750803661cda596d097dea",
+     "quote": "Esters are easily reduced by treatment with LiAlH 4 to yield primary alcohols",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CCOC(=O)c1ccccc1"
+   ],
+   "reagents": "1. LiAlH4; 2. H3O+",
+   "reagent_tokens": [
+    "lialh4",
+    "lithiumaluminium",
+    "lithiumaluminum",
+    "lah",
+    "reduction"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "OCc1ccccc1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "benzyl alcohol",
+     "status": "match",
+     "pubchem": "C1=CC=C(C=C1)CO"
+    }
+   ],
+   "uncertainty": "The quoted sentence gives a general rule; the substrate and product were chosen by the author (a model) by applying it. Provisional: excluded from reference-validated accuracy."
+  },
+  {
+   "id": "RX-39",
+   "capability": "reactions",
+   "category": "nitrile reduction",
+   "title": "rule-nitrile-lah",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00236",
+     "title": "OpenStax Organic Chemistry, module m00236: Chemistry of Nitriles",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00236/index.cnxml",
+     "snapshot": "snapshots/openstax/m00236.cnxml",
+     "sha256": "d5163e001ef27f3dbf9a9f82c8d3bbd7257986013676feb566cf6f61f683973a",
+     "quote": "Reduction of a nitrile with LiAlH 4 gives a primary amine, RNH 2",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CCCC#N"
+   ],
+   "reagents": "1. LiAlH4; 2. H2O",
+   "reagent_tokens": [
+    "lialh4",
+    "lithiumaluminium",
+    "lithiumaluminum",
+    "lah",
+    "reduction"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCCCN",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "butylamine",
+     "status": "match",
+     "pubchem": "CCCCN"
+    }
+   ],
+   "uncertainty": "The quoted sentence gives a general rule; the substrate and product were chosen by the author (a model) by applying it. Provisional: excluded from reference-validated accuracy."
+  },
+  {
+   "id": "RX-40",
+   "capability": "reactions",
+   "category": "Grignard addition to a nitrile",
+   "title": "rule-nitrile-grignard",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00236",
+     "title": "OpenStax Organic Chemistry, module m00236: Chemistry of Nitriles",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00236/index.cnxml",
+     "snapshot": "snapshots/openstax/m00236.cnxml",
+     "sha256": "d5163e001ef27f3dbf9a9f82c8d3bbd7257986013676feb566cf6f61f683973a",
+     "quote": "Grignard reagents add to a nitrile to give an intermediate imine anion that is hydrolyzed by addition of water to yield a ketone",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "N#Cc1ccccc1",
+    "C[Mg]Br"
+   ],
+   "reagents": "1. CH3MgBr; 2. H3O+",
+   "reagent_tokens": [
+    "mgbr",
+    "grignard",
+    "organomagnesium"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC(=O)c1ccccc1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "acetophenone",
+     "status": "match",
+     "pubchem": "CC(=O)C1=CC=CC=C1"
+    }
+   ],
+   "uncertainty": "The quoted sentence gives a general rule; the substrate and product were chosen by the author (a model) by applying it. Provisional: excluded from reference-validated accuracy."
+  },
+  {
+   "id": "RX-41",
+   "capability": "reactions",
+   "category": "hydroboration-oxidation, anti-Markovnikov",
+   "title": "rule-hydroboration-terminal",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00093",
+     "title": "OpenStax Organic Chemistry, module m00093: Predicting the Products of a Hydration Reaction",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00093/index.cnxml",
+     "snapshot": "snapshots/openstax/m00093.cnxml",
+     "sha256": "4d5effc8fced360c3fba18e384630dced89de785089db6affb6a63ab577f8358",
+     "quote": "Hydroboration–oxidation occurs with syn stereochemistry and gives the non-Markovnikov addition product; oxymercuration–demercuration gives the Markovnikov product",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CCCCC=C"
+   ],
+   "reagents": "1. BH3, THF; 2. H2O2, NaOH",
+   "reagent_tokens": [
+    "bh3",
+    "borane",
+    "hydroboration",
+    "b2h6",
+    "thf"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "OCCCCCC",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CCCCC(C)O"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "nameChecks": [
+    {
+     "name": "1-hexanol",
+     "status": "match",
+     "pubchem": "CCCCCCO"
+    }
+   ],
+   "uncertainty": "The quoted sentence gives a general rule; the substrate and product were chosen by the author (a model) by applying it. Provisional: excluded from reference-validated accuracy."
+  },
+  {
+   "id": "RX-42",
+   "capability": "reactions",
+   "category": "oxymercuration-demercuration, Markovnikov",
+   "title": "rule-oxymercuration",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00093",
+     "title": "OpenStax Organic Chemistry, module m00093: Predicting the Products of a Hydration Reaction",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00093/index.cnxml",
+     "snapshot": "snapshots/openstax/m00093.cnxml",
+     "sha256": "4d5effc8fced360c3fba18e384630dced89de785089db6affb6a63ab577f8358",
+     "quote": "Hydroboration–oxidation occurs with syn stereochemistry and gives the non-Markovnikov addition product; oxymercuration–demercuration gives the Markovnikov product",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC1=CCCCC1"
+   ],
+   "reagents": "1. Hg(OAc)2, H2O; 2. NaBH4",
+   "reagent_tokens": [
+    "hgoac",
+    "hg(oac)2",
+    "oxymercuration",
+    "mercuric",
+    "mercury"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CC1(O)CCCCC1",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [
+     "CC1CCCCC1O"
+    ],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity",
+    "regiochemistry"
+   ],
+   "nameChecks": [
+    {
+     "name": "1-methylcyclohexanol",
+     "status": "match",
+     "pubchem": "CC1(CCCCC1)O"
+    }
+   ],
+   "uncertainty": "The quoted sentence gives a general rule; the substrate and product were chosen by the author (a model) by applying it. Provisional: excluded from reference-validated accuracy."
+  },
+  {
+   "id": "RX-43",
+   "capability": "reactions",
+   "category": "Fischer esterification",
+   "title": "rule-fischer",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00241",
+     "title": "OpenStax Organic Chemistry, module m00241: Reactions of Carboxylic Acids",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00241/index.cnxml",
+     "snapshot": "snapshots/openstax/m00241.cnxml",
+     "sha256": "391ce027c28f5d7b292b2788f8b95fad13d5ed4a21fb5efb7168210aa8ca1bb9",
+     "quote": "Esters can also be synthesized by an acid-catalyzed nucleophilic acyl substitution reaction of a carboxylic acid with an alcohol, a process called the Fischer esterification reaction",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC(=O)O",
+    "CCCO"
+   ],
+   "reagents": "H2SO4 (cat.), heat",
+   "reagent_tokens": [
+    "h2so4",
+    "fischer",
+    "esterification",
+    "acidcatalyzed"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCCOC(C)=O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "propyl acetate",
+     "status": "match",
+     "pubchem": "CCCOC(=O)C"
+    }
+   ],
+   "uncertainty": "The quoted sentence gives a general rule; the substrate and product were chosen by the author (a model) by applying it. Provisional: excluded from reference-validated accuracy."
+  },
+  {
+   "id": "RX-44",
+   "capability": "reactions",
+   "category": "Grignard addition to a ketone",
+   "title": "rule-grignard-ketone",
+   "evidence": "rule-derived-provisional",
+   "sources": [
+    {
+     "id": "openstax-organic-chemistry-m00225",
+     "title": "OpenStax Organic Chemistry, module m00225: Spectroscopy of Aldehydes and Ketones",
+     "publisher": "OpenStax (Rice University), CC BY 4.0",
+     "url": "https://github.com/openstax/osbooks-organic-chemistry/blob/main/modules/m00225/index.cnxml",
+     "snapshot": "snapshots/openstax/m00225.cnxml",
+     "sha256": "8c705118319d235873d895440b11fc13e784d100185ee44612c6222cc1a81e23",
+     "quote": "Addition of Grignard reagents to aldehydes and ketones also gives alcohols (secondary and tertiary, respectively)",
+     "quoteFoundInSnapshot": true,
+     "inspected": "module CNXML fetched, saved, and the quoted sentence located programmatically in the saved text",
+     "kind": "secondary: peer-reviewed open textbook, not primary literature"
+    }
+   ],
+   "reactants": [
+    "CC(=O)CC",
+    "C[Mg]Br"
+   ],
+   "reagents": "1. CH3MgBr; 2. H3O+",
+   "reagent_tokens": [
+    "mgbr",
+    "grignard",
+    "organomagnesium"
+   ],
+   "expected": {
+    "outcome": "determinate",
+    "products": [
+     {
+      "smiles": "CCC(C)(C)O",
+      "role": "sole"
+     }
+    ],
+    "forbidden": [],
+    "stereo": "none"
+   },
+   "criteria": [
+    "connectivity"
+   ],
+   "nameChecks": [
+    {
+     "name": "2-methylbutan-2-ol",
+     "status": "match",
+     "pubchem": "CCC(C)(C)O"
+    }
+   ],
+   "uncertainty": "The quoted sentence gives a general rule; the substrate and product were chosen by the author (a model) by applying it. Provisional: excluded from reference-validated accuracy."
+  }
+ ]
+}

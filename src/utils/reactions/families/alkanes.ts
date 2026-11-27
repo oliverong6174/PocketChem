@@ -21,6 +21,7 @@ const alkaneTrigger = {
 export const alkaneReactionRules: ReactionRule[] = [
   {
     id: "alkane-radical-bromination",
+    conditions: { radical: true },
     family: "alkanes",
     reactionType: "radical",
     title: "Free-Radical Bromination",
@@ -56,6 +57,7 @@ export const alkaneReactionRules: ReactionRule[] = [
   },
   {
     id: "alkane-radical-chlorination",
+    conditions: { radical: true },
     family: "alkanes",
     reactionType: "radical",
     title: "Free-Radical Chlorination",

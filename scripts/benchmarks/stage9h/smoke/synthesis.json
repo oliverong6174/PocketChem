@@ -1,0 +1,1 @@
+{"cases":[{"id":"SMK-SY","category":"smoke","evidence":"smoke","start":"CC(C)=O","target":"CC(C)O","copies":1,"n_steps_min":1,"n_steps_max":1,"route_must_avoid":[]}]}

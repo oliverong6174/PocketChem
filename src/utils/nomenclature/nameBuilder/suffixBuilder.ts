@@ -547,8 +547,10 @@ export function shouldOmitSingleLocant(
 
   return (
     (feature.type === "alcohol" && parent.carbonCount <= 2 && locant === 1) ||
-    (feature.type === "ketone" && parent.carbonCount <= 3) ||
-    (feature.type === "thioketone" && parent.carbonCount <= 3) ||
+    // IUPAC 2013 P-64.3: the locant of a ketone is cited (ethan-1-one, propan-2-one); only methanone has a single possible position.
+    // "propanone" cannot be read unambiguously once the chain carries a substituent (1-phenylpropanone).
+    (feature.type === "ketone" && parent.carbonCount <= 1) ||
+    (feature.type === "thioketone" && parent.carbonCount <= 1) ||
     (feature.type === "thiol" && parent.carbonCount <= 2 && locant === 1) ||
     (feature.type === "imine" && parent.carbonCount <= 2 && locant === 1) ||
     ((feature.type === "sulfonicAcid" ||

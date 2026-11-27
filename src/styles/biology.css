@@ -1,0 +1,130 @@
+/* Biology learning tools (Stage 15). Diagrams sit on paper in both themes (see .ui-diagram); text controls use the shared tokens. */
+.bio-diagram { padding-bottom: var(--sp-2); }
+.bio-diagram .ph-svg { margin-inline: auto; }
+.bio-base { font-family: var(--font-mono, ui-monospace, monospace); font-size: 13px; font-weight: 700; fill: #0f172a; }
+.bio-rowlabels text { font-size: 11px; font-weight: 600; fill: #334155; font-family: var(--font-body, system-ui); }
+.bio-rowlabels .bio-role { fill: #0b6a72; font-weight: 700; }
+.bio-end { font-size: 11px; font-weight: 700; fill: #475569; font-family: var(--font-body, system-ui); }
+.bio-frag { font-size: 10px; fill: #7c4a03; font-family: var(--font-body, system-ui); }
+.bio-enz-text { font-size: 10.5px; font-weight: 700; fill: #0f172a; font-family: var(--font-body, system-ui); }
+.bio-codon-text { font-family: var(--font-mono, ui-monospace, monospace); font-size: 14px; font-weight: 700; fill: #0f172a; }
+.bio-small { font-size: 11px; fill: #334155; font-family: var(--font-body, system-ui); }
+.bio-small.strong { font-weight: 700; fill: #0f172a; }
+.bio-site-label { font-size: 12px; font-weight: 800; fill: #0b6a72; font-family: var(--font-body, system-ui); }
+.bio-key { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-sm); color: var(--ink-soft, #475569); }
+.bio-swatch { display: inline-block; width: 14px; height: 14px; border-radius: 4px; border: 2px solid; }
+.bio-swatch.ssb { border-radius: 50%; background: #94a3b8; border-color: #94a3b8; width: 9px; height: 9px; opacity: 0.7; }
+
+.bio-organism-note { margin: 0; padding: var(--sp-2) var(--sp-3); border-left: 3px solid var(--accent); background: var(--accent-soft); font-size: var(--fs-sm); color: var(--text); border-radius: var(--radius-sm, 6px); }
+.bio-seq { letter-spacing: 0.06em; text-transform: uppercase; }
+.bio-caption { padding: var(--sp-3) var(--sp-4); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: var(--radius-md, 8px); background: var(--surface-raised); }
+.bio-caption h3 { margin: 0 0 var(--sp-1); font-size: var(--fs-md, 1rem); }
+.bio-caption p { margin: 0; color: var(--text); overflow-wrap: anywhere; }
+.bio-mono { font-family: var(--font-mono, ui-monospace, monospace); overflow-wrap: anywhere; word-break: break-all; }
+.bio-seqline { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px var(--sp-3); align-items: baseline; font-size: var(--fs-sm); }
+.bio-seqline dt { color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+.bio-seqline dd { margin: 0; font-family: var(--font-mono, ui-monospace, monospace); overflow-wrap: anywhere; word-break: break-all; }
+.bio-chip-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.bio-intron-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) auto; gap: var(--sp-2); align-items: end; }
+
+.bio-options { display: grid; gap: var(--sp-2); }
+.bio-option { text-align: left; min-height: var(--touch, 44px); padding: var(--sp-2) var(--sp-3); border: 1px solid var(--border-strong); border-radius: var(--radius-md, 8px); background: var(--surface-raised); color: var(--text); font: inherit; cursor: pointer; }
+.bio-option:hover:not(:disabled) { border-color: var(--accent); }
+.bio-option:disabled { cursor: default; opacity: 1; }
+.bio-option[aria-checked="true"] { outline: 2px solid var(--accent); }
+.bio-option.is-right { background: var(--status-ok-bg); border-color: var(--status-ok); }
+.bio-option.is-wrong { background: var(--status-danger-bg); border-color: var(--status-danger); }
+.bio-score { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); font-weight: 600; }
+.bio-quiz-nav { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+
+/* genetic-code table */
+.bio-code { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.bio-code-cell { padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-sm); background: var(--surface-raised); display: flex; justify-content: space-between; gap: 6px; }
+.bio-code-cell.is-stop { border-color: var(--status-danger); color: var(--status-danger); }
+.bio-code-cell.is-start { border-color: var(--status-ok); color: var(--status-ok); }
+.bio-code-cell.is-here { outline: 2px solid var(--accent); }
+@media (max-width: 520px) { .bio-code { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bio-intron-row { grid-template-columns: minmax(0, 1fr); } }
+.bio-compare { display: grid; gap: 4px; font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-sm); }
+.bio-compare .row { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: var(--sp-2); align-items: baseline; }
+.bio-compare .row > span:last-child { overflow-wrap: anywhere; word-break: break-all; }
+.bio-aa-diff { background: var(--status-warn-bg); color: var(--status-warn); border-radius: 3px; padding: 0 2px; }
+.bio-nt-diff { background: var(--status-danger-bg); color: var(--status-danger); border-radius: 3px; padding: 0 1px; }
+.bio-codon-strip { display: flex; flex-wrap: wrap; gap: 4px; }
+.bio-codon-chip { padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border-strong); font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-sm); background: var(--surface-raised); }
+.bio-codon-chip.start { border-color: var(--status-ok); }
+.bio-codon-chip.stop { border-color: var(--status-danger); color: var(--status-danger); }
+.bio-codon-chip.here { outline: 2px solid var(--accent); }
+
+.bio-ladder th[scope="row"] { white-space: nowrap; text-align: left; }
+.bio-ladder td, .bio-ladder th[scope="col"] { text-align: center; }
+.bio-ladder .bio-stop { color: var(--status-danger); font-weight: 700; }
+.bio-ladder td.bio-aa-diff { background: var(--status-warn-bg); color: var(--status-warn); font-weight: 700; }
+
+/* ---- Stage 16: gene regulation, genetics, mitosis and meiosis -------------------------------------------------------------- */
+.bio-diagram { overflow-x: auto; width: 100%; }
+.rg-svg, .cd-svg { width: 100%; min-width: 760px; height: auto; }
+.bio-parent-svg { width: 100%; min-width: 210px; max-width: 460px; height: auto; border-radius: 8px; }
+.bio-gamete-svg { width: 100%; min-width: 210px; max-width: 760px; height: auto; border-radius: 8px; }
+.bio-cross-svg { width: 100%; min-width: 520px; max-width: 760px; height: auto; border-radius: 8px; }
+.bio-parents { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--sp-3); align-items: start; }
+.bio-chrom-allele { font-family: var(--font-mono, ui-monospace, monospace); font-size: 13px; font-weight: 800; fill: #0f172a; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; stroke-linejoin: round; }
+.bio-chrom-tag { font-family: var(--font-body, system-ui); font-size: 11px; font-weight: 800; fill: #334155; }
+.bio-legend { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); }
+.bio-note { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+.bio-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* selectable SVG parts: keyboard-focusable with a visible ring */
+.rg-sel, .cd-chrom { cursor: pointer; outline: none; }
+.rg-sel:hover > rect:first-of-type, .rg-sel:hover > ellipse:first-of-type { filter: brightness(0.96); }
+.rg-sel:focus-visible, .cd-chrom:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; border-radius: 6px; }
+.cd-chrom { transition: transform 0.7s ease; }
+@media (prefers-reduced-motion: reduce) { .cd-chrom { transition: none !important; } }
+
+/* genotype editor */
+.bio-genotype { border: 1px solid var(--border); border-radius: var(--radius-md, 8px); padding: var(--sp-2) var(--sp-3) var(--sp-3); margin: 0; display: grid; gap: var(--sp-2); min-width: 0; }
+.bio-genotype legend { font-weight: 700; font-size: var(--fs-sm); padding-inline: var(--sp-1); }
+.bio-genotype-pairname { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); font-weight: 600; }
+.bio-genotype-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.bio-genotype-hom { min-width: 9.5rem; font-size: var(--fs-sm); color: var(--text); }
+.bio-genotype select, .bio-select-row select, .gc-field select { min-height: var(--touch, 44px); }
+.bio-select-row { display: grid; grid-template-columns: minmax(7rem, 1fr) minmax(0, 1.4fr); gap: var(--sp-2); align-items: center; font-size: var(--fs-sm); }
+.bio-check { display: flex; align-items: center; gap: var(--sp-2); min-height: var(--touch, 44px); font-size: var(--fs-sm); cursor: pointer; }
+.bio-check input { width: 20px; height: 20px; accent-color: var(--accent); }
+.bio-toggle.is-on { background: var(--accent-soft); border-color: var(--accent); font-weight: 700; }
+.bio-toggle.is-on::before { content: "✓ "; }
+
+/* stage timeline */
+.bio-timeline { display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-2); list-style: none; padding: 0; margin: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+.bio-timeline li { padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-raised); }
+.bio-timeline li.is-now { border-color: var(--accent); color: var(--text); font-weight: 700; background: var(--accent-soft); }
+.bio-timeline li.is-done { color: var(--text); }
+.cd-timeline li { padding: 0; }
+.cd-timeline li button { min-height: 36px; padding: 2px 10px; border-radius: 999px; font-size: var(--fs-sm); }
+.bio-detail-list { margin: var(--sp-2) 0 0; padding-left: 1.1rem; font-size: var(--fs-sm); color: var(--text-muted); }
+
+/* Punnett square and distributions */
+.bio-punnett-wrap { overflow-x: auto; }
+.bio-punnett { border-collapse: separate; border-spacing: 4px; font-size: var(--fs-sm); min-width: 280px; }
+.bio-punnett caption { text-align: left; color: var(--text-muted); padding-bottom: var(--sp-2); caption-side: top; }
+.bio-punnett th { font-family: var(--font-mono, ui-monospace, monospace); background: var(--surface-raised); border: 1px solid var(--border-strong); border-radius: 6px; padding: 6px 10px; text-align: center; }
+.bio-punnett th small, .bio-punnett td small { display: block; font-weight: 400; color: var(--text-muted); font-family: var(--font-body, system-ui); }
+.bio-punnett td { border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; text-align: center; background: var(--surface-raised); min-width: 6.5rem; }
+.bio-punnett td strong { display: block; font-family: var(--font-mono, ui-monospace, monospace); }
+.bio-punnett td span { display: block; font-size: 0.78rem; color: var(--text-muted); }
+.bio-punnett-corner { font-size: 0.7rem; font-weight: 600; background: transparent !important; border-color: transparent !important; }
+.bio-dist { border-collapse: collapse; width: 100%; font-size: var(--fs-sm); }
+.bio-dist caption { text-align: left; font-weight: 600; padding-bottom: var(--sp-1); }
+.bio-dist th, .bio-dist td { padding: 4px 8px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; }
+.bio-dist th[scope="col"] { color: var(--text-muted); font-weight: 600; }
+.bio-dist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--sp-4); }
+.bio-bar { display: block; height: 10px; width: 100%; min-width: 60px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.bio-bar > span { display: block; height: 100%; background: var(--accent); }
+@media (max-width: 520px) { .bio-select-row { grid-template-columns: minmax(0, 1fr); } .bio-genotype-hom { min-width: 0; width: 100%; } }
+
+/* allele symbols are case-sensitive: never upper-case table headers or labels in the genetics tables */
+.bio-punnett th, .bio-punnett td, .bio-dist th, .bio-dist td, .bio-genotype select, .bio-genotype option { text-transform: none; letter-spacing: normal; }
+.bio-dist th[scope="row"] { font-weight: 600; }
+.gc-field select, .bio-select-row select, .bio-genotype select { max-width: 100%; }
+.gc-inputs .gc-field select { width: 100%; }
+.bio-genotype-row label { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-sm); }
+.bio-chip-row .gc-chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 700; }

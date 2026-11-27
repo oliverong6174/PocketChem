@@ -1,0 +1,209 @@
+{
+  "id": "NM-18",
+  "startedUTC": "2026-11-06T18:21:52.791Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "(E)-hept-3-ene",
+      "commonName": null,
+      "displayName": "(E)-hept-3-ene",
+      "namingConfidence": "Medium",
+      "namingStatus": "systematic",
+      "parentChain": "hept-3-ene",
+      "parentChainLength": 7,
+      "mainSuffix": "-ene",
+      "prefixes": [],
+      "motifs": [],
+      "explanation": "Parent chain contains 7 carbons. Assigned 3E stereochemistry from the molecular structure.",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ],
+      "stereodescriptors": [
+        {
+          "kind": "double-bond",
+          "descriptor": "E",
+          "locant": 3,
+          "bondAtomIndices": [
+            3,
+            4
+          ],
+          "source": "rdkit-cip"
+        }
+      ],
+      "stereoPrefix": "(E)-"
+    },
+    "properties": {
+      "molecularFormula": "C7H14",
+      "exactMass": "98.1095",
+      "molecularWeight": "98.19",
+      "degreesOfUnsaturation": 1,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 7
+        },
+        {
+          "element": "H",
+          "count": 14
+        }
+      ],
+      "heavyAtomCount": 7,
+      "hydrogenBondDonors": 0,
+      "hydrogenBondAcceptors": 0,
+      "rotatableBonds": 3,
+      "topologicalPolarSurfaceArea": "0.00",
+      "logP": "2.75",
+      "ringCount": 0,
+      "boilingPointTendency": {
+        "level": "Very low",
+        "score": 1,
+        "factors": [
+          "Moderate molecular weight slightly raises boiling point."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Very low",
+        "score": 1,
+        "factors": [
+          "Low TPSA means less polar surface area.",
+          "Moderate logP gives a balance between water and lipid solubility."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "Very high",
+        "score": 9,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Alkene",
+      "priority": 24,
+      "nomenclaturePriority": 18,
+      "confidence": "High",
+      "suffix": "-ene",
+      "prefix": "alkenyl",
+      "count": 1,
+      "mcatNote": "Alkenes contain a carbon-carbon double bond. They undergo electrophilic addition reactions and contribute one degree of unsaturation.",
+      "matches": [
+        {
+          "atoms": [
+            3,
+            4
+          ],
+          "bonds": [
+            3
+          ]
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            3,
+            4
+          ],
+          "bonds": [
+            3
+          ]
+        }
+      ],
+      "displaySmarts": "[CX3]=[CX3]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Alkene",
+        "priority": 24,
+        "nomenclaturePriority": 18,
+        "confidence": "High",
+        "suffix": "-ene",
+        "prefix": "alkenyl",
+        "count": 1,
+        "mcatNote": "Alkenes contain a carbon-carbon double bond. They undergo electrophilic addition reactions and contribute one degree of unsaturation.",
+        "matches": [
+          {
+            "atoms": [
+              3,
+              4
+            ],
+            "bonds": [
+              3
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              3,
+              4
+            ],
+            "bonds": [
+              3
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3]=[CX3]",
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Alkene",
+        "priority": 24,
+        "nomenclaturePriority": 18,
+        "confidence": "High",
+        "suffix": "-ene",
+        "prefix": "alkenyl",
+        "count": 1,
+        "mcatNote": "Alkenes contain a carbon-carbon double bond. They undergo electrophilic addition reactions and contribute one degree of unsaturation.",
+        "matches": [
+          {
+            "atoms": [
+              3,
+              4
+            ],
+            "bonds": [
+              3
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              3,
+              4
+            ],
+            "bonds": [
+              3
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3]=[CX3]",
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:21:54.171Z"
+}

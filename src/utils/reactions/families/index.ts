@@ -17,6 +17,8 @@ import { enolateReactionRules } from "./enolates";
 import { epoxideReactionRules } from "./epoxides";
 import { esterReactionRules } from "./esters";
 import { etherReactionRules } from "./ethers";
+import { expansion9mReactionRules } from "./expansion9m";
+import { expansion9m2ReactionRules } from "./expansion9m2";
 import { haloalkaneReactionRules } from "./haloalkanes";
 import { ketoneReactionRules } from "./ketones";
 import { nitrileReactionRules } from "./nitriles";
@@ -44,6 +46,8 @@ export {
   epoxideReactionRules,
   esterReactionRules,
   etherReactionRules,
+  expansion9mReactionRules,
+  expansion9m2ReactionRules,
   haloalkaneReactionRules,
   ketoneReactionRules,
   nitrileReactionRules,
@@ -76,4 +80,6 @@ export const reactionFamilies: ReadonlyArray<ReadonlyArray<ReactionRule>> = [
   amineReactionRules,
   diazoniumReactionRules,
   sulfurReactionRules,
+  expansion9mReactionRules,
+  expansion9m2ReactionRules,
 ];

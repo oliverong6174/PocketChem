@@ -1,0 +1,178 @@
+{
+  "id": "RX-14",
+  "startedUTC": "2026-11-06T18:22:44.618Z",
+  "calls": [
+    "predictReactionPathways"
+  ],
+  "input": "CCCCCCCBr.[C-]#N",
+  "pathways": [
+    {
+      "ruleId": "haloalkane-sn2-cyanide",
+      "family": "haloalkanes",
+      "reactionType": "substitution",
+      "title": "SN2 with Cyanide",
+      "reagentLabel": "Polar aprotic conditions",
+      "reagentNote": "Draw the alkyl halide and cyanide ion as disconnected structures",
+      "shortExplanation": "Cyanide attacks through carbon and displaces the leaving group in an SN2 reaction, extending the carbon skeleton by one carbon.",
+      "course": "ochem-1",
+      "chapter": "Substitution and elimination",
+      "mechanism": "SN2",
+      "reactionClass": "nucleophilic substitution",
+      "purpose": null,
+      "selectivity": [
+        "Backside attack",
+        "Inversion at a reacting stereocenter"
+      ],
+      "selectivityProfile": {
+        "substitutionElimination": {
+          "pathway": "sn2",
+          "reagent": "nucleophile"
+        },
+        "stereochemistry": {
+          "mode": "inversion",
+          "attackMode": "backside",
+          "stereospecific": true
+        },
+        "mixture": "single"
+      },
+      "selectivityAssessment": {
+        "level": "major",
+        "estimatedFraction": null,
+        "planningPenalty": 0,
+        "label": "Major pathway (qualitative)",
+        "basis": "A weakly basic nucleophile on a primary halide favors SN2 over E2. Substitution versus elimination follows the substrate class and the reagent class (Wade, Organic Chemistry, ch. 6-7 summary of SN2/E2 competition; Clayden, Greeves and Warren, ch. 17; not re-read in this stage). It is qualitative: solvent, temperature and the exact base change the ratio, and no fraction is given."
+      },
+      "limitations": [
+        "SN2 inversion is explicitly encoded at a stereogenic reacting carbon.",
+        "Secondary substrates can compete with E2."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "cyanide ion",
+          "trigger": {
+            "includeSmarts": [
+              "[C-]#N"
+            ]
+          },
+          "supplyMode": "auto",
+          "presetSmiles": "[C-]#N",
+          "id": "cyanide",
+          "searchAliases": [
+            "cyanide ion",
+            "cyanide",
+            "CN-",
+            "cyanide anion"
+          ],
+          "contributesToProduct": true,
+          "role": "nucleophile"
+        }
+      ],
+      "id": "haloalkane-sn2-cyanide",
+      "reactantSmiles": "CCCCCCCBr.[C-]#N",
+      "reactantLabel": "1-bromoheptane + cyanide",
+      "productSmiles": "CCCCCCCC#N",
+      "productLabel": "octanenitrile",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCCCCCCBr",
+        "[C-]#N"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "selected": [
+    {
+      "ruleId": "haloalkane-sn2-cyanide",
+      "family": "haloalkanes",
+      "reactionType": "substitution",
+      "title": "SN2 with Cyanide",
+      "reagentLabel": "Polar aprotic conditions",
+      "reagentNote": "Draw the alkyl halide and cyanide ion as disconnected structures",
+      "shortExplanation": "Cyanide attacks through carbon and displaces the leaving group in an SN2 reaction, extending the carbon skeleton by one carbon.",
+      "course": "ochem-1",
+      "chapter": "Substitution and elimination",
+      "mechanism": "SN2",
+      "reactionClass": "nucleophilic substitution",
+      "purpose": null,
+      "selectivity": [
+        "Backside attack",
+        "Inversion at a reacting stereocenter"
+      ],
+      "selectivityProfile": {
+        "substitutionElimination": {
+          "pathway": "sn2",
+          "reagent": "nucleophile"
+        },
+        "stereochemistry": {
+          "mode": "inversion",
+          "attackMode": "backside",
+          "stereospecific": true
+        },
+        "mixture": "single"
+      },
+      "selectivityAssessment": {
+        "level": "major",
+        "estimatedFraction": null,
+        "planningPenalty": 0,
+        "label": "Major pathway (qualitative)",
+        "basis": "A weakly basic nucleophile on a primary halide favors SN2 over E2. Substitution versus elimination follows the substrate class and the reagent class (Wade, Organic Chemistry, ch. 6-7 summary of SN2/E2 competition; Clayden, Greeves and Warren, ch. 17; not re-read in this stage). It is qualitative: solvent, temperature and the exact base change the ratio, and no fraction is given."
+      },
+      "limitations": [
+        "SN2 inversion is explicitly encoded at a stereogenic reacting carbon.",
+        "Secondary substrates can compete with E2."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [
+        {
+          "label": "cyanide ion",
+          "trigger": {
+            "includeSmarts": [
+              "[C-]#N"
+            ]
+          },
+          "supplyMode": "auto",
+          "presetSmiles": "[C-]#N",
+          "id": "cyanide",
+          "searchAliases": [
+            "cyanide ion",
+            "cyanide",
+            "CN-",
+            "cyanide anion"
+          ],
+          "contributesToProduct": true,
+          "role": "nucleophile"
+        }
+      ],
+      "id": "haloalkane-sn2-cyanide",
+      "reactantSmiles": "CCCCCCCBr.[C-]#N",
+      "reactantLabel": "1-bromoheptane + cyanide",
+      "productSmiles": "CCCCCCCC#N",
+      "productLabel": "octanenitrile",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCCCCCCBr",
+        "[C-]#N"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "products": [
+    {
+      "smiles": "CCCCCCCC#N",
+      "level": "major",
+      "ruleId": "haloalkane-sn2-cyanide",
+      "mixtureKind": null
+    }
+  ],
+  "interfaceLimitation": "Conditions are represented by fixed pathway-family filters and explicit nucleophile/base molecules; engine listing API accepts no solvent/temperature field. No target-dependent fallback.",
+  "finishedUTC": "2026-11-06T18:22:46.553Z"
+}

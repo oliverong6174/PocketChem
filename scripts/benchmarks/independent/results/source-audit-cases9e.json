@@ -1,0 +1,121 @@
+{
+ "auditedOn": "2026-11-03",
+ "results": [
+  {
+   "id": "libretexts-epoxide-nassau",
+   "url": "https://chem.libretexts.org/Courses/Nassau_Community_College/Organic_Chemistry_I_and_II/08%3A_Reactions_of_Alkenes/8.14%3A_Opening_of_Epoxides_-_Acidic_versus_Basic_Conditions",
+   "cite": "LibreTexts (Nassau Community College) 8.14 Opening of Epoxides: Acidic versus Basic Conditions",
+   "status": "supported",
+   "coverage": 0.87,
+   "missing": [
+    "opens",
+    "attacks"
+   ],
+   "readableChars": 27646
+  },
+  {
+   "id": "libretexts-epoxide-wade",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Wade)_Complete_and_Semesters_I_and_II/Map%3A_Organic_Chemistry_(Wade)/15%3A_Ethers_Epoxides_and_Thioethers/15.08%3A_Opening_of_Epoxides",
+   "cite": "LibreTexts (Wade) 15.08 Opening of Epoxides",
+   "status": "supported",
+   "coverage": 1,
+   "missing": [],
+   "readableChars": 27416
+  },
+  {
+   "id": "libretexts-ether-synthesis",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_%28Organic_Chemistry%29/Ethers/Synthesis_of_Ethers/Ether_Synthesis",
+   "cite": "LibreTexts: Ether Synthesis (Williamson)",
+   "status": "partial",
+   "coverage": 0.58,
+   "missing": [
+    "displaces",
+    "primary",
+    "secondary",
+    "tertiary",
+    "halides"
+   ],
+   "readableChars": 16759
+  },
+  {
+   "id": "libretexts-williamson-nassau",
+   "url": "https://chem.libretexts.org/Courses/Nassau_Community_College/Organic_Chemistry_I_and_II/14%3A_Ethers_Epoxides_and_Thioethers/14.03%3A_The_Williamson_Ether_Synthesis",
+   "cite": "LibreTexts (Nassau Community College) 14.03 The Williamson Ether Synthesis",
+   "status": "supported",
+   "coverage": 0.78,
+   "missing": [
+    "secondary",
+    "tertiary"
+   ],
+   "readableChars": 22600
+  },
+  {
+   "id": "ucla-wittig",
+   "url": "https://www.chem.ucla.edu/~harding/IGOC/W/wittig_reaction.html",
+   "cite": "UCLA Illustrated Glossary of Organic Chemistry: Wittig reaction",
+   "status": "supported",
+   "coverage": 0.73,
+   "missing": [
+    "phosphorus",
+    "converts",
+    "methylenetriphenylphosphorane"
+   ],
+   "readableChars": 1592
+  },
+  {
+   "id": "libretexts-aldol-openstax",
+   "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(OpenStax)/23%3A_Carbonyl_Condensation_Reactions/23.03%3A_Dehydration_of_Aldol_Products_-_Synthesis_of_Enones",
+   "cite": "LibreTexts (OpenStax) 23.3 Dehydration of Aldol Products: Synthesis of Enones",
+   "status": "supported",
+   "coverage": 0.64,
+   "missing": [
+    "beta-hydroxy",
+    "loses",
+    "butenal",
+    "crotonaldehyde"
+   ],
+   "readableChars": 25934
+  },
+  {
+   "id": "wikipedia-3-hydroxybutanal",
+   "url": "https://en.wikipedia.org/wiki/3-Hydroxybutanal",
+   "cite": "Wikipedia: 3-Hydroxybutanal (acetaldol)",
+   "status": "supported",
+   "coverage": 0.8,
+   "missing": [
+    "called",
+    "molecules"
+   ],
+   "readableChars": 17418
+  },
+  {
+   "id": "openstax-hydroboration",
+   "url": "https://openstax.org/books/organic-chemistry/pages/8-5-hydration-of-alkenes-addition-of-h2o-by-hydroboration",
+   "cite": "OpenStax Organic Chemistry 8.5 Hydration of Alkenes: Addition of H2O by Hydroboration",
+   "status": "supported",
+   "coverage": 0.91,
+   "missing": [
+    "anti-markovnikov"
+   ],
+   "readableChars": 11399
+  },
+  {
+   "id": "libretexts-diels-alder-winona",
+   "url": "https://chem.libretexts.org/Courses/Winona_State_University/Klein_and_Straumanis_Guided/17%3A_Conjugated_Pi_Systems_and_Pericyclic_Reactions/17.16%3A_Diels-Alder_-_a_closer_look",
+   "cite": "LibreTexts (Winona State, Klein) 17.16 Diels-Alder: a closer look",
+   "status": "supported",
+   "coverage": 0.83,
+   "missing": [
+    "generates"
+   ],
+   "readableChars": 29509
+  },
+  {
+   "id": "alfredstate-diels-alder-lab",
+   "url": "https://web.alfredstate.edu/faculty/fongjd/Organic%20Chemistry%202/POWERPOINT%20PRESENTATIONS/LAB/lab5dielsalder.pdf",
+   "cite": "Alfred State lab handout: Diels-Alder reaction of butadiene (from 3-sulfolene) with maleic anhydride",
+   "status": "unreachable",
+   "detail": "UND_ERR_CONNECT_TIMEOUT"
+  }
+ ]
+}

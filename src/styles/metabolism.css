@@ -1,0 +1,59 @@
+/* Metabolic pathways (Stage 18). Diagrams use fixed paper colours inside a white surface; text beside every colour carries the same meaning. */
+.mt-svg { display: block; width: 100%; height: auto; background: #fff; border-radius: 8px; }
+.mt-scroll { width: 100%; overflow-x: auto; max-width: 100%; border-radius: 8px; -webkit-overflow-scrolling: touch; }
+.mt-hit { cursor: pointer; }
+.mt-hit:focus-visible { outline: none; }
+.mt-hit:focus-visible rect:first-of-type, .mt-hit:focus-visible path:first-of-type { stroke: #0f172a; stroke-width: 4; }
+.mt-hit:hover text { text-decoration: underline; }
+.mt-card { border: 1px solid var(--border, #cbd5e1); border-radius: 10px; padding: 0.75rem 0.9rem; background: var(--surface, #fff); }
+.mt-card h3 { margin: 0 0 0.4rem; font-size: 1.05rem; }
+.mt-card p { margin: 0.4rem 0; }
+.mt-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.25rem 0 0.5rem; }
+.mt-eq { font-weight: 700; font-size: 1rem; overflow-wrap: anywhere; }
+.mt-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.mt-chip { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; border: 1.5px solid currentColor; }
+.mt-chip-up { color: #166534; background: #f0fdf4; }
+.mt-chip-down { color: #9a3412; background: #fff7ed; }
+.mt-chip-none { color: #475569; background: #f8fafc; font-weight: 500; }
+.mt-structs { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.5rem; }
+.mt-struct { display: flex; flex-direction: column; align-items: center; max-width: 200px; }
+.mt-struct-name { font-size: 0.8rem; text-align: center; min-height: 32px; }
+.mt-links { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.2rem 0.6rem; }
+.mt-links li { display: inline-flex; align-items: baseline; }
+.mt-signals { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.5rem; }
+.mt-ledger caption { text-align: left; font-weight: 700; padding-bottom: 0.3rem; }
+.mt-caption { padding: 0.5rem 0.75rem; border-left: 4px solid var(--accent, #0f766e); background: var(--accent-soft, #f0fdfa); border-radius: 0 8px 8px 0; margin: 0.5rem 0; }
+.mt-caption h3 { margin: 0 0 0.25rem; font-size: 1rem; }
+.mt-caption p { margin: 0.2rem 0; }
+.mt-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; list-style: none; padding: 0; margin: 0; font-size: 0.82rem; }
+.mt-legend i { display: inline-block; width: 1.6rem; height: 0; border-top: 3px solid; margin-right: 0.35rem; vertical-align: middle; }
+.mt-statement { display: flex; gap: 0.5rem; align-items: flex-start; margin: 0.35rem 0; }
+.mt-statement .ui-badge { flex: 0 0 auto; }
+.mt-stage-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
+.mt-pathway-list { display: flex; flex-wrap: wrap; gap: 0.35rem; list-style: none; padding: 0; margin: 0.5rem 0; }
+.mt-pathway-list button, .mt-rxn-chip { min-height: 36px; padding: 0.3rem 0.6rem; border: 1.5px solid var(--border, #cbd5e1); border-radius: 8px; background: var(--surface, #fff); color: inherit; font: inherit; font-size: 0.85rem; cursor: pointer; }
+.mt-pathway-list button[aria-pressed="true"], .mt-rxn-chip[aria-pressed="true"] { background: var(--accent-soft, #ccfbf1); border-color: var(--accent, #0f766e); font-weight: 700; }
+.mt-pathway-list button:focus-visible, .mt-rxn-chip:focus-visible { outline: 3px solid var(--accent, #0f766e); outline-offset: 2px; }
+.mt-group { margin: 0.75rem 0 0.25rem; font-size: 0.9rem; }
+.mt-ledger-big { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; margin: 0.5rem 0; }
+@media (max-width: 600px) { .mt-struct { max-width: 160px; } .mt-eq { font-size: 0.95rem; } }
+@media (prefers-reduced-motion: no-preference) { .mt-svg .mt-move { transition: transform 0.35s ease; } }
+
+.mt-lane-narrow { max-width: 640px; margin: 0 auto; }
+.mt-lane-wide { max-width: 940px; margin: 0 auto; }
+.mt-cycle { max-width: 860px; margin: 0 auto; }
+.mt-mito { max-width: 980px; margin: 0 auto; }
+.mt-map { max-width: 1000px; margin: 0 auto; }
+.mt-hint { display: none; margin: 0.35rem 0 0; font-size: 0.8rem; color: var(--text-muted, #475569); }
+@media (max-width: 760px) { .mt-hint { display: block; } }
+
+/* Stage 25: fatty-acid chain bar, shuttle step list, carbon circles (text inside every circle; colour is secondary) */
+.fa-chain { display: flex; flex-wrap: wrap; gap: 4px; margin: 0.5rem 0; }
+.fa-carbon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #334155; background: #f8fafc; color: #0f172a; font-size: 0.78rem; font-weight: 700; }
+.fa-carbon.fa-c1 { border-width: 4px; background: #fef3c7; }
+.fa-carbon.fa-ab { border-color: #15803d; background: #f0fdf4; }
+.fa-carbon.fa-released { border-style: dashed; color: #64748b; background: #e2e8f0; border-color: #94a3b8; }
+.mt-shuttle { padding-left: 1.2rem; }
+.mt-shuttle li { margin: 0.35rem 0; }
+.mt-shuttle li[aria-current="true"] { font-weight: 700; border-left: 4px solid var(--accent, #0f766e); padding-left: 0.4rem; }
+@media (max-width: 600px) { .fa-carbon { width: 26px; height: 26px; font-size: 0.72rem; } }

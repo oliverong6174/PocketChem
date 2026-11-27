@@ -736,7 +736,43 @@ function unsaturationSuffix(doubleLocants: number[], tripleLocants: number[]): s
  * parent and assigns unsaturation locants from the complete graph rather than
  * flattening it into an acyclic dodecene chain.
  */
+/**
+ * These recognisers describe the ring skeleton and halogen substituents only. A skeleton carrying anything else (alkyl groups such as
+ * the gem-dimethyl of pinene, heteroatoms, functional groups) would be named as the bare skeleton, silently dropping atoms, so those
+ * structures are declined here and left to the callers' unsupported handling.
+ */
+function skeletonCoversEveryAtom(parsedMol: ParsedMol): boolean {
+  const { carbonSet, adjacency } = simpleCarbonAdjacency(parsedMol);
+  const degree = new Map<number, number>([...adjacency].map(([atom, neighbours]) => [atom, neighbours.size]));
+  const core = new Set(carbonSet);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const atom of [...core]) {
+      const live = [...(adjacency.get(atom) ?? [])].filter((other) => core.has(other)).length;
+      if (live <= 1) { core.delete(atom); changed = true; }
+    }
+  }
+  void degree;
+  for (const atom of parsedMol.atoms) {
+    if (core.has(atom.atomIndex)) continue;
+    const halogen = HALOGEN_PREFIX_BY_ELEMENT[atom.element];
+    if (!halogen) return false;
+    const bond = (parsedMol.adjacency.get(atom.atomIndex) ?? [])[0];
+    if (!bond) return false;
+    const carbon = bond.atomA === atom.atomIndex ? bond.atomB : bond.atomA;
+    if (!core.has(carbon)) return false;
+  }
+  return true;
+}
+
 export function getPolycyclicHydrocarbonName(
+  parsedMol: ParsedMol,
+): PolycyclicHydrocarbonName | null {
+  return skeletonCoversEveryAtom(parsedMol) ? getPolycyclicHydrocarbonNameUnchecked(parsedMol) : null;
+}
+
+function getPolycyclicHydrocarbonNameUnchecked(
   parsedMol: ParsedMol,
 ): PolycyclicHydrocarbonName | null {
   const tetralinDerivative = getTetralinDerivativeName(parsedMol);

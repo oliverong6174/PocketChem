@@ -1,0 +1,343 @@
+{
+  "id": "MS-05",
+  "startedUTC": "2026-11-06T18:21:58.032Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties",
+    "predictMassSpectrum"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "pyrimidine",
+      "commonName": null,
+      "displayName": "pyrimidine",
+      "namingConfidence": "High",
+      "namingStatus": "retained",
+      "parentChain": "pyrimidine",
+      "parentChainLength": 0,
+      "mainSuffix": null,
+      "prefixes": [],
+      "motifs": [],
+      "explanation": "Recognized pyrimidine as the retained heterocyclic parent and applied its standard ring numbering before naming external substituents.",
+      "limitations": []
+    },
+    "properties": {
+      "molecularFormula": "C4H4N2",
+      "exactMass": "80.0374",
+      "molecularWeight": "80.09",
+      "degreesOfUnsaturation": 4,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 4
+        },
+        {
+          "element": "H",
+          "count": 4
+        },
+        {
+          "element": "N",
+          "count": 2
+        }
+      ],
+      "heavyAtomCount": 6,
+      "hydrogenBondDonors": 0,
+      "hydrogenBondAcceptors": 2,
+      "rotatableBonds": 0,
+      "topologicalPolarSurfaceArea": "25.78",
+      "logP": "0.48",
+      "ringCount": 1,
+      "boilingPointTendency": {
+        "level": "Low",
+        "score": 2,
+        "factors": [
+          "Moderate molecular weight slightly raises boiling point.",
+          "Hydrogen-bond acceptors increase intermolecular attraction."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Low",
+        "score": 3,
+        "factors": [
+          "Low TPSA means less polar surface area.",
+          "Low logP means the molecule is fairly water-loving.",
+          "Hydrogen-bond acceptors help the molecule interact with water."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "High",
+        "score": 8,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Benzene",
+      "priority": 31,
+      "nomenclaturePriority": 22,
+      "confidence": "High",
+      "suffix": "benzene",
+      "prefix": "phenyl",
+      "count": 1,
+      "mcatNote": "A benzene ring is a six-membered aromatic ring with six delocalized π electrons. It is the most common aromatic system in organic chemistry.",
+      "matches": [
+        {
+          "atoms": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "bonds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "bonds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      ],
+      "displaySmarts": "c1ccccc1",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Benzene",
+        "priority": 31,
+        "nomenclaturePriority": 22,
+        "confidence": "High",
+        "suffix": "benzene",
+        "prefix": "phenyl",
+        "count": 1,
+        "mcatNote": "A benzene ring is a six-membered aromatic ring with six delocalized π electrons. It is the most common aromatic system in organic chemistry.",
+        "matches": [
+          {
+            "atoms": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "bonds": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "bonds": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          }
+        ],
+        "displaySmarts": "c1ccccc1",
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Benzene",
+        "priority": 31,
+        "nomenclaturePriority": 22,
+        "confidence": "High",
+        "suffix": "benzene",
+        "prefix": "phenyl",
+        "count": 1,
+        "mcatNote": "A benzene ring is a six-membered aromatic ring with six delocalized π electrons. It is the most common aromatic system in organic chemistry.",
+        "matches": [
+          {
+            "atoms": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "bonds": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "bonds": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          }
+        ],
+        "displaySmarts": "c1ccccc1",
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "ms": {
+    "formula": "C4H4N2",
+    "molecularIonMz": 80.0374,
+    "nominalMass": 80,
+    "basePeakMz": 80.037,
+    "basePeakCertainty": "supported",
+    "basePeakCandidates": [
+      80,
+      77
+    ],
+    "basePeakBasis": "Aromatic compound with no readily cleaved side chain: the molecular ion is usually the base peak.",
+    "peaks": [
+      {
+        "mz": 77,
+        "relativeIntensity": 73.4,
+        "label": "m/z 77",
+        "kind": "diagnostic",
+        "explanation": "A phenyl-type fragment is common for many aromatic compounds.",
+        "fragmentSmiles": "c1cc[cH+]cc1",
+        "previewStructure": "c1cc[cH+]cc1",
+        "previewLabel": "m/z 77",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "m/z 77",
+            "explanation": "A phenyl-type fragment is common for many aromatic compounds.",
+            "fragmentSmiles": "c1cc[cH+]cc1"
+          }
+        ]
+      },
+      {
+        "mz": 80.037,
+        "relativeIntensity": 100,
+        "label": "M⁺•",
+        "kind": "molecular-ion",
+        "explanation": "Predicted intact molecular radical cation. The radical/positive charge is generally delocalized, so the preview labels the ion without arbitrarily pinning the charge to one atom.",
+        "previewStructure": "c1cncnc1",
+        "previewLabel": "M⁺•",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "M⁺•",
+            "explanation": "Predicted intact molecular radical cation. The radical/positive charge is generally delocalized, so the preview labels the ion without arbitrarily pinning the charge to one atom."
+          }
+        ]
+      },
+      {
+        "mz": 81.037,
+        "relativeIntensity": 5,
+        "label": "M+1",
+        "kind": "isotope",
+        "explanation": "Natural-isotope contribution 1 nominal mass unit above M. The preview shows representative isotopologues that contribute to this same isotope-envelope peak.",
+        "previewStructure": "c1[13cH]cncn1",
+        "previewLabel": "M+1",
+        "previewContributorLabels": [
+          "one ¹³C",
+          "one ¹⁵N"
+        ],
+        "previewAlternatives": [
+          {
+            "structure": "c1[13cH]cncn1",
+            "label": "M+1"
+          },
+          {
+            "structure": "c1[13cH]cncn1",
+            "label": "one ¹³C"
+          },
+          {
+            "structure": "c1cnc[15n]c1",
+            "label": "one ¹⁵N"
+          }
+        ],
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "M+1",
+            "explanation": "Natural-isotope contribution 1 nominal mass unit above M. The preview shows representative isotopologues that contribute to this same isotope-envelope peak."
+          }
+        ]
+      }
+    ],
+    "notes": [
+      "Relative abundances are normalized educational EI predictions: the strongest predicted ion is set to 100%. They are not instrument-calibrated/NIST intensities.",
+      "General fragment peaks are generated by graph-level sigma-bond cleavage. Both charge-retaining sides are considered, then scored by bond lability, carbocation/heteroatom/resonance stabilization, complementary-radical stability, and pathway multiplicity.",
+      "Displayed fragment structures are representative ion skeletons; charge/radical localization can be resonance-delocalized in the real gas-phase ion.",
+      "Special diagnostic mechanisms (for example dehydration, carbonyl/ester cleavage, halogen loss, and aromatic ions) are retained as additional competing pathways rather than being the only source of fragments."
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:21:59.469Z"
+}

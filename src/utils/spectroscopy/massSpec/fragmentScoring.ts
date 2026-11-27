@@ -156,5 +156,11 @@ export function estimateParentIonPropensity(graph: MassGraph) {
   // Small, conjugated/aromatic molecules tend to retain a stronger molecular ion;
   // large flexible aliphatics fragment more readily.
   const sizePenalty = Math.max(0, heavyAtoms - 8) * 0.85;
-  return Math.max(12, Math.min(82, 28 + aromaticBonds * 2.4 + piBonds * 4 + heteroAtoms * 1.8 - sizePenalty));
+  const estimate = Math.max(12, Math.min(82, 28 + aromaticBonds * 2.4 + piBonds * 4 + heteroAtoms * 1.8 - sizePenalty));
+  // Saturated acyclic compounds with six or more heavy atoms (aliphatic halides, alcohols, ethers, nitriles, esters, acids) show a weak or
+  // absent molecular ion because the radical cation fragments almost completely (McLafferty & Turecek, ch. 5; NIST spectra of
+  // 1-bromoalkanes, 1-alkanols, alkanenitriles). The molecular ion is therefore not allowed to dominate the prediction.
+  const ringBonds = graph.bonds.length - graph.atoms.length + 1;
+  if (aromaticBonds === 0 && piBonds === 0 && ringBonds <= 0 && heavyAtoms >= 6) return Math.min(estimate, 14);
+  return estimate;
 }

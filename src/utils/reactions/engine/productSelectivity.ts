@@ -5,12 +5,15 @@ import type {
   ReactionSitePreference,
 } from "../reactionTypes";
 import {
+  runReactionSmarts,
   runReactionSmartsWithMultiplicity,
 } from "./rdkitReaction";
+import { scoreEasProducts } from "./aromaticSiteSelection";
 import {
   canonicalizeStereoStructure,
   filterProductsByRelativeSubstituentFace,
 } from "./stereochemistry";
+import { elimination } from "./handlers/elimination";
 
 type Histogram = Map<number, number>;
 
@@ -327,11 +330,353 @@ function percentLabel(fraction: number): string {
  * textbook abstraction rate ratios. The estimate is intentionally used for
  * ranking, not as an experimental yield prediction.
  */
+async function smartsMatches(smiles: string, smarts: string): Promise<boolean> {
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(smiles);
+  const query = rdkit.get_qmol(smarts);
+  try {
+    if (!mol || !query) return false;
+    const match = mol.get_substruct_match?.(query);
+    return typeof match === "string" && match !== "{}" && match !== "";
+  } catch {
+    return false;
+  } finally {
+    query?.delete?.();
+    mol?.delete?.();
+  }
+}
+
+/**
+ * Qualitative, referenced preferences declared on the rule (ProductPreference). The first
+ * preference whose structural condition holds and whose product pattern matches decides; a
+ * product no preference describes returns null and stays unranked. No fraction is invented.
+ */
+async function assessDeclaredPreference(
+  rule: ReactionRule,
+  reactants: string[],
+  productSmiles: string,
+): Promise<ReactionSelectivityAssessment | null> {
+  for (const preference of rule.productPreferences ?? []) {
+    let applies = true;
+    for (const smarts of preference.whenReactantSmarts) {
+      let found = false;
+      for (const reactant of reactants) {
+        if (await smartsMatches(reactant, smarts)) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        applies = false;
+        break;
+      }
+    }
+    if (!applies) continue;
+    for (const smarts of preference.unlessReactantSmarts ?? []) {
+      for (const reactant of reactants) {
+        if (await smartsMatches(reactant, smarts)) applies = false;
+      }
+    }
+    if (!applies) continue;
+    if (!(await smartsMatches(productSmiles, preference.productSmarts))) continue;
+    return {
+      level: preference.level,
+      estimatedFraction: null,
+      planningPenalty: preference.level === "minor" ? 40 : 0,
+      label: preference.level === "major" ? "Major product (qualitative)" : "Minor product (qualitative)",
+      basis: `${preference.basis} Source: ${preference.references.join("; ")} Qualitative preference, not a measured ratio.`,
+    };
+  }
+  return null;
+}
+
+const easSiblingCache = new Map<string, Promise<{ keys: string[]; scores: Array<number | null> }>>();
+
+/**
+ * Qualitative ranking of the ring positions of a Friedel-Crafts step by directing effects. The
+ * siblings are every product the rule's own template gives for these reactants. A ring the simple
+ * model does not cover (fused, no benzene ring) is not ranked at all.
+ */
+async function assessEasDirecting(
+  rule: ReactionRule,
+  reactants: string[],
+  productSmiles: string,
+): Promise<ReactionSelectivityAssessment | null> {
+  const installed = rule.selectivityProfile?.easDirecting;
+  if (!installed || rule.transform.type !== "reactionSmarts" || reactants.length < 2) return null;
+  const rearranging = installed === "alkyl" ? await primaryHalideCanRearrange(reactants) : false;
+  if (rearranging) {
+    // A primary alkyl halide can alkylate directly or after a hydride/alkyl shift; the split depends on temperature, catalyst and
+    // reaction time, so no single product (and no ring position of one) may be called major.
+    return {
+      level: "competitive",
+      estimatedFraction: null,
+      planningPenalty: 10,
+      label: "Condition-dependent (rearrangement possible)",
+      basis:
+        "A primary alkyl halide with AlCl\u2083 can alkylate without rearrangement or after a 1,2-hydride shift to a more stable carbocation. The direct and rearranged products are both reported and neither is ranked, because the ratio depends on temperature, catalyst loading and time (Wade, Organic Chemistry, Friedel-Crafts alkylation: rearrangements; not re-read in this stage). Ring-position preferences are not ranked for the same reason.",
+    };
+  }
+  const cacheKey = `${rule.id}|${reactants.join(".")}`;
+  let pending = easSiblingCache.get(cacheKey);
+  if (!pending) {
+    pending = (async () => {
+      const siblings = await runReactionSmarts(reactants, (rule.transform as { smarts: string }).smarts, 24);
+      const keys: string[] = [];
+      for (const sibling of siblings) keys.push((await canonicalizeStereoStructure(sibling))?.isomeric ?? sibling);
+      return { keys, scores: await scoreEasProducts(reactants[0], siblings, installed) };
+    })();
+    if (easSiblingCache.size > 200) easSiblingCache.clear();
+    easSiblingCache.set(cacheKey, pending);
+  }
+  const { keys, scores } = await pending;
+  if (keys.length < 2 || scores.some((score) => score === null)) return null;
+  const own = (await canonicalizeStereoStructure(productSmiles))?.isomeric ?? productSmiles;
+  const index = keys.indexOf(own);
+  if (index < 0) return null;
+  const sterics = await bulkyElectrophileOrthoPenalty(installed, reactants, productSmiles);
+  const numeric = scores as number[];
+  const best = Math.max(...numeric);
+  const ties = numeric.filter((score) => Math.abs(score - best) < 1e-6).length;
+  const gap = best - numeric[index];
+  const basisTail =
+    "Estimated from the substituents' directing effects only: this ranks ring positions of one alkyl group, not direct versus carbocation-rearranged products (listed separately and left unranked). The ortho/para ratio, steric effects and polyalkylation are not modeled.";
+  if (sterics) {
+    return { level: "minor", estimatedFraction: null, planningPenalty: 40, label: "Disfavored ring position (steric, qualitative)", basis: sterics };
+  }
+  if (gap < 1e-6 && ties === 1) {
+    return { level: "major", estimatedFraction: null, planningPenalty: 0, label: "Favored ring position (qualitative)", basis: `Most activated position for substitution. ${basisTail}` };
+  }
+  if (gap <= 1.0) {
+    return { level: "competitive", estimatedFraction: null, planningPenalty: 10, label: "Competitive ring position (qualitative)", basis: `Similarly activated as the best position. ${basisTail}` };
+  }
+  return { level: "minor", estimatedFraction: null, planningPenalty: 40, label: "Disfavored ring position (qualitative)", basis: `Clearly less activated than the best position. ${basisTail}` };
+}
+
+/** Two adjacent substituted benzene-ring carbons: only an ortho substitution creates this from a monosubstituted reactant. */
+const ORTHO_PAIR = "[c;R1;$(c-!@[!#1])]:[c;R1;$(c-!@[!#1])]";
+const BULKY_ELECTROPHILE_HALIDE = "[CX4;H0]([Cl,Br,I])([#6])([#6])[#6]";
+const BULKY_ELECTROPHILE_REFERENCE =
+  "Ortho attack next to an existing ring substituent is sterically disfavored for bulky electrophiles (acylium ions, tert-alkyl cations), and para attack dominates; for example Friedel-Crafts acylation of toluene is essentially all para (Clayden, Greeves and Warren, Organic Chemistry 2nd ed., ch. 21; Carey and Sundberg, Advanced Organic Chemistry A, ch. 10; not re-read in this stage). Qualitative only: no ratio is given. Under thermodynamic control (long times, excess AlCl\u2083) tert-butylation isomerizes toward the meta product, which this model does not cover.";
+
+async function bulkyElectrophileOrthoPenalty(installed: "alkyl" | "acyl", reactants: string[], productSmiles: string): Promise<string | null> {
+  const bulky =
+    installed === "acyl" ||
+    (await (async () => {
+      for (const reactant of reactants.slice(1)) if (await smartsMatches(reactant, BULKY_ELECTROPHILE_HALIDE)) return true;
+      return false;
+    })());
+  if (!bulky) return null;
+  // Only a monosubstituted benzene has the simple ortho-vs-para choice; in polysubstituted rings the position may be para to another group.
+  if ((await countMatches(reactants[0], "[cH]")) !== 5 || (await countMatches(reactants[0], "c")) !== 6) return null;
+  return (await smartsMatches(productSmiles, ORTHO_PAIR)) ? BULKY_ELECTROPHILE_REFERENCE : null;
+}
+
+async function primaryHalideCanRearrange(reactants: string[]): Promise<boolean> {
+  for (const reactant of reactants.slice(1)) {
+    // CH2(X) attached to a carbon that bears a hydrogen (hydride shift available), not benzylic/allylic.
+    if (await smartsMatches(reactant, "[CH2;!$(C-c);!$(C-C=C)]([Cl,Br,I])[CX4;H1,H2]")) return true;
+  }
+  return false;
+}
+
+const ELIMINATION_REFERENCES = {
+  smallBase:
+    "Zaitsev rule: with small strong bases (hydroxide, methoxide, ethoxide) E2 gives mainly the more substituted alkene (LibreTexts, Elimination by the E2 mechanism; UCLA Illustrated Glossary of Organic Chemistry, Hofmann's rule: 2-bromo-2-methylbutane with methoxide gives 2-methylbut-2-ene as the major product; Reusch, MSU: 2-bromo-2,3-dimethylbutane with methoxide gives 80% of the tetrasubstituted alkene).",
+  bulkyBase:
+    "Bulky bases such as tert-butoxide tend to give higher yields of the less substituted alkene (LibreTexts, Elimination by the E2 mechanism); for tertiary halides this is the major product: 2-bromo-2-methylbutane gives 2-methylbut-1-ene (UCLA glossary) and 2-bromo-2,3-dimethylbutane gives about 75% of 2,3-dimethylbut-1-ene (Reusch, MSU).",
+};
+
+/** Alkene bonds conjugated with an aryl group, carbonyl, nitrile or another alkene: substitution count alone does not rank these. */
+const CONJUGATED_ALKENE = "[CX3]=[CX3]-[$(c),$([CX3]=O),$(C#N),$([CX3]=[CX3])]";
+
+/**
+ * Qualitative Zaitsev/Hofmann ranking of the constitutional alkenes an E1/E2 rule offers. The rule's own
+ * outcomes are the siblings. Returns null (unranked) whenever the principle does not safely apply: one
+ * constitution only, the leaving group on a ring carbon (anti-periplanar access decides), or alkenes that differ
+ * in conjugation. Fractions are never invented; E/Z geometry within one constitution is not ranked here.
+ */
+async function assessEliminationRegiochemistry(
+  rule: ReactionRule,
+  substrate: string,
+  productSmiles: string,
+): Promise<ReactionSelectivityAssessment | null> {
+  const mode = rule.selectivityProfile?.regiochemistry?.mode;
+  const transform = rule.transform;
+  if ((mode !== "zaitsev" && mode !== "hofmann") || transform.type !== "customHandler" || transform.handler !== "elimination") {
+    return null;
+  }
+  const options = transform.options;
+  if (options.mode !== "e1" && options.mode !== "e2" && options.mode !== "betaElimination") return null;
+  if (await smartsMatches(substrate, "[C;R]-[Cl,Br,I,OX2H]")) return null;
+
+  const siblings = await elimination(substrate, options);
+  const groups = new Map<string, { score: number; conjugated: boolean }>();
+  const baseline = await totalAlkeneSubstitutionScore(substrate);
+  for (const sibling of siblings) {
+    const key = (await canonicalizeStereoStructure(sibling))?.connectivity;
+    if (!key || groups.has(key)) continue;
+    groups.set(key, {
+      score: (await totalAlkeneSubstitutionScore(sibling)) - baseline,
+      conjugated: await smartsMatches(sibling, CONJUGATED_ALKENE),
+    });
+  }
+  const own = groups.get((await canonicalizeStereoStructure(productSmiles))?.connectivity ?? "");
+  if (!own || groups.size < 2) return null;
+  const all = [...groups.values()];
+  if (all.some((entry) => entry.conjugated !== all[0].conjugated)) return null;
+
+  const scores = all.map((entry) => entry.score);
+  const high = Math.max(...scores);
+  const low = Math.min(...scores);
+  const tail = " Qualitative preference, not a measured ratio; E/Z geometry within a constitution is not ranked.";
+  if (high === low) {
+    return { level: "competitive", estimatedFraction: null, planningPenalty: 10, label: "Competitive alkene (qualitative)", basis: `The alkenes are equally substituted.${tail}` };
+  }
+  if (mode === "zaitsev") {
+    return own.score === high
+      ? { level: "major", estimatedFraction: null, planningPenalty: 0, label: "Major product (qualitative)", basis: `${ELIMINATION_REFERENCES.smallBase} This is the more substituted alkene.${tail}` }
+      : { level: "minor", estimatedFraction: null, planningPenalty: 40, label: "Minor product (qualitative)", basis: `${ELIMINATION_REFERENCES.smallBase} This is a less substituted alkene.${tail}` };
+  }
+  // Hofmann (bulky base): the documented major-product cases are tertiary halides; elsewhere both stay competitive.
+  const tertiary = await smartsMatches(substrate, "[C;H0;X4]-[Cl,Br,I,OX2H]");
+  if (tertiary && own.score === low) {
+    return { level: "major", estimatedFraction: null, planningPenalty: 0, label: "Major product (qualitative)", basis: `${ELIMINATION_REFERENCES.bulkyBase} This is the less substituted alkene from a tertiary halide.${tail}` };
+  }
+  return {
+    level: "competitive",
+    estimatedFraction: null,
+    planningPenalty: 10,
+    label: "Competitive alkene (qualitative)",
+    basis: `${ELIMINATION_REFERENCES.bulkyBase} ${tertiary ? "This is the more substituted alkene, which remains a significant product." : "The documented major-product cases are tertiary halides; for this substrate neither alkene is ranked as major."}${tail}`,
+  };
+}
+
+const SN_E_REFERENCE =
+  "Substitution versus elimination follows the substrate class and the reagent class (Wade, Organic Chemistry, ch. 6-7 summary of SN2/E2 competition; Clayden, Greeves and Warren, ch. 17; not re-read in this stage). It is qualitative: solvent, temperature and the exact base change the ratio, and no fraction is given.";
+
+type HalideClass = "methyl" | "primary" | "secondary" | "tertiary";
+
+/** Class of the single sp3 carbon bearing a halogen, or null when the substrate is outside the simple textbook cases. */
+async function simpleHalideClass(reactants: string[]): Promise<HalideClass | null> {
+  for (const reactant of reactants) {
+    if (!(await smartsMatches(reactant, "[CX4][Cl,Br,I]"))) continue;
+    if (await smartsMatches(reactant, "[CX4]([Cl,Br,I])-[$([#6]=*),$(c),$(C#*)]")) return null; // allylic, benzylic, alpha-carbonyl
+    if (await smartsMatches(reactant, "[CX4]([Cl,Br,I])[CX4]([Cl,Br,I])") || (await countMatches(reactant, "[CX4][Cl,Br,I]")) > 1) return null;
+    if (await smartsMatches(reactant, "[CH3][Cl,Br,I]")) return "methyl";
+    if (await smartsMatches(reactant, "[CH2]([Cl,Br,I])[CX4;!H3;!H2]")) return null; // beta-branched primary: SN2 hindered, E2 enhanced
+    if (await smartsMatches(reactant, "[CX4;H2]([Cl,Br,I])[#6]")) return "primary";
+    if (await smartsMatches(reactant, "[CX4;H1]([Cl,Br,I])([#6])[#6]")) return "secondary";
+    if (await smartsMatches(reactant, "[CX4;H0]([Cl,Br,I])([#6])([#6])[#6]")) return "tertiary";
+    return null;
+  }
+  return null;
+}
+
+async function countMatches(smiles: string, smarts: string): Promise<number> {
+  const rdkit = await getRDKit();
+  const mol = rdkit.get_mol(smiles);
+  const query = rdkit.get_qmol(smarts);
+  try {
+    if (!mol || !query) return 0;
+    const raw = mol.get_substruct_matches?.(query);
+    return typeof raw === "string" ? (JSON.parse(raw) as unknown[]).length : 0;
+  } catch {
+    return 0;
+  } finally {
+    query?.delete?.();
+    mol?.delete?.();
+  }
+}
+
+/**
+ * Qualitative SN2-versus-E2 comparison for simple haloalkanes. Returns null (unassessed) for allylic, benzylic,
+ * alpha-carbonyl, beta-branched primary, polyhalogenated and ring-fused cases, and for any reagent class not declared on the rule.
+ */
+async function assessSubstitutionElimination(rule: ReactionRule, reactants: string[]): Promise<ReactionSelectivityAssessment | null> {
+  const declared = rule.selectivityProfile?.substitutionElimination;
+  if (!declared) return null;
+  const cls = await simpleHalideClass(reactants);
+  if (!cls) return null;
+  const { pathway, reagent } = declared;
+  const make = (level: "major" | "competitive" | "minor", why: string): ReactionSelectivityAssessment => ({
+    level,
+    estimatedFraction: null,
+    planningPenalty: level === "minor" ? 40 : level === "competitive" ? 10 : 0,
+    label: level === "major" ? "Major pathway (qualitative)" : level === "minor" ? "Minor pathway (qualitative)" : "Competitive pathway (qualitative)",
+    basis: `${why} ${SN_E_REFERENCE}`,
+  });
+  const where = `${cls} halide`;
+  // No competing pathway exists for a methyl halide (no beta hydrogen) or for a tertiary halide (no SN2): a lone outcome is not ranked.
+  if (cls === "methyl") return null;
+  if (reagent === "nucleophile") {
+    // weakly basic, good nucleophile: SN2 on primary and secondary, no E2 offered by these rules
+    return pathway === "sn2" && cls !== "tertiary" ? make("major", `A weakly basic nucleophile on a ${where} favors SN2 over E2.`) : null;
+  }
+  if (reagent === "bulky-base") {
+    return pathway === "e2" ? make("major", `A bulky strong base on a ${where} favors elimination because it is too hindered to attack carbon.`) : null;
+  }
+  // hydroxide or small alkoxide: strong base and good nucleophile
+  if (cls === "primary") {
+    return pathway === "sn2"
+      ? make("major", `Hydroxide/alkoxide on an unhindered ${where} gives mainly SN2; E2 is the minor pathway.`)
+      : make("minor", `Hydroxide/alkoxide on an unhindered ${where} gives mainly SN2; elimination is the minor pathway. Heat or a hindered base raises the E2 share.`);
+  }
+  if (cls === "secondary") {
+    if (reagent === "alkoxide") {
+      return pathway === "e2"
+        ? make("major", "A strong alkoxide base on a secondary halide gives mainly E2.")
+        : make("minor", "A strong alkoxide base on a secondary halide gives mainly E2; SN2 is the minor pathway.");
+    }
+    return make("competitive", "Hydroxide on a secondary halide gives both SN2 and E2, and the balance depends on solvent and temperature, so neither is ranked.");
+  }
+  return null; // tertiary: E2 is the only pathway these rules offer, so it is not ranked against anything
+}
+
+async function constitutionalAlkeneCount(rule: ReactionRule, substrate: string): Promise<number> {
+  const transform = rule.transform;
+  if (transform.type !== "customHandler" || transform.handler !== "elimination") return 1;
+  const keys = new Set<string>();
+  for (const sibling of await elimination(substrate, transform.options)) {
+    const key = (await canonicalizeStereoStructure(sibling))?.connectivity;
+    if (key) keys.add(key);
+  }
+  return keys.size;
+}
+
 export async function assessReactionProductSelectivity(
   rule: ReactionRule,
   reactantSmiles: string,
   productSmiles: string,
+  allReactantSmiles: string[] = [reactantSmiles],
 ): Promise<ReactionSelectivityAssessment | null> {
+  if (rule.selectivityProfile?.easDirecting) {
+    return assessEasDirecting(rule, allReactantSmiles, productSmiles);
+  }
+  if (rule.selectivityProfile?.substitutionElimination) {
+    const pathway = await assessSubstitutionElimination(rule, allReactantSmiles);
+    if (rule.selectivityProfile.substitutionElimination.pathway === "e2") {
+      // Alkene-level ranking (Zaitsev/Hofmann among the constitutional alkenes) is the finer statement and is kept when it exists.
+      // The pathway verdict can only demote it (E2 is the minor pathway), never promote a competitive or minor alkene to major.
+      const alkene = await assessEliminationRegiochemistry(rule, reactantSmiles, productSmiles);
+      if (alkene) {
+        if (pathway?.level === "minor" && alkene.level !== "minor") {
+          return { ...alkene, level: "minor", planningPenalty: 40, label: "Minor pathway (qualitative)", basis: `${pathway.basis} ${alkene.basis}` };
+        }
+        return alkene;
+      }
+      // The alkene ranking was withheld on purpose (ring substrate, conjugation difference) or there is one alkene. With several
+      // constitutional alkenes the pathway verdict would label each of them, which says nothing about which alkene: leave them unranked.
+      if ((await constitutionalAlkeneCount(rule, reactantSmiles)) > 1) return null;
+    }
+    return pathway;
+  }
+  if (rule.selectivityProfile?.regiochemistry?.mode === "zaitsev" || rule.selectivityProfile?.regiochemistry?.mode === "hofmann") {
+    return assessEliminationRegiochemistry(rule, reactantSmiles, productSmiles);
+  }
+  if (rule.productPreferences?.length) {
+    return assessDeclaredPreference(rule, allReactantSmiles, productSmiles);
+  }
   if (
     rule.selectivityProfile?.sitePreference !== "most-stable-radical-site" ||
     rule.transform.type !== "customHandler" ||
@@ -449,6 +794,20 @@ export async function applyRuleProductSelectivity(
   selected = await applyMechanismProductPostconditions(rule, selected);
 
   if (profile?.mixture === "expected") return selected;
+
+  if (profile?.keepConstitutionalAlternatives && selected.length > 1) {
+    if (!profile.stereochemistry?.stereoselective) return selected;
+    // One product per constitution (the first, which the handler orders E before Z); constitutions are all kept.
+    const seen = new Set<string>();
+    const perConstitution: string[] = [];
+    for (const product of selected) {
+      const key = (await canonicalizeStereoStructure(product))?.connectivity ?? product;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      perConstitution.push(product);
+    }
+    return perConstitution;
+  }
 
   // `mixture: "single"` is now enforced, not merely descriptive metadata.
   // A rule that promises one major product must not leak lower-ranked RDKit

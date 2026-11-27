@@ -564,6 +564,17 @@ function dielsAlderTargets(
     ))
     .filter((target): target is StereoTarget => target !== null);
 
+  // Endo rule (Stage 9J fix). An electron-withdrawing dienophile substituent (C=O, C#N) adds endo, so in the cycloadduct it is on the SAME
+  // face as the diene's "outside" substituents; an (E,E)-diene puts both terminal substituents outside and on one face, so the two diene
+  // targets share a face. Previously every dienophile substituent defaulted to the opposite face, which drew the exo adduct for
+  // methyl acrylate + (E,E)-hexa-2,4-diene even though the directive says the dienophile is activated. Applies only when the diene
+  // terminals are on one face (nothing is claimed for E,Z dienes, where which terminal is "outside" is not recorded here).
+  if (directive.dielsAlder?.activatedDienophile && dieneTargets.length >= 2 && dieneTargets[0].desired === dieneTargets[1].desired) {
+    for (const target of dienophileTargets) {
+      if (isElectronWithdrawingBranch(graph, target.neighbor, target.center)) target.desired = dieneTargets[0].desired;
+    }
+  }
+
   if (dienophileTargets.length >= 2) {
     const geometry = directive.dielsAlder?.dienophileGeometry ?? null;
     if (geometry === "E") {

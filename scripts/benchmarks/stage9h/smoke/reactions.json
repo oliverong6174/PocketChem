@@ -1,0 +1,1 @@
+{"cases":[{"id":"SMK-RX","category":"smoke","evidence":"smoke","reactants":["C=CC"],"reagents":"HBr","reagent_tokens":["hbr"],"expected":{"outcome":"determinate","products":[{"smiles":"CC(C)Br","role":"sole"}],"forbidden":["CCCBr"],"stereo":"none"}}]}

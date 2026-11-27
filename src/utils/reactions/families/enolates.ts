@@ -79,6 +79,7 @@ export const enolateReactionRules: ReactionRule[] = [
   },
   {
     id: "enolate-alkylation",
+    conditions: { base: "strong", anhydrous: true },
     family: "enolates",
     reactionType: "substitution",
     title: "Enolate Alkylation",
@@ -106,6 +107,84 @@ export const enolateReactionRules: ReactionRule[] = [
     priority: 1830,
   },
   {
+    id: "enolate-alkylation-kinetic",
+    conditions: { base: "strong", anhydrous: true },
+    family: "enolates",
+    reactionType: "substitution",
+    title: "Kinetic Enolate Alkylation",
+    reagents: "1) LDA, THF, −78 °C  2) methyl or primary R–X",
+    reagentNote: "Irreversible deprotonation at the less substituted alpha carbon",
+    productHint: "Alpha-alkylated ketone",
+    explanation:
+      "A strong, bulky, non-nucleophilic base at low temperature removes the more accessible proton, at the less substituted alpha carbon (more alpha hydrogens), and the kinetic enolate is trapped irreversibly by an SN2 alkylation.",
+    trigger: { includeSmarts: ["[C;X4;$([CH3][C](=O)[C;X4;H0,H1,H2]),$([CH2;X4][C](=O)[C;X4;H0,H1]),$([CH1;X4][C](=O)[C;X4;H0])]"] },
+    additionalReactants: [
+      {
+        label: "methyl or primary alkyl halide",
+        trigger: { includeSmarts: ["[C;X4;H2,H3][Cl,Br,I]"] },
+      },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[CH3:1][C:2](=[O:3])[C;X4;H0,H1,H2:5].[C;X4:4][Cl,Br,I]>>[C:1]([C:4])[C:2](=[O:3])[C;X4;H0,H1,H2:5]",
+      maxProducts: 6,
+      forwardTemplates: [
+        { smarts: "[CH3:1][C:2](=[O:3])[C;X4;H0,H1,H2:5].[C;X4:4][Cl,Br,I]>>[C:1]([C:4])[C:2](=[O:3])[C;X4;H0,H1,H2:5]" },
+        { smarts: "[CH2;X4:1][C:2](=[O:3])[C;X4;H0,H1:5].[C;X4:4][Cl,Br,I]>>[C:1]([C:4])[C:2](=[O:3])[C;X4;H0,H1:5]" },
+        { smarts: "[CH1;X4:1][C:2](=[O:3])[C;X4;H0:5].[C;X4:4][Cl,Br,I]>>[C:1]([C:4])[C:2](=[O:3])[C;X4;H0:5]" },
+      ],
+    },
+    productStatus: "representative",
+    limitations: [
+      "Applies only to ketones whose two alpha carbons carry different numbers of hydrogens; for a symmetric ketone use the general enolate alkylation rule.",
+      "Selectivity is the textbook trend (kinetic versus thermodynamic control), not a measured ratio; enolate equilibration, aggregation and counter-ion effects are not modeled.",
+    ],
+    mechanism: "Enolate formation followed by SN2",
+    selectivity: [
+      "LDA in THF at −78 °C gives the kinetic enolate at the less substituted alpha carbon (for example 2-methylcyclohexanone gives 2,6-dimethylcyclohexanone after methylation).",
+    ],
+    priority: 1831,
+  },
+  {
+    id: "enolate-alkylation-thermodynamic",
+    conditions: { base: "mild", anhydrous: false },
+    family: "enolates",
+    reactionType: "substitution",
+    title: "Thermodynamic Enolate Alkylation",
+    reagents: "1) NaOEt/EtOH or NaH, room temperature (equilibrating)  2) methyl or primary R–X",
+    reagentNote: "Reversible deprotonation favors the more substituted enolate",
+    productHint: "Alpha-alkylated ketone",
+    explanation:
+      "A base weak enough to leave the enolates in equilibrium lets the more stable, more substituted enolate dominate, and that enolate is alkylated by SN2. Over-alkylation at the same carbon is possible.",
+    trigger: { includeSmarts: ["[C;X4;$([CH3][C](=O)[C;X4;H0,H1,H2]),$([CH2;X4][C](=O)[C;X4;H0,H1]),$([CH1;X4][C](=O)[C;X4;H0])]"] },
+    additionalReactants: [
+      {
+        label: "methyl or primary alkyl halide",
+        trigger: { includeSmarts: ["[C;X4;H2,H3][Cl,Br,I]"] },
+      },
+    ],
+    transform: {
+      type: "reactionSmarts",
+      smarts: "[C;H0;X4:1][C:2](=[O:3])[C;X4;H1,H2,H3:5].[C;X4:4][Cl,Br,I]>>[C:1]([C:4])[C:2](=[O:3])[C;X4;H1,H2,H3:5]",
+      maxProducts: 6,
+      forwardTemplates: [
+        { smarts: "[C;H0;X4:1][C:2](=[O:3])[C;X4;H1,H2,H3:5].[C;X4:4][Cl,Br,I]>>[C:1]([C:4])[C:2](=[O:3])[C;X4;H1,H2,H3:5]" },
+        { smarts: "[C;H1;X4:1][C:2](=[O:3])[C;X4;H2,H3:5].[C;X4:4][Cl,Br,I]>>[C:1]([C:4])[C:2](=[O:3])[C;X4;H2,H3:5]" },
+        { smarts: "[C;H2;X4:1][C:2](=[O:3])[C;X4;H3:5].[C;X4:4][Cl,Br,I]>>[C:1]([C:4])[C:2](=[O:3])[C;X4;H3:5]" },
+      ],
+    },
+    productStatus: "representative",
+    limitations: [
+      "Applies only to ketones whose two alpha carbons carry different numbers of hydrogens; for a symmetric ketone use the general enolate alkylation rule.",
+      "Selectivity is the textbook trend (kinetic versus thermodynamic control), not a measured ratio; enolate equilibration, aggregation and counter-ion effects are not modeled.",
+    ],
+    mechanism: "Enolate formation followed by SN2",
+    selectivity: [
+      "Equilibrating conditions give the more substituted enolate (for example 2-methylcyclohexanone gives 2,2-dimethylcyclohexanone after methylation).",
+    ],
+    priority: 1832,
+  },
+  {
     id: "aldol-addition-general",
     family: "enolates",
     reactionType: "addition",
@@ -128,6 +207,17 @@ export const enolateReactionRules: ReactionRule[] = [
       maxProducts: 16,
     },
     productStatus: "representative",
+    productPreferences: [
+      {
+        id: "aldol-ketone-electrophile-disfavored",
+        whenReactantSmarts: ["[CX3H1](=O)[#6]", "[CX3;H0]([#6])([#6])=O"],
+        productSmarts: "[CX4;H0]([OX2H])([#6])([#6])[CX4][CX3]=O",
+        level: "minor",
+        basis:
+          "When an aldehyde is present beside a ketone, addition to the ketone carbonyl is the less favorable aldol: ketones are less electrophilic and their aldol adducts are less stable, so the equilibrium lies toward the aldehyde adduct. This marks only the ketone-electrophile product as minor; it does NOT make the aldehyde-electrophile product major, because self-aldol of the more acidic and more electrophilic aldehyde competes and is not enumerated here.",
+        references: ["Clayden, Greeves and Warren, Organic Chemistry 2nd ed., ch. 26 (crossed aldol: aldehydes as electrophiles, ketone adducts disfavored); not re-read in this stage."],
+      },
+    ],
     limitations: ["Crossed aldol reactions can give multiple donor/electrophile and alpha-site combinations; the engine enumerates constitutional products but does not rank them."],
     mechanism: "Enolate addition",
     priority: 1840,
@@ -230,9 +320,11 @@ export const enolateReactionRules: ReactionRule[] = [
     productHint: "Beta-substituted carbonyl",
     explanation:
       "Gilman reagents are soft carbon nucleophiles that typically add to the beta carbon of an alpha,beta-unsaturated carbonyl, preserving the carbonyl group after workup.",
+    // Structural trigger only: the functional-group classifier names cyclic enones such as cyclohex-2-enone
+    // "Crotonaldehyde"/"Acryloyl" rather than "Enone", so a name-based condition made the rule unreachable for them.
     trigger: {
-      anyFunctionalGroups: ["Enone", "Enal", "Enoate", "Chalcone"],
       includeSmarts: ["[C]=[C][C](=O)"],
+      excludeSmarts: ["[CX3](=O)[OX2H1]"],
     },
     additionalReactants: [
       { label: "Gilman or organocuprate reagent", trigger: { includeSmarts: ["[#6][Cu]"] } },

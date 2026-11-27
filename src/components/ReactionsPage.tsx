@@ -1,5 +1,9 @@
 import { reagentBubbleLabels } from "../utils/reactions/reactionPresentation";
+import { useIncomingMolecule } from "./ui/useIncomingMolecule";
+import { peekMoleculeTransfer } from "../utils/moleculeTransfer";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { MolecularFigure } from "./ui/MolecularFigure";
+import { componentSource } from "../utils/moleculeTransfer";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import {
   analyzeFunctionalGroupHierarchy,
@@ -15,6 +19,32 @@ import {
   type HalogenSymbol,
 } from "../utils/reactions/profiles/halogens";
 import { rendererForReactionDisplay } from "./reactionProductRenderer";
+import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
+import { ToolHeader } from "./ui/primitives";
+import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
+import { DebouncedTask } from "../utils/persistence/debouncedTask";
+import { restoreEditorContent } from "../utils/persistence/editorRestore";
+import { transferIntoEditor, transferIntoEditors } from "../utils/persistence/handoffTransfer";
+import { ketHasStructureText, ketIdentityKey } from "../utils/persistence/ketIdentity";
+import {
+  REACTIONS_ENGINE_VERSION,
+  describeReactionsAnalysis,
+  handoffOfferAvailable,
+  isReactionsOutcomeKind,
+  restoredResultsAreStale,
+  validateReactionsInputs,
+  validateReactionsResults,
+  type ReactionsOutcomeKind,
+  type ReactionsWorkspaceInputs,
+  type ReactionsWorkspaceResults,
+} from "../utils/persistence/reactionsWorkspace";
+import type { Capture, RecoveryOutcome } from "../utils/persistence/workspacePersistence";
+import type { WorkspaceResults } from "../utils/persistence/workspaceStore";
+import { getAppAnalysisLibrary } from "../utils/persistence/analysisLibraryApp";
+import type { OpenedAnalysis } from "../utils/persistence/analysisLibrary";
+import { useSavedAnalysisOpen } from "../utils/persistence/useSavedAnalysisOpen";
+import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./SavedAnalysisControls";
+import { ReactionResultsExplorer } from "./reactions/ReactionResultsExplorer";
 
 import {
   predictReactionPathways,
@@ -36,6 +66,15 @@ type Props = {
   initialReactantSvg?: string | null;
   /** Preserved Ketcher V3000 block for each disconnected reactant component. */
   initialReactantComponentMolfiles?: string[];
+  /** Identifies the Properties analysis the initial props came from; null when there is none. */
+  handoffId?: string | null;
+  /** Display name of that analysis's molecule, for the "Use in Reactions" offer. */
+  handoffLabel?: string | null;
+  /** Its SMILES, used only when no molfile is available. */
+  handoffSmiles?: string | null;
+  /** A saved analysis the user chose on the Saved page; opened once recovery has finished. */
+  openRequest?: { id: string; recordId: string } | null;
+  onOpenHandled?: (requestId: string) => void;
 };
 
 type SvgListMap = Record<string, string[]>;
@@ -45,6 +84,8 @@ type DisplayProductVariant = {
   completeSmiles: string;
   componentSmiles: string[];
   label: string;
+  /** The engine's qualitative ranking of this outcome, when it has one; null means unranked (not "minor"). */
+  assessment: ReactionPathway["selectivityAssessment"];
 };
 
 const HALOGEN_SYMBOLS: readonly HalogenSymbol[] = ["Cl", "Br", "I"];
@@ -61,7 +102,26 @@ type DisplayReactionPathway = ReactionPathway & {
 };
 
 type AnalysisMode = "forward" | "retrosynthesis";
+
+/** What the page knows about the finished analysis on screen. */
+type ReactionsResultMeta = {
+  kind: ReactionsOutcomeKind;
+  computedAt: string;
+  engineVersion: number;
+  /** Chemistry identity of the structure(s) the analysis was run on. */
+  structureKey: string;
+  mode: AnalysisMode;
+  /** Loaded from a previous session instead of computed in this one. */
+  restored: boolean;
+  /** Saved by an earlier version of the reaction engine; shown as saved, never recomputed. */
+  engineMismatch: boolean;
+  /** The saved drawing could not be confirmed to match these results. */
+  stale: boolean;
+  /** Set when the analysis was opened from the Saved Analyses library. */
+  opened?: { name: string; savedAt: string } | null;
+};
 const RESULTS_PER_BATCH = 12;
+const EMPTY_ID_SET: ReadonlySet<string> = new Set();
 
 function courseLabel(course: ReactionPathway["course"]) {
   return course === "ochem-1"
@@ -132,6 +192,7 @@ function productVariantsForPathway(pathway: ReactionPathway): DisplayProductVari
       .map((component) => component.trim())
       .filter(Boolean),
     label: pathway.productMixture?.displayName ?? pathway.productLabel,
+    assessment: pathway.selectivityAssessment ?? null,
   }));
 }
 
@@ -261,7 +322,7 @@ function displayProductLabel(pathway: ReactionPathway | DisplayReactionPathway):
     return generalizedSeriesText(pathway, base);
   }
   if ("productVariants" in pathway && pathway.productVariants.length > 1 && !pathway.productMixture) {
-    return `${pathway.productVariants.length} chemically competitive product alternatives`;
+    return `${pathway.productVariants.length} product alternatives`;
   }
   return base;
 }
@@ -319,27 +380,24 @@ async function reactionInputDisplayName(smiles: string): Promise<string> {
 export default function ReactionsPage({
   initialPathways,
   initialReactantMolfile = null,
-  initialReactantSvg = null,
-  initialReactantComponentMolfiles = [],
+  handoffId = null,
+  handoffLabel = null,
+  handoffSmiles = null,
+  openRequest = null,
+  onOpenHandled,
 }: Props) {
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [reactionSmiles, setReactionSmiles] = useState("");
-  // Preserve the main-page Ketcher depiction on the very first render. Without
-  // this handoff, initial pathways contain only canonical SMILES and RDKit is
-  // free to reflect/rotate an equivalent fused-ring drawing before the user
-  // ever presses Analyze on this page.
-  const [reactionMolfile, setReactionMolfile] = useState<string | null>(
-    initialReactantMolfile,
-  );
-  const [reactionSvgSnapshot, setReactionSvgSnapshot] = useState<string | null>(
-    initialReactantSvg,
-  );
-  const [reactionComponentMolfiles, setReactionComponentMolfiles] = useState<string[]>(
-    initialReactantComponentMolfiles,
-  );
+  // The molecule from the latest Properties analysis is never shown automatically: opening this
+  // page restores its own saved workspace. The user can adopt that molecule with "Use in
+  // Reactions" (adoptHandoff), which loads its exact Ketcher molfile and its already computed
+  // pathways, preserving the main-page depiction, scaffold orientation and wedge/hash bonds.
+  const [reactionMolfile, setReactionMolfile] = useState<string | null>(null);
+  const [reactionSvgSnapshot, setReactionSvgSnapshot] = useState<string | null>(null);
+  const [reactionComponentMolfiles, setReactionComponentMolfiles] = useState<string[]>([]);
   const [reactionInputName, setReactionInputName] = useState("");
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>("forward");
-  const [pathways, setPathways] = useState<ReactionPathway[]>(initialPathways);
+  const [pathways, setPathways] = useState<ReactionPathway[]>([]);
   const [retroPathways, setRetroPathways] = useState<RetrosynthesisPathway[]>([]);
   const [noReactionOutcomes, setNoReactionOutcomes] = useState<NoReactionOutcome[]>([]);
   const [reactantSvgs, setReactantSvgs] = useState<SvgListMap>({});
@@ -352,14 +410,600 @@ export default function ReactionsPage({
   const [visibleResultCount, setVisibleResultCount] = useState(RESULTS_PER_BATCH);
   const analysisRunRef = useRef(0);
 
+  // ---- workspace recovery (Stage 8B-2B) --------------------------------------------------------
+  // The drawn structure(s), the analysis mode and the finished analysis (pathways, retrosynthetic
+  // routes, NO REACTION outcomes) are saved and come back after a reload or a visit to another
+  // page. Restoring never runs a prediction. As before, editing the canvas discards the results on
+  // screen, so a saved result is always about the structures it was saved with.
+  const [snapshotTask] = useState(() => new DebouncedTask(async () => undefined));
+  // The last Properties analysis this workspace adopted (saved with the workspace, so a reload or
+  // a later visit does not offer the same molecule again).
+  const [handoffSeen, setHandoffSeen] = useState<string | null>(null);
+  const { controller: persistence, recovery, status: persistenceStatus } = useWorkspacePersistence<
+    ReactionsWorkspaceInputs,
+    ReactionsWorkspaceResults
+  >({
+    page: "reactions",
+    engineVersion: REACTIONS_ENGINE_VERSION,
+    validateInputs: validateReactionsInputs,
+    validateResults: validateReactionsResults,
+    beforeLeave: () => snapshotTask.flushNow(),
+  });
+  const [resultMeta, setResultMeta] = useState<ReactionsResultMeta | null>(null);
+  const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
+  const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
+  const [editorRestoreVersion, setEditorRestoreVersion] = useState(0);
+  const ketcherRef = useRef<KetcherApi | null>(null);
+  const snapshotRef = useRef<{ ket: string | null; key: string | null }>({ ket: null, key: null });
+  const pendingEditorRef = useRef<{ ket: string; key: string | null; token: number } | null>(null);
+  const restoringRef = useRef(false);
+  const analysisStartedRef = useRef(false);
+  const adoptedRef = useRef(false);
+  const adoptingRef = useRef(false);
+  const deferredRecoveryRef = useRef<RecoveryOutcome<ReactionsWorkspaceInputs, ReactionsWorkspaceResults> | null>(null);
+  const [isAdopting, setIsAdopting] = useState(false);
+  const appliedRecoveryRef = useRef<unknown>(null);
+  const applyRestoreRef = useRef<((outcome: RecoveryOutcome<ReactionsWorkspaceInputs, ReactionsWorkspaceResults>) => void) | null>(null);
+  const requestPersistRef = useRef<() => void>(() => undefined);
+  const restoreEditorRef = useRef<() => void>(() => undefined);
+  const latestRef = useRef({
+    reactionSmiles, reactionMolfile, reactionComponentMolfiles, reactionInputName, reactionStatus,
+    analysisMode, pathways, retroPathways, noReactionOutcomes, visibleResultCount, isAnalyzing, resultMeta, handoffSeen,
+  });
+
+  function captureReactions(): Capture<ReactionsWorkspaceInputs, ReactionsWorkspaceResults> | null {
+    const latest = latestRef.current;
+    const snapshot = snapshotRef.current;
+    const inputs: ReactionsWorkspaceInputs = {
+      ket: snapshot.ket,
+      key: snapshot.key,
+      analysisMode: latest.analysisMode,
+      visibleResultCount: latest.visibleResultCount,
+      // A prediction that is still running is recorded as interrupted, never as a result.
+      interrupted: latest.isAnalyzing ? latest.analysisMode : null,
+      handoffSeen: latest.handoffSeen,
+    };
+    let results: WorkspaceResults<ReactionsWorkspaceResults> | null = null;
+    const meta = latest.resultMeta;
+    if (meta && !latest.isAnalyzing && latest.reactionSmiles) {
+      const forward = meta.mode === "forward";
+      results = {
+        computedAt: meta.computedAt,
+        engineVersion: meta.engineVersion,
+        stale: meta.stale,
+        status: meta.kind,
+        data: {
+          inputKey: meta.structureKey,
+          mode: meta.mode,
+          smiles: latest.reactionSmiles,
+          molfile: latest.reactionMolfile,
+          componentMolfiles: latest.reactionComponentMolfiles,
+          inputName: latest.reactionInputName,
+          statusText: latest.reactionStatus,
+          pathways: forward ? latest.pathways : [],
+          retroPathways: forward ? [] : latest.retroPathways,
+          noReactionOutcomes: forward ? latest.noReactionOutcomes : [],
+        },
+      };
+    }
+    if (!inputs.ket && !results && !inputs.interrupted) return null;
+    return { inputs, results };
+  }
+
+  function requestPersist() {
+    persistence.requestSave(captureReactions);
+  }
+
+  /** Reads the editor and refreshes the saved drawing. */
+  async function takeEditorSnapshot() {
+    const api = ketcherRef.current;
+    if (!api || restoringRef.current || pendingEditorRef.current) return;
+    const token = persistence.token();
+    try {
+      const ket = await Promise.race([
+        api.getKet(),
+        new Promise<never>((_resolve, reject) => setTimeout(() => reject(new Error("Timed out reading the editor.")), 8000)),
+      ]);
+      const key = await ketIdentityKey(ket);
+      if (!persistence.isCurrent(token) || restoringRef.current || pendingEditorRef.current) return;
+      snapshotRef.current = { ket: ketHasStructureText(ket) ? ket : null, key };
+      requestPersist();
+    } catch (snapshotError) {
+      console.warn("[PocketChem:Reactions] Could not read the editor for workspace recovery.", snapshotError);
+    }
+  }
+
+  /** Drops the results on screen (the canvas no longer matches them). */
+  function discardShownResults(statusText: string) {
+    analysisRunRef.current += 1;
+    setResultMeta(null);
+    setReactionSmiles("");
+    setReactionMolfile(null);
+    setReactionComponentMolfiles([]);
+    setReactionSvgSnapshot(null);
+    setReactionInputName("");
+    setReactionError(null);
+    setPathways([]);
+    setRetroPathways([]);
+    setNoReactionOutcomes([]);
+    setReactantSvgs({});
+    setProductSvgs({});
+    setRetroTargetSvgs({});
+    setRetroPrecursorSvgs({});
+    setIsAnalyzing(false);
+    setVisibleResultCount(RESULTS_PER_BATCH);
+    setReactionStatus(statusText);
+  }
+
+  async function restoreEditor() {
+    const pending = pendingEditorRef.current;
+    const api = ketcherRef.current;
+    if (!pending || !api || restoringRef.current || adoptingRef.current) return;
+    restoringRef.current = true;
+    const { token } = pending;
+    // A transfer in progress invalidates a drawing restore, exactly like Clear does.
+    const outcome = await restoreEditorContent(api, { ket: pending.ket, key: pending.key }, () => persistence.isCurrent(token) && !adoptingRef.current);
+    if (persistence.isCurrent(token)) {
+      pendingEditorRef.current = null;
+      if (outcome.kind === "failed") {
+        // Do not let an editor that failed to restore overwrite the saved copy, and do not present
+        // the restored results as belonging to whatever is now on the canvas.
+        persistence.disable();
+        setResultMeta((meta) => (meta ? { ...meta, stale: true } : meta));
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: "The saved drawing could not be restored into the editor. Your saved work was kept and will not be overwritten; use Clear Analysis to start over." },
+        ]);
+      } else if (outcome.kind === "user-content-kept") {
+        // A drawing made before the saved one arrived wins, and results about another structure go.
+        discardShownResults("Structure changed. Predict again when the new input is ready.");
+      }
+    }
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      if (outcome.kind === "user-content-kept") snapshotTask.schedule();
+    }, 500);
+  }
+
+  function applyRestoredReactions(outcome: RecoveryOutcome<ReactionsWorkspaceInputs, ReactionsWorkspaceResults>) {
+    if (appliedRecoveryRef.current === outcome) return;
+    if (adoptingRef.current) {
+      // A molecule is being adopted right now: the record is applied only if that transfer fails.
+      deferredRecoveryRef.current = outcome;
+      return;
+    }
+    appliedRecoveryRef.current = outcome;
+    if (outcome.kind === "rejected") {
+      setRecoveryNotices([{ tone: "warn", text: `Saved work from a previous session could not be used (${outcome.message}). It was set aside and the page started clean.` }]);
+      return;
+    }
+    if (outcome.kind !== "restored" || !persistence.isCurrent(outcome.epoch)) return;
+    // Opening the page restores its own workspace; a Properties molecule never displaces it. Work
+    // (or an adoption) that began before the record arrived is the user's newer choice and wins.
+    if (analysisStartedRef.current || latestRef.current.isAnalyzing || adoptedRef.current) {
+      setRecoveryNotices([{ tone: "info", text: "Saved work from a previous session was not restored because you had already started working on this page." }]);
+      return;
+    }
+    setHandoffSeen(outcome.inputs.handoffSeen);
+
+    const { inputs, results } = outcome;
+    const notices: WorkspaceNoticeItem[] = [];
+    setAnalysisMode(inputs.analysisMode);
+    setVisibleResultCount(inputs.visibleResultCount);
+    snapshotRef.current = { ket: inputs.ket, key: inputs.key };
+    if (inputs.ket) {
+      pendingEditorRef.current = { ket: inputs.ket, key: inputs.key, token: outcome.epoch };
+      setEditorRestoreVersion((version) => version + 1);
+    }
+
+    if (results && isReactionsOutcomeKind(results.status)) {
+      const data = results.data;
+      setAnalysisMode(data.mode);
+      setReactionSmiles(data.smiles);
+      setReactionMolfile(data.molfile);
+      setReactionComponentMolfiles(data.componentMolfiles);
+      setReactionSvgSnapshot(null);
+      setReactionInputName(data.inputName);
+      setPathways(data.pathways);
+      setRetroPathways(data.retroPathways);
+      setNoReactionOutcomes(data.noReactionOutcomes);
+      setReactionError(null);
+      setReactionStatus(`Restored from your previous session, ${data.statusText}`);
+      setResultMeta({
+        kind: results.status,
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        structureKey: data.inputKey,
+        mode: data.mode,
+        restored: true,
+        engineMismatch: outcome.engineMismatch,
+        // A record whose results do not match its own saved drawing is never presented as current.
+        stale: restoredResultsAreStale(inputs, results),
+      });
+    } else if (inputs.interrupted) {
+      notices.push({
+        tone: "warn",
+        text: `A ${inputs.interrupted === "retrosynthesis" ? "reactant search" : "product prediction"} was running when this page was last saved. It did not finish and was not resumed; press the button again to run it.`,
+      });
+      setReactionStatus("The previous prediction was interrupted and did not finish.");
+    } else if (inputs.ket) {
+      setInputsOnlyRestored(true);
+      setReactionStatus("Restored your drawing from your previous session.");
+    }
+    if (outcome.resultsDropped) {
+      notices.push({ tone: "warn", text: "Saved reaction results could not be validated and were not restored. Your drawing was." });
+    }
+    if (outcome.migratedFrom !== null) {
+      notices.push({ tone: "info", text: "Your saved workspace was upgraded from an older storage format." });
+    }
+    setRecoveryNotices(notices);
+  }
+
+  /**
+   * "Use in Reactions": the user explicitly adopts the molecule from the latest Properties analysis.
+   *
+   * This is a transaction (see transferIntoEditor) and the saved Reactions workspace is never
+   * touched until it succeeds. Late restoration, pending saves and stale callbacks are held off
+   * while it runs; on failure the previous drawing is put back and the previous workspace carries
+   * on, and a recovery that arrived meanwhile is applied. On success the page shows the transferred
+   * molecule with the pathways Properties already computed (nothing is predicted here), every
+   * prediction belonging to the old molecule is cleared, and one write replaces the saved record
+   * with the new drawing and the adopted analysis id.
+   */
+  async function adoptHandoff() {
+    const api = ketcher;
+    const source = initialReactantMolfile || handoffSmiles;
+    if (!api || !source || handoffId === null || isAnalyzing) return;
+    if (adoptingRef.current || handoffSeen === handoffId) return; // one transfer at a time, never twice
+    adoptingRef.current = true;
+    setIsAdopting(true);
+    snapshotTask.cancel();
+    restoringRef.current = true;
+
+    const outcome = await transferIntoEditor(api, source, persistence);
+
+    if (outcome.kind !== "adopted") {
+      if (outcome.kind === "rolled-back") {
+        const deferred = deferredRecoveryRef.current;
+        deferredRecoveryRef.current = null;
+        if (deferred) {
+          try {
+            applyRestoreRef.current?.(deferred);
+          } finally {
+            persistence.resumeAfterRestore();
+          }
+        }
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: "The molecule from Properties could not be loaded. Your Reactions workspace is unchanged." },
+        ]);
+        requestPersistRef.current();
+      } else {
+        // The canvas may have changed, so the predictions on screen no longer describe it. The
+        // stored workspace is untouched and nothing is saved over it.
+        discardShownResults("The molecule from Properties could not be loaded.");
+        setRecoveryNotices([
+          { tone: "warn", text: "The molecule from Properties could not be loaded and the editor could not be restored. Your saved Reactions workspace is unchanged; reload this page to bring it back." },
+        ]);
+      }
+      adoptingRef.current = false;
+      setIsAdopting(false);
+      window.setTimeout(() => {
+        restoringRef.current = false;
+      }, 500);
+      return;
+    }
+
+    deferredRecoveryRef.current = null;
+    pendingEditorRef.current = null;
+    snapshotRef.current = { ket: outcome.ket, key: outcome.key };
+    adoptedRef.current = true;
+    analysisStartedRef.current = false;
+    analysisRunRef.current += 1;
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
+    setReactionSmiles("");
+    setReactionMolfile(initialReactantMolfile);
+    setReactionComponentMolfiles([]);
+    setReactionSvgSnapshot(null);
+    setReactionInputName("");
+    setReactionError(null);
+    setAnalysisMode("forward");
+    setPathways(initialPathways);
+    setRetroPathways([]);
+    setNoReactionOutcomes([]);
+    setReactantSvgs({});
+    setProductSvgs({});
+    setRetroTargetSvgs({});
+    setRetroPrecursorSvgs({});
+    setIsAnalyzing(false);
+    setVisibleResultCount(RESULTS_PER_BATCH);
+    setHandoffSeen(handoffId);
+    setReactionStatus("Using the molecule from Properties. Press Predict Products or Predict Reactants to run a prediction here.");
+    persistence.requestSave(() => ({
+      inputs: {
+        ket: outcome.ket,
+        key: outcome.key,
+        analysisMode: "forward",
+        visibleResultCount: RESULTS_PER_BATCH,
+        interrupted: null,
+        handoffSeen: handoffId,
+      },
+      results: null,
+    }));
+    await persistence.flush();
+    adoptingRef.current = false;
+    setIsAdopting(false);
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      snapshotTask.schedule();
+    }, 500);
+  }
+
+  // ---- Saved Analyses (Stage 8B-3B-2) ------------------------------------------------------------
+  // "Save Analysis" copies the finished analysis (pathways, mixtures, retrosynthetic routes, NO REACTION
+  // outcomes, with their explanations) into the library; opening one puts it back and redraws the
+  // reaction and product images from the saved structures. Nothing is predicted when one is opened.
+
+  const [saveForm, setSaveForm] = useState<{ name: string } | null>(null);
+  const [saveBusy, setSaveBusy] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<WorkspaceNoticeItem | null>(null);
+
+  function defaultAnalysisName(): string {
+    const l = latestRef.current;
+    return `Reactions of ${l.reactionInputName || l.reactionSmiles || "this molecule"}`.slice(0, 100);
+  }
+
+  async function saveCurrentAnalysis(analysisName: string, announce = true): Promise<boolean> {
+    setSaveBusy(true);
+    try {
+      await snapshotTask.flushNow();
+      const capture = captureReactions();
+      if (!capture || !capture.results || latestRef.current.isAnalyzing) {
+        setSaveMessage({ tone: "warn", text: "Run a prediction before saving an analysis." });
+        return false;
+      }
+      const saved = await getAppAnalysisLibrary().save("reactions", {
+        name: analysisName,
+        summary: describeReactionsAnalysis(capture.results.data),
+        inputs: capture.inputs,
+        results: capture.results,
+      });
+      if (!saved.ok) {
+        setSaveMessage({ tone: "warn", text: `The analysis was not saved: ${saved.error.message}` });
+        return false;
+      }
+      if (announce) setSaveMessage({ tone: "info", text: `Saved “${saved.value.name}” to Saved analyses.` });
+      return true;
+    } finally {
+      setSaveBusy(false);
+    }
+  }
+
+  /**
+   * Replaces the Reactions workspace with a saved analysis, as one transaction (see
+   * transferIntoEditors). A saved analysis takes precedence over the older automatic workspace, and a
+   * Properties molecule is never adopted by opening one: the "Use in Reactions" offer stays an offer.
+   */
+  async function applySavedAnalysis(opened: OpenedAnalysis<ReactionsWorkspaceInputs, ReactionsWorkspaceResults>): Promise<boolean> {
+    const api = ketcherRef.current;
+    if (!api || adoptingRef.current) return false;
+    adoptingRef.current = true; // one transfer at a time, shared with "Use in Reactions"
+    setIsAdopting(true);
+    snapshotTask.cancel();
+    restoringRef.current = true;
+    const { inputs, results } = opened;
+    const outcome = await transferIntoEditors(
+      [{ api, source: inputs.ket, expectKey: inputs.ket ? inputs.key : null }],
+      persistence,
+    );
+    if (outcome.kind !== "adopted") {
+      if (outcome.kind === "rolled-back") {
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: `“${opened.record.name}” could not be opened. Your Reactions workspace is unchanged.` },
+        ]);
+        requestPersistRef.current();
+      } else {
+        // The canvas may have changed, so the predictions on screen no longer describe it.
+        discardShownResults("The saved analysis could not be opened.");
+        setRecoveryNotices([
+          { tone: "warn", text: `“${opened.record.name}” could not be opened and the editor could not be restored. Your saved workspace is unchanged; reload this page to bring it back.` },
+        ]);
+      }
+      adoptingRef.current = false;
+      setIsAdopting(false);
+      window.setTimeout(() => {
+        restoringRef.current = false;
+      }, 500);
+      return false;
+    }
+
+    // Success: the old workspace's callbacks are invalid and the saved analysis is the workspace now.
+    deferredRecoveryRef.current = null;
+    pendingEditorRef.current = null;
+    snapshotRef.current = { ket: outcome.editors[0].ket, key: outcome.editors[0].key };
+    adoptedRef.current = true;
+    analysisStartedRef.current = false;
+    analysisRunRef.current += 1;
+    setHandoffSeen(inputs.handoffSeen);
+    setInputsOnlyRestored(false);
+    setVisibleResultCount(inputs.visibleResultCount);
+    setReactantSvgs({});
+    setProductSvgs({});
+    setRetroTargetSvgs({});
+    setRetroPrecursorSvgs({});
+    setReactionError(null);
+    setIsAnalyzing(false);
+    const notices: WorkspaceNoticeItem[] = [];
+    if (opened.resultsDropped) notices.push({ tone: "warn", text: "The saved reaction results could not be validated and were not opened. The drawing was." });
+    if (results && isReactionsOutcomeKind(results.status)) {
+      const data = results.data;
+      setAnalysisMode(data.mode);
+      setReactionSmiles(data.smiles);
+      setReactionMolfile(data.molfile);
+      setReactionComponentMolfiles(data.componentMolfiles);
+      setReactionSvgSnapshot(null);
+      setReactionInputName(data.inputName);
+      setPathways(data.pathways);
+      setRetroPathways(data.retroPathways);
+      setNoReactionOutcomes(data.noReactionOutcomes);
+      setReactionStatus(`Opened saved analysis “${opened.record.name}”, ${data.statusText}`);
+      setResultMeta({
+        kind: results.status,
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        structureKey: data.inputKey,
+        mode: data.mode,
+        restored: false,
+        opened: { name: opened.record.name, savedAt: opened.record.updatedAt },
+        engineMismatch: opened.engineMismatch,
+        // Whatever was true when it was saved stays true; an inconsistent record is never shown as current.
+        stale: restoredResultsAreStale(inputs, results),
+      });
+    } else {
+      setAnalysisMode(inputs.analysisMode);
+      setReactionSmiles("");
+      setReactionMolfile(null);
+      setReactionComponentMolfiles([]);
+      setReactionSvgSnapshot(null);
+      setReactionInputName("");
+      setPathways([]);
+      setRetroPathways([]);
+      setNoReactionOutcomes([]);
+      setResultMeta(null);
+      if (inputs.interrupted) {
+        notices.push({ tone: "warn", text: "A prediction was running when this analysis was saved. It did not finish and was not resumed." });
+      }
+      setReactionStatus(`Opened saved analysis “${opened.record.name}” (drawing only).`);
+    }
+    setRecoveryNotices(notices);
+    // One write replaces the automatic workspace with the opened analysis.
+    persistence.requestSave(() => ({ inputs: opened.inputs, results: opened.results }));
+    await persistence.flush();
+    adoptingRef.current = false;
+    setIsAdopting(false);
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      snapshotTask.schedule();
+    }, 500);
+    return true;
+  }
+
+  const savedOpen = useSavedAnalysisOpen<ReactionsWorkspaceInputs, ReactionsWorkspaceResults>({
+    page: "reactions",
+    openRequest,
+    onOpenHandled,
+    ready: recovery !== null && ketcher !== null,
+    busyReason: () =>
+      latestRef.current.isAnalyzing || adoptingRef.current ? "Wait for the current prediction to finish before opening a saved analysis." : null,
+    hasUnsavedWork: () => captureReactions() !== null,
+    canSaveCurrent: () => Boolean(latestRef.current.resultMeta) && !latestRef.current.isAnalyzing,
+    saveCurrent: (analysisName) => saveCurrentAnalysis(analysisName, false),
+    defaultName: defaultAnalysisName,
+    apply: applySavedAnalysis,
+    notify: (item) => setRecoveryNotices((notices) => [...notices, item]),
+  });
+
+  useEffect(() => {
+    ketcherRef.current = ketcher;
+    requestPersistRef.current = requestPersist;
+    restoreEditorRef.current = () => void restoreEditor();
+    applyRestoreRef.current = applyRestoredReactions;
+    snapshotTask.setTask(takeEditorSnapshot);
+    latestRef.current = {
+      reactionSmiles, reactionMolfile, reactionComponentMolfiles, reactionInputName, reactionStatus,
+      analysisMode, pathways, retroPathways, noReactionOutcomes, visibleResultCount, isAnalyzing, resultMeta, handoffSeen,
+    };
+  });
+
+  // Autosave: only settled state is watched (the debounce and the finished-analysis rule keep
+  // half-finished predictions and rapid edits out of storage).
+  useEffect(() => {
+    requestPersistRef.current();
+  }, [
+    reactionSmiles, reactionMolfile, reactionComponentMolfiles, reactionInputName, analysisMode,
+    pathways, retroPathways, noReactionOutcomes, visibleResultCount, isAnalyzing, resultMeta, handoffSeen,
+  ]);
+
+  useEffect(() => {
+    if (!recovery) return;
+    try {
+      applyRestoreRef.current?.(recovery);
+    } finally {
+      // Saving starts only after the recovered record has been applied (or deliberately skipped).
+      persistence.resumeAfterRestore();
+    }
+  }, [recovery, persistence]);
+
+  useEffect(() => {
+    if (ketcher && pendingEditorRef.current) restoreEditorRef.current();
+  }, [ketcher, editorRestoreVersion]);
+
+  useEffect(() => {
+    return () => snapshotTask.cancel();
+  }, [snapshotTask]);
+
+  // What was recovered, what could not be saved.
+  const workspaceNotices: WorkspaceNoticeItem[] = [...recoveryNotices];
+  if (resultMeta?.restored) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Restored from your previous session (predicted ${new Date(resultMeta.computedAt).toLocaleString()}). These are previously computed model predictions and were not recomputed.`,
+    });
+  } else if (inputsOnlyRestored) {
+    workspaceNotices.push({ tone: "info", text: "Restored your drawing from your previous session." });
+  }
+  if (resultMeta?.opened) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Opened saved analysis “${resultMeta.opened.name}” (saved ${new Date(resultMeta.opened.savedAt).toLocaleString()}; predicted ${new Date(resultMeta.computedAt).toLocaleString()}). These are saved model predictions and were not recomputed.`,
+    });
+  }
+  if (saveMessage) workspaceNotices.push(saveMessage);
+  if (resultMeta?.engineMismatch) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: "These results were saved by an earlier version of the reaction engine. They are shown as saved and have not been recomputed.",
+    });
+  }
+  if (resultMeta?.stale) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: "These results may not describe the structure now on the canvas. They are a saved snapshot; predict again to update them.",
+    });
+  }
+  if (!persistenceStatus.available) {
+    workspaceNotices.push({ tone: "warn", text: "Browser storage is unavailable, so your work on this page will not be saved." });
+  }
+  if (persistenceStatus.saveError) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: persistenceStatus.saveError.code === "quota"
+        ? "Your latest changes could not be saved because browser storage is full."
+        : `Your latest changes could not be saved (${persistenceStatus.saveError.message}).`,
+    });
+  }
+  if (persistenceStatus.resultsOmitted) {
+    workspaceNotices.push({ tone: "warn", text: "The results were too large to save; your drawing was saved without them." });
+  }
+
   const displayPathways = useMemo(
     () => groupDisplayPathways(pathways),
     [pathways],
   );
-  const visiblePathways = useMemo(
-    () => displayPathways.slice(0, visibleResultCount),
-    [displayPathways, visibleResultCount],
-  );
+  // Which result rows are open. Diagrams are built only for open rows. The set belongs to one analysis: a new analysis starts closed.
+  const [expandedState, setExpandedState] = useState<{ source: unknown; ids: ReadonlySet<string> }>({ source: null, ids: new Set() });
+  const expandedIds: ReadonlySet<string> = expandedState.source === pathways ? expandedState.ids : EMPTY_ID_SET;
+  const setExpandedRows = (ids: readonly string[]) => setExpandedState({ source: pathways, ids: new Set(ids) });
+  const toggleExpandedRow = (id: string) => {
+    const next = new Set(expandedIds);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    setExpandedState({ source: pathways, ids: next });
+  };
+  const expandedPathways = useMemo(() => displayPathways.filter((pathway) => expandedIds.has(pathway.id)), [displayPathways, expandedIds]);
+  const svgCacheRef = useRef<{ context: string; source: unknown; reactants: SvgListMap; products: ProductVariantSvgMap }>({ context: "", source: null, reactants: {}, products: {} });
   const visibleRetroPathways = useMemo(
     () => retroPathways.slice(0, visibleResultCount),
     [retroPathways, visibleResultCount],
@@ -369,10 +1013,16 @@ export default function ReactionsPage({
     let cancelled = false;
 
     async function buildSvgs() {
-      const nextReactants: SvgListMap = {};
-      const nextProducts: ProductVariantSvgMap = {};
+      const contextKey = JSON.stringify([reactionSvgSnapshot, reactionMolfile, reactionComponentMolfiles]);
+      const cache = svgCacheRef.current;
+      if (cache.context !== contextKey || cache.source !== pathways) {
+        cache.context = contextKey; cache.source = pathways; cache.reactants = {}; cache.products = {};
+      }
+      const nextReactants = cache.reactants;
+      const nextProducts = cache.products;
 
-      for (const pathway of visiblePathways) {
+      for (const pathway of expandedPathways) {
+        if (cache.reactants[pathway.id] !== undefined) continue;
         const reactantComponents = pathway.reactantComponents.length > 0
           ? pathway.reactantComponents
           : pathway.reactantSmiles.split(".").filter(Boolean);
@@ -445,8 +1095,8 @@ export default function ReactionsPage({
       }
 
       if (!cancelled) {
-        setReactantSvgs(nextReactants);
-        setProductSvgs(nextProducts);
+        setReactantSvgs({ ...nextReactants });
+        setProductSvgs({ ...nextProducts });
       }
     }
 
@@ -455,7 +1105,7 @@ export default function ReactionsPage({
     return () => {
       cancelled = true;
     };
-  }, [visiblePathways, reactionMolfile, reactionSvgSnapshot, reactionComponentMolfiles]);
+  }, [expandedPathways, pathways, reactionMolfile, reactionSvgSnapshot, reactionComponentMolfiles]);
 
   useEffect(() => {
     let cancelled = false;
@@ -540,6 +1190,10 @@ export default function ReactionsPage({
 
     const runId = analysisRunRef.current + 1;
     analysisRunRef.current = runId;
+    analysisStartedRef.current = true;
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
     setIsAnalyzing(true);
     setReactionError(null);
     setReactionStatus(
@@ -573,6 +1227,31 @@ export default function ReactionsPage({
       }
 
       setReactionSmiles(smiles);
+      // The structure this analysis is about; the saved results are tied to it.
+      let analyzedKet: string | null = null;
+      try {
+        analyzedKet = (await ketcher?.getKet()) ?? null;
+      } catch {
+        analyzedKet = null;
+      }
+      const analyzedKey = await ketIdentityKey(analyzedKet);
+      if (analysisRunRef.current !== runId) return;
+      const recordFinished = (kind: ReactionsOutcomeKind) => {
+        if (!analyzedKey) return;
+        snapshotRef.current = { ket: ketHasStructureText(analyzedKet) ? analyzedKet : null, key: analyzedKey };
+        setResultMeta({
+          kind,
+          computedAt: new Date().toISOString(),
+          engineVersion: REACTIONS_ENGINE_VERSION,
+          structureKey: analyzedKey,
+          mode,
+          restored: false,
+          engineMismatch: false,
+          stale: false,
+        });
+        // Edits made while the prediction ran are caught by this re-read.
+        snapshotTask.schedule();
+      };
       const inputName = await reactionInputDisplayName(smiles);
       if (analysisRunRef.current !== runId) return;
       setReactionInputName(inputName);
@@ -588,6 +1267,7 @@ export default function ReactionsPage({
             ? `${results.length} verified precursor route${results.length === 1 ? "" : "s"} found.`
             : "No verified precursor routes were found.",
         );
+        recordFinished(results.length > 0 ? "retro-found" : "retro-none");
         return;
       }
 
@@ -620,6 +1300,7 @@ export default function ReactionsPage({
           ? `${outcomeCount} supported reaction outcome${outcomeCount === 1 ? "" : "s"} found.`
           : "No supported reactions were found.",
       );
+      recordFinished(outcomeCount > 0 ? "forward-found" : "forward-none");
     } catch (error) {
       console.error("Reaction analysis failed:", error);
       if (analysisRunRef.current === runId) {
@@ -631,6 +1312,17 @@ export default function ReactionsPage({
   }
 
   async function clearAnalysis() {
+    // Clearing also discards the saved workspace and invalidates any restoration still in flight.
+    void persistence.discard();
+    adoptedRef.current = false;
+    setHandoffSeen(null);
+    pendingEditorRef.current = null;
+    snapshotRef.current = { ket: null, key: null };
+    snapshotTask.cancel();
+    analysisStartedRef.current = false;
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
     analysisRunRef.current += 1;
     await ketcher?.setMolecule("");
     setReactionSmiles("");
@@ -652,6 +1344,10 @@ export default function ReactionsPage({
   }
 
   const handleReactionCanvasChange = useCallback(() => {
+    // Putting a saved drawing back into the editor is not a user edit.
+    if (restoringRef.current || pendingEditorRef.current) return;
+    setResultMeta(null);
+    snapshotTask.schedule();
     // Results belong to an exact Ketcher snapshot.  As soon as the student
     // changes that snapshot, invalidate both the old forward/retro result and
     // any in-flight async analysis.  This prevents a Diels–Alder/other result
@@ -674,22 +1370,56 @@ export default function ReactionsPage({
     setIsAnalyzing(false);
     setVisibleResultCount(RESULTS_PER_BATCH);
     setReactionStatus("Structure changed. Predict again when the new input is ready.");
-  }, []);
+  }, [snapshotTask]);
 
+  // A molecule just sent from Properties has its own confirmation; offering the analysis again would duplicate it.
+  const [sentFromProperties] = useState(() => peekMoleculeTransfer("reactions")?.from === "analysis");
+  const incoming = useIncomingMolecule({ destination: "reactions", api: ketcher, ready: recovery !== null && ketcher !== null && !isAdopting, hasWork: pathways.length > 0, expectRestore: recovery?.kind === "restored" });
   return (
     <section className="card reactions-page-card">
-      <div className="card-header">
-        <div>
-          <h2>Molecule Drawer</h2>
-          <p>
-            Draw reactant(s) to predict products, or draw a product to predict
-            reactants. Use R or * for generic groups.
-          </p>
+{incoming}
+      <ToolHeader
+        group="Synthesize"
+        title="Reactions"
+        purpose="Draw reactant(s) to predict products, or draw a product to predict reactants. Use R or * for generic groups."
+        ready={Boolean(ketcher)}
+        evidence="rule"
+        steps={[
+          { label: "Draw or name", detail: "Add reactants with a drawing or a name; Add keeps what is drawn, Replace swaps it." },
+          { label: "Choose reagents", detail: "Pick a reagent or condition, or let PocketChem search." },
+          { label: "Read the products", detail: "Major and minor outcomes, with the rule behind each." },
+        ]}
+      />
+
+      <WorkspaceNotice
+        embedded
+        notices={workspaceNotices}
+        onDiscard={resultMeta?.restored || inputsOnlyRestored ? () => void clearAnalysis() : undefined}
+        discardDisabled={isAnalyzing}
+      />
+
+      {savedOpen.prompt && (
+        <ReplaceWorkspacePrompt
+          embedded
+          name={savedOpen.prompt.opened.record.name}
+          canSaveFirst={Boolean(resultMeta) && !isAnalyzing}
+          busy={savedOpen.saveBusy}
+          onChoose={(choice) => void savedOpen.resolve(choice)}
+        />
+      )}
+
+      {!sentFromProperties && recovery !== null && (initialReactantMolfile || handoffSmiles) && handoffOfferAvailable(handoffId, handoffSeen) && (
+        <div className="workspace-notice workspace-notice-embedded">
+          <ul>
+            <li className="workspace-notice-info">
+              A molecule from your Properties analysis is available{handoffLabel ? `: ${handoffLabel}` : ""}. Opening this page keeps your Reactions workspace.
+            </li>
+          </ul>
+          <button className="secondary-button" type="button" disabled={!ketcher || isAnalyzing || isAdopting} onClick={() => void adoptHandoff()}>
+            Use in Reactions
+          </button>
         </div>
-        <span className={`status ${ketcher ? "ready" : "loading"}`}>
-          {ketcher ? "Editor ready" : "Loading editor"}
-        </span>
-      </div>
+      )}
 
       <div className="reaction-ketcher-panel">
         <div className="reaction-ketcher-box">
@@ -697,6 +1427,7 @@ export default function ReactionsPage({
             globalKey="reactionKetcher"
             nameInputMode="add-or-replace"
             onChange={handleReactionCanvasChange}
+            onStructureLoaded={() => snapshotTask.schedule()}
             onReady={setKetcher}
           />
         </div>
@@ -729,7 +1460,33 @@ export default function ReactionsPage({
           >
             Clear Analysis
           </button>
+
+          <button
+            className="secondary-button"
+            disabled={!resultMeta || isAnalyzing || isAdopting || saveBusy}
+            title={resultMeta ? "Keep this analysis in Saved analyses" : "Run a prediction first"}
+            onClick={() => {
+              setSaveMessage(null);
+              setSaveForm({ name: defaultAnalysisName() });
+            }}
+          >
+            Save Analysis
+          </button>
         </div>
+
+        {saveForm && (
+          <SaveAnalysisForm
+            name={saveForm.name}
+            busy={saveBusy}
+            onChange={(analysisName) => setSaveForm({ name: analysisName })}
+            onCancel={() => setSaveForm(null)}
+            onSubmit={() => {
+              void saveCurrentAnalysis(saveForm.name).then((saved) => {
+                if (saved) setSaveForm(null);
+              });
+            }}
+          />
+        )}
 
         {reactionSmiles && (
           <p className="empty" title={reactionSmiles}>
@@ -763,15 +1520,21 @@ export default function ReactionsPage({
               structures from the same Ketcher canvas.
             </p>
 
-            <div className="reaction-pathway-list">
-              {visiblePathways.map((pathway) => (
-                <div className="reaction-pathway-card" key={pathway.id}>
+            <ReactionResultsExplorer
+              candidateCount={pathways.length}
+              expanded={expandedIds}
+              noReactionCount={noReactionOutcomes.length}
+              onSetExpanded={setExpandedRows}
+              onToggleRow={toggleExpandedRow}
+              outcomes={displayPathways}
+              renderBody={(pathway) => (
+                <div className="reaction-pathway-card" id={`pathway-${pathway.id}`}>
                   <div className="reaction-card-heading">
                     <div>
                       <h3>{displayPathwayTitle(pathway)}</h3>
                       <p className="reaction-curriculum">
-                        {courseLabel(pathway.course)} · {pathway.chapter}
-                        {pathway.mechanism ? ` · ${pathway.mechanism}` : ""}
+                        {courseLabel(pathway.course)}, {pathway.chapter}
+                        {pathway.mechanism ? `, ${pathway.mechanism}` : ""}
                       </p>
                     </div>
                     <span
@@ -794,7 +1557,7 @@ export default function ReactionsPage({
                   <div className="reaction-three-column">
                     <div className="reaction-column">
                       <div className="reaction-svg-box reaction-component-box">
-                        {(reactantSvgs[pathway.id] ?? []).map((svg, index) => (
+                        {(reactantSvgs[pathway.id] ?? []).map((svg, index, all) => (
                           <div
                             className="reaction-component-item"
                             key={`${pathway.id}-reactant-${index}`}
@@ -802,7 +1565,7 @@ export default function ReactionsPage({
                             {index > 0 && (
                               <span className="reaction-component-plus">+</span>
                             )}
-                            <div dangerouslySetInnerHTML={{ __html: svg }} />
+                            <MolecularFigure source={componentSource(pathway.reactantComponents.length > 0 ? pathway.reactantComponents : pathway.reactantSmiles.split(".").filter(Boolean), all.length, index)} svg={svg} title={`Reactant ${index + 1}`} />
                           </div>
                         ))}
                       </div>
@@ -870,7 +1633,7 @@ export default function ReactionsPage({
                                 </span>
                               )}
                               <div className="reaction-component-box">
-                                {variantSvgs.map((svg, componentIndex) => (
+                                {variantSvgs.map((svg, componentIndex, all) => (
                                   <div
                                     className="reaction-component-item"
                                     key={`${pathway.id}-product-${variantIndex}-${componentIndex}`}
@@ -878,10 +1641,18 @@ export default function ReactionsPage({
                                     {componentIndex > 0 && (
                                       <span className="reaction-component-plus">+</span>
                                     )}
-                                    <div dangerouslySetInnerHTML={{ __html: svg }} />
+                                    <MolecularFigure source={componentSource((pathway.productMixture?.memberSmiles?.[variantIndex] ?? pathway.productSmiles ?? "").split(".").filter(Boolean), all.length, componentIndex)} svg={svg} title={`Product ${componentIndex + 1}`} />
                                   </div>
                                 ))}
                               </div>
+                              {pathway.productVariants.length > 1 && pathway.productVariants[variantIndex]?.assessment && (
+                                <span
+                                  className={`reaction-variant-assessment level-${pathway.productVariants[variantIndex].assessment?.level}`}
+                                  title={pathway.productVariants[variantIndex].assessment?.basis}
+                                >
+                                  {pathway.productVariants[variantIndex].assessment?.label}
+                                </span>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -902,8 +1673,8 @@ export default function ReactionsPage({
                     <p className="reaction-detail">
                       <strong>Product mixture:</strong>{" "}
                       {pathway.productMixture.kind === "racemic"
-                        ? "Racemic mixture · one enantiomer shown; + mirror-image enantiomer"
-                        : `${pathway.productMixture.label} · ${pathway.productMixture.memberCount} stereoisomer${pathway.productMixture.memberCount === 1 ? "" : "s"} shown`}
+                        ? "Racemic mixture, one enantiomer shown; + mirror-image enantiomer"
+                        : `${pathway.productMixture.label}, ${pathway.productMixture.memberCount} stereoisomer${pathway.productMixture.memberCount === 1 ? "" : "s"} shown`}
                     </p>
                   )}
 
@@ -911,17 +1682,28 @@ export default function ReactionsPage({
                     <p className="reaction-detail">
                       <strong>Alternative products:</strong>{" "}
                       {pathway.halogenSeries
-                        ? "Parallel halogen variants are condensed onto this one card; any remaining structural alternatives are genuine selectivity ties after major-product ranking."
-                        : "Major-product ranking has already removed lower-probability atom-map/regioisomer matches; multiple structures remain only when the rule represents a genuine mixture or an unresolved chemical tie."}
+                        ? "Parallel halogen variants are condensed onto this one card. The remaining structural alternatives are listed; a label under a structure is the engine's qualitative ranking."
+                        : pathway.productVariants.some((variant) => variant.assessment)
+                          ? "The rule offers several outcomes. A label under a structure is the engine's qualitative ranking, taken from the evidence quoted below; it is not a measured ratio. A structure without a label is unranked, which means PocketChem does not know, not that it is minor."
+                          : "The rule offers several outcomes and PocketChem does not rank them: it has no sourced basis for saying which one dominates, so none is called the major product."}
                     </p>
                   )}
+
+                  {!pathway.productMixture && pathway.productVariants.length > 1 && (() => {
+                    const evidence = [...new Set(pathway.productVariants.map((variant) => variant.assessment?.basis).filter((basis): basis is string => Boolean(basis)))];
+                    return evidence.length > 0 ? (
+                      <p className="reaction-detail">
+                        <strong>Selectivity evidence:</strong> {evidence.join(" ")}
+                      </p>
+                    ) : null;
+                  })()}
 
                   <p className="reaction-note">{pathway.shortExplanation}</p>
 
                   {pathway.selectivity.length > 0 && (
                     <p className="reaction-detail">
                       <strong>Selectivity:</strong>{" "}
-                      {pathway.selectivity.join(" · ")}
+                      {pathway.selectivity.join(", ")}
                     </p>
                   )}
 
@@ -932,8 +1714,9 @@ export default function ReactionsPage({
                     </p>
                   )}
                 </div>
-              ))}
-            </div>
+              )}
+              substrate={reactionInputName || ""}
+            />
             {noReactionOutcomes.length > 0 && (
               <div className="no-reaction-section">
                 <h3>Applicable NO REACTION conditions for this substrate</h3>
@@ -963,22 +1746,6 @@ export default function ReactionsPage({
               </div>
             )}
 
-            {visiblePathways.length < displayPathways.length && (
-              <button
-                className="secondary-button load-more-button"
-                onClick={() =>
-                  setVisibleResultCount((count) => count + RESULTS_PER_BATCH)
-                }
-                type="button"
-              >
-                Show{" "}
-                {Math.min(
-                  RESULTS_PER_BATCH,
-                  displayPathways.length - visiblePathways.length,
-                )}{" "}
-                more reactions
-              </button>
-            )}
           </>
         )
       ) : retroPathways.length === 0 ? (
@@ -1003,8 +1770,8 @@ export default function ReactionsPage({
                   <div>
                     <h3>Retrosynthesis via {displayPathwayTitle(pathway)}</h3>
                     <p className="reaction-curriculum">
-                      {courseLabel(pathway.course)} · {pathway.chapter}
-                      {pathway.mechanism ? ` · ${pathway.mechanism}` : ""}
+                      {courseLabel(pathway.course)}, {pathway.chapter}
+                      {pathway.mechanism ? `, ${pathway.mechanism}` : ""}
                     </p>
                   </div>
                   <span
@@ -1031,7 +1798,7 @@ export default function ReactionsPage({
                           {index > 0 && (
                             <span className="reaction-component-plus">+</span>
                           )}
-                          <div dangerouslySetInnerHTML={{ __html: svg }} />
+                          <MolecularFigure svg={svg} title="Target structure" />
                         </div>
                       ))}
                     </div>
@@ -1098,7 +1865,7 @@ export default function ReactionsPage({
                           {index > 0 && (
                             <span className="reaction-component-plus">+</span>
                           )}
-                          <div dangerouslySetInnerHTML={{ __html: svg }} />
+                          <MolecularFigure svg={svg} title={`Precursor ${index + 1}`} />
                         </div>
                       ))}
                     </div>
@@ -1118,14 +1885,14 @@ export default function ReactionsPage({
                             route.reagentNote ? ` (${route.reagentNote})` : ""
                           }`,
                       )
-                      .join(" · ")}
+                      .join(", ")}
                   </p>
                 )}
 
                 {pathway.selectivity.length > 0 && (
                   <p className="reaction-detail">
                     <strong>Forward selectivity:</strong>{" "}
-                    {pathway.selectivity.join(" · ")}
+                    {pathway.selectivity.join(", ")}
                   </p>
                 )}
 

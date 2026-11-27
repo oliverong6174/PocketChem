@@ -1,0 +1,251 @@
+{
+ "cases": [
+  {
+   "id": "MB-01",
+   "category": "ketone",
+   "title": "2-octanone",
+   "smiles": "CCCCCCC(=O)C",
+   "formula": "C8H16O",
+   "source": {
+    "id": "C111137",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111137&Index=0&Type=Mass",
+    "snapshot": "snapshots/2-octanone.json",
+    "sha256": "acc0845f7aa4dfe4405074aa21eaa2c5d586f7ffafdab77c60bb19e8bf3a9d0b"
+   },
+   "expected": {
+    "molecular_ion_mz": 128,
+    "molecular_ion_rel": 5.9,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 21
+     },
+     {
+      "mz": 58,
+      "rel": 86
+     }
+    ]
+   }
+  },
+  {
+   "id": "MB-02",
+   "category": "aromatic",
+   "title": "butylbenzene",
+   "smiles": "CCCCC1=CC=CC=C1",
+   "formula": "C10H14",
+   "source": {
+    "id": "C104518",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C104518&Index=0&Type=Mass",
+    "snapshot": "snapshots/butylbenzene.json",
+    "sha256": "ba929fc831ce1d9b12156818077f8526eeb3fa254a9c555dbab9bcfb3e7e17f5"
+   },
+   "expected": {
+    "molecular_ion_mz": 134,
+    "molecular_ion_rel": 26.3,
+    "base_peak_mz": 91,
+    "key_fragments": [
+     {
+      "mz": 92,
+      "rel": 60
+     }
+    ]
+   }
+  },
+  {
+   "id": "MB-03",
+   "category": "amine",
+   "title": "dibutylamine",
+   "smiles": "CCCCNCCCC",
+   "formula": "C8H19N",
+   "source": {
+    "id": "C111922",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111922&Index=0&Type=Mass",
+    "snapshot": "snapshots/dibutylamine.json",
+    "sha256": "db6fab3c5a2e4e02f2e0940dfa034a042bd3ba1248f8f3f07b1e3a812e791bf9"
+   },
+   "expected": {
+    "molecular_ion_mz": 129,
+    "molecular_ion_rel": 7.1,
+    "base_peak_mz": 86,
+    "key_fragments": [
+     {
+      "mz": 29,
+      "rel": 21
+     },
+     {
+      "mz": 30,
+      "rel": 62
+     },
+     {
+      "mz": 44,
+      "rel": 72
+     }
+    ]
+   }
+  },
+  {
+   "id": "MB-04",
+   "category": "ester",
+   "title": "ethyl butanoate",
+   "smiles": "CCCC(=O)OCC",
+   "formula": "C6H12O2",
+   "source": {
+    "id": "C105544",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C105544&Index=0&Type=Mass",
+    "snapshot": "snapshots/ethyl-butanoate.json",
+    "sha256": "4b41e1baf2c4c7f160462a99929c3f952405751b1bbc33b99399efb6671d4c89"
+   },
+   "expected": {
+    "molecular_ion_mz": 116,
+    "molecular_ion_rel": 3.5,
+    "base_peak_mz": 71,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 49
+     },
+     {
+      "mz": 29,
+      "rel": 59
+     },
+     {
+      "mz": 43,
+      "rel": 94
+     },
+     {
+      "mz": 88,
+      "rel": 57
+     }
+    ]
+   }
+  },
+  {
+   "id": "MB-05",
+   "category": "ester",
+   "title": "ethyl hexanoate",
+   "smiles": "CCCCCC(=O)OCC",
+   "formula": "C8H16O2",
+   "source": {
+    "id": "C123660",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C123660&Index=0&Type=Mass",
+    "snapshot": "snapshots/ethyl-hexanoate.json",
+    "sha256": "0cbf9b43b4642e114964cdb4db5c684da8b7e1a3c502b409626d0ccd5564f639"
+   },
+   "expected": {
+    "molecular_ion_mz": 144,
+    "molecular_ion_rel": 1.5,
+    "base_peak_mz": 88,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 69
+     },
+     {
+      "mz": 29,
+      "rel": 98
+     },
+     {
+      "mz": 43,
+      "rel": 86
+     },
+     {
+      "mz": 99,
+      "rel": 54
+     }
+    ]
+   }
+  },
+  {
+   "id": "MB-06",
+   "category": "nitrile",
+   "title": "octanenitrile",
+   "smiles": "CCCCCCCC#N",
+   "formula": "C8H15N",
+   "source": {
+    "id": "C124129",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C124129&Index=0&Type=Mass",
+    "snapshot": "snapshots/octanenitrile.json",
+    "sha256": "6b6be9b48aac7bf36cbb161a64dc56c001a11a72eed32ec799520429fdd90a4f"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.5,
+    "base_peak_mz": 82,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 77
+     },
+     {
+      "mz": 54,
+      "rel": 60
+     },
+     {
+      "mz": 55,
+      "rel": 56
+     },
+     {
+      "mz": 96,
+      "rel": 62
+     }
+    ]
+   }
+  },
+  {
+   "id": "MB-07",
+   "category": "acid",
+   "title": "octanoic acid",
+   "smiles": "CCCCCCCC(=O)O",
+   "formula": "C8H16O2",
+   "source": {
+    "id": "C124072",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C124072&Index=0&Type=Mass",
+    "snapshot": "snapshots/octanoic-acid.json",
+    "sha256": "99b51c5b537774b78a9aa0ccf87682b65f121e89a50b76809fe1cd130df0a55b"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.3,
+    "base_peak_mz": 60,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 38
+     },
+     {
+      "mz": 43,
+      "rel": 43
+     },
+     {
+      "mz": 55,
+      "rel": 35
+     },
+     {
+      "mz": 73,
+      "rel": 63
+     }
+    ]
+   }
+  },
+  {
+   "id": "MB-08",
+   "category": "aromatic",
+   "title": "propylbenzene",
+   "smiles": "CCCC1=CC=CC=C1",
+   "formula": "C9H12",
+   "source": {
+    "id": "C103651",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C103651&Index=0&Type=Mass",
+    "snapshot": "snapshots/propylbenzene.json",
+    "sha256": "53c6f5004e2cba5d6eced533884cefdf7a1d9f2113797e4d4be1375dec7961e0"
+   },
+   "expected": {
+    "molecular_ion_mz": 120,
+    "molecular_ion_rel": 25.9,
+    "base_peak_mz": 91,
+    "key_fragments": []
+   }
+  }
+ ]
+}

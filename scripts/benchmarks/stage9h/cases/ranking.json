@@ -1,0 +1,1858 @@
+{
+ "cases": [
+  {
+   "id": "RK-01",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "pentane / pentan-1-ol / pentanal / pentanoic acid",
+   "evidence": "reference-database",
+   "smiles": [
+    "CCCCC",
+    "CCCCCO",
+    "CCCCC=O",
+    "CCCCC(=O)O"
+   ],
+   "expected_order": [
+    [
+     "CCCCC(=O)O"
+    ],
+    [
+     "CCCCCO"
+    ],
+    [
+     "CCCCC=O"
+    ],
+    [
+     "CCCCC"
+    ]
+   ],
+   "values": {
+    "CCCCC": 36.11,
+    "CCCCCO": 137.78,
+    "CCCCC=O": 103,
+    "CCCCC(=O)O": 186.4
+   },
+   "basis": "normal boiling point (C): pentanoic acid 186.4, pentan-1-ol 137.78, pentanal 103, pentane 36.11",
+   "sources": [
+    {
+     "name": "pentane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8003",
+     "snapshot": "snapshots/pubchem-ranking/pentane.json",
+     "sha256": "36f7805615544da32d49102478b7a39ad50a32c857968c95f3aa6d9bcc5a6d72",
+     "nValues": 7
+    },
+    {
+     "name": "pentan-1-ol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6276",
+     "snapshot": "snapshots/pubchem-ranking/pentan-1-ol.json",
+     "sha256": "b92fa641e228dddfd991bf128c5f4453a2fe0a2dadc4935f9b3ba3c7425f0cff",
+     "nValues": 5
+    },
+    {
+     "name": "pentanal",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8063",
+     "snapshot": "snapshots/pubchem-ranking/pentanal.json",
+     "sha256": "dd008829c995ee479a4958dfe2e862ba910d843e226ece1ee92dd20cf4e5c3ac",
+     "nValues": 7
+    },
+    {
+     "name": "pentanoic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7991",
+     "snapshot": "snapshots/pubchem-ranking/pentanoic-acid.json",
+     "sha256": "6158df93771e60dbd64470ab1ec669fb39e05339d64f4c42b471ddc4fe7a9eb2",
+     "nValues": 5
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 7/5/7/5 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-02",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "propane / propanal / propan-1-ol / propanoic acid",
+   "evidence": "reference-database",
+   "smiles": [
+    "CCC",
+    "CCC=O",
+    "CCCO",
+    "CCC(=O)O"
+   ],
+   "expected_order": [
+    [
+     "CCC(=O)O"
+    ],
+    [
+     "CCCO"
+    ],
+    [
+     "CCC=O"
+    ],
+    [
+     "CCC"
+    ]
+   ],
+   "values": {
+    "CCC": -42.11,
+    "CCC=O": 48.89,
+    "CCCO": 97.2,
+    "CCC(=O)O": 141.1
+   },
+   "basis": "normal boiling point (C): propanoic acid 141.1, propan-1-ol 97.2, propanal 48.89, propane -42.11",
+   "sources": [
+    {
+     "name": "propane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6334",
+     "snapshot": "snapshots/pubchem-ranking/propane.json",
+     "sha256": "b4b40fe5d66c3bd0f09c36e4060b48cea71d7ca3535d947db140ecc10048fc6d",
+     "nValues": 6
+    },
+    {
+     "name": "propanal",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/527",
+     "snapshot": "snapshots/pubchem-ranking/propanal.json",
+     "sha256": "2dddeed0cb0286aaa24f65787d82c307900dd003ff6e9741eb6ef09e9b12b87a",
+     "nValues": 6
+    },
+    {
+     "name": "propan-1-ol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/1031",
+     "snapshot": "snapshots/pubchem-ranking/propan-1-ol.json",
+     "sha256": "c409706deb57c8d689f22ccc741dfe7afa77661729fa40f7db205306bb7c6cba",
+     "nValues": 7
+    },
+    {
+     "name": "propanoic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/1032",
+     "snapshot": "snapshots/pubchem-ranking/propanoic-acid.json",
+     "sha256": "5667ac6fb6e9ba53367d7d90e6da4cca30c7cdb6159a466277f2ed1e5952c54c",
+     "nValues": 7
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 6/6/7/7 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-03",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "butan-1-ol / butan-2-ol / 2-methylpropan-2-ol / 2-methylpropan-1-ol",
+   "evidence": "reference-database",
+   "smiles": [
+    "CCCCO",
+    "CCC(C)O",
+    "CC(C)(C)O",
+    "CC(C)CO"
+   ],
+   "expected_order": [
+    [
+     "CCCCO"
+    ],
+    [
+     "CC(C)CO"
+    ],
+    [
+     "CCC(C)O"
+    ],
+    [
+     "CC(C)(C)O"
+    ]
+   ],
+   "values": {
+    "CCCCO": 117.6,
+    "CCC(C)O": 99.5,
+    "CC(C)(C)O": 82.3,
+    "CC(C)CO": 108
+   },
+   "basis": "normal boiling point (C): butan-1-ol 117.6, 2-methylpropan-1-ol 108, butan-2-ol 99.5, 2-methylpropan-2-ol 82.3",
+   "sources": [
+    {
+     "name": "butan-1-ol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/263",
+     "snapshot": "snapshots/pubchem-ranking/butan-1-ol.json",
+     "sha256": "df0628bdf8946cf71018484fceb213f929b08ea4f006164f02719837f20257be",
+     "nValues": 7
+    },
+    {
+     "name": "butan-2-ol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6568",
+     "snapshot": "snapshots/pubchem-ranking/butan-2-ol.json",
+     "sha256": "bafdf783902b98ace03bd0302832d44e44eac917451d3bd44dcdc3e48d848060",
+     "nValues": 7
+    },
+    {
+     "name": "2-methylpropan-2-ol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6386",
+     "snapshot": "snapshots/pubchem-ranking/2-methylpropan-2-ol.json",
+     "sha256": "c87e835dca604061c3526a59e95a43969541f5a56ac027266d750fe587b64cf1",
+     "nValues": 7
+    },
+    {
+     "name": "2-methylpropan-1-ol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6560",
+     "snapshot": "snapshots/pubchem-ranking/2-methylpropan-1-ol.json",
+     "sha256": "20c5e3b383bce52c3785950ffe3c0b70634265e6f385c2335cc33ce96f4c4366",
+     "nValues": 8
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 7/7/7/8 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-04",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "butylamine / diethylamine / triethylamine / dimethylethylamine",
+   "evidence": "reference-database",
+   "smiles": [
+    "CCCCN",
+    "CCNCC",
+    "CCN(CC)CC",
+    "CCN(C)C"
+   ],
+   "expected_order": [
+    [
+     "CCN(CC)CC"
+    ],
+    [
+     "CCCCN"
+    ],
+    [
+     "CCNCC"
+    ],
+    [
+     "CCN(C)C"
+    ]
+   ],
+   "values": {
+    "CCCCN": 78,
+    "CCNCC": 55.5,
+    "CCN(CC)CC": 89.14,
+    "CCN(C)C": 36.5
+   },
+   "basis": "normal boiling point (C): triethylamine 89.14, butylamine 78, diethylamine 55.5, dimethylethylamine 36.5",
+   "sources": [
+    {
+     "name": "butylamine",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8007",
+     "snapshot": "snapshots/pubchem-ranking/butylamine.json",
+     "sha256": "a47335b837ee0e298fdfdc302ccb553a87fff92d7641648f7b3399b8da600da2",
+     "nValues": 8
+    },
+    {
+     "name": "diethylamine",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8021",
+     "snapshot": "snapshots/pubchem-ranking/diethylamine.json",
+     "sha256": "878f996c6c46bf585b1e0592ed41bdb7700ecf58b29814d02b505a96729381a2",
+     "nValues": 7
+    },
+    {
+     "name": "triethylamine",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8471",
+     "snapshot": "snapshots/pubchem-ranking/triethylamine.json",
+     "sha256": "488fd2da8be76da9ec754a61cbf207378157424e06ce21f690837d8ab7460703",
+     "nValues": 8
+    },
+    {
+     "name": "dimethylethylamine",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/11723",
+     "snapshot": "snapshots/pubchem-ranking/dimethylethylamine.json",
+     "sha256": "95245068f144529da915b615ad68248970acf7f3d83036f61bf8e0f44b590352",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 8/7/8/1 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-05",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "cyclopentane / cyclohexane / cycloheptane / cyclooctane",
+   "evidence": "reference-database",
+   "smiles": [
+    "C1CCCC1",
+    "C1CCCCC1",
+    "C1CCCCCC1",
+    "C1CCCCCCC1"
+   ],
+   "expected_order": [
+    [
+     "C1CCCCCCC1"
+    ],
+    [
+     "C1CCCCCC1"
+    ],
+    [
+     "C1CCCCC1"
+    ],
+    [
+     "C1CCCC1"
+    ]
+   ],
+   "values": {
+    "C1CCCC1": 49.29,
+    "C1CCCCC1": 80.72,
+    "C1CCCCCC1": 118.49,
+    "C1CCCCCCC1": 151
+   },
+   "basis": "normal boiling point (C): cyclooctane 151, cycloheptane 118.49, cyclohexane 80.72, cyclopentane 49.29",
+   "sources": [
+    {
+     "name": "cyclopentane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/9253",
+     "snapshot": "snapshots/pubchem-ranking/cyclopentane.json",
+     "sha256": "a104062da8ea2bf8b90e9377acf04fdd83fbab98f0381b8389c335822ebdca35",
+     "nValues": 6
+    },
+    {
+     "name": "cyclohexane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8078",
+     "snapshot": "snapshots/pubchem-ranking/cyclohexane.json",
+     "sha256": "86f2884d7e175bb034dc0170518f13e78017715831ae64ba6f820057e842d13d",
+     "nValues": 7
+    },
+    {
+     "name": "cycloheptane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/9265",
+     "snapshot": "snapshots/pubchem-ranking/cycloheptane.json",
+     "sha256": "2296f38e6e07e5c08747f679b1261623f03d6f8cffe3f61dfc5868178a855957",
+     "nValues": 2
+    },
+    {
+     "name": "cyclooctane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/9266",
+     "snapshot": "snapshots/pubchem-ranking/cyclooctane.json",
+     "sha256": "f1eca231863222d38013fadfda6906f8689bb3a329868658fed34de69570e923",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 6/7/2/1 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-06",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "chloroethane / bromoethane / iodoethane / 1,2-dibromoethane",
+   "evidence": "reference-database",
+   "smiles": [
+    "CCCl",
+    "CCBr",
+    "CCI",
+    "C(CBr)Br"
+   ],
+   "expected_order": [
+    [
+     "C(CBr)Br"
+    ],
+    [
+     "CCI"
+    ],
+    [
+     "CCBr"
+    ],
+    [
+     "CCCl"
+    ]
+   ],
+   "values": {
+    "CCCl": 12.29,
+    "CCBr": 38.36,
+    "CCI": 72.2,
+    "C(CBr)Br": 131.21
+   },
+   "basis": "normal boiling point (C): 1,2-dibromoethane 131.21, iodoethane 72.2, bromoethane 38.36, chloroethane 12.29",
+   "sources": [
+    {
+     "name": "chloroethane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6337",
+     "snapshot": "snapshots/pubchem-ranking/chloroethane.json",
+     "sha256": "7314d13f8791e3b6b4e5dfef534762a3d21d2834fc511ecc443b4f65931c2c81",
+     "nValues": 6
+    },
+    {
+     "name": "bromoethane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6332",
+     "snapshot": "snapshots/pubchem-ranking/bromoethane.json",
+     "sha256": "54f6da2513b0cc13f395dd1145e67b2cfe92c5df0bb600e1f7d09ff1353434ee",
+     "nValues": 6
+    },
+    {
+     "name": "iodoethane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6340",
+     "snapshot": "snapshots/pubchem-ranking/iodoethane.json",
+     "sha256": "3c7b3c4f607522f96499533f1f95e26a4e853cc55087872fdca18b5625a8c912",
+     "nValues": 2
+    },
+    {
+     "name": "1,2-dibromoethane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7839",
+     "snapshot": "snapshots/pubchem-ranking/1-2-dibromoethane.json",
+     "sha256": "034267a5f2c4bf30ee80dcb89638665c1c649394df275c2c978247e17bb00df7",
+     "nValues": 6
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 6/6/2/6 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-07",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "1-pentene / 1-hexene / 1-heptene / 1-octene",
+   "evidence": "reference-database",
+   "smiles": [
+    "CCCC=C",
+    "CCCCC=C",
+    "CCCCCC=C",
+    "CCCCCCC=C"
+   ],
+   "expected_order": [
+    [
+     "CCCCCCC=C"
+    ],
+    [
+     "CCCCCC=C"
+    ],
+    [
+     "CCCCC=C"
+    ],
+    [
+     "CCCC=C"
+    ]
+   ],
+   "values": {
+    "CCCC=C": 29.9,
+    "CCCCC=C": 63.45,
+    "CCCCCC=C": 93.6,
+    "CCCCCCC=C": 121.24
+   },
+   "basis": "normal boiling point (C): 1-octene 121.24, 1-heptene 93.6, 1-hexene 63.45, 1-pentene 29.9",
+   "sources": [
+    {
+     "name": "1-pentene",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8004",
+     "snapshot": "snapshots/pubchem-ranking/1-pentene.json",
+     "sha256": "5c248cf432de77258b975c0a89e8d032b2963c6a9a7c0b189bbbfbc4b60d5ee2",
+     "nValues": 3
+    },
+    {
+     "name": "1-hexene",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/11597",
+     "snapshot": "snapshots/pubchem-ranking/1-hexene.json",
+     "sha256": "ff2f3436b42e2c3766ecd1242b27a6923ba06f046fb9dc869a1dc5cdadaae598",
+     "nValues": 4
+    },
+    {
+     "name": "1-heptene",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/11610",
+     "snapshot": "snapshots/pubchem-ranking/1-heptene.json",
+     "sha256": "9f26ca00e38aeb1b397ad616e4f6adfa9b353c78d0262055292e281fd04f5de8",
+     "nValues": 3
+    },
+    {
+     "name": "1-octene",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8125",
+     "snapshot": "snapshots/pubchem-ranking/1-octene.json",
+     "sha256": "8ea6ae8c44ff715322096f2d18942990f684243166c4afcb2d468af3c6f05651",
+     "nValues": 6
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 3/4/3/6 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-08",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "dimethyl ether / ethyl methyl ether / dipropyl ether / dibutyl ether",
+   "evidence": "reference-database",
+   "smiles": [
+    "COC",
+    "CCOC",
+    "CCCOCCC",
+    "CCCCOCCCC"
+   ],
+   "expected_order": [
+    [
+     "CCCCOCCCC"
+    ],
+    [
+     "CCCOCCC"
+    ],
+    [
+     "CCOC"
+    ],
+    [
+     "COC"
+    ]
+   ],
+   "values": {
+    "COC": -24.2,
+    "CCOC": 7.4,
+    "CCCOCCC": 89.5,
+    "CCCCOCCCC": 142
+   },
+   "basis": "normal boiling point (C): dibutyl ether 142, dipropyl ether 89.5, ethyl methyl ether 7.4, dimethyl ether -24.2",
+   "sources": [
+    {
+     "name": "dimethyl ether",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8254",
+     "snapshot": "snapshots/pubchem-ranking/dimethyl-ether.json",
+     "sha256": "af5e703780e65fd82896895d97517ecf008c25bed5fab65a8c91d6a3e60eeb3a",
+     "nValues": 4
+    },
+    {
+     "name": "ethyl methyl ether",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/10903",
+     "snapshot": "snapshots/pubchem-ranking/ethyl-methyl-ether.json",
+     "sha256": "23b5c6649451829c5e0084248c8949ea5d36f1cc0a24a55f3cb13af04166c36f",
+     "nValues": 1
+    },
+    {
+     "name": "dipropyl ether",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8114",
+     "snapshot": "snapshots/pubchem-ranking/dipropyl-ether.json",
+     "sha256": "42930cfe0fad375f954d1a7d05ac573014b3c7485573f6996696b5c9a80545cd",
+     "nValues": 2
+    },
+    {
+     "name": "dibutyl ether",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8909",
+     "snapshot": "snapshots/pubchem-ranking/dibutyl-ether.json",
+     "sha256": "7faa6ab45d9396e10cdfe4564c438248986bb9e934e0988f45163cd9201344e3",
+     "nValues": 4
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 4/1/2/4 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-09",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "benzene / toluene / ethylbenzene / propylbenzene",
+   "evidence": "reference-database",
+   "smiles": [
+    "C1=CC=CC=C1",
+    "CC1=CC=CC=C1",
+    "CCC1=CC=CC=C1",
+    "CCCC1=CC=CC=C1"
+   ],
+   "expected_order": [
+    [
+     "CCCC1=CC=CC=C1"
+    ],
+    [
+     "CCC1=CC=CC=C1"
+    ],
+    [
+     "CC1=CC=CC=C1"
+    ],
+    [
+     "C1=CC=CC=C1"
+    ]
+   ],
+   "values": {
+    "C1=CC=CC=C1": 80.09,
+    "CC1=CC=CC=C1": 111,
+    "CCC1=CC=CC=C1": 136.16,
+    "CCCC1=CC=CC=C1": 159.2
+   },
+   "basis": "normal boiling point (C): propylbenzene 159.2, ethylbenzene 136.16, toluene 111, benzene 80.09",
+   "sources": [
+    {
+     "name": "benzene",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/241",
+     "snapshot": "snapshots/pubchem-ranking/benzene.json",
+     "sha256": "c6b59b3569291af7340cebaeb810e97214c076953d316e1d541abef9ef0d1f2e",
+     "nValues": 7
+    },
+    {
+     "name": "toluene",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/1140",
+     "snapshot": "snapshots/pubchem-ranking/toluene.json",
+     "sha256": "c7825ae15afc95b8a6790ba4d19443525f9ad376836dd86921f1cf91933b41fd",
+     "nValues": 7
+    },
+    {
+     "name": "ethylbenzene",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7500",
+     "snapshot": "snapshots/pubchem-ranking/ethylbenzene.json",
+     "sha256": "ae6933a65337f56464d74747f37b2ef730b06b4be26bcc1bdab1075162e57d54",
+     "nValues": 6
+    },
+    {
+     "name": "propylbenzene",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7668",
+     "snapshot": "snapshots/pubchem-ranking/propylbenzene.json",
+     "sha256": "3dbe650eba6974d6b51a0bf387bfefe5b836f1bb28a88b7bb5884e5579452aaa",
+     "nValues": 3
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 7/7/6/3 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-10",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "benzene / pyridine / aniline / nitrobenzene",
+   "evidence": "reference-database",
+   "smiles": [
+    "C1=CC=CC=C1",
+    "C1=CC=NC=C1",
+    "C1=CC=C(C=C1)N",
+    "C1=CC=C(C=C1)[N+](=O)[O-]"
+   ],
+   "expected_order": [
+    [
+     "C1=CC=C(C=C1)[N+](=O)[O-]"
+    ],
+    [
+     "C1=CC=C(C=C1)N"
+    ],
+    [
+     "C1=CC=NC=C1"
+    ],
+    [
+     "C1=CC=CC=C1"
+    ]
+   ],
+   "values": {
+    "C1=CC=CC=C1": 80.09,
+    "C1=CC=NC=C1": 115.25,
+    "C1=CC=C(C=C1)N": 184.1,
+    "C1=CC=C(C=C1)[N+](=O)[O-]": 210.79
+   },
+   "basis": "normal boiling point (C): nitrobenzene 210.79, aniline 184.1, pyridine 115.25, benzene 80.09",
+   "sources": [
+    {
+     "name": "benzene",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/241",
+     "snapshot": "snapshots/pubchem-ranking/benzene.json",
+     "sha256": "c6b59b3569291af7340cebaeb810e97214c076953d316e1d541abef9ef0d1f2e",
+     "nValues": 7
+    },
+    {
+     "name": "pyridine",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/1049",
+     "snapshot": "snapshots/pubchem-ranking/pyridine.json",
+     "sha256": "bea6f0a4220a8f91123e69c42955745575a2187d5844daac6f282c1f813fc34f",
+     "nValues": 7
+    },
+    {
+     "name": "aniline",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6115",
+     "snapshot": "snapshots/pubchem-ranking/aniline.json",
+     "sha256": "08d2456ca85c4355b2c2fcc77b6943df89024d69027eab351585101269e840aa",
+     "nValues": 7
+    },
+    {
+     "name": "nitrobenzene",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7416",
+     "snapshot": "snapshots/pubchem-ranking/nitrobenzene.json",
+     "sha256": "8a0966651f5df1fdafc0e4720259701dd7b7ba876d5d77456c659b8b334aa883",
+     "nValues": 6
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 7/7/7/6 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-11",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "octane / 1-octanol / 2-methylheptane / octanoic acid",
+   "evidence": "reference-database",
+   "smiles": [
+    "CCCCCCCC",
+    "CCCCCCCCO",
+    "CCCCCC(C)C",
+    "CCCCCCCC(=O)O"
+   ],
+   "expected_order": [
+    [
+     "CCCCCCCC(=O)O"
+    ],
+    [
+     "CCCCCCCCO"
+    ],
+    [
+     "CCCCCCCC"
+    ],
+    [
+     "CCCCCC(C)C"
+    ]
+   ],
+   "values": {
+    "CCCCCCCC": 125.62,
+    "CCCCCCCCO": 194.85,
+    "CCCCCC(C)C": 117,
+    "CCCCCCCC(=O)O": 239.86
+   },
+   "basis": "normal boiling point (C): octanoic acid 239.86, 1-octanol 194.85, octane 125.62, 2-methylheptane 117",
+   "sources": [
+    {
+     "name": "octane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/356",
+     "snapshot": "snapshots/pubchem-ranking/octane.json",
+     "sha256": "c6389476125173d3967f2f3c55f081a82fd087d047a72433b5581cf5a9ecadeb",
+     "nValues": 7
+    },
+    {
+     "name": "1-octanol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/957",
+     "snapshot": "snapshots/pubchem-ranking/1-octanol.json",
+     "sha256": "830b0c9a821aad218f805ef0c168389ac01e99c0b7c90689218a21947a7c9ca3",
+     "nValues": 6
+    },
+    {
+     "name": "2-methylheptane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/11594",
+     "snapshot": "snapshots/pubchem-ranking/2-methylheptane.json",
+     "sha256": "f4a425a5ecaea5823cece3b70debf378295998327f2966dafe8567288c093d3e",
+     "nValues": 2
+    },
+    {
+     "name": "octanoic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/379",
+     "snapshot": "snapshots/pubchem-ranking/octanoic-acid.json",
+     "sha256": "4cb0c7c2e34a2cc8f64739cb7e1765852b973fb78cd0ff58c44e89ee1cb578ba",
+     "nValues": 4
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 7/6/2/4 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-12",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "ethanol / ethylene glycol / glycerol / diethylene glycol",
+   "evidence": "reference-database",
+   "smiles": [
+    "CCO",
+    "C(CO)O",
+    "C(C(CO)O)O",
+    "C(COCCO)O"
+   ],
+   "expected_order": [
+    [
+     "C(C(CO)O)O"
+    ],
+    [
+     "C(COCCO)O"
+    ],
+    [
+     "C(CO)O"
+    ],
+    [
+     "CCO"
+    ]
+   ],
+   "values": {
+    "CCO": 78.29,
+    "C(CO)O": 197.61,
+    "C(C(CO)O)O": 290,
+    "C(COCCO)O": 245
+   },
+   "basis": "normal boiling point (C): glycerol 290, diethylene glycol 245, ethylene glycol 197.61, ethanol 78.29",
+   "sources": [
+    {
+     "name": "ethanol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/702",
+     "snapshot": "snapshots/pubchem-ranking/ethanol.json",
+     "sha256": "055e7c219774be39fa666b7737a3b58f8b9043ea0b6123f1107a032b339458ba",
+     "nValues": 7
+    },
+    {
+     "name": "ethylene glycol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/174",
+     "snapshot": "snapshots/pubchem-ranking/ethylene-glycol.json",
+     "sha256": "620ef196e4cfba183d5fb57022591cfa53a37ccce0c3bb383b0cc0130122f1ab",
+     "nValues": 7
+    },
+    {
+     "name": "glycerol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/753",
+     "snapshot": "snapshots/pubchem-ranking/glycerol.json",
+     "sha256": "74f8acfcb40213416805b8a8b0523cc138f13e0332d5595ec2c3da8fcc078c82",
+     "nValues": 6
+    },
+    {
+     "name": "diethylene glycol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8117",
+     "snapshot": "snapshots/pubchem-ranking/diethylene-glycol.json",
+     "sha256": "51fe6c089cbd80a590e16088a1bd6eea4648b4a98bd203e387be7f2916581e86",
+     "nValues": 3
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 7/7/6/3 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-13",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "heptane / octane / nonane / decane",
+   "evidence": "reference-database",
+   "smiles": [
+    "CCCCCCC",
+    "CCCCCCCC",
+    "CCCCCCCCC",
+    "CCCCCCCCCC"
+   ],
+   "expected_order": [
+    [
+     "CCCCCCCCCC"
+    ],
+    [
+     "CCCCCCCCC"
+    ],
+    [
+     "CCCCCCCC"
+    ],
+    [
+     "CCCCCCC"
+    ]
+   ],
+   "values": {
+    "CCCCCCC": 98.39,
+    "CCCCCCCC": 125.62,
+    "CCCCCCCCC": 150.78,
+    "CCCCCCCCCC": 174.15
+   },
+   "basis": "normal boiling point (C): decane 174.15, nonane 150.78, octane 125.62, heptane 98.39",
+   "sources": [
+    {
+     "name": "heptane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8900",
+     "snapshot": "snapshots/pubchem-ranking/heptane.json",
+     "sha256": "7c77ede413a93870f2eca6293c4c1b7546df9604271073601f4d72503bb8bafd",
+     "nValues": 7
+    },
+    {
+     "name": "octane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/356",
+     "snapshot": "snapshots/pubchem-ranking/octane.json",
+     "sha256": "c6389476125173d3967f2f3c55f081a82fd087d047a72433b5581cf5a9ecadeb",
+     "nValues": 7
+    },
+    {
+     "name": "nonane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8141",
+     "snapshot": "snapshots/pubchem-ranking/nonane.json",
+     "sha256": "ff1a513359af9bedd4934dcfb98eced77881d141c499e4e5778d70f22a231184",
+     "nValues": 7
+    },
+    {
+     "name": "decane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/15600",
+     "snapshot": "snapshots/pubchem-ranking/decane.json",
+     "sha256": "e20dc4b8ea4faabb45f571196fffcb575fd0b2a32f8b2b1ac570c107072e9577",
+     "nValues": 5
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 7/7/7/5 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-14",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "chloromethane / dichloromethane / chloroform / carbon tetrachloride",
+   "evidence": "reference-database",
+   "smiles": [
+    "CCl",
+    "C(Cl)Cl",
+    "C(Cl)(Cl)Cl",
+    "C(Cl)(Cl)(Cl)Cl"
+   ],
+   "expected_order": [
+    [
+     "C(Cl)(Cl)(Cl)Cl"
+    ],
+    [
+     "C(Cl)(Cl)Cl"
+    ],
+    [
+     "C(Cl)Cl"
+    ],
+    [
+     "CCl"
+    ]
+   ],
+   "values": {
+    "CCl": -24.16,
+    "C(Cl)Cl": 40,
+    "C(Cl)(Cl)Cl": 61.67,
+    "C(Cl)(Cl)(Cl)Cl": 76.72
+   },
+   "basis": "normal boiling point (C): carbon tetrachloride 76.72, chloroform 61.67, dichloromethane 40, chloromethane -24.16",
+   "sources": [
+    {
+     "name": "chloromethane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6327",
+     "snapshot": "snapshots/pubchem-ranking/chloromethane.json",
+     "sha256": "c915feae278bfad1fab4c205ca8c90fdfc01447573186561e40d6ed3e279085a",
+     "nValues": 6
+    },
+    {
+     "name": "dichloromethane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6344",
+     "snapshot": "snapshots/pubchem-ranking/dichloromethane.json",
+     "sha256": "ed5740875539432cac0f92b76e1a1cceb47b89e8590813ad1eb8c3ad38e55f6f",
+     "nValues": 6
+    },
+    {
+     "name": "chloroform",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6212",
+     "snapshot": "snapshots/pubchem-ranking/chloroform.json",
+     "sha256": "0f0808ab75e2073de13750ce4df07f2eb85a8ac6a7b3ed4336ba3b027ef37d76",
+     "nValues": 7
+    },
+    {
+     "name": "carbon tetrachloride",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/5943",
+     "snapshot": "snapshots/pubchem-ranking/carbon-tetrachloride.json",
+     "sha256": "8372240f91ff9cd5b2f42706e2f5896fe56895987324c1879f4b4ecc0d798460",
+     "nValues": 7
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 6/6/7/7 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-15",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "acetaldehyde / propanal / butanal / pentanal",
+   "evidence": "reference-database",
+   "smiles": [
+    "CC=O",
+    "CCC=O",
+    "CCCC=O",
+    "CCCCC=O"
+   ],
+   "expected_order": [
+    [
+     "CCCCC=O"
+    ],
+    [
+     "CCCC=O"
+    ],
+    [
+     "CCC=O"
+    ],
+    [
+     "CC=O"
+    ]
+   ],
+   "values": {
+    "CC=O": 20.56,
+    "CCC=O": 48.89,
+    "CCCC=O": 74.8,
+    "CCCCC=O": 103
+   },
+   "basis": "normal boiling point (C): pentanal 103, butanal 74.8, propanal 48.89, acetaldehyde 20.56",
+   "sources": [
+    {
+     "name": "acetaldehyde",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/177",
+     "snapshot": "snapshots/pubchem-ranking/acetaldehyde.json",
+     "sha256": "26ac4319bdf303ea876222bf54c4db21bfa52fecc752941d54629932951ac0a8",
+     "nValues": 7
+    },
+    {
+     "name": "propanal",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/527",
+     "snapshot": "snapshots/pubchem-ranking/propanal.json",
+     "sha256": "2dddeed0cb0286aaa24f65787d82c307900dd003ff6e9741eb6ef09e9b12b87a",
+     "nValues": 6
+    },
+    {
+     "name": "butanal",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/261",
+     "snapshot": "snapshots/pubchem-ranking/butanal.json",
+     "sha256": "aa13df1dee1637c04e7c9385f9ef45eefdde4a75c4cceb3489542dcc3e63d228",
+     "nValues": 6
+    },
+    {
+     "name": "pentanal",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8063",
+     "snapshot": "snapshots/pubchem-ranking/pentanal.json",
+     "sha256": "dd008829c995ee479a4958dfe2e862ba910d843e226ece1ee92dd20cf4e5c3ac",
+     "nValues": 7
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 7/6/6/7 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-16",
+   "capability": "ranking",
+   "mode_id": "boilingPoint",
+   "category": "boilingPoint",
+   "title": "nitromethane / nitroethane / 1-nitropropane / nitrobenzene",
+   "evidence": "reference-database",
+   "smiles": [
+    "C[N+](=O)[O-]",
+    "CC[N+](=O)[O-]",
+    "CCC[N+](=O)[O-]",
+    "C1=CC=C(C=C1)[N+](=O)[O-]"
+   ],
+   "expected_order": [
+    [
+     "C1=CC=C(C=C1)[N+](=O)[O-]"
+    ],
+    [
+     "CCC[N+](=O)[O-]"
+    ],
+    [
+     "CC[N+](=O)[O-]"
+    ],
+    [
+     "C[N+](=O)[O-]"
+    ]
+   ],
+   "values": {
+    "C[N+](=O)[O-]": 101.11,
+    "CC[N+](=O)[O-]": 114.05,
+    "CCC[N+](=O)[O-]": 131.67,
+    "C1=CC=C(C=C1)[N+](=O)[O-]": 210.79
+   },
+   "basis": "normal boiling point (C): nitrobenzene 210.79, 1-nitropropane 131.67, nitroethane 114.05, nitromethane 101.11",
+   "sources": [
+    {
+     "name": "nitromethane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6375",
+     "snapshot": "snapshots/pubchem-ranking/nitromethane.json",
+     "sha256": "8a4b5f1d6fea7c3d4e603edf7bf5235fb15fe45fea209393d1a1fa8ec2a44df6",
+     "nValues": 6
+    },
+    {
+     "name": "nitroethane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6587",
+     "snapshot": "snapshots/pubchem-ranking/nitroethane.json",
+     "sha256": "8dd29b021e280d24bc4a5cb4c2538ed7a6e1ae7dbc235dad9818cde595b850e0",
+     "nValues": 6
+    },
+    {
+     "name": "1-nitropropane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7903",
+     "snapshot": "snapshots/pubchem-ranking/1-nitropropane.json",
+     "sha256": "8c349a9a1a854bc656a4c9832e59e0b2a22bb7d4dbdc48f5974df4850e6f93e6",
+     "nValues": 6
+    },
+    {
+     "name": "nitrobenzene",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7416",
+     "snapshot": "snapshots/pubchem-ranking/nitrobenzene.json",
+     "sha256": "8a0966651f5df1fdafc0e4720259701dd7b7ba876d5d77456c659b8b334aa883",
+     "nValues": 6
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 6/6/6/6 listed values; adjacent members differ by at least 8."
+  },
+  {
+   "id": "RK-17",
+   "capability": "ranking",
+   "mode_id": "acidity",
+   "category": "acidity",
+   "title": "chloroacetic acid / dichloroacetic acid / acetic acid / trichloroacetic acid",
+   "evidence": "reference-database",
+   "smiles": [
+    "C(C(=O)O)Cl",
+    "C(C(=O)O)(Cl)Cl",
+    "CC(=O)O",
+    "C(=O)(C(Cl)(Cl)Cl)O"
+   ],
+   "expected_order": [
+    [
+     "C(=O)(C(Cl)(Cl)Cl)O"
+    ],
+    [
+     "C(C(=O)O)(Cl)Cl"
+    ],
+    [
+     "C(C(=O)O)Cl"
+    ],
+    [
+     "CC(=O)O"
+    ]
+   ],
+   "values": {
+    "C(C(=O)O)Cl": 2.87,
+    "C(C(=O)O)(Cl)Cl": 1.26,
+    "CC(=O)O": 4.76,
+    "C(=O)(C(Cl)(Cl)Cl)O": 0.51
+   },
+   "basis": "aqueous pKa (lower = stronger acid): trichloroacetic acid 0.51, dichloroacetic acid 1.26, chloroacetic acid 2.87, acetic acid 4.76",
+   "sources": [
+    {
+     "name": "chloroacetic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/300",
+     "snapshot": "snapshots/pubchem-ranking/chloroacetic-acid.json",
+     "sha256": "f265c60b525565040d7a6ee0c035b46d3fb9ed548a964c68cddc5929d67146dc",
+     "nValues": 1
+    },
+    {
+     "name": "dichloroacetic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6597",
+     "snapshot": "snapshots/pubchem-ranking/dichloroacetic-acid.json",
+     "sha256": "658722a6d6806a19bbec3c37a067a52d644e74a1cdc32e8aa89e19f816a6352f",
+     "nValues": 1
+    },
+    {
+     "name": "acetic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/176",
+     "snapshot": "snapshots/pubchem-ranking/acetic-acid.json",
+     "sha256": "06db858599fe0ee57b612999ba5dd9f99f201dbde414e97bb0166b694dd94ded",
+     "nValues": 1
+    },
+    {
+     "name": "trichloroacetic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6421",
+     "snapshot": "snapshots/pubchem-ranking/trichloroacetic-acid.json",
+     "sha256": "b85f368975ff781c88b718e10b6e0e00719d275204deaa56a5cb5ea61fda4c12",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 1/1/1/1 listed values; adjacent members differ by at least 0.5."
+  },
+  {
+   "id": "RK-18",
+   "capability": "ranking",
+   "mode_id": "acidity",
+   "category": "acidity",
+   "title": "oxalic acid / acetic acid / hydrogen cyanide / phenol",
+   "evidence": "reference-database",
+   "smiles": [
+    "C(=O)(C(=O)O)O",
+    "CC(=O)O",
+    "C#N",
+    "C1=CC=C(C=C1)O"
+   ],
+   "expected_order": [
+    [
+     "C(=O)(C(=O)O)O"
+    ],
+    [
+     "CC(=O)O"
+    ],
+    [
+     "C#N"
+    ],
+    [
+     "C1=CC=C(C=C1)O"
+    ]
+   ],
+   "values": {
+    "C(=O)(C(=O)O)O": 1,
+    "CC(=O)O": 4.76,
+    "C#N": 9.2,
+    "C1=CC=C(C=C1)O": 9.99
+   },
+   "basis": "aqueous pKa (lower = stronger acid): oxalic acid 1, acetic acid 4.76, hydrogen cyanide 9.2, phenol 9.99",
+   "sources": [
+    {
+     "name": "oxalic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/971",
+     "snapshot": "snapshots/pubchem-ranking/oxalic-acid.json",
+     "sha256": "38514fb9e49c28665735a23d6a1336d479e2b5268831aeb87df100662f568979",
+     "nValues": 1
+    },
+    {
+     "name": "acetic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/176",
+     "snapshot": "snapshots/pubchem-ranking/acetic-acid.json",
+     "sha256": "06db858599fe0ee57b612999ba5dd9f99f201dbde414e97bb0166b694dd94ded",
+     "nValues": 1
+    },
+    {
+     "name": "hydrogen cyanide",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/768",
+     "snapshot": "snapshots/pubchem-ranking/hydrogen-cyanide.json",
+     "sha256": "187c48d285ac53c3cb3218b441ab42767980f02567766c6e1d77b231d6bae3a6",
+     "nValues": 1
+    },
+    {
+     "name": "phenol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/996",
+     "snapshot": "snapshots/pubchem-ranking/phenol.json",
+     "sha256": "fe787a55da139c0ddc4ce1d1c75c2722e247827e7287b988ea5e92e3a1ccd229",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 1/1/1/1 listed values; adjacent members differ by at least 0.5."
+  },
+  {
+   "id": "RK-19",
+   "capability": "ranking",
+   "mode_id": "acidity",
+   "category": "acidity",
+   "title": "acetic acid / phenol / 4-nitrophenol / trifluoroacetic acid",
+   "evidence": "reference-database",
+   "smiles": [
+    "CC(=O)O",
+    "C1=CC=C(C=C1)O",
+    "C1=CC(=CC=C1[N+](=O)[O-])O",
+    "C(=O)(C(F)(F)F)O"
+   ],
+   "expected_order": [
+    [
+     "C(=O)(C(F)(F)F)O"
+    ],
+    [
+     "CC(=O)O"
+    ],
+    [
+     "C1=CC(=CC=C1[N+](=O)[O-])O"
+    ],
+    [
+     "C1=CC=C(C=C1)O"
+    ]
+   ],
+   "values": {
+    "CC(=O)O": 4.76,
+    "C1=CC=C(C=C1)O": 9.99,
+    "C1=CC(=CC=C1[N+](=O)[O-])O": 7.15,
+    "C(=O)(C(F)(F)F)O": 0.3
+   },
+   "basis": "aqueous pKa (lower = stronger acid): trifluoroacetic acid 0.3, acetic acid 4.76, 4-nitrophenol 7.15, phenol 9.99",
+   "sources": [
+    {
+     "name": "acetic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/176",
+     "snapshot": "snapshots/pubchem-ranking/acetic-acid.json",
+     "sha256": "06db858599fe0ee57b612999ba5dd9f99f201dbde414e97bb0166b694dd94ded",
+     "nValues": 1
+    },
+    {
+     "name": "phenol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/996",
+     "snapshot": "snapshots/pubchem-ranking/phenol.json",
+     "sha256": "fe787a55da139c0ddc4ce1d1c75c2722e247827e7287b988ea5e92e3a1ccd229",
+     "nValues": 1
+    },
+    {
+     "name": "4-nitrophenol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/980",
+     "snapshot": "snapshots/pubchem-ranking/4-nitrophenol.json",
+     "sha256": "c8fce13be52e054dd1d30495a7e65d29316976bb491f451e896b8ed8ab68b867",
+     "nValues": 1
+    },
+    {
+     "name": "trifluoroacetic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6422",
+     "snapshot": "snapshots/pubchem-ranking/trifluoroacetic-acid.json",
+     "sha256": "d729c8e4809ff7fcbfe2cf29cbe924b0c198d969a4f8135a4ba0336882b54608",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 1/1/1/1 listed values; adjacent members differ by at least 0.5."
+  },
+  {
+   "id": "RK-20",
+   "capability": "ranking",
+   "mode_id": "acidity",
+   "category": "acidity",
+   "title": "formic acid / chloroacetic acid / trifluoroacetic acid / phenol",
+   "evidence": "reference-database",
+   "smiles": [
+    "C(=O)O",
+    "C(C(=O)O)Cl",
+    "C(=O)(C(F)(F)F)O",
+    "C1=CC=C(C=C1)O"
+   ],
+   "expected_order": [
+    [
+     "C(=O)(C(F)(F)F)O"
+    ],
+    [
+     "C(C(=O)O)Cl"
+    ],
+    [
+     "C(=O)O"
+    ],
+    [
+     "C1=CC=C(C=C1)O"
+    ]
+   ],
+   "values": {
+    "C(=O)O": 3.75,
+    "C(C(=O)O)Cl": 2.87,
+    "C(=O)(C(F)(F)F)O": 0.3,
+    "C1=CC=C(C=C1)O": 9.99
+   },
+   "basis": "aqueous pKa (lower = stronger acid): trifluoroacetic acid 0.3, chloroacetic acid 2.87, formic acid 3.75, phenol 9.99",
+   "sources": [
+    {
+     "name": "formic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/284",
+     "snapshot": "snapshots/pubchem-ranking/formic-acid.json",
+     "sha256": "a333b1d0347b74f6a0c7292b8aca58232bc8215ad831db771175251167f73bb4",
+     "nValues": 1
+    },
+    {
+     "name": "chloroacetic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/300",
+     "snapshot": "snapshots/pubchem-ranking/chloroacetic-acid.json",
+     "sha256": "f265c60b525565040d7a6ee0c035b46d3fb9ed548a964c68cddc5929d67146dc",
+     "nValues": 1
+    },
+    {
+     "name": "trifluoroacetic acid",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6422",
+     "snapshot": "snapshots/pubchem-ranking/trifluoroacetic-acid.json",
+     "sha256": "d729c8e4809ff7fcbfe2cf29cbe924b0c198d969a4f8135a4ba0336882b54608",
+     "nValues": 1
+    },
+    {
+     "name": "phenol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/996",
+     "snapshot": "snapshots/pubchem-ranking/phenol.json",
+     "sha256": "fe787a55da139c0ddc4ce1d1c75c2722e247827e7287b988ea5e92e3a1ccd229",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 1/1/1/1 listed values; adjacent members differ by at least 0.5."
+  },
+  {
+   "id": "RK-21",
+   "capability": "ranking",
+   "mode_id": "acidity",
+   "category": "acidity",
+   "title": "2-chlorophenol / phenol / 4-nitrophenol / 2,4-dinitrophenol",
+   "evidence": "reference-database",
+   "smiles": [
+    "C1=CC=C(C(=C1)O)Cl",
+    "C1=CC=C(C=C1)O",
+    "C1=CC(=CC=C1[N+](=O)[O-])O",
+    "C1=CC(=C(C=C1[N+](=O)[O-])[N+](=O)[O-])O"
+   ],
+   "expected_order": [
+    [
+     "C1=CC(=C(C=C1[N+](=O)[O-])[N+](=O)[O-])O"
+    ],
+    [
+     "C1=CC(=CC=C1[N+](=O)[O-])O"
+    ],
+    [
+     "C1=CC=C(C(=C1)O)Cl"
+    ],
+    [
+     "C1=CC=C(C=C1)O"
+    ]
+   ],
+   "values": {
+    "C1=CC=C(C(=C1)O)Cl": 8.54,
+    "C1=CC=C(C=C1)O": 9.99,
+    "C1=CC(=CC=C1[N+](=O)[O-])O": 7.15,
+    "C1=CC(=C(C=C1[N+](=O)[O-])[N+](=O)[O-])O": 4.09
+   },
+   "basis": "aqueous pKa (lower = stronger acid): 2,4-dinitrophenol 4.09, 4-nitrophenol 7.15, 2-chlorophenol 8.54, phenol 9.99",
+   "sources": [
+    {
+     "name": "2-chlorophenol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7245",
+     "snapshot": "snapshots/pubchem-ranking/2-chlorophenol.json",
+     "sha256": "a8ae6ceb2f70a49a6509a39609ecd7e694a16bf7b236489620aacca1d41ab7ae",
+     "nValues": 2
+    },
+    {
+     "name": "phenol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/996",
+     "snapshot": "snapshots/pubchem-ranking/phenol.json",
+     "sha256": "fe787a55da139c0ddc4ce1d1c75c2722e247827e7287b988ea5e92e3a1ccd229",
+     "nValues": 1
+    },
+    {
+     "name": "4-nitrophenol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/980",
+     "snapshot": "snapshots/pubchem-ranking/4-nitrophenol.json",
+     "sha256": "c8fce13be52e054dd1d30495a7e65d29316976bb491f451e896b8ed8ab68b867",
+     "nValues": 1
+    },
+    {
+     "name": "2,4-dinitrophenol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/1493",
+     "snapshot": "snapshots/pubchem-ranking/2-4-dinitrophenol.json",
+     "sha256": "2e3001b80d4be4b5bcfe568d35c399c67fca5706a5fba79b4417e44ef2c3c77d",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 2/1/1/1 listed values; adjacent members differ by at least 0.5."
+  },
+  {
+   "id": "RK-22",
+   "capability": "ranking",
+   "mode_id": "basicity",
+   "category": "basicity",
+   "title": "dimethylamine / imidazole / pyridine / 4-nitroaniline",
+   "evidence": "reference-database",
+   "smiles": [
+    "CNC",
+    "C1=CN=CN1",
+    "C1=CC=NC=C1",
+    "C1=CC(=CC=C1N)[N+](=O)[O-]"
+   ],
+   "expected_order": [
+    [
+     "CNC"
+    ],
+    [
+     "C1=CN=CN1"
+    ],
+    [
+     "C1=CC=NC=C1"
+    ],
+    [
+     "C1=CC(=CC=C1N)[N+](=O)[O-]"
+    ]
+   ],
+   "values": {
+    "CNC": 10.73,
+    "C1=CN=CN1": 7,
+    "C1=CC=NC=C1": 5.23,
+    "C1=CC(=CC=C1N)[N+](=O)[O-]": 1.01
+   },
+   "basis": "pKa of the conjugate acid (higher = stronger base): dimethylamine 10.73, imidazole 7, pyridine 5.23, 4-nitroaniline 1.01",
+   "sources": [
+    {
+     "name": "dimethylamine",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/674",
+     "snapshot": "snapshots/pubchem-ranking/dimethylamine.json",
+     "sha256": "8b9ce1ffe0a5243ffb1f7373800acac4822e1bdae4fee87dc6a8f852c935dea3",
+     "nValues": 1
+    },
+    {
+     "name": "imidazole",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/795",
+     "snapshot": "snapshots/pubchem-ranking/imidazole.json",
+     "sha256": "1aac1729fb1d66518a69bb23d63a9e691f3f0b59cb020bca8cab1da576d6be8f",
+     "nValues": 1
+    },
+    {
+     "name": "pyridine",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/1049",
+     "snapshot": "snapshots/pubchem-ranking/pyridine.json",
+     "sha256": "bea6f0a4220a8f91123e69c42955745575a2187d5844daac6f282c1f813fc34f",
+     "nValues": 1
+    },
+    {
+     "name": "4-nitroaniline",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7475",
+     "snapshot": "snapshots/pubchem-ranking/4-nitroaniline.json",
+     "sha256": "2cd9dabb2f74bd74f6ab7472aa1bafb4cdaff9d3765ffc1c7d5ae45613284711",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 1/1/1/1 listed values; adjacent members differ by at least 0.8."
+  },
+  {
+   "id": "RK-23",
+   "capability": "ranking",
+   "mode_id": "lipophilicity",
+   "category": "lipophilicity",
+   "title": "methanol / butan-1-ol / hexan-1-ol / octan-1-ol",
+   "evidence": "reference-database",
+   "smiles": [
+    "CO",
+    "CCCCO",
+    "CCCCCCO",
+    "CCCCCCCCO"
+   ],
+   "expected_order": [
+    [
+     "CCCCCCCCO"
+    ],
+    [
+     "CCCCCCO"
+    ],
+    [
+     "CCCCO"
+    ],
+    [
+     "CO"
+    ]
+   ],
+   "values": {
+    "CO": -0.77,
+    "CCCCO": 0.88,
+    "CCCCCCO": 2.03,
+    "CCCCCCCCO": 3
+   },
+   "basis": "experimental log Kow: octan-1-ol 3, hexan-1-ol 2.03, butan-1-ol 0.88, methanol -0.77",
+   "sources": [
+    {
+     "name": "methanol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/887",
+     "snapshot": "snapshots/pubchem-ranking/methanol.json",
+     "sha256": "7db4c6b812c1a4d2a86807c0154d0c5a1df8402e33d4dad67123ca187522c14d",
+     "nValues": 3
+    },
+    {
+     "name": "butan-1-ol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/263",
+     "snapshot": "snapshots/pubchem-ranking/butan-1-ol.json",
+     "sha256": "df0628bdf8946cf71018484fceb213f929b08ea4f006164f02719837f20257be",
+     "nValues": 4
+    },
+    {
+     "name": "hexan-1-ol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8103",
+     "snapshot": "snapshots/pubchem-ranking/hexan-1-ol.json",
+     "sha256": "156220391971ef7f986f3bf33b5833a621751be6bbfd909484a4eee10d642e58",
+     "nValues": 4
+    },
+    {
+     "name": "octan-1-ol",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/957",
+     "snapshot": "snapshots/pubchem-ranking/octan-1-ol.json",
+     "sha256": "86a5e2301bbb776f491cefa98875056c6fa20eb4d7e6b07507fba0a12c6c3837",
+     "nValues": 4
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 3/4/4/4 listed values; adjacent members differ by at least 0.7."
+  },
+  {
+   "id": "RK-24",
+   "capability": "ranking",
+   "mode_id": "lipophilicity",
+   "category": "lipophilicity",
+   "title": "acetone / diethyl ether / hexane / water",
+   "evidence": "reference-database",
+   "smiles": [
+    "CC(=O)C",
+    "CCOCC",
+    "CCCCCC",
+    "O"
+   ],
+   "expected_order": [
+    [
+     "CCCCCC"
+    ],
+    [
+     "CCOCC"
+    ],
+    [
+     "CC(=O)C"
+    ],
+    [
+     "O"
+    ]
+   ],
+   "values": {
+    "CC(=O)C": -0.24,
+    "CCOCC": 0.89,
+    "CCCCCC": 3.9,
+    "O": -1.38
+   },
+   "basis": "experimental log Kow: hexane 3.9, diethyl ether 0.89, acetone -0.24, water -1.38",
+   "sources": [
+    {
+     "name": "acetone",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/180",
+     "snapshot": "snapshots/pubchem-ranking/acetone.json",
+     "sha256": "ed6e5313e9862019d818d24322ef1282cdf80144d08d365a736942495b2c0930",
+     "nValues": 4
+    },
+    {
+     "name": "diethyl ether",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/3283",
+     "snapshot": "snapshots/pubchem-ranking/diethyl-ether.json",
+     "sha256": "8ccd0755faaa759f16d25d31d41ec4517c05b49b80386325ad81062cc8a76434",
+     "nValues": 2
+    },
+    {
+     "name": "hexane",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8058",
+     "snapshot": "snapshots/pubchem-ranking/hexane.json",
+     "sha256": "14f09165384a3d218890f63a8774362e384e57317753cd8ce59736c5ad137c4d",
+     "nValues": 4
+    },
+    {
+     "name": "water",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/compound/962",
+     "snapshot": "snapshots/pubchem-ranking/water.json",
+     "sha256": "3a1546a31b53ac815ec5791b4ab854cb2c31d8726200b55b26d19bd5ae7ff615",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "PubChem compiles experimental values from several handbooks; the value used is the median of 4/2/4/1 listed values; adjacent members differ by at least 0.7."
+  },
+  {
+   "id": "RK-25",
+   "capability": "ranking",
+   "mode_id": "ewgStrength",
+   "category": "ewgStrength",
+   "title": "Hammett sigma-para: Nitro / Cyano / Trifluoromethyl / Ethoxycarbonyl",
+   "evidence": "reference-secondary",
+   "smiles": [
+    "O=[N+]([O-])c1ccccc1",
+    "N#Cc1ccccc1",
+    "FC(F)(F)c1ccccc1",
+    "CCOC(=O)c1ccccc1"
+   ],
+   "expected_order": [
+    [
+     "O=[N+]([O-])c1ccccc1"
+    ],
+    [
+     "N#Cc1ccccc1"
+    ],
+    [
+     "FC(F)(F)c1ccccc1"
+    ],
+    [
+     "CCOC(=O)c1ccccc1"
+    ]
+   ],
+   "values": {
+    "O=[N+]([O-])c1ccccc1": 0.778,
+    "N#Cc1ccccc1": 0.66,
+    "FC(F)(F)c1ccccc1": 0.54,
+    "CCOC(=O)c1ccccc1": 0.45
+   },
+   "basis": "sigma_para (Hammett 1937 values as tabulated on Wikipedia 'Hammett equation'): Nitro 0.778, Cyano 0.66, Trifluoromethyl 0.54, Ethoxycarbonyl 0.45",
+   "sources": [
+    {
+     "name": "Wikipedia Hammett equation (raw wikitext)",
+     "url": "https://en.wikipedia.org/wiki/Hammett_equation",
+     "snapshot": "snapshots/wikipedia/Hammett_equation.wikitext",
+     "sha256": "8d8d96dea844a2231711952e0569fca9c80f531fd26894848e61cb0c074af19f",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "Original 1937 constants; modern compilations (Hansch 1991) differ numerically but the order of members used here is unchanged where gaps are at least 0.05. Secondary source."
+  },
+  {
+   "id": "RK-26",
+   "capability": "ranking",
+   "mode_id": "ewgStrength",
+   "category": "ewgStrength",
+   "title": "Hammett sigma-para: Ethoxycarbonyl / Iodo / Fluoro / Nitro",
+   "evidence": "reference-secondary",
+   "smiles": [
+    "CCOC(=O)c1ccccc1",
+    "Ic1ccccc1",
+    "Fc1ccccc1",
+    "O=[N+]([O-])c1ccccc1"
+   ],
+   "expected_order": [
+    [
+     "O=[N+]([O-])c1ccccc1"
+    ],
+    [
+     "CCOC(=O)c1ccccc1"
+    ],
+    [
+     "Ic1ccccc1"
+    ],
+    [
+     "Fc1ccccc1"
+    ]
+   ],
+   "values": {
+    "CCOC(=O)c1ccccc1": 0.45,
+    "Ic1ccccc1": 0.276,
+    "Fc1ccccc1": 0.062,
+    "O=[N+]([O-])c1ccccc1": 0.778
+   },
+   "basis": "sigma_para (Hammett 1937 values as tabulated on Wikipedia 'Hammett equation'): Nitro 0.778, Ethoxycarbonyl 0.45, Iodo 0.276, Fluoro 0.062",
+   "sources": [
+    {
+     "name": "Wikipedia Hammett equation (raw wikitext)",
+     "url": "https://en.wikipedia.org/wiki/Hammett_equation",
+     "snapshot": "snapshots/wikipedia/Hammett_equation.wikitext",
+     "sha256": "8d8d96dea844a2231711952e0569fca9c80f531fd26894848e61cb0c074af19f",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "Original 1937 constants; modern compilations (Hansch 1991) differ numerically but the order of members used here is unchanged where gaps are at least 0.05. Secondary source."
+  },
+  {
+   "id": "RK-27",
+   "capability": "ranking",
+   "mode_id": "ewgStrength",
+   "category": "ewgStrength",
+   "title": "Hammett sigma-para: Cyano / Trifluoromethyl / Iodo / Fluoro",
+   "evidence": "reference-secondary",
+   "smiles": [
+    "N#Cc1ccccc1",
+    "FC(F)(F)c1ccccc1",
+    "Ic1ccccc1",
+    "Fc1ccccc1"
+   ],
+   "expected_order": [
+    [
+     "N#Cc1ccccc1"
+    ],
+    [
+     "FC(F)(F)c1ccccc1"
+    ],
+    [
+     "Ic1ccccc1"
+    ],
+    [
+     "Fc1ccccc1"
+    ]
+   ],
+   "values": {
+    "N#Cc1ccccc1": 0.66,
+    "FC(F)(F)c1ccccc1": 0.54,
+    "Ic1ccccc1": 0.276,
+    "Fc1ccccc1": 0.062
+   },
+   "basis": "sigma_para (Hammett 1937 values as tabulated on Wikipedia 'Hammett equation'): Cyano 0.66, Trifluoromethyl 0.54, Iodo 0.276, Fluoro 0.062",
+   "sources": [
+    {
+     "name": "Wikipedia Hammett equation (raw wikitext)",
+     "url": "https://en.wikipedia.org/wiki/Hammett_equation",
+     "snapshot": "snapshots/wikipedia/Hammett_equation.wikitext",
+     "sha256": "8d8d96dea844a2231711952e0569fca9c80f531fd26894848e61cb0c074af19f",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "Original 1937 constants; modern compilations (Hansch 1991) differ numerically but the order of members used here is unchanged where gaps are at least 0.05. Secondary source."
+  },
+  {
+   "id": "RK-28",
+   "capability": "ranking",
+   "mode_id": "edgStrength",
+   "category": "edgStrength",
+   "title": "Hammett sigma-para: Dimethylamino / Amino / Methoxy / Methyl",
+   "evidence": "reference-secondary",
+   "smiles": [
+    "CN(C)c1ccccc1",
+    "Nc1ccccc1",
+    "COc1ccccc1",
+    "Cc1ccccc1"
+   ],
+   "expected_order": [
+    [
+     "CN(C)c1ccccc1"
+    ],
+    [
+     "Nc1ccccc1"
+    ],
+    [
+     "COc1ccccc1"
+    ],
+    [
+     "Cc1ccccc1"
+    ]
+   ],
+   "values": {
+    "CN(C)c1ccccc1": -0.83,
+    "Nc1ccccc1": -0.66,
+    "COc1ccccc1": -0.268,
+    "Cc1ccccc1": -0.17
+   },
+   "basis": "sigma_para (Hammett 1937 values as tabulated on Wikipedia 'Hammett equation'): Dimethylamino -0.83, Amino -0.66, Methoxy -0.268, Methyl -0.17",
+   "sources": [
+    {
+     "name": "Wikipedia Hammett equation (raw wikitext)",
+     "url": "https://en.wikipedia.org/wiki/Hammett_equation",
+     "snapshot": "snapshots/wikipedia/Hammett_equation.wikitext",
+     "sha256": "8d8d96dea844a2231711952e0569fca9c80f531fd26894848e61cb0c074af19f",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "Original 1937 constants; modern compilations (Hansch 1991) differ numerically but the order of members used here is unchanged where gaps are at least 0.05. Secondary source."
+  },
+  {
+   "id": "RK-29",
+   "capability": "ranking",
+   "mode_id": "edgStrength",
+   "category": "edgStrength",
+   "title": "Hammett sigma-para: Amino / Hydroxy / Ethoxy / Methyl",
+   "evidence": "reference-secondary",
+   "smiles": [
+    "Nc1ccccc1",
+    "Oc1ccccc1",
+    "CCOc1ccccc1",
+    "Cc1ccccc1"
+   ],
+   "expected_order": [
+    [
+     "Nc1ccccc1"
+    ],
+    [
+     "Oc1ccccc1"
+    ],
+    [
+     "CCOc1ccccc1"
+    ],
+    [
+     "Cc1ccccc1"
+    ]
+   ],
+   "values": {
+    "Nc1ccccc1": -0.66,
+    "Oc1ccccc1": -0.37,
+    "CCOc1ccccc1": -0.25,
+    "Cc1ccccc1": -0.17
+   },
+   "basis": "sigma_para (Hammett 1937 values as tabulated on Wikipedia 'Hammett equation'): Amino -0.66, Hydroxy -0.37, Ethoxy -0.25, Methyl -0.17",
+   "sources": [
+    {
+     "name": "Wikipedia Hammett equation (raw wikitext)",
+     "url": "https://en.wikipedia.org/wiki/Hammett_equation",
+     "snapshot": "snapshots/wikipedia/Hammett_equation.wikitext",
+     "sha256": "8d8d96dea844a2231711952e0569fca9c80f531fd26894848e61cb0c074af19f",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "Original 1937 constants; modern compilations (Hansch 1991) differ numerically but the order of members used here is unchanged where gaps are at least 0.05. Secondary source."
+  },
+  {
+   "id": "RK-30",
+   "capability": "ranking",
+   "mode_id": "edgStrength",
+   "category": "edgStrength",
+   "title": "Hammett sigma-para: Hydroxy / Methoxy / Methyl / Fluoro",
+   "evidence": "reference-secondary",
+   "smiles": [
+    "Oc1ccccc1",
+    "COc1ccccc1",
+    "Cc1ccccc1",
+    "Fc1ccccc1"
+   ],
+   "expected_order": [
+    [
+     "Oc1ccccc1"
+    ],
+    [
+     "COc1ccccc1"
+    ],
+    [
+     "Cc1ccccc1"
+    ],
+    [
+     "Fc1ccccc1"
+    ]
+   ],
+   "values": {
+    "Oc1ccccc1": -0.37,
+    "COc1ccccc1": -0.268,
+    "Cc1ccccc1": -0.17,
+    "Fc1ccccc1": 0.062
+   },
+   "basis": "sigma_para (Hammett 1937 values as tabulated on Wikipedia 'Hammett equation'): Hydroxy -0.37, Methoxy -0.268, Methyl -0.17, Fluoro 0.062",
+   "sources": [
+    {
+     "name": "Wikipedia Hammett equation (raw wikitext)",
+     "url": "https://en.wikipedia.org/wiki/Hammett_equation",
+     "snapshot": "snapshots/wikipedia/Hammett_equation.wikitext",
+     "sha256": "8d8d96dea844a2231711952e0569fca9c80f531fd26894848e61cb0c074af19f",
+     "nValues": 1
+    }
+   ],
+   "uncertainty": "Original 1937 constants; modern compilations (Hansch 1991) differ numerically but the order of members used here is unchanged where gaps are at least 0.05. Secondary source."
+  }
+ ]
+}

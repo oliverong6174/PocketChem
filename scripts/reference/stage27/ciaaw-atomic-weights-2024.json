@@ -1,0 +1,516 @@
+{
+ "id": "ciaaw-atomic-weights-2024",
+ "title": "CIAAW Standard Atomic Weights 2024 and Abridged Atomic Weights",
+ "urls": [
+  "https://ciaaw.org/atomic-weights.htm",
+  "https://ciaaw.org/abridged-atomic-weights.htm"
+ ],
+ "retrieved": "2026-11-23",
+ "note": "Transcribed programmatically from the two CIAAW HTML tables on the retrieval date; standard2024 is the unabridged value or interval string; abridged is the conventional value used by PocketChem. Offline copy for tests only - not a runtime dependency.",
+ "elements": {
+  "H": {
+   "Z": 1,
+   "abridged": 1.008,
+   "abridgedUncertainty": 0.0002,
+   "standard2024": "[1.00784,1.00811]"
+  },
+  "He": {
+   "Z": 2,
+   "abridged": 4.0026,
+   "abridgedUncertainty": 0.0001,
+   "standard2024": "4.002602(2)"
+  },
+  "Li": {
+   "Z": 3,
+   "abridged": 6.94,
+   "abridgedUncertainty": 0.06,
+   "standard2024": "[6.938,6.997]"
+  },
+  "Be": {
+   "Z": 4,
+   "abridged": 9.0122,
+   "abridgedUncertainty": 0.0001,
+   "standard2024": "9.0121831(5)"
+  },
+  "B": {
+   "Z": 5,
+   "abridged": 10.81,
+   "abridgedUncertainty": 0.02,
+   "standard2024": "[10.806,10.821]"
+  },
+  "C": {
+   "Z": 6,
+   "abridged": 12.011,
+   "abridgedUncertainty": 0.002,
+   "standard2024": "[12.0096,12.0116]"
+  },
+  "N": {
+   "Z": 7,
+   "abridged": 14.007,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "[14.00643,14.00728]"
+  },
+  "O": {
+   "Z": 8,
+   "abridged": 15.999,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "[15.99903,15.99977]"
+  },
+  "F": {
+   "Z": 9,
+   "abridged": 18.998,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "18.998403162(5)"
+  },
+  "Ne": {
+   "Z": 10,
+   "abridged": 20.18,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "20.1797(6)"
+  },
+  "Na": {
+   "Z": 11,
+   "abridged": 22.99,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "22.98976928(2)"
+  },
+  "Mg": {
+   "Z": 12,
+   "abridged": 24.305,
+   "abridgedUncertainty": 0.002,
+   "standard2024": "[24.304,24.307]"
+  },
+  "Al": {
+   "Z": 13,
+   "abridged": 26.982,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "26.9815384(3)"
+  },
+  "Si": {
+   "Z": 14,
+   "abridged": 28.085,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "[28.084,28.086]"
+  },
+  "P": {
+   "Z": 15,
+   "abridged": 30.974,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "30.973761998(5)"
+  },
+  "S": {
+   "Z": 16,
+   "abridged": 32.06,
+   "abridgedUncertainty": 0.02,
+   "standard2024": "[32.059,32.076]"
+  },
+  "Cl": {
+   "Z": 17,
+   "abridged": 35.45,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "[35.446,35.457]"
+  },
+  "Ar": {
+   "Z": 18,
+   "abridged": 39.95,
+   "abridgedUncertainty": 0.16,
+   "standard2024": "[39.792,39.963]"
+  },
+  "K": {
+   "Z": 19,
+   "abridged": 39.098,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "39.0983(1)"
+  },
+  "Ca": {
+   "Z": 20,
+   "abridged": 40.078,
+   "abridgedUncertainty": 0.004,
+   "standard2024": "40.078(4)"
+  },
+  "Sc": {
+   "Z": 21,
+   "abridged": 44.956,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "44.955907(4)"
+  },
+  "Ti": {
+   "Z": 22,
+   "abridged": 47.867,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "47.867(1)"
+  },
+  "V": {
+   "Z": 23,
+   "abridged": 50.942,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "50.9415(1)"
+  },
+  "Cr": {
+   "Z": 24,
+   "abridged": 51.996,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "51.9961(6)"
+  },
+  "Mn": {
+   "Z": 25,
+   "abridged": 54.938,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "54.938043(2)"
+  },
+  "Fe": {
+   "Z": 26,
+   "abridged": 55.845,
+   "abridgedUncertainty": 0.002,
+   "standard2024": "55.845(2)"
+  },
+  "Co": {
+   "Z": 27,
+   "abridged": 58.933,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "58.933 194(3)"
+  },
+  "Ni": {
+   "Z": 28,
+   "abridged": 58.693,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "58.6934(4)"
+  },
+  "Cu": {
+   "Z": 29,
+   "abridged": 63.546,
+   "abridgedUncertainty": 0.003,
+   "standard2024": "63.546(3)"
+  },
+  "Zn": {
+   "Z": 30,
+   "abridged": 65.38,
+   "abridgedUncertainty": 0.02,
+   "standard2024": "65.38(2)"
+  },
+  "Ga": {
+   "Z": 31,
+   "abridged": 69.723,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "69.723(1)"
+  },
+  "Ge": {
+   "Z": 32,
+   "abridged": 72.63,
+   "abridgedUncertainty": 0.008,
+   "standard2024": "72.630(8)"
+  },
+  "As": {
+   "Z": 33,
+   "abridged": 74.922,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "74.921595(6)"
+  },
+  "Se": {
+   "Z": 34,
+   "abridged": 78.971,
+   "abridgedUncertainty": 0.008,
+   "standard2024": "78.971(8)"
+  },
+  "Br": {
+   "Z": 35,
+   "abridged": 79.904,
+   "abridgedUncertainty": 0.003,
+   "standard2024": "[79.901,79.907]"
+  },
+  "Kr": {
+   "Z": 36,
+   "abridged": 83.798,
+   "abridgedUncertainty": 0.002,
+   "standard2024": "83.798(2)"
+  },
+  "Rb": {
+   "Z": 37,
+   "abridged": 85.468,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "85.4678(3)"
+  },
+  "Sr": {
+   "Z": 38,
+   "abridged": 87.62,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "87.62(1)"
+  },
+  "Y": {
+   "Z": 39,
+   "abridged": 88.906,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "88.905838(2)"
+  },
+  "Zr": {
+   "Z": 40,
+   "abridged": 91.222,
+   "abridgedUncertainty": 0.003,
+   "standard2024": "91.222(3)"
+  },
+  "Nb": {
+   "Z": 41,
+   "abridged": 92.906,
+   "abridgedUncertainty": 0.001,
+   "standard2024": "92.90637(1)"
+  },
+  "Mo": {
+   "Z": 42,
+   "abridged": 95.95,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "95.95(1)"
+  },
+  "Ru": {
+   "Z": 44,
+   "abridged": 101.07,
+   "abridgedUncertainty": 0.02,
+   "standard2024": "101.07(2)"
+  },
+  "Rh": {
+   "Z": 45,
+   "abridged": 102.91,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "102.90549(2)"
+  },
+  "Pd": {
+   "Z": 46,
+   "abridged": 106.42,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "106.42(1)"
+  },
+  "Ag": {
+   "Z": 47,
+   "abridged": 107.87,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "107.8682(2)"
+  },
+  "Cd": {
+   "Z": 48,
+   "abridged": 112.41,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "112.414(4)"
+  },
+  "In": {
+   "Z": 49,
+   "abridged": 114.82,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "114.818(1)"
+  },
+  "Sn": {
+   "Z": 50,
+   "abridged": 118.71,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "118.710(7)"
+  },
+  "Sb": {
+   "Z": 51,
+   "abridged": 121.76,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "121.760(1)"
+  },
+  "Te": {
+   "Z": 52,
+   "abridged": 127.6,
+   "abridgedUncertainty": 0.03,
+   "standard2024": "127.60(3)"
+  },
+  "I": {
+   "Z": 53,
+   "abridged": 126.9,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "126.90447(3)"
+  },
+  "Xe": {
+   "Z": 54,
+   "abridged": 131.29,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "131.293(6)"
+  },
+  "Cs": {
+   "Z": 55,
+   "abridged": 132.91,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "132.90545196(6)"
+  },
+  "Ba": {
+   "Z": 56,
+   "abridged": 137.33,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "137.327(7)"
+  },
+  "La": {
+   "Z": 57,
+   "abridged": 138.91,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "138.90547(7)"
+  },
+  "Ce": {
+   "Z": 58,
+   "abridged": 140.12,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "140.116(1)"
+  },
+  "Pr": {
+   "Z": 59,
+   "abridged": 140.91,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "140.90766(1)"
+  },
+  "Nd": {
+   "Z": 60,
+   "abridged": 144.24,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "144.242(3)"
+  },
+  "Sm": {
+   "Z": 62,
+   "abridged": 150.36,
+   "abridgedUncertainty": 0.02,
+   "standard2024": "150.36(2)"
+  },
+  "Eu": {
+   "Z": 63,
+   "abridged": 151.96,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "151.964(1)"
+  },
+  "Gd": {
+   "Z": 64,
+   "abridged": 157.25,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "157.249(2)"
+  },
+  "Tb": {
+   "Z": 65,
+   "abridged": 158.93,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "158.925354(7)"
+  },
+  "Dy": {
+   "Z": 66,
+   "abridged": 162.5,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "162.500(1)"
+  },
+  "Ho": {
+   "Z": 67,
+   "abridged": 164.93,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "164.930329(5)"
+  },
+  "Er": {
+   "Z": 68,
+   "abridged": 167.26,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "167.259(3)"
+  },
+  "Tm": {
+   "Z": 69,
+   "abridged": 168.93,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "168.934219(5)"
+  },
+  "Yb": {
+   "Z": 70,
+   "abridged": 173.05,
+   "abridgedUncertainty": 0.02,
+   "standard2024": "173.045(10)"
+  },
+  "Lu": {
+   "Z": 71,
+   "abridged": 174.97,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "174.96669(5)"
+  },
+  "Hf": {
+   "Z": 72,
+   "abridged": 178.49,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "178.486(6)"
+  },
+  "Ta": {
+   "Z": 73,
+   "abridged": 180.95,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "180.94788(2)"
+  },
+  "W": {
+   "Z": 74,
+   "abridged": 183.84,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "183.84(1)"
+  },
+  "Re": {
+   "Z": 75,
+   "abridged": 186.21,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "186.207(1)"
+  },
+  "Os": {
+   "Z": 76,
+   "abridged": 190.23,
+   "abridgedUncertainty": 0.03,
+   "standard2024": "190.23(3)"
+  },
+  "Ir": {
+   "Z": 77,
+   "abridged": 192.22,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "192.217(2)"
+  },
+  "Pt": {
+   "Z": 78,
+   "abridged": 195.08,
+   "abridgedUncertainty": 0.02,
+   "standard2024": "195.084(9)"
+  },
+  "Au": {
+   "Z": 79,
+   "abridged": 196.97,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "196.966570(4)"
+  },
+  "Hg": {
+   "Z": 80,
+   "abridged": 200.59,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "200.592(3)"
+  },
+  "Tl": {
+   "Z": 81,
+   "abridged": 204.38,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "[204.382,204.385]"
+  },
+  "Pb": {
+   "Z": 82,
+   "abridged": 207.2,
+   "abridgedUncertainty": 1.1,
+   "standard2024": "[206.14,207.94]"
+  },
+  "Bi": {
+   "Z": 83,
+   "abridged": 208.98,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "208.98040(1)"
+  },
+  "Th": {
+   "Z": 90,
+   "abridged": 232.04,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "232.0377(4)"
+  },
+  "Pa": {
+   "Z": 91,
+   "abridged": 231.04,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "231.03588(1)"
+  },
+  "U": {
+   "Z": 92,
+   "abridged": 238.03,
+   "abridgedUncertainty": 0.01,
+   "standard2024": "238.02891(3)"
+  }
+ }
+}

@@ -1,0 +1,487 @@
+{
+  "note": "Exposed Stage 9H cases; development diagnostic only.",
+  "summary": {
+    "label": "current",
+    "cases": 52,
+    "frozen9HRule": {
+      "correct": 33,
+      "wrong-flagged": 11,
+      "abstained": 8
+    },
+    "strictStereoAware": {
+      "correct": 43,
+      "abstained": 8,
+      "wrong-flagged": 1
+    }
+  },
+  "rows": [
+    {
+      "id": "NM-01",
+      "reference": "buta-1,3-diene",
+      "shown": "buta-1,3-diene",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-02",
+      "reference": "but-2-yne",
+      "shown": "but-2-yne",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-03",
+      "reference": "2-methylbutanoic acid",
+      "shown": "2-methylbutanoic acid",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-04",
+      "reference": "2-methylpropan-1-ol",
+      "shown": "2-methylpropan-1-ol (isobutyl alcohol)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-05",
+      "reference": "3-methylbutanoic acid",
+      "shown": "3-methylbutanoic acid",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-06",
+      "reference": "1-phenylethanone",
+      "shown": "1-phenylethan-1-one (acetophenone)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-07",
+      "reference": "acetyl chloride",
+      "shown": "ethanoyl chloride",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "wrong-flagged",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-08",
+      "reference": "azanium chloride",
+      "shown": "azanium chloride (ammonium chloride)",
+      "status": "functional-class",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-09",
+      "reference": "anthracene",
+      "shown": "anthracene",
+      "status": "retained",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-10",
+      "reference": "bicyclo[2.2.2]octane",
+      "shown": "bicyclo[2.2.2]octane",
+      "status": "systematic",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-11",
+      "reference": "1,1'-biphenyl",
+      "shown": "Name not available (unsupported structure)",
+      "status": "unsupported",
+      "confidence": "Low",
+      "rule9h": "abstained",
+      "strict": "abstained"
+    },
+    {
+      "id": "NM-12",
+      "reference": "1,7,7-trimethylbicyclo[2.2.1]heptan-2-one",
+      "shown": "Name not available (unsupported structure)",
+      "status": "unsupported",
+      "confidence": "Low",
+      "rule9h": "abstained",
+      "strict": "abstained"
+    },
+    {
+      "id": "NM-13",
+      "reference": "azepan-2-one",
+      "shown": "azepan-2-one",
+      "status": "retained",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-14",
+      "reference": "cis-(1S,2R)-1,2-dimethylcyclohexane",
+      "shown": "(1R,2S)-1,2-dimethylcyclohexane",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "wrong-flagged",
+      "strict": "wrong-flagged"
+    },
+    {
+      "id": "NM-15",
+      "reference": "2-hydroxypropane-1,2,3-tricarboxylic acid",
+      "shown": "2-hydroxypropane-1,2,3-tricarboxylic acid (citric acid)",
+      "status": "systematic",
+      "confidence": "Low",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-16",
+      "reference": "cyclopropane",
+      "shown": "cyclopropane",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-17",
+      "reference": "(2R)-2-hydroxypropanoic acid",
+      "shown": "(R)-2-hydroxypropanoic acid (lactic acid)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "wrong-flagged",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-18",
+      "reference": "dimethyl carbonate",
+      "shown": "dimethyl carbonate",
+      "status": "functional-class",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-19",
+      "reference": "N-phenylaniline",
+      "shown": "Name not available (unsupported structure)",
+      "status": "unsupported",
+      "confidence": "Low",
+      "rule9h": "abstained",
+      "strict": "abstained"
+    },
+    {
+      "id": "NM-20",
+      "reference": "methoxyethane",
+      "shown": "methoxyethane (methyl ethyl ether)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-21",
+      "reference": "ethyl propanoate",
+      "shown": "ethyl propanoate (ethyl propionate)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-22",
+      "reference": "2-methoxy-4-prop-2-enylphenol",
+      "shown": "2-methoxy-4-(prop-2-en-1-yl)phenol (eugenol)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-23",
+      "reference": "furan",
+      "shown": "furan",
+      "status": "retained",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-24",
+      "reference": "oxolan-2-one",
+      "shown": "oxolan-2-one",
+      "status": "retained",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-25",
+      "reference": "hexanoic acid",
+      "shown": "hexanoic acid (caproic acid)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-26",
+      "reference": "1H-indole",
+      "shown": "indole",
+      "status": "retained",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-27",
+      "reference": "(2S)-2-aminopropanoic acid",
+      "shown": "(S)-2-aminopropanoic acid (alanine)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "wrong-flagged",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-28",
+      "reference": "(2S)-2-hydroxypropanoic acid",
+      "shown": "(S)-2-hydroxypropanoic acid (lactic acid)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "wrong-flagged",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-29",
+      "reference": "methyl propanoate",
+      "shown": "methyl propanoate (methyl propionate)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-30",
+      "reference": "morpholine",
+      "shown": "morpholine",
+      "status": "retained",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-31",
+      "reference": "N-methylaniline",
+      "shown": "N-methylaniline",
+      "status": "systematic",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-32",
+      "reference": "3-[(2S)-1-methylpyrrolidin-2-yl]pyridine",
+      "shown": "Name not available (unsupported structure)",
+      "status": "unsupported",
+      "confidence": "Low",
+      "rule9h": "abstained",
+      "strict": "abstained"
+    },
+    {
+      "id": "NM-33",
+      "reference": "1-nitroethane",
+      "shown": "nitroethane",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-34",
+      "reference": "oxalic acid",
+      "shown": "ethanedioic acid (oxalic acid)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-35",
+      "reference": "ethynylbenzene",
+      "shown": "ethynylbenzene",
+      "status": "systematic",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-36",
+      "reference": "phenylhydrazine",
+      "shown": "Name not available (unsupported structure)",
+      "status": "unsupported",
+      "confidence": "Low",
+      "rule9h": "abstained",
+      "strict": "abstained"
+    },
+    {
+      "id": "NM-37",
+      "reference": "2-benzofuran-1,3-dione",
+      "shown": "Name not available (unsupported structure)",
+      "status": "unsupported",
+      "confidence": "Low",
+      "rule9h": "abstained",
+      "strict": "abstained"
+    },
+    {
+      "id": "NM-38",
+      "reference": "prop-2-yn-1-ol",
+      "shown": "prop-2-yn-1-ol",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-39",
+      "reference": "propyl formate",
+      "shown": "propyl methanoate",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "wrong-flagged",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-40",
+      "reference": "(5R)-2-methyl-5-prop-1-en-2-ylcyclohex-2-en-1-one",
+      "shown": "(R)-2-methyl-5-(prop-1-en-2-yl)cyclohex-2-enone",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "wrong-flagged",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-41",
+      "reference": "(4R)-1-methyl-4-prop-1-en-2-ylcyclohexene",
+      "shown": "(R)-1-methyl-4-(prop-1-en-2-yl)cyclohex-1-ene",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "wrong-flagged",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-42",
+      "reference": "(4S)-1-methyl-4-prop-1-en-2-ylcyclohexene",
+      "shown": "(S)-1-methyl-4-(prop-1-en-2-yl)cyclohex-1-ene",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "wrong-flagged",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-43",
+      "reference": "2-hydroxybenzoic acid",
+      "shown": "2-hydroxybenzoic acid (salicylic acid)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-44",
+      "reference": "sodium acetate",
+      "shown": "sodium ethanoate (sodium acetate)",
+      "status": "functional-class",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-45",
+      "reference": "spiro[4.4]nonane",
+      "shown": "Name not available (unsupported structure)",
+      "status": "unsupported",
+      "confidence": "Low",
+      "rule9h": "abstained",
+      "strict": "abstained"
+    },
+    {
+      "id": "NM-46",
+      "reference": "styrene",
+      "shown": "styrene",
+      "status": "systematic",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-47",
+      "reference": "oxolane-2,5-dione",
+      "shown": "oxolane-2,5-dione",
+      "status": "retained",
+      "confidence": "High",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-48",
+      "reference": "2-methoxy-2-methylpropane",
+      "shown": "2-methoxy-2-methylpropane (MTBE)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-49",
+      "reference": "tetramethylazanium chloride",
+      "shown": "Name not available (unsupported structure)",
+      "status": "unsupported",
+      "confidence": "Low",
+      "rule9h": "abstained",
+      "strict": "abstained"
+    },
+    {
+      "id": "NM-50",
+      "reference": "5-methyl-2-propan-2-ylphenol",
+      "shown": "5-methyl-2-(propan-2-yl)phenol",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "wrong-flagged",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-51",
+      "reference": "trans-(1R,2R)-1,2-dimethylcyclohexane",
+      "shown": "(1R,2R)-1,2-dimethylcyclohexane",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "wrong-flagged",
+      "strict": "correct"
+    },
+    {
+      "id": "NM-52",
+      "reference": "4-hydroxy-3-methoxybenzaldehyde",
+      "shown": "4-hydroxy-3-methoxybenzaldehyde (vanillin)",
+      "status": "systematic",
+      "confidence": "Medium",
+      "rule9h": "correct",
+      "strict": "correct"
+    }
+  ]
+}

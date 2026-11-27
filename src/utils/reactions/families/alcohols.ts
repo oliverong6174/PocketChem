@@ -124,6 +124,7 @@ function makeSecondaryAlcoholOxidationRule(
 export const alcoholReactionRules: ReactionRule[] = [
   {
     id: "alcohol-deprotonation",
+    conditions: { reactionCentre: ["alcohol"], base: "strong", anhydrous: true },
     family: "alcohols",
     reactionType: "acidBase",
     title: "Alcohol Deprotonation",
@@ -175,7 +176,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
       allowsRearrangement: true,
     },
     selectivity: [
@@ -222,7 +223,7 @@ export const alcoholReactionRules: ReactionRule[] = [
       stereochemistry: { mode: "e-preferred", stereoselective: true },
       regiochemistry: { mode: "zaitsev", regioselective: true },
       mixture: "possible",
-      majorProductOnly: true,
+      keepConstitutionalAlternatives: true,
       allowsRearrangement: false,
     },
     selectivity: ["No free primary carbocation", "Usually the more stable accessible alkene"],
@@ -469,6 +470,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   },
   {
     id: "primary-alcohol-mild-oxidation",
+    conditions: { oxidant: "mild", anhydrous: true },
     family: "alcohols",
     reactionType: "oxidation",
     title: "Primary Alcohol Oxidation to an Aldehyde",
@@ -494,6 +496,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   },
   {
     id: "primary-alcohol-strong-oxidation",
+    conditions: { oxidant: "strong", acid: "strong" },
     family: "alcohols",
     reactionType: "oxidation",
     title: "Primary Alcohol Oxidation to a Carboxylic Acid",
@@ -573,6 +576,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   },
   {
     id: "alcohol-williamson-ether",
+    conditions: { reactionCentre: ["alcohol"], base: "strong", anhydrous: true },
     family: "alcohols",
     reactionType: "substitution",
     title: "Williamson Ether Synthesis from an Alcohol",
@@ -639,6 +643,7 @@ export const alcoholReactionRules: ReactionRule[] = [
   },
   {
     id: "fischer-esterification",
+    conditions: { reactionCentre: ["carboxylic-acid","alcohol"], acid: "strong" },
     family: "alcohols",
     reactionType: "substitution",
     title: "Fischer Esterification",
@@ -759,6 +764,7 @@ export const alcoholReactionRules: ReactionRule[] = [
     reactionType: "substitution",
     title: "Phosphate Ester Formation",
     reagents: "Activated phosphoric acid derivative",
+    reagentAtomSources: ["P", "O"],
     reagentNote: "O-phosphorylation",
     productHint: "Phosphate monoester",
     explanation:
@@ -810,6 +816,8 @@ export const alcoholReactionRules: ReactionRule[] = [
     ],
     limitations: [
       "PocketChem reports the highest-priority migration class rather than mixing generic dehydration products into the same strong-acid/heat condition.",
+      "The leaving hydroxyl is chosen by carbocation stability (substitution plus aryl stabilization) before any migration is ranked; ties keep every tied orientation.",
+      "Where hydride ranks against aryl migration differs between sources and substrates, so the hydride-first order is a simplification; stereochemical requirements of the migration are not modeled.",
     ],
     // Must outrank ordinary secondary/tertiary alcohol E1 dehydration (500).
     competition: { group: "acidic-alcohol-rearrangement", specificity: 100 },

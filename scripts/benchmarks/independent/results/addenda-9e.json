@@ -1,0 +1,113 @@
+{
+  "summary": {
+    "generatedBy": "scripts/benchmarks/independent/run.mjs",
+    "cases": 1,
+    "counts": {
+      "validatedHeldOut": 0,
+      "provisional": 0,
+      "overlappingFixtures": 1
+    },
+    "referenceValidated": {},
+    "provisionalOnly": {},
+    "overlappingOnly": {
+      "structure": {
+        "correct": 1
+      },
+      "connectivity": {
+        "correct": 1
+      },
+      "regiochemistry": {
+        "correct": 1
+      }
+    },
+    "allCases": {
+      "structure": {
+        "correct": 1
+      },
+      "connectivity": {
+        "correct": 1
+      },
+      "regiochemistry": {
+        "correct": 1
+      }
+    },
+    "byCategory": {
+      "competing-pathways": {}
+    },
+    "runtime": {
+      "totalMs": 442,
+      "slowestMs": 442,
+      "peakRssMB": 283
+    }
+  },
+  "records": [
+    {
+      "id": "HX-06R",
+      "category": "competing-pathways",
+      "kind": "step",
+      "title": "tert-Butyl bromide + an unhindered alkoxide (base supplied by the rule): isobutylene by E2; the Williamson ether is not formed",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": true,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "haloalkane-e2-zaitsev"
+        ],
+        "outcomes": [
+          {
+            "product": "C=C(C)C",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 442
+    }
+  ],
+  "sources": {
+    "libretexts-ether-synthesis": {
+      "cite": "LibreTexts: Ether Synthesis (Williamson)",
+      "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_%28Organic_Chemistry%29/Ethers/Synthesis_of_Ethers/Ether_Synthesis",
+      "says": "Williamson ether synthesis: an alkoxide displaces a halide from a primary alkyl halide by SN2; secondary and tertiary halides give elimination"
+    },
+    "libretexts-williamson-nassau": {
+      "cite": "LibreTexts (Nassau Community College) 14.03 The Williamson Ether Synthesis",
+      "url": "https://chem.libretexts.org/Courses/Nassau_Community_College/Organic_Chemistry_I_and_II/14%3A_Ethers_Epoxides_and_Thioethers/14.03%3A_The_Williamson_Ether_Synthesis",
+      "says": "use a primary alkyl halide: the strong alkoxide base gives E2 elimination with secondary and tertiary halides"
+    }
+  },
+  "corrections": [
+    {
+      "id": "HX-06",
+      "note": "authoring error: the E2 rule supplies its own base, so ethoxide must not be a second molecule; restated as HX-06R"
+    }
+  ]
+}

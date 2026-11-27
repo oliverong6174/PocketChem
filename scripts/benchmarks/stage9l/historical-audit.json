@@ -1,0 +1,474 @@
+{
+  "purpose": "Read-only historical audit, not replacement scores; no predictions executed",
+  "stage9jRoutes": {
+    "first-run": {
+      "inventory": {
+        "total": 29,
+        "counts": {
+          "flag": 12,
+          "clear": 13,
+          "not-supported": 2,
+          "ambiguous": 2
+        }
+      },
+      "missingRecords": [],
+      "combinedSensitivity": {
+        "count": [
+          11,
+          12
+        ],
+        "rate": 0.9166666666666666,
+        "wilson95": [
+          0.646120088858883,
+          0.9851349055950829
+        ]
+      },
+      "chemicalSensitivity": {
+        "count": [
+          7,
+          12
+        ],
+        "rate": 0.5833333333333334,
+        "wilson95": [
+          0.31951131254954973,
+          0.8067396863412435
+        ]
+      },
+      "verifiedChemicalSensitivity": {
+        "count": [
+          4,
+          5
+        ],
+        "rate": 0.8,
+        "wilson95": [
+          0.37553462976252533,
+          0.9637758913675698
+        ]
+      },
+      "falsePositiveRate": {
+        "count": [
+          1,
+          13
+        ],
+        "rate": 0.07692307692307693,
+        "wilson95": [
+          0.013710421242556586,
+          0.3331395092109959
+        ]
+      },
+      "replayFailures": [
+        "F05",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12"
+      ],
+      "replayOnly": [
+        "F05",
+        "F07"
+      ],
+      "bookkeeping": [
+        "F08",
+        "F09"
+      ],
+      "chemical": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F10",
+        "F11",
+        "F12"
+      ],
+      "unscored": {
+        "ambiguous": [
+          "A01",
+          "A02"
+        ],
+        "unsupported": [
+          {
+            "id": "N01",
+            "tier": "known-concern"
+          },
+          {
+            "id": "N02",
+            "tier": "known-concern"
+          }
+        ]
+      }
+    },
+    "second-run-harness-v2": {
+      "inventory": {
+        "total": 29,
+        "counts": {
+          "flag": 12,
+          "clear": 13,
+          "not-supported": 2,
+          "ambiguous": 2
+        }
+      },
+      "missingRecords": [],
+      "combinedSensitivity": {
+        "count": [
+          11,
+          12
+        ],
+        "rate": 0.9166666666666666,
+        "wilson95": [
+          0.646120088858883,
+          0.9851349055950829
+        ]
+      },
+      "chemicalSensitivity": {
+        "count": [
+          7,
+          12
+        ],
+        "rate": 0.5833333333333334,
+        "wilson95": [
+          0.31951131254954973,
+          0.8067396863412435
+        ]
+      },
+      "verifiedChemicalSensitivity": {
+        "count": [
+          4,
+          5
+        ],
+        "rate": 0.8,
+        "wilson95": [
+          0.37553462976252533,
+          0.9637758913675698
+        ]
+      },
+      "falsePositiveRate": {
+        "count": [
+          1,
+          13
+        ],
+        "rate": 0.07692307692307693,
+        "wilson95": [
+          0.013710421242556586,
+          0.3331395092109959
+        ]
+      },
+      "replayFailures": [
+        "F05",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12"
+      ],
+      "replayOnly": [
+        "F05",
+        "F07"
+      ],
+      "bookkeeping": [
+        "F08",
+        "F09"
+      ],
+      "chemical": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F10",
+        "F11",
+        "F12"
+      ],
+      "unscored": {
+        "ambiguous": [
+          "A01",
+          "A02"
+        ],
+        "unsupported": [
+          {
+            "id": "N01",
+            "tier": "chemically-supported"
+          },
+          {
+            "id": "N02",
+            "tier": "known-concern"
+          }
+        ]
+      }
+    },
+    "third-run-harness-v2b": {
+      "inventory": {
+        "total": 29,
+        "counts": {
+          "flag": 12,
+          "clear": 13,
+          "not-supported": 2,
+          "ambiguous": 2
+        }
+      },
+      "missingRecords": [],
+      "combinedSensitivity": {
+        "count": [
+          11,
+          12
+        ],
+        "rate": 0.9166666666666666,
+        "wilson95": [
+          0.646120088858883,
+          0.9851349055950829
+        ]
+      },
+      "chemicalSensitivity": {
+        "count": [
+          8,
+          12
+        ],
+        "rate": 0.6666666666666666,
+        "wilson95": [
+          0.39062208887279953,
+          0.8618799089087867
+        ]
+      },
+      "verifiedChemicalSensitivity": {
+        "count": [
+          6,
+          7
+        ],
+        "rate": 0.8571428571428571,
+        "wilson95": [
+          0.4868721707256811,
+          0.9743203756552565
+        ]
+      },
+      "falsePositiveRate": {
+        "count": [
+          0,
+          13
+        ],
+        "rate": 0,
+        "wilson95": [
+          0,
+          0.22809537235419838
+        ]
+      },
+      "replayFailures": [
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11"
+      ],
+      "replayOnly": [
+        "F07"
+      ],
+      "bookkeeping": [
+        "F08",
+        "F09"
+      ],
+      "chemical": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F06",
+        "F10",
+        "F11",
+        "F12"
+      ],
+      "unscored": {
+        "ambiguous": [
+          "A01",
+          "A02"
+        ],
+        "unsupported": [
+          {
+            "id": "N01",
+            "tier": "chemically-supported"
+          },
+          {
+            "id": "N02",
+            "tier": "known-concern"
+          }
+        ]
+      }
+    }
+  },
+  "pooledDevelopmentMS": {
+    "n": 23,
+    "numericAbstentions": 0,
+    "supportedCoverage": 0.21739130434782608,
+    "candidateFieldAvailable": 0,
+    "strata": {
+      "supported": {
+        "n": 5,
+        "basePeak": {
+          "count": [
+            5,
+            5
+          ],
+          "rate": 1,
+          "wilson95": [
+            0.5655175352168251,
+            1
+          ]
+        },
+        "fragments": {
+          "count": [
+            0,
+            4
+          ],
+          "rate": 0,
+          "wilson95": [
+            0,
+            0.4898908364545973
+          ]
+        }
+      },
+      "heuristic": {
+        "n": 9,
+        "basePeak": {
+          "count": [
+            2,
+            9
+          ],
+          "rate": 0.2222222222222222,
+          "wilson95": [
+            0.06322510711784671,
+            0.5474110308930111
+          ]
+        },
+        "fragments": {
+          "count": [
+            3,
+            9
+          ],
+          "rate": 0.3333333333333333,
+          "wilson95": [
+            0.1205838183869109,
+            0.6457978644196036
+          ]
+        }
+      },
+      "unreliable": {
+        "n": 9,
+        "basePeak": {
+          "count": [
+            2,
+            9
+          ],
+          "rate": 0.2222222222222222,
+          "wilson95": [
+            0.06322510711784671,
+            0.5474110308930111
+          ]
+        },
+        "fragments": {
+          "count": [
+            0,
+            9
+          ],
+          "rate": 0,
+          "wilson95": [
+            0,
+            0.2991450484195441
+          ]
+        }
+      },
+      "unknown": {
+        "n": 0,
+        "basePeak": {
+          "count": [
+            0,
+            0
+          ],
+          "rate": null,
+          "wilson95": null
+        },
+        "fragments": {
+          "count": [
+            0,
+            0
+          ],
+          "rate": null,
+          "wilson95": null
+        }
+      }
+    }
+  },
+  "stage9kRouteAttribution": {
+    "inventory": {
+      "total": 11,
+      "counts": {
+        "flag": 5,
+        "clear": 6,
+        "not-supported": 0,
+        "ambiguous": 0
+      }
+    },
+    "missingRecords": [],
+    "combinedSensitivity": {
+      "count": [
+        5,
+        5
+      ],
+      "rate": 1,
+      "wilson95": [
+        0.5655175352168251,
+        1
+      ]
+    },
+    "chemicalSensitivity": {
+      "count": [
+        4,
+        5
+      ],
+      "rate": 0.8,
+      "wilson95": [
+        0.37553462976252533,
+        0.9637758913675698
+      ]
+    },
+    "verifiedChemicalSensitivity": {
+      "count": [
+        2,
+        2
+      ],
+      "rate": 1,
+      "wilson95": [
+        0.34238022750665303,
+        1
+      ]
+    },
+    "falsePositiveRate": {
+      "count": [
+        0,
+        6
+      ],
+      "rate": 0,
+      "wilson95": [
+        2.7755575615628914e-17,
+        0.3903342879021653
+      ]
+    },
+    "replayFailures": [
+      "RQ-07",
+      "RQ-08",
+      "RQ-12"
+    ],
+    "replayOnly": [
+      "RQ-12"
+    ],
+    "bookkeeping": [],
+    "chemical": [
+      "RQ-07",
+      "RQ-08",
+      "RQ-09",
+      "RQ-10"
+    ],
+    "unscored": {
+      "ambiguous": [],
+      "unsupported": []
+    }
+  }
+}

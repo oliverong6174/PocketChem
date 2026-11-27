@@ -1,0 +1,520 @@
+{
+  "id": "MS-07",
+  "startedUTC": "2026-11-06T18:22:01.570Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties",
+    "predictMassSpectrum"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "cycloheptanone",
+      "commonName": null,
+      "displayName": "cycloheptanone",
+      "namingConfidence": "Medium",
+      "namingStatus": "systematic",
+      "parentChain": "cycloheptane",
+      "parentChainLength": 7,
+      "mainSuffix": "-one",
+      "prefixes": [
+        "cycloalkyl ×6"
+      ],
+      "motifs": [],
+      "explanation": "Detected cycloheptane as the parent ring. ketone chosen as highest-priority functional group.",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ]
+    },
+    "properties": {
+      "molecularFormula": "C7H12O",
+      "exactMass": "112.0888",
+      "molecularWeight": "112.17",
+      "degreesOfUnsaturation": 2,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 7
+        },
+        {
+          "element": "H",
+          "count": 12
+        },
+        {
+          "element": "O",
+          "count": 1
+        }
+      ],
+      "heavyAtomCount": 8,
+      "hydrogenBondDonors": 0,
+      "hydrogenBondAcceptors": 1,
+      "rotatableBonds": 0,
+      "topologicalPolarSurfaceArea": "17.07",
+      "logP": "1.91",
+      "ringCount": 1,
+      "boilingPointTendency": {
+        "level": "Medium",
+        "score": 4.5,
+        "factors": [
+          "Larger molecular weight raises boiling point.",
+          "Polar functional groups increase dipole-dipole attractions.",
+          "Hydrogen-bond acceptors increase intermolecular attraction."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Low",
+        "score": 1.5,
+        "factors": [
+          "Low TPSA means less polar surface area.",
+          "Moderate logP gives a balance between water and lipid solubility.",
+          "Hydrogen-bond acceptors help the molecule interact with water."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "High",
+        "score": 5.5,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Ketone",
+      "priority": 9,
+      "nomenclaturePriority": 9,
+      "confidence": "High",
+      "suffix": "-one",
+      "prefix": "oxo",
+      "count": 1,
+      "mcatNote": "Ketones contain an internal carbonyl. They undergo nucleophilic addition reactions and are less easily oxidized than aldehydes.",
+      "matches": [
+        {
+          "atoms": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "bonds": [
+            3,
+            4,
+            5
+          ]
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            4,
+            5
+          ],
+          "bonds": [
+            4
+          ]
+        }
+      ],
+      "displaySmarts": "[CX3]=[OX1]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Ketone",
+        "priority": 9,
+        "nomenclaturePriority": 9,
+        "confidence": "High",
+        "suffix": "-one",
+        "prefix": "oxo",
+        "count": 1,
+        "mcatNote": "Ketones contain an internal carbonyl. They undergo nucleophilic addition reactions and are less easily oxidized than aldehydes.",
+        "matches": [
+          {
+            "atoms": [
+              3,
+              4,
+              5,
+              6
+            ],
+            "bonds": [
+              3,
+              4,
+              5
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              4,
+              5
+            ],
+            "bonds": [
+              4
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3]=[OX1]",
+        "category": "functionalGroup"
+      },
+      {
+        "name": "Cycloalkane",
+        "priority": 32.9,
+        "nomenclaturePriority": 23.9,
+        "confidence": "Medium",
+        "suffix": "cycloalkane",
+        "prefix": "cycloalkyl",
+        "equivalentNames": [
+          "saturated carbocycle"
+        ],
+        "count": 6,
+        "mcatNote": "Cycloalkanes are saturated carbon rings. Ring size strongly affects strain and conformation.",
+        "matches": [
+          {
+            "atoms": [
+              0
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              1
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              2
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              3
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              6
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              7
+            ],
+            "bonds": []
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              0
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              1
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              2
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              3
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              6
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              7
+            ],
+            "bonds": []
+          }
+        ],
+        "category": "scaffold"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Ketone",
+        "priority": 9,
+        "nomenclaturePriority": 9,
+        "confidence": "High",
+        "suffix": "-one",
+        "prefix": "oxo",
+        "count": 1,
+        "mcatNote": "Ketones contain an internal carbonyl. They undergo nucleophilic addition reactions and are less easily oxidized than aldehydes.",
+        "matches": [
+          {
+            "atoms": [
+              3,
+              4,
+              5,
+              6
+            ],
+            "bonds": [
+              3,
+              4,
+              5
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              4,
+              5
+            ],
+            "bonds": [
+              4
+            ]
+          }
+        ],
+        "displaySmarts": "[CX3]=[OX1]",
+        "category": "functionalGroup"
+      },
+      {
+        "name": "Cycloalkane",
+        "priority": 32.9,
+        "nomenclaturePriority": 23.9,
+        "confidence": "Medium",
+        "suffix": "cycloalkane",
+        "prefix": "cycloalkyl",
+        "equivalentNames": [
+          "saturated carbocycle"
+        ],
+        "count": 6,
+        "mcatNote": "Cycloalkanes are saturated carbon rings. Ring size strongly affects strain and conformation.",
+        "matches": [
+          {
+            "atoms": [
+              0
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              1
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              2
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              3
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              6
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              7
+            ],
+            "bonds": []
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              0
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              1
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              2
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              3
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              6
+            ],
+            "bonds": []
+          },
+          {
+            "atoms": [
+              7
+            ],
+            "bonds": []
+          }
+        ],
+        "category": "scaffold"
+      }
+    ]
+  },
+  "ms": {
+    "formula": "C7H12O",
+    "molecularIonMz": 112.0888,
+    "nominalMass": 112,
+    "basePeakMz": 112.089,
+    "basePeakCertainty": "heuristic",
+    "basePeakCandidates": [
+      112,
+      84
+    ],
+    "basePeakBasis": "Top ion among several comparable predicted channels; abundances are class-based heuristics.",
+    "peaks": [
+      {
+        "mz": 84.0788,
+        "relativeIntensity": 71,
+        "label": "M − CO",
+        "kind": "fragment",
+        "explanation": "Carbonyl compounds may show loss of CO; the displayed structure is a representative decarbonylated fragment skeleton when that transformation can be resolved from the parent graph.",
+        "fragmentSmiles": "C1CCCCC1",
+        "previewStructure": "C1CCCCC1",
+        "previewLabel": "M − CO",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "M − CO",
+            "explanation": "Carbonyl compounds may show loss of CO; the displayed structure is a representative decarbonylated fragment skeleton when that transformation can be resolved from the parent graph.",
+            "fragmentSmiles": "C1CCCCC1"
+          }
+        ]
+      },
+      {
+        "mz": 112.089,
+        "relativeIntensity": 100,
+        "label": "M⁺•",
+        "kind": "molecular-ion",
+        "explanation": "Predicted intact molecular radical cation. The radical/positive charge is generally delocalized, so the preview labels the ion without arbitrarily pinning the charge to one atom.",
+        "previewStructure": "O=C1CCCCCC1",
+        "previewLabel": "M⁺•",
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "M⁺•",
+            "explanation": "Predicted intact molecular radical cation. The radical/positive charge is generally delocalized, so the preview labels the ion without arbitrarily pinning the charge to one atom."
+          }
+        ]
+      },
+      {
+        "mz": 113.089,
+        "relativeIntensity": 7.7,
+        "label": "M+1",
+        "kind": "isotope",
+        "explanation": "Natural-isotope contribution 1 nominal mass unit above M. The preview shows representative isotopologues that contribute to this same isotope-envelope peak.",
+        "previewStructure": "O=[13C]1CCCCCC1",
+        "previewLabel": "M+1",
+        "previewContributorLabels": [
+          "one ¹³C",
+          "one ¹⁷O"
+        ],
+        "previewAlternatives": [
+          {
+            "structure": "O=[13C]1CCCCCC1",
+            "label": "M+1"
+          },
+          {
+            "structure": "O=[13C]1CCCCCC1",
+            "label": "one ¹³C"
+          },
+          {
+            "structure": "[17O]=C1CCCCCC1",
+            "label": "one ¹⁷O"
+          }
+        ],
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "M+1",
+            "explanation": "Natural-isotope contribution 1 nominal mass unit above M. The preview shows representative isotopologues that contribute to this same isotope-envelope peak."
+          }
+        ]
+      },
+      {
+        "mz": 114.089,
+        "relativeIntensity": 0.6,
+        "label": "M+2",
+        "kind": "isotope",
+        "explanation": "Natural-isotope contribution 2 nominal mass units above M. The preview shows representative isotopologues that contribute to this same isotope-envelope peak.",
+        "previewStructure": "O=[13C]1CCC[13CH2]CC1",
+        "previewLabel": "M+2",
+        "previewContributorLabels": [
+          "2 × ¹³C",
+          "one ¹⁸O"
+        ],
+        "previewAlternatives": [
+          {
+            "structure": "O=[13C]1CCC[13CH2]CC1",
+            "label": "M+2"
+          },
+          {
+            "structure": "O=[13C]1CCC[13CH2]CC1",
+            "label": "2 × ¹³C"
+          },
+          {
+            "structure": "[18O]=C1CCCCCC1",
+            "label": "one ¹⁸O"
+          }
+        ],
+        "pathwayCount": 1,
+        "contributors": [
+          {
+            "label": "M+2",
+            "explanation": "Natural-isotope contribution 2 nominal mass units above M. The preview shows representative isotopologues that contribute to this same isotope-envelope peak."
+          }
+        ]
+      }
+    ],
+    "notes": [
+      "Relative abundances are normalized educational EI predictions: the strongest predicted ion is set to 100%. They are not instrument-calibrated/NIST intensities.",
+      "General fragment peaks are generated by graph-level sigma-bond cleavage. Both charge-retaining sides are considered, then scored by bond lability, carbocation/heteroatom/resonance stabilization, complementary-radical stability, and pathway multiplicity.",
+      "Displayed fragment structures are representative ion skeletons; charge/radical localization can be resonance-delocalized in the real gas-phase ion.",
+      "Special diagnostic mechanisms (for example dehydration, carbonyl/ester cleavage, halogen loss, and aromatic ions) are retained as additional competing pathways rather than being the only source of fragments."
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:22:03.089Z"
+}

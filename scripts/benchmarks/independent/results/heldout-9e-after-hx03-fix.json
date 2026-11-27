@@ -1,0 +1,707 @@
+{
+  "summary": {
+    "generatedBy": "scripts/benchmarks/independent/run.mjs",
+    "cases": 11,
+    "counts": {
+      "validatedHeldOut": 10,
+      "provisional": 0,
+      "overlappingFixtures": 1
+    },
+    "referenceValidated": {
+      "structure": {
+        "correct": 10
+      },
+      "connectivity": {
+        "correct": 10
+      },
+      "regiochemistry": {
+        "correct": 5
+      },
+      "stereochemistry": {
+        "incomplete": 1
+      },
+      "classification": {
+        "abstained": 1
+      }
+    },
+    "provisionalOnly": {},
+    "overlappingOnly": {
+      "connectivity": {
+        "abstained": 1
+      },
+      "regiochemistry": {
+        "abstained": 1
+      }
+    },
+    "allCases": {
+      "structure": {
+        "correct": 10
+      },
+      "connectivity": {
+        "correct": 10,
+        "abstained": 1
+      },
+      "regiochemistry": {
+        "correct": 5,
+        "abstained": 1
+      },
+      "stereochemistry": {
+        "incomplete": 1
+      },
+      "classification": {
+        "abstained": 1
+      }
+    },
+    "byCategory": {
+      "epoxide-regiochemistry": {
+        "structure": {
+          "correct": 4
+        },
+        "connectivity": {
+          "correct": 4
+        },
+        "regiochemistry": {
+          "correct": 4
+        },
+        "classification": {
+          "abstained": 1
+        }
+      },
+      "substitution-elimination": {
+        "structure": {
+          "correct": 1
+        },
+        "connectivity": {
+          "correct": 1
+        }
+      },
+      "competing-pathways": {},
+      "carbonyl": {
+        "structure": {
+          "correct": 3
+        },
+        "connectivity": {
+          "correct": 3
+        }
+      },
+      "alkenes": {
+        "structure": {
+          "correct": 2
+        },
+        "connectivity": {
+          "correct": 2
+        },
+        "regiochemistry": {
+          "correct": 1
+        },
+        "stereochemistry": {
+          "incomplete": 1
+        }
+      }
+    },
+    "runtime": {
+      "totalMs": 683,
+      "slowestMs": 377,
+      "peakRssMB": 300
+    }
+  },
+  "records": [
+    {
+      "id": "HX-01",
+      "category": "epoxide-regiochemistry",
+      "kind": "step",
+      "title": "Propylene oxide + methoxide (basic methanol): SN2 at the less substituted carbon gives 1-methoxypropan-2-ol",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "epoxide-base-alkoxide-opening"
+        ],
+        "outcomes": [
+          {
+            "product": "COCC(C)O",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 377
+    },
+    {
+      "id": "HX-02",
+      "category": "epoxide-regiochemistry",
+      "kind": "step",
+      "title": "Propylene oxide + methanol/H+: attack at the more substituted carbon predominates (2-methoxypropan-1-ol), the other regioisomer is minor",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": "only outcome"
+        },
+        "classification": {
+          "status": "abstained",
+          "detail": "single-outcome"
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "epoxide-acid-alcohol-opening"
+        ],
+        "outcomes": [
+          {
+            "product": "COC(C)CO",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 30
+    },
+    {
+      "id": "HX-03",
+      "category": "epoxide-regiochemistry",
+      "kind": "step",
+      "title": "Propylene oxide + HBr (both epoxide carbons primary/secondary): bromide attacks the LESS substituted carbon, giving 1-bromopropan-2-ol",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "epoxide-hx-opening-hbr"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(O)CBr",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 23
+    },
+    {
+      "id": "HX-04",
+      "category": "epoxide-regiochemistry",
+      "kind": "step",
+      "title": "2,2-Dimethyloxirane + HBr (one tertiary epoxide carbon): bromide attacks the tertiary carbon, giving 2-bromo-2-methylpropan-1-ol",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "epoxide-hx-opening-hbr"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(C)(Br)CO",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 26
+    },
+    {
+      "id": "HX-05",
+      "category": "substitution-elimination",
+      "kind": "step",
+      "title": "Williamson: sodium ethoxide + 1-bromopropane gives ethyl propyl ether",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "haloalkane-williamson-ether"
+        ],
+        "outcomes": [
+          {
+            "product": "CCCOCC",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 31
+    },
+    {
+      "id": "HX-06",
+      "category": "competing-pathways",
+      "kind": "step",
+      "title": "Sodium ethoxide + tert-butyl bromide gives isobutylene (E2), not the ether",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": true,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "abstained",
+          "detail": "status no-reaction"
+        },
+        "regiochemistry": {
+          "status": "abstained",
+          "detail": "no products offered"
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "no-reaction",
+        "rules": [
+          "haloalkane-williamson-ether",
+          "haloalkane-e2-zaitsev"
+        ],
+        "outcomes": []
+      },
+      "ms": 6
+    },
+    {
+      "id": "HX-07",
+      "category": "carbonyl",
+      "kind": "step",
+      "title": "Wittig: benzaldehyde + methylenetriphenylphosphorane (from CH3Br) gives styrene",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "aldehyde-wittig"
+        ],
+        "outcomes": [
+          {
+            "product": "C=Cc1ccccc1",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 43
+    },
+    {
+      "id": "HX-08",
+      "category": "carbonyl",
+      "kind": "step",
+      "title": "Aldol addition: two acetaldehyde give 3-hydroxybutanal",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "aldol-addition-general"
+        ],
+        "outcomes": [
+          {
+            "product": "CC(O)CC=O",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 26
+    },
+    {
+      "id": "HX-09",
+      "category": "carbonyl",
+      "kind": "step",
+      "title": "Aldol condensation: two acetaldehyde give 2-butenal (crotonaldehyde), the E enal",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "aldol-condensation-general"
+        ],
+        "outcomes": [
+          {
+            "product": "CC=CC=O",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 19
+    },
+    {
+      "id": "HX-10",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "Hydroboration-oxidation of 1-hexene gives hexan-1-ol (anti-Markovnikov)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "correct",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "alkene-hydroboration-oxidation"
+        ],
+        "outcomes": [
+          {
+            "product": "CCCCCCO",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 23
+    },
+    {
+      "id": "HX-11",
+      "category": "alkenes",
+      "kind": "step",
+      "title": "Diels-Alder: 1,3-butadiene + maleic anhydride gives the cis-fused 4-cyclohexene-1,2-dicarboxylic anhydride (meso)",
+      "provenance": "verified-secondary",
+      "overlapsFixtures": false,
+      "knownGap": null,
+      "dimensions": {
+        "structure": {
+          "status": "correct",
+          "detail": ""
+        },
+        "connectivity": {
+          "status": "correct",
+          "detail": ""
+        },
+        "regiochemistry": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "classification": {
+          "status": "n/a",
+          "detail": ""
+        },
+        "stereochemistry": {
+          "status": "incomplete",
+          "detail": "stereochemistry unspecified in the product"
+        },
+        "conditions": {
+          "status": "n/a",
+          "detail": ""
+        }
+      },
+      "engine": {
+        "status": "offered",
+        "rules": [
+          "diene-diels-alder"
+        ],
+        "outcomes": [
+          {
+            "product": "O=C1OC(=O)C2CC=CCC12",
+            "class": "single-outcome",
+            "level": null,
+            "mixture": null
+          }
+        ]
+      },
+      "ms": 79
+    }
+  ],
+  "sources": {
+    "libretexts-epoxide-nassau": {
+      "cite": "LibreTexts (Nassau Community College) 8.14 Opening of Epoxides: Acidic versus Basic Conditions",
+      "url": "https://chem.libretexts.org/Courses/Nassau_Community_College/Organic_Chemistry_I_and_II/08%3A_Reactions_of_Alkenes/8.14%3A_Opening_of_Epoxides_-_Acidic_versus_Basic_Conditions",
+      "says": "an asymmetric epoxide in basic methanol opens by SN2 at the less substituted carbon; in acidic methanol the more substituted carbon reacts; with HX, when both carbons are primary or secondary the halide attacks the less substituted carbon, and if one carbon is tertiary it attacks the tertiary carbon"
+    },
+    "libretexts-epoxide-wade": {
+      "cite": "LibreTexts (Wade) 15.08 Opening of Epoxides",
+      "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Map%3A_Organic_Chemistry_(Wade)_Complete_and_Semesters_I_and_II/Map%3A_Organic_Chemistry_(Wade)/15%3A_Ethers_Epoxides_and_Thioethers/15.08%3A_Opening_of_Epoxides",
+      "says": "basic methanol: SN2 at the less substituted carbon; acidic methanol: the more substituted carbon is the site of reaction and product A predominates; HX: primary or secondary carbons react at the less substituted carbon, tertiary at the tertiary carbon"
+    },
+    "libretexts-ether-synthesis": {
+      "cite": "LibreTexts: Ether Synthesis (Williamson)",
+      "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Supplemental_Modules_%28Organic_Chemistry%29/Ethers/Synthesis_of_Ethers/Ether_Synthesis",
+      "says": "Williamson ether synthesis: an alkoxide displaces a halide from a primary alkyl halide by SN2; secondary and tertiary halides give elimination"
+    },
+    "libretexts-williamson-nassau": {
+      "cite": "LibreTexts (Nassau Community College) 14.03 The Williamson Ether Synthesis",
+      "url": "https://chem.libretexts.org/Courses/Nassau_Community_College/Organic_Chemistry_I_and_II/14%3A_Ethers_Epoxides_and_Thioethers/14.03%3A_The_Williamson_Ether_Synthesis",
+      "says": "use a primary alkyl halide: the strong alkoxide base gives E2 elimination with secondary and tertiary halides"
+    },
+    "ucla-wittig": {
+      "cite": "UCLA Illustrated Glossary of Organic Chemistry: Wittig reaction",
+      "url": "https://www.chem.ucla.edu/~harding/IGOC/W/wittig_reaction.html",
+      "says": "Wittig reaction: a phosphorus ylide converts an aldehyde or ketone into an alkene; benzaldehyde with methylenetriphenylphosphorane gives styrene"
+    },
+    "libretexts-aldol-openstax": {
+      "cite": "LibreTexts (OpenStax) 23.3 Dehydration of Aldol Products: Synthesis of Enones",
+      "url": "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_(OpenStax)/23%3A_Carbonyl_Condensation_Reactions/23.03%3A_Dehydration_of_Aldol_Products_-_Synthesis_of_Enones",
+      "says": "the aldol product of acetaldehyde, a beta-hydroxy aldehyde, loses water to give a conjugated enone, 2-butenal (crotonaldehyde)"
+    },
+    "wikipedia-3-hydroxybutanal": {
+      "cite": "Wikipedia: 3-Hydroxybutanal (acetaldol)",
+      "url": "https://en.wikipedia.org/wiki/3-Hydroxybutanal",
+      "says": "3-hydroxybutanal, also called acetaldol or aldol, is the aldol addition product of two molecules of acetaldehyde; dehydration gives crotonaldehyde"
+    },
+    "openstax-hydroboration": {
+      "cite": "OpenStax Organic Chemistry 8.5 Hydration of Alkenes: Addition of H2O by Hydroboration",
+      "url": "https://openstax.org/books/organic-chemistry/pages/8-5-hydration-of-alkenes-addition-of-h2o-by-hydroboration",
+      "says": "hydroboration followed by oxidation with hydrogen peroxide and base gives the anti-Markovnikov alcohol: the OH ends up on the less substituted alkene carbon, by syn addition"
+    },
+    "libretexts-diels-alder-winona": {
+      "cite": "LibreTexts (Winona State, Klein) 17.16 Diels-Alder: a closer look",
+      "url": "https://chem.libretexts.org/Courses/Winona_State_University/Klein_and_Straumanis_Guided/17%3A_Conjugated_Pi_Systems_and_Pericyclic_Reactions/17.16%3A_Diels-Alder_-_a_closer_look",
+      "says": "the Diels-Alder reaction is stereospecific: a cis dienophile generates a ring with cis substitution"
+    },
+    "alfredstate-diels-alder-lab": {
+      "cite": "Alfred State lab handout: Diels-Alder reaction of butadiene (from 3-sulfolene) with maleic anhydride",
+      "url": "https://web.alfredstate.edu/faculty/fongjd/Organic%20Chemistry%202/POWERPOINT%20PRESENTATIONS/LAB/lab5dielsalder.pdf",
+      "says": "butadiene and maleic anhydride give 4-cyclohexene-cis-1,2-dicarboxylic anhydride; the cis configuration of the carbonyl groups in maleic anhydride is retained"
+    }
+  },
+  "corrections": []
+}

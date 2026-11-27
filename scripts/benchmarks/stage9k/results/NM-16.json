@@ -1,0 +1,279 @@
+{
+  "id": "NM-16",
+  "startedUTC": "2026-11-06T18:21:49.367Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "2-aminobutan-1-ol",
+      "commonName": null,
+      "displayName": "2-aminobutan-1-ol",
+      "namingConfidence": "Medium",
+      "namingStatus": "systematic",
+      "parentChain": "butane",
+      "parentChainLength": 4,
+      "mainSuffix": "-ol",
+      "prefixes": [
+        "amino"
+      ],
+      "motifs": [],
+      "explanation": "Parent chain contains 4 carbons. alcohol chosen as highest-priority functional group.",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ]
+    },
+    "properties": {
+      "molecularFormula": "C4H11NO",
+      "exactMass": "89.0841",
+      "molecularWeight": "89.14",
+      "degreesOfUnsaturation": 0,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 4
+        },
+        {
+          "element": "H",
+          "count": 11
+        },
+        {
+          "element": "O",
+          "count": 1
+        },
+        {
+          "element": "N",
+          "count": 1
+        }
+      ],
+      "heavyAtomCount": 6,
+      "hydrogenBondDonors": 3,
+      "hydrogenBondAcceptors": 2,
+      "rotatableBonds": 2,
+      "topologicalPolarSurfaceArea": "46.25",
+      "logP": "-0.28",
+      "ringCount": 0,
+      "boilingPointTendency": {
+        "level": "Medium",
+        "score": 5,
+        "factors": [
+          "Moderate molecular weight slightly raises boiling point.",
+          "Hydrogen-bond donors raise boiling point.",
+          "Hydrogen-bond acceptors increase intermolecular attraction."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Very high",
+        "score": 9,
+        "factors": [
+          "Moderate TPSA increases water interaction.",
+          "Negative logP means the molecule strongly prefers water over oil.",
+          "Hydrogen-bond donors increase water solubility.",
+          "Hydrogen-bond acceptors help the molecule interact with water."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Medium",
+        "score": 4,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Very water-loving molecules cross lipid membranes poorly.",
+          "Many hydrogen-bond donors reduce membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "Medium",
+        "score": 5,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Primary alcohol",
+      "priority": 9.7,
+      "nomenclaturePriority": 9.7,
+      "confidence": "High",
+      "suffix": "-ol",
+      "prefix": "hydroxy",
+      "equivalentNames": [
+        "1° alcohol"
+      ],
+      "count": 1,
+      "mcatNote": "Primary alcohols have the OH-bearing carbon attached to one other carbon. They can usually be oxidized to aldehydes and then carboxylic acids.",
+      "matches": [
+        {
+          "atoms": [
+            3,
+            4,
+            2
+          ],
+          "bonds": [
+            3,
+            2
+          ]
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            4
+          ],
+          "bonds": []
+        }
+      ],
+      "displaySmarts": "[OX2H]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Primary alcohol",
+        "priority": 9.7,
+        "nomenclaturePriority": 9.7,
+        "confidence": "High",
+        "suffix": "-ol",
+        "prefix": "hydroxy",
+        "equivalentNames": [
+          "1° alcohol"
+        ],
+        "count": 1,
+        "mcatNote": "Primary alcohols have the OH-bearing carbon attached to one other carbon. They can usually be oxidized to aldehydes and then carboxylic acids.",
+        "matches": [
+          {
+            "atoms": [
+              3,
+              4,
+              2
+            ],
+            "bonds": [
+              3,
+              2
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              4
+            ],
+            "bonds": []
+          }
+        ],
+        "displaySmarts": "[OX2H]",
+        "category": "functionalGroup"
+      },
+      {
+        "name": "Primary amine",
+        "priority": 14.8,
+        "nomenclaturePriority": 14.8,
+        "confidence": "High",
+        "suffix": "-amine",
+        "prefix": "amino",
+        "equivalentNames": [
+          "1° amine"
+        ],
+        "count": 1,
+        "mcatNote": "Primary amines have nitrogen bonded to one carbon and two hydrogens. They are basic and can act as nucleophiles.",
+        "matches": [
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          }
+        ],
+        "displaySmarts": "[NX3H2]",
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Primary alcohol",
+        "priority": 9.7,
+        "nomenclaturePriority": 9.7,
+        "confidence": "High",
+        "suffix": "-ol",
+        "prefix": "hydroxy",
+        "equivalentNames": [
+          "1° alcohol"
+        ],
+        "count": 1,
+        "mcatNote": "Primary alcohols have the OH-bearing carbon attached to one other carbon. They can usually be oxidized to aldehydes and then carboxylic acids.",
+        "matches": [
+          {
+            "atoms": [
+              3,
+              4,
+              2
+            ],
+            "bonds": [
+              3,
+              2
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              4
+            ],
+            "bonds": []
+          }
+        ],
+        "displaySmarts": "[OX2H]",
+        "category": "functionalGroup"
+      },
+      {
+        "name": "Primary amine",
+        "priority": 14.8,
+        "nomenclaturePriority": 14.8,
+        "confidence": "High",
+        "suffix": "-amine",
+        "prefix": "amino",
+        "equivalentNames": [
+          "1° amine"
+        ],
+        "count": 1,
+        "mcatNote": "Primary amines have nitrogen bonded to one carbon and two hydrogens. They are basic and can act as nucleophiles.",
+        "matches": [
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          }
+        ],
+        "displaySmarts": "[NX3H2]",
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:21:50.780Z"
+}

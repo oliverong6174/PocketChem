@@ -1,0 +1,2243 @@
+{
+  "generatedBy": "scripts/benchmarks/multicatalyticBenchmark.mjs",
+  "scenarios": [
+    {
+      "id": "D1",
+      "title": "Single material, several distinct transformations",
+      "starts": [
+        "C#CCCCC"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "alkyne-mercury-hydration-terminal",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CCCCC(C)=O",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "named"
+        },
+        {
+          "attempt": 2,
+          "rule": "ketone-reduction",
+          "status": "reaction",
+          "consumed": [
+            "s1.1"
+          ],
+          "produced": [
+            "s2.1"
+          ],
+          "product": "CCCCC(C)O",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        },
+        {
+          "attempt": 3,
+          "rule": "alcohol-socl2",
+          "status": "reaction",
+          "consumed": [
+            "s2.1"
+          ],
+          "produced": [
+            "s3.1"
+          ],
+          "product": "CCCCC(C)Cl",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "unknown"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s3.1",
+          "smiles": "CCCCC(C)Cl",
+          "role": "primary",
+          "lineage": [
+            0
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Hg²⁺-catalysed Markovnikov hydration of a terminal alkyne gives the methyl ketone; hydride reduction gives the secondary alcohol; SOCl₂/pyridine converts it to the chloride (textbook)."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 3,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "alcohol-socl2",
+            "alkyne-mercury-hydration-terminal"
+          ],
+          "oneRoutePairs": [
+            {
+              "steps": [
+                1,
+                2
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                1,
+                3
+              ],
+              "category": "unassessed"
+            }
+          ],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction,reaction,reaction"
+        },
+        {
+          "name": "final inventory",
+          "ok": true,
+          "detail": "CCCCC(C)Cl"
+        },
+        {
+          "name": "supplied materials consumed",
+          "ok": true,
+          "detail": "0"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 135
+    },
+    {
+      "id": "D2a",
+      "title": "Two-material coupling (acid + alcohol)",
+      "starts": [
+        "CC(=O)O",
+        "CCO"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "fischer-esterification",
+          "status": "reaction",
+          "consumed": [
+            "sm1#1",
+            "sm0#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CCOC(C)=O",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "named"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s1.1",
+          "smiles": "CCOC(C)=O",
+          "role": "primary",
+          "lineage": [
+            0,
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Fischer esterification, acid-catalysed equilibrium (textbook)."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 1,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction"
+        },
+        {
+          "name": "final inventory",
+          "ok": true,
+          "detail": "CCOC(C)=O"
+        },
+        {
+          "name": "supplied materials consumed",
+          "ok": true,
+          "detail": "0,1"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 23
+    },
+    {
+      "id": "D2b",
+      "title": "Two-material coupling (Pd-catalysed Suzuki)",
+      "starts": [
+        "Brc1ccccc1",
+        "OB(O)c1ccccc1"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "suzuki-coupling",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1",
+            "sm1#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "c1ccc(-c2ccccc2)cc1",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "generic"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s1.1",
+          "smiles": "c1ccc(-c2ccccc2)cc1",
+          "role": "primary",
+          "lineage": [
+            0,
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Suzuki–Miyaura coupling of an aryl bromide with an arylboronic acid (textbook)."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 1,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "suzuki-coupling"
+          ],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction"
+        },
+        {
+          "name": "final inventory",
+          "ok": true,
+          "detail": "c1ccc(-c2ccccc2)cc1"
+        },
+        {
+          "name": "supplied materials consumed",
+          "ok": true,
+          "detail": "0,1"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 33
+    },
+    {
+      "id": "D2c",
+      "title": "Duplicate material copies: an acetal consumes two ethanol molecules, supplied as two copies",
+      "starts": [
+        "CC=O",
+        "CCO",
+        "CCO"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "aldehyde-acetal-formation",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1",
+            "sm1#1",
+            "sm2#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CCOC(C)OCC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "generic"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s1.1",
+          "smiles": "CCOC(C)OCC",
+          "role": "primary",
+          "lineage": [
+            0,
+            1,
+            2
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Acid-catalysed acetal formation consumes two equivalents of alcohol (textbook); here two separate ethanol molecules are required in the inventory."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 1,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "aldehyde-acetal-formation"
+          ],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction"
+        },
+        {
+          "name": "final inventory",
+          "ok": true,
+          "detail": "CCOC(C)OCC"
+        },
+        {
+          "name": "supplied materials consumed",
+          "ok": true,
+          "detail": "0,1,2"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 26
+    },
+    {
+      "id": "D3+D4",
+      "title": "Two transformed branches, convergence, post-convergence modification",
+      "starts": [
+        "CCCCBr",
+        "CCCCO"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "haloalkane-grignard-formation-bromide",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CCC[CH2][Mg][Br]",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        },
+        {
+          "attempt": 2,
+          "rule": "primary-alcohol-mild-oxidation",
+          "status": "reaction",
+          "consumed": [
+            "sm1#1"
+          ],
+          "produced": [
+            "s2.1"
+          ],
+          "product": "CCCC=O",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        },
+        {
+          "attempt": 3,
+          "rule": "aldehyde-organometallic-addition",
+          "status": "reaction",
+          "consumed": [
+            "s2.1",
+            "s1.1"
+          ],
+          "produced": [
+            "s3.1"
+          ],
+          "product": "CCCCC(O)CCC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        },
+        {
+          "attempt": 4,
+          "rule": "secondary-alcohol-oxidation-pcc",
+          "status": "reaction",
+          "consumed": [
+            "s3.1"
+          ],
+          "produced": [
+            "s4.1"
+          ],
+          "product": "CCCCC(=O)CCC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s4.1",
+          "smiles": "CCCCC(=O)CCC",
+          "role": "primary",
+          "lineage": [
+            0,
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "BuBr → BuMgBr (Mg, ether); BuOH → butanal (PCC); Grignard addition gives octan-4-ol; PCC gives octan-4-one (textbook)."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 4,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "secondary-alcohol-oxidation-pcc"
+          ],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction,reaction,reaction,reaction"
+        },
+        {
+          "name": "final inventory",
+          "ok": true,
+          "detail": "CCCCC(=O)CCC"
+        },
+        {
+          "name": "supplied materials consumed",
+          "ok": true,
+          "detail": "0,1"
+        },
+        {
+          "name": "two independent branches before the join",
+          "ok": true,
+          "detail": "[[],[],[1,2],[3]]"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 60
+    },
+    {
+      "id": "D3b+D4b",
+      "title": "Second convergent route: alcohol branch + acid-chloride branch, then reduction",
+      "starts": [
+        "C=CCCCC",
+        "CCC(=O)O"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "alkene-acid-hydration",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CCCCC(C)O",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "generic"
+        },
+        {
+          "attempt": 2,
+          "rule": "carboxylic-acid-to-acid-chloride",
+          "status": "reaction",
+          "consumed": [
+            "sm1#1"
+          ],
+          "produced": [
+            "s2.1"
+          ],
+          "product": "CCC(=O)Cl",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "unknown"
+        },
+        {
+          "attempt": 3,
+          "rule": "alcohol-acid-chloride-esterification",
+          "status": "reaction",
+          "consumed": [
+            "s1.1",
+            "s2.1"
+          ],
+          "produced": [
+            "s3.1"
+          ],
+          "product": "CCCCC(C)OC(=O)CC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "unknown"
+        },
+        {
+          "attempt": 4,
+          "rule": "ester-lah-reduction",
+          "status": "reaction",
+          "consumed": [
+            "s3.1"
+          ],
+          "produced": [
+            "s4.1",
+            "s4.2"
+          ],
+          "product": "CCCCC(C)O.CCCO",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s4.1",
+          "smiles": "CCCCC(C)O",
+          "role": "primary",
+          "lineage": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "s4.2",
+          "smiles": "CCCO",
+          "role": "coproduct",
+          "lineage": [
+            0,
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Hydration gives hexan-2-ol; SOCl₂ gives propanoyl chloride; acylation gives hexan-2-yl propanoate; LiAlH₄ cleaves the ester to propan-1-ol and hexan-2-ol (textbook)."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 4,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "alcohol-acid-chloride-esterification",
+            "carboxylic-acid-to-acid-chloride"
+          ],
+          "oneRoutePairs": [
+            {
+              "steps": [
+                1,
+                2
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                1,
+                3
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                1,
+                4
+              ],
+              "category": "documented-conflict"
+            }
+          ],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction,reaction,reaction,reaction"
+        },
+        {
+          "name": "inventory size",
+          "ok": true,
+          "detail": "2"
+        },
+        {
+          "name": "supplied materials consumed",
+          "ok": true,
+          "detail": "0,1"
+        },
+        {
+          "name": "two independent branches before the join",
+          "ok": true,
+          "detail": "[[],[],[1,2],[3]]"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 62
+    },
+    {
+      "id": "INT-1",
+      "title": "Integrated: two catalytic branches, Heck join with an explicit outcome choice, then Pd/C hydrogenation",
+      "starts": [
+        "OC(=O)c1ccc(Br)cc1",
+        "CO",
+        "C#CC(=O)OC"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "fischer-esterification",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1",
+            "sm1#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "COC(=O)c1ccc(Br)cc1",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "named"
+        },
+        {
+          "attempt": 2,
+          "rule": "alkyne-lindlar-reduction-terminal",
+          "status": "reaction",
+          "consumed": [
+            "sm2#1"
+          ],
+          "produced": [
+            "s2.1"
+          ],
+          "product": "C=CC(=O)OC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "named"
+        },
+        {
+          "attempt": 3,
+          "rule": "heck-coupling",
+          "status": "reaction",
+          "consumed": [
+            "s1.1",
+            "s2.1"
+          ],
+          "produced": [
+            "s3.1"
+          ],
+          "product": "COC(=O)/C=C/c1ccc(C(=O)OC)cc1",
+          "outcomes": 2,
+          "selectivityClass": "major",
+          "catalystIdentity": "generic"
+        },
+        {
+          "attempt": 4,
+          "rule": "alkene-hydrogenation",
+          "status": "reaction",
+          "consumed": [
+            "s3.1"
+          ],
+          "produced": [
+            "s4.1"
+          ],
+          "product": "COC(=O)CCc1ccc(C(=O)OC)cc1",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "named"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s4.1",
+          "smiles": "COC(=O)CCc1ccc(C(=O)OC)cc1",
+          "role": "primary",
+          "lineage": [
+            0,
+            1,
+            2
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Fischer esterification of 4-bromobenzoic acid with methanol (H₂SO₄ cat.); Lindlar partial hydrogenation of methyl propiolate to methyl acrylate; Heck coupling of the aryl bromide with the acrylate gives the (E)-cinnamate (Pd cat.); Pd/C hydrogenation of the conjugated C=C. Provisional: terminal acrylates polymerise readily and propiolate semi-hydrogenation needs careful control, which the model does not assess."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 1,
+            "single-outcome": 3,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 1,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "alkene-hydrogenation",
+            "heck-coupling"
+          ],
+          "oneRoutePairs": [
+            {
+              "steps": [
+                1,
+                2
+              ],
+              "category": "incomplete"
+            },
+            {
+              "steps": [
+                1,
+                3
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                1,
+                4
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                2,
+                3
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                2,
+                4
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                3,
+                4
+              ],
+              "category": "unassessed"
+            }
+          ],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction,reaction,reaction,reaction"
+        },
+        {
+          "name": "final inventory",
+          "ok": true,
+          "detail": "COC(=O)CCc1ccc(C(=O)OC)cc1"
+        },
+        {
+          "name": "supplied materials consumed",
+          "ok": true,
+          "detail": "0,1,2"
+        },
+        {
+          "name": "two independent branches before the join",
+          "ok": true,
+          "detail": "[[],[],[1,2],[3]]"
+        },
+        {
+          "name": "catalytic steps",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "distinct catalyst systems",
+          "ok": true,
+          "detail": "H₂SO₄; Lindlar catalyst; Pd catalyst; Pd/C"
+        },
+        {
+          "name": "generic (type-only) catalyst steps",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "intermediate of step 1",
+          "ok": true,
+          "detail": "COC(=O)c1ccc(Br)cc1"
+        },
+        {
+          "name": "intermediate of step 2",
+          "ok": true,
+          "detail": "C=CC(=O)OC"
+        },
+        {
+          "name": "intermediate of step 3",
+          "ok": true,
+          "detail": "COC(=O)/C=C/c1ccc(C(=O)OC)cc1"
+        },
+        {
+          "name": "selectivity class of the chosen outcome in step 3",
+          "ok": true,
+          "detail": "major"
+        },
+        {
+          "name": "step 3 was chosen explicitly by the user",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 100
+    },
+    {
+      "id": "INT-2",
+      "title": "Integrated: Lindlar then stereospecific epoxidation (branch A), Grignard formation (branch B), epoxide opening join, then PCC",
+      "starts": [
+        "CCC#CCC",
+        "CCCCBr"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "alkyne-lindlar-reduction-internal",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CC/C=C\\CC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "named"
+        },
+        {
+          "attempt": 2,
+          "rule": "alkene-epoxidation",
+          "status": "reaction",
+          "consumed": [
+            "s1.1"
+          ],
+          "produced": [
+            "s2.1"
+          ],
+          "product": "CC[C@@H]1O[C@@H]1CC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "unknown"
+        },
+        {
+          "attempt": 3,
+          "rule": "haloalkane-grignard-formation-bromide",
+          "status": "reaction",
+          "consumed": [
+            "sm1#1"
+          ],
+          "produced": [
+            "s3.1"
+          ],
+          "product": "CCC[CH2][Mg][Br]",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        },
+        {
+          "attempt": 4,
+          "rule": "epoxide-grignard-opening",
+          "status": "reaction",
+          "consumed": [
+            "s2.1",
+            "s3.1"
+          ],
+          "produced": [
+            "s4.1"
+          ],
+          "product": "CCCC[C@H](CC)[C@H](O)CC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "unknown"
+        },
+        {
+          "attempt": 5,
+          "rule": "secondary-alcohol-oxidation-pcc",
+          "status": "reaction",
+          "consumed": [
+            "s4.1"
+          ],
+          "produced": [
+            "s5.1"
+          ],
+          "product": "CCCC[C@H](CC)C(=O)CC",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s5.1",
+          "smiles": "CCCC[C@H](CC)C(=O)CC",
+          "role": "primary",
+          "lineage": [
+            0,
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "connectivity-only",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Lindlar semi-hydrogenation gives the (Z)-alkene; peroxyacid epoxidation of a Z alkene gives the cis (meso) epoxide; BuMgBr opens the epoxide by SN2 at a ring carbon; PCC oxidises the secondary alcohol (Corey & Suggs 1975). Provisional as a sequence: the stereochemical outcome of the opening step (relative configuration) is not asserted, and PocketChem does not model it."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 5,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "alkene-epoxidation",
+            "alkyne-lindlar-reduction-internal",
+            "secondary-alcohol-oxidation-pcc"
+          ],
+          "oneRoutePairs": [
+            {
+              "steps": [
+                1,
+                2
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                1,
+                3
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                1,
+                4
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                1,
+                5
+              ],
+              "category": "unassessed"
+            }
+          ],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction,reaction,reaction,reaction,reaction"
+        },
+        {
+          "name": "final inventory (constitution)",
+          "ok": true,
+          "detail": "CCCCC(CC)C(=O)CC"
+        },
+        {
+          "name": "constitution of step 4",
+          "ok": true,
+          "detail": "CCCC[C@H](CC)[C@H](O)CC"
+        },
+        {
+          "name": "constitution of step 5",
+          "ok": true,
+          "detail": "CCCC[C@H](CC)C(=O)CC"
+        },
+        {
+          "name": "supplied materials consumed",
+          "ok": true,
+          "detail": "0,1"
+        },
+        {
+          "name": "catalytic steps",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "distinct catalyst systems",
+          "ok": true,
+          "detail": "Lindlar catalyst"
+        },
+        {
+          "name": "intermediate of step 1",
+          "ok": true,
+          "detail": "CC/C=C\\CC"
+        },
+        {
+          "name": "intermediate of step 2",
+          "ok": true,
+          "detail": "CC[C@@H]1O[C@@H]1CC"
+        },
+        {
+          "name": "intermediate of step 3",
+          "ok": true,
+          "detail": "CCC[CH2][Mg][Br]"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "connectivity-only"
+        }
+      ],
+      "elapsedMs": 72
+    },
+    {
+      "id": "D5",
+      "title": "Several distinct catalytic steps (Sonogashira, Lindlar, Pd/C hydrogenation)",
+      "starts": [
+        "Ic1ccccc1",
+        "C#CCCCC"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "sonogashira-coupling",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1",
+            "sm1#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CCCCC#Cc1ccccc1",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "generic"
+        },
+        {
+          "attempt": 2,
+          "rule": "alkyne-lindlar-reduction-internal",
+          "status": "reaction",
+          "consumed": [
+            "s1.1"
+          ],
+          "produced": [
+            "s2.1"
+          ],
+          "product": "CCCC/C=C\\c1ccccc1",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "named"
+        },
+        {
+          "attempt": 3,
+          "rule": "alkene-hydrogenation",
+          "status": "reaction",
+          "consumed": [
+            "s2.1"
+          ],
+          "produced": [
+            "s3.1"
+          ],
+          "product": "CCCCCCc1ccccc1",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "named"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s3.1",
+          "smiles": "CCCCCCc1ccccc1",
+          "role": "primary",
+          "lineage": [
+            0,
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Pd/Cu Sonogashira coupling; Lindlar semi-hydrogenation to the cis alkene; Pd/C hydrogenation to the alkane (textbook)."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 3,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "alkene-hydrogenation",
+            "alkyne-lindlar-reduction-internal",
+            "sonogashira-coupling"
+          ],
+          "oneRoutePairs": [
+            {
+              "steps": [
+                1,
+                2
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                1,
+                3
+              ],
+              "category": "unassessed"
+            },
+            {
+              "steps": [
+                2,
+                3
+              ],
+              "category": "unassessed"
+            }
+          ],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction,reaction,reaction"
+        },
+        {
+          "name": "final inventory",
+          "ok": true,
+          "detail": "CCCCCCc1ccccc1"
+        },
+        {
+          "name": "catalytic steps",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "distinct catalyst systems",
+          "ok": true,
+          "detail": "CuI + Pd catalyst; Lindlar catalyst; Pd/C"
+        },
+        {
+          "name": "generic (type-only) catalyst steps",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 48
+    },
+    {
+      "id": "D6a",
+      "title": "Competing products with the rule's own numeric estimates (radical bromination)",
+      "starts": [
+        "CC(C)CC"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "alkane-radical-bromination",
+          "status": "needs-selection",
+          "consumed": [],
+          "produced": [],
+          "product": null,
+          "outcomes": 4,
+          "selectivityClass": [
+            "major",
+            "disfavored",
+            "disfavored",
+            "disfavored"
+          ],
+          "catalystIdentity": "unknown"
+        },
+        {
+          "attempt": 2,
+          "rule": "alkane-radical-bromination",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CCC(C)(C)Br",
+          "outcomes": 4,
+          "selectivityClass": "major",
+          "catalystIdentity": "unknown"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s1.1",
+          "smiles": "CCC(C)(C)Br",
+          "role": "primary",
+          "lineage": [
+            0
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Bromination of 2-methylbutane is selective for the tertiary C–H (textbook)."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 1,
+            "single-outcome": 0,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 1,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "needs-selection"
+        },
+        {
+          "name": "nothing consumed while a choice is pending",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "outcome selectivity classes",
+          "ok": true,
+          "detail": "major,disfavored,disfavored,disfavored"
+        },
+        {
+          "name": "explicit selection commits the chosen outcome",
+          "ok": true,
+          "detail": "CCC(C)(C)Br"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 52
+    },
+    {
+      "id": "D6b",
+      "title": "Competing products with no ranking (Heck of an alkyl alkene)",
+      "starts": [
+        "Brc1ccccc1",
+        "C=CCCCC"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "heck-coupling",
+          "status": "needs-selection",
+          "consumed": [],
+          "produced": [],
+          "product": null,
+          "outcomes": 2,
+          "selectivityClass": [
+            "unranked",
+            "unranked"
+          ],
+          "catalystIdentity": "generic"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "sm0#1",
+          "smiles": "Brc1ccccc1",
+          "role": "supplied",
+          "lineage": [
+            0
+          ]
+        },
+        {
+          "id": "sm1#1",
+          "smiles": "C=CCCCC",
+          "role": "supplied",
+          "lineage": [
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "no committed step",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "No regiochemical preference is modeled for alkyl alkenes (mixtures and double-bond isomerization are common in practice); both attachment sites are offered and neither is called major."
+        },
+        "4-selectivity-supported": null,
+        "5-condition-compatible": null,
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "needs-selection"
+        },
+        {
+          "name": "nothing consumed while a choice is pending",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "outcome selectivity classes",
+          "ok": true,
+          "detail": "unranked,unranked"
+        }
+      ],
+      "elapsedMs": 25
+    },
+    {
+      "id": "D6c",
+      "title": "Qualitative major/minor from a referenced preference (Heck of methyl acrylate)",
+      "starts": [
+        "Brc1ccccc1",
+        "C=CC(=O)OC"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "heck-coupling",
+          "status": "needs-selection",
+          "consumed": [],
+          "produced": [],
+          "product": null,
+          "outcomes": 2,
+          "selectivityClass": [
+            "major",
+            "disfavored"
+          ],
+          "catalystIdentity": "generic"
+        },
+        {
+          "attempt": 2,
+          "rule": "heck-coupling",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1",
+            "sm1#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "COC(=O)/C=C/c1ccccc1",
+          "outcomes": 2,
+          "selectivityClass": "major",
+          "catalystIdentity": "generic"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s1.1",
+          "smiles": "COC(=O)/C=C/c1ccccc1",
+          "role": "primary",
+          "lineage": [
+            0,
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Methyl (E)-cinnamate is the standard Heck product of an aryl halide with methyl acrylate (Heck, Acc. Chem. Res. 1979, 12, 146); the alpha-aryl acrylate is minor. The ranking is qualitative: no ratio is claimed."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 1,
+            "single-outcome": 0,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 1,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "heck-coupling"
+          ],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "needs-selection"
+        },
+        {
+          "name": "nothing consumed while a choice is pending",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "outcome selectivity classes",
+          "ok": true,
+          "detail": "major,disfavored"
+        },
+        {
+          "name": "explicit selection commits the chosen outcome",
+          "ok": true,
+          "detail": "COC(=O)/C=C/c1ccccc1"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 52
+    },
+    {
+      "id": "D6d",
+      "title": "Friedel–Crafts ring positions ranked by directing effects",
+      "starts": [
+        "COc1ccccc1",
+        "CC(=O)Cl"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "aromatic-friedel-crafts-acylation",
+          "status": "needs-selection",
+          "consumed": [],
+          "produced": [],
+          "product": null,
+          "outcomes": 3,
+          "selectivityClass": [
+            "major",
+            "unranked",
+            "disfavored"
+          ],
+          "catalystIdentity": "unknown"
+        },
+        {
+          "attempt": 2,
+          "rule": "aromatic-friedel-crafts-acylation",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1",
+            "sm1#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "COc1ccc(C(C)=O)cc1",
+          "outcomes": 3,
+          "selectivityClass": "major",
+          "catalystIdentity": "unknown"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s1.1",
+          "smiles": "COc1ccc(C(C)=O)cc1",
+          "role": "primary",
+          "lineage": [
+            0,
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Acylation of anisole gives 4-methoxyacetophenone as the main product (textbook); ortho is a minor competing product in practice, which the model shows as competitive, not as a ratio."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 1,
+            "single-outcome": 0,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 1,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "aromatic-friedel-crafts-acylation"
+          ],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "needs-selection"
+        },
+        {
+          "name": "nothing consumed while a choice is pending",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "outcome selectivity classes",
+          "ok": true,
+          "detail": "major,unranked,disfavored"
+        },
+        {
+          "name": "explicit selection commits the chosen outcome",
+          "ok": true,
+          "detail": "COc1ccc(C(C)=O)cc1"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 64
+    },
+    {
+      "id": "D6e",
+      "title": "Pinacol rearrangement: the more stable carbocation decides the leaving hydroxyl",
+      "starts": [
+        "CCCCCCC(O)CO"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "pinacol-rearrangement",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CCCCCCCC=O",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "unknown"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s1.1",
+          "smiles": "CCCCCCCC=O",
+          "role": "primary",
+          "lineage": [
+            0
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Terminal 1,2-diols rearrange through the secondary cation with hydride shift to the aldehyde (acid dehydration of 1,2-propanediol gives propanal as an intermediate, PNNL 2009); the hydride-versus-aryl migratory order is not settled in sources and is a documented simplification."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 1,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "pinacol-rearrangement"
+          ],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction"
+        },
+        {
+          "name": "final inventory",
+          "ok": true,
+          "detail": "CCCCCCCC=O"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 17
+    },
+    {
+      "id": "D6f",
+      "title": "Epoxidation keeps the alkene geometry (E gives the trans racemate, Z the cis meso compound)",
+      "starts": [
+        "c1ccccc1/C=C/c1ccccc1"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "alkene-epoxidation",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "c1ccc([C@H]2O[C@@H]2c2ccccc2)cc1",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "unknown"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s1.1",
+          "smiles": "c1ccc([C@H]2O[C@@H]2c2ccccc2)cc1",
+          "role": "primary",
+          "lineage": [
+            0
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "connectivity-only",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Peroxyacid epoxidation is a concerted syn addition of oxygen: trans-stilbene gives trans-stilbene oxide, (R,R)/(S,S)."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 1,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "alkene-epoxidation"
+          ],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction"
+        },
+        {
+          "name": "inventory size",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "connectivity-only"
+        }
+      ],
+      "elapsedMs": 27
+    },
+    {
+      "id": "D7",
+      "title": "Missing structural partner; nothing substituted downstream",
+      "starts": [
+        "CCO"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "fischer-esterification",
+          "status": "needs-input",
+          "consumed": [],
+          "produced": [],
+          "product": null,
+          "outcomes": 0,
+          "selectivityClass": [],
+          "catalystIdentity": "named"
+        },
+        {
+          "attempt": 2,
+          "rule": "primary-alcohol-mild-oxidation",
+          "status": "dependency-failed",
+          "consumed": [],
+          "produced": [],
+          "product": null,
+          "outcomes": 0,
+          "selectivityClass": [],
+          "catalystIdentity": "none"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "sm0#1",
+          "smiles": "CCO",
+          "role": "supplied",
+          "lineage": [
+            0
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "no committed step",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Not a reaction claim: the test is that no molecule is invented or silently reused."
+        },
+        "4-selectivity-supported": null,
+        "5-condition-compatible": null,
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "needs-input,dependency-failed"
+        },
+        {
+          "name": "final inventory",
+          "ok": true,
+          "detail": "CCO"
+        }
+      ],
+      "elapsedMs": 0
+    },
+    {
+      "id": "D8",
+      "title": "Failed intermediate transformation; independent branch still runs",
+      "starts": [
+        "CCCCCC",
+        "CCO"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "primary-alcohol-mild-oxidation",
+          "status": "no-reaction",
+          "consumed": [],
+          "produced": [],
+          "product": null,
+          "outcomes": 0,
+          "selectivityClass": [],
+          "catalystIdentity": "none"
+        },
+        {
+          "attempt": 2,
+          "rule": "primary-alcohol-mild-oxidation",
+          "status": "reaction",
+          "consumed": [
+            "sm1#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CC=O",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        },
+        {
+          "attempt": 3,
+          "rule": "ketone-reduction",
+          "status": "dependency-failed",
+          "consumed": [],
+          "produced": [],
+          "product": null,
+          "outcomes": 0,
+          "selectivityClass": [],
+          "catalystIdentity": "none"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "sm0#1",
+          "smiles": "CCCCCC",
+          "role": "supplied",
+          "lineage": [
+            0
+          ]
+        },
+        {
+          "id": "s1.1",
+          "smiles": "CC=O",
+          "role": "primary",
+          "lineage": [
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "Hexane has no alcohol to oxidise (no reaction); ethanol gives acetaldehyde (textbook)."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 1,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "no-reaction,reaction,dependency-failed"
+        },
+        {
+          "name": "final inventory",
+          "ok": true,
+          "detail": "CCCCCC + CC=O"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 7
+    },
+    {
+      "id": "D9",
+      "title": "Molecular identity: stereochemistry, isotope, geometry",
+      "starts": [
+        "CC[C@H](C)Br",
+        "[13CH3]CO"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "haloalkane-sn2-hydroxide",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1"
+          ],
+          "produced": [
+            "s1.1"
+          ],
+          "product": "CC[C@@H](C)O",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "unknown"
+        },
+        {
+          "attempt": 2,
+          "rule": "primary-alcohol-mild-oxidation",
+          "status": "reaction",
+          "consumed": [
+            "sm1#1"
+          ],
+          "produced": [
+            "s2.1"
+          ],
+          "product": "[13CH3]C=O",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "s1.1",
+          "smiles": "CC[C@@H](C)O",
+          "role": "primary",
+          "lineage": [
+            0
+          ]
+        },
+        {
+          "id": "s2.1",
+          "smiles": "[13CH3]C=O",
+          "role": "primary",
+          "lineage": [
+            1
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "SN2 hydroxide displacement inverts the stereocentre; the 13C label is carried through oxidation (textbook)."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 2,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [
+            "haloalkane-sn2-hydroxide"
+          ],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction,reaction"
+        },
+        {
+          "name": "final inventory",
+          "ok": true,
+          "detail": "CC[C@@H](C)O + [13CH3]C=O"
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 17
+    },
+    {
+      "id": "D10",
+      "title": "Inventory, retained species and coproducts",
+      "starts": [
+        "CC(=O)OCC",
+        "CCCCCC"
+      ],
+      "steps": [
+        {
+          "attempt": 1,
+          "rule": "ester-lah-reduction",
+          "status": "reaction",
+          "consumed": [
+            "sm0#1"
+          ],
+          "produced": [
+            "s1.1",
+            "s1.2"
+          ],
+          "product": "CCO.CCO",
+          "outcomes": 1,
+          "selectivityClass": "single-outcome",
+          "catalystIdentity": "none"
+        }
+      ],
+      "finalInventory": [
+        {
+          "id": "sm1#1",
+          "smiles": "CCCCCC",
+          "role": "supplied",
+          "lineage": [
+            1
+          ]
+        },
+        {
+          "id": "s1.1",
+          "smiles": "CCO",
+          "role": "primary",
+          "lineage": [
+            0
+          ]
+        },
+        {
+          "id": "s1.2",
+          "smiles": "CCO",
+          "role": "coproduct",
+          "lineage": [
+            0
+          ]
+        }
+      ],
+      "levels": {
+        "1-syntactically-valid": true,
+        "2-structure-replay": "verified",
+        "3-chemically-plausible": {
+          "established": "asserted (not computed)",
+          "basis": "LiAlH₄ cleaves ethyl acetate to two molecules of ethanol (textbook); hexane is an untouched spectator."
+        },
+        "4-selectivity-supported": {
+          "counts": {
+            "major": 0,
+            "single-outcome": 1,
+            "disfavored": 0,
+            "unranked": 0,
+            "unassessed": 0
+          },
+          "supportedSteps": 0,
+          "note": "Only a rule's own estimate (numeric, or a referenced qualitative preference) counts; single-outcome means unranked, not major."
+        },
+        "5-condition-compatible": {
+          "declaredConditionWarnings": 0,
+          "unassessedRules": [],
+          "oneRoutePairs": [],
+          "note": "Steps are isolated and sequential; no one-pot or cooperative claim."
+        },
+        "6-experimentally-established": "not established by PocketChem"
+      },
+      "checks": [
+        {
+          "name": "step statuses",
+          "ok": true,
+          "detail": "reaction"
+        },
+        {
+          "name": "inventory size",
+          "ok": true,
+          "detail": "3"
+        },
+        {
+          "name": "coproduct lots",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "retained spectator",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "structure replay",
+          "ok": true,
+          "detail": "verified"
+        }
+      ],
+      "elapsedMs": 10
+    }
+  ],
+  "performance": {
+    "chain": "C=CCC → alkene-acid-hydration → secondary-alcohol-oxidation-pcc → ketone-reduction",
+    "repeats": 7,
+    "sequentialMedianMs": 21,
+    "workspaceMedianMs": 21,
+    "note": "Same rules, same molecule. The workspace additionally records every alternative outcome, canonicalises every lot and assesses selectivity per step; its verification replay is timed separately below.",
+    "assessmentMs": 29
+  }
+}

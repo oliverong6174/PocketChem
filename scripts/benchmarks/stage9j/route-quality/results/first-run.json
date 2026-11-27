@@ -1,0 +1,389 @@
+{
+ "summary": {
+  "label": "first-run",
+  "flag": {
+   "n": 12,
+   "detected": 11,
+   "missed": [
+    "F06:plausible-incomplete"
+   ]
+  },
+  "clear": {
+   "n": 13,
+   "falselyFlagged": [
+    "C10:contradicted[contradiction:replay-failed,support:selectivity-single-outcome]"
+   ],
+   "notFlagged": 12
+  },
+  "notSupported": {
+   "n": 2,
+   "wronglySupported": []
+  },
+  "errors": [],
+  "tierCounts": {
+   "known-concern": 8,
+   "contradicted": 8,
+   "plausible-incomplete": 8,
+   "chemically-supported": 5
+  }
+ },
+ "records": [
+  {
+   "id": "F01",
+   "label": "flag",
+   "built": "engine",
+   "tier": "known-concern",
+   "codes": [
+    "concern:eas-overhalogenation",
+    "incomplete:conditions-unassessed",
+    "concern:selectivity-regioisomers"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "F02",
+   "label": "flag",
+   "built": "engine",
+   "tier": "known-concern",
+   "codes": [
+    "concern:eas-overhalogenation",
+    "incomplete:conditions-unassessed",
+    "concern:selectivity-regioisomers"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "F03",
+   "label": "flag",
+   "built": "engine",
+   "tier": "known-concern",
+   "codes": [
+    "concern:eas-nitration-free-arylamine",
+    "incomplete:conditions-unassessed",
+    "concern:selectivity-regioisomers"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "F04",
+   "label": "flag",
+   "built": "engine",
+   "tier": "known-concern",
+   "codes": [
+    "concern:eas-friedel-crafts-alkylation",
+    "incomplete:conditions-unassessed",
+    "concern:selectivity-regioisomers"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "F05",
+   "label": "flag",
+   "built": "engine",
+   "tier": "contradicted",
+   "codes": [
+    "contradiction:replay-failed",
+    "incomplete:conditions-unassessed",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "failed"
+  },
+  {
+   "id": "F06",
+   "label": "flag",
+   "built": "engine",
+   "tier": "plausible-incomplete",
+   "codes": [
+    "incomplete:conditions-unassessed",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "F07",
+   "label": "flag",
+   "built": "manual (engine did not produce this product)",
+   "tier": "contradicted",
+   "codes": [
+    "contradiction:replay-failed",
+    "incomplete:conditions-unassessed",
+    "incomplete:selectivity-unassessed"
+   ],
+   "note": "",
+   "structural": "failed"
+  },
+  {
+   "id": "F08",
+   "label": "flag",
+   "built": "manual (fabricated)",
+   "tier": "contradicted",
+   "codes": [
+    "contradiction:replay-failed",
+    "contradiction:unsourced-atoms",
+    "incomplete:conditions-unassessed",
+    "incomplete:selectivity-unassessed"
+   ],
+   "note": "",
+   "structural": "failed"
+  },
+  {
+   "id": "F09",
+   "label": "flag",
+   "built": "manual (fabricated)",
+   "tier": "contradicted",
+   "codes": [
+    "contradiction:replay-failed",
+    "contradiction:unsourced-atoms",
+    "incomplete:selectivity-unassessed"
+   ],
+   "note": "",
+   "structural": "failed"
+  },
+  {
+   "id": "F10",
+   "label": "flag",
+   "built": "manual (engine did not produce this product)",
+   "tier": "contradicted",
+   "codes": [
+    "contradiction:replay-failed",
+    "concern:eas-friedel-crafts-alkylation",
+    "incomplete:conditions-unassessed",
+    "incomplete:selectivity-unassessed"
+   ],
+   "note": "",
+   "structural": "failed"
+  },
+  {
+   "id": "F11",
+   "label": "flag",
+   "built": "manual (fabricated)",
+   "tier": "contradicted",
+   "codes": [
+    "contradiction:replay-failed",
+    "contradiction:compatibility-acid-base-quench",
+    "incomplete:selectivity-unassessed"
+   ],
+   "note": "",
+   "structural": "failed"
+  },
+  {
+   "id": "F12",
+   "label": "flag",
+   "built": "manual (fabricated)",
+   "tier": "contradicted",
+   "codes": [
+    "contradiction:replay-failed",
+    "concern:compatibility-competing-reactivity",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "failed"
+  },
+  {
+   "id": "N01",
+   "label": "not-supported",
+   "built": "engine",
+   "tier": "known-concern",
+   "codes": [
+    "concern:selectivity-radical-mixture"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "N02",
+   "label": "not-supported",
+   "built": "engine",
+   "tier": "known-concern",
+   "codes": [
+    "incomplete:conditions-unassessed",
+    "concern:selectivity-regioisomers"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C01",
+   "label": "clear",
+   "built": "engine",
+   "tier": "plausible-incomplete",
+   "codes": [
+    "incomplete:conditions-unassessed",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C02",
+   "label": "clear",
+   "built": "engine",
+   "tier": "chemically-supported",
+   "codes": [
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C03",
+   "label": "clear",
+   "built": "engine",
+   "tier": "plausible-incomplete",
+   "codes": [
+    "incomplete:conditions-unassessed",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C04",
+   "label": "clear",
+   "built": "engine",
+   "tier": "plausible-incomplete",
+   "codes": [
+    "incomplete:conditions-unassessed",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C05",
+   "label": "clear",
+   "built": "engine",
+   "tier": "chemically-supported",
+   "codes": [
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C06",
+   "label": "clear",
+   "built": "engine",
+   "tier": "plausible-incomplete",
+   "codes": [
+    "incomplete:conditions-unassessed",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C07",
+   "label": "clear",
+   "built": "engine",
+   "tier": "plausible-incomplete",
+   "codes": [
+    "incomplete:conditions-unassessed",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C08",
+   "label": "clear",
+   "built": "engine",
+   "tier": "chemically-supported",
+   "codes": [
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C09",
+   "label": "clear",
+   "built": "engine",
+   "tier": "chemically-supported",
+   "codes": [
+    "support:selectivity-single-outcome",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C10",
+   "label": "clear",
+   "built": "engine",
+   "tier": "contradicted",
+   "codes": [
+    "contradiction:replay-failed",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "failed"
+  },
+  {
+   "id": "C11",
+   "label": "clear",
+   "built": "engine",
+   "tier": "plausible-incomplete",
+   "codes": [
+    "incomplete:conditions-unassessed",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C12",
+   "label": "clear",
+   "built": "engine",
+   "tier": "plausible-incomplete",
+   "codes": [
+    "incomplete:conditions-unassessed",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "C13",
+   "label": "clear",
+   "built": "engine",
+   "tier": "chemically-supported",
+   "codes": [
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "A01",
+   "label": "ambiguous",
+   "built": "engine",
+   "tier": "known-concern",
+   "codes": [
+    "concern:eas-friedel-crafts-alkylation",
+    "incomplete:conditions-unassessed",
+    "support:selectivity-single-outcome"
+   ],
+   "note": "",
+   "structural": "verified"
+  },
+  {
+   "id": "A02",
+   "label": "ambiguous",
+   "built": "engine",
+   "tier": "known-concern",
+   "codes": [
+    "incomplete:conditions-unassessed",
+    "concern:selectivity-regioisomers"
+   ],
+   "note": "",
+   "structural": "verified"
+  }
+ ]
+}

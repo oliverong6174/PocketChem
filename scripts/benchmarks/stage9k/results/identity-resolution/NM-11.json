@@ -1,0 +1,7 @@
+{
+  "id": "NM-11",
+  "emittedName": "N-ethylpropanamide",
+  "startedUTC": "2026-11-06T20:05:52.331888+00:00",
+  "smiles": "CCC(=O)NCC",
+  "method": "exact frozen accepted name/structure pair"
+}

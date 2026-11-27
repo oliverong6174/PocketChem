@@ -315,6 +315,7 @@ export default function IsolatedKetcherEditor({
       src={frameSrc}
       title={`${debugLabel} molecule editor`}
       scrolling="no"
+      allow="clipboard-read; clipboard-write"
       data-pocketchem-ketcher-frame={frameId}
       onLoad={() => {
         // A load means contentWindow may now point at a fresh document. Do not

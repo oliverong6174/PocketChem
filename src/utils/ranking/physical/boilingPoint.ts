@@ -3,6 +3,7 @@ import type { FunctionalGroupResult } from "../../functionalGroups/types";
 import { getLongestCarbonPath } from "../../nomenclature/graph/parentSelection";
 import { parseMolBlock } from "../../nomenclature/molParser";
 import type { PropertyTendencyLevel } from "../../nomenclature/types";
+import { estimateJobackBoilingPoint } from "./jobackBoilingPoint";
 import {
   countCarboxylicAcidGroups,
   estimateBoilingPointTendency,
@@ -21,7 +22,42 @@ export type BoilingPointRankingResult = {
   branchingEstimate: number;
   factors: string[];
   explanation: string;
+  /** Joback-Reid group-contribution estimate in kelvin, or null when the method cannot parameterise the structure. */
+  jobackBoilingPointK: number | null;
+  jobackUnavailableReason: string | null;
+  /** Number of cis (Z) 1,2-dialkyl C=C bonds: the dipole they keep raises the boiling point slightly relative to trans. */
+  cisAlkeneCount: number;
 };
+
+export function countCisDialkylAlkenes(
+  mol: { get_stereo_tags?: () => string },
+  parsedMol: ReturnType<typeof parseMolBlock>
+): number {
+  let document: { CIP_bonds?: unknown } | null;
+  try {
+    document = JSON.parse(mol.get_stereo_tags?.() ?? "");
+  } catch {
+    return 0;
+  }
+  if (!document || !Array.isArray(document.CIP_bonds)) return 0;
+  const isAlkylSubstituted = (atomIndex: number, partner: number) => {
+    const others = (parsedMol.adjacency.get(atomIndex) ?? [])
+      .map((bond) => (bond.atomA === atomIndex ? bond.atomB : bond.atomA))
+      .filter((index) => index !== partner);
+    return (
+      others.length === 1 &&
+      parsedMol.atoms.find((atom) => atom.atomIndex === others[0])?.element === "C"
+    );
+  };
+  let count = 0;
+  for (const entry of document.CIP_bonds) {
+    if (!Array.isArray(entry) || String(entry[2]).replace(/[()]/g, "") !== "Z") continue;
+    if (isAlkylSubstituted(Number(entry[0]), Number(entry[1])) && isAlkylSubstituted(Number(entry[1]), Number(entry[0]))) {
+      count += 1;
+    }
+  }
+  return count;
+}
 
 function getAdjustedHydrogenBondAcceptors(
   parsedMol: ReturnType<typeof parseMolBlock>,
@@ -100,7 +136,16 @@ export async function analyzeBoilingPointRanking(
       carbonCount - longestCarbonPath.length
     );
 
+    const joback = estimateJobackBoilingPoint(
+      RDKit as never,
+      mol as never,
+      parsedMol.atoms.filter((atom) => atom.element !== "H").length
+    );
+
     return {
+      jobackBoilingPointK: joback.ok ? joback.boilingPointK : null,
+      jobackUnavailableReason: joback.ok ? null : joback.reason,
+      cisAlkeneCount: countCisDialkylAlkenes(mol as never, parsedMol),
       boilingPointScore: tendency.score,
       tendency: tendency.level,
       molecularWeight,

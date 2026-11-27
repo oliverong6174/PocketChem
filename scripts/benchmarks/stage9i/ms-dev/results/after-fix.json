@@ -1,0 +1,473 @@
+{
+ "summary": {
+  "label": "after-fix",
+  "cases": 15,
+  "molecularIon": "6/6",
+  "basePeak": "4/15",
+  "strictFragments": "3/15",
+  "basePeakWhenCommitted": "0/0",
+  "uncertain": 15,
+  "uncertainButCandidateSetHit": 0
+ },
+ "records": [
+  {
+   "id": "MD-01",
+   "category": "alkyl halide",
+   "title": "1-bromooctane",
+   "expectedBasePeak": 57,
+   "engineBasePeak": 192,
+   "basePeakCertainty": "unreliable",
+   "candidateBasePeaks": null,
+   "top": [
+    "192:100",
+    "194:98",
+    "113:79",
+    "29:61"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "192.051 vs 57"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41 (3/4 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":3}"
+    }
+   }
+  },
+  {
+   "id": "MD-02",
+   "category": "alkyl halide",
+   "title": "1-bromopentane",
+   "expectedBasePeak": 43,
+   "engineBasePeak": 150,
+   "basePeakCertainty": "unreliable",
+   "candidateBasePeaks": null,
+   "top": [
+    "150:100",
+    "152:97",
+    "71:79",
+    "29:61"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "150.004 vs 43"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41, 42, 55 (1/4 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":1}"
+    }
+   }
+  },
+  {
+   "id": "MD-03",
+   "category": "alkyl halide",
+   "title": "1-iodobutane",
+   "expectedBasePeak": 57,
+   "engineBasePeak": 184,
+   "basePeakCertainty": "unreliable",
+   "candidateBasePeaks": null,
+   "top": [
+    "184:100",
+    "57:37",
+    "29:29",
+    "43:29"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "183.975 vs 57"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41 (1/2 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":2,\"present\":1}"
+    }
+   }
+  },
+  {
+   "id": "MD-04",
+   "category": "alcohol",
+   "title": "1-octanol",
+   "expectedBasePeak": 56,
+   "engineBasePeak": 31,
+   "basePeakCertainty": "unreliable",
+   "candidateBasePeaks": null,
+   "top": [
+    "31:100",
+    "112:35",
+    "17:33",
+    "113:22"
+   ],
+   "dimensions": {
+    "basePeak": {
+     "status": "wrong",
+     "detail": "31 vs 56"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41, 55, 70 (1/4 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":1}"
+    }
+   }
+  },
+  {
+   "id": "MD-05",
+   "category": "alcohol",
+   "title": "2-methyl-2-pentanol",
+   "expectedBasePeak": 59,
+   "engineBasePeak": 87,
+   "basePeakCertainty": "unreliable",
+   "candidateBasePeaks": null,
+   "top": [
+    "87:100",
+    "59:85",
+    "85:44",
+    "17:28"
+   ],
+   "dimensions": {
+    "basePeak": {
+     "status": "wrong",
+     "detail": "87 vs 59"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41, 45 (2/4 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":2}"
+    }
+   }
+  },
+  {
+   "id": "MD-06",
+   "category": "alkyl halide",
+   "title": "3-chloropentane",
+   "expectedBasePeak": 41,
+   "engineBasePeak": 77,
+   "basePeakCertainty": "unreliable",
+   "candidateBasePeaks": null,
+   "top": [
+    "77:100",
+    "71:64",
+    "29:58",
+    "91:44"
+   ],
+   "dimensions": {
+    "basePeak": {
+     "status": "wrong",
+     "detail": "77 vs 41"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 27, 43, 70 (1/4 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":1}"
+    }
+   }
+  },
+  {
+   "id": "MD-07",
+   "category": "alcohol",
+   "title": "3-pentanol",
+   "expectedBasePeak": 59,
+   "engineBasePeak": 59,
+   "basePeakCertainty": "unreliable",
+   "candidateBasePeaks": null,
+   "top": [
+    "59:100",
+    "71:26",
+    "17:23",
+    "70:21"
+   ],
+   "dimensions": {
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 31, 41 (0/2 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":2,\"present\":0}"
+    }
+   }
+  },
+  {
+   "id": "MD-08",
+   "category": "acid",
+   "title": "butanoic acid",
+   "expectedBasePeak": 60,
+   "engineBasePeak": 71,
+   "basePeakCertainty": "heuristic",
+   "candidateBasePeaks": null,
+   "top": [
+    "71:100",
+    "45:84",
+    "60:71",
+    "17:29"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "71 vs 60"
+    },
+    "fragments": {
+     "status": "correct",
+     "detail": "1/1"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":1,\"present\":1}"
+    }
+   }
+  },
+  {
+   "id": "MD-09",
+   "category": "ester",
+   "title": "butyl acetate",
+   "expectedBasePeak": 43,
+   "engineBasePeak": 43,
+   "basePeakCertainty": "supported",
+   "candidateBasePeaks": null,
+   "top": [
+    "43:100",
+    "101:49",
+    "57:39",
+    "73:35"
+   ],
+   "dimensions": {
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 56 (0/1 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":1,\"present\":0}"
+    }
+   }
+  },
+  {
+   "id": "MD-10",
+   "category": "ether",
+   "title": "dibutyl ether",
+   "expectedBasePeak": 57,
+   "engineBasePeak": 87,
+   "basePeakCertainty": "unreliable",
+   "candidateBasePeaks": null,
+   "top": [
+    "87:100",
+    "73:97",
+    "57:64",
+    "29:25"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "87 vs 57"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41 (0/1 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":1,\"present\":0}"
+    }
+   }
+  },
+  {
+   "id": "MD-11",
+   "category": "aldehyde",
+   "title": "heptanal",
+   "expectedBasePeak": 70,
+   "engineBasePeak": 44,
+   "basePeakCertainty": "heuristic",
+   "candidateBasePeaks": null,
+   "top": [
+    "44:100",
+    "29:77",
+    "43:69",
+    "114:62"
+   ],
+   "dimensions": {
+    "molecularIon": {
+     "status": "correct",
+     "detail": ""
+    },
+    "basePeak": {
+     "status": "wrong",
+     "detail": "44 vs 70"
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41, 55 (2/4 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":2}"
+    }
+   }
+  },
+  {
+   "id": "MD-12",
+   "category": "nitrile",
+   "title": "hexanenitrile",
+   "expectedBasePeak": 41,
+   "engineBasePeak": 41,
+   "basePeakCertainty": "heuristic",
+   "candidateBasePeaks": null,
+   "top": [
+    "41:100",
+    "97:40",
+    "26:37",
+    "40:35"
+   ],
+   "dimensions": {
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 27, 55 (2/4 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":2}"
+    }
+   }
+  },
+  {
+   "id": "MD-13",
+   "category": "acid",
+   "title": "hexanoic acid",
+   "expectedBasePeak": 60,
+   "engineBasePeak": 99,
+   "basePeakCertainty": "heuristic",
+   "candidateBasePeaks": null,
+   "top": [
+    "99:100",
+    "45:84",
+    "60:71",
+    "17:29"
+   ],
+   "dimensions": {
+    "basePeak": {
+     "status": "wrong",
+     "detail": "99 vs 60"
+    },
+    "fragments": {
+     "status": "correct",
+     "detail": "1/1"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":1,\"present\":1}"
+    }
+   }
+  },
+  {
+   "id": "MD-14",
+   "category": "ester",
+   "title": "methyl hexanoate",
+   "expectedBasePeak": 74,
+   "engineBasePeak": 99,
+   "basePeakCertainty": "heuristic",
+   "candidateBasePeaks": null,
+   "top": [
+    "99:100",
+    "59:55",
+    "74:46",
+    "31:19"
+   ],
+   "dimensions": {
+    "basePeak": {
+     "status": "wrong",
+     "detail": "99 vs 74"
+    },
+    "fragments": {
+     "status": "correct",
+     "detail": "4/4"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":4,\"present\":4}"
+    }
+   }
+  },
+  {
+   "id": "MD-15",
+   "category": "ether",
+   "title": "methyl tert-butyl ether",
+   "expectedBasePeak": 73,
+   "engineBasePeak": 73,
+   "basePeakCertainty": "unreliable",
+   "candidateBasePeaks": null,
+   "top": [
+    "73:100",
+    "57:33",
+    "31:21",
+    "15:14"
+   ],
+   "dimensions": {
+    "basePeak": {
+     "status": "correct",
+     "detail": ""
+    },
+    "fragments": {
+     "status": "wrong",
+     "detail": "missing m/z 41 (1/2 present)"
+    },
+    "fragmentRecall": {
+     "status": "count",
+     "detail": "{\"listed\":2,\"present\":1}"
+    }
+   }
+  }
+ ]
+}

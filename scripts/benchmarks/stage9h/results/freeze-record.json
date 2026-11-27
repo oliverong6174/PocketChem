@@ -1,0 +1,6 @@
+{
+ "freezeCommit": "b31356c933cb09129fd69abe832c07ccf81f572e",
+ "recordedAt": "2026-11-04T23:21:01.759Z",
+ "note": "Frozen artifacts (cases, snapshots, scoring, protocol, manifest) were committed at freezeCommit. The engine had not been run on any frozen case at that time.",
+ "engineSrcTree": "767acf31bf8b20bd1b3ae26b8e301fa5d8e55e28"
+}

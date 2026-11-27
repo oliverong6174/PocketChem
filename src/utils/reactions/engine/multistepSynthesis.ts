@@ -15,6 +15,16 @@ import {
 } from "./reactionInput";
 import { predictReactionPathwaysFromRules } from "./reactionEngine";
 import { predictRetrosynthesisPathwaysFromRules } from "./retroSynthesis";
+import { verifyMultistepRoute } from "./routeVerification";
+import { assessRouteSelectivity } from "./selectivityAssessment";
+import { assessRouteQuality } from "./routeQuality";
+import {
+  assessRouteCompatibility,
+  assessStepCompatibility,
+  compatibilityAdjustedLength,
+  compatibilityPenalty,
+} from "./compatibility";
+import { searchConvergentRoutesCore, type ConvergentSearchResult } from "./convergentSearch";
 import {
   canonicalizeStereoStructure,
   compareStereoStructureKeys,
@@ -66,6 +76,38 @@ type SearchNode = {
 
 type ProgressCallback = (progress: MultistepSynthesisProgress) => void;
 
+const rulesByIdCache = new WeakMap<ReactionRule[], Map<string, ReactionRule>>();
+
+/**
+ * Attaches advisory compatibility findings to a freshly built step and returns the planning
+ * cost they add (0 for rules without condition metadata). The cost only orders candidates;
+ * it never removes one, and structural verification is untouched.
+ */
+async function attachStepCompatibility(step: SynthesisStep, rules: ReactionRule[]): Promise<number> {
+  let byId = rulesByIdCache.get(rules);
+  if (!byId) {
+    byId = new Map(rules.map((rule) => [rule.id, rule]));
+    rulesByIdCache.set(rules, byId);
+  }
+  const found = await assessStepCompatibility(byId.get(step.ruleId), step.reactantComponents, step.productComponents);
+  if (found && found.length > 0) step.compatibility = found;
+  return compatibilityPenalty(found ?? undefined);
+}
+
+/** Parent expansions the multi-start forward lane may spend before the other lanes run. */
+const FORWARD_LANE_PARENT_BUDGET_NORMAL = 30;
+/** Extra bridge expansions allowed after the first acceptable route, to let a shorter one win. */
+const BRIDGE_GRACE_EXPANSIONS = 6;
+/** Extra expansions spent looking for a constraint-free route when the first one is flagged. */
+const BRIDGE_COMPAT_EXTRA_EXPANSIONS = 24;
+
+function routeHasModelConstraint(route: MultistepSynthesisRoute | undefined): boolean {
+  return Boolean(
+    route?.steps.some((step) => step.compatibility?.some((item) => item.severity === "model-constraint")),
+  );
+}
+const FORWARD_LANE_PARENT_BUDGET_DEEP = 50;
+
 function frontierDiagnosticFields(
   nodes: SearchNode[],
   targetCanonical: string,
@@ -76,6 +118,7 @@ function frontierDiagnosticFields(
   | "exactTargetCount"
   | "targetMixtureMemberCount"
   | "fullyConsumedStartingMaterialCount"
+  | "frontierRuleSummary"
 > {
   const ranked = [...nodes].sort(
     (a, b) =>
@@ -437,7 +480,7 @@ async function matchStartingMaterialSideReactants(
   return allocated;
 }
 
-function forwardStepFromPathway(pathway: ReactionPathway): SynthesisStep | null {
+export function forwardStepFromPathway(pathway: ReactionPathway): SynthesisStep | null {
   if (!pathway.productSmiles) return null;
 
   return {
@@ -688,6 +731,13 @@ function cachedRetroPredictions(
   return pending;
 }
 
+/**
+ * Most outcomes of one rule kept when the branch limit forces a cut. A rule can legitimately return several unranked
+ * outcomes (ortho and para products, Zaitsev and Hofmann alkenes, direct and rearranged products); they are alternatives
+ * of equal standing, so dropping all but one by input order would hide whichever the search needed.
+ */
+const MAX_SIBLING_OUTCOMES = 4;
+
 function diversePathwaySample<
   T extends { family: string; planningCost: number; ruleId: string },
 >(pathways: T[], limit: number): T[] {
@@ -699,28 +749,74 @@ function diversePathwaySample<
       a.ruleId.localeCompare(b.ruleId),
   );
 
+  // The limit counts distinct RULES, not pathways. Broad-family diversity was too coarse: dozens of unrelated alkene
+  // reactions share family="alkenes", so an essential reaction such as Br2 addition could disappear before synthesis even
+  // began. Every selected rule then keeps up to MAX_SIBLING_OUTCOMES of its own outcomes.
+  const byRule = new Map<string, T[]>();
+  for (const pathway of ranked) {
+    const group = byRule.get(pathway.ruleId);
+    if (group) group.push(pathway);
+    else byRule.set(pathway.ruleId, [pathway]);
+  }
+
+  const chosenRules = [...byRule.values()].slice(0, Math.max(0, limit));
+  // Best outcome of every chosen rule first, then second outcomes, and so on, so a later cut never favours one rule.
   const selected: T[] = [];
-  const selectedIndices = new Set<number>();
-  const seenRules = new Set<string>();
+  for (let round = 0; round < MAX_SIBLING_OUTCOMES; round += 1) {
+    for (const group of chosenRules) {
+      if (group[round]) selected.push(group[round]);
+    }
+  }
 
-  // Preserve one representative from every distinct reaction rule before
-  // allowing a rule that generated multiple regio-/stereoisomers to occupy
-  // another slot. Broad-family diversity was too coarse: dozens of unrelated
-  // alkene reactions all share family="alkenes", so an essential reaction
-  // such as Br2 addition could disappear before synthesis even began.
-  ranked.forEach((pathway, index) => {
-    if (selected.length >= limit || seenRules.has(pathway.ruleId)) return;
-    seenRules.add(pathway.ruleId);
-    selected.push(pathway);
-    selectedIndices.add(index);
-  });
-
-  for (let index = 0; index < ranked.length && selected.length < limit; index += 1) {
-    if (selectedIndices.has(index)) continue;
-    selected.push(ranked[index]);
+  // Unused slots (fewer rules than the limit) are not left empty: remaining outcomes fill them in rank order.
+  if (selected.length < limit) {
+    const have = new Set(selected);
+    for (const pathway of ranked) {
+      if (selected.length >= limit) break;
+      if (!have.has(pathway)) selected.push(pathway);
+    }
   }
 
   return selected;
+}
+
+/**
+ * Branch-limit sampling that never discards a pathway reaching the other search front.
+ *
+ * `diversePathwaySample` breaks cost ties by rule id, and most rules share the default
+ * planning cost, so with more pathways than `limit` the cut fell alphabetically: from ethanol,
+ * `primary-alcohol-mild-oxidation` (a one-step route to the target) sorted after ten `alcohol-*`
+ * rules and was dropped before it could meet the goal. A pathway one of whose structures is
+ * already known on the opposite frontier (`goalKeys`, canonical isomeric SMILES) is kept first;
+ * the remaining slots are sampled as before.
+ */
+async function samplePathwaysKeepingGoalReaching<
+  T extends { family: string; planningCost: number; ruleId: string },
+>(
+  pathways: T[],
+  limit: number,
+  structuresOf: (pathway: T) => string[],
+  goalKeys: Set<string>,
+): Promise<T[]> {
+  if (pathways.length <= limit || goalKeys.size === 0) return diversePathwaySample(pathways, limit);
+
+  const reaching: T[] = [];
+  const rest: T[] = [];
+  for (const pathway of pathways) {
+    let reachesGoal = false;
+    for (const component of structuresOf(pathway)) {
+      const structure = await canonicalizeSmiles(component);
+      if (structure && goalKeys.has(structure.isomeric)) {
+        reachesGoal = true;
+        break;
+      }
+    }
+    (reachesGoal ? reaching : rest).push(pathway);
+  }
+  if (reaching.length === 0) return diversePathwaySample(pathways, limit);
+
+  const kept = diversePathwaySample(reaching, limit);
+  return [...kept, ...diversePathwaySample(rest, Math.max(0, limit - kept.length))];
 }
 
 async function expandForwardLayer(
@@ -790,7 +886,13 @@ async function expandForwardLayer(
       }
       if (!(await yieldToBrowser(signal))) return [];
 
-      for (const pathway of diversePathwaySample(pathways, branchLimit)) {
+      const sampledPathways = await samplePathwaysKeepingGoalReaching(
+        pathways,
+        branchLimit,
+        (pathway) => splitReactionComponents(pathway.productSmiles ?? ""),
+        preferredKeys,
+      );
+      for (const pathway of sampledPathways) {
         // A combined input is useful only when the chosen reaction actually
         // consumes both structures. This prevents a second disconnected
         // starting material from merely generating unrelated single-substrate
@@ -809,6 +911,7 @@ async function expandForwardLayer(
 
         const step = forwardStepFromPathway(pathway);
         if (!step || pathway.productStatus === "concept-only") continue;
+        const compatibilityCost = await attachStepCompatibility(step, rules);
         if (!allowGeneric && isGenericReactionSmiles(step.productSmiles)) continue;
 
         const productComponents = step.productComponents;
@@ -876,6 +979,7 @@ async function expandForwardLayer(
             parent.pathCost +
             pathway.planningCost +
             stereoControlPenalty +
+            compatibilityCost +
             representationPenalty +
             componentMixturePenalty +
             stereochemicalMixturePenalty +
@@ -975,9 +1079,16 @@ async function expandRetroLayer(
     }
     if (!(await yieldToBrowser(signal))) return [];
 
-    for (const pathway of diversePathwaySample(pathways, branchLimit)) {
+    const sampledPathways = await samplePathwaysKeepingGoalReaching(
+      pathways,
+      branchLimit,
+      (pathway) => pathway.precursorComponents,
+      preferredKeys,
+    );
+    for (const pathway of sampledPathways) {
       const step = retroStepFromPathway(pathway);
       if (!allowGeneric && isGenericReactionSmiles(step.reactantSmiles)) continue;
+      const compatibilityCost = await attachStepCompatibility(step, rules);
 
       for (let index = 0; index < pathway.precursorComponents.length; index += 1) {
         if (searchCancelled(signal)) return [];
@@ -1010,6 +1121,7 @@ async function expandRetroLayer(
           parent.pathCost +
           pathway.planningCost +
           retrosynthesisTierPenalty(pathway.retrosynthesisTier) +
+          compatibilityCost +
           confidencePenalty +
           multiReactantPenalty +
           continuationPenalty +
@@ -1178,7 +1290,7 @@ function balancedSplits(totalDepth: number): Array<[number, number]> {
  * disconnection before returning it. Carbon-bearing side precursors in a
  * retrosynthetic disconnection must match one of the supplied starting materials.
  */
-export async function findMultistepSynthesisRoutesFromRules(
+async function searchMultistepRoutes(
   startingSmiles: string,
   targetSmiles: string,
   rules: ReactionRule[],
@@ -1279,7 +1391,8 @@ export async function findMultistepSynthesisRoutesFromRules(
         planningSignatureDistance(startingPlanningSignatures[index] ?? null, targetPlanningSignature) *
         PLANNING_HEURISTIC_SCALE;
       return {
-        smiles: material.smiles,
+        // The canonical spelling roots the search so that equivalent inputs explore alike.
+        smiles: material.canonical,
         canonical: material.canonical,
         connectivity: material.connectivity,
         hasSpecifiedStereo: material.hasSpecifiedStereo,
@@ -1298,7 +1411,7 @@ export async function findMultistepSynthesisRoutesFromRules(
   const retroLayers: SearchNode[][] = [
     [
       {
-        smiles: normalizedTarget,
+        smiles: targetCanonical,
         canonical: targetCanonical,
         connectivity: targetStructure.connectivity,
         hasSpecifiedStereo: targetStructure.hasSpecifiedStereo,
@@ -1392,7 +1505,7 @@ export async function findMultistepSynthesisRoutesFromRules(
     // Once routes are in the same selectivity/stereochemical class, prefer the
     // shorter synthesis, then use the detailed planning score as a tie-break.
     return (
-      a.steps.length - b.steps.length ||
+      compatibilityAdjustedLength(a.steps) - compatibilityAdjustedLength(b.steps) ||
       a.score - b.score ||
       a.id.localeCompare(b.id)
     );
@@ -1701,9 +1814,17 @@ export async function findMultistepSynthesisRoutesFromRules(
       usedStartingMaterialIndices: [...node.usedStartingMaterialIndices],
     }));
     let firstStereoFallbackDepth: number | null = null;
+    // The lane is breadth-first, so each extra layer multiplies its cost. Bound it by the
+    // number of parent expansions (deterministic work, not wall clock) so that the
+    // goal-directed retrosynthesis and bridge lanes that follow always get to run; with
+    // several supplied materials the lane used to exhaust the whole interactive deadline
+    // at forward depth 3-4 and never reach them.
+    let laneParentsLeft = searchEffort === "deep" ? FORWARD_LANE_PARENT_BUDGET_DEEP : FORWARD_LANE_PARENT_BUDGET_NORMAL;
 
     for (let depth = 1; depth <= laneMaxDepth; depth += 1) {
-      if (searchCancelled(signal) || frontier.length === 0) return [];
+      if (searchCancelled(signal) || frontier.length === 0 || laneParentsLeft <= 0) return [];
+      if (frontier.length > laneParentsLeft) frontier = frontier.slice(0, laneParentsLeft);
+      laneParentsLeft -= frontier.length;
 
       onProgress?.({
         phase: "forward",
@@ -1821,7 +1942,14 @@ export async function findMultistepSynthesisRoutesFromRules(
 
   async function runBestFirstBridge(): Promise<MultistepSynthesisRoute[]> {
     const maxExpansions = searchEffort === "deep" ? 96 : 40;
-    const fastBeamWidth = Math.min(beamWidth, searchEffort === "deep" ? 10 : 6);
+    // Children of ONE parent enter an ordered open list, so this cap only
+    // decides which siblings are ever considered. It must not be smaller than
+    // the number of distinct products a common substrate yields: acetone has
+    // seven, and a cap of 6 silently discarded the worst-ranked sibling
+    // (Baeyer-Villiger, one step from a valid ester-reduction route to ethanol)
+    // before it could be expanded. Normal and deep share the same cap; deep
+    // still differs by its larger branch limit, expansion budget and beams.
+    const fastBeamWidth = Math.min(beamWidth, 10);
     const fastBranchLimit = Math.min(branchLimit, searchEffort === "deep" ? 18 : 10);
 
     // Continue from the deepest non-empty forward layer already discovered by
@@ -1855,12 +1983,30 @@ export async function findMultistepSynthesisRoutesFromRules(
     );
     let expansions = 0;
     let preferForwardOnNearTie = true;
+    // Expansion count at which an acceptable (preferred) route was first found. Every other
+    // lane returns such a route at once; this one used to ignore it and keep expanding until
+    // its whole budget was spent, so a route found early was lost whenever the caller's
+    // deadline arrived first. A short grace window still lets a shorter route displace it.
+    let acceptedAt: number | null = null;
+    // A route whose steps carry a deterministic compatibility constraint (see
+    // compatibility.ts) is accepted only provisionally: the bridge keeps looking for a clean
+    // alternative for a bounded number of extra expansions, then returns the best it has.
+    let cleanAt: number | null = null;
+    const noteAccepted = (accepted: MultistepSynthesisRoute[] | null) => {
+      if (!accepted) return;
+      if (acceptedAt === null) acceptedAt = expansions;
+      if (cleanAt === null && !routeHasModelConstraint(accepted[0])) cleanAt = expansions;
+    };
 
     const sortOpen = (nodes: SearchNode[]) =>
       nodes.sort((a, b) => a.rank - b.rank || a.depth - b.depth || a.canonical.localeCompare(b.canonical));
 
     while (
       expansions < maxExpansions &&
+      (acceptedAt === null ||
+        (cleanAt !== null
+          ? expansions < cleanAt + BRIDGE_GRACE_EXPANSIONS
+          : expansions < acceptedAt + BRIDGE_COMPAT_EXTRA_EXPANSIONS)) &&
       (forwardOpen.length > 0 || retroOpen.length > 0)
     ) {
       if (!(await yieldToBrowser(signal))) return [];
@@ -1951,7 +2097,7 @@ export async function findMultistepSynthesisRoutesFromRules(
             normalizedTarget,
             maxRoutes,
           );
-          preferredDiscoveredRoutes(routes);
+          noteAccepted(preferredDiscoveredRoutes(routes));
         }
       } else {
         const parent = retroOpen.shift()!;
@@ -2017,7 +2163,7 @@ export async function findMultistepSynthesisRoutesFromRules(
             normalizedTarget,
             maxRoutes,
           );
-          preferredDiscoveredRoutes(routes);
+          noteAccepted(preferredDiscoveredRoutes(routes));
         }
       }
     }
@@ -2248,4 +2394,155 @@ export async function findMultistepSynthesisRoutesFromRules(
   }
 
   return selectivityFallbackRoutes;
+}
+
+/**
+ * Runs only the forward convergent lane (see convergentSearch.ts) and returns
+ * its routes with search statistics. Every returned route has been replayed
+ * against the supplied inventory; nothing unverified is returned.
+ */
+export function findConvergentSynthesisRoutes(
+  startingSmiles: string,
+  targetSmiles: string,
+  rules: ReactionRule[],
+  options: MultistepSynthesisSearchOptions = {},
+  onProgress?: ProgressCallback,
+): Promise<ConvergentSearchResult> {
+  const convergent = typeof options.convergentSearch === "object" ? options.convergentSearch : {};
+  return searchConvergentRoutesCore({
+    startingSmiles,
+    targetSmiles,
+    rules,
+    options: { maxRoutes: options.maxRoutes, ...convergent },
+    stepFromPathway: forwardStepFromPathway,
+    signal: options.signal,
+    onProgress,
+    onRouteFound: options.onRouteFound,
+  });
+}
+
+/**
+ * Plans routes, then replays every returned route end to end from the supplied
+ * starting materials (see routeVerification.ts) and attaches the result. The
+ * replay never drops a route: a route whose replay could not be confirmed is
+ * still returned, labelled by its `verification`, so a planner or replay
+ * limitation cannot silently hide a route the user could still inspect.
+ */
+export async function findMultistepSynthesisRoutesFromRules(
+  startingSmiles: string,
+  targetSmiles: string,
+  rules: ReactionRule[],
+  options: MultistepSynthesisSearchOptions = {},
+  onProgress?: ProgressCallback,
+): Promise<MultistepSynthesisRoute[]> {
+  // Opt-in convergent lane. Its routes are already replayed against the supplied
+  // inventory, so they are returned as they are; anything else falls through to
+  // the unchanged linear search below.
+  if (options.convergentSearch) {
+    const convergent = await findConvergentSynthesisRoutes(
+      startingSmiles,
+      targetSmiles,
+      rules,
+      options,
+      onProgress,
+    );
+    if (convergent.routes.length > 0 || searchCancelled(options.signal)) return convergent.routes;
+  }
+
+  // Inventory chosen for the convergent lane also applies to the replay of linear routes.
+  const copies =
+    typeof options.convergentSearch === "object" ? options.convergentSearch.startingMaterialCopies : undefined;
+  return searchLinearSynthesisRoutes(startingSmiles, targetSmiles, rules, options, onProgress, copies);
+}
+
+/** Test seams for the linear lane; production callers never pass these. */
+export type LinearSearchHooks = {
+  plan?: typeof searchMultistepRoutes;
+  verify?: typeof verifyMultistepRoute;
+};
+
+/** Widest candidate list the resume pass asks the planner for. */
+const RESUME_MAX_ROUTES = 10;
+
+/**
+ * The linear lane on its own: plan, then replay every returned route end to end
+ * against the supplied inventory (see findMultistepSynthesisRoutesFromRules).
+ * `options.convergentSearch` is ignored here; the caller states the replay
+ * inventory explicitly through `startingMaterialCopies` (absent means one copy of
+ * each material). Reusable entry point for the adaptive scheduler.
+ *
+ * The first-verified-route planner stops at its first candidate set, so a set whose every
+ * route fails replay used to end the search with nothing even when other routes existed.
+ * In that case, and only then, the planner is run once more as an exhaustive
+ * shortest-first sweep that asks for more candidates (same abort signal, so the caller's
+ * deadline still applies); routes already replayed are not replayed again.
+ */
+export async function searchLinearSynthesisRoutes(
+  startingSmiles: string,
+  targetSmiles: string,
+  rules: ReactionRule[],
+  options: MultistepSynthesisSearchOptions = {},
+  onProgress?: ProgressCallback,
+  startingMaterialCopies?: number | number[],
+  hooks: LinearSearchHooks = {},
+): Promise<MultistepSynthesisRoute[]> {
+  const plan = hooks.plan ?? searchMultistepRoutes;
+  const verify = hooks.verify ?? verifyMultistepRoute;
+  const copies = startingMaterialCopies;
+
+  const replayAll = async (candidates: MultistepSynthesisRoute[]): Promise<MultistepSynthesisRoute[]> => {
+    const replayedRoutes: MultistepSynthesisRoute[] = [];
+    for (const route of candidates) {
+      try {
+        const replayed = {
+          ...route,
+          verification: await verify(
+            route,
+            rules,
+            copies === undefined ? undefined : { startingMaterialCopies: copies },
+          ),
+        };
+        replayed.compatibility = await assessRouteCompatibility(replayed, rules);
+        replayed.selectivity = await assessRouteSelectivity(replayed, rules);
+        replayed.quality = await assessRouteQuality(replayed, rules);
+        replayedRoutes.push(replayed);
+        if (replayed.verification.status !== "failed") {
+          try {
+            options.onRouteFound?.(replayed);
+          } catch (callbackError) {
+            console.error("[PocketChem:Synthesis] onRouteFound callback failed; continuing.", callbackError);
+          }
+        }
+      } catch (error) {
+        console.error("[PocketChem:Synthesis] Route replay failed; returning the route unverified.", error);
+        replayedRoutes.push(route);
+      }
+    }
+    return replayedRoutes;
+  };
+
+  const routes = await plan(startingSmiles, targetSmiles, rules, options, onProgress);
+  if (searchCancelled(options.signal)) return routes;
+
+  const verified = await replayAll(routes);
+
+  const everyCandidateFailed =
+    verified.length > 0 && verified.every((route) => route.verification?.status === "failed");
+  if (everyCandidateFailed && !searchCancelled(options.signal)) {
+    const tried = new Set(verified.map((route) => route.id));
+    const widened = await plan(
+      startingSmiles,
+      targetSmiles,
+      rules,
+      {
+        ...options,
+        preferFirstVerifiedRoute: false,
+        maxRoutes: Math.min(RESUME_MAX_ROUTES, Math.max(5, (options.maxRoutes ?? 1) * 5)),
+      },
+      onProgress,
+    );
+    if (searchCancelled(options.signal)) return verified;
+    verified.push(...(await replayAll(widened.filter((route) => !tried.has(route.id)))));
+  }
+  return verified;
 }

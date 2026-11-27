@@ -36,6 +36,8 @@ export {
   splitReactionComponents,
   getSequentialConditionOptions,
   runSequentialSynthesis,
+  runSequentialSynthesisDetailed,
+  verifyMultistepRoute,
   predictNoReactionOutcomes,
 } from "./reactions";
 
@@ -44,6 +46,7 @@ export { runMechanisticStereoRegressionSuite } from "./stereochemistry/regressio
 export type {
   ReactionComponent,
   ReactionDisplayMetadata,
+  ReactionEngineIssue,
   ReactionPathway,
   ReactionProductMixture,
   ReactionProductMixtureKind,
@@ -62,6 +65,15 @@ export type {
   SynthesisStepSource,
   SequentialConditionOption,
   SequentialSynthesisBranch,
+  RouteMatchLevel,
+  RouteStepReactantCheck,
+  RouteStepVerification,
+  RouteVerification,
+  RouteVerificationStatus,
+  SequentialBranchExclusion,
+  SequentialBranchRanking,
+  SequentialStepMixture,
+  SequentialSynthesisReport,
   SequentialSynthesisOptions,
   SequentialSynthesisStep,
   NoReactionOutcome,
@@ -98,6 +110,82 @@ function definedAlkeneGeometries(mol: any): Array<"E" | "Z"> {
   } catch {
     return [];
   }
+}
+
+/**
+ * Does the chemistry determine the relative configuration of a stereospecific addition across a C=C?
+ * Only if the alkene's geometry is defined (E or Z) or the alkene is in a 5-7 membered ring (which can only
+ * be cis). With an undefined acyclic geometry the relative configuration is genuinely unknown, so no
+ * representative may be chosen: it would be an arbitrary diastereomer presented as the product.
+ */
+function alkeneGeometryDetermined(rdkit: any, rawGetMol: RawGetMol, reactants: readonly string[]): boolean {
+  for (const smiles of reactants) {
+    const mol = rawGetMol(smiles) as any;
+    if (!mol) continue;
+    try {
+      // Stage 9E: a drawn E/Z geometry is usable only where the engine's geometry-conditional templates exist, i.e. for
+      // 1,2-disubstituted (H1=H1) acyclic alkenes. For tri- and tetrasubstituted alkenes the templates cannot see the
+      // geometry, and completing the product here would give (E) and (Z) the same diastereomer, wrong for one of them.
+      if (definedAlkeneGeometries(mol).length > 0) {
+        const disubstituted = rdkit.get_qmol?.("[C;H1]=[C;H1]");
+        if (disubstituted) {
+          try {
+            if (mol.get_substruct_match?.(disubstituted) !== "{}") return true;
+          } finally {
+            disubstituted.delete?.();
+          }
+        }
+      }
+      const query = rdkit.get_qmol?.("[C;r5,r6,r7]=@[C;r5,r6,r7]");
+      if (query) {
+        try {
+          if (mol.get_substruct_match?.(query) !== "{}") return true;
+        } finally {
+          query.delete?.();
+        }
+      }
+    } finally {
+      mol.delete?.();
+    }
+  }
+  return false;
+}
+
+/**
+ * Exactly one aliphatic C=C in the reactants and it is terminal (CH2=C): a stereospecific addition then creates ONE
+ * new stereocentre, so the achiral reaction gives a racemate. Counting "@" in a completed representative is not
+ * reliable (the depiction completer can leave a quaternary centre unmarked), so this is decided from the reactants.
+ */
+function singleNewStereocentreFromTerminalAlkene(rdkit: any, rawGetMol: RawGetMol, reactants: readonly string[]): boolean {
+  let alkenes = 0;
+  let terminal = false;
+  for (const smiles of reactants) {
+    const mol = rawGetMol(smiles) as any;
+    if (!mol) continue;
+    try {
+      for (const [smarts, isTerminalQuery] of [["[C]=[C]", false], ["[CH2]=[C]", true]] as const) {
+        const query = rdkit.get_qmol?.(smarts);
+        if (!query) continue;
+        try {
+          const raw = mol.get_substruct_matches?.(query);
+          const parsed: unknown = raw ? JSON.parse(raw) : [];
+          // RDKit returns an array of matches, or a single {atoms: [...]} object when there is exactly one.
+          const matches: unknown[] = Array.isArray(parsed) ? parsed : parsed && typeof parsed === "object" && "atoms" in parsed ? [parsed] : [];
+          const distinct = new Set(matches.map((match) => {
+            const atoms: number[] = Array.isArray(match) ? match : (match as { atoms?: number[] }).atoms ?? [];
+            return [...atoms].sort((a, b) => a - b).join("-");
+          }));
+          if (isTerminalQuery) terminal = terminal || distinct.size > 0;
+          else alkenes += distinct.size;
+        } finally {
+          query.delete?.();
+        }
+      }
+    } finally {
+      mol.delete?.();
+    }
+  }
+  return alkenes === 1 && terminal;
 }
 
 function hasActivatedAlkeneSubstituent(rdkit: any, rawGetMol: RawGetMol, smiles: string) {
@@ -360,16 +448,36 @@ async function applyMechanisticStereoRuntime(
       (candidate) => /@/.test(candidate),
     );
 
+    // Stage 9D: a stereospecific addition fixes the relative configuration only when the alkene geometry is
+    // known. Otherwise a lone new stereocentre of an achiral reaction is a racemate (both enantiomers are
+    // shown, none preferred), and anything with several unknown centres stays unspecified.
+    const additionDirective =
+      directive.kind === "epoxide-alcohol-opening" ||
+      directive.kind === "syn-vicinal" ||
+      directive.kind === "anti-vicinal";
+    const determined =
+      !additionDirective || alkeneGeometryDetermined(rdkit, rawGetMol, pathway.reactantComponents);
+    let forceRacemic = false;
+    let leftUnspecified = false;
+
     if (
       !candidatesAlreadyHaveStereo &&
-      (directive.kind === "diels-alder" ||
-        directive.kind === "epoxide-alcohol-opening" ||
-        directive.kind === "syn-vicinal" ||
-        directive.kind === "anti-vicinal")
+      (directive.kind === "diels-alder" || additionDirective)
     ) {
       for (const seed of [...candidateSet]) {
         const completed = completeStereoRepresentative(rawGetMol, seed, directive);
         if (!completed) continue;
+        if (!determined) {
+          if (
+            !reactantsHaveSpecifiedStereo(pathway.reactantComponents) &&
+            singleNewStereocentreFromTerminalAlkene(rdkit, rawGetMol, pathway.reactantComponents)
+          ) {
+            forceRacemic = true;
+          } else {
+            leftUnspecified = true;
+            continue;
+          }
+        }
         candidateSet.add(completed);
         if (!reactantsHaveSpecifiedStereo(pathway.reactantComponents)) {
           const completedMirror = canonicalize(
@@ -414,11 +522,48 @@ async function applyMechanisticStereoRuntime(
       .filter((candidate) => Math.abs(candidate.score - bestScore) < 1e-9)
       .map((candidate) => candidate.canonical);
 
-    let memberSmiles = pathway.productMixture
+    // Stage 9E: an achiral stereospecific addition to a stereo-free reactant whose relative configuration is
+    // determined (alkene geometry drawn, or a 5-7 membered ring alkene) gives a chiral product as a racemate: neither
+    // enantiotopic face is preferred. The mirror image used to be generated, scored below the drawing
+    // representative, and dropped, leaving one enantiomer presented as the product. A meso product is its own mirror image
+    // and is left alone.
+    if (
+      !forceRacemic &&
+      !pathway.productMixture &&
+      (additionDirective || directive.kind === "diels-alder") &&
+      determined &&
+      !leftUnspecified &&
+      // Only a reactant stereocentre makes the faces diastereotopic; alkene geometry (E/Z) does not.
+      !pathway.reactantComponents.some((component) => component.includes("@")) &&
+      /@/.test(best)
+    ) {
+      const bestMirror = canonicalize(rawGetMol, mirrorTetrahedralSmiles(best));
+      if (bestMirror && bestMirror !== best) forceRacemic = true;
+    }
+    const seedMixture: ReactionPathway["productMixture"] =
+      pathway.productMixture ??
+      (forceRacemic
+        ? {
+            kind: "stereoisomeric",
+            groupId: `${rule.id}::racemic::${canonicalConnectivity(rawGetMol, best) ?? best}`,
+            label: "Stereoisomeric mixture",
+            memberIndex: 0,
+            memberCount: 2,
+            memberSmiles: [],
+            displayName: null,
+          }
+        : null);
+    let memberSmiles = seedMixture
       ? Array.from(new Set(mechanisticMembers))
       : null;
+    if (forceRacemic && seedMixture && memberSmiles) {
+      // Both enantiotopic faces are equally accessible: the product is the racemate, so BOTH enantiomers are
+      // members and neither is preferred (the card still draws one representative).
+      const mirror = canonicalize(rawGetMol, mirrorTetrahedralSmiles(best));
+      memberSmiles = mirror && mirror !== best ? [best, mirror] : memberSmiles;
+    }
 
-    let nextMixture = pathway.productMixture;
+    let nextMixture = seedMixture;
     if (nextMixture && memberSmiles && memberSmiles.length === 2) {
       const [left, right] = await Promise.all(
         memberSmiles.map((smiles) => canonicalizeStereoStructure(smiles)),
@@ -454,12 +599,39 @@ async function applyMechanisticStereoRuntime(
       }
     }
 
+    // Stage 9E: when the alkene geometry is undetermined the engine lists every stereoisomer the mechanism permits.
+    // Choosing one drawing representative must not shrink that set: a mixture label with a single member would present an
+    // arbitrary configuration as the product.
+    if (
+      additionDirective &&
+      !determined &&
+      nextMixture &&
+      pathway.productMixture &&
+      (memberSmiles?.length ?? 0) < pathway.productMixture.memberSmiles.length
+    ) {
+      const original = new Set<string>();
+      for (const member of pathway.productMixture.memberSmiles) {
+        const canonical = canonicalize(rawGetMol, member);
+        if (canonical) original.add(canonical);
+      }
+      if (best) original.add(best);
+      if (original.size > (memberSmiles?.length ?? 0)) memberSmiles = [...original];
+    }
+
     const nextProductLabel = best === pathway.productSmiles
       ? pathway.productLabel
       : await refreshedProductLabel(best, pathway.productLabel);
 
     const nextPathway: ReactionPathway = {
       ...pathway,
+      limitations: leftUnspecified
+        ? [
+            ...pathway.limitations,
+            pathway.reactantComponents.some((component) => component.includes("/") || component.includes(String.fromCharCode(92)))
+              ? "The relative stereochemistry of this stereospecific addition is not assigned: PocketChem derives it from the alkene geometry only for 1,2-disubstituted alkenes drawn as E or Z and for alkenes in 5-7 membered rings. For tri- and tetrasubstituted alkenes, even with a geometry drawn, the product is shown without assigned stereochemistry rather than with an arbitrary diastereomer."
+              : "The relative stereochemistry of this stereospecific addition is not determined because the alkene geometry is not specified (draw the alkene as E or Z, or in a ring). The product is shown without assigned stereochemistry.",
+          ]
+        : pathway.limitations,
       productSmiles: best,
       productLabel: nextProductLabel,
       productMixture:

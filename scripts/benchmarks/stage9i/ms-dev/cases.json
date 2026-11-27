@@ -1,0 +1,472 @@
+{
+ "cases": [
+  {
+   "id": "MD-01",
+   "category": "alkyl halide",
+   "title": "1-bromooctane",
+   "smiles": "CCCCCCCCBr",
+   "formula": "C8H17Br",
+   "source": {
+    "id": "C111831",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111831&Index=0&Type=Mass",
+    "snapshot": "snapshots/1-bromooctane.json",
+    "sha256": "878eb470b79baae50b1f6b115ac9a9d7bf76e059c8b5608b6685211e1c7d0385"
+   },
+   "expected": {
+    "molecular_ion_mz": 192,
+    "molecular_ion_rel": 4.1,
+    "base_peak_mz": 57,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 91
+     },
+     {
+      "mz": 43,
+      "rel": 98
+     },
+     {
+      "mz": 135,
+      "rel": 86
+     },
+     {
+      "mz": 137,
+      "rel": 84
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-02",
+   "category": "alkyl halide",
+   "title": "1-bromopentane",
+   "smiles": "CCCCCBr",
+   "formula": "C5H11Br",
+   "source": {
+    "id": "C110532",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C110532&Index=0&Type=Mass",
+    "snapshot": "snapshots/1-bromopentane.json",
+    "sha256": "01036fde64718b0191887aa3bb9b5527065a24f5d22c14f39093443314a13a59"
+   },
+   "expected": {
+    "molecular_ion_mz": 150,
+    "molecular_ion_rel": 3.5,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 33
+     },
+     {
+      "mz": 42,
+      "rel": 30
+     },
+     {
+      "mz": 55,
+      "rel": 27
+     },
+     {
+      "mz": 71,
+      "rel": 84
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-03",
+   "category": "alkyl halide",
+   "title": "1-iodobutane",
+   "smiles": "CCCCI",
+   "formula": "C4H9I",
+   "source": {
+    "id": "C542698",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C542698&Index=0&Type=Mass",
+    "snapshot": "snapshots/1-iodobutane.json",
+    "sha256": "a1f387b7ef19baa1f7a4f409b8f3a705e41c65afc4f954b6fe05e8ae7189c3be"
+   },
+   "expected": {
+    "molecular_ion_mz": 184,
+    "molecular_ion_rel": 15.1,
+    "base_peak_mz": 57,
+    "key_fragments": [
+     {
+      "mz": 29,
+      "rel": 62
+     },
+     {
+      "mz": 41,
+      "rel": 50
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-04",
+   "category": "alcohol",
+   "title": "1-octanol",
+   "smiles": "CCCCCCCCO",
+   "formula": "C8H18O",
+   "source": {
+    "id": "C111875",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111875&Index=0&Type=Mass",
+    "snapshot": "snapshots/1-octanol.json",
+    "sha256": "98fa68c76c7c09f9358cdb887b178e46373dac6c66affd16d9d62ebb6249ba86"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0,
+    "base_peak_mz": 56,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 81
+     },
+     {
+      "mz": 43,
+      "rel": 75
+     },
+     {
+      "mz": 55,
+      "rel": 88
+     },
+     {
+      "mz": 70,
+      "rel": 61
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-05",
+   "category": "alcohol",
+   "title": "2-methyl-2-pentanol",
+   "smiles": "CCCC(C)(C)O",
+   "formula": "C6H14O",
+   "source": {
+    "id": "C590363",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C590363&Index=0&Type=Mass",
+    "snapshot": "snapshots/2-methyl-2-pentanol.json",
+    "sha256": "2f87b3b0b1300c2044f80ba4d96df84648b5b75a8a24d6680adfec88282d74e1"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0,
+    "base_peak_mz": 59,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 22
+     },
+     {
+      "mz": 43,
+      "rel": 22
+     },
+     {
+      "mz": 45,
+      "rel": 48
+     },
+     {
+      "mz": 87,
+      "rel": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-06",
+   "category": "alkyl halide",
+   "title": "3-chloropentane",
+   "smiles": "CCC(CC)Cl",
+   "formula": "C5H11Cl",
+   "source": {
+    "id": "C616206",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C616206&Index=0&Type=Mass",
+    "snapshot": "snapshots/3-chloropentane.json",
+    "sha256": "07467d0b897310468fc77fede83c7c4354ab308221600d8cb1c5db604f3584f4"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.4,
+    "base_peak_mz": 41,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 47
+     },
+     {
+      "mz": 43,
+      "rel": 44
+     },
+     {
+      "mz": 70,
+      "rel": 70
+     },
+     {
+      "mz": 71,
+      "rel": 43
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-07",
+   "category": "alcohol",
+   "title": "3-pentanol",
+   "smiles": "CCC(CC)O",
+   "formula": "C5H12O",
+   "source": {
+    "id": "C584021",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C584021&Index=0&Type=Mass",
+    "snapshot": "snapshots/3-pentanol.json",
+    "sha256": "2ee6eba8cb2572d2b1902b9771e7b7f1c3eddaa809de6598f3d3e9d676a3e1b4"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.1,
+    "base_peak_mz": 59,
+    "key_fragments": [
+     {
+      "mz": 31,
+      "rel": 43
+     },
+     {
+      "mz": 41,
+      "rel": 26
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-08",
+   "category": "acid",
+   "title": "butanoic acid",
+   "smiles": "CCCC(=O)O",
+   "formula": "C4H8O2",
+   "source": {
+    "id": "C107926",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C107926&Index=0&Type=Mass",
+    "snapshot": "snapshots/butanoic-acid.json",
+    "sha256": "e451d00f603ef5217215712cbb96e376d60bb18f56978ec29c29c8e49ec34af3"
+   },
+   "expected": {
+    "molecular_ion_mz": 88,
+    "molecular_ion_rel": 2.6,
+    "base_peak_mz": 60,
+    "key_fragments": [
+     {
+      "mz": 73,
+      "rel": 32
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-09",
+   "category": "ester",
+   "title": "butyl acetate",
+   "smiles": "CCCCOC(=O)C",
+   "formula": "C6H12O2",
+   "source": {
+    "id": "C123864",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C123864&Index=0&Type=Mass",
+    "snapshot": "snapshots/butyl-acetate.json",
+    "sha256": "49d38c29036f1650b2c1796eb270a813ec01bb96cb8266ead92a223857a64930"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0,
+    "base_peak_mz": 43,
+    "key_fragments": [
+     {
+      "mz": 56,
+      "rel": 37
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-10",
+   "category": "ether",
+   "title": "dibutyl ether",
+   "smiles": "CCCCOCCCC",
+   "formula": "C8H18O",
+   "source": {
+    "id": "C142961",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C142961&Index=0&Type=Mass",
+    "snapshot": "snapshots/dibutyl-ether.json",
+    "sha256": "097662268475df802603f8f66969a5779c9b8c0d0ecbd47e447717a52638c238"
+   },
+   "expected": {
+    "molecular_ion_mz": 130,
+    "molecular_ion_rel": 1.1,
+    "base_peak_mz": 57,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 22
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-11",
+   "category": "aldehyde",
+   "title": "heptanal",
+   "smiles": "CCCCCCC=O",
+   "formula": "C7H14O",
+   "source": {
+    "id": "C111717",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C111717&Index=0&Type=Mass",
+    "snapshot": "snapshots/heptanal.json",
+    "sha256": "f3bce4addc1931a4eb9a9624e3e8ebabcd48817bbb47ef6d8a7d9fd6153d2aad"
+   },
+   "expected": {
+    "molecular_ion_mz": 114,
+    "molecular_ion_rel": 1,
+    "base_peak_mz": 70,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 90
+     },
+     {
+      "mz": 43,
+      "rel": 84
+     },
+     {
+      "mz": 44,
+      "rel": 88
+     },
+     {
+      "mz": 55,
+      "rel": 78
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-12",
+   "category": "nitrile",
+   "title": "hexanenitrile",
+   "smiles": "CCCCCC#N",
+   "formula": "C6H11N",
+   "source": {
+    "id": "C628739",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C628739&Index=0&Type=Mass",
+    "snapshot": "snapshots/hexanenitrile.json",
+    "sha256": "2899d00f8120cecfced951040736a424b7dd3bc6753ba243a4ee6c5e4b2ee83f"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.8,
+    "base_peak_mz": 41,
+    "key_fragments": [
+     {
+      "mz": 27,
+      "rel": 33
+     },
+     {
+      "mz": 29,
+      "rel": 43
+     },
+     {
+      "mz": 54,
+      "rel": 82
+     },
+     {
+      "mz": 55,
+      "rel": 42
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-13",
+   "category": "acid",
+   "title": "hexanoic acid",
+   "smiles": "CCCCCC(=O)O",
+   "formula": "C6H12O2",
+   "source": {
+    "id": "C142621",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C142621&Index=0&Type=Mass",
+    "snapshot": "snapshots/hexanoic-acid.json",
+    "sha256": "99e68b8cff609af34ec9be0f0ea8e6d1cfee821d306cba8436b2f594fd93ff8c"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.9,
+    "base_peak_mz": 60,
+    "key_fragments": [
+     {
+      "mz": 73,
+      "rel": 45
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-14",
+   "category": "ester",
+   "title": "methyl hexanoate",
+   "smiles": "CCCCCC(=O)OC",
+   "formula": "C7H14O2",
+   "source": {
+    "id": "C106707",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C106707&Index=0&Type=Mass",
+    "snapshot": "snapshots/methyl-hexanoate.json",
+    "sha256": "05abcc26007c5fdb23dd78182a8c1d7ef09195b505e226ac7c09ff6cb80c602f"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0.4,
+    "base_peak_mz": 74,
+    "key_fragments": [
+     {
+      "mz": 43,
+      "rel": 38
+     },
+     {
+      "mz": 59,
+      "rel": 27
+     },
+     {
+      "mz": 87,
+      "rel": 40
+     },
+     {
+      "mz": 99,
+      "rel": 27
+     }
+    ]
+   }
+  },
+  {
+   "id": "MD-15",
+   "category": "ether",
+   "title": "methyl tert-butyl ether",
+   "smiles": "CC(C)(C)OC",
+   "formula": "C5H12O",
+   "source": {
+    "id": "C1634044",
+    "jcampUrl": "https://webbook.nist.gov/cgi/cbook.cgi?JCAMP=C1634044&Index=0&Type=Mass",
+    "snapshot": "snapshots/methyl-tert-butyl-ether.json",
+    "sha256": "48c427a44accfb4df66ff823129898cae5ad40a472b68184653ec842aecf4e13"
+   },
+   "expected": {
+    "molecular_ion_mz": null,
+    "molecular_ion_rel": 0,
+    "base_peak_mz": 73,
+    "key_fragments": [
+     {
+      "mz": 41,
+      "rel": 25
+     },
+     {
+      "mz": 57,
+      "rel": 26
+     }
+    ]
+   }
+  }
+ ]
+}

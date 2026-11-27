@@ -16,7 +16,7 @@ const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
   reagentNote: "Acidic halohydrin formation",
   productHint: `${symbol}-substituted alcohol`,
   explanation:
-    `Under acidic conditions, ${acid} protonates the epoxide and ${anionName} attacks the more substituted epoxide carbon. Ring opening is backside, so the halogen and the oxygen-derived OH are anti.`,
+    `${acid} protonates the epoxide and ${anionName} opens it from the back side, so the halogen and the oxygen-derived OH are anti. When exactly one epoxide carbon can carry positive charge (tertiary, benzylic or allylic) the halide attacks it (SN1-like); when neither can, it attacks the less substituted carbon (SN2-like); when both can, both regioisomers are listed and neither is preferred.`,
   trigger: epoxideTrigger,
   transform: {
     type: "customHandler",
@@ -24,7 +24,7 @@ const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
     options: {
       mode: "epoxideNucleophileOpening",
       nucleophile: "halide",
-      attackPreference: "more-substituted",
+      attackPreference: "cation-stabilized-else-less-substituted",
       halogen: symbol,
     },
   },
@@ -32,11 +32,11 @@ const epoxideHxRules: ReactionRule[] = HYDROHALOGENS.map(
   selectivityProfile: {
     stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
     regiochemistry: { mode: "directed", regioselective: true },
-    mixture: "possible",
+    mixture: "expected",
     allowsRearrangement: false,
   },
   selectivity: [
-    "Acidic opening favors attack at the more substituted epoxide carbon.",
+    "A tertiary epoxide carbon is attacked by the halide; otherwise the halide attacks the less substituted carbon (LibreTexts, Wade 15.08 and Nassau 8.14). A benzylic or allylic carbon stabilizes positive charge like a tertiary one and is treated the same way (Parker and Isaacs, Chem. Rev. 1959, 59, 737, for aryl epoxides; not re-read in this stage, so the benzylic and allylic extension is a mechanistic generalisation rather than a quoted rule). This differs from acid-catalysed opening by water or an alcohol, where the more substituted carbon is favoured.",
     "Attack is backside/anti relative to the epoxide oxygen bond being broken.",
   ],
   priority: 840 + index,
@@ -67,7 +67,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 800,
@@ -96,7 +96,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 810,
@@ -107,10 +107,10 @@ export const epoxideReactionRules: ReactionRule[] = [
     reactionType: "ringOpening",
     title: "Acid-Catalyzed Epoxide Opening with Alcohol",
     reagents: "ROH, H⁺",
-    reagentNote: "Anti opening; OR attacks more substituted carbon",
+    reagentNote: "Anti opening; OR attacks the carbon that best carries positive charge (both regioisomers kept when neither does)",
     productHint: "Alkoxy alcohol",
     explanation:
-      "An alcohol opens a protonated epoxide. The supplied OR group attacks the more substituted epoxide carbon and the original epoxide oxygen becomes OH.",
+      "An alcohol opens a protonated epoxide. The supplied OR group attacks the epoxide carbon that better carries positive charge (tertiary, benzylic or allylic); when neither does, both regioisomers are given because the opening has mixed SN1/SN2 character. The original epoxide oxygen becomes OH.",
     trigger: epoxideTrigger,
     additionalReactants: [
       { label: "alcohol", trigger: { includeSmarts: ["[O;H1][#6]"] } },
@@ -121,14 +121,14 @@ export const epoxideReactionRules: ReactionRule[] = [
       options: {
         mode: "epoxideNucleophileOpening",
         nucleophile: "alcohol",
-        attackPreference: "more-substituted",
+        attackPreference: "cation-stabilized-else-both",
       },
     },
     productStatus: "computed",
     selectivityProfile: {
       stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 820,
@@ -160,7 +160,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "anti-addition", relativeRelationship: "anti", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 830,
@@ -168,6 +168,7 @@ export const epoxideReactionRules: ReactionRule[] = [
   ...epoxideHxRules,
   {
     id: "epoxide-grignard-opening",
+    conditions: { organometallic: true, anhydrous: true },
     family: "epoxides",
     reactionType: "ringOpening",
     title: "Epoxide Opening with Grignard/Organolithium Reagent",
@@ -192,7 +193,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     selectivity: [
@@ -228,7 +229,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 855,
@@ -257,7 +258,7 @@ export const epoxideReactionRules: ReactionRule[] = [
     selectivityProfile: {
       stereochemistry: { mode: "inversion", attackMode: "backside", stereospecific: true },
       regiochemistry: { mode: "directed", regioselective: true },
-      mixture: "possible",
+      mixture: "expected",
       allowsRearrangement: false,
     },
     priority: 860,

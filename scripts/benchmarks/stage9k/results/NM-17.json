@@ -1,0 +1,268 @@
+{
+  "id": "NM-17",
+  "startedUTC": "2026-11-06T18:21:51.122Z",
+  "calls": [
+    "analyzeNomenclatureAndProperties"
+  ],
+  "identity": {
+    "nomenclature": {
+      "estimatedName": "(S)-2-chloropentane",
+      "commonName": null,
+      "displayName": "(S)-2-chloropentane",
+      "namingConfidence": "Medium",
+      "namingStatus": "systematic",
+      "parentChain": "pentane",
+      "parentChainLength": 5,
+      "mainSuffix": "Never suffix",
+      "prefixes": [
+        "halo"
+      ],
+      "motifs": [],
+      "explanation": "Parent chain contains 5 carbons. Detected 1 substituent(s). Assigned 2S stereochemistry from the molecular structure.",
+      "limitations": [
+        "This is an estimated learning name, not a full IUPAC engine yet."
+      ],
+      "stereodescriptors": [
+        {
+          "kind": "tetrahedral",
+          "descriptor": "S",
+          "locant": 2,
+          "atomIndex": 3,
+          "source": "rdkit-cip"
+        }
+      ],
+      "stereoPrefix": "(S)-"
+    },
+    "properties": {
+      "molecularFormula": "C5H11Cl",
+      "exactMass": "106.0549",
+      "molecularWeight": "106.60",
+      "degreesOfUnsaturation": 0,
+      "formalCharge": 0,
+      "atomCounts": [
+        {
+          "element": "C",
+          "count": 5
+        },
+        {
+          "element": "H",
+          "count": 11
+        },
+        {
+          "element": "Cl",
+          "count": 1
+        }
+      ],
+      "heavyAtomCount": 6,
+      "hydrogenBondDonors": 0,
+      "hydrogenBondAcceptors": 0,
+      "rotatableBonds": 2,
+      "topologicalPolarSurfaceArea": "0.00",
+      "logP": "2.41",
+      "ringCount": 0,
+      "boilingPointTendency": {
+        "level": "Low",
+        "score": 2,
+        "factors": [
+          "Larger molecular weight raises boiling point."
+        ],
+        "explanation": "This is a qualitative boiling point tendency, not an exact experimental boiling point. It is based on molecular weight, polarity, hydrogen bonding, charge, and branching."
+      },
+      "waterSolubilityTendency": {
+        "level": "Very low",
+        "score": 1,
+        "factors": [
+          "Low TPSA means less polar surface area.",
+          "Moderate logP gives a balance between water and lipid solubility."
+        ],
+        "explanation": "This is a qualitative water-solubility tendency based on polarity, charge, hydrogen bonding, TPSA, logP, and molecular size."
+      },
+      "membranePermeabilityTendency": {
+        "level": "Very high",
+        "score": 10,
+        "factors": [
+          "Smaller molecules tend to cross membranes more easily.",
+          "Low TPSA favors membrane permeability.",
+          "Moderate logP supports membrane permeability."
+        ],
+        "explanation": "This estimates passive membrane permeability using size, charge, TPSA, logP, and hydrogen-bond donors."
+      },
+      "volatilityTendency": {
+        "level": "High",
+        "score": 8,
+        "factors": [
+          "Volatility usually moves opposite to boiling point: lower boiling point means higher volatility."
+        ],
+        "explanation": "This estimates how easily a molecule evaporates. Higher volatility usually means lower boiling point, smaller size, and weaker intermolecular forces."
+      },
+      "notes": [
+        "Formula and DBE are calculated from the RDKit mol block plus PocketChem implicit-hydrogen estimates."
+      ]
+    }
+  },
+  "hierarchy": {
+    "mainGroup": {
+      "name": "Halogen",
+      "priority": 27,
+      "nomenclaturePriority": 21,
+      "confidence": "High",
+      "suffix": "Never suffix",
+      "prefix": "fluoro, chloro, bromo, iodo",
+      "count": 1,
+      "mcatNote": "Halogens are electronegative substituents. In organic molecules they are named as fluoro, chloro, bromo, or iodo substituents.",
+      "matches": [
+        {
+          "atoms": [
+            5
+          ],
+          "bonds": []
+        }
+      ],
+      "displayMatches": [
+        {
+          "atoms": [
+            5
+          ],
+          "bonds": []
+        }
+      ],
+      "displaySmarts": "[F,Cl,Br,I]",
+      "category": "functionalGroup"
+    },
+    "primaryGroups": [
+      {
+        "name": "Halogen",
+        "priority": 27,
+        "nomenclaturePriority": 21,
+        "confidence": "High",
+        "suffix": "Never suffix",
+        "prefix": "fluoro, chloro, bromo, iodo",
+        "count": 1,
+        "mcatNote": "Halogens are electronegative substituents. In organic molecules they are named as fluoro, chloro, bromo, or iodo substituents.",
+        "matches": [
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          }
+        ],
+        "displaySmarts": "[F,Cl,Br,I]",
+        "category": "functionalGroup"
+      },
+      {
+        "name": "Haloalkane",
+        "priority": 27.1,
+        "nomenclaturePriority": 21.1,
+        "confidence": "High",
+        "suffix": "Never suffix",
+        "prefix": "halo",
+        "equivalentNames": [
+          "alkyl halide"
+        ],
+        "count": 1,
+        "mcatNote": "Haloalkanes contain a halogen attached to an sp3 carbon. They readily undergo SN1, SN2, E1, and E2 reactions.",
+        "matches": [
+          {
+            "atoms": [
+              3,
+              5
+            ],
+            "bonds": [
+              4
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              3,
+              5
+            ],
+            "bonds": [
+              4
+            ]
+          }
+        ],
+        "displaySmarts": "[CX4][F,Cl,Br,I]",
+        "category": "functionalGroup"
+      }
+    ],
+    "functionalGroups": [
+      {
+        "name": "Halogen",
+        "priority": 27,
+        "nomenclaturePriority": 21,
+        "confidence": "High",
+        "suffix": "Never suffix",
+        "prefix": "fluoro, chloro, bromo, iodo",
+        "count": 1,
+        "mcatNote": "Halogens are electronegative substituents. In organic molecules they are named as fluoro, chloro, bromo, or iodo substituents.",
+        "matches": [
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              5
+            ],
+            "bonds": []
+          }
+        ],
+        "displaySmarts": "[F,Cl,Br,I]",
+        "category": "functionalGroup"
+      },
+      {
+        "name": "Haloalkane",
+        "priority": 27.1,
+        "nomenclaturePriority": 21.1,
+        "confidence": "High",
+        "suffix": "Never suffix",
+        "prefix": "halo",
+        "equivalentNames": [
+          "alkyl halide"
+        ],
+        "count": 1,
+        "mcatNote": "Haloalkanes contain a halogen attached to an sp3 carbon. They readily undergo SN1, SN2, E1, and E2 reactions.",
+        "matches": [
+          {
+            "atoms": [
+              3,
+              5
+            ],
+            "bonds": [
+              4
+            ]
+          }
+        ],
+        "displayMatches": [
+          {
+            "atoms": [
+              3,
+              5
+            ],
+            "bonds": [
+              4
+            ]
+          }
+        ],
+        "displaySmarts": "[CX4][F,Cl,Br,I]",
+        "category": "functionalGroup"
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:21:52.486Z"
+}

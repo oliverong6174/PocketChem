@@ -1,0 +1,476 @@
+{
+  "checkpoint": "9ab60709f4154dbffd8bcc8adad8dd04f8170f94",
+  "evidenceClass": "same-author development; no held-out accuracy or base-peak reference claim",
+  "rows": [
+    {
+      "name": "undecan-1-ol",
+      "smiles": "CCCCCCCCCCCO",
+      "formula": "C11H24O",
+      "expectedMechanisticCandidates": [
+        126,
+        98,
+        70,
+        55
+      ],
+      "before": {
+        "base": 31,
+        "certainty": "unreliable",
+        "expectedPresent": [],
+        "fragmentCandidates": []
+      },
+      "after": {
+        "base": 31,
+        "certainty": "unreliable",
+        "expectedPresent": [
+          126,
+          98,
+          70,
+          55
+        ],
+        "fragmentCandidates": [
+          {
+            "mz": 126,
+            "ionFormula": "C9H18",
+            "charge": 1,
+            "neutralLossFormula": "C2H6O",
+            "mechanism": "Alcohol dehydration followed by ethylene elimination",
+            "explanation": "Alcohol dehydration followed by ethylene elimination; total lost composition C2H6O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 98,
+            "ionFormula": "C7H14",
+            "charge": 1,
+            "neutralLossFormula": "C4H10O",
+            "mechanism": "Alcohol dehydration followed by ethylene elimination",
+            "explanation": "Alcohol dehydration followed by ethylene elimination; total lost composition C4H10O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 70,
+            "ionFormula": "C5H10",
+            "charge": 1,
+            "neutralLossFormula": "C6H14O",
+            "mechanism": "Alcohol dehydration followed by ethylene elimination",
+            "explanation": "Alcohol dehydration followed by ethylene elimination; total lost composition C6H14O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 42,
+            "ionFormula": "C3H6",
+            "charge": 1,
+            "neutralLossFormula": "C8H18O",
+            "mechanism": "Alcohol dehydration followed by ethylene elimination",
+            "explanation": "Alcohol dehydration followed by ethylene elimination; total lost composition C8H18O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 41,
+            "ionFormula": "C3H5",
+            "charge": 1,
+            "neutralLossFormula": "C8H19O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C8H19O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 55,
+            "ionFormula": "C4H7",
+            "charge": 1,
+            "neutralLossFormula": "C7H17O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C7H17O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 69,
+            "ionFormula": "C5H9",
+            "charge": 1,
+            "neutralLossFormula": "C6H15O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C6H15O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 83,
+            "ionFormula": "C6H11",
+            "charge": 1,
+            "neutralLossFormula": "C5H13O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C5H13O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 97,
+            "ionFormula": "C7H13",
+            "charge": 1,
+            "neutralLossFormula": "C4H11O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C4H11O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 111,
+            "ionFormula": "C8H15",
+            "charge": 1,
+            "neutralLossFormula": "C3H9O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C3H9O. Candidate composition only: no intensity or unique ion structure is assigned."
+          }
+        ]
+      }
+    },
+    {
+      "name": "dodecan-1-ol",
+      "smiles": "CCCCCCCCCCCCO",
+      "formula": "C12H26O",
+      "expectedMechanisticCandidates": [
+        140,
+        112,
+        84,
+        56
+      ],
+      "before": {
+        "base": 31,
+        "certainty": "unreliable",
+        "expectedPresent": [],
+        "fragmentCandidates": []
+      },
+      "after": {
+        "base": 31,
+        "certainty": "unreliable",
+        "expectedPresent": [
+          140,
+          112,
+          84,
+          56
+        ],
+        "fragmentCandidates": [
+          {
+            "mz": 140,
+            "ionFormula": "C10H20",
+            "charge": 1,
+            "neutralLossFormula": "C2H6O",
+            "mechanism": "Alcohol dehydration followed by ethylene elimination",
+            "explanation": "Alcohol dehydration followed by ethylene elimination; total lost composition C2H6O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 112,
+            "ionFormula": "C8H16",
+            "charge": 1,
+            "neutralLossFormula": "C4H10O",
+            "mechanism": "Alcohol dehydration followed by ethylene elimination",
+            "explanation": "Alcohol dehydration followed by ethylene elimination; total lost composition C4H10O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 84,
+            "ionFormula": "C6H12",
+            "charge": 1,
+            "neutralLossFormula": "C6H14O",
+            "mechanism": "Alcohol dehydration followed by ethylene elimination",
+            "explanation": "Alcohol dehydration followed by ethylene elimination; total lost composition C6H14O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 56,
+            "ionFormula": "C4H8",
+            "charge": 1,
+            "neutralLossFormula": "C8H18O",
+            "mechanism": "Alcohol dehydration followed by ethylene elimination",
+            "explanation": "Alcohol dehydration followed by ethylene elimination; total lost composition C8H18O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 41,
+            "ionFormula": "C3H5",
+            "charge": 1,
+            "neutralLossFormula": "C9H21O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C9H21O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 55,
+            "ionFormula": "C4H7",
+            "charge": 1,
+            "neutralLossFormula": "C8H19O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C8H19O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 69,
+            "ionFormula": "C5H9",
+            "charge": 1,
+            "neutralLossFormula": "C7H17O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C7H17O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 83,
+            "ionFormula": "C6H11",
+            "charge": 1,
+            "neutralLossFormula": "C6H15O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C6H15O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 97,
+            "ionFormula": "C7H13",
+            "charge": 1,
+            "neutralLossFormula": "C5H13O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C5H13O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 111,
+            "ionFormula": "C8H15",
+            "charge": 1,
+            "neutralLossFormula": "C4H11O",
+            "mechanism": "Alcohol dehydration followed by allylic cleavage",
+            "explanation": "Alcohol dehydration followed by allylic cleavage; total lost composition C4H11O. Candidate composition only: no intensity or unique ion structure is assigned."
+          }
+        ]
+      }
+    },
+    {
+      "name": "undecanal",
+      "smiles": "CCCCCCCCCCC=O",
+      "formula": "C11H22O",
+      "expectedMechanisticCandidates": [
+        56,
+        70
+      ],
+      "before": {
+        "base": 44,
+        "certainty": "heuristic",
+        "expectedPresent": [],
+        "fragmentCandidates": []
+      },
+      "after": {
+        "base": 44,
+        "certainty": "heuristic",
+        "expectedPresent": [
+          56,
+          70
+        ],
+        "fragmentCandidates": [
+          {
+            "mz": 42,
+            "ionFormula": "C3H6",
+            "charge": 1,
+            "neutralLossFormula": "C8H16O",
+            "mechanism": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage",
+            "explanation": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage; total lost composition C8H16O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 56,
+            "ionFormula": "C4H8",
+            "charge": 1,
+            "neutralLossFormula": "C7H14O",
+            "mechanism": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage",
+            "explanation": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage; total lost composition C7H14O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 70,
+            "ionFormula": "C5H10",
+            "charge": 1,
+            "neutralLossFormula": "C6H12O",
+            "mechanism": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage",
+            "explanation": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage; total lost composition C6H12O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 84,
+            "ionFormula": "C6H12",
+            "charge": 1,
+            "neutralLossFormula": "C5H10O",
+            "mechanism": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage",
+            "explanation": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage; total lost composition C5H10O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 98,
+            "ionFormula": "C7H14",
+            "charge": 1,
+            "neutralLossFormula": "C4H8O",
+            "mechanism": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage",
+            "explanation": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage; total lost composition C4H8O. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 112,
+            "ionFormula": "C8H16",
+            "charge": 1,
+            "neutralLossFormula": "C3H6O",
+            "mechanism": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage",
+            "explanation": "Aldehyde decarbonylation followed by hydrogen-transfer cleavage; total lost composition C3H6O. Candidate composition only: no intensity or unique ion structure is assigned."
+          }
+        ]
+      }
+    },
+    {
+      "name": "cyclooctanone",
+      "smiles": "O=C1CCCCCCC1",
+      "formula": "C8H14O",
+      "expectedMechanisticCandidates": [
+        98,
+        70
+      ],
+      "before": {
+        "base": 126.105,
+        "certainty": "heuristic",
+        "expectedPresent": [
+          98
+        ],
+        "fragmentCandidates": []
+      },
+      "after": {
+        "base": 126.105,
+        "certainty": "heuristic",
+        "expectedPresent": [
+          98,
+          70
+        ],
+        "fragmentCandidates": [
+          {
+            "mz": 98,
+            "ionFormula": "C6H10O",
+            "charge": 1,
+            "neutralLossFormula": "C2H4",
+            "mechanism": "Cyclic ketone ring opening and ethylene loss",
+            "explanation": "Cyclic ketone ring opening and ethylene loss; total lost composition C2H4. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 70,
+            "ionFormula": "C5H10",
+            "charge": 1,
+            "neutralLossFormula": "C3H4O",
+            "mechanism": "Cyclic ketone ring opening, ethylene and CO loss",
+            "explanation": "Cyclic ketone ring opening, ethylene and CO loss; total lost composition C3H4O. Candidate composition only: no intensity or unique ion structure is assigned."
+          }
+        ]
+      }
+    },
+    {
+      "name": "2-methylpyrimidine",
+      "smiles": "Cc1ncccn1",
+      "formula": "C5H6N2",
+      "expectedMechanisticCandidates": [
+        67,
+        40
+      ],
+      "before": {
+        "base": 79,
+        "certainty": "supported",
+        "expectedPresent": [],
+        "fragmentCandidates": []
+      },
+      "after": {
+        "base": 79,
+        "certainty": "supported",
+        "expectedPresent": [
+          67,
+          40
+        ],
+        "fragmentCandidates": [
+          {
+            "mz": 67,
+            "ionFormula": "C4H5N",
+            "charge": 1,
+            "neutralLossFormula": "CHN",
+            "mechanism": "Azine ring fragmentation with HCN loss",
+            "explanation": "Azine ring fragmentation with HCN loss; total lost composition CHN. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 40,
+            "ionFormula": "C3H4",
+            "charge": 1,
+            "neutralLossFormula": "C2H2N2",
+            "mechanism": "Sequential azine HCN losses",
+            "explanation": "Sequential azine HCN losses; total lost composition C2H2N2. Candidate composition only: no intensity or unique ion structure is assigned."
+          }
+        ]
+      }
+    },
+    {
+      "name": "3-methylpyridazine",
+      "smiles": "Cc1cccnn1",
+      "formula": "C5H6N2",
+      "expectedMechanisticCandidates": [
+        66,
+        65
+      ],
+      "before": {
+        "base": 79,
+        "certainty": "supported",
+        "expectedPresent": [],
+        "fragmentCandidates": []
+      },
+      "after": {
+        "base": 79,
+        "certainty": "supported",
+        "expectedPresent": [
+          66,
+          65
+        ],
+        "fragmentCandidates": [
+          {
+            "mz": 67,
+            "ionFormula": "C4H5N",
+            "charge": 1,
+            "neutralLossFormula": "CHN",
+            "mechanism": "Azine ring fragmentation with HCN loss",
+            "explanation": "Azine ring fragmentation with HCN loss; total lost composition CHN. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 66,
+            "ionFormula": "C5H6",
+            "charge": 1,
+            "neutralLossFormula": "N2",
+            "mechanism": "Adjacent azine nitrogens eliminated as N2",
+            "explanation": "Adjacent azine nitrogens eliminated as N2; total lost composition N2. Candidate composition only: no intensity or unique ion structure is assigned."
+          },
+          {
+            "mz": 65,
+            "ionFormula": "C5H5",
+            "charge": 1,
+            "neutralLossFormula": "HN2",
+            "mechanism": "Azine N2 elimination followed by H loss",
+            "explanation": "Azine N2 elimination followed by H loss; total lost composition HN2. Candidate composition only: no intensity or unique ion structure is assigned."
+          }
+        ]
+      }
+    },
+    {
+      "name": "methyl decanoate",
+      "smiles": "CCCCCCCCCC(=O)OC",
+      "formula": "C11H22O2",
+      "expectedMechanisticCandidates": [
+        74
+      ],
+      "before": {
+        "base": 155,
+        "certainty": "heuristic",
+        "expectedPresent": [
+          74
+        ],
+        "fragmentCandidates": []
+      },
+      "after": {
+        "base": 155,
+        "certainty": "heuristic",
+        "expectedPresent": [
+          74
+        ],
+        "fragmentCandidates": []
+      }
+    }
+  ],
+  "performance": {
+    "before": {
+      "n": 35,
+      "medianMs": 47.4362000000001,
+      "p95Ms": 117.91460000000006
+    },
+    "after": {
+      "n": 35,
+      "medianMs": 55.35399999999936,
+      "p95Ms": 106.2461000000003
+    },
+    "candidateGeneration": {
+      "n": 35,
+      "medianMs": 2.1189000000003944,
+      "p95Ms": 4.820099999999911
+    },
+    "rssBytes": 315670528
+  },
+  "notes": [
+    "Mass matches include existing ranked peaks and new unranked composition candidates. This is channel coverage, not measured spectral accuracy.",
+    "Base peaks remain heuristic; new unranked candidates cannot win the base-peak ranking. No intensity constants were fitted."
+  ]
+}

@@ -406,17 +406,71 @@ export type ReactionSelectivityProfile = {
   mixture?: "single" | "possible" | "expected";
   /** Prefer the alkene site consumed by the transformation when several C=C bonds are present. */
   sitePreference?: ReactionSitePreference;
+  /**
+   * Rank the ring positions of an electrophilic aromatic substitution by the substituents' directing
+   * effects (the same simple benzene model as halogenation/nitration). "alkyl" or "acyl" names what
+   * the step installs. The ranking is qualitative; ortho/para ratios are not modeled.
+   */
+  easDirecting?: "alkyl" | "acyl";
   /** Keep the handler-ranked major constitutional product rather than every lower-probability regioisomer. */
   majorProductOnly?: boolean;
+  /**
+   * Elimination rules: keep every constitutional alkene (Zaitsev and Hofmann) instead of only the handler-preferred one.
+   * Geometric isomers of one constitution still follow `stereochemistry.stereoselective` (E first). The qualitative
+   * major/minor label comes from assessReactionProductSelectivity, not from deleting the alternatives.
+   */
+  keepConstitutionalAlternatives?: boolean;
   allowsRearrangement?: boolean;
+  /**
+   * Marks a haloalkane substitution/elimination rule so the two pathways can be compared on the same substrate:
+   * "pathway" is what this rule does; "reagent" is the nucleophile/base class that decides the competition
+   * (nucleophile = weakly basic good nucleophile such as cyanide, azide or iodide; hydroxide; alkoxide = small
+   * alkoxide; bulky-base = tert-butoxide or an amide base). Used only for qualitative ranking.
+   */
+  substitutionElimination?: { pathway: "sn2" | "e2"; reagent: "nucleophile" | "hydroxide" | "alkoxide" | "bulky-base" };
 };
 
 /** How PocketChem generates the product structure. */
+/** A forward-only reaction template, optionally conditional on the reactant's defined alkene geometry. */
+export type ForwardTemplate = {
+  smarts: string;
+  /** Apply only when the reactants' single defined C=C is E, Z, or has no defined geometry. */
+  whenAlkene?: "E" | "Z" | "unspecified";
+  maxProducts?: number;
+};
+
+/**
+ * A documented qualitative product preference of a rule. It marks the product(s) matching
+ * `productSmarts` as the major (or minor) outcome when the `whenReactantSmarts` condition that
+ * causes the preference holds. It carries no fraction, and products it does not describe stay
+ * unranked: absence of a preference is not evidence of equal outcomes, nor of a major product.
+ */
+export type ProductPreference = {
+  id: string;
+  /** Every one of these must match some reactant (the structural factor behind the preference). */
+  whenReactantSmarts: string[];
+  /** None of these may match any reactant. */
+  unlessReactantSmarts?: string[];
+  productSmarts: string;
+  level: "major" | "minor";
+  basis: string;
+  references: string[];
+};
+
 export type ReactionTransform =
   | {
       type: "reactionSmarts";
+      /** Template used for retrosynthesis, and for forward products when no forwardTemplates apply. */
       smarts: string;
       maxProducts?: number;
+      /** Forward-only templates that can carry alkene geometry or fixed regiochemistry (see engine/forwardTemplates.ts). */
+      forwardTemplates?: ForwardTemplate[];
+      /**
+       * The electrophile reactant ionizes to a carbocation that may undergo favorable 1,2-hydride/alkyl shifts
+       * (Friedel-Crafts alkylation of a neopentyl or primary halide). The template is also run on each rearranged
+       * precursor; direct and rearranged products are all returned and none is ranked.
+       */
+      carbocationRearrangement?: { leavingGroup: "halide" };
     }
   | { type: "customHandler"; handler: "addition"; options: HandlerOptions<AdditionHandlerMode> }
   | { type: "customHandler"; handler: "substitution"; options: HandlerOptions<SubstitutionHandlerMode> }
@@ -472,8 +526,138 @@ export type ReactionReactantRequirement = {
   role?: ReactionReactantRole;
 };
 
+/**
+ * Machine-readable reaction conditions, declared per rule (never inferred from the
+ * free-text reagent label). They describe the conditions the rule's chemistry needs, not
+ * what the engine executes. A rule WITHOUT `conditions` is "not assessed" (unknown), which
+ * is different from `conditions: {}` ("assessed: nothing special").
+ */
+export type RuleConditions = {
+  /** mild: hydroxide/alkoxide/carbonate level; strong: amide, hydride, organolithium level. */
+  base?: "mild" | "strong";
+  /** strong: concentrated mineral acid or a strong Lewis acid. */
+  acid?: "mild" | "strong";
+  /** A carbanion nucleophile (Grignard, organolithium, Gilman, acetylide) is used or formed. */
+  organometallic?: boolean;
+  /** Radical chain halogenation (NBS/light, X2/hv). */
+  radical?: boolean;
+  oxidant?: "mild" | "strong";
+  /** Metal hydride reductant (LiAlH4, DIBAL-H). */
+  hydride?: boolean;
+  /** Water and protic functional groups are not tolerated. */
+  anhydrous?: boolean;
+  /**
+   * Group ids (see engine/compatibility.ts) that this rule's reaction centre consumes or
+   * regenerates. They are never reported as unreacted spectators, because a before/after
+   * count cannot tell "consumed and re-formed" (acetylene -> a new terminal alkyne) from
+   * "left alone".
+   */
+  reactionCentre?: string[];
+};
+
+export type CompatibilitySeverity = "model-constraint" | "plausible";
+
+/** An advisory finding. It never changes whether the structural replay passed. */
+export type CompatibilityWarning = {
+  stepNumber?: number;
+  ruleId: string;
+  severity: CompatibilitySeverity;
+  kind: "acid-base-quench" | "competing-electrophile" | "competing-reactivity";
+  /** Spectator group (present before and after the step) that causes the finding. */
+  group: string;
+  /** Declared condition that makes it a problem. */
+  condition: string;
+  message: string;
+};
+
+export type RouteCompatibility = {
+  warnings: CompatibilityWarning[];
+  /** Rule ids of steps that carry no condition metadata (nothing could be assessed). */
+  unassessedRuleIds: string[];
+  worst: "none" | CompatibilitySeverity;
+};
+
+/**
+ * What is known about which constitutional outcome a step's rule produces, taken from
+ * the rule's own metadata and the engine's output for these reactants. "unassessed" is
+ * unknown, not wrong.
+ */
+export type StepSelectivityClass =
+  /** A numeric product-specific estimate marks this outcome as the major one. */
+  | "major"
+  /** The engine offers exactly one constitutional outcome for these reactants; nothing was ranked. */
+  | "single-outcome"
+  /** A product-specific estimate documents this outcome as minor or trace. */
+  | "disfavored"
+  /** The engine offers several constitutional outcomes for these reactants and does not rank them. */
+  | "unranked"
+  /** The step could not be assessed. */
+  | "unassessed";
+
+export type StepSelectivityFinding = {
+  stepNumber: number;
+  ruleId: string;
+  class: StepSelectivityClass;
+  /** Distinct constitutional outcomes the engine offered for this step's reactants. */
+  alternatives: number | null;
+  /** The rule's product structure is illustrative rather than computed. */
+  representative: boolean;
+  /** Limitations the rule itself documents (copied; empty when it documents none). */
+  limitations: string[];
+  basis: string;
+};
+
+/** Advisory; independent of `verification` (structure) and `compatibility` (conditions). */
+export type RouteSelectivity = {
+  findings: StepSelectivityFinding[];
+  counts: Record<StepSelectivityClass, number>;
+};
+
+/**
+ * Conservative chemical-quality tier for a route (Stage 9I). It is separate from structural
+ * replay (`verification`): a route can replay exactly and still be chemically questionable.
+ * No yields or probabilities are implied; every finding cites the declared rule metadata or the
+ * textbook principle it rests on.
+ *
+ *  - structure-verified: replay passed, but no chemical assessment was available.
+ *  - chemically-supported: every step was assessed (declared conditions, one unambiguous outcome)
+ *    and nothing contradicted or worried the assessment. Still a model check, not validation.
+ *  - plausible-incomplete: nothing contradicted or worrying was found, but some steps could not be
+ *    assessed (no declared conditions, selectivity not established, unused steps).
+ *  - known-concern: at least one documented selectivity, condition or stability concern.
+ *  - contradicted: a declared model constraint is violated, atoms have no source, or replay failed.
+ */
+export type RouteQualityTier =
+  | "structure-verified"
+  | "chemically-supported"
+  | "plausible-incomplete"
+  | "known-concern"
+  | "contradicted";
+
+export type RouteQualityFindingLevel = "contradiction" | "concern" | "incomplete" | "support" | "info";
+
+export type RouteQualityFinding = {
+  /** Null for route-level findings. */
+  stepNumber: number | null;
+  /** Stable machine id, for example "eas-overhalogenation". */
+  code: string;
+  level: RouteQualityFindingLevel;
+  message: string;
+};
+
+export type RouteQuality = {
+  /** Bumped when the assessment rules change, so saved results are not read as current. */
+  assessmentVersion: number;
+  /** Structural replay status, reported unchanged. */
+  structural: RouteVerificationStatus | "not-run";
+  tier: RouteQualityTier;
+  findings: RouteQualityFinding[];
+};
+
 export type ReactionRule = {
   id: string;
+  /** Declared reaction conditions; see RuleConditions. */
+  conditions?: RuleConditions;
   family: ReactionFamily;
 
   /** Chemical classification. This does not select executable code. */
@@ -481,6 +665,9 @@ export type ReactionRule = {
 
   title: string;
   reagents: string;
+  /** Elements a declared reagent can supply. An empty array explicitly
+   * supplies no checked atoms. Overrides legacy formula-token inference. */
+  reagentAtomSources?: string[];
   reagentNote: string;
   productHint: string;
   explanation: string;
@@ -528,6 +715,8 @@ export type ReactionRule = {
   purpose?: ReactionPurpose;
   selectivity?: string[];
   selectivityProfile?: ReactionSelectivityProfile;
+  /** Qualitative, referenced product preferences (see ProductPreference). */
+  productPreferences?: ProductPreference[];
   limitations?: string[];
   productStatus?: ProductGenerationStatus;
 };
@@ -570,6 +759,27 @@ export type ReactionComponent = {
   smiles: string;
   functionalGroups: FunctionalGroupResult[];
   isGeneric: boolean;
+  /**
+   * Set when functional-group analysis threw. `functionalGroups` is then empty
+   * because the analysis FAILED, not because the molecule has no groups, so
+   * name-gated rules must not be read as chemically inapplicable.
+   */
+  analysisError?: string;
+};
+
+/**
+ * An internal engine failure observed while predicting reactions. These are
+ * reported separately from chemical nonreactivity so that callers can avoid
+ * presenting an engine/matcher failure as "NO REACTION".
+ */
+export type ReactionEngineIssue = {
+  kind:
+    | "component-analysis"
+    | "rule-matching"
+    | "smarts-execution"
+    | "rule-execution";
+  ruleId?: string;
+  message: string;
 };
 
 export type ReactionPredictionInput = {
@@ -662,6 +872,8 @@ export type SynthesisStep = {
   reactantSmiles: string;
   reactantComponents: string[];
   reactantLabel: string;
+  /** Advisory compatibility findings for this step (see engine/compatibility.ts). */
+  compatibility?: CompatibilityWarning[];
 
   productSmiles: string;
   productComponents: string[];
@@ -684,9 +896,136 @@ export type SynthesisStep = {
   retrosynthesisConfidence: RetrosynthesisConfidence | null;
   productMixture: ReactionProductMixture | null;
   display: ReactionDisplayMetadata | null;
+  /**
+   * Optional material provenance, aligned with `reactantComponents`: the lot
+   * ids (see RouteVerification.inventory / leftovers) this step consumes. When
+   * present, the route verifier consumes exactly those lots instead of the
+   * first structure match, so two lots with the same structure but different
+   * histories (two copies of one starting material, a racemate and an
+   * enantiopure sample) are never confused.
+   */
+  reactantLotIds?: string[];
 };
 
 export type SynthesisRouteConfidence = "verified" | "connectivity-verified";
+
+/** How closely two structures agree. */
+export type RouteMatchLevel =
+  /** Identical canonical isomeric SMILES (stereochemistry included). */
+  | "exact"
+  /** Same constitution; stereochemistry differs or is unspecified on one side. */
+  | "connectivity"
+  /** Equal to one member of a known stereo mixture produced by the step. */
+  | "mixture-member"
+  | "none";
+
+export type RouteVerificationStatus = "verified" | "connectivity-only" | "failed";
+
+export type RouteStepReactantCheck = {
+  smiles: string;
+  /** Where the reactant came from: a supplied material, an earlier step, or nowhere. */
+  origin:
+    | "starting-material"
+    | "earlier-step"
+    /** A reagent the rule itself supplies (for example a base); not a route material. */
+    | "rule-supplied-reagent"
+    | "missing"
+    | "already-consumed";
+  match: RouteMatchLevel;
+  /** Id of the lot this reactant was matched to (absent when nothing matched). */
+  lotId?: string;
+  /** Indices of the supplied starting materials this lot descends from. */
+  lineage?: number[];
+};
+
+export type RouteStepVerification = {
+  stepNumber: number;
+  ruleId: string;
+  status: RouteVerificationStatus;
+  reactants: RouteStepReactantCheck[];
+  /** Recorded step product versus the product obtained by replaying the rule. */
+  productMatch: RouteMatchLevel;
+  problems: string[];
+};
+
+/**
+ * Result of replaying a route from its supplied starting materials, one rule
+ * application at a time. "verified" means every reactant was available and
+ * every product and the target matched exactly (stereochemistry included);
+ * "connectivity-only" means the route is constitutionally consistent but at
+ * least one stereochemical or mixture-member match was not exact. This is a
+ * check against PocketChem's own reaction model, not experimental validation.
+ */
+export type RouteVerification = {
+  status: RouteVerificationStatus;
+  steps: RouteStepVerification[];
+  targetMatch: RouteMatchLevel;
+  /** Supplied starting materials the route never consumed. */
+  unusedStartingMaterials: string[];
+  /**
+   * Other products the route leaves in the final state beside the matched
+   * target (for example methanol next to ethanol after an ester reduction).
+   * The target is still an exact structure match; this only says it is not
+   * the sole product, so a "verified" route is not read as a clean one.
+   */
+  coproducts: string[];
+  problems: string[];
+  /** Supplied starting materials, their copies and what consumed them. */
+  inventory?: RouteInventoryEntry[];
+  /** Every species still present after the last step, with provenance. */
+  leftovers?: RouteLeftoverSpecies[];
+  /** Which earlier steps each step depends on; independent branches share none. */
+  stepDependencies?: RouteStepDependency[];
+  /** Which part of the route actually produces the matched target. */
+  targetLineage?: RouteTargetLineage | null;
+};
+
+/**
+ * Starting-material copies available to a route replay. A number applies to
+ * every supplied component; an array is indexed by component order. A copy is
+ * a qualitative availability count (one isolated batch), not an amount of
+ * substance: PocketChem does no mole or limiting-reagent accounting.
+ */
+export type RouteVerificationOptions = {
+  startingMaterialCopies?: number | number[];
+};
+
+export type RouteInventoryEntry = {
+  startIndex: number;
+  smiles: string;
+  copies: number;
+  consumed: number;
+  lotIds: string[];
+  /** Step number that consumed each lot, or null when it was never used. */
+  consumedByStep: Array<number | null>;
+};
+
+export type RouteLeftoverSpecies = {
+  lotId: string;
+  smiles: string;
+  origin: "starting-material" | "earlier-step";
+  producedByStep: number | null;
+  /** Indices of the supplied starting materials this species descends from. */
+  lineage: number[];
+  fromMixture: boolean;
+};
+
+export type RouteStepDependency = {
+  stepNumber: number;
+  consumedLotIds: string[];
+  producedLotIds: string[];
+  dependsOnSteps: number[];
+};
+
+export type RouteTargetLineage = {
+  lotId: string;
+  startingMaterialIndices: number[];
+  contributingSteps: number[];
+  /** Steps whose products never feed the target (side branches or waste). */
+  unusedSteps: number[];
+  /** Longest chain of dependent steps leading to the target. */
+  longestLinearSequence: number;
+};
 
 export type MultistepSynthesisRoute = {
   id: string;
@@ -695,9 +1034,72 @@ export type MultistepSynthesisRoute = {
   steps: SynthesisStep[];
   confidence: SynthesisRouteConfidence;
   score: number;
+  /** End-to-end replay result; absent only for routes built outside the planner. */
+  verification?: RouteVerification;
+  /** Advisory chemical-compatibility summary; independent of `verification`. */
+  compatibility?: RouteCompatibility;
+  /** Advisory product-selectivity summary; absent on routes saved before it existed. */
+  selectivity?: RouteSelectivity;
+  /** Conservative chemical-quality tier; absent on routes saved before Stage 9I. */
+  quality?: RouteQuality;
+};
+
+/**
+ * Budgets and inventory for the opt-in forward convergent lane (A -> A', B -> B',
+ * A' + B' -> target). Every field is optional; omitted fields use conservative
+ * defaults. A copy is a qualitative availability count, not an amount.
+ */
+/** Budgets for the retrosynthetic goal-set side of bidirectional convergent search. */
+export type RetroGoalSearchOptions = {
+  maxRetroExpansions?: number;
+  /** Most retro-engine disconnection calls (each is one goal structure). */
+  maxRetroCalls?: number;
+  maxRetroDepth?: number;
+  maxResultsPerGoal?: number;
+  /** Most unresolved goals one retro state may hold. */
+  maxGoals?: number;
+};
+
+export type ConvergentSearchOptions = {
+  /**
+   * Opt in to retrosynthetic goal-set exploration. The target is disconnected
+   * into sets of precursor goals, which are matched against forward pool states
+   * and replayed through the verifier. Off by default.
+   */
+  bidirectional?: boolean | RetroGoalSearchOptions;
+  /** Copies of each supplied material (number for all, array by component). Default one each. */
+  startingMaterialCopies?: number | number[];
+  maxStateExpansions?: number;
+  maxReactionExecutions?: number;
+  /** Most steps in one explored path. */
+  maxDepth?: number;
+  /** Most lots one step may consume. */
+  maxArity?: number;
+  maxLiveLots?: number;
+  maxLiveCoproducts?: number;
+  maxPathwaysPerExecution?: number;
+  /** Wall-clock budget for this lane, in milliseconds. */
+  maxWallMs?: number;
+  /** Absolute Date.now() deadline; the lane stops at the earlier of this and its wall budget. */
+  deadline?: number;
+  maxRoutes?: number;
 };
 
 export type MultistepSynthesisSearchOptions = {
+  /**
+   * Called once for each route that has passed end-to-end replay (status
+   * "verified" or "connectivity-only", never "failed"). The convergent lane
+   * reports each route as soon as it is accepted, so a caller can keep it if the
+   * search is later cut short. The ordinary linear search does NOT stream: it
+   * reports its routes only after the whole search has finished and replayed them.
+   * Exceptions thrown by the callback are ignored.
+   */
+  onRouteFound?: (route: MultistepSynthesisRoute) => void;
+  /**
+   * Opt in to the forward convergent lane before the linear search. Off by
+   * default; when absent the search behaves exactly as before.
+   */
+  convergentSearch?: boolean | ConvergentSearchOptions;
   maxSteps?: number;
   beamWidth?: number;
   branchLimit?: number;

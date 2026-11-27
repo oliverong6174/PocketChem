@@ -417,24 +417,24 @@ function getPiOverlap(bondType: BondType): string | null {
   return null;
 }
 
-function getBondExplanation(bondType: BondType, atomA: ParsedAtom, atomB: ParsedAtom) {
+function getBondExplanation(bondType: BondType) {
   if (bondType === "single") {
-    return `Bond ${atomA.atomIndex}-${atomB.atomIndex} is a sigma bond. Rotation is usually possible unless restricted by a ring or resonance.`;
+    return "Rotation is usually possible unless restricted by a ring or resonance.";
   }
 
   if (bondType === "double") {
-    return `Bond ${atomA.atomIndex}-${atomB.atomIndex} contains one sigma bond and one pi bond. Rotation is restricted.`;
+    return "The pi bond restricts rotation.";
   }
 
   if (bondType === "triple") {
-    return `Bond ${atomA.atomIndex}-${atomB.atomIndex} contains one sigma bond and two pi bonds. The atoms are usually linear and sp-hybridized.`;
+    return "The bonded atoms are usually linear and sp-hybridized.";
   }
 
   if (bondType === "aromatic") {
-    return `Bond ${atomA.atomIndex}-${atomB.atomIndex} is part of an aromatic system with delocalized pi electrons.`;
+    return "Part of an aromatic system with delocalized pi electrons.";
   }
 
-  return `Bond ${atomA.atomIndex}-${atomB.atomIndex} has unknown bond type.`;
+  return "Bond type could not be determined.";
 }
 
 export async function getMoleculeAnnotation(
@@ -467,8 +467,6 @@ export async function getMoleculeAnnotation(
 });
 
 const bonds: BondAnnotation[] = parsedMol.bonds.map((bond) => {
-  const rawAtomA = parsedMol.atoms[bond.atomA];
-  const rawAtomB = parsedMol.atoms[bond.atomB];
   const atomA = atoms[bond.atomA];
   const atomB = atoms[bond.atomB];
   const bondType = getBondType(bond.bondOrder);
@@ -491,9 +489,7 @@ const bonds: BondAnnotation[] = parsedMol.bonds.map((bond) => {
         : ["unknown bond orbital"],
     sigmaOverlap,
     piOverlap,
-    explanation: `${getBondExplanation(bondType, rawAtomA, rawAtomB)} Sigma component: ${sigmaOverlap}.${
-      piOverlap ? ` Pi component: ${piOverlap}.` : ""
-    }`,
+    explanation: getBondExplanation(bondType),
   };
 });
 
@@ -508,6 +504,22 @@ export type MoleculeHighlightRenderOptions = {
   selectedAtomRadius?: number;
   bondWidthMultiplier?: number;
 };
+
+/** Bond index -> [begin atom, end atom], read from the RDKit molecule JSON; empty if unavailable. */
+export function bondEndpointMap(mol: { get_json?: () => string }): Map<number, [number, number]> {
+  const map = new Map<number, [number, number]>();
+  try {
+    const parsed = JSON.parse(mol.get_json?.() ?? "{}") as {
+      molecules?: Array<{ bonds?: Array<{ atoms?: number[] }> }>;
+    };
+    (parsed.molecules?.[0]?.bonds ?? []).forEach((bond, index) => {
+      if (bond.atoms && bond.atoms.length === 2) map.set(index, [bond.atoms[0], bond.atoms[1]]);
+    });
+  } catch {
+    /* highlighting then falls back to the bond alone */
+  }
+  return map;
+}
 
 export async function getHighlightedMoleculeSvg(
   smiles: string,
@@ -530,20 +542,31 @@ export async function getHighlightedMoleculeSvg(
   const selectedBonds =
     selectedBondIndex !== null ? [selectedBondIndex] : [];
 
-  const strongAtomIndices = Array.from(
-    new Set([...selectedAtoms, ...selectedSystemAtomIndices])
-  );
-
   const strongBondIndices = Array.from(
     new Set([...selectedBonds, ...selectedSystemBondIndices])
   );
 
-  const allHighlightedAtoms = Array.from(
-    new Set([...atomIndices, ...strongAtomIndices])
-  );
-
   const allHighlightedBonds = Array.from(
     new Set([...bondIndices, ...strongBondIndices])
+  );
+
+  // A highlighted bond always highlights both of its endpoint atoms, so the
+  // participating atoms of the interaction are identifiable (single, double,
+  // triple and aromatic bonds alike). Only the bonds' own endpoints are added.
+  const endpoints = bondEndpointMap(mol);
+  const endpointsOf = (bonds: number[]) =>
+    bonds.flatMap((bondIndex) => endpoints.get(bondIndex) ?? []);
+
+  const strongAtomIndices = Array.from(
+    new Set([
+      ...selectedAtoms,
+      ...selectedSystemAtomIndices,
+      ...endpointsOf(strongBondIndices),
+    ])
+  );
+
+  const allHighlightedAtoms = Array.from(
+    new Set([...atomIndices, ...strongAtomIndices, ...endpointsOf(bondIndices)])
   );
 
   const softAtomColor: [number, number, number] = [0.65, 0.82, 1.0];

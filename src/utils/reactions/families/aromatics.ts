@@ -44,12 +44,13 @@ const birchTrigger = aromaticTrigger;
 const easModelNotes = {
   productStatus: "computed" as const,
   selectivityProfile: {
-    mixture: "single" as const,
-    majorProductOnly: true,
+    // Positions as activated as the best one are all kept: ortho and para are both formed from an ortho/para director.
+    mixture: "possible" as const,
     sitePreference: "most-activated-aromatic-site" as const,
   },
   limitations: [
-    "Simple benzene rings are ranked by ring activation/deactivation plus ortho/meta/para directing effects. Fused polycyclic aromatics intentionally fall back to unranked enumeration rather than applying simple-benzene directing constants outside their domain.",
+    "Simple benzene rings are screened by ring activation/deactivation plus ortho/meta/para directing effects; positions the model scores as equally activated (for example ortho and para of toluene) are all listed and left unranked. The ortho:para ratio, which depends on the electrophile, solvent and temperature, is not predicted.",
+    "Fused polycyclic aromatics intentionally fall back to unranked enumeration rather than applying simple-benzene directing constants outside their domain.",
   ],
 };
 
@@ -134,9 +135,29 @@ export const aromaticReactionRules: ReactionRule[] = [
     selectivity: [
       "Directing groups are classified from the atom directly bonded to the ring: resonance donors and alkyl/benzylic groups direct ortho/para; directly attached carbonyl, nitro, cyano, and sulfonyl groups direct meta; halogens are deactivating but ortho/para directing.",
       "When several benzene rings are present, ring activation/deactivation is ranked before positional preference; Ar–CH₂–C(=O)R is therefore not misclassified as a directly attached acyl meta director.",
-      "For a monosubstituted alkyl/benzylic ring, para is preferred over ortho when steric effects distinguish them.",
+      "For a monosubstituted alkyl/benzylic ring both ortho and para products are formed (toluene nitration is reported as about 58% ortho, 4% meta, 38% para); PocketChem lists both and does not rank them.",
     ],
     ...easModelNotes,
+    productPreferences: [
+      {
+        id: "nitration-halobenzene-para",
+        whenReactantSmarts: ["[Cl,Br]c1[cH][cH][cH][cH][cH]1"],
+        productSmarts: "[Cl,Br]c1ccc([N+](=O)[O-])cc1",
+        level: "major",
+        basis:
+          "Chloro- and bromobenzene nitrate mainly para: measured isomer distributions are about 30% ortho / 1% meta / 69% para for chlorobenzene and 37% / 1% / 62% for bromobenzene.",
+        references: ["Caltech-hosted 1954 J. Am. Chem. Soc. nitration isomer study (authors.library.caltech.edu/61405)", "LibreTexts/SUNY MCC, The Effect of Substituents on Orientation"],
+      },
+      {
+        id: "nitration-halobenzene-ortho",
+        whenReactantSmarts: ["[Cl,Br]c1[cH][cH][cH][cH][cH]1"],
+        productSmarts: "[Cl,Br]c1ccccc1[N+](=O)[O-]",
+        level: "minor",
+        basis:
+          "The ortho isomer is the smaller of the two ortho/para products for chloro- and bromobenzene (about 30% and 37%) but is formed in substantial amount.",
+        references: ["Caltech-hosted 1954 J. Am. Chem. Soc. nitration isomer study (authors.library.caltech.edu/61405)"],
+      },
+    ],
     planningCost: 72,
     retrosynthesis: { tier: "preferred", group: "aryl-nitration" },
     priority: 1800,
@@ -518,15 +539,18 @@ export const aromaticReactionRules: ReactionRule[] = [
       type: "reactionSmarts",
       smarts: "[cH:1].[C;X4:2][Cl,Br,I]>>[c:1]-[C:2]",
       maxProducts: 12,
+      carbocationRearrangement: { leavingGroup: "halide" },
     },
     productStatus: "representative",
     mechanism: "Electrophilic aromatic substitution",
+    selectivityProfile: { easDirecting: "alkyl", mixture: "possible", allowsRearrangement: true },
     competition: { group: "friedel-crafts-alkylation", specificity: 10 },
     limitations: [
-      "The engine enumerates available aromatic C-H sites but does not rank ortho/para/meta directing effects.",
+      "Ring positions are ranked qualitatively by the substituents' directing effects only (simple benzene rings); the ortho/para ratio is not modeled. Fused rings are not ranked.",
       "Fails on strongly deactivated rings.",
       "Amino groups complex strongly with AlCl₃ unless protected.",
-      "Carbocation rearrangement and polyalkylation may occur; the generated structure represents direct attachment of the drawn alkyl group.",
+      "The alkyl halide is treated as a carbocation source: when a 1,2-hydride or methyl shift gives a clearly more stable cation (neopentyl to tert-pentyl, n-propyl to isopropyl) the rearranged alkylarene is listed as well as the direct one. The ratio of direct to rearranged product depends on conditions and is not predicted, so neither is ranked.",
+      "Polyalkylation is not modeled.",
     ],
     constraints: [
       "friedel-crafts-ring-not-strongly-deactivated",
@@ -558,7 +582,8 @@ export const aromaticReactionRules: ReactionRule[] = [
     },
     productStatus: "representative",
     mechanism: "Electrophilic aromatic substitution",
-    limitations: ["The engine enumerates available aromatic C-H sites but does not rank ortho/para/meta directing effects.", "Fails on strongly deactivated rings and often on unprotected amino-substituted rings."],
+    selectivityProfile: { easDirecting: "acyl", mixture: "possible" },
+    limitations: ["Ring positions are ranked qualitatively by the substituents' directing effects only (simple benzene rings); the ortho/para ratio is not modeled.", "Fails on strongly deactivated rings and often on unprotected amino-substituted rings."],
     constraints: [
       "friedel-crafts-ring-not-strongly-deactivated",
       "friedel-crafts-amine-compatible",
@@ -619,6 +644,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   },
   {
     id: "benzylic-bromination",
+    conditions: { radical: true },
     family: "aromatics",
     reactionType: "radical",
     title: "Benzylic Bromination",
@@ -647,6 +673,7 @@ export const aromaticReactionRules: ReactionRule[] = [
   },
   {
     id: "benzylic-oxidation",
+    conditions: { oxidant: "strong" },
     family: "aromatics",
     reactionType: "oxidation",
     title: "Benzylic Side-Chain Oxidation",

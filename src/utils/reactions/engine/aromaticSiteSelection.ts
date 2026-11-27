@@ -100,6 +100,14 @@ function isSulfonylSulfur(graph: Graph, atom: number): boolean {
 }
 
 /**
+ * Small preference for para over ortho used to order products for bulky electrophiles (Friedel-Crafts). It is a
+ * steric tie-break, not an electronic difference between the two positions, so formal ortho and para
+ * products must not be separated by it when the electrophile is not bulky: toluene nitration is about
+ * 58% ortho, 4% meta and 38% para (LibreTexts/UIS CHE 269, 18.07), i.e. ortho is not minor.
+ */
+const PARA_STERIC_BONUS = 0.45;
+
+/**
  * Scores one pre-existing substituent on a simple benzene ring.  Critically,
  * classification starts from the atom DIRECTLY bonded to the ring, so
  * Ar-CH2-C(=O)R remains an alkyl/benzylic o/p director while Ar-C(=O)-R is a
@@ -109,7 +117,7 @@ function substituentContribution(graph: Graph, root: number, distance: number): 
   const symbol=graph.symbols[root];
   const orthoPara = distance===1 || distance===3;
   const meta = distance===2;
-  const paraBonus = distance===3 ? 0.45 : 0;
+  const paraBonus = distance===3 ? PARA_STERIC_BONUS : 0;
 
   if (symbol === "O") return 4.0 + (orthoPara ? 4.0 + paraBonus : 0) + (meta ? -1.5 : 0);
   if (symbol === "N") {
@@ -134,8 +142,13 @@ function substituentContribution(graph: Graph, root: number, distance: number): 
   return 0;
 }
 
-function matchesInstalledElectrophile(graph: Graph, root: number, electrophile: AromaticEasElectrophileId): boolean {
+/** What a Friedel-Crafts step installs: an sp3 carbon (alkyl) or a carbonyl carbon (acyl). */
+export type EasInstalledGroup = AromaticEasElectrophileId | "alkyl" | "acyl";
+
+function matchesInstalledElectrophile(graph: Graph, root: number, electrophile: EasInstalledGroup): boolean {
   const symbol=graph.symbols[root];
+  if (electrophile === "alkyl") return symbol === "C" && !isCarbonylCarbon(graph,root);
+  if (electrophile === "acyl") return symbol === "C" && isCarbonylCarbon(graph,root);
   if (electrophile === "bromo") return symbol === "Br";
   if (electrophile === "chloro") return symbol === "Cl";
   if (electrophile === "iodo") return symbol === "I";
@@ -144,9 +157,29 @@ function matchesInstalledElectrophile(graph: Graph, root: number, electrophile: 
   return isSulfonylSulfur(graph,root);
 }
 
-function scoreSite(graph: Graph, ring: number[], site: number, installedRoot: number): number {
+/**
+ * Friedel-Crafts electrophiles are bulky: a ring position flanked on BOTH sides by substituents (for
+ * example between the two methyl groups of m-xylene) is strongly disfavored for steric reasons even when
+ * electronically activated. Halogenation/nitration use smaller electrophiles and keep the purely
+ * electronic score. The size of this penalty is a model parameter, not a measured value.
+ */
+const FLANKED_SITE_PENALTY = 2.5;
+
+function isFlanked(graph: Graph, ring: number[], site: number, installedRoot: number): boolean {
+  const ringSet = new Set(ring);
+  const index = ring.indexOf(site);
+  const neighbours = [ring[(index + 1) % ring.length], ring[(index + ring.length - 1) % ring.length]];
+  return neighbours.every((neighbour) =>
+    (graph.adjacency.get(neighbour) ?? []).some((bond) => {
+      const root = other(bond, neighbour);
+      return !ringSet.has(root) && root !== installedRoot;
+    }),
+  );
+}
+
+function scoreSite(graph: Graph, ring: number[], site: number, installedRoot: number, bulky = false): number {
   const ringSet=new Set(ring);
-  let score=0;
+  let score=bulky && isFlanked(graph, ring, site, installedRoot) ? -FLANKED_SITE_PENALTY : 0;
   for (const ringAtom of ring) {
     for (const bond of graph.adjacency.get(ringAtom) ?? []) {
       const root=other(bond,ringAtom);
@@ -157,7 +190,7 @@ function scoreSite(graph: Graph, ring: number[], site: number, installedRoot: nu
   return score;
 }
 
-async function scoreProduct(substrate: string, product: string, electrophile: AromaticEasElectrophileId): Promise<number | null> {
+async function scoreProduct(substrate: string, product: string, electrophile: EasInstalledGroup): Promise<number | null> {
   const rdkit=await getRDKit();
   const mol=rdkit.get_mol(product);
   const substrateQuery=rdkit.get_qmol(substrate);
@@ -182,7 +215,7 @@ async function scoreProduct(substrate: string, product: string, electrophile: Ar
           if (ringSet.has(root) || !matchesInstalledElectrophile(graph,root,electrophile)) continue;
           const isNew=mappings.some((mapping)=>!new Set(mapping).has(root));
           if (!isNew) continue;
-          const value=scoreSite(graph,ring,site,root);
+          const value=scoreSite(graph,ring,site,root,electrophile === "alkyl" || electrophile === "acyl");
           if (best===null || value>best) best=value;
         }
       }
@@ -191,7 +224,11 @@ async function scoreProduct(substrate: string, product: string, electrophile: Ar
   } finally { substrateQuery.delete?.(); mol.delete?.(); }
 }
 
-/** Rank formal EAS products by ring activation plus directing effects. */
+/**
+ * Keeps every product whose site is as electronically activated as the best one. The para steric tie-break does
+ * not exclude ortho (see PARA_STERIC_BONUS); the ortho:para ratio itself is not modelled, so the survivors are
+ * returned unranked and callers must not describe any one of them as the major product.
+ */
 export async function selectMajorAromaticEasProducts(
   substrateSmiles: string,
   products: string[],
@@ -208,5 +245,20 @@ export async function selectMajorAromaticEasProducts(
   // Do not partially rank fused/unsupported systems.
   if (unsupported || !scored.length) return products;
   const best=Math.max(...scored.map((item)=>item.score));
-  return scored.filter((item)=>Math.abs(item.score-best)<1e-6).map((item)=>item.product);
+  return scored.filter((item)=>best-item.score<PARA_STERIC_BONUS+1e-6).map((item)=>item.product);
+}
+
+/**
+ * Directing-effect score of each product (higher = the substitution site is more activated), or
+ * null for a product on a ring the simple benzene model does not cover (fused rings, no ring),
+ * in which case callers must not rank at all.
+ */
+export async function scoreEasProducts(
+  substrateSmiles: string,
+  products: string[],
+  installed: EasInstalledGroup,
+): Promise<Array<number | null>> {
+  const scores: Array<number | null> = [];
+  for (const product of products) scores.push(await scoreProduct(substrateSmiles, product, installed));
+  return scores;
 }

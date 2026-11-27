@@ -1,0 +1,15 @@
+import { closeEngine, loadModule } from "../../tests/engine.mjs";
+const L = await loadModule("/src/utils/biochem/metabolism/lipids.ts");
+const j = (x) => JSON.stringify(x);
+console.log("act16", j(L.activation(16)));
+console.log("pal", j(L.oxidationTotals({ kind: "saturated", carbons: 16 })));
+console.log("C4", j(L.oxidationTotals({ kind: "saturated", carbons: 4 })));
+console.log("C15", j(L.oxidationTotals({ kind: "saturated", carbons: 15 })));
+console.log("oleate", j(L.oxidationTotals({ kind: "oleate" })));
+console.log("synth16", j(L.synthesisLedger(16)));
+console.log("synth16cyt", j(L.synthesisLedger(16, "cytosolic")));
+console.log("ketoAcAc", j(L.ketoneOxidationAtp("acetoacetate")), j(L.ketoneOxidationAtp("bhb")));
+console.log("ketogen", j(L.ketogenesisNet("acetoacetate")), j(L.ketogenesisNet("bhb")), j(L.ketolysisNet("bhb")));
+console.log("prop", j(L.propionateRoute().net));
+console.log("seq len", L.oxidationSequence({ kind: "saturated", carbons: 16 }).length, L.synthesisSequence(16).length);
+await closeEngine();

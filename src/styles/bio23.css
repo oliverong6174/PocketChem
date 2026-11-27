@@ -1,0 +1,44 @@
+/* Stage 23: Cellular Biology and Physiology tools (membranes, cell signaling, neuronal physiology). */
+.c23-svg { display: block; width: 100%; height: auto; max-width: 760px; margin-inline: auto; background: #ffffff; border-radius: 8px; user-select: none; }
+.c23-svg.is-wide { max-width: 900px; }
+.c23-sel { cursor: pointer; outline: none; }
+.c23-sel:hover { filter: brightness(0.96); }
+.c23-sel:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; border-radius: 6px; }
+.c23-param { display: grid; gap: var(--sp-1); margin-bottom: var(--sp-2); }
+.c23-param .gc-field { margin: 0; }
+.c23-fieldset { border: 1px solid var(--border); border-radius: var(--radius-md, 8px); padding: var(--sp-2) var(--sp-3); margin: 0 0 var(--sp-2); display: grid; gap: var(--sp-2); }
+.c23-fieldset legend { font-weight: 700; font-size: var(--fs-sm); padding-inline: var(--sp-1); }
+.c23-sections { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-2); }
+.c23-sections .ui-seg { flex-wrap: wrap; }
+.c23-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.c23-table th, .c23-table td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border); vertical-align: top; text-transform: none; }
+.c23-table th[scope="row"] { font-weight: 700; }
+.c23-note { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+.c23-mech-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.c23-card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px var(--sp-2); align-items: start; width: 100%; text-align: left; padding: var(--sp-2) var(--sp-3); border: 2px solid var(--border-strong); border-radius: var(--radius-md, 8px); background: var(--surface, #fff); color: var(--text); min-height: var(--touch, 44px); cursor: pointer; font: inherit; }
+.c23-card:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
+.c23-card[aria-pressed="true"] { outline: 3px solid var(--accent); }
+.c23-card .sym { font-size: 1.3rem; line-height: 1.2; grid-row: span 2; }
+.c23-card .name { font-weight: 700; }
+.c23-card .state { font-size: var(--fs-sm); color: var(--text-muted); overflow-wrap: anywhere; }
+.c23-card.on { border-color: var(--status-ok); background: var(--status-ok-bg); }
+.c23-card.blocked { border-style: dashed; border-color: var(--status-danger); background: var(--status-danger-bg); }
+.c23-card.attenuated { border-color: var(--status-warn); background: var(--status-warn-bg); }
+.c23-card.persisting { border-color: var(--status-warn); background: var(--status-warn-bg); border-width: 3px; }
+.c23-card.pending { opacity: 0.6; border-style: dotted; }
+.c23-connector { text-align: center; color: var(--text-muted); line-height: 1; margin: 0; }
+.c23-legend { display: flex; flex-wrap: wrap; gap: var(--sp-3); font-size: var(--fs-sm); margin: 0; padding: 0; list-style: none; }
+.c23-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.c23-status { font-weight: 700; }
+.c23-badge-ok { color: var(--status-ok); }
+.c23-badge-bad { color: var(--status-danger); }
+.c23-pert-list { display: grid; gap: var(--sp-1); }
+.c23-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.c23-chart-pair { display: grid; gap: var(--sp-3); grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
+.c23-textalt { font-size: var(--fs-sm); color: var(--text-muted); }
+@media (max-width: 520px) { .c23-svg { max-width: none; } }
+@media (prefers-reduced-motion: reduce) { .c23-sel, .c23-card { transition: none; } }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.c23-tablewrap { overflow-x: auto; max-width: 100%; }
+.c23-card-static { list-style: none; display: grid; gap: var(--sp-2); padding: var(--sp-3); border: 1px solid var(--border-strong); border-radius: var(--radius-md, 8px); }

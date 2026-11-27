@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useIncomingMolecule } from "./ui/useIncomingMolecule";
+import { MolecularFigure } from "./ui/MolecularFigure";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
 import { readKetcherStructureSnapshot } from "../utils/ketcherSnapshot";
 import {
@@ -7,10 +9,31 @@ import {
 } from "../utils/functionalGroups";
 import { analyzeNomenclatureAndProperties } from "../utils/nomenclatureUtils";
 import {
-  applyResolvedNameToIdentity,
+  resolveStructureIdentity,
   type MoleculeNameResolution,
 } from "../utils/moleculeNameResolver";
 import { getHighlightedMoleculeSvg } from "../utils/moleculeAnnotation";
+import WorkspaceNotice, { type WorkspaceNoticeItem } from "./WorkspaceNotice";
+import { ToolHeader } from "./ui/primitives";
+import { useWorkspacePersistence } from "../utils/persistence/useWorkspacePersistence";
+import { DebouncedTask } from "../utils/persistence/debouncedTask";
+import { restoreEditorContent } from "../utils/persistence/editorRestore";
+import { ketHasStructureText, ketIdentityKey } from "../utils/persistence/ketIdentity";
+import {
+  SPECTROSCOPY_ENGINE_VERSION,
+  validateSpectroscopyInputs,
+  validateSpectroscopyResults,
+  type SpectroscopyWorkspaceInputs,
+  type SpectroscopyWorkspaceResults,
+} from "../utils/persistence/spectroscopyWorkspace";
+import type { Capture, RecoveryOutcome } from "../utils/persistence/workspacePersistence";
+import type { WorkspaceResults } from "../utils/persistence/workspaceStore";
+import { getAppAnalysisLibrary } from "../utils/persistence/analysisLibraryApp";
+import type { OpenedAnalysis } from "../utils/persistence/analysisLibrary";
+import { transferIntoEditors } from "../utils/persistence/handoffTransfer";
+import { ReplaceWorkspacePrompt, SaveAnalysisForm } from "./SavedAnalysisControls";
+import { useSavedAnalysisOpen } from "../utils/persistence/useSavedAnalysisOpen";
+import { describeSpectroscopyAnalysis } from "../utils/persistence/spectroscopyWorkspace";
 import {
   analyzeMolecularSpectroscopy,
   resolveIRPeakHighlightSite,
@@ -26,6 +49,22 @@ import {
 } from "../utils/spectroscopy/irCurveModel";
 
 type SpectroscopyTab = "proton" | "carbon" | "ir" | "mass";
+
+/** What the page knows about the spectra on screen. */
+type SpectroscopyResultMeta = {
+  computedAt: string;
+  engineVersion: number;
+  /** Chemistry identity of the structure that was predicted. */
+  structureKey: string;
+  /** Loaded from a previous session instead of computed in this one. */
+  restored: boolean;
+  /** Saved by an earlier version of the prediction code; shown as saved, never recomputed. */
+  engineMismatch: boolean;
+  /** The drawn structure changed after this prediction. */
+  stale: boolean;
+  /** Set when the spectra were opened from the Saved Analyses library. */
+  opened?: { name: string; savedAt: string } | null;
+};
 
 type Stick = {
   x: number;
@@ -821,7 +860,13 @@ function MassTable({
   );
 }
 
-export default function SpectroscopyPage() {
+type SpectroscopyPageProps = {
+  /** A saved analysis the user chose on the Saved page; opened once recovery has finished. */
+  openRequest?: { id: string; recordId: string } | null;
+  onOpenHandled?: (requestId: string) => void;
+};
+
+export default function SpectroscopyPage({ openRequest = null, onOpenHandled }: SpectroscopyPageProps) {
   const importedNameResolutionRef = useRef<MoleculeNameResolution | null>(null);
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [editorResetVersion, setEditorResetVersion] = useState(0);
@@ -844,6 +889,417 @@ export default function SpectroscopyPage() {
   const [formula, setFormula] = useState<string | null>(null);
   const [result, setResult] = useState<SpectroscopyResult | null>(null);
   const structurePreviewRef = useRef<HTMLDivElement | null>(null);
+
+  // ---- workspace recovery (Stage 8B-2A) --------------------------------------------------------
+  // The drawn structure and the predicted spectra are saved and come back after a reload or a
+  // visit to another page. Restored spectra are saved model predictions: nothing is recomputed, the
+  // plots are rebuilt from the saved peaks, and they are labelled stale once the structure changes.
+  const [snapshotTask] = useState(() => new DebouncedTask(async () => undefined));
+  const { controller: persistence, recovery, status: persistenceStatus } = useWorkspacePersistence<
+    SpectroscopyWorkspaceInputs,
+    SpectroscopyWorkspaceResults
+  >({
+    page: "spectroscopy",
+    engineVersion: SPECTROSCOPY_ENGINE_VERSION,
+    validateInputs: validateSpectroscopyInputs,
+    validateResults: validateSpectroscopyResults,
+    beforeLeave: () => snapshotTask.flushNow(),
+  });
+  const [resultMeta, setResultMeta] = useState<SpectroscopyResultMeta | null>(null);
+  const [recoveryNotices, setRecoveryNotices] = useState<WorkspaceNoticeItem[]>([]);
+  const [inputsOnlyRestored, setInputsOnlyRestored] = useState(false);
+  const [editorRestoreVersion, setEditorRestoreVersion] = useState(0);
+  const [isOpening, setIsOpening] = useState(false);
+  const [saveForm, setSaveForm] = useState<{ name: string } | null>(null);
+  const [saveBusy, setSaveBusy] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<WorkspaceNoticeItem | null>(null);
+  const openingRef = useRef(false);
+  const ketcherRef = useRef<KetcherApi | null>(null);
+  const snapshotRef = useRef<{ ket: string | null; key: string | null }>({ ket: null, key: null });
+  const pendingEditorRef = useRef<{ ket: string; key: string | null; token: number } | null>(null);
+  const restoringRef = useRef(false);
+  const svgAttemptedRef = useRef<string | null>(null);
+  const appliedRecoveryRef = useRef<unknown>(null);
+  const applyRestoreRef = useRef<((outcome: RecoveryOutcome<SpectroscopyWorkspaceInputs, SpectroscopyWorkspaceResults>) => void) | null>(null);
+  const requestPersistRef = useRef<() => void>(() => undefined);
+  const restoreEditorRef = useRef<() => void>(() => undefined);
+  const latestRef = useRef({ smiles, structureSource, name, formula, result, activeTab, protonWindow, resultMeta, isAnalyzing });
+
+  function captureSpectroscopy(): Capture<SpectroscopyWorkspaceInputs, SpectroscopyWorkspaceResults> | null {
+    const latest = latestRef.current;
+    const snapshot = snapshotRef.current;
+    const inputs: SpectroscopyWorkspaceInputs = {
+      ket: snapshot.ket,
+      key: snapshot.key,
+      activeTab: latest.activeTab,
+      protonWindow: latest.protonWindow,
+    };
+    let results: WorkspaceResults<SpectroscopyWorkspaceResults> | null = null;
+    const meta = latest.resultMeta;
+    // Only a finished prediction is a result; nothing is saved for spectra that were never computed.
+    if (meta && latest.result && latest.structureSource && !latest.isAnalyzing) {
+      results = {
+        computedAt: meta.computedAt,
+        engineVersion: meta.engineVersion,
+        stale: meta.stale,
+        status: "complete",
+        data: {
+          inputKey: meta.structureKey,
+          smiles: latest.smiles,
+          structureSource: latest.structureSource,
+          name: latest.name,
+          formula: latest.formula,
+          result: latest.result,
+        },
+      };
+    }
+    if (!inputs.ket && !results) return null;
+    return { inputs, results };
+  }
+
+  function requestPersist() {
+    persistence.requestSave(captureSpectroscopy);
+  }
+
+  /** Reads the editor, refreshes the saved drawing and the stale-result check. */
+  async function takeEditorSnapshot() {
+    const api = ketcherRef.current;
+    if (!api || latestRef.current.isAnalyzing || restoringRef.current || pendingEditorRef.current) return;
+    const token = persistence.token();
+    try {
+      const ket = await Promise.race([
+        api.getKet(),
+        new Promise<never>((_resolve, reject) => setTimeout(() => reject(new Error("Timed out reading the editor.")), 8000)),
+      ]);
+      const key = await ketIdentityKey(ket);
+      if (!persistence.isCurrent(token) || latestRef.current.isAnalyzing || restoringRef.current || pendingEditorRef.current) return;
+      snapshotRef.current = { ket: ketHasStructureText(ket) ? ket : null, key };
+      setResultMeta((meta) => (meta && !meta.stale && meta.structureKey !== key ? { ...meta, stale: true } : meta));
+      requestPersist();
+    } catch (snapshotError) {
+      console.warn("[PocketChem:Spectroscopy] Could not read the editor for workspace recovery.", snapshotError);
+    }
+  }
+
+  async function restoreEditor() {
+    const pending = pendingEditorRef.current;
+    const api = ketcherRef.current;
+    if (!pending || !api || restoringRef.current || openingRef.current) return;
+    restoringRef.current = true;
+    const { token } = pending;
+    // Opening a saved analysis invalidates a drawing restore, exactly like Clear does.
+    const outcome = await restoreEditorContent(api, { ket: pending.ket, key: pending.key }, () => persistence.isCurrent(token) && !openingRef.current);
+    if (persistence.isCurrent(token)) {
+      pendingEditorRef.current = null;
+      if (outcome.kind === "failed") {
+        // Do not let an editor that failed to restore overwrite the saved copy.
+        persistence.disable();
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: "The saved structure could not be restored into the editor. Your saved work was kept and will not be overwritten; use Clear Analysis to start over." },
+        ]);
+      }
+    }
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      if (outcome.kind === "user-content-kept") snapshotTask.schedule();
+    }, 500);
+  }
+
+  function applyRestoredSpectroscopy(outcome: RecoveryOutcome<SpectroscopyWorkspaceInputs, SpectroscopyWorkspaceResults>) {
+    if (appliedRecoveryRef.current === outcome) return;
+    appliedRecoveryRef.current = outcome;
+    if (outcome.kind === "rejected") {
+      setRecoveryNotices([{ tone: "warn", text: `Saved work from a previous session could not be used (${outcome.message}). It was set aside and the page started clean.` }]);
+      return;
+    }
+    if (outcome.kind !== "restored" || !persistence.isCurrent(outcome.epoch)) return;
+    const latest = latestRef.current;
+    if (latest.result || latest.isAnalyzing || latest.smiles !== "Not analyzed yet") {
+      setRecoveryNotices([{ tone: "info", text: "Saved work from a previous session was not restored because you had already started new work on this page." }]);
+      return;
+    }
+
+    const { inputs, results } = outcome;
+    const notices: WorkspaceNoticeItem[] = [];
+    setActiveTab(inputs.activeTab);
+    setProtonWindow(inputs.protonWindow);
+    snapshotRef.current = { ket: inputs.ket, key: inputs.key };
+    if (inputs.ket) {
+      pendingEditorRef.current = { ket: inputs.ket, key: inputs.key, token: outcome.epoch };
+      setEditorRestoreVersion((version) => version + 1);
+    }
+
+    if (results) {
+      const data = results.data;
+      setSmiles(data.smiles);
+      setStructureSource(data.structureSource);
+      setName(data.name);
+      setFormula(data.formula);
+      setResult(data.result);
+      setStatus("Restored from your previous session");
+      setResultMeta({
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        structureKey: data.inputKey,
+        restored: true,
+        engineMismatch: outcome.engineMismatch,
+        // A record whose results do not match its own saved structure is never presented as current.
+        stale: results.stale || inputs.key === null || inputs.key !== data.inputKey,
+      });
+    } else if (inputs.ket) {
+      setInputsOnlyRestored(true);
+      setStatus("Restored your drawn structure from your previous session.");
+    }
+    if (outcome.resultsDropped) {
+      notices.push({ tone: "warn", text: "Saved spectra could not be validated and were not restored. Your structure was." });
+    }
+    if (outcome.migratedFrom !== null) {
+      notices.push({ tone: "info", text: "Your saved workspace was upgraded from an older storage format." });
+    }
+    setRecoveryNotices(notices);
+  }
+
+  // ---- Saved Analyses (Stage 8B-3B-1) -----------------------------------------------------------
+  // "Save Analysis" copies the finished prediction (all four spectra, assignments and explanations)
+  // into the library; opening one puts it back and redraws the plots from the saved peaks.
+
+  function defaultAnalysisName(): string {
+    const l = latestRef.current;
+    return `Spectra of ${l.name || l.smiles}`.slice(0, 100);
+  }
+
+  async function saveCurrentAnalysis(analysisName: string, announce = true): Promise<boolean> {
+    setSaveBusy(true);
+    try {
+      await snapshotTask.flushNow();
+      const capture = captureSpectroscopy();
+      if (!capture || !capture.results || latestRef.current.isAnalyzing) {
+        setSaveMessage({ tone: "warn", text: "Predict spectra before saving an analysis." });
+        return false;
+      }
+      const saved = await getAppAnalysisLibrary().save("spectroscopy", {
+        name: analysisName,
+        summary: describeSpectroscopyAnalysis(capture.results.data),
+        inputs: capture.inputs,
+        results: capture.results,
+      });
+      if (!saved.ok) {
+        setSaveMessage({ tone: "warn", text: `The analysis was not saved: ${saved.error.message}` });
+        return false;
+      }
+      if (announce) setSaveMessage({ tone: "info", text: `Saved “${saved.value.name}” to Saved analyses.` });
+      return true;
+    } finally {
+      setSaveBusy(false);
+    }
+  }
+
+  /** Replaces the Spectroscopy workspace with a saved analysis, as one transaction (see transferIntoEditors). */
+  async function applySavedAnalysis(opened: OpenedAnalysis<SpectroscopyWorkspaceInputs, SpectroscopyWorkspaceResults>): Promise<boolean> {
+    const api = ketcherRef.current;
+    if (!api || openingRef.current) return false;
+    openingRef.current = true;
+    setIsOpening(true);
+    snapshotTask.cancel();
+    restoringRef.current = true;
+    const { inputs, results } = opened;
+    const outcome = await transferIntoEditors(
+      [{ api, source: inputs.ket, expectKey: inputs.ket ? inputs.key : null }],
+      persistence,
+    );
+    if (outcome.kind !== "adopted") {
+      if (outcome.kind === "rolled-back") {
+        setRecoveryNotices((notices) => [
+          ...notices,
+          { tone: "warn", text: `“${opened.record.name}” could not be opened. Your Spectroscopy workspace is unchanged.` },
+        ]);
+        requestPersistRef.current();
+      } else {
+        // The editor may have changed, so the spectra on screen no longer describe it.
+        setResultMeta(null);
+        setResult(null);
+        setStructureSvg(null);
+        setRecoveryNotices([
+          { tone: "warn", text: `“${opened.record.name}” could not be opened and the editor could not be restored. Your saved workspace is unchanged; reload this page to bring it back.` },
+        ]);
+      }
+      openingRef.current = false;
+      setIsOpening(false);
+      window.setTimeout(() => {
+        restoringRef.current = false;
+      }, 500);
+      return false;
+    }
+
+    // Success: the old workspace's callbacks are invalid and the saved analysis is the workspace now.
+    pendingEditorRef.current = null;
+    importedNameResolutionRef.current = null;
+    snapshotRef.current = { ket: outcome.editors[0].ket, key: outcome.editors[0].key };
+    svgAttemptedRef.current = null; // the structure preview is drawn again from the saved SMILES
+    setActiveTab(inputs.activeTab);
+    setProtonWindow(inputs.protonWindow);
+    setSelectedIrPeak(null);
+    setResolvedIrHighlight(null);
+    setIrHighlightedSvg(null);
+    setSelectedNmrSignal(null);
+    setNmrHighlightedSvg(null);
+    setSelectedMassPeak(null);
+    setMassFragmentSvg(null);
+    setMassPreviewSvgs([]);
+    setStructureSvg(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices(
+      opened.resultsDropped ? [{ tone: "warn", text: "The saved spectra could not be validated and were not opened. The structure was." }] : [],
+    );
+    if (results) {
+      const data = results.data;
+      setSmiles(data.smiles);
+      setStructureSource(data.structureSource);
+      setName(data.name);
+      setFormula(data.formula);
+      setResult(data.result);
+      setStatus(`Opened saved analysis “${opened.record.name}”`);
+      setResultMeta({
+        computedAt: results.computedAt,
+        engineVersion: results.engineVersion,
+        structureKey: data.inputKey,
+        restored: false,
+        opened: { name: opened.record.name, savedAt: opened.record.updatedAt },
+        engineMismatch: opened.engineMismatch,
+        // Whatever was true when it was saved stays true; an inconsistent record is never shown as current.
+        stale: results.stale || inputs.key === null || inputs.key !== data.inputKey,
+      });
+    } else {
+      setSmiles("Not analyzed yet");
+      setStructureSource("");
+      setName(null);
+      setFormula(null);
+      setResult(null);
+      setResultMeta(null);
+      setStatus(`Opened saved analysis “${opened.record.name}” (structure only).`);
+    }
+    // One write replaces the automatic workspace with the opened analysis.
+    persistence.requestSave(() => ({ inputs: opened.inputs, results: opened.results }));
+    await persistence.flush();
+    openingRef.current = false;
+    setIsOpening(false);
+    window.setTimeout(() => {
+      restoringRef.current = false;
+      snapshotTask.schedule();
+    }, 500);
+    return true;
+  }
+
+  const savedOpen = useSavedAnalysisOpen<SpectroscopyWorkspaceInputs, SpectroscopyWorkspaceResults>({
+    page: "spectroscopy",
+    openRequest,
+    onOpenHandled,
+    ready: recovery !== null && ketcher !== null,
+    busyReason: () =>
+      latestRef.current.isAnalyzing || openingRef.current ? "Wait for the current prediction to finish before opening a saved analysis." : null,
+    hasUnsavedWork: () => captureSpectroscopy() !== null,
+    canSaveCurrent: () => Boolean(latestRef.current.resultMeta && latestRef.current.result),
+    saveCurrent: (analysisName) => saveCurrentAnalysis(analysisName, false),
+    defaultName: defaultAnalysisName,
+    apply: applySavedAnalysis,
+    notify: (item) => setRecoveryNotices((notices) => [...notices, item]),
+  });
+
+  useEffect(() => {
+    ketcherRef.current = ketcher;
+    requestPersistRef.current = requestPersist;
+    restoreEditorRef.current = () => void restoreEditor();
+    applyRestoreRef.current = applyRestoredSpectroscopy;
+    snapshotTask.setTask(takeEditorSnapshot);
+    latestRef.current = { smiles, structureSource, name, formula, result, activeTab, protonWindow, resultMeta, isAnalyzing };
+  });
+
+  // Autosave: only settled state is watched (the debounce and the finished-prediction rule keep
+  // half-finished predictions and rapid edits out of storage).
+  useEffect(() => {
+    requestPersistRef.current();
+  }, [smiles, structureSource, name, formula, result, activeTab, protonWindow, resultMeta, isAnalyzing]);
+
+  useEffect(() => {
+    if (!recovery) return;
+    try {
+      applyRestoreRef.current?.(recovery);
+    } finally {
+      // Saving starts only after the recovered record has been applied (or deliberately skipped).
+      persistence.resumeAfterRestore();
+    }
+  }, [recovery, persistence]);
+
+  useEffect(() => {
+    if (ketcher && pendingEditorRef.current) restoreEditorRef.current();
+  }, [ketcher, editorRestoreVersion]);
+
+  // The structure preview is drawn again from the saved SMILES (it is not stored).
+  useEffect(() => {
+    if (!result || structureSvg || !smiles.trim() || smiles === "Not analyzed yet") return;
+    if (svgAttemptedRef.current === smiles) return;
+    svgAttemptedRef.current = smiles;
+    const wanted = smiles;
+    void getMoleculeSvg(wanted).then((svg) => {
+      if (svg) setStructureSvg((current) => current ?? svg);
+    }).catch(() => undefined);
+  }, [result, structureSvg, smiles]);
+
+  useEffect(() => {
+    return () => snapshotTask.cancel();
+  }, [snapshotTask]);
+
+  function handleEditorChange() {
+    // Recheck the imported identity against canonical isomeric structure at analysis.
+    // Programmatic restores are not user edits.
+    if (restoringRef.current) return;
+    snapshotTask.schedule();
+  }
+
+  // What was recovered, what is only a saved snapshot, and what could not be saved.
+  const workspaceNotices: WorkspaceNoticeItem[] = [...recoveryNotices];
+  if (resultMeta?.restored) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Restored from your previous session (predicted ${new Date(resultMeta.computedAt).toLocaleString()}). These are saved model predictions, not experimental measurements, and they were not recomputed.`,
+    });
+  } else if (inputsOnlyRestored) {
+    workspaceNotices.push({ tone: "info", text: "Restored your drawn structure from your previous session." });
+  }
+  if (resultMeta?.opened) {
+    workspaceNotices.push({
+      tone: "info",
+      text: `Opened saved analysis “${resultMeta.opened.name}” (saved ${new Date(resultMeta.opened.savedAt).toLocaleString()}; predicted ${new Date(resultMeta.computedAt).toLocaleString()}). These are saved model predictions, not experimental measurements, and they were not recomputed.`,
+    });
+  }
+  if (saveMessage) workspaceNotices.push(saveMessage);
+  if (resultMeta?.engineMismatch) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: "These spectra were saved by an earlier version of the prediction code. They are shown as saved and have not been recomputed.",
+    });
+  }
+  if (resultMeta?.stale) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: `The structure changed after these spectra were predicted. They describe the earlier structure (${smiles}); predict again to update them.`,
+    });
+  }
+  if (!persistenceStatus.available) {
+    workspaceNotices.push({ tone: "warn", text: "Browser storage is unavailable, so your work on this page will not be saved." });
+  }
+  if (persistenceStatus.saveError) {
+    workspaceNotices.push({
+      tone: "warn",
+      text: persistenceStatus.saveError.code === "quota"
+        ? "Your latest changes could not be saved because browser storage is full."
+        : `Your latest changes could not be saved (${persistenceStatus.saveError.message}).`,
+    });
+  }
+  if (persistenceStatus.resultsOmitted) {
+    workspaceNotices.push({ tone: "warn", text: "The spectra were too large to save; your structure was saved without them." });
+  }
 
   const protonSticks = useMemo<Stick[]>(() => {
     const signals = result?.protonNMR ?? [];
@@ -1156,7 +1612,7 @@ export default function SpectroscopyPage() {
       const rawSvg = await getMoleculeSvg(alternative.structure);
       if (!rawSvg) return null;
       const badgeLabel = alternatives.length > 1
-        ? `${selectedMassPeak.previewLabel ?? selectedMassPeak.label} · ${alternative.label}`
+        ? `${selectedMassPeak.previewLabel ?? selectedMassPeak.label}, ${alternative.label}`
         : selectedMassPeak.previewLabel ?? selectedMassPeak.label;
       return {
         label: alternative.label,
@@ -1217,12 +1673,23 @@ export default function SpectroscopyPage() {
   }, [displayedStructureSvg, result, activeTab, selectedIrPeak, selectedNmrSignal, structureSource]);
 
   const analyze = async () => {
-    if (!ketcher || isAnalyzing) return;
+    if (!ketcher || isAnalyzing || openingRef.current) return;
     setIsAnalyzing(true);
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
     setStatus("Reading structure…");
 
     try {
       const snapshot = await readKetcherStructureSnapshot(ketcher);
+      // The structure this prediction is about; results are tied to it.
+      let analyzedKet: string | null = null;
+      try {
+        analyzedKet = await ketcher.getKet();
+      } catch {
+        analyzedKet = null;
+      }
+      const analyzedKey = await ketIdentityKey(analyzedKet);
       const currentSmiles = snapshot?.smiles?.trim() ?? "";
       if (!currentSmiles) {
         setStatus("Draw a molecule before predicting spectra.");
@@ -1249,7 +1716,8 @@ export default function SpectroscopyPage() {
         hierarchy.primaryGroups,
         hierarchy.mainGroup,
       );
-      const identity = applyResolvedNameToIdentity(
+      const identity = await resolveStructureIdentity(
+        currentSmiles,
         localIdentity,
         importedNameResolutionRef.current,
       );
@@ -1268,6 +1736,19 @@ export default function SpectroscopyPage() {
       setStructureSvg(await svgPromise);
       setName(identity.nomenclature.displayName || identity.nomenclature.estimatedName);
       setFormula(identity.properties.molecularFormula);
+      if (analyzedKey) {
+        snapshotRef.current = { ket: ketHasStructureText(analyzedKet) ? analyzedKet : null, key: analyzedKey };
+        setResultMeta({
+          computedAt: new Date().toISOString(),
+          engineVersion: SPECTROSCOPY_ENGINE_VERSION,
+          structureKey: analyzedKey,
+          restored: false,
+          engineMismatch: false,
+          stale: false,
+        });
+        // Edits made while the prediction ran are caught by this re-check.
+        snapshotTask.schedule();
+      }
       setStatus("Spectroscopy prediction complete");
     } catch (error) {
       console.error("Spectroscopy analysis failed:", error);
@@ -1278,6 +1759,15 @@ export default function SpectroscopyPage() {
   };
 
   const clear = () => {
+    // Clearing also discards the saved workspace and invalidates any restoration still in flight.
+    void persistence.discard();
+    pendingEditorRef.current = null;
+    snapshotRef.current = { ket: null, key: null };
+    snapshotTask.cancel();
+    svgAttemptedRef.current = null;
+    setResultMeta(null);
+    setInputsOnlyRestored(false);
+    setRecoveryNotices([]);
     importedNameResolutionRef.current = null;
     // Reset both the spectroscopy state and the editor itself. Importing an empty
     // structure into Ketcher can leave stale selection/tool/zoom state, so remount
@@ -1303,24 +1793,30 @@ export default function SpectroscopyPage() {
     setActiveTab("proton");
   };
 
+  const incoming = useIncomingMolecule({ destination: "spectroscopy", api: ketcher, ready: recovery !== null && ketcher !== null, expectRestore: recovery?.kind === "restored" });
   return (
     <div className="spectroscopy-page">
+{incoming}
       <section className="card spectroscopy-input-card">
-        <div className="card-header">
-          <div>
-            <h2>Spectroscopy</h2>
-            <p>Draw one molecule to predict its ¹H NMR, ¹³C NMR, IR, and mass-spectrum features.</p>
-          </div>
-          <span className={`status ${ketcher ? "ready" : "loading"}`}>{ketcher ? "Editor ready" : "Loading editor"}</span>
-        </div>
+        <ToolHeader
+          group="Analyze"
+          title="Spectroscopy"
+          purpose="Draw one molecule to predict its ¹H NMR, ¹³C NMR, IR, and mass-spectrum features."
+          ready={Boolean(ketcher)}
+          evidence="estimate"
+          steps={[
+            { label: "Draw or name", detail: "One molecule; press Enter after a name to analyze." },
+            { label: "Analyze", detail: "Estimates all four spectra from the structure." },
+            { label: "Read the peaks", detail: "Each peak is tied to the atoms it comes from." },
+          ]}
+        />
 
         <div className="drawer-placeholder spectroscopy-drawer">
           <MoleculeDrawer
             key={`spectroscopy-ketcher-${editorResetVersion}`}
             onReady={setKetcher}
-            onChange={() => {
-              importedNameResolutionRef.current = null;
-            }}
+            onChange={handleEditorChange}
+            onStructureLoaded={() => snapshotTask.schedule()}
             onNameStructureApplied={(resolution, action) => {
               importedNameResolutionRef.current = action === "replace" ? resolution : null;
             }}
@@ -1334,8 +1830,49 @@ export default function SpectroscopyPage() {
             {isAnalyzing ? "Predicting…" : "Predict Spectra"}
           </button>
           <button className="secondary-button" type="button" onClick={clear} disabled={isAnalyzing}>Clear Analysis</button>
+          <button
+            className="secondary-button"
+            type="button"
+            disabled={!resultMeta || !result || isAnalyzing || isOpening || saveBusy}
+            title={result ? "Keep these spectra in Saved analyses" : "Predict spectra first"}
+            onClick={() => {
+              setSaveMessage(null);
+              setSaveForm({ name: defaultAnalysisName() });
+            }}
+          >
+            Save Analysis
+          </button>
         </div>
+
+        {saveForm && (
+          <SaveAnalysisForm
+            name={saveForm.name}
+            busy={saveBusy}
+            onChange={(analysisName) => setSaveForm({ name: analysisName })}
+            onCancel={() => setSaveForm(null)}
+            onSubmit={() => {
+              void saveCurrentAnalysis(saveForm.name).then((saved) => {
+                if (saved) setSaveForm(null);
+              });
+            }}
+          />
+        )}
       </section>
+
+      <WorkspaceNotice
+        notices={workspaceNotices}
+        onDiscard={resultMeta?.restored || inputsOnlyRestored ? clear : undefined}
+        discardDisabled={isAnalyzing}
+      />
+
+      {savedOpen.prompt && (
+        <ReplaceWorkspacePrompt
+          name={savedOpen.prompt.opened.record.name}
+          canSaveFirst={Boolean(resultMeta && result) && !isAnalyzing}
+          busy={savedOpen.saveBusy}
+          onChoose={(choice) => void savedOpen.resolve(choice)}
+        />
+      )}
 
       <section className="card spectroscopy-results-card">
         <div className="spectroscopy-summary">
@@ -1356,6 +1893,11 @@ export default function SpectroscopyPage() {
             <code>{smiles}</code>
           </div>
         </div>
+        {result ? (
+          <p className="spectroscopy-estimate-note" data-testid="spectroscopy-estimate-note" role="note">
+            <strong>Predicted, not measured.</strong> These spectra are generated algorithmically from the structure. They are estimates, not experimental data.
+          </p>
+        ) : null}
 
         {activeTab === "mass" && massPreviewSvgs.length > 1 ? (
           <div
@@ -1372,21 +1914,21 @@ export default function SpectroscopyPage() {
             }}
           >
             {massPreviewSvgs.map((preview, index) => (
-              <div
-                key={`${preview.label}-${index}`}
-                style={{ minWidth: 0, width: "100%", overflow: "hidden" }}
-                dangerouslySetInnerHTML={{ __html: preview.svg }}
-              />
+              <div key={`${preview.label}-${index}`} style={{ minWidth: 0, width: "100%", overflow: "hidden" }}>
+                <MolecularFigure svg={preview.svg} title={preview.label} />
+              </div>
             ))}
           </div>
         ) : displayedStructureSvg && (
-          <div
-            ref={structurePreviewRef}
+          <MolecularFigure
+            containerRef={structurePreviewRef}
+            clickToExpand={false}
+            svg={displayedStructureSvg}
+            title="Structure"
             className={((activeTab === "ir" && irHighlightedSvg) || ((activeTab === "proton" || activeTab === "carbon") && nmrHighlightedSvg) || (activeTab === "mass" && massFragmentSvg)) ? "spectroscopy-structure-preview highlighted-molecule-svg" : "spectroscopy-structure-preview"}
-            title={activeTab === "mass"
+            htmlTitle={activeTab === "mass"
               ? ((selectedMassPeak?.previewStructure || selectedMassPeak?.fragmentSmiles) ? "Selected mass-spectral ion or fragment shown above." : undefined)
               : "Tap an atom or bond to jump to the corresponding spectral assignment. Tap the same site again to cycle through multiple matching assignments."}
-            dangerouslySetInnerHTML={{ __html: displayedStructureSvg }}
           />
         )}
 
@@ -1461,7 +2003,7 @@ export default function SpectroscopyPage() {
                 {selectedNmrSignal && (
                   <div id="spectroscopy-selected-assignment" className="annotation-card annotation-card-selected" style={{ cursor: "default" }}>
                     <h3>{selectedNmrSignal.sourceGroup}</h3>
-                    <p><strong>{selectedNmrSignal.shift}</strong>{` · ${(selectedNmrSignal as HNMRSignal).integration ?? "—"} · ${(selectedNmrSignal as HNMRSignal).multiplicity ?? "—"}`}</p>
+                    <p><strong>{selectedNmrSignal.shift}</strong>{`, ${(selectedNmrSignal as HNMRSignal).integration ?? "—"}, ${(selectedNmrSignal as HNMRSignal).multiplicity ?? "—"}`}</p>
                     <p>{selectedNmrSignal.explanation}</p>
                     <p className="selected-note">The atoms responsible for this ¹H signal are highlighted above.</p>
                     {nmrHighlightedSvg && (
@@ -1495,7 +2037,7 @@ export default function SpectroscopyPage() {
                 {selectedNmrSignal && (
                   <div id="spectroscopy-selected-assignment" className="annotation-card annotation-card-selected" style={{ cursor: "default" }}>
                     <h3>{selectedNmrSignal.sourceGroup}</h3>
-                    <p><strong>{selectedNmrSignal.shift}</strong>{` · ${(selectedNmrSignal as CNMRSignal).carbonCount ?? 1} equivalent C`}</p>
+                    <p><strong>{selectedNmrSignal.shift}</strong>{`, ${(selectedNmrSignal as CNMRSignal).carbonCount ?? 1} equivalent C`}</p>
                     <p>{selectedNmrSignal.explanation}</p>
                     <p className="selected-note">The carbon environment responsible for this ¹³C signal is highlighted above.</p>
                     {nmrHighlightedSvg && (
@@ -1531,7 +2073,7 @@ export default function SpectroscopyPage() {
                     <h3>{selectedIrPeak.label}</h3>
                     <p>
                       <strong>{selectedIrPeak.center === undefined ? selectedIrPeak.range : `${Math.round(selectedIrPeak.center)} cm⁻¹`}</strong>
-                      {` · ${formatIrIntensity(selectedIrPeak.intensity)} · ${formatIrShape(selectedIrPeak.shape)}`}
+                      {`, ${formatIrIntensity(selectedIrPeak.intensity)}, ${formatIrShape(selectedIrPeak.shape)}`}
                     </p>
                     <p>{selectedIrPeak.sourceGroup}: {selectedIrPeak.explanation}</p>
                     {resolvedIrHighlight?.specificity === "vibration" && resolvedIrHighlight.bondIndices.length > 0 ? (
@@ -1559,7 +2101,7 @@ export default function SpectroscopyPage() {
                 )}
                 <div className="spectroscopy-notes">
                   <p><strong>Two-way linking:</strong> tap an assigned IR band to highlight its molecular vibration, or tap an atom/bond in the molecule to select the corresponding band and card. Repeated taps cycle through multiple bands associated with the same molecular site.</p>
-                  <p><strong>Functional-group region:</strong> 4000–1500 cm⁻¹. The engine applies characteristic stretches plus modifiers such as hydrogen bonding, conjugation, ring strain, resonance donation, overlap suppression, and symmetry suppression.</p>
+                  <p><strong>Functional-group region:</strong> 4000–1500 cm⁻¹. Characteristic stretches are adjusted for effects such as hydrogen bonding, conjugation, ring strain, resonance donation, overlapping bands and symmetry.</p>
                   <p><strong>Fingerprint region:</strong> below 1500 cm⁻¹. Named bands are combined with deterministic, complexity-weighted skeletal/bending modes; the 650–1350 cm⁻¹ region is intentionally more crowded while major diagnostic bands remain visible.</p>
                 </div>
                 <IrTable peaks={result.ir} selectedPeak={selectedIrPeak} onSelectPeak={handleIrPeakSelect} />
@@ -1588,13 +2130,13 @@ export default function SpectroscopyPage() {
                 <div className="mass-summary-grid">
                   <div><span>Molecular ion</span><strong>{result.massSpec.molecularIonMz ?? "—"}</strong></div>
                   <div><span>Nominal mass</span><strong>{result.massSpec.nominalMass ?? "—"}</strong></div>
-                  <div><span>Predicted base peak</span><strong>{result.massSpec.basePeakMz ?? "—"}</strong></div>
+                  <div><span>Predicted base peak{result.massSpec.basePeakCertainty && result.massSpec.basePeakCertainty !== "supported" ? ` (${result.massSpec.basePeakCertainty})` : ""}</span><strong>{result.massSpec.basePeakMz ?? "—"}</strong>{result.massSpec.basePeakCandidates && result.massSpec.basePeakCertainty !== "supported" && <small title={result.massSpec.basePeakBasis}> candidates: {result.massSpec.basePeakCandidates.join(", ")}</small>}</div>
                 </div>
                 {selectedMassPeak && (
                   <div id="spectroscopy-selected-assignment" className="selected-assignment-card">
                     <p className="selected-tag">Selected mass-spectral assignment</p>
                     <h4>{selectedMassPeak.label}</h4>
-                    <p><strong>m/z {selectedMassPeak.mz}</strong> · {selectedMassPeak.relativeIntensity.toFixed(1)}% predicted relative abundance</p>
+                    <p><strong>m/z {selectedMassPeak.mz}</strong>, {selectedMassPeak.relativeIntensity.toFixed(1)}% predicted relative abundance</p>
                     {(selectedMassPeak.pathwayCount ?? 0) > 1 && (
                       <p><strong>{selectedMassPeak.pathwayCount} contributing fragmentation pathways</strong> merge at this m/z.</p>
                     )}
@@ -1614,6 +2156,19 @@ export default function SpectroscopyPage() {
                   </div>
                 )}
                 <MassTable peaks={result.massSpec.peaks} selectedPeak={selectedMassPeak} onSelectPeak={handleMassPeakSelect} />
+                {Boolean(result.massSpec.fragmentCandidates?.length) && (
+                  <details className="spectroscopy-notes">
+                    <summary>Additional fragment candidates (abundance unknown)</summary>
+                    <p>These are possible fragment compositions. They have no predicted intensity, are excluded from the plot and base-peak ranking, and do not identify a unique ion structure.</p>
+                    <ul>
+                      {result.massSpec.fragmentCandidates!.map((candidate) => (
+                        <li key={`${candidate.ionFormula}-${candidate.mechanism}`}>
+                          <strong>m/z {candidate.mz}, {candidate.ionFormula}⁺</strong>: {candidate.explanation}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
                 <div className="spectroscopy-notes">
                   {result.massSpec.notes.map((note) => <p key={note}>{note}</p>)}
                 </div>

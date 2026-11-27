@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { MolecularFigure } from "./ui/MolecularFigure";
 import MoleculeDrawer, { type KetcherApi } from "./MoleculeDrawer";
+import { ToolHeader } from "./ui/primitives";
+import { SequenceRoutePanel } from "./multicatalytic/RouteViews";
+import { buildSequenceOverview } from "../utils/reactions/engine/sequenceOverview";
+import ReactionWorkspacePanel from "./ReactionWorkspacePanel";
 import {
   analyzeFunctionalGroupHierarchy,
   getCondensedSulfonateSvg,
@@ -8,7 +13,8 @@ import { analyzeNomenclatureAndProperties } from "../utils/nomenclatureUtils";
 import {
   getSequentialConditionOptions,
   reactionRegistry,
-  runSequentialSynthesis,
+  runSequentialSynthesisDetailed,
+  type SequentialBranchExclusion,
   type SequentialConditionOption,
   type SequentialSynthesisBranch,
   type SequentialSynthesisStep,
@@ -17,6 +23,26 @@ import {
 import { rendererForReactionDisplay } from "./reactionProductRenderer";
 
 type SvgMap = Record<string, string | null>;
+
+const STATUS_CHIP_LABEL: Record<SequentialSynthesisStep["status"], string> = {
+  reaction: "Reaction",
+  "no-reaction": "NO REACTION",
+  "needs-input": "NEEDS INPUT",
+  unsupported: "UNSUPPORTED",
+  "unknown-rule": "UNKNOWN CONDITION",
+  "execution-error": "EVALUATION FAILED",
+  "not-run": "NOT RUN",
+};
+
+const STATUS_HEADING: Record<SequentialSynthesisStep["status"], string> = {
+  reaction: "Reaction",
+  "no-reaction": "NO REACTION",
+  "needs-input": "ADDITIONAL STRUCTURE REQUIRED",
+  unsupported: "STRUCTURAL PRODUCT NOT SUPPORTED",
+  "unknown-rule": "CONDITION NOT IN REGISTRY",
+  "execution-error": "INTERNAL ENGINE ERROR — NOT A CHEMICAL PREDICTION",
+  "not-run": "NOT RUN — A REQUIRED INTERMEDIATE WAS NOT FORMED",
+};
 
 function rendererForStep(step: SequentialSynthesisStep) {
   return rendererForReactionDisplay(step.display, { allowGenericHalogen: true });
@@ -41,15 +67,89 @@ async function moleculeDisplayName(smiles: string): Promise<string> {
   }
 }
 
-export default function MultiCatalyticPage() {
+type MultiCatalyticPageProps = {
+  /** A saved Multi-Catalytic analysis chosen on the Saved page. */
+  openRequest?: { id: string; recordId: string } | null;
+  onOpenHandled?: (requestId: string) => void;
+};
+
+type MultiCatalyticMode = "workspace" | "sequence";
+
+/**
+ * Two tools share this page. The workspace keeps an inventory of several molecules and runs one
+ * explicitly chosen reaction at a time (Stage 9B-2). The ordered sequence is the original
+ * single-molecule tool and is unchanged. Both stay mounted once opened so neither loses its state.
+ */
+export default function MultiCatalyticPage({ openRequest = null, onOpenHandled }: MultiCatalyticPageProps) {
+  const [mode, setMode] = useState<MultiCatalyticMode>("workspace");
+  const [sequenceOpened, setSequenceOpened] = useState(false);
+
+  function choose(next: MultiCatalyticMode) {
+    if (next === "sequence") setSequenceOpened(true);
+    setMode(next);
+  }
+
+  return (
+    <section className="card multicatalytic-page-card">
+      <div className="multicatalytic-mode-tabs" role="tablist" aria-label="Multi-Catalytic tools">
+        <button
+          type="button"
+          role="tab"
+          id="multicatalytic-tab-workspace"
+          aria-selected={mode === "workspace"}
+          aria-controls="multicatalytic-panel-workspace"
+          className={mode === "workspace" ? "active" : ""}
+          onClick={() => choose("workspace")}
+        >
+          Workspace (several molecules)
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="multicatalytic-tab-sequence"
+          aria-selected={mode === "sequence"}
+          aria-controls="multicatalytic-panel-sequence"
+          className={mode === "sequence" ? "active" : ""}
+          onClick={() => choose("sequence")}
+        >
+          Ordered sequence (one molecule)
+        </button>
+      </div>
+      <div id="multicatalytic-panel-workspace" role="tabpanel" aria-labelledby="multicatalytic-tab-workspace" hidden={mode !== "workspace"}>
+        <ReactionWorkspacePanel openRequest={openRequest} onOpenHandled={onOpenHandled} />
+      </div>
+      {sequenceOpened && (
+        <div id="multicatalytic-panel-sequence" role="tabpanel" aria-labelledby="multicatalytic-tab-sequence" hidden={mode !== "sequence"}>
+          <OrderedSequencePanel />
+        </div>
+      )}
+    </section>
+  );
+}
+
+function OrderedSequencePanel() {
   const [ketcher, setKetcher] = useState<KetcherApi | null>(null);
   const [query, setQuery] = useState("");
   const [sequence, setSequence] = useState<SequentialConditionOption[]>([]);
   const [branches, setBranches] = useState<SequentialSynthesisBranch[]>([]);
+  const [exclusions, setExclusions] = useState<SequentialBranchExclusion[]>([]);
   const [startingSmiles, setStartingSmiles] = useState("");
   const [startingName, setStartingName] = useState("");
   const [svgs, setSvgs] = useState<SvgMap>({});
+  // Which sequence outcome's detail is open. The choice belongs to one run; a new run starts at the engine's first outcome.
+  const [selectedOutcome, setSelectedOutcome] = useState<{ source: unknown; index: number }>({ source: null, index: 0 });
+  const activeOutcome = selectedOutcome.source === branches ? Math.min(selectedOutcome.index, Math.max(0, branches.length - 1)) : 0;
+  const sequenceOverview = useMemo(() => buildSequenceOverview(startingSmiles, branches), [startingSmiles, branches]);
+  const nameLookup = useMemo(() => {
+    const known = new Map<string, string>();
+    if (startingSmiles && startingName) known.set(startingSmiles, startingName);
+    for (const branch of branches) for (const step of branch.steps) if (step.status === "reaction" && step.productLabel && !known.has(step.productSmiles)) known.set(step.productSmiles, step.productLabel);
+    return known;
+  }, [startingSmiles, startingName, branches]);
   const [isRunning, setIsRunning] = useState(false);
+  // Legacy diagnostic mode: keep applying later conditions to the last established molecule after a
+  // step that formed no product. Off by default; its results are provisional.
+  const [diagnosticMode, setDiagnosticMode] = useState(false);
   const [status, setStatus] = useState("Draw one starting molecule, then build a reagent sequence.");
   const [error, setError] = useState<string | null>(null);
 
@@ -145,13 +245,15 @@ export default function MultiCatalyticPage() {
       setStartingSmiles(smiles);
       setStartingName(await moleculeDisplayName(smiles));
 
-      const results = await runSequentialSynthesis(
+      const report = await runSequentialSynthesisDetailed(
         smiles,
         sequence.map((condition) => condition.ruleId),
         reactionRegistry,
-        { branchLimit: 6 },
+        { branchLimit: 6, unresolvedStepPolicy: diagnosticMode ? "continue-provisional" : "stop" },
       );
+      const results = report.branches;
       setBranches(results);
+      setExclusions(report.exclusions);
       setStatus(
         results.length === 0
           ? "No sequence result was generated."
@@ -171,6 +273,7 @@ export default function MultiCatalyticPage() {
     setQuery("");
     setSequence([]);
     setBranches([]);
+    setExclusions([]);
     setStartingSmiles("");
     setStartingName("");
     setSvgs({});
@@ -179,19 +282,19 @@ export default function MultiCatalyticPage() {
   }
 
   return (
-    <section className="card multicatalytic-page-card">
-      <div className="card-header">
-        <div>
-          <h2>Multi-Catalytic Synthesis</h2>
-          <p>
-            Start with one molecule and apply an ordered reagent/catalyst sequence.
-            A NO REACTION step leaves the molecule unchanged and continues to the next condition.
-          </p>
-        </div>
-        <span className={`status ${ketcher ? "ready" : "loading"}`}>
-          {ketcher ? "Editor ready" : "Loading editor"}
-        </span>
-      </div>
+    <div className="multicatalytic-sequence-mode">
+      <ToolHeader
+        group="Synthesize"
+        title="Multi-Catalytic Synthesis"
+        purpose="Start with one molecule and apply an ordered reagent/catalyst sequence. A NO REACTION step leaves the molecule unchanged and continues to the next condition."
+        ready={Boolean(ketcher)}
+        evidence="rule"
+        steps={[
+          { label: "Draw one molecule", detail: "Draw it or type a name below the editor." },
+          { label: "Build the sequence", detail: "Add reagents or catalysts in the order they are used." },
+          { label: "Run and read each step", detail: "The product of each step feeds the next." },
+        ]}
+      />
 
       <div className="multicatalytic-editor">
         <MoleculeDrawer globalKey="multiCatalyticKetcher" onReady={setKetcher} />
@@ -223,12 +326,12 @@ export default function MultiCatalyticPage() {
               >
                 <span>{option.reagents}</span>
                 <small>
-                  {option.title} · {option.family}
+                  {option.title}, {option.family}
                   {option.autoSuppliedReactantLabels.length > 0
-                    ? ` · auto-supplies ${option.autoSuppliedReactantLabels.join(", ")}`
+                    ? `, auto-supplies ${option.autoSuppliedReactantLabels.join(", ")}`
                     : ""}
                   {option.requiresStructuralReactantInput
-                    ? " · additional structural reactant required"
+                    ? ", additional structural reactant required"
                     : ""}
                 </small>
               </button>
@@ -253,10 +356,10 @@ export default function MultiCatalyticPage() {
                     <small>
                       {condition.title}
                       {condition.autoSuppliedReactantLabels.length > 0
-                        ? ` · ${condition.autoSuppliedReactantLabels.join(", ")} supplied automatically`
+                        ? `, ${condition.autoSuppliedReactantLabels.join(", ")} supplied automatically`
                         : ""}
                       {condition.requiresStructuralReactantInput
-                        ? " · needs an additional structural reactant"
+                        ? ", needs an additional structural reactant"
                         : ""}
                     </small>
                   </div>
@@ -272,6 +375,19 @@ export default function MultiCatalyticPage() {
         </div>
       </div>
 
+      <label className="reaction-note multicatalytic-diagnostic">
+        <input
+          type="checkbox"
+          checked={diagnosticMode}
+          disabled={isRunning}
+          onChange={(event: { target: { checked: boolean } }) => {
+            setDiagnosticMode(event.target.checked);
+            setBranches([]);
+          }}
+        />{" "}
+        Diagnostic mode: continue after a step that formed no product. Later steps then act on the last established molecule and are
+        provisional. By default a branch stops, because a step cannot use an intermediate that was never made.
+      </label>
       <div className="reaction-actions">
         <button className="primary-button" type="button" disabled={!ketcher || isRunning} onClick={() => void runSequence()}>
           {isRunning ? "Computing…" : "Run Sequence"}
@@ -287,14 +403,41 @@ export default function MultiCatalyticPage() {
       {startingSmiles && (
         <div className="multicatalytic-starting-structure">
           <strong>Starting molecule</strong>
-          {svgs.start && <div className="reaction-svg-box" dangerouslySetInnerHTML={{ __html: svgs.start }} />}
+          {svgs.start && <MolecularFigure className="reaction-svg-box" source={{ smiles: startingSmiles, label: startingName }} svg={svgs.start} title="Starting molecule" />}
           <p>{startingName}</p>
         </div>
       )}
 
+      {branches.length > 0 && exclusions.length > 0 && (
+        <p className="reaction-detail reaction-limitation">
+          {exclusions.length} lower-ranked outcome{exclusions.length === 1 ? " was" : "s were"} not
+          shown because of the 6-outcome limit per step:{" "}
+          {exclusions
+            .slice(0, 6)
+            .map((item) =>
+              `step ${item.stepNumber} ${item.label}${item.selectivityLabel ? ` (${item.selectivityLabel})` : ""}`,
+            )
+            .join("; ")}
+          {exclusions.length > 6 ? "; …" : ""}. Outcomes are ordered by PocketChem&apos;s heuristic
+          selectivity estimates where available; these are model estimates, not experimental results.
+        </p>
+      )}
+
+      {branches.length > 0 && (
+        <SequenceRoutePanel
+          nameOf={(smiles) => nameLookup.get(smiles) ?? smiles}
+          onSelect={(index) => setSelectedOutcome({ source: branches, index })}
+          overview={sequenceOverview}
+          selectedIndex={activeOutcome}
+          stepSvg={(branchId, stepNumber) => svgs[`${branchId}-${stepNumber}`]}
+          svgOf={(smiles) => (smiles === startingSmiles ? svgs.start : null)}
+        />
+      )}
+
       {branches.length > 0 && (
         <div className="multicatalytic-results">
-          {branches.map((branch, branchIndex) => (
+          <h3>Step-by-step details of outcome #{activeOutcome + 1}</h3>
+          {branches.map((branch, branchIndex) => branchIndex !== activeOutcome ? null : (
             <article className="reaction-pathway-card" key={branch.id}>
               <div className="reaction-card-heading">
                 <div>
@@ -309,43 +452,72 @@ export default function MultiCatalyticPage() {
                     <div className="multicatalytic-result-step-heading">
                       <strong>Step {step.stepNumber}: {step.title}</strong>
                       <span className={step.status === "reaction" ? "reaction-status reaction-status-computed" : "no-reaction-chip"}>
-                        {step.status === "reaction"
-                          ? "Reaction"
-                          : step.status === "no-reaction"
-                            ? "NO REACTION"
-                            : step.status === "needs-input"
-                              ? "NEEDS INPUT"
-                              : "UNSUPPORTED"}
+                        {STATUS_CHIP_LABEL[step.status]}
                       </span>
                     </div>
+                    {step.inputUnresolved && (
+                      <p className="reaction-detail reaction-limitation">
+                        An earlier step in this sequence was not resolved (needs input, unsupported,
+                        unknown, or failed), so this step starts from that step&apos;s unchanged
+                        molecule. Treat the result as provisional.
+                      </p>
+                    )}
                     <div className="reagent-pill">{step.reagentLabel}</div>
 
                     {step.status !== "reaction" ? (
                       <div className="no-reaction-result">
-                        <strong>
-                          {step.status === "no-reaction"
-                            ? "NO REACTION"
-                            : step.status === "needs-input"
-                              ? "ADDITIONAL STRUCTURE REQUIRED"
-                              : "STRUCTURAL PRODUCT NOT SUPPORTED"}
-                        </strong>
+                        <strong>{STATUS_HEADING[step.status]}</strong>
                         <p>{step.explanation}</p>
                         {step.noReaction?.suggestion && <p><strong>Instead:</strong> {step.noReaction.suggestion}</p>}
                         <small>
                           {step.status === "no-reaction"
                             ? "Starting material carries forward unchanged to the next step."
-                            : "The sequence stops here until this step can be supplied or represented."}
+                            : step.status === "not-run"
+                              ? "Nothing was run for this step."
+                              : diagnosticMode
+                                ? "No chemistry was computed for this step. Diagnostic mode: the molecule is carried forward unchanged, but the step itself is unresolved."
+                                : "No chemistry was computed for this step. Later steps of this branch are not run."}
                         </small>
                       </div>
                     ) : (
                       <>
                         {svgs[`${branch.id}-${step.stepNumber}`] && (
-                          <div
+                          <MolecularFigure
                             className="reaction-svg-box multicatalytic-product-svg"
-                            dangerouslySetInnerHTML={{ __html: svgs[`${branch.id}-${step.stepNumber}`] ?? "" }}
+                            svg={svgs[`${branch.id}-${step.stepNumber}`] ?? ""}
+                            title={`Product of step ${step.stepNumber}`}
                           />
                         )}
                         <p className="multicatalytic-product-name">{step.productLabel}</p>
+                        {step.selectivity && (
+                          <p className="reaction-note">
+                            Estimated selectivity: {step.selectivity.label} (heuristic estimate, not
+                            experimentally verified).
+                          </p>
+                        )}
+                        {step.mixture?.collapsed && (
+                          <p className="reaction-note">
+                            Racemic mixture of {step.mixture.memberCount} enantiomers; one is drawn.
+                            Later steps are computed on that representative.
+                          </p>
+                        )}
+                        {step.mixture && !step.mixture.collapsed && (
+                          <p className="reaction-note">
+                            One member of a {step.mixture.kind} product mixture
+                            ({step.mixture.memberCount} members); the other members are separate outcomes.
+                          </p>
+                        )}
+                        {step.spectators.length > 0 && (
+                          <p className="reaction-note">
+                            Unchanged by this step and carried forward: {step.spectators.join(", ")}.
+                          </p>
+                        )}
+                        {step.productComponents.length > 1 && step.spectators.length === 0 && (
+                          <p className="reaction-note">
+                            This step gives a mixture of {step.productComponents.length} products
+                            (drawn together).
+                          </p>
+                        )}
                         <p className="reaction-note">{step.explanation}</p>
                       </>
                     )}
@@ -356,6 +528,6 @@ export default function MultiCatalyticPage() {
           ))}
         </div>
       )}
-    </section>
+    </div>
   );
 }

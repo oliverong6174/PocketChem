@@ -1,0 +1,19 @@
+{
+  "cases": 1,
+  "byCategory": {
+    "competing-pathways": 1
+  },
+  "byProvenance": {
+    "verified-primary": 0,
+    "verified-secondary": 1,
+    "provisional": 0
+  },
+  "problems": [],
+  "overlapping": {
+    "HX-06R": [
+      "scripts\\tests\\mechanism9e.test.mjs",
+      "scripts\\tests\\sequential.test.mjs"
+    ]
+  },
+  "heldOut": 0
+}

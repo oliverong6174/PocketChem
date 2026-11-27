@@ -1,0 +1,212 @@
+{
+  "id": "RQ-02",
+  "startedUTC": "2026-11-06T18:22:49.095Z",
+  "calls": [
+    "runRule",
+    "verifyMultistepRoute",
+    "assessRouteCompatibility",
+    "assessRouteSelectivity",
+    "assessRouteQuality"
+  ],
+  "pathways": [
+    {
+      "ruleId": "ketone-reduction",
+      "family": "ketones",
+      "reactionType": "reduction",
+      "title": "Ketone Reduction",
+      "reagentLabel": "NaBH₄ or LiAlH₄, then H₃O⁺",
+      "reagentNote": "Hydride reduction",
+      "shortExplanation": "Hydride reagents reduce ketones to secondary alcohols.",
+      "course": "ochem-2",
+      "chapter": "Aldehydes and ketones",
+      "mechanism": null,
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "ketone-reduction",
+      "reactantSmiles": "CC(=O)CC(C)CC",
+      "reactantLabel": "Current intermediate",
+      "productSmiles": "CCC(C)CC(C)O",
+      "productLabel": "Secondary alcohol",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CC(=O)CC(C)CC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "construction": "engine-pathway",
+  "route": {
+    "id": "RQ-02",
+    "startingSmiles": "CC(=O)CC(C)CC",
+    "targetSmiles": "CC(O)CC(C)CC",
+    "steps": [
+      {
+        "id": "s1",
+        "stepNumber": 1,
+        "source": "forward",
+        "ruleId": "ketone-reduction",
+        "family": "ketones",
+        "reactionType": "reduction",
+        "title": "Ketone Reduction",
+        "reactantSmiles": "CC(=O)CC(C)CC",
+        "reactantComponents": [
+          "CC(=O)CC(C)CC"
+        ],
+        "reactantLabel": "Current intermediate",
+        "productSmiles": "CCC(C)CC(C)O",
+        "productComponents": [
+          "CCC(C)CC(C)O"
+        ],
+        "productLabel": "Secondary alcohol",
+        "reagentLabel": "NaBH₄ or LiAlH₄, then H₃O⁺",
+        "reagentNote": "Hydride reduction",
+        "shortExplanation": "Hydride reagents reduce ketones to secondary alcohols.",
+        "course": "ochem-2",
+        "chapter": "Aldehydes and ketones",
+        "mechanism": null,
+        "reactionClass": null,
+        "purpose": null,
+        "selectivity": [],
+        "selectivityProfile": null,
+        "selectivityAssessment": null,
+        "limitations": [],
+        "retrosynthesisConfidence": null,
+        "productMixture": null,
+        "display": null
+      }
+    ],
+    "confidence": "verified",
+    "score": 0,
+    "verification": {
+      "status": "verified",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "ruleId": "ketone-reduction",
+          "status": "verified",
+          "reactants": [
+            {
+              "smiles": "CC(=O)CC(C)CC",
+              "origin": "starting-material",
+              "match": "exact",
+              "lotId": "sm0#1",
+              "lineage": [
+                0
+              ]
+            }
+          ],
+          "productMatch": "exact",
+          "problems": []
+        }
+      ],
+      "targetMatch": "exact",
+      "coproducts": [],
+      "unusedStartingMaterials": [],
+      "problems": [],
+      "inventory": [
+        {
+          "startIndex": 0,
+          "smiles": "CC(=O)CC(C)CC",
+          "copies": 1,
+          "consumed": 1,
+          "lotIds": [
+            "sm0#1"
+          ],
+          "consumedByStep": [
+            1
+          ]
+        }
+      ],
+      "leftovers": [
+        {
+          "lotId": "s1.1",
+          "smiles": "CCC(C)CC(C)O",
+          "origin": "earlier-step",
+          "producedByStep": 1,
+          "lineage": [
+            0
+          ],
+          "fromMixture": false
+        }
+      ],
+      "stepDependencies": [
+        {
+          "stepNumber": 1,
+          "consumedLotIds": [
+            "sm0#1"
+          ],
+          "producedLotIds": [
+            "s1.1"
+          ],
+          "dependsOnSteps": []
+        }
+      ],
+      "targetLineage": {
+        "lotId": "s1.1",
+        "startingMaterialIndices": [
+          0
+        ],
+        "contributingSteps": [
+          1
+        ],
+        "unusedSteps": [],
+        "longestLinearSequence": 1
+      }
+    },
+    "compatibility": {
+      "warnings": [],
+      "unassessedRuleIds": [],
+      "worst": "none"
+    },
+    "selectivity": {
+      "findings": [
+        {
+          "stepNumber": 1,
+          "ruleId": "ketone-reduction",
+          "representative": false,
+          "limitations": [],
+          "class": "single-outcome",
+          "alternatives": 1,
+          "basis": "The engine offers one constitutional outcome for these reactants; it was not ranked against alternatives."
+        }
+      ],
+      "counts": {
+        "major": 0,
+        "single-outcome": 1,
+        "disfavored": 0,
+        "unranked": 0,
+        "unassessed": 0
+      }
+    }
+  },
+  "quality": {
+    "assessmentVersion": 1,
+    "structural": "verified",
+    "tier": "chemically-supported",
+    "findings": [
+      {
+        "stepNumber": 1,
+        "code": "documented-reagents",
+        "level": "info",
+        "message": "Uses documented reagents (NaBH₄ or LiAlH₄, then H₃O⁺) that are not tracked as structural partners (Na, B, Li, Al stay out of the product). Their availability is assumed, not replayed."
+      },
+      {
+        "stepNumber": 1,
+        "code": "selectivity-single-outcome",
+        "level": "support",
+        "message": "The engine offers one constitutional outcome for these reactants; it was not ranked against alternatives."
+      }
+    ]
+  },
+  "finishedUTC": "2026-11-06T18:22:50.489Z"
+}

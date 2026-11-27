@@ -121,6 +121,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
   },
   {
     id: "acid-chloride-lah",
+    conditions: { hydride: true, anhydrous: true },
     family: "acid-chlorides",
     reactionType: "reduction",
     title: "Reduction",
@@ -144,6 +145,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
 
   {
     id: "acid-chloride-grignard",
+    conditions: { organometallic: true, anhydrous: true },
     family: "acid-chlorides",
     reactionType: "addition",
     title: "Organometallic Addition",
@@ -170,6 +172,7 @@ export const acidChlorideReactionRules: ReactionRule[] = [
 
   {
     id: "acid-chloride-gilman",
+    conditions: { organometallic: true, anhydrous: true },
     family: "acid-chlorides",
     reactionType: "substitution",
     title: "Gilman Reagent",

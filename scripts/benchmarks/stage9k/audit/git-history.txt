@@ -1,0 +1,95 @@
+03e017bdb9992cffbe1706f0f646d07820ef80c0 stage9h-fresh-evaluation@{0} commit: test: freeze independent Stage 9K scientific benchmark before evaluation
+03e017bdb9992cffbe1706f0f646d07820ef80c0 HEAD@{0} commit: test: freeze independent Stage 9K scientific benchmark before evaluation
+7f4cdc021790f1d047f96ff9f2c89352ba4c58ee stage9h-fresh-evaluation@{1} commit (amend): docs/test: Stage 9J report, errata, handoff; stereo regression suite now passes completely (Stage 9J checkpoint 3)
+7f4cdc021790f1d047f96ff9f2c89352ba4c58ee HEAD@{1} commit (amend): docs/test: Stage 9J report, errata, handoff; stereo regression suite now passes completely (Stage 9J checkpoint 3)
+4218536dd9522d81808957af8d01c048b4ba4b9c stage9h-fresh-evaluation@{2} commit: docs/test: Stage 9J report, errata, handoff; stereo regression suite now passes completely (Stage 9J checkpoint 3)
+4218536dd9522d81808957af8d01c048b4ba4b9c HEAD@{2} commit: docs/test: Stage 9J report, errata, handoff; stereo regression suite now passes completely (Stage 9J checkpoint 3)
+b92a5eef804284ab3b693c268c63a4dac3e45687 HEAD@{3} reset: moving to HEAD
+b92a5eef804284ab3b693c268c63a4dac3e45687 stage9h-fresh-evaluation@{3} commit: fix: Diels-Alder endo rule for activated dienophiles (was drawing the exo adduct), ring-count name guard counts heterocycle stems, stereo-sensitive synonym equivalence, MS McLafferty audit, set B baseline (Stage 9J checkpoint 2)
+b92a5eef804284ab3b693c268c63a4dac3e45687 HEAD@{4} commit: fix: Diels-Alder endo rule for activated dienophiles (was drawing the exo adduct), ring-count name guard counts heterocycle stems, stereo-sensitive synonym equivalence, MS McLafferty audit, set B baseline (Stage 9J checkpoint 2)
+8191d92596dd443cf1db35ed452840ad81d28e76 stage9h-fresh-evaluation@{4} commit: test: freeze Stage 9J mass-spectrum development set B before any engine run on it
+8191d92596dd443cf1db35ed452840ad81d28e76 HEAD@{5} commit: test: freeze Stage 9J mass-spectrum development set B before any engine run on it
+ec19b64b10d0066b433f7bd42510557dc96e46a4 stage9h-fresh-evaluation@{5} commit: fix: beta-halo carbonyl check covers strong-base haloalkane rules; Stage 9J route-quality validation runs (first run preserved, harness v2 runs appended)
+ec19b64b10d0066b433f7bd42510557dc96e46a4 HEAD@{6} commit: fix: beta-halo carbonyl check covers strong-base haloalkane rules; Stage 9J route-quality validation runs (first run preserved, harness v2 runs appended)
+0d90f3e416caa48ffa1ea585edfea216ef3ffdcc stage9h-fresh-evaluation@{6} commit: test: freeze Stage 9J route-quality validation cases before running the assessor on them
+734943dcc41c05cb4ea95e0b02a53ee6017c72a9 stage9h-fresh-evaluation@{7} commit: feat: qualitative SN2/E2 competition, bulky-electrophile ortho penalty, condition-dependent primary Friedel-Crafts alkylation, aldol ketone-electrophile minor, acid epoxide alcoholysis keeps both regioisomers (Stage 9J checkpoint 1)
+0d90f3e416caa48ffa1ea585edfea216ef3ffdcc HEAD@{7} commit: test: freeze Stage 9J route-quality validation cases before running the assessor on them
+734943dcc41c05cb4ea95e0b02a53ee6017c72a9 HEAD@{8} commit: feat: qualitative SN2/E2 competition, bulky-electrophile ortho penalty, condition-dependent primary Friedel-Crafts alkylation, aldol ketone-electrophile minor, acid epoxide alcoholysis keeps both regioisomers (Stage 9J checkpoint 1)
+7763b4439f3e5a22fb15b5264291cf35f3c32dae stage9h-fresh-evaluation@{8} commit: feat: McLafferty ions, base-peak certainty, alcohol alpha-cleavage weighting; Stage 9I report, results and handoff (checkpoint 3)
+7763b4439f3e5a22fb15b5264291cf35f3c32dae HEAD@{9} commit: feat: McLafferty ions, base-peak certainty, alcohol alpha-cleavage weighting; Stage 9I report, results and handoff (checkpoint 3)
+4da985909afec65a7617ee29a7182832bd7d86d3 stage9h-fresh-evaluation@{9} commit: test: freeze Stage 9I mass-spectrum development set (15 NIST EI cases, not Stage 9H/9F compounds) before any engine run on it
+4da985909afec65a7617ee29a7182832bd7d86d3 HEAD@{10} commit: test: freeze Stage 9I mass-spectrum development set (15 NIST EI cases, not Stage 9H/9F compounds) before any engine run on it
+d80c3ccc25ea1a58d244200b4377be7badf0ddf3 stage9h-fresh-evaluation@{10} commit: fix: nomenclature (ethenyl/ethynyl, ketone parents and locants, one-carbon parents, ring ketones, polycarboxylic acids, salts, e-elision) and name-vs-structure guards (Stage 9I checkpoint 2)
+d80c3ccc25ea1a58d244200b4377be7badf0ddf3 HEAD@{11} commit: fix: nomenclature (ethenyl/ethynyl, ketone parents and locants, one-carbon parents, ring ketones, polycarboxylic acids, salts, e-elision) and name-vs-structure guards (Stage 9I checkpoint 2)
+51489e0e3fd000c919e214c94e0d92bee3ae1af0 HEAD@{12} reset: moving to HEAD
+51489e0e3fd000c919e214c94e0d92bee3ae1af0 stage9h-fresh-evaluation@{11} commit: feat: route chemical-quality tier separate from structural replay (Stage 9I checkpoint 1)
+51489e0e3fd000c919e214c94e0d92bee3ae1af0 HEAD@{13} commit: feat: route chemical-quality tier separate from structural replay (Stage 9I checkpoint 1)
+59513502d6e2743198a08a579c703331d516d2fa stage9h-fresh-evaluation@{12} commit: test: Stage 9H baseline results, analysis, report and handoff (engine unchanged; frozen set now exposed)
+59513502d6e2743198a08a579c703331d516d2fa HEAD@{14} commit: test: Stage 9H baseline results, analysis, report and handoff (engine unchanged; frozen set now exposed)
+03460be1a9d424250588f7ad9006159d75c7da35 stage9h-fresh-evaluation@{13} commit: test: record Stage 9H freeze commit
+03460be1a9d424250588f7ad9006159d75c7da35 HEAD@{15} commit: test: record Stage 9H freeze commit
+
+A	scripts/benchmarks/stage9j/ERRATA-9J.md
+A	scripts/benchmarks/stage9j/HANDOFF-9J.md
+A	scripts/benchmarks/stage9j/REPORT.md
+A	scripts/benchmarks/stage9j/ms-dev-b/PROTOCOL.md
+A	scripts/benchmarks/stage9j/ms-dev-b/calibration.mjs
+A	scripts/benchmarks/stage9j/ms-dev-b/cases.json
+A	scripts/benchmarks/stage9j/ms-dev-b/manifest.json
+A	scripts/benchmarks/stage9j/ms-dev-b/results/baseline.json
+A	scripts/benchmarks/stage9j/ms-dev-b/results/calibration.json
+A	scripts/benchmarks/stage9j/ms-dev-b/run.mjs
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/1-hexanol.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/2-butanol.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/2-octanone.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/3-hexanone.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/anisole.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/benzaldehyde.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/benzyl-alcohol.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/butylamine.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/butylbenzene.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/cyclohexanol.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/dibutylamine.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/ethyl-benzoate.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/ethyl-butanoate.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/ethyl-hexanoate.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/hexanal.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/methyl-butanoate.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/octanenitrile.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/octanoic-acid.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/pentanal.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/pentanenitrile.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/pentanoic-acid.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/propyl-acetate.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/propylbenzene.json
+A	scripts/benchmarks/stage9j/ms-dev-b/snapshots/triethylamine.json
+A	scripts/benchmarks/stage9j/nameEquivalence.mjs
+A	scripts/benchmarks/stage9j/nomenclature-run.mjs
+A	scripts/benchmarks/stage9j/nomenclature-strict.mjs
+A	scripts/benchmarks/stage9j/results/nomenclature-current.json
+A	scripts/benchmarks/stage9j/results/nomenclature-strict.json
+A	scripts/benchmarks/stage9j/route-quality/cases.json
+A	scripts/benchmarks/stage9j/route-quality/results/first-run.json
+A	scripts/benchmarks/stage9j/route-quality/results/second-run-harness-v2.json
+A	scripts/benchmarks/stage9j/route-quality/results/third-run-harness-v2b.json
+A	scripts/benchmarks/stage9j/route-quality/run.mjs
+A	scripts/benchmarks/stage9j/tools/msDevSetB.mjs
+A	scripts/tests/dielsAlder9j.test.mjs
+M	scripts/tests/existingRegression.test.mjs
+A	scripts/tests/massSpec9j.test.mjs
+M	scripts/tests/mechanism9e.test.mjs
+A	scripts/tests/nameEquivalence9j.test.mjs
+A	scripts/tests/nomenclature9j.test.mjs
+A	scripts/tests/routeQuality9j.test.mjs
+M	scripts/tests/scientificRegression9f.test.mjs
+A	scripts/tests/selectivity9j.test.mjs
+M	src/utils/nomenclature/nameBuilder/namingSupport.ts
+M	src/utils/reactions/engine/handlers/ring.ts
+M	src/utils/reactions/engine/productSelectivity.ts
+M	src/utils/reactions/engine/routeQuality.ts
+M	src/utils/reactions/families/enolates.ts
+M	src/utils/reactions/families/epoxides.ts
+M	src/utils/reactions/families/haloalkanes.ts
+M	src/utils/reactions/reactionTypes.ts
+M	src/utils/stereochemistry/depictionEngine.ts
+M	src/utils/stereochemistry/regression.ts

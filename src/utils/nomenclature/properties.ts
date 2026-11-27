@@ -39,19 +39,31 @@ function countImplicitHydrogens(
   return Math.max(0, Math.round(expectedValence - bondOrderSum));
 }
 
+/** Element symbol of a count key: "C", or the base of an isotope-labelled species such as "[13C]" or "[2H]". */
+const baseElement = (key: string) => /^\[\d+([A-Z][a-z]?)\]$/.exec(key)?.[1] ?? key;
+const isotopeOf = (key: string) => Number(/^\[(\d+)[A-Z][a-z]?\]$/.exec(key)?.[1] ?? 0);
+
+/**
+ * Hill-ordered formula. Isotope-labelled atoms are separate species written as [13C] or [2H] and sit in the slot of their element,
+ * after the unlabelled atoms of that element: C[13C]H4O2, C[2H]Cl3, [2H]2O. (They used to be counted as the plain element.)
+ */
 export function buildFormula(atomCounts: Map<string, number>) {
-  const orderedElements = [
-    ...ELEMENT_ORDER.filter((element) => atomCounts.has(element)),
-    ...Array.from(atomCounts.keys())
-      .filter((element) => !ELEMENT_ORDER.includes(element))
-      .sort(),
+  const bases = Array.from(new Set(Array.from(atomCounts.keys()).map(baseElement)));
+  const orderedBases = [
+    ...ELEMENT_ORDER.filter((element) => bases.includes(element)),
+    ...bases.filter((element) => !ELEMENT_ORDER.includes(element)).sort(),
   ];
 
-  return orderedElements
-    .map((element) => {
-      const count = atomCounts.get(element) ?? 0;
-      return count === 1 ? element : `${element}${count}`;
-    })
+  return orderedBases
+    .flatMap((element) =>
+      Array.from(atomCounts.keys())
+        .filter((key) => baseElement(key) === element)
+        .sort((a, b) => isotopeOf(a) - isotopeOf(b))
+        .map((key) => {
+          const count = atomCounts.get(key) ?? 0;
+          return count === 1 ? key : `${key}${count}`;
+        }),
+    )
     .join("");
 }
 
@@ -59,7 +71,8 @@ export function calculateAtomCounts(parsedMol: ParsedMol) {
   const counts = new Map<string, number>();
 
   for (const atom of parsedMol.atoms) {
-    counts.set(atom.element, (counts.get(atom.element) ?? 0) + 1);
+    const key = atom.isotope ? `[${atom.isotope}${atom.element}]` : atom.element;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
 
     const implicitHydrogens = countImplicitHydrogens(atom, parsedMol.adjacency);
 
@@ -71,21 +84,25 @@ export function calculateAtomCounts(parsedMol: ParsedMol) {
   return counts;
 }
 
-export function calculateDBE(atomCounts: Map<string, number>) {
-  const carbon = atomCounts.get("C") ?? 0;
-  if (carbon === 0) return null;
+/**
+ * Degrees of unsaturation from the formula: (2C + 2 + N + P - H - X) / 2, with H adjusted by the formal charge so that ions follow the
+ * same convention (acetate C2H3O2- gives 1, ammonium gives 0). Trivalent phosphorus counts like nitrogen (triphenylphosphine gives 12),
+ * and a formula without carbon is no longer reported as unavailable. S=O and P=O are not counted: this is a formula property, not a
+ * structure count.
+ */
+export function calculateDBE(atomCounts: Map<string, number>, formalCharge = 0) {
+  const total = (symbols: string[]) =>
+    Array.from(atomCounts.entries())
+      .filter(([key]) => symbols.includes(baseElement(key)))
+      .reduce((sum, [, count]) => sum + count, 0);
 
-  const hydrogen = atomCounts.get("H") ?? 0;
-  const nitrogen = atomCounts.get("N") ?? 0;
+  const carbon = total(["C"]);
+  const hydrogen = total(["H"]) - formalCharge;
+  const trivalent = total(["N", "P"]);
+  const halogens = total(["F", "Cl", "Br", "I"]);
+  if (carbon === 0 && trivalent === 0 && hydrogen <= 0) return null;
 
-  const halogens =
-    (atomCounts.get("F") ?? 0) +
-    (atomCounts.get("Cl") ?? 0) +
-    (atomCounts.get("Br") ?? 0) +
-    (atomCounts.get("I") ?? 0);
-
-  const dbe = carbon - (hydrogen + halogens) / 2 + nitrogen / 2 + 1;
-
+  const dbe = (2 * carbon + 2 + trivalent - hydrogen - halogens) / 2;
   return Math.max(0, Number(dbe.toFixed(1)));
 }
 
@@ -477,12 +494,14 @@ export function buildProperties(
 ): MoleculePropertyResult {
   const counts = calculateAtomCounts(parsedMol);
   const formula = buildFormula(counts);
-  const dbe = calculateDBE(counts);
   const formalCharge = parsedMol.atoms.reduce(
     (sum, atom) => sum + atom.charge,
     0
   );
-  const heavyAtomCount = parsedMol.atoms.filter((atom) => atom.element !== "H")
+  const unspecifiedAtomCount = parsedMol.atoms.filter((atom) => !/^[A-Z][a-z]?$/.test(atom.element) || ["R", "A", "Q", "X"].includes(atom.element)).length;
+  const fullySpecified = unspecifiedAtomCount === 0;
+  const dbe = fullySpecified ? calculateDBE(counts, formalCharge) : null;
+  const heavyAtomCount = parsedMol.atoms.filter((atom) => atom.element !== "H" && /^[A-Z][a-z]?$/.test(atom.element) && !["R", "A", "Q", "X"].includes(atom.element))
     .length;
 
   const exactMass = getNumberDescriptor(descriptors, [
@@ -575,9 +594,11 @@ export function buildProperties(
   }
 
   return {
+    fullySpecified,
+    unspecifiedAtomCount,
     molecularFormula: formula || "Not available",
-    exactMass: formatDescriptor(exactMass, 4),
-    molecularWeight: formatDescriptor(molecularWeight, 2),
+    exactMass: fullySpecified ? formatDescriptor(exactMass, 4) : null,
+    molecularWeight: fullySpecified ? formatDescriptor(molecularWeight, 2) : null,
     degreesOfUnsaturation: dbe,
     formalCharge,
     atomCounts,
@@ -592,6 +613,6 @@ export function buildProperties(
     waterSolubilityTendency,
     membranePermeabilityTendency,
     volatilityTendency,
-    notes,
+    notes: fullySpecified ? notes : [...notes, "Generic structure: R / wildcard atoms are unspecified substituents, not elements. Mass, DBE and whole-molecule physicochemical tendencies are unavailable. Atom counts, formal charge, rings and detected groups describe the drawn scaffold only."],
   };
 }

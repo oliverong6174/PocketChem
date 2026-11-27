@@ -1,0 +1,106 @@
+/* General Chemistry: acid-base and titration tool (Stage 11). Uses the Stage 10 tokens; charts sit on paper. */
+.gc-page { display: grid; gap: var(--sp-4); }
+.gc-toolbar { display: flex; flex-wrap: wrap; gap: var(--sp-3) var(--sp-5); align-items: flex-start; }
+.gc-toolbar-actions { margin-left: auto; display: flex; gap: var(--sp-2); }
+.gc-opened { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+
+.gc-layout { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: var(--sp-4); align-items: start; }
+.gc-inputs { display: grid; gap: var(--sp-3); position: sticky; top: var(--sticky-top); }
+.gc-stage { display: grid; gap: var(--sp-4); min-width: 0; }
+@media (max-width: 900px) {
+  .gc-layout { grid-template-columns: minmax(0, 1fr); }
+  .gc-inputs { position: static; }
+}
+
+.gc-presets { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.gc-field { display: grid; gap: 4px; }
+.gc-field label { font-size: var(--fs-sm); font-weight: 600; color: var(--text-muted); }
+.gc-unit { font-weight: 400; color: var(--text-faint); }
+.gc-field input[type="text"] { width: 100%; font-family: var(--font-mono); font-size: var(--fs-md, 0.95rem); min-height: var(--touch); }
+.gc-field.has-error input { border-color: var(--status-danger); }
+.gc-field-error { margin: 0; font-size: var(--fs-sm); color: var(--status-danger); }
+.gc-field-hint { margin: 0; font-size: var(--fs-xs); color: var(--text-faint); }
+.gc-fieldset { border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-3); display: grid; gap: var(--sp-3); margin: 0; }
+.gc-fieldset legend { padding: 0 var(--sp-2); font-size: var(--fs-sm); font-weight: 600; color: var(--text-muted); }
+
+.gc-slider { display: grid; gap: var(--sp-2); }
+.gc-slider label { font-size: var(--fs-sm); color: var(--text-muted); }
+.gc-slider input[type="range"] { width: 100%; min-height: var(--touch); accent-color: var(--accent); }
+.gc-jumps { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+
+.gc-big { font-family: var(--font-display); font-size: 2rem; line-height: 1.1; }
+.gc-eq-list { margin: 0; padding-left: 1.1em; display: grid; gap: var(--sp-2); font-family: var(--font-mono); font-size: var(--fs-sm); }
+.gc-assumptions { margin: 0; padding-left: 1.2em; display: grid; gap: var(--sp-1); }
+.gc-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.gc-table th, .gc-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+.gc-table td { font-family: var(--font-mono); }
+
+.gc-predict, .gc-lessons { display: grid; gap: var(--sp-3); }
+.gc-scenario-pick { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.gc-scenario-pick .is-on { border-color: var(--accent); background: var(--accent-soft); }
+.gc-question { margin: 0; }
+.gc-reveal button { margin-top: var(--sp-2); }
+
+/* ---- chart (always on paper) ---- */
+.gc-chart { width: 100%; min-width: 0; }
+.gc-chart-svg { display: block; width: 100%; max-width: 100%; height: auto; user-select: none; }
+.gc-grid { stroke: #d6dde6; stroke-width: 1; }
+.gc-frame { fill: none; stroke: #94a3b8; stroke-width: 1; }
+.gc-tick { fill: #334155; font-size: 12px; font-family: var(--font-body, system-ui); }
+.gc-axis-label { fill: #0f172a; font-size: 13px; font-weight: 600; font-family: var(--font-body, system-ui); }
+.gc-line { stroke: #0b6a72; stroke-width: 2.6; stroke-linejoin: round; stroke-linecap: round; }
+.gc-band { fill: rgba(11, 106, 114, 0.14); }
+.gc-marker circle { stroke: #ffffff; stroke-width: 2; }
+.gc-marker.kind-equivalence circle { fill: #b45309; }
+.gc-marker.kind-half circle { fill: #6d28d9; }
+.gc-marker.kind-info circle { fill: #0f172a; }
+.gc-marker text { fill: #0f172a; font-size: 12px; font-weight: 600; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; }
+.gc-current line { stroke: #be123c; stroke-width: 1.6; stroke-dasharray: 5 4; }
+.gc-current circle { fill: #be123c; stroke: #ffffff; stroke-width: 2.5; }
+.gc-current:focus { outline: none; }
+.gc-current:focus-visible circle { stroke: #0f172a; stroke-width: 3; }
+
+/* ---- overview ---- */
+.gc-tool-cards { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
+.gc-tool-card { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-3); padding: var(--sp-4); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface-raised); }
+.gc-tool-card h3 { margin: 0 0 var(--sp-1); font-family: var(--font-display); }
+.gc-tool-card p { margin: 0 0 var(--sp-2); color: var(--text-muted); }
+.gc-feature-list { margin: 0 0 var(--sp-3); padding-left: 1.2em; display: grid; gap: 2px; font-size: var(--fs-sm); }
+.gc-tool-card-foot { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+.gc-planned { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.gc-planned li { display: flex; justify-content: space-between; gap: var(--sp-3); align-items: center; padding: var(--sp-2) var(--sp-3); border: 1px dashed var(--border-strong, var(--border)); border-radius: var(--radius-md); color: var(--text-muted); }
+.gc-chip { min-height: 38px; padding: 6px 12px; }
+
+/* ---- Stage 12: equilibrium, kinetics, thermodynamics (shared patterns) ---- */
+.gc-fieldset.gc-species { padding: var(--sp-3); }
+.gc-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--sp-2); }
+.gc-field textarea { width: 100%; resize: vertical; font-size: var(--fs-sm); line-height: 1.45; }
+.gc-field .gc-mono, .gc-field input.gc-mono { font-family: var(--font-mono); }
+.gc-reaction { font-family: var(--font-body, system-ui); font-size: 1rem; overflow-wrap: anywhere; }
+.gc-eq-line { margin: 0; font-family: var(--font-mono); font-size: var(--fs-sm); overflow-wrap: anywhere; }
+.gc-step { display: grid; gap: var(--sp-1); margin-bottom: var(--sp-3); }
+.gc-step h4 { margin: 0; font-size: var(--fs-md, 1rem); }
+.gc-step p { margin: 0; }
+.gc-ice th[scope="row"], .gc-shift-table th[scope="row"] { font-weight: 600; color: var(--text); }
+.gc-table-scroll { overflow-x: auto; }
+.gc-bar { display: block; height: 6px; margin-top: 4px; border-radius: 3px; background: var(--accent, #0b6a72); opacity: 0.75; max-width: 100%; }
+.gc-verdict { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; }
+.gc-fit-table td, .gc-fit-table th { white-space: nowrap; }
+.gc-fit-table tr.is-best td, .gc-fit-table tr.is-best th { background: var(--accent-soft); }
+.gc-case-table td:first-child, .gc-case-table th:first-child { font-weight: 600; }
+.gc-case-table tr.is-here td, .gc-case-table tr.is-here th { background: var(--accent-soft); }
+.gc-hess-step { display: grid; gap: var(--sp-2); }
+.gc-ledger { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.gc-ledger li { padding: var(--sp-2) var(--sp-3); border: 1px solid var(--border); border-radius: var(--radius-md); display: grid; gap: 2px; }
+.gc-ledger .gc-ledger-total { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.gc-calc-steps { margin: 0; padding-left: 1.3em; display: grid; gap: var(--sp-3); }
+.gc-calc-steps li > span { display: block; }
+.gc-calc-steps .gc-expr { font-family: var(--font-mono); font-size: var(--fs-sm); overflow-wrap: anywhere; color: var(--text-muted); }
+.gc-calc-steps .gc-result { font-weight: 600; }
+.gc-dot { fill: #0b6a72; stroke: #ffffff; stroke-width: 1.5; }
+.gc-band.kind-warn { fill: rgba(180, 83, 9, 0.16); }
+.gc-check { display: flex; gap: var(--sp-2); align-items: flex-start; font-size: var(--fs-sm); }
+.gc-check input { margin-top: 3px; }
+.gc-stage > *, .gc-inputs > * { min-width: 0; }
+.gc-stage .ui-figure { min-width: 0; }
+.gc-stage .ui-figure dd { overflow-wrap: anywhere; }

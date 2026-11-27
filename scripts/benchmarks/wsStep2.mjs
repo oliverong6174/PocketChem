@@ -1,0 +1,10 @@
+import { closeEngine, loadEngine, loadModule } from "../tests/engine.mjs";
+const { utils } = await loadEngine();
+const ws = await loadModule("/src/utils/reactions/engine/reactionWorkspace.ts");
+const [ruleId, ...reactants] = process.argv.slice(2);
+const created = await ws.createWorkspace(reactants);
+console.log("lots:", created.workspace.pool.lots.map((l) => `${l.id}:${l.smiles ?? l.canonical}`).join(" | "));
+const lotIds = created.workspace.pool.lots.map((l) => l.id);
+const result = await ws.executeWorkspaceStep(created.workspace, { ruleId, lotIds }, utils.reactionRegistry);
+console.log(JSON.stringify(result.step, (k, v) => (k === "outcomes" ? v.length : v)).slice(0, 900));
+await closeEngine(); process.exit(0);

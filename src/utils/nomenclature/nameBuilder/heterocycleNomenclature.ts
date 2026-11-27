@@ -23,6 +23,8 @@ type HeterocycleTemplate = {
   locants: HeterocycleLocant[];
   minUnsaturatedBonds?: number;
   maxUnsaturatedBonds?: number;
+  /** Index permutations of the template atoms that are symmetry operations of the parent (alternative numberings of a symmetric fused system). */
+  symmetries?: number[][];
 };
 
 export type HeterocycleNomenclatureResult = {
@@ -46,6 +48,20 @@ export type HeterocycleNomenclatureResult = {
  */
 const HETEROCYCLE_TEMPLATES: HeterocycleTemplate[] = [
   // Fused systems -------------------------------------------------------------
+  {
+    name: "naphthalene",
+    stem: "naphthalen",
+    smarts: "[#6]1~[#6]~[#6]~[#6]~[#6]2~[#6]~[#6]~[#6]~[#6]~[#6]1~2",
+    // Query order: C1 C2 C3 C4 C4a C5 C6 C7 C8 C8a
+    locants: [1, 2, 3, 4, "4a", 5, 6, 7, 8, "8a"],
+    minUnsaturatedBonds: 5,
+    // Mirror through the midpoints of C2-C3 and C6-C7; mirror through C4a-C8a; and their product.
+    symmetries: [
+      [3, 2, 1, 0, 9, 8, 7, 6, 5, 4],
+      [8, 7, 6, 5, 4, 3, 2, 1, 0, 9],
+      [5, 6, 7, 8, 9, 0, 1, 2, 3, 4],
+    ],
+  },
   {
     name: "purine",
     stem: "purin",
@@ -384,19 +400,86 @@ function getExternalRankingVector(
   return [...suffixLike, ...ordinary];
 }
 
+/** All rotations and reflections of a ring walk whose element sequence equals the original (so heteroatoms keep their template positions). */
+function ringNumberings(parsedMol: ParsedMol, atoms: number[]): number[][] {
+  const n = atoms.length;
+  const elements = atoms.map((atom) => parsedMol.atoms[atom]?.element ?? "?");
+  const seen = new Set<string>();
+  const out: number[][] = [];
+  for (const direction of [1, -1]) {
+    for (let start = 0; start < n; start += 1) {
+      const variant = Array.from({ length: n }, (_, k) => atoms[(((start + direction * k) % n) + n) % n]);
+      if (!variant.every((atom, k) => (parsedMol.atoms[atom]?.element ?? "?") === elements[k])) continue;
+      const key = variant.join(",");
+      if (!seen.has(key)) { seen.add(key); out.push(variant); }
+    }
+  }
+  return out.length ? out : [atoms];
+}
+
+/**
+ * True when some part of the molecule outside the matched template is joined to it at two or more template atoms. That part is a further
+ * fused or bridged ring, not a substituent, so the template cannot be the whole parent: naphthalene matched inside anthracene was named
+ * "2,3-ditridec-1,3,5,7,9,11-en-1-ylnaphthalene" because the third ring was read as two chain substituents.
+ */
+function extendsTemplateRingSystem(parsedMol: ParsedMol, templateAtoms: number[]): boolean {
+  const inTemplate = new Set(templateAtoms);
+  const seen = new Set<number>();
+  for (const atom of parsedMol.atoms) {
+    if (inTemplate.has(atom.atomIndex) || seen.has(atom.atomIndex)) continue;
+    const attachments = new Set<number>();
+    const stack = [atom.atomIndex];
+    seen.add(atom.atomIndex);
+    while (stack.length > 0) {
+      const current = stack.pop() as number;
+      for (const bond of parsedMol.adjacency.get(current) ?? []) {
+        const other = bond.atomA === current ? bond.atomB : bond.atomA;
+        if (inTemplate.has(other)) {
+          attachments.add(other);
+        } else if (!seen.has(other)) {
+          seen.add(other);
+          stack.push(other);
+        }
+      }
+    }
+    if (attachments.size >= 2) return true;
+  }
+  return false;
+}
+
 function findHeterocycleMatch(
   RDKit: RDKitModule,
   mol: RDKitMol,
   parsedMol: ParsedMol
 ): HeterocycleMatch | null {
+  // Atoms shared by two or more rings (fused, bridged, spiro). A monocyclic template (a single ring closure) must not claim a ring
+  // that is part of such a system: the ring name plus substituent chains would describe a different molecule (cyclohexene oxide
+  // read as a di(hexyloxy-pentyl)oxirane). Fused systems that have their own template are unaffected.
+  const sharedRingAtoms = new Set<number>();
+  {
+    const sharedQuery = RDKit.get_qmol("[R;!R1]");
+    try {
+      if (sharedQuery) {
+        for (const atoms of parseMatchArray(mol.get_substruct_matches(sharedQuery))) {
+          for (const atom of atoms) sharedRingAtoms.add(atom);
+        }
+      }
+    } finally {
+      sharedQuery?.delete?.();
+    }
+  }
+
   for (const template of HETEROCYCLE_TEMPLATES) {
     let query: RDKitQuery | null = null;
     try {
       query = RDKit.get_qmol(template.smarts);
       if (!query) continue;
+      const monocyclic = !/[2-9]/.test(template.smarts.replace(/\[[^\]]*\]/g, ""));
 
       const matches = parseMatchArray(mol.get_substruct_matches(query))
         .filter((atoms) => atoms.length === template.locants.length)
+        .filter((atoms) => !(monocyclic && atoms.some((atom) => sharedRingAtoms.has(atom))))
+        .filter((atoms) => !extendsTemplateRingSystem(parsedMol, atoms))
         .filter((atoms) => {
           const unsaturated = countInternalUnsaturatedBonds(parsedMol, atoms);
           if (
@@ -416,7 +499,15 @@ function findHeterocycleMatch(
 
       if (matches.length === 0) continue;
 
-      const best = [...matches].sort((a, b) =>
+      // RDKit reports one match per atom SET, so only one of the equivalent numberings of a ring is seen and lowest-locant
+      // selection never had a choice (2,3,3-trimethyloxirane, 4-methyloxetane, 5-methylthiophene). Every rotation and reflection of
+      // the ring walk that keeps the template's element sequence is a legal numbering; rank them all.
+      const numberings = matches.flatMap((atoms) =>
+        monocyclic
+          ? ringNumberings(parsedMol, atoms)
+          : [atoms, ...(template.symmetries ?? []).map((permutation) => permutation.map((index) => atoms[index]))],
+      );
+      const best = [...numberings].sort((a, b) =>
         compareNumericVectors(
           getExternalRankingVector(parsedMol, a, template.locants),
           getExternalRankingVector(parsedMol, b, template.locants)
@@ -570,6 +661,17 @@ function getOxygenPrefix(parsedMol: ParsedMol, oxygenIndex: number, parentAtom: 
   }
 
   return "oxy";
+}
+
+/**
+ * IUPAC P-16.7.1: the final "e" of a parent name is elided before a suffix that starts with a vowel and kept before one that starts with a
+ * consonant, so oxolan-2-one but oxolane-2,5-dione (the "d" of "dione") and oxolane-2-thione. Templates store the stem without the "e".
+ */
+function stemBeforeSuffix(template: { name: string; stem: string }, suffixStartsWithConsonant: boolean): string {
+  if (!suffixStartsWithConsonant) return template.stem;
+  return template.name.endsWith("e") && template.name.slice(0, -1) === template.stem
+    ? template.stem + "e"
+    : template.stem;
 }
 
 function getMultiplier(count: number) {
@@ -755,11 +857,11 @@ export function getHeterocycleNomenclature(
   // heterocycle -one/-dione rather than selecting an acyclic "imine" chain.
   if (!suffixBase && oxoLocants.length > 0) {
     const locants = [...oxoLocants].sort((a, b) => locantSortValue(a) - locantSortValue(b));
-    suffixBase = `${match.template.stem}-${locants.join(",")}-${getMultiplier(locants.length)}one`;
+    suffixBase = `${stemBeforeSuffix(match.template, getMultiplier(locants.length) !== "")}-${locants.join(",")}-${getMultiplier(locants.length)}one`;
     mainSuffix = locants.length > 1 ? `-${getMultiplier(locants.length)}one` : "-one";
   } else if (!suffixBase && thioxoLocants.length > 0) {
     const locants = [...thioxoLocants].sort((a, b) => locantSortValue(a) - locantSortValue(b));
-    suffixBase = `${match.template.stem}-${locants.join(",")}-${getMultiplier(locants.length)}thione`;
+    suffixBase = `${stemBeforeSuffix(match.template, true)}-${locants.join(",")}-${getMultiplier(locants.length)}thione`;
     mainSuffix = locants.length > 1 ? `-${getMultiplier(locants.length)}thione` : "-thione";
   }
 

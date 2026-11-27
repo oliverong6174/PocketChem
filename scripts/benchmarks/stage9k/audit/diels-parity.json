@@ -1,0 +1,22 @@
+{
+  "method": "Python RDKit 2026.09.1: generate independent 2D hexagon; set all three external substituent bonds to BEGINDASH; assign atom chirality from bond directions; compare canonical structures.",
+  "drawnCanonical": "COC(=O)[C@H]1C[C@@H](C)C=C[C@H]1C",
+  "stage9jExpectedCanonical": "COC(=O)[C@@H]1C[C@H](C)C=C[C@@H]1C",
+  "matchesExpectedOrMirror": true,
+  "differentFromExoOrMirror": true,
+  "centers": [
+    [
+      1,
+      "R"
+    ],
+    [
+      5,
+      "R"
+    ],
+    [
+      7,
+      "S"
+    ]
+  ],
+  "externalEvidence": "University of Shizuoka lecture PDF page 15; inspect lecture-page-15.png"
+}

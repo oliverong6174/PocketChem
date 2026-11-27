@@ -27,9 +27,8 @@ const betaEliminationSmarts: Record<LeavingGroup, string> = {
  * still fall back to the constitutional product until the general alkene
  * stereochemistry enumerator is added.
  */
-const betaEliminationStereoSmarts: Record<
-  LeavingGroup,
-  { e: string; z: string }
+const betaEliminationStereoSmarts: Partial<
+  Record<LeavingGroup, { e: string; z: string }>
 > = {
   halide: {
     e: "[*:4][C;H1;X4:2]([Cl,Br,I:3])-[C;H2:1][*:5]>>[*:4]/[C:2]=[C:1]/[*:5]",
@@ -89,7 +88,8 @@ async function alkeneSubstitutionScore(smiles: string): Promise<number> {
 
 async function applyAlkenePreference(
   products: string[],
-  preference: AlkenePreference
+  preference: AlkenePreference,
+  keepAlternatives = false,
 ): Promise<string[]> {
   if (preference === "all" || products.length <= 1) return products;
 
@@ -108,6 +108,14 @@ async function applyAlkenePreference(
       ? Math.max(...validScores)
       : Math.min(...validScores);
 
+  if (keepAlternatives) {
+    // Preferred constitution(s) first, every other alkene after them in the order generated: nothing is dropped.
+    return [
+      ...scored.filter((item) => item.score === target),
+      ...scored.filter((item) => item.score !== target),
+    ].map((item) => item.product);
+  }
+
   return scored
     .filter((item) => item.score === target)
     .map((item) => item.product);
@@ -117,7 +125,8 @@ async function eliminateFromPrecursors(
   precursorSmiles: string[],
   leavingGroup: LeavingGroup,
   preference: AlkenePreference,
-  maxProducts: number
+  maxProducts: number,
+  keepAlternatives = false,
 ): Promise<string[]> {
   const constitutionalProducts: string[] = [];
   const eProducts: string[] = [];
@@ -136,12 +145,14 @@ async function eliminateFromPrecursors(
     // This avoids accidentally assigning geometry to an unrelated alkene that
     // was already present elsewhere in the substrate.
     const stereoSmarts = betaEliminationStereoSmarts[leavingGroup];
-    eProducts.push(
-      ...(await runReactionSmarts(precursor, stereoSmarts.e, maxProducts))
-    );
-    zProducts.push(
-      ...(await runReactionSmarts(precursor, stereoSmarts.z, maxProducts))
-    );
+    if (stereoSmarts) {
+      eProducts.push(
+        ...(await runReactionSmarts(precursor, stereoSmarts.e, maxProducts))
+      );
+      zProducts.push(
+        ...(await runReactionSmarts(precursor, stereoSmarts.z, maxProducts))
+      );
+    }
 
     if (
       uniqueProducts([
@@ -179,7 +190,7 @@ async function eliminateFromPrecursors(
     ...constitutionalWithoutStereoDuplicates,
   ]);
 
-  const preferred = await applyAlkenePreference(merged, preference);
+  const preferred = await applyAlkenePreference(merged, preference, keepAlternatives);
   return uniqueProducts(preferred).slice(0, maxProducts);
 }
 
@@ -234,7 +245,9 @@ export async function elimination(
     const maxShiftDepth = readPositiveIntegerOption(options, "maxShiftDepth", 2);
     const allowRearrangement = options?.allowRearrangement !== false;
 
-    const precursors = allowRearrangement
+    // Amines do not ionize to carbocations, so carbocation shift enumeration
+    // only applies to halide/alcohol leaving groups.
+    const precursors = allowRearrangement && leavingGroup !== "amine"
       ? await enumerateCarbocationPrecursors(reactantSmiles, {
           maxShiftDepth,
           maxCandidates: Math.max(6, maxProducts),
@@ -252,7 +265,8 @@ export async function elimination(
       precursors.map((precursor) => precursor.smiles),
       leavingGroup,
       preference,
-      maxProducts
+      maxProducts,
+      leavingGroup !== "amine",
     );
   }
 
@@ -260,6 +274,7 @@ export async function elimination(
     [reactantSmiles],
     leavingGroup,
     preference,
-    maxProducts
+    maxProducts,
+    leavingGroup !== "amine",
   );
 }

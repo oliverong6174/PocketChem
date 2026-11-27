@@ -20,6 +20,32 @@ export type PhysicalSummary = {
   rigidityScore: number;
 };
 
+/**
+ * Wiener index of the heavy-atom skeleton: the sum of shortest-path lengths over all atom pairs. For isomers it falls as the skeleton becomes
+ * more compact (n-butanol 20, sec-butanol 18, tert-butanol 16), the trend that boiling points follow because compact molecules have less
+ * surface for dispersion contact.
+ */
+function wienerIndex(graph: ParsedMol): number {
+  const atoms = graph.atoms.filter((atom) => atom.element !== "H").map((atom) => atom.atomIndex);
+  const inSkeleton = new Set(atoms);
+  let total = 0;
+  for (const start of atoms) {
+    const distance = new Map<number, number>([[start, 0]]);
+    const queue = [start];
+    while (queue.length) {
+      const current = queue.shift() as number;
+      for (const bond of graph.adjacency.get(current) ?? []) {
+        const next = bond.atomA === current ? bond.atomB : bond.atomA;
+        if (!inSkeleton.has(next) || distance.has(next)) continue;
+        distance.set(next, (distance.get(current) ?? 0) + 1);
+        queue.push(next);
+      }
+    }
+    for (const value of distance.values()) total += value;
+  }
+  return total / 2;
+}
+
 export function applyPhysicalMetrics(
   metrics: Record<ComparisonModeId, ComparisonMetric>,
   graph: ParsedMol,
@@ -31,20 +57,32 @@ export function applyPhysicalMetrics(
   boiling: BoilingPointRankingResult | null,
   solubility: SolubilityRankingResult | null,
 ): PhysicalSummary {
-  metrics.boilingPoint = boiling
-    ? metric(
-        boiling.boilingPointScore,
-        `${boiling.tendency} · score ${boiling.boilingPointScore.toFixed(1)}`,
-        boiling.explanation,
-        boiling.factors,
-      )
-    : emptyMetric("Boiling-point tendency could not be estimated.");
+  metrics.boilingPoint =
+    boiling && boiling.jobackBoilingPointK !== null
+      ? metric(
+          boiling.jobackBoilingPointK,
+          `Joback estimate ≈ ${Math.round(boiling.jobackBoilingPointK - 273.15)} °C (${boiling.tendency} tendency)`,
+          "Group-contribution estimate (Joback & Reid 1987; typical error about 12 K, larger for strongly hydrogen-bonded or unusual structures). It orders the molecules; it is not a measured boiling point.",
+          boiling.factors,
+          // Estimate in kelvin decides first. Equal estimates (branching and stereoisomers that the additive groups cannot see) fall back to
+          // cis-alkene dipole, then molecular mass, then skeleton compactness.
+          [Math.round(boiling.jobackBoilingPointK), boiling.cisAlkeneCount, Math.round(boiling.molecularWeight ?? 0), wienerIndex(graph)],
+        )
+      : emptyMetric(
+          boiling?.jobackUnavailableReason
+            ? `Boiling point not ranked: the structure ${boiling.jobackUnavailableReason}.`
+            : "Boiling-point tendency could not be estimated.",
+        );
   metrics.solubility = solubility
     ? metric(
         solubility.waterSolubilityScore,
-        `${solubility.tendency} · score ${solubility.waterSolubilityScore.toFixed(1)}`,
+        `${solubility.tendency}, score ${solubility.waterSolubilityScore.toFixed(1)}`,
         solubility.explanation,
         solubility.factors,
+        // The coarse score decides first; equal scores fall back to hydrophobicity (lower Crippen logP = more water-soluble, the
+        // continuous predictor behind ESOL-type solubility models), which separates n-butanol from tert-butanol-class isomers and
+        // pentane from hexane.
+        solubility.logP === null ? undefined : [solubility.waterSolubilityScore, -Math.round(solubility.logP * 100) / 100, -wienerIndex(graph)],
       )
     : emptyMetric("Water-solubility tendency could not be estimated.");
 
@@ -64,7 +102,7 @@ export function applyPhysicalMetrics(
   metrics.polarity = metric(
     polarityScore,
     descriptors.tpsa !== null
-      ? `TPSA ${descriptors.tpsa.toFixed(1)} Å²${descriptors.logP !== null ? ` · logP ${descriptors.logP.toFixed(2)}` : ""}`
+      ? `TPSA ${descriptors.tpsa.toFixed(1)} Å²${descriptors.logP !== null ? `, logP ${descriptors.logP.toFixed(2)}` : ""}`
       : `polarity proxy ${polarityScore.toFixed(1)}`,
     "Higher TPSA/charge and lower hydrophobicity increase this qualitative polarity score.",
   );
@@ -80,7 +118,7 @@ export function applyPhysicalMetrics(
   const hbScore = (descriptors.hbd ?? 0) * 2 + (descriptors.hba ?? 0);
   metrics.hydrogenBonding = metric(
     hbScore,
-    `${descriptors.hbd ?? 0} donor(s) · ${descriptors.hba ?? 0} acceptor(s)`,
+    `${descriptors.hbd ?? 0} donor(s), ${descriptors.hba ?? 0} acceptor(s)`,
     "Donors receive extra weight because they contribute directly to intermolecular hydrogen-bond donation.",
   );
   const dipoleScore = polarityScore + strongestEwg.score * 4 + carbonyl.score * 3;

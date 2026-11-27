@@ -7,15 +7,19 @@ import { getRuleChapter, getRuleCourse } from "../reactionCurriculum";
 import type {
   ProductGenerationStatus,
   ReactionComponent,
+  ReactionEngineIssue,
   ReactionPathway,
   ReactionRule,
 } from "../reactionTypes";
 import { runCustomHandler } from "./handlers";
+import { enumerateCarbocationPrecursors } from "./handlers/carbocationUtils";
 import {
   analyzeReactionComponents,
+  cachedComponentGroups,
   isGenericReactionSmiles,
 } from "./reactionInput";
 import { runReactionSmarts } from "./rdkitReaction";
+import { runForwardTemplates } from "./forwardTemplates";
 import { classifyReactionProducts } from "./productMixtures";
 import {
   applyRuleProductSelectivity,
@@ -38,7 +42,27 @@ type ReactionPredictionOptions = {
   signal?: AbortSignal;
   /** Optional interactive-planner cap after structural trigger matching. */
   maxExecutedRules?: number;
+  /**
+   * Optional collector for internal failures (matcher/SMARTS/handler errors,
+   * failed component analysis). Failures are still skipped exactly as before so
+   * existing callers are unaffected; callers that need to distinguish an engine
+   * failure from chemical nonreactivity can read this list afterwards.
+   */
+  issues?: ReactionEngineIssue[];
 };
+
+function recordIssue(
+  options: ReactionPredictionOptions,
+  kind: ReactionEngineIssue["kind"],
+  message: string,
+  ruleId?: string,
+): void {
+  options.issues?.push({ kind, message, ...(ruleId ? { ruleId } : {}) });
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
 
 function searchCancelled(signal?: AbortSignal): boolean {
   return Boolean(signal?.aborted);
@@ -105,10 +129,9 @@ async function buildAutoSuppliedReactants(
       return null;
     }
 
-    const hierarchy = await analyzeFunctionalGroupHierarchy(requirement.presetSmiles);
     supplied.push({
       smiles: requirement.presetSmiles,
-      functionalGroups: hierarchy.primaryGroups,
+      functionalGroups: await cachedComponentGroups(requirement.presetSmiles),
       isGeneric: false,
     });
   }
@@ -153,23 +176,43 @@ async function getProductName(
 
 async function applyRule(
   rule: ReactionRule,
-  reactants: ReactionComponent[]
+  reactants: ReactionComponent[],
+  onIssue?: (message: string) => void,
 ): Promise<RuleExecution> {
   const reactantSmiles = reactants.map((component) => component.smiles);
   const hasGenericReactant = reactants.some((component) => component.isGeneric);
 
   switch (rule.transform.type) {
-    case "reactionSmarts":
+    case "reactionSmarts": {
+      const { smarts, maxProducts, forwardTemplates, carbocationRearrangement } = rule.transform;
+      const run = (inputs: string[]) =>
+        forwardTemplates?.length
+          ? runForwardTemplates(inputs, forwardTemplates, smarts, maxProducts, onIssue)
+          : runReactionSmarts(inputs, smarts, maxProducts, onIssue);
+      const products = await run(reactantSmiles);
+      if (carbocationRearrangement) {
+        // Each reactant that ionizes to a cation which can shift to a clearly more stable one is
+        // replaced by that shifted precursor; direct and rearranged products are all kept.
+        for (let index = 0; index < reactantSmiles.length; index += 1) {
+          const shifted = await enumerateCarbocationPrecursors(reactantSmiles[index], {
+            leavingGroup: carbocationRearrangement.leavingGroup,
+            includeUnrearranged: false,
+            maxShiftDepth: 2,
+            maxCandidates: 4,
+          });
+          for (const precursor of shifted) {
+            const inputs = reactantSmiles.map((smiles, position) => (position === index ? precursor.smiles : smiles));
+            for (const product of await run(inputs)) if (!products.includes(product)) products.push(product);
+          }
+        }
+      }
       return {
-        products: await runReactionSmarts(
-          reactantSmiles,
-          rule.transform.smarts,
-          rule.transform.maxProducts
-        ),
+        products,
         productStatus: hasGenericReactant
           ? "generic"
           : rule.productStatus ?? "computed",
       };
+    }
 
     case "customHandler": {
       // Custom handlers receive the ordered structural reactants. Most handlers
@@ -280,7 +323,9 @@ async function createExecutedPathways(
   reactants: ReactionComponent[],
   options: ReactionPredictionOptions = {},
 ): Promise<ReactionPathway[]> {
-  const execution = await applyRule(rule, reactants);
+  const execution = await applyRule(rule, reactants, (message) =>
+    recordIssue(options, "smarts-execution", message, rule.id),
+  );
   const base = createPathwayBase(rule);
   const reactantSmiles = reactants.map((component) => component.smiles).join(".");
   const reactantLabel = options.planning
@@ -402,6 +447,7 @@ async function createExecutedPathways(
       rule,
       reactants[0]?.smiles ?? reactantSmiles,
       product.smiles,
+      reactantComponents,
     );
 
     pathways.push({
@@ -526,6 +572,16 @@ export async function predictReactionPathwaysFromRules(
 
   if (components.length === 0 || searchCancelled(signal)) return [];
 
+  for (const component of components) {
+    if (component.analysisError) {
+      recordIssue(
+        options,
+        "component-analysis",
+        `Functional-group analysis failed for "${component.smiles}": ${component.analysisError}`,
+      );
+    }
+  }
+
   const multiRules = rules.filter((rule) => (rule.additionalReactants?.length ?? 0) > 0);
   const multiMatches: Array<{ rule: ReactionRule; reactants: ReactionComponent[] }> = [];
 
@@ -535,11 +591,14 @@ export async function predictReactionPathwaysFromRules(
       if (ruleIndex > 0 && ruleIndex % 12 === 0 && !(await yieldToBrowser(signal))) return [];
       const rule = multiRules[ruleIndex];
       try {
-        const assignments = await matchAllRuleReactants(rule, components);
+        const assignments = await matchAllRuleReactants(rule, components, (message) =>
+          recordIssue(options, "rule-matching", message, rule.id),
+        );
         for (const reactants of assignments) {
           multiMatches.push({ rule, reactants });
         }
       } catch (error) {
+        recordIssue(options, "rule-matching", errorMessage(error), rule.id);
         console.error(`[PocketChem:ReactionEngine] Skipping rule ${rule.id} after reactant-matching failure.`, error);
       }
     }
@@ -563,6 +622,7 @@ export async function predictReactionPathwaysFromRules(
         try {
           pathways.push(...await createExecutedPathways(match.rule, match.reactants, options));
         } catch (error) {
+          recordIssue(options, "rule-execution", errorMessage(error), match.rule.id);
           console.error(`[PocketChem:ReactionEngine] Skipping rule ${match.rule.id} after execution failure.`, error);
         }
       }
@@ -582,9 +642,11 @@ export async function predictReactionPathwaysFromRules(
           rules,
           component.smiles,
           component.functionalGroups,
+          (message) => recordIssue(options, "rule-matching", message),
         ),
       );
     } catch (error) {
+      recordIssue(options, "rule-matching", errorMessage(error));
       console.error("[PocketChem:ReactionEngine] Could not match rules for one reactant component; continuing with the remaining components.", {
         smiles: component.smiles,
         error,
@@ -634,6 +696,7 @@ export async function predictReactionPathwaysFromRules(
     try {
       pathways.push(...await createExecutedPathways(match.rule, match.reactants, options));
     } catch (error) {
+      recordIssue(options, "rule-execution", errorMessage(error), match.rule.id);
       console.error(`[PocketChem:ReactionEngine] Skipping rule ${match.rule.id} after execution failure.`, error);
     }
   }

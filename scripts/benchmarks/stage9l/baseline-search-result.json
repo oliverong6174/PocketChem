@@ -1,0 +1,26 @@
+{
+  "checkpoint": "9ab60709f4154dbffd8bcc8adad8dd04f8170f94",
+  "purpose": "one starting-engine regression diagnostic; no frozen evaluation",
+  "elapsedMs": 45142.8668,
+  "deadlineMs": 45000,
+  "aborted": true,
+  "routes": 0,
+  "restoredSourceFiles": [
+    "src/components/SpectroscopyPage.tsx",
+    "src/utils/persistence/multicatalyticWorkspace.ts",
+    "src/utils/persistence/reactionsWorkspace.ts",
+    "src/utils/persistence/spectroscopyWorkspace.ts",
+    "src/utils/persistence/synthesisWorkspace.ts",
+    "src/utils/reactions/engine/productMixtures.ts",
+    "src/utils/reactions/engine/routeQuality.ts",
+    "src/utils/reactions/engine/stereochemistry.ts",
+    "src/utils/reactions/families/alcohols.ts",
+    "src/utils/reactions/families/alkenes.ts",
+    "src/utils/reactions/families/amines.ts",
+    "src/utils/reactions/reactionTypes.ts",
+    "src/utils/spectroscopy/massSpec.ts",
+    "src/utils/spectroscopy/massSpec/fragmentationEngine.ts",
+    "src/utils/spectroscopy/massSpec/peakNormalization.ts",
+    "src/utils/spectroscopy/types.ts"
+  ]
+}

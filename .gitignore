@@ -32,3 +32,16 @@ data/chebi-flat/
 
 # Large uncompressed generated database
 public/data/chemical-names.index.json
+
+# Optional locally built pKa index (IUPAC dataset, CC BY-NC 4.0): never commit or redistribute commercially
+public/data/pka-reference.index.json
+
+# Third-party reference material: optional local benchmark inputs, never committed.
+# See scripts/benchmarks/stage29b/history-rewrite/MANIFEST.md
+scripts/benchmarks/stage9f/snapshots/
+scripts/benchmarks/stage9h/snapshots/
+scripts/benchmarks/stage9i/ms-dev/snapshots/
+scripts/benchmarks/stage9j/ms-dev-b/snapshots/
+scripts/benchmarks/stage9k/references/
+scripts/benchmarks/stage9k/audit/*.pdf
+scripts/benchmarks/stage9k/audit/*.png

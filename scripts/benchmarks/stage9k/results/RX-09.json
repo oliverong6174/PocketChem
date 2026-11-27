@@ -1,0 +1,1372 @@
+{
+  "id": "RX-09",
+  "startedUTC": "2026-11-06T18:22:34.343Z",
+  "calls": [
+    "predictReactionPathways"
+  ],
+  "input": "CCC#CCCCC",
+  "pathways": [
+    {
+      "ruleId": "alkyne-hydrogenation",
+      "family": "alkynes",
+      "reactionType": "reduction",
+      "title": "Complete Hydrogenation",
+      "reagentLabel": "Excess H₂, Pt; or Excess H₂, Pd/C",
+      "reagentNote": "Full catalytic reduction",
+      "shortExplanation": "Excess hydrogen over a metal catalyst reduces both pi bonds of an alkyne to give an alkane.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Catalytic hydrogenation",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hydrogenation",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCCCCC",
+      "productLabel": "octane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-complete-deuteration",
+      "family": "alkynes",
+      "reactionType": "reduction",
+      "title": "Complete Catalytic Deuteration",
+      "reagentLabel": "Excess D₂, Pt; or Excess D₂, Pd/C",
+      "reagentNote": "Full reduction with deuterium",
+      "shortExplanation": "Excess D₂ reduces both pi bonds. Each alkyne carbon receives two explicit deuterium atoms while any hydrogen already present on a terminal alkyne is retained.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Catalytic deuteration",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "syn-addition",
+          "relativeRelationship": "syn",
+          "stereospecific": true
+        },
+        "mixture": "possible",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-complete-deuteration",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "[2H]C([2H])(CC)C([2H])([2H])CCCC",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-lindlar-reduction-internal",
+      "family": "alkynes",
+      "reactionType": "reduction",
+      "title": "Lindlar Reduction (Syn)",
+      "reagentLabel": "H₂, Lindlar catalyst",
+      "reagentNote": "Syn addition; cis/Z alkene",
+      "shortExplanation": "Lindlar catalyst adds hydrogen syn and stops at the alkene. An internal alkyne therefore gives the cis/Z alkene.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Catalytic hydrogenation",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Syn addition",
+        "Z/cis alkene"
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "z-preferred",
+          "stereospecific": true
+        },
+        "mixture": "single",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-lindlar-reduction-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CC/C=C\\CCCC",
+      "productLabel": "(Z)-oct-3-ene",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-lindlar-deuteration-internal",
+      "family": "alkynes",
+      "reactionType": "reduction",
+      "title": "Lindlar Deuteration (Syn)",
+      "reagentLabel": "D₂, Lindlar catalyst",
+      "reagentNote": "Syn addition of D₂; cis/Z alkene",
+      "shortExplanation": "D₂ on Lindlar catalyst adds one explicit D to each alkyne carbon from the same face and stops at the cis/Z alkene.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Catalytic deuteration",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "D and D add syn",
+        "Z/cis alkene"
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "z-preferred",
+          "stereospecific": true
+        },
+        "mixture": "single",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-lindlar-deuteration-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "[2H]/C(CC)=C(\\[2H])CCCC",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-dissolving-metal-reduction-internal",
+      "family": "alkynes",
+      "reactionType": "reduction",
+      "title": "Dissolving-Metal Reduction (Anti)",
+      "reagentLabel": "Na, NH₃(l); or Li, NH₃(l)",
+      "reagentNote": "Anti addition; trans/E alkene",
+      "shortExplanation": "Single-electron transfer and protonation occur twice from opposite faces, giving anti addition and the trans/E alkene from an internal alkyne.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Dissolving-metal reduction",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Anti addition",
+        "E/trans alkene"
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "e-preferred",
+          "stereospecific": true
+        },
+        "mixture": "single",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-dissolving-metal-reduction-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CC/C=C/CCCC",
+      "productLabel": "(E)-oct-3-ene",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-dissolving-metal-deuteration-internal",
+      "family": "alkynes",
+      "reactionType": "reduction",
+      "title": "Dissolving-Metal Deuteration (Anti)",
+      "reagentLabel": "Na, ND₃(l); or Li, ND₃(l)",
+      "reagentNote": "Anti addition of D; trans/E alkene",
+      "shortExplanation": "Using ND₃ as the deuterium source gives anti delivery of one D to each alkyne carbon and the trans/E alkene.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Dissolving-metal reduction",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "D and D add anti",
+        "E/trans alkene"
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "e-preferred",
+          "stereospecific": true
+        },
+        "mixture": "single",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-dissolving-metal-deuteration-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "[2H]/C(CC)=C(/[2H])CCCC",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hbr-addition-one-equivalent-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Hydrobromination (1 equiv)",
+      "reagentLabel": "1 equiv HBr",
+      "reagentNote": "Addition to an internal alkyne",
+      "shortExplanation": "One equivalent of HBr converts an internal alkyne into a vinyl halide. Unsymmetrical internal alkynes can give constitutional and E/Z mixtures.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "E/Z mixtures may form"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one constitutional vinyl-halide product."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-one-equivalent-internal",
+          "variable": "X",
+          "value": "Br"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hbr-addition-one-equivalent-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC=C(Br)CC",
+      "productLabel": "3-bromooct-3-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hbr-addition-one-equivalent-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Hydrobromination (1 equiv)",
+      "reagentLabel": "1 equiv HBr",
+      "reagentNote": "Addition to an internal alkyne",
+      "shortExplanation": "One equivalent of HBr converts an internal alkyne into a vinyl halide. Unsymmetrical internal alkynes can give constitutional and E/Z mixtures.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "E/Z mixtures may form"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one constitutional vinyl-halide product."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-one-equivalent-internal",
+          "variable": "X",
+          "value": "Br"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hbr-addition-one-equivalent-internal--2",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCC=C(Br)CCCC",
+      "productLabel": "4-bromooct-3-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hbr-addition-excess-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Excess HBr",
+      "reagentLabel": "Excess HBr",
+      "reagentNote": "Addition across both pi bonds",
+      "shortExplanation": "Excess HBr adds twice to an internal alkyne to form a geminal dihalide. Unsymmetrical alkynes can give regioisomeric products.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Geminal dihalide"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one geminal-dihalide regioisomer."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-excess-internal",
+          "variable": "X",
+          "value": "Br"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hbr-addition-excess-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCCC(Br)(Br)CC",
+      "productLabel": "3,3-dibromooctane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hbr-addition-excess-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Excess HBr",
+      "reagentLabel": "Excess HBr",
+      "reagentNote": "Addition across both pi bonds",
+      "shortExplanation": "Excess HBr adds twice to an internal alkyne to form a geminal dihalide. Unsymmetrical alkynes can give regioisomeric products.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Geminal dihalide"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one geminal-dihalide regioisomer."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-excess-internal",
+          "variable": "X",
+          "value": "Br"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hbr-addition-excess-internal--2",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC(Br)(Br)CCC",
+      "productLabel": "4,4-dibromooctane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hcl-addition-one-equivalent-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Hydrochlorination (1 equiv)",
+      "reagentLabel": "1 equiv HCl",
+      "reagentNote": "Addition to an internal alkyne",
+      "shortExplanation": "One equivalent of HCl converts an internal alkyne into a vinyl halide. Unsymmetrical internal alkynes can give constitutional and E/Z mixtures.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "E/Z mixtures may form"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one constitutional vinyl-halide product."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-one-equivalent-internal",
+          "variable": "X",
+          "value": "Cl"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hcl-addition-one-equivalent-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC=C(Cl)CC",
+      "productLabel": "3-chlorooct-3-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hcl-addition-one-equivalent-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Hydrochlorination (1 equiv)",
+      "reagentLabel": "1 equiv HCl",
+      "reagentNote": "Addition to an internal alkyne",
+      "shortExplanation": "One equivalent of HCl converts an internal alkyne into a vinyl halide. Unsymmetrical internal alkynes can give constitutional and E/Z mixtures.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "E/Z mixtures may form"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one constitutional vinyl-halide product."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-one-equivalent-internal",
+          "variable": "X",
+          "value": "Cl"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hcl-addition-one-equivalent-internal--2",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCC=C(Cl)CCCC",
+      "productLabel": "4-chlorooct-3-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hcl-addition-excess-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Excess HCl",
+      "reagentLabel": "Excess HCl",
+      "reagentNote": "Addition across both pi bonds",
+      "shortExplanation": "Excess HCl adds twice to an internal alkyne to form a geminal dihalide. Unsymmetrical alkynes can give regioisomeric products.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Geminal dihalide"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one geminal-dihalide regioisomer."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-excess-internal",
+          "variable": "X",
+          "value": "Cl"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hcl-addition-excess-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCCC(Cl)(Cl)CC",
+      "productLabel": "3,3-dichlorooctane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hcl-addition-excess-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Excess HCl",
+      "reagentLabel": "Excess HCl",
+      "reagentNote": "Addition across both pi bonds",
+      "shortExplanation": "Excess HCl adds twice to an internal alkyne to form a geminal dihalide. Unsymmetrical alkynes can give regioisomeric products.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Geminal dihalide"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one geminal-dihalide regioisomer."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-excess-internal",
+          "variable": "X",
+          "value": "Cl"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hcl-addition-excess-internal--2",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC(Cl)(Cl)CCC",
+      "productLabel": "4,4-dichlorooctane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hi-addition-one-equivalent-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Hydroiodination (1 equiv)",
+      "reagentLabel": "1 equiv HI",
+      "reagentNote": "Addition to an internal alkyne",
+      "shortExplanation": "One equivalent of HI converts an internal alkyne into a vinyl halide. Unsymmetrical internal alkynes can give constitutional and E/Z mixtures.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "E/Z mixtures may form"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one constitutional vinyl-halide product."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-one-equivalent-internal",
+          "variable": "X",
+          "value": "I"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hi-addition-one-equivalent-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC=C(I)CC",
+      "productLabel": "3-iodooct-3-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hi-addition-one-equivalent-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Hydroiodination (1 equiv)",
+      "reagentLabel": "1 equiv HI",
+      "reagentNote": "Addition to an internal alkyne",
+      "shortExplanation": "One equivalent of HI converts an internal alkyne into a vinyl halide. Unsymmetrical internal alkynes can give constitutional and E/Z mixtures.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "E/Z mixtures may form"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one constitutional vinyl-halide product."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-one-equivalent-internal",
+          "variable": "X",
+          "value": "I"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hi-addition-one-equivalent-internal--2",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCC=C(I)CCCC",
+      "productLabel": "4-iodooct-3-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hi-addition-excess-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Excess HI",
+      "reagentLabel": "Excess HI",
+      "reagentNote": "Addition across both pi bonds",
+      "shortExplanation": "Excess HI adds twice to an internal alkyne to form a geminal dihalide. Unsymmetrical alkynes can give regioisomeric products.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Geminal dihalide"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one geminal-dihalide regioisomer."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-excess-internal",
+          "variable": "X",
+          "value": "I"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hi-addition-excess-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCCC(I)(I)CC",
+      "productLabel": "3,3-diiodooctane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hi-addition-excess-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Hydrohalogenation: Excess HI",
+      "reagentLabel": "Excess HI",
+      "reagentNote": "Addition across both pi bonds",
+      "shortExplanation": "Excess HI adds twice to an internal alkyne to form a geminal dihalide. Unsymmetrical alkynes can give regioisomeric products.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Geminal dihalide"
+      ],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes can give more than one geminal-dihalide regioisomer."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-hx-excess-internal",
+          "variable": "X",
+          "value": "I"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hi-addition-excess-internal--2",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC(I)(I)CCC",
+      "productLabel": "4,4-diiodooctane",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-bromination-one-equivalent",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Bromination: One Equivalent",
+      "reagentLabel": "1 equiv Br₂",
+      "reagentNote": "Predominantly anti addition",
+      "shortExplanation": "One equivalent of bromine adds across one pi bond to form a vicinal dibromoalkene, commonly favoring trans geometry.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Predominantly anti addition"
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "anti-addition",
+          "relativeRelationship": "anti",
+          "stereoselective": true
+        },
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "General E/Z assignment for every substituted dihaloalkene is not yet enumerated."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-x2-one-equivalent",
+          "variable": "X",
+          "value": "Br"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-bromination-one-equivalent",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC(Br)=C(Br)CC",
+      "productLabel": "3,4-dibromooct-3-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-chlorination-one-equivalent",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Chlorination: One Equivalent",
+      "reagentLabel": "1 equiv Cl₂",
+      "reagentNote": "Predominantly anti addition",
+      "shortExplanation": "One equivalent of chlorine adds across one pi bond to form a vicinal dichloroalkene, commonly favoring trans geometry.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Predominantly anti addition"
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "anti-addition",
+          "relativeRelationship": "anti",
+          "stereoselective": true
+        },
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "General E/Z assignment for every substituted dihaloalkene is not yet enumerated."
+      ],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-x2-one-equivalent",
+          "variable": "X",
+          "value": "Cl"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-chlorination-one-equivalent",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC(Cl)=C(Cl)CC",
+      "productLabel": "3,4-dichlorooct-3-ene",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-bromination-excess",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Bromination: Excess",
+      "reagentLabel": "Excess Br₂",
+      "reagentNote": "Addition across both pi bonds",
+      "shortExplanation": "Two equivalents of bromine add across the triple bond to form a tetrabromide.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-x2-excess",
+          "variable": "X",
+          "value": "Br"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-bromination-excess",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC(Br)(Br)C(Br)(Br)CC",
+      "productLabel": "3,3,4,4-tetrabromooctane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-chlorination-excess",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Chlorination: Excess",
+      "reagentLabel": "Excess Cl₂",
+      "reagentNote": "Addition across both pi bonds",
+      "shortExplanation": "Two equivalents of chlorine add across the triple bond to form a tetrachloride.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Electrophilic addition",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": {
+        "renderer": "generic-halogen",
+        "series": {
+          "id": "alkyne-x2-excess",
+          "variable": "X",
+          "value": "Cl"
+        }
+      },
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-chlorination-excess",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC(Cl)(Cl)C(Cl)(Cl)CC",
+      "productLabel": "3,3,4,4-tetrachlorooctane",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-mercury-hydration-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Mercury(II)-Catalyzed Hydration: Internal Alkyne",
+      "reagentLabel": "HgSO₄, H₂SO₄, H₂O",
+      "reagentNote": "Hg²⁺-catalyzed hydration, then tautomerization",
+      "shortExplanation": "Mercury(II)-catalyzed hydration of an internal alkyne gives an enol that tautomerizes to a ketone. Unsymmetrical alkynes can produce constitutional isomers.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Mercury(II)-catalyzed hydration and keto-enol tautomerization",
+      "reactionClass": "mercury(II)-catalyzed hydration",
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes may give a ketone mixture."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-mercury-hydration-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCCC(=O)CC",
+      "productLabel": "octan-3-one",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-mercury-hydration-internal",
+      "family": "alkynes",
+      "reactionType": "addition",
+      "title": "Mercury(II)-Catalyzed Hydration: Internal Alkyne",
+      "reagentLabel": "HgSO₄, H₂SO₄, H₂O",
+      "reagentNote": "Hg²⁺-catalyzed hydration, then tautomerization",
+      "shortExplanation": "Mercury(II)-catalyzed hydration of an internal alkyne gives an enol that tautomerizes to a ketone. Unsymmetrical alkynes can produce constitutional isomers.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Mercury(II)-catalyzed hydration and keto-enol tautomerization",
+      "reactionClass": "mercury(II)-catalyzed hydration",
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "Unsymmetrical internal alkynes may give a ketone mixture."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-mercury-hydration-internal--2",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC(=O)CCC",
+      "productLabel": "octan-4-one",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hydroboration-oxidation-internal",
+      "family": "alkynes",
+      "reactionType": "oxidation",
+      "title": "Hydroboration–Oxidation of an Internal Alkyne",
+      "reagentLabel": "1) (Sia)₂BH  2) H₂O₂, OH⁻ OR 1) 9-BBN  2) H₂O₂, OH⁻ OR 1) BH₃·THF  2) H₂O₂, OH⁻",
+      "reagentNote": "Hydration followed by tautomerization",
+      "shortExplanation": "Internal alkynes form ketones after hydroboration, oxidation, and tautomerization. Unsymmetrical substrates can give regioisomer mixtures; bulky boranes improve steric selectivity.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Hydroboration, oxidation, and tautomerization",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "For unsymmetrical internal alkynes, PocketChem shows accessible ketone constitutions but does not yet quantitatively rank the sterically preferred regioisomer for each borane."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hydroboration-oxidation-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCCC(=O)CC",
+      "productLabel": "octan-3-one",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hydroboration-oxidation-internal",
+      "family": "alkynes",
+      "reactionType": "oxidation",
+      "title": "Hydroboration–Oxidation of an Internal Alkyne",
+      "reagentLabel": "1) (Sia)₂BH  2) H₂O₂, OH⁻ OR 1) 9-BBN  2) H₂O₂, OH⁻ OR 1) BH₃·THF  2) H₂O₂, OH⁻",
+      "reagentNote": "Hydration followed by tautomerization",
+      "shortExplanation": "Internal alkynes form ketones after hydroboration, oxidation, and tautomerization. Unsymmetrical substrates can give regioisomer mixtures; bulky boranes improve steric selectivity.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Hydroboration, oxidation, and tautomerization",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": {
+        "mixture": "possible"
+      },
+      "selectivityAssessment": null,
+      "limitations": [
+        "For unsymmetrical internal alkynes, PocketChem shows accessible ketone constitutions but does not yet quantitatively rank the sterically preferred regioisomer for each borane."
+      ],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hydroboration-oxidation-internal--2",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC(=O)CCC",
+      "productLabel": "octan-4-one",
+      "productStatus": "representative",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-cold-kmno4-oxidation",
+      "family": "alkynes",
+      "reactionType": "oxidation",
+      "title": "Cold Permanganate Oxidation of an Internal Alkyne",
+      "reagentLabel": "KMnO₄, H₂O, cold/dilute",
+      "reagentNote": "Mild oxidation",
+      "shortExplanation": "Cold, dilute permanganate oxidizes an internal alkyne to a vicinal diketone without the vigorous cleavage associated with hot permanganate.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Mild permanganate oxidation",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-cold-kmno4-oxidation",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCCCC(=O)C(=O)CC",
+      "productLabel": "octane-3,4-dione",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-ozonolysis-cleavage",
+      "family": "alkynes",
+      "reactionType": "cleavage",
+      "title": "Alkyne Ozonolysis",
+      "reagentLabel": "1) O₃  2) H₂O",
+      "reagentNote": "Oxidative cleavage",
+      "shortExplanation": "Ozonolysis cleaves an alkyne oxidatively. Internal alkyne carbons become carboxylic acids; a terminal alkyne carbon is ultimately oxidized to CO₂.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Oxidative cleavage",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-ozonolysis-cleavage",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCC(=O)O.CCCCC(=O)O",
+      "productLabel": "propanoic acid (propionic acid) + pentanoic acid (valeric acid)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-hot-kmno4-cleavage",
+      "family": "alkynes",
+      "reactionType": "cleavage",
+      "title": "Hot Permanganate Oxidative Cleavage",
+      "reagentLabel": "1) KMnO₄, OH⁻, heat  2) H₃O⁺",
+      "reagentNote": "Strong oxidative cleavage",
+      "shortExplanation": "Hot permanganate cleaves an alkyne. Internal alkyne carbons form carboxylic acids, while a terminal alkyne carbon is oxidized to CO₂.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Strong oxidative cleavage",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [],
+      "selectivityProfile": null,
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-hot-kmno4-cleavage",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CCC(=O)O.CCCCC(=O)O",
+      "productLabel": "propanoic acid (propionic acid) + pentanoic acid (valeric acid)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "selected": [
+    {
+      "ruleId": "alkyne-dissolving-metal-reduction-internal",
+      "family": "alkynes",
+      "reactionType": "reduction",
+      "title": "Dissolving-Metal Reduction (Anti)",
+      "reagentLabel": "Na, NH₃(l); or Li, NH₃(l)",
+      "reagentNote": "Anti addition; trans/E alkene",
+      "shortExplanation": "Single-electron transfer and protonation occur twice from opposite faces, giving anti addition and the trans/E alkene from an internal alkyne.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Dissolving-metal reduction",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "Anti addition",
+        "E/trans alkene"
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "e-preferred",
+          "stereospecific": true
+        },
+        "mixture": "single",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-dissolving-metal-reduction-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "CC/C=C/CCCC",
+      "productLabel": "(E)-oct-3-ene",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    },
+    {
+      "ruleId": "alkyne-dissolving-metal-deuteration-internal",
+      "family": "alkynes",
+      "reactionType": "reduction",
+      "title": "Dissolving-Metal Deuteration (Anti)",
+      "reagentLabel": "Na, ND₃(l); or Li, ND₃(l)",
+      "reagentNote": "Anti addition of D; trans/E alkene",
+      "shortExplanation": "Using ND₃ as the deuterium source gives anti delivery of one D to each alkyne carbon and the trans/E alkene.",
+      "course": "ochem-1",
+      "chapter": "Alkynes",
+      "mechanism": "Dissolving-metal reduction",
+      "reactionClass": null,
+      "purpose": null,
+      "selectivity": [
+        "D and D add anti",
+        "E/trans alkene"
+      ],
+      "selectivityProfile": {
+        "stereochemistry": {
+          "mode": "e-preferred",
+          "stereospecific": true
+        },
+        "mixture": "single",
+        "allowsRearrangement": false
+      },
+      "selectivityAssessment": null,
+      "limitations": [],
+      "display": null,
+      "missingReactants": [],
+      "competition": null,
+      "planningCost": 100,
+      "reactantRequirements": [],
+      "id": "alkyne-dissolving-metal-deuteration-internal",
+      "reactantSmiles": "CCC#CCCCC",
+      "reactantLabel": "oct-3-yne",
+      "productSmiles": "[2H]/C(CC)=C(/[2H])CCCC",
+      "productLabel": "Name not available (unsupported structure)",
+      "productStatus": "computed",
+      "reactantComponents": [
+        "CCC#CCCCC"
+      ],
+      "hasGenericReactant": false,
+      "productMixture": null
+    }
+  ],
+  "products": [
+    {
+      "smiles": "CC/C=C/CCCC",
+      "level": null,
+      "ruleId": "alkyne-dissolving-metal-reduction-internal",
+      "mixtureKind": null
+    },
+    {
+      "smiles": "[2H]/C(CC)=C(/[2H])CCCC",
+      "level": null,
+      "ruleId": "alkyne-dissolving-metal-deuteration-internal",
+      "mixtureKind": null
+    }
+  ],
+  "interfaceLimitation": "Conditions are represented by fixed pathway-family filters and explicit nucleophile/base molecules; engine listing API accepts no solvent/temperature field. No target-dependent fallback.",
+  "finishedUTC": "2026-11-06T18:22:36.370Z"
+}

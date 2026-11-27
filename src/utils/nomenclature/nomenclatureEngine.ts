@@ -1,4 +1,5 @@
 import { getRDKit } from "../rdkit";
+import { assessNameConsistency, assessNamingSupport } from "./nameBuilder/namingSupport";
 import type { FunctionalGroupResult } from "../functionalGroups/types";
 
 import type {
@@ -33,6 +34,7 @@ import {
 } from "./displayName";
 
 import { getCommonNameMatch } from "./nameBuilder/commonNames";
+import { getSimpleSaltName } from "./nameBuilder/saltNames";
 import { getHeterocycleNomenclature } from "./nameBuilder/heterocycleNomenclature";
 
 import {
@@ -110,6 +112,7 @@ export async function analyzeNomenclatureAndProperties(
     );
 
     return {
+      structureKey: canonicalSmiles?.split(".").sort().join("."),
       nomenclature: estimateNomenclature(
         RDKit,
         mol as unknown as { get_substruct_matches: (query: { delete?: () => void }) => string },
@@ -138,7 +141,48 @@ function getPrefixes(
 }
 
 
-function estimateNomenclature(
+type NomenclatureArgs = Parameters<typeof estimateNomenclatureCore>;
+
+/**
+ * Runs the builders, then withholds a name the builders are known to get wrong for the structure (see assessNamingSupport) instead of
+ * presenting it with the builder's own confidence.
+ */
+function estimateNomenclature(...args: NomenclatureArgs): NomenclatureResult {
+  const result = estimateNomenclatureCore(...args);
+  const [RDKit, mol, parsedMol, , , canonicalSmiles] = args;
+  const salt = getSimpleSaltName(canonicalSmiles, result);
+  if (salt) {
+    return {
+      ...result,
+      estimatedName: salt.name,
+      commonName: salt.commonName,
+      displayName: formatDisplayName(salt.name, salt.commonName),
+      namingStatus: "functional-class",
+      namingConfidence: "Medium",
+      parentChain: null,
+      parentChainLength: 0,
+      explanation: "Named as a salt: cation first, then anion (IUPAC 2013 P-73). Only monatomic or ammonium cations with monatomic anions, or with one organic anion named by the ordinary builders, are handled.",
+      limitations: [...result.limitations, "Ionic compounds are named from their written ions; solvates, hydrates and lattice stoichiometry are not described."],
+    };
+  }
+  const reason =
+    assessNamingSupport(RDKit, mol, parsedMol, canonicalSmiles, result) ?? assessNameConsistency(RDKit, mol, parsedMol, result);
+  if (!reason) return result;
+  return {
+    ...result,
+    estimatedName: "Name not available (unsupported structure)",
+    commonName: null,
+    displayName: "Name not available (unsupported structure)",
+    namingConfidence: "Low",
+    namingStatus: "unsupported",
+    parentChain: null,
+    parentChainLength: 0,
+    explanation: `PocketChem withheld a name because ${reason}. An automatic attempt gave "${result.displayName}", which is not shown as an answer.`,
+    limitations: [...result.limitations, reason],
+  };
+}
+
+function estimateNomenclatureCore(
   RDKit: { get_qmol: (smarts: string) => { delete?: () => void } | null },
   mol: {
     get_substruct_matches: (query: { delete?: () => void }) => string;
